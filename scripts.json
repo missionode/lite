@@ -1,0 +1,83 @@
+{
+  "intro": {
+    "gratitude_en": "Before we begin, take a moment to express gratitude to your feet. Thank you feet, for holding us on the ground and protecting us.",
+    "gratitude_ml": "നമുക്ക് തുടങ്ങുന്നതിന് മുമ്പ്, നമ്മുടെ പാദങ്ങളോട് നന്ദി പറയാം. ഈ ഭൂമിയിൽ നമ്മെ ഉറപ്പിച്ചു നിർത്തുന്നതിനും സംരക്ഷിക്കുന്നതിനും എന്റെ പാദങ്ങൾക്ക് നന്ദി."
+  },
+  "root": {
+    "name": "Root Chakra (Muladhara)",
+    "mantra": "LAM",
+    "frequency": 396,
+    "color": "#FF0000",
+    "symbol": "symbols/root.png",
+    "en": "Bring your awareness to the base of your spine. This chakra is related to your sense of security and survival. Feel grounded like a mountain. The mantra is LAM.",
+    "ml": "നിങ്ങളുടെ നട്ടെല്ലിന്റെ താഴത്തെ ഭാഗത്തേക്ക് ശ്രദ്ധ കൊണ്ടുവരിക. ഇത് നിങ്ങളുടെ സുരക്ഷിതത്വബോധവുമായി ബന്ധപ്പെട്ടിരിക്കുന്നു. പർവ്വതത്തെപ്പോലെ ശാന്തമായി നിലകൊള്ളുക. ഇതിന്റെ മന്ത്രം ലം (LAM) എന്നാണ്.",
+    "affirmation_en": "You are now safe, grounded, and secure. Your foundation is strong.",
+    "affirmation_ml": "നിങ്ങൾ ഇപ്പോൾ സുരക്ഷിതനും സുസ്ഥിരനുമാണ്. നിങ്ങളുടെ അടിത്തറ ശക്തമാണ്."
+  },
+  "sacral": {
+    "name": "Sacral Chakra (Svadhisthana)",
+    "mantra": "VAM",
+    "frequency": 417,
+    "color": "#FF7F00",
+    "symbol": "symbols/sacral.png",
+    "en": "Focus on the lower abdomen. This chakra governs your creativity and emotions. Feel the flow like water. The mantra is VAM.",
+    "ml": "വയറിന്റെ താഴത്തെ ഭാഗത്തേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് നിങ്ങളുടെ സർഗ്ഗാത്മകതയെയും വികാരങ്ങളെയും നിയന്ത്രിക്കുന്നു. ജലം പോലെ ഒഴുകുക. ഇതിന്റെ മന്ത്രം വം (VAM) എന്നാണ്.",
+    "affirmation_en": "You are now creative, emotional, and balanced. You flow with life.",
+    "affirmation_ml": "നിങ്ങൾ ഇപ്പോൾ സർഗ്ഗാത്മകതയും വികാരങ്ങളും സമതുലിതമായവനാണ്. നിങ്ങൾ ജീവിതത്തോടൊപ്പം ഒഴുകുന്നു."
+  },
+  "solar": {
+    "name": "Solar Plexus (Manipura)",
+    "mantra": "RAM",
+    "frequency": 528,
+    "color": "#FFFF00",
+    "symbol": "symbols/solar.png",
+    "en": "Focus on the area above your navel. This is your center of power and confidence. Feel the heat like fire. The mantra is RAM.",
+    "ml": "പൊക്കിളിന് മുകൾ ഭാഗത്തേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് നിങ്ങളുടെ ശക്തിയുടെയും ആത്മവിശ്വാസത്തിന്റെയും കേന്ദ്രമാണ്. അഗ്നിയെപ്പോലെ ജ്വലിക്കുക. ഇതിന്റെ മന്ത്രം രം (RAM) എന്നാണ്.",
+    "affirmation_en": "You are now powerful, confident, and worthy. Your inner fire burns bright.",
+    "affirmation_ml": "നിങ്ങൾ ഇപ്പോൾ ശക്തനും ആത്മവിശ്വാസമുള്ളവനും യോഗ്യനുമാണ്. നിങ്ങളുടെ ഉള്ളിലെ അഗ്നി തെളിഞ്ഞു കത്തുന്നു."
+  },
+  "heart": {
+    "name": "Heart Chakra (Anahata)",
+    "mantra": "YAM",
+    "frequency": 639,
+    "color": "#00FF00",
+    "symbol": "symbols/heart.png",
+    "en": "Focus on the center of your chest. This is the center of love and compassion. Feel as light as air. The mantra is YAM.",
+    "ml": "നെഞ്ചിന്റെ മധ്യഭാഗത്തേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് സ്നേഹത്തിന്റെയും അനുകമ്പയുടെയും കേന്ദ്രമാണ്. വായുവിനെപ്പോലെ ലഘുവായി ഇരിക്കുക. ഇതിന്റെ മന്ത്രം യം (YAM) എന്നാണ്.",
+    "affirmation_en": "You are now loved and you are love. Your heart is open and peaceful.",
+    "affirmation_ml": "നിങ്ങൾ ഇപ്പോൾ സ്നേഹിക്കപ്പെടുന്നു, നിങ്ങൾ സ്നേഹമാണ്. നിങ്ങളുടെ ഹൃദയം തുറന്നതും സമാധാനപൂർണ്ണവുമാണ്."
+  },
+  "throat": {
+    "name": "Throat Chakra (Vishuddha)",
+    "mantra": "HAM",
+    "frequency": 741,
+    "color": "#0000FF",
+    "symbol": "symbols/throat.png",
+    "en": "Focus on your throat. This is your center of communication and truth. Feel the vastness of space. The mantra is HAM.",
+    "ml": "തൊണ്ടയിലേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് ആശയവിനിമയത്തിന്റെയും സത്യത്തിന്റെയും കേന്ദ്രമാണ്. ആകാശം പോലെ വിശാലമായി ഇരിക്കുക. ഇതിന്റെ മന്ത്രം ഹം (HAM) എന്നാണ്.",
+    "affirmation_en": "You speak your truth with clarity and kindness. You are heard.",
+    "affirmation_ml": "നിങ്ങൾ നിങ്ങളുടെ സത്യം വ്യക്തതയോടും കരുണയോടും കൂടി സംസാരിക്കുന്നു. നിങ്ങൾ ശ്രദ്ധിക്കപ്പെടുന്നു."
+  },
+  "thirdeye": {
+    "name": "Third Eye (Ajna)",
+    "mantra": "OM",
+    "frequency": 852,
+    "color": "#4B0082",
+    "symbol": "symbols/thirdeye.png",
+    "en": "Focus on the space between your eyebrows. This is your center of intuition and wisdom. The mantra is OM.",
+    "ml": "പുരികങ്ങൾക്കിടയിലുള്ള ഭാഗത്തേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് നിങ്ങളുടെ ഉൾക്കാഴ്ചയുടെയും ജ്ഞാനത്തിന്റെയും കേന്ദ്രമാണ്. ഇതിന്റെ മന്ത്രം ഓം (OM) എന്നാണ്.",
+    "affirmation_en": "You trust your intuition. You see the path clearly with wisdom.",
+    "affirmation_ml": "നിങ്ങൾ നിങ്ങളുടെ ഉൾക്കാഴ്ചയെ വിശ്വസിക്കുന്നു. നിങ്ങൾ നിങ്ങളുടെ പാത ജ്ഞാനത്തോടെ വ്യക്തമായി കാണുന്നു."
+  },
+  "crown": {
+    "name": "Crown Chakra (Sahasrara)",
+    "mantra": "AUM",
+    "frequency": 963,
+    "color": "#8B00FF",
+    "symbol": "symbols/crown.png",
+    "en": "Focus on the top of your head. This is your connection to the divine consciousness. The mantra is AUM.",
+    "ml": "തലയുടെ മുകൾ ഭാഗത്തേക്ക് ശ്രദ്ധ കേന്ദ്രീകരിക്കുക. ഇത് പ്രപഞ്ചവുമായുള്ള നിങ്ങളുടെ ബന്ധമാണ്. ഇതിന്റെ മന്ത്രം ഔം (AUM) എന്നാണ്.",
+    "affirmation_en": "You are now connected to the divine consciousness. You are one with the universe.",
+    "affirmation_ml": "നിങ്ങൾ ഇപ്പോൾ പ്രപഞ്ച ചൈതന്യവുമായി ബന്ധിക്കപ്പെട്ടിരിക്കുന്നു. നിങ്ങൾ പ്രപഞ്ചവുമായി ഒന്നാണ്."
+  }
+}

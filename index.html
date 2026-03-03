@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chakra Meditation</title>
+    <!-- Google Fonts for Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="symbols/root.png">
+</head>
+<body>
+    <div id="app">
+        <!-- Background Aura & Particles -->
+        <div id="aura-bg"></div>
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- Configuration Screen -->
+        <section id="config-screen" class="screen">
+            <h1>Chakra Meditation</h1>
+            <p class="subtitle">Set your preferences for a guided experience</p>
+            
+            <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
+                Journeys: <span id="stat-journeys">0</span> | Total Time: <span id="stat-time">0</span> mins
+            </div>
+
+            <div class="config-group">
+                <label for="language-select">Language</label>
+                <select id="language-select">
+                    <option value="ml">Malayalam</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label for="voice-select">Narration Voice</label>
+                <select id="voice-select">
+                    <option value="">Detecting voices...</option>
+                </select>
+                <button id="test-voice" class="secondary-btn">Test Voice</button>
+            </div>
+
+            <div class="config-group" style="margin-top: 1rem;">
+                <label>Custom Journey</label>
+                <div id="chakra-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
+                    <label class="checkbox-label"><input type="checkbox" value="root" checked> Root</label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral" checked> Sacral</label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar" checked> Solar</label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart" checked> Heart</label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat" checked> Throat</label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye" checked> 3rd Eye</label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown" checked> Crown</label>
+                </div>
+            </div>
+
+            <button id="save-config" class="primary-btn">Start Meditation</button>
+        </section>
+
+        <!-- Lobby Screen -->
+        <section id="lobby-screen" class="screen hidden">
+            <h1 id="lobby-title">Meditation Room</h1>
+            <div class="time-selector">
+                <label for="time-per-chakra">Time per Chakra (minutes)</label>
+                <input type="range" id="time-per-chakra" min="1" max="7" value="5" step="0.5">
+                <span id="time-display">5.0 mins</span>
+            </div>
+            <button id="start-meditation" class="primary-btn">Begin Journey</button>
+            <button id="open-settings" class="link-btn">Settings</button>
+        </section>
+
+        <!-- Box Breathing Screen -->
+        <section id="breathing-screen" class="screen hidden">
+            <div id="breathing-tutorial" class="tutorial-overlay">
+                <h2 id="tutorial-title">Preparation</h2>
+                <p id="tutorial-text">Sit comfortably. We will start with a centering breath.</p>
+            </div>
+            <h1 id="breathing-instruction">Prepare</h1>
+            <div id="breathing-circle-container">
+                <div id="breathing-circle"></div>
+            </div>
+            <div id="breathing-timer">04</div>
+        </section>
+
+        <!-- Meditation Screen -->
+        <section id="meditation-screen" class="screen hidden">
+            <div id="timer-display" class="timer">00:00</div>
+            <div id="chakra-container">
+                <img id="chakra-symbol" src="" alt="Chakra Symbol">
+                <div id="glow-effect"></div>
+            </div>
+            <div id="mantra-display"></div>
+            <div id="narration-text"></div>
+            
+            <!-- Progress Journey Dots -->
+            <div id="progress-tracker">
+                <div class="dot" data-chakra="root"></div>
+                <div class="dot" data-chakra="sacral"></div>
+                <div class="dot" data-chakra="solar"></div>
+                <div class="dot" data-chakra="heart"></div>
+                <div class="dot" data-chakra="throat"></div>
+                <div class="dot" data-chakra="thirdeye"></div>
+                <div class="dot" data-chakra="crown"></div>
+            </div>
+
+            <div id="controls">
+                <button id="btn-mixer" class="icon-btn">🎚</button>
+                <button id="pause-meditation" class="icon-btn">II</button>
+                <button id="stop-meditation" class="icon-btn">✕</button>
+            </div>
+
+            <!-- In-Session Volume Mixer -->
+            <div id="volume-mixer" class="hidden">
+                <div class="mixer-row">
+                    <label>Voice</label>
+                    <input type="range" id="vol-voice" min="0" max="1" step="0.1" value="1.0">
+                </div>
+                <div class="mixer-row">
+                    <label>Drone</label>
+                    <input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.03">
+                </div>
+                <div class="mixer-row">
+                    <label>Bell</label>
+                    <input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5">
+                </div>
+                <button id="close-mixer" class="secondary-btn" style="margin-top:1rem;">Close</button>
+            </div>
+        </section>
+
+        <!-- Completion Modal -->
+        <div id="completion-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="completion-icon">🕉️</div>
+                <h2 id="completion-title">Journey Complete</h2>
+                <p id="completion-message">Meditation Completed. Stay Blessed.</p>
+                <button id="close-completion" class="primary-btn">Return to Room</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
