@@ -363,7 +363,6 @@ class MeditationController {
                 instruction.textContent = step.text;
                 circle.style.transform = `scale(${step.scale})`;
                 
-                // Low voice guidance for the step
                 this.narrateSoft(step.text);
 
                 for (let s = 4; s > 0; s--) {
@@ -373,6 +372,17 @@ class MeditationController {
                     await new Promise(r => setTimeout(r, 1000));
                 }
             }
+        }
+
+        // Intimate Completion
+        if (this.isMeditationActive) {
+            instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
+            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ." : "Breathing exercise is complete. Stay still for a moment.";
+            await this.narrate(completeText);
+            
+            // 5 second interval before Chakra Journey starts
+            instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            await new Promise(r => setTimeout(r, 5000));
         }
     }
 
