@@ -217,32 +217,57 @@ class VisualEngine {
     }
     emitParticles() {
         if (!this.isEmitting) return;
-        if (Math.random() > 0.8) {
+        // Faster emission for a richer feel
+        if (Math.random() > 0.6) {
             this.particles.push({
-                x: this.canvas.width / 2 + (Math.random() - 0.5) * 50,
-                y: this.canvas.height / 2 + (Math.random() - 0.5) * 50,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5 - 0.2,
+                x: this.canvas.width / 2,
+                y: this.canvas.height / 2,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5,
                 life: 1.0,
-                size: Math.random() * 2 + 1
+                // Dynamic Radius
+                radius: Math.random() * 5 + 2,
+                maxRadius: Math.random() * 30 + 10,
+                growth: Math.random() * 0.2 + 0.1
             });
         }
     }
+
     animateParticles() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.emitParticles();
+
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
-            p.x += p.vx; p.y += p.vy; p.life -= 0.002;
-            if (p.life <= 0) { this.particles.splice(i, 1); continue; }
-            this.ctx.globalAlpha = p.life * 0.5;
-            this.ctx.fillStyle = this.particleColor;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.003; // Slightly slower fade
+
+            // Grow and then shrink radius
+            if (p.life > 0.5) p.radius += p.growth;
+            else p.radius -= p.growth;
+
+            if (p.life <= 0 || p.radius <= 0) {
+                this.particles.splice(i, 1);
+                continue;
+            }
+
+            // Draw Glowing Orb using Radial Gradient
+            const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+            gradient.addColorStop(0, this.particleColor);
+            gradient.addColorStop(0.4, this.particleColor + '44'); // Soft inner glow
+            gradient.addColorStop(1, 'transparent'); // Fading edges
+
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = gradient;
             this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             this.ctx.fill();
         }
+
         requestAnimationFrame(() => this.animateParticles());
     }
+
     startPulsing(color) {
         this.particleColor = color;
         this.isEmitting = true;
