@@ -3,7 +3,7 @@
   "short_name": "Chakra",
   "description": "Guided chakra meditation with ecstasy vibes.",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#050505",
   "theme_color": "#8e44ad",
   "icons": [
