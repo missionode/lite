@@ -490,7 +490,10 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.4; utterance.pitch = 0.7; utterance.volume = state.volVoice * 0.6;
+            // Normal calm speed, no longer stretchy
+            utterance.rate = 0.8; 
+            utterance.pitch = 0.9; 
+            utterance.volume = state.volVoice * 0.6;
             utterance.onend = resolve;
             window.speechSynthesis.speak(utterance);
         });
@@ -587,7 +590,7 @@ const state = {
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.0,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.03,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.06,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.5,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
