@@ -22,9 +22,10 @@ body {
     font-family: var(--font-family);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: safe center; /* Centered, but allows scrolling if content is tall */
     min-height: 100vh;
-    overflow: hidden;
+    margin: 0;
+    padding: 20px 0; /* Add some vertical space for mobile */
     user-select: none;
 }
 
@@ -35,6 +36,7 @@ body {
     text-align: center;
     position: relative;
     z-index: 2;
+    margin: auto; /* Ensures centering in scrollable container */
 }
 
 #aura-bg {
