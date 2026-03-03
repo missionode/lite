@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v2';
+const CACHE_NAME = 'chakra-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -6,19 +6,25 @@ const ASSETS = [
   './app.js',
   './manifest.json',
   './scripts.json',
+  './android-chrome-192x192.png',
+  './android-chrome-512x512.png',
+  './apple-touch-icon.png',
+  './favicon-16x16.png',
+  './favicon-32x32.png',
+  './favicon.ico',
   './symbols/root.png',
   './symbols/sacral.png',
   './symbols/solar.png',
   './symbols/heart.png',
   './symbols/throat.png',
   './symbols/thirdeye.png',
-  './symbols/crown.png'
+  './symbols/crown.png',
+  './symbols/hreem.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Use relative paths to support GitHub Pages sub-folders
       return cache.addAll(ASSETS);
     })
   );
@@ -32,7 +38,6 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {

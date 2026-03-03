@@ -300,6 +300,7 @@ class MeditationController {
         this.scripts = null;
         this.isMeditationActive = false;
         this.isPaused = false;
+        this.isHighEnergy = false;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
@@ -313,6 +314,8 @@ class MeditationController {
         await wakeLock.request();
         this.isMeditationActive = true;
         this.isPaused = false;
+        this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
+        
         document.getElementById('pause-meditation').textContent = 'II';
         document.getElementById('completion-modal').classList.add('hidden');
 
@@ -321,7 +324,15 @@ class MeditationController {
         
         if (this.isMeditationActive) {
             showScreen(meditationScreen);
-            await this.runSequence();
+            if (this.isHighEnergy) {
+                await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
+                if (this.isMeditationActive) {
+                    await this.handleSilence();
+                    this.finish();
+                }
+            } else {
+                await this.runSequence();
+            }
         }
     }
 
@@ -435,8 +446,14 @@ class MeditationController {
         this.isPaused = !this.isPaused;
         const btn = document.getElementById('pause-meditation');
         btn.textContent = this.isPaused ? '▶' : 'II';
-        if (this.isPaused) window.speechSynthesis.pause();
-        else window.speechSynthesis.resume();
+        
+        if (this.isPaused) {
+            window.speechSynthesis.pause();
+            if (this.audio.ctx) this.audio.ctx.suspend();
+        } else {
+            window.speechSynthesis.resume();
+            if (this.audio.ctx) this.audio.ctx.resume();
+        }
     }
 
     async runSequence() {
@@ -768,7 +785,9 @@ function attachEventListeners() {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: 'Chakra Meditation', artist: 'Mahakatha Vibe',
-            artwork: [{ src: 'symbols/root.png', sizes: '512x512', type: 'image/png' }]
+            artwork: [
+                { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
+            ]
         });
         navigator.mediaSession.setActionHandler('play', () => { if (meditation.isPaused) meditation.togglePause(); });
         navigator.mediaSession.setActionHandler('pause', () => { if (!meditation.isPaused) meditation.togglePause(); });
