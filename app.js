@@ -16,6 +16,11 @@ class AudioEngine {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
+        // Dedicated Bell Gain (Bypasses master drone gain)
+        this.bellGain = this.ctx.createGain();
+        this.bellGain.gain.value = state.volBell;
+        this.bellGain.connect(this.ctx.destination);
+
         this.pannerNode = this.ctx.createStereoPanner();
         this.pannerNode.pan.value = 0;
         
@@ -189,7 +194,7 @@ class AudioEngine {
             gain.gain.exponentialRampToValueAtTime(0.001, now + 8);
             osc.connect(filter);
             filter.connect(gain);
-            gain.connect(this.masterGain);
+            gain.connect(this.bellGain); // Use dedicated bell gain
             osc.start(now);
             osc.stop(now + 8.1);
         });
@@ -781,6 +786,9 @@ function attachEventListeners() {
     document.getElementById('vol-bell').addEventListener('input', (e) => {
         state.volBell = parseFloat(e.target.value);
         localStorage.setItem('chakra_vol_bell', state.volBell);
+        if (audio.bellGain) {
+            audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
+        }
     });
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
