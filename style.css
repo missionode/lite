@@ -231,6 +231,7 @@ input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 18px;
     height: 18px;
+    margin-top: -7px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, var(--accent-glow), var(--accent-color));
     box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
