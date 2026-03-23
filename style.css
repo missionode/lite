@@ -96,10 +96,12 @@ h1 {
     text-transform: uppercase;
     margin-bottom: 0.5rem;
     font-size: 1.8rem;
+    color: var(--text-color);
 }
 
 .subtitle {
-    opacity: 0.5;
+    color: var(--accent-color);
+    opacity: 0.6;
     font-size: 0.8rem;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -119,7 +121,7 @@ label {
     opacity: 0.6;
 }
 
-select, input[type="range"] {
+select {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: white;
@@ -136,7 +138,7 @@ select:focus {
 }
 
 .primary-btn {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
     border: none;
     padding: 18px;
@@ -147,7 +149,7 @@ select:focus {
     text-transform: uppercase;
     letter-spacing: 3px;
     margin-top: 1rem;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
 }
 
 .primary-btn:active {
@@ -199,7 +201,45 @@ select:focus {
     font-size: 2rem;
     font-weight: 200;
     color: var(--accent-color);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
     letter-spacing: 2px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(
+        90deg,
+        var(--primary-color) 0%,
+        var(--accent-color) var(--range-fill, 65%),
+        rgba(255, 255, 255, 0.1) var(--range-fill, 65%)
+    );
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--accent-glow), var(--accent-color));
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.7);
+    border: none;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-progress {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    height: 4px;
+    border-radius: 4px;
 }
 
 /* Meditation Styles */
@@ -342,6 +382,25 @@ select:focus {
 
 .checkbox-label input {
     cursor: pointer;
+}
+
+#stats-display {
+    border-radius: 20px;
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    padding: 6px 14px;
+    background: var(--glass-bg);
+}
+
+#stats-display span {
+    color: var(--accent-color);
+    opacity: 1;
+}
+
+.chip-active {
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    background: rgba(251, 191, 36, 0.08) !important;
+    color: var(--accent-color) !important;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.15);
 }
 
 /* Volume Mixer */

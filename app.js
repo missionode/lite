@@ -806,6 +806,8 @@ function testVoice() {
 function loadPreferences() {
     languageSelect.value = state.language;
     timeSlider.value = state.timePerChakra;
+    const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
+    timeSlider.style.setProperty('--range-fill', pctInit);
     timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
     document.getElementById('vol-voice').value = state.volVoice;
     document.getElementById('vol-drone').value = state.volDrone;
@@ -819,8 +821,17 @@ function loadPreferences() {
 }
 
 function checkFirstTime() {
-    if (localStorage.getItem('chakra_configured')) showScreen(lobbyScreen);
-    else showScreen(configScreen);
+    if (localStorage.getItem('chakra_configured')) {
+        showScreen(lobbyScreen);
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+        aura.style.opacity = '1';
+    } else {
+        showScreen(configScreen);
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
+        aura.style.opacity = '1';
+    }
 }
 
 function showScreen(screen) {
@@ -841,11 +852,16 @@ function attachEventListeners() {
         localStorage.setItem('chakra_voice', state.voiceName);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+        aura.style.opacity = '1';
     });
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
         timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
         localStorage.setItem('chakra_time', state.timePerChakra);
+        const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
+        e.target.style.setProperty('--range-fill', pct);
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
@@ -895,6 +911,13 @@ function attachEventListeners() {
         navigator.mediaSession.setActionHandler('pause', () => { if (!meditation.isPaused) meditation.togglePause(); });
         navigator.mediaSession.setActionHandler('stop', () => meditation.stop());
     }
+    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            cb.closest('.checkbox-label').classList.toggle('chip-active', cb.checked);
+        });
+        // Set initial state
+        if (cb.checked) cb.closest('.checkbox-label').classList.add('chip-active');
+    });
 }
 
 init();
