@@ -263,6 +263,7 @@ input[type="range"]::-moz-range-progress {
     .chakra-gold-ring { animation: ringPulse 4s ease-in-out infinite; }
     #mantra-display { animation: goldShimmer 4s ease-in-out infinite; }
     .cosmic-entrance { animation: cosmicEntrance 1.2s ease-out forwards; }
+    .gold-burst { animation: burstPulse 3s ease-in-out infinite; }
 }
 
 #chakra-symbol {
@@ -543,14 +544,72 @@ input[type="range"]::-moz-range-progress {
 }
 
 .modal-content {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(10, 0, 20, 0.88);
+    border: 1px solid rgba(251, 191, 36, 0.25);
     padding: 3rem;
     border-radius: 32px;
     max-width: 400px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.3), 0 0 80px rgba(251, 191, 36, 0.08);
+    z-index: 1;
+    position: relative;
+}
+
+.gold-burst {
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, transparent 65%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.gold-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 0.5rem auto;
+    opacity: 0.7;
+    border-radius: 1px;
+}
+
+.comp-stats {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    background: rgba(251, 191, 36, 0.04);
+    border-radius: 14px;
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-lbl {
+    font-size: 0.62rem;
+    color: var(--text-color);
+    opacity: 0.5;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.stat-val {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
 }
 
 .completion-icon {
@@ -627,6 +686,11 @@ input[type="range"]::-moz-range-progress {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+@keyframes burstPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+}
+
 @keyframes goldShimmer {
     0%, 100% {
         text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
@@ -660,6 +724,7 @@ input[type="range"]::-moz-range-progress {
     #mantra-display { animation: none; }
     .chakra-gold-ring { animation: none; }
     .cosmic-entrance { animation: none; }
+    .gold-burst { animation: none; }
 }
 
 @media (max-width: 600px) {

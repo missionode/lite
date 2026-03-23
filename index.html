@@ -153,10 +153,23 @@
 
         <!-- Completion Modal -->
         <div id="completion-modal" class="modal hidden">
+            <div class="gold-burst"></div>
             <div class="modal-content">
                 <div class="completion-icon">🕉️</div>
+                <div class="gold-line"></div>
                 <h2 id="completion-title">Journey Complete</h2>
+                <div class="gold-line"></div>
                 <p id="completion-message">Meditation Completed. Stay Blessed.</p>
+                <div class="comp-stats">
+                    <div class="stat-row">
+                        <span class="stat-lbl">Session Time</span>
+                        <span class="stat-val" id="stat-session-time">—</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-lbl">Total Journeys</span>
+                        <span class="stat-val" id="stat-total-journeys">—</span>
+                    </div>
+                </div>
                 <button id="close-completion" class="primary-btn">Return to Room</button>
             </div>
         </div>

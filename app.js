@@ -684,6 +684,10 @@ class MeditationController {
         localStorage.setItem('chakra_stats_time', state.stats.time);
         document.getElementById('stat-journeys').textContent = state.stats.journeys;
         document.getElementById('stat-time').textContent = state.stats.time;
+        document.getElementById('stat-session-time').textContent =
+            Math.round(state.stats.time) + ' mins';
+        document.getElementById('stat-total-journeys').textContent =
+            state.stats.journeys;
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
