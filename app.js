@@ -571,8 +571,15 @@ class MeditationController {
 
     async meditateOnChakra(chakra, key) {
         if (!this.isMeditationActive) return;
-        document.getElementById('chakra-symbol').src = chakra.symbol;
-        document.getElementById('chakra-symbol').style.opacity = "1";
+        const symbolEl = document.getElementById('chakra-symbol');
+        symbolEl.style.opacity = '';   // clear any inline opacity
+        symbolEl.classList.remove('cosmic-entrance');
+        // Force reflow to restart animation
+        void symbolEl.offsetWidth;
+        symbolEl.classList.add('cosmic-entrance');
+        setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
+        symbolEl.src = chakra.symbol;
+        symbolEl.style.opacity = "1";
         document.getElementById('mantra-display').textContent = chakra.mantra;
         document.getElementById('mantra-display').style.color = chakra.color;
         document.body.style.setProperty('--primary-color', chakra.color);

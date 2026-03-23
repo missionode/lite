@@ -250,11 +250,25 @@ input[type="range"]::-moz-range-progress {
     margin: 0 auto;
 }
 
+.chakra-gold-ring {
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15), inset 0 0 20px rgba(251, 191, 36, 0.05);
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .chakra-gold-ring { animation: ringPulse 4s ease-in-out infinite; }
+    #mantra-display { animation: goldShimmer 4s ease-in-out infinite; }
+}
+
 #chakra-symbol {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 30px var(--primary-color));
+    filter: drop-shadow(0 0 25px var(--primary-color));
     z-index: 2;
     position: relative;
     transition: transform 0.5s ease, opacity 1s ease;
@@ -267,7 +281,7 @@ input[type="range"]::-moz-range-progress {
     transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
-    background: var(--primary-color);
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%);
     border-radius: 50%;
     filter: blur(60px);
     opacity: 0.15;
@@ -282,6 +296,8 @@ input[type="range"]::-moz-range-progress {
     text-transform: uppercase;
     margin-top: 1rem;
     text-shadow: 0 0 20px rgba(255,255,255,0.1);
+    color: var(--accent-color);
+    animation: goldShimmer 4s ease-in-out infinite;
 }
 
 #narration-text {
@@ -289,7 +305,8 @@ input[type="range"]::-moz-range-progress {
     font-weight: 300;
     line-height: 1.6;
     letter-spacing: 1px;
-    opacity: 0.6;
+    color: #ffffff;
+    opacity: 0.7;
     max-width: 85%;
     margin: 0 auto;
 }
@@ -323,14 +340,14 @@ input[type="range"]::-moz-range-progress {
 }
 
 .dot.active {
-    background: var(--primary-color);
-    box-shadow: 0 0 15px var(--primary-color);
+    background: var(--accent-color);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
     transform: scale(2);
 }
 
 .dot.completed {
-    background: var(--primary-color);
-    opacity: 0.3;
+    background: rgba(124, 58, 237, 0.5);
+    opacity: 1;
 }
 
 #controls {
@@ -341,8 +358,8 @@ input[type="range"]::-moz-range-progress {
 }
 
 .icon-btn {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.15);
     color: white;
     width: 56px;
     height: 56px;
@@ -610,12 +627,43 @@ input[type="range"]::-moz-range-progress {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+@keyframes goldShimmer {
+    0%, 100% {
+        text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        color: #fbbf24;
+    }
+    50% {
+        text-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.3);
+        color: #fde68a;
+    }
+}
+
+@keyframes cosmicEntrance {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+        filter: drop-shadow(0 0 0px transparent);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 25px var(--primary-color));
+    }
+}
+
+.cosmic-entrance {
+    animation: cosmicEntrance 1.2s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .mandala-ring-outer,
     .mandala-ring-mid,
     .mandala-ring-inner {
         animation: none;
     }
+    #mantra-display { animation: none; }
+    .chakra-gold-ring { animation: none; }
+    .cosmic-entrance { animation: none; }
 }
 
 @media (max-width: 600px) {
