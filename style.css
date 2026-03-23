@@ -472,21 +472,24 @@ input[type="range"]::-moz-range-progress {
     width: 240px;
     height: 240px;
     margin: 2rem auto;
-    border: 1px solid var(--glass-border);
+    border: none;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     background: var(--glass-bg);
+    position: relative;
 }
 
 #breathing-circle {
     width: 20px;
     height: 20px;
-    background: var(--primary-color);
     border-radius: 50%;
     transition: transform 4s linear;
-    box-shadow: 0 0 40px var(--primary-color);
+    background: radial-gradient(circle at 35% 35%, #a78bfa, #7c3aed 60%, #4c1d95);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.9), 0 0 50px rgba(124, 58, 237, 0.4);
+    position: relative;
+    z-index: 1;
 }
 
 #breathing-timer {
@@ -494,13 +497,16 @@ input[type="range"]::-moz-range-progress {
     font-weight: 100;
     letter-spacing: 4px;
     opacity: 0.8;
+    color: var(--accent-color);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
 #breathing-instruction {
     font-size: 1.2rem;
     letter-spacing: 6px;
     font-weight: 300;
-    opacity: 0.7;
+    opacity: 0.85;
+    color: var(--text-color);
 }
 
 /* Completion Modal */
@@ -558,6 +564,52 @@ input[type="range"]::-moz-range-progress {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
     to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.mandala-ring-outer,
+.mandala-ring-mid,
+.mandala-ring-inner {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+}
+
+.mandala-ring-outer {
+    width: 240px;
+    height: 240px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.2), inset 0 0 20px rgba(251, 191, 36, 0.05);
+    animation: ringPulse 4s ease-in-out infinite;
+}
+
+.mandala-ring-mid {
+    width: 216px;
+    height: 216px;
+    transform: translate(-50%, -50%);
+    border: 1px dashed rgba(251, 191, 36, 0.2);
+    animation: mandalaSpin 20s linear infinite;
+}
+
+.mandala-ring-inner {
+    width: 192px;
+    height: 192px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    animation: ringPulse 4s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes ringPulse {
+        0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+    }
+
+    @keyframes mandalaSpin {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 }
 
 @media (max-width: 600px) {
