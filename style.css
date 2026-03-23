@@ -600,15 +600,21 @@ input[type="range"]::-moz-range-progress {
     animation: ringPulse 4s ease-in-out infinite reverse;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    @keyframes ringPulse {
-        0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
-    }
+@keyframes ringPulse {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+}
 
-    @keyframes mandalaSpin {
-        from { transform: translate(-50%, -50%) rotate(0deg); }
-        to { transform: translate(-50%, -50%) rotate(360deg); }
+@keyframes mandalaSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mandala-ring-outer,
+    .mandala-ring-mid,
+    .mandala-ring-inner {
+        animation: none;
     }
 }
 
