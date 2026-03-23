@@ -277,16 +277,49 @@ class VisualEngine {
         this.animationId = null;
         this.canvas = document.getElementById('particle-canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
+        this.stars = [];
+        this.starsAnimId = null;
         this.particleColor = '#ffffff';
         this.isEmitting = false;
         window.addEventListener('resize', () => this.resizeCanvas());
         this.resizeCanvas();
-        this.animateParticles();
+        this.generateStars();
+        this.animateStars();
     }
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        if (this.stars && this.stars.length > 0) this.generateStars();
+    }
+    generateStars() {
+        this.stars = [];
+        const count = 60;
+        for (let i = 0; i < count; i++) {
+            this.stars.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                radius: 0.5 + Math.random() * 1.0,
+                baseOpacity: 0.1 + Math.random() * 0.4,
+                phase: Math.random() * Math.PI * 2,
+                speed: 0.3 + Math.random() * 0.9
+            });
+        }
+    }
+    animateStars() {
+        const ctx = this.canvas.getContext('2d');
+        const draw = (time) => {
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            const t = time * 0.001;
+            this.stars.forEach(star => {
+                const opacity = star.baseOpacity + (1 - star.baseOpacity) * 0.5 * (1 + Math.sin(t * star.speed + star.phase));
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                ctx.fill();
+            });
+            this.starsAnimId = requestAnimationFrame(draw);
+        };
+        this.starsAnimId = requestAnimationFrame(draw);
     }
     emitParticles() {
         if (!this.isEmitting) return;
@@ -304,41 +337,6 @@ class VisualEngine {
                 growth: Math.random() * 0.2 + 0.1
             });
         }
-    }
-
-    animateParticles() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.emitParticles();
-
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            const p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= 0.003; // Slightly slower fade
-
-            // Grow and then shrink radius
-            if (p.life > 0.5) p.radius += p.growth;
-            else p.radius -= p.growth;
-
-            if (p.life <= 0 || p.radius <= 0) {
-                this.particles.splice(i, 1);
-                continue;
-            }
-
-            // Draw Glowing Orb using Radial Gradient
-            const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-            gradient.addColorStop(0, this.particleColor);
-            gradient.addColorStop(0.4, this.particleColor + '44'); // Soft inner glow
-            gradient.addColorStop(1, 'transparent'); // Fading edges
-
-            this.ctx.globalAlpha = p.life;
-            this.ctx.fillStyle = gradient;
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-
-        requestAnimationFrame(() => this.animateParticles());
     }
 
     startPulsing(color) {
@@ -360,7 +358,6 @@ class VisualEngine {
     stop() {
         cancelAnimationFrame(this.animationId);
         this.isEmitting = false;
-        this.particles = [];
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
