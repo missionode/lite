@@ -1,12 +1,14 @@
 :root {
-    --bg-color: #000000; /* True AMOLED Black */
-    --text-color: #f0f0f0;
-    --primary-color: #8e44ad;
+    --bg-color: #000000;
+    --text-color: #ede9fe;
+    --primary-color: #7c3aed;
+    --primary-dark: #6d28d9;
+    --accent-color: #fbbf24;
+    --accent-glow: #fde68a;
     --secondary-color: #111111;
-    --accent-color: #f1c40f;
     --font-family: 'Inter', 'Manjari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(124, 58, 237, 0.06);
+    --glass-border: rgba(251, 191, 36, 0.15);
 }
 
 * {
@@ -35,7 +37,7 @@ body {
     padding: 2rem;
     text-align: center;
     position: relative;
-    z-index: 2;
+    z-index: 3;
     margin: auto; /* Ensures centering in scrollable container */
 }
 
@@ -52,13 +54,27 @@ body {
     pointer-events: none;
 }
 
+#nebula-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.25) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 70%, rgba(109,40,217,0.15) 0%, transparent 45%),
+        radial-gradient(ellipse at 80% 60%, rgba(167,139,250,0.10) 0%, transparent 40%);
+    z-index: 0;
+    pointer-events: none;
+}
+
 #particle-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 1;
+    z-index: 2;
     pointer-events: none;
     opacity: 0.5;
 }
