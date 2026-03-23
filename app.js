@@ -1,3 +1,13 @@
+const MANTRA_AUDIO_MAP = {
+    root:     'audio/LAM.mp3',
+    sacral:   'audio/VAM.mp3',
+    solar:    'audio/RAM.mp3',
+    heart:    'audio/YAM.mp3',
+    throat:   'audio/HAM.mp3',
+    thirdeye: null,            // OM — silence
+    crown:    'audio/AUM.mp3'
+};
+
 // Audio Engine
 class AudioEngine {
     constructor() {
@@ -8,6 +18,9 @@ class AudioEngine {
         this.reverbNode = null;
         this.pannerNode = null;
         this.isInitialized = false;
+        this.mantraSource = null;
+        this.mantraGain = null;
+        this.mantraBuffer = {};
     }
 
     async init() {
@@ -42,10 +55,14 @@ class AudioEngine {
         this.delayFeedback.connect(this.delayNode);
 
         this.masterGain.connect(this.delayNode);
-        this.masterGain.connect(this.pannerNode); 
+        this.masterGain.connect(this.pannerNode);
         this.delayNode.connect(this.pannerNode);
         this.pannerNode.connect(this.reverbNode);
         this.reverbNode.connect(this.ctx.destination);
+
+        this.mantraGain = this.ctx.createGain();
+        this.mantraGain.gain.value = 0;
+        this.mantraGain.connect(this.reverbNode);
 
         this.isInitialized = true;
     }
@@ -174,6 +191,57 @@ class AudioEngine {
             setTimeout(() => { try { src.stop(); } catch(e) {} }, 5100);
         });
         this.elementalNodes = [];
+    }
+
+    async playMantraTrack(key) {
+        const filePath = MANTRA_AUDIO_MAP[key];
+        if (!filePath) return; // silence (thirdeye / OM)
+
+        this.stopMantraTrack();
+
+        if (!this.mantraBuffer[key]) {
+            const response = await fetch(filePath);
+            const arrayBuffer = await response.arrayBuffer();
+            this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
+        }
+
+        const source = this.ctx.createBufferSource();
+        source.buffer = this.mantraBuffer[key];
+        source.loop = true;
+        source.connect(this.mantraGain);
+        source.start();
+        this.mantraSource = source;
+
+        // Fade in mantra, fade down drone
+        const now = this.ctx.currentTime;
+        this.mantraGain.gain.cancelScheduledValues(now);
+        this.mantraGain.gain.setValueAtTime(0, now);
+        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 5);
+
+        if (this.masterGain) {
+            this.masterGain.gain.cancelScheduledValues(now);
+            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
+        }
+    }
+
+    stopMantraTrack() {
+        if (!this.mantraSource) return;
+        const now = this.ctx.currentTime;
+
+        this.mantraGain.gain.cancelScheduledValues(now);
+        this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
+        this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
+
+        if (this.masterGain) {
+            this.masterGain.gain.cancelScheduledValues(now);
+            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
+        }
+
+        const src = this.mantraSource;
+        this.mantraSource = null;
+        setTimeout(() => { try { src.stop(); } catch(e) {} }, 4100);
     }
 
     playSingingBowl() {
@@ -468,7 +536,19 @@ class MeditationController {
             await this.meditateOnChakra(this.scripts[key], key);
             if (i < this.chakraOrder.length - 1 && this.isMeditationActive) await this.handleInterval();
         }
-        if (this.isMeditationActive) { await this.handleSilence(); this.finish(); }
+        if (this.isMeditationActive) { await this.handleSilence(); }
+        if (this.isMeditationActive) { await this.runClosing(); }
+        if (this.isMeditationActive) { this.finish(); }
+    }
+
+    async runClosing() {
+        document.getElementById('mantra-display').textContent = "✦";
+        document.getElementById('chakra-symbol').style.opacity = "0.4";
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
+        const closingText = this.scripts.closing[state.language];
+        await this.narrate(closingText);
+        await new Promise(r => setTimeout(r, 3000));
     }
 
     async handleInterval() {
@@ -514,6 +594,10 @@ class MeditationController {
         this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
         if (!this.isMeditationActive) return;
+
+        // Start looping mantra audio track (fades in, drone fades down)
+        await this.audio.playMantraTrack(key);
+
         const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
@@ -529,6 +613,11 @@ class MeditationController {
             await new Promise(r => setTimeout(r, 100));
         }
         timerEl.textContent = "00:00";
+
+        // Fade out mantra, restore drone before affirmation
+        this.audio.stopMantraTrack();
+        await new Promise(r => setTimeout(r, 4000));
+
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
     }
 
@@ -583,7 +672,7 @@ class MeditationController {
     }
 
     finish() {
-        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); wakeLock.release();
+        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -603,7 +692,7 @@ class MeditationController {
     }
 
     stop() {
-        this.isMeditationActive = false; this.audio.stopDrone(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
@@ -639,6 +728,7 @@ const state = {
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.0,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.06,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.5,
+    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.8,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -724,6 +814,7 @@ function loadPreferences() {
     document.getElementById('vol-voice').value = state.volVoice;
     document.getElementById('vol-drone').value = state.volDrone;
     document.getElementById('vol-bell').value = state.volBell;
+    document.getElementById('vol-mantra').value = state.volMantra;
     document.getElementById('stat-journeys').textContent = state.stats.journeys;
     document.getElementById('stat-time').textContent = state.stats.time;
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
@@ -788,6 +879,13 @@ function attachEventListeners() {
         localStorage.setItem('chakra_vol_bell', state.volBell);
         if (audio.bellGain) {
             audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
+        }
+    });
+    document.getElementById('vol-mantra').addEventListener('input', (e) => {
+        state.volMantra = parseFloat(e.target.value);
+        localStorage.setItem('chakra_vol_mantra', state.volMantra);
+        if (audio.mantraGain && audio.mantraSource) {
+            audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
         }
     });
     if ('mediaSession' in navigator) {
