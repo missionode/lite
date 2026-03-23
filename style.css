@@ -122,6 +122,8 @@ label {
 }
 
 select {
+    -webkit-appearance: none;
+    appearance: none;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: white;
@@ -694,11 +696,11 @@ input[type="range"]::-moz-range-progress {
 @keyframes goldShimmer {
     0%, 100% {
         text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-        color: #fbbf24;
+        color: var(--accent-color);
     }
     50% {
         text-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.3);
-        color: #fde68a;
+        color: var(--accent-glow);
     }
 }
 
