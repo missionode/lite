@@ -306,7 +306,7 @@ class VisualEngine {
         }
     }
     animateStars() {
-        const ctx = this.canvas.getContext('2d');
+        const ctx = this.ctx;
         const draw = (time) => {
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             const t = time * 0.001;
@@ -358,7 +358,6 @@ class VisualEngine {
     stop() {
         cancelAnimationFrame(this.animationId);
         this.isEmitting = false;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
 
