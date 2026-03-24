@@ -1,11 +1,12 @@
 const MANTRA_AUDIO_MAP = {
-    root:     'audio/LAM.mp3',
-    sacral:   'audio/VAM.mp3',
-    solar:    'audio/RAM.mp3',
-    heart:    'audio/YAM.mp3',
-    throat:   'audio/HAM.mp3',
-    thirdeye: null,            // OM — silence
-    crown:    'audio/AUM.mp3'
+    root:        'audio/LAM.mp3',
+    sacral:      'audio/VAM.mp3',
+    solar:       'audio/RAM.mp3',
+    heart:       'audio/YAM.mp3',
+    throat:      'audio/HAM.mp3',
+    thirdeye:    null,               // OM — silence
+    crown:       'audio/AUM.mp3',
+    high_energy: 'audio/HREEM.mp3'
 };
 
 // Audio Engine
