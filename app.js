@@ -901,13 +901,23 @@ function attachEventListeners() {
         aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
         aura.style.opacity = '1';
     });
+    function updateSessionEstimate() {
+        const isHigh = document.getElementById('high-energy-toggle').checked;
+        const chakraCount = isHigh ? 1 : state.selectedChakras.length;
+        const estimate = Math.round(state.timePerChakra * chakraCount + 5);
+        document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
+    }
+
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
         timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
         localStorage.setItem('chakra_time', state.timePerChakra);
         const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
         e.target.style.setProperty('--range-fill', pct);
+        updateSessionEstimate();
     });
+
+    document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
         meditation.chakraOrder = state.selectedChakras;
@@ -963,6 +973,9 @@ function attachEventListeners() {
         // Set initial state
         if (cb.checked) cb.closest('.checkbox-label').classList.add('chip-active');
     });
+
+    // Initial estimate on load
+    updateSessionEstimate();
 }
 
 init();

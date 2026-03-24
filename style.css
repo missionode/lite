@@ -139,6 +139,17 @@ select:focus {
     border-color: var(--primary-color);
 }
 
+#session-estimate {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    opacity: 0.7;
+    text-align: center;
+    margin-top: 0.5rem;
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
 .primary-btn {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
