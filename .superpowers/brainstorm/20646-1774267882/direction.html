@@ -1,0 +1,141 @@
+<style>
+  .direction-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  .dir-card {
+    border-radius: 20px;
+    padding: 1.5rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .dir-card.selected { border-color: #a78bfa; box-shadow: 0 0 30px rgba(167,139,250,0.3); }
+  .dir-card h3 { font-size: 1.1rem; margin-bottom: 0.4rem; font-weight: 600; }
+  .dir-card p { font-size: 0.85rem; opacity: 0.7; line-height: 1.5; }
+  .dir-card .tag { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; }
+
+  /* Direction A: Cosmic */
+  .dir-a {
+    background: linear-gradient(135deg, #0a0015 0%, #1a0533 50%, #0d0d2b 100%);
+    color: #e8d5ff;
+  }
+  .dir-a-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(139,92,246,0.2);
+  }
+  .cosmic-orb {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #c084fc, #7c3aed 50%, #1e0a3c);
+    box-shadow: 0 0 20px rgba(192,132,252,0.5), 0 0 60px rgba(124,58,237,0.2);
+    flex-shrink: 0;
+  }
+  .cosmic-text { text-align: left; }
+  .cosmic-text .mantra { font-size: 1.4rem; letter-spacing: 8px; color: #e9d5ff; font-weight: 100; }
+  .cosmic-text .sub { font-size: 0.7rem; opacity: 0.4; letter-spacing: 2px; margin-top: 4px; }
+
+  /* Direction B: Sacred */
+  .dir-b {
+    background: linear-gradient(135deg, #0c0800 0%, #1a1000 50%, #100a00 100%);
+    color: #fde68a;
+  }
+  .dir-b-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(234,179,8,0.2);
+  }
+  .sacred-symbol {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 2px solid rgba(234,179,8,0.5);
+    box-shadow: 0 0 15px rgba(234,179,8,0.3), inset 0 0 15px rgba(234,179,8,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+  .sacred-text .mantra { font-size: 1.4rem; letter-spacing: 8px; color: #fde68a; font-weight: 100; }
+  .sacred-text .sub { font-size: 0.7rem; opacity: 0.4; letter-spacing: 2px; margin-top: 4px; color: #fde68a; }
+
+  /* Direction C: Soft Glow */
+  .dir-c {
+    background: linear-gradient(135deg, #000000 0%, #0a0a12 50%, #050510 100%);
+    color: #bfdbfe;
+  }
+  .dir-c-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(96,165,250,0.15);
+  }
+  .glow-orb {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle, #7dd3fc 0%, #3b82f6 50%, #1e3a8a 100%);
+    box-shadow: 0 0 25px rgba(125,211,252,0.4), 0 0 60px rgba(59,130,246,0.15);
+    flex-shrink: 0;
+  }
+  .glow-text .mantra { font-size: 1.4rem; letter-spacing: 8px; color: #bfdbfe; font-weight: 100; }
+  .glow-text .sub { font-size: 0.7rem; opacity: 0.4; letter-spacing: 2px; margin-top: 4px; }
+</style>
+
+<h2>Which visual direction feels right?</h2>
+<p class="subtitle">Choose the aesthetic you want to move toward</p>
+
+<div class="direction-cards">
+
+  <div class="dir-card dir-a" data-choice="cosmic" onclick="toggleSelect(this)">
+    <div class="tag">Option A</div>
+    <h3>Cosmic / Deep Space</h3>
+    <p>Rich violet-purple depth. Nebula-like gradients behind the aura. Stars/light-dust particle field. Feels vast, mystical, infinite.</p>
+    <div class="dir-a-preview">
+      <div class="cosmic-orb"></div>
+      <div class="cosmic-text">
+        <div class="mantra">YAM</div>
+        <div class="sub">Heart Chakra · 639hz</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dir-card dir-b" data-choice="sacred" onclick="toggleSelect(this)">
+    <div class="tag">Option B</div>
+    <h3>Sacred Gold / Temple</h3>
+    <p>Deep black with warm amber-gold tones. Thin geometric borders and rings around symbols. Feels ancient, ceremonial, reverent.</p>
+    <div class="dir-b-preview">
+      <div class="sacred-symbol">✦</div>
+      <div class="sacred-text">
+        <div class="mantra">YAM</div>
+        <div class="sub">Heart Chakra · 639hz</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dir-card dir-c" data-choice="soft" onclick="toggleSelect(this)">
+    <div class="tag">Option C</div>
+    <h3>Soft Luminance / Minimal</h3>
+    <p>Pure black with cleaner, crisper glows. Each chakra color is muted and refined — like light through fog. Calm, modern, precise.</p>
+    <div class="dir-c-preview">
+      <div class="glow-orb"></div>
+      <div class="glow-text">
+        <div class="mantra">YAM</div>
+        <div class="sub">Heart Chakra · 639hz</div>
+      </div>
+    </div>
+  </div>
+
+</div>

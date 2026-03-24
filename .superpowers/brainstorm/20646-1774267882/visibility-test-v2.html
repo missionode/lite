@@ -1,0 +1,63 @@
+<style>
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .compare-box { padding: 1.2rem; border-radius: 14px; background: #000; border: 1px solid rgba(255,255,255,0.08); }
+  .compare-box h4 { font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; color: #ffffff; opacity: 0.9; margin-bottom: 1rem; background: rgba(255,255,255,0.08); padding: 4px 8px; border-radius: 6px; display: inline-block; }
+
+  .fix-option { padding: 1.4rem; border-radius: 14px; background: #0a0a0a; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s; margin-bottom: 0.8rem; }
+  .fix-option.selected { border-color: #a78bfa; background: rgba(124,58,237,0.08); }
+  .fix-title { font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 0.8rem; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,0.1); display: inline-block; }
+  .fix-note { font-size: 0.75rem; color: #aaaaaa; margin-top: 0.8rem; line-height: 1.5; }
+
+  .section-heading { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: #c4b5fd; margin-bottom: 0.8rem; margin-top: 1.5rem; font-weight: 600; }
+</style>
+
+<h2>Visibility Check — Fixed Labels</h2>
+<p class="subtitle">Current vs Proposed, then two fix options</p>
+
+<div class="section-heading">Issue 1 — Body &amp; Narration Text</div>
+<div class="compare">
+  <div class="compare-box">
+    <h4>Current</h4>
+    <p style="color:#f0f0f0; font-size:0.95rem; line-height:1.6; opacity:0.6;">You are safe, deeply rooted, and fully supported by this earth.</p>
+    <p style="color:#f0f0f0; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-top:0.8rem;">Language</p>
+  </div>
+  <div class="compare-box" style="border-color:rgba(124,58,237,0.3);">
+    <h4>Proposed #ede9fe</h4>
+    <p style="color:#ede9fe; font-size:0.95rem; line-height:1.6; opacity:0.6;">You are safe, deeply rooted, and fully supported by this earth.</p>
+    <p style="color:#ede9fe; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-top:0.8rem;">Language</p>
+  </div>
+</div>
+
+<div class="section-heading">Issue 2 — Sacred Gold on Black</div>
+<div class="compare">
+  <div class="compare-box">
+    <h4>Current #f1c40f</h4>
+    <div style="color:#f1c40f; font-size:2rem; letter-spacing:12px; font-weight:100;">5.0 mins</div>
+    <div style="color:#f1c40f; font-size:0.7rem; letter-spacing:2px; margin-top:0.5rem; opacity:0.8;">TIMER</div>
+  </div>
+  <div class="compare-box" style="border-color:rgba(245,158,11,0.3);">
+    <h4>Proposed #f59e0b</h4>
+    <div style="color:#f59e0b; font-size:2rem; letter-spacing:12px; font-weight:100;">5.0 mins</div>
+    <div style="color:#f59e0b; font-size:0.7rem; letter-spacing:2px; margin-top:0.5rem; opacity:0.8;">TIMER</div>
+  </div>
+</div>
+
+<div class="section-heading">Choose a Fix</div>
+
+<div class="fix-option" data-choice="fix-a" onclick="toggleSelect(this)">
+  <div class="fix-title">Fix A — Pure white for body text, gold for accents only</div>
+  <p style="color:#ffffff; font-size:0.95rem; line-height:1.6; opacity:0.75; margin-bottom:0.8rem;">You are safe, deeply rooted, and fully supported by this earth.</p>
+  <p style="color:#ffffff; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.65;">Language · Narration Voice</p>
+  <div style="color:#f59e0b; font-size:2rem; letter-spacing:12px; font-weight:100; margin-top:0.8rem; text-shadow: 0 0 15px rgba(245,158,11,0.4);">YAM</div>
+  <div class="fix-note">Body text stays pure #ffffff. Gold (#f59e0b) used only for mantra, timer, and active elements.</div>
+</div>
+
+<div class="fix-option" data-choice="fix-b" onclick="toggleSelect(this)">
+  <div class="fix-title">Fix B — Brighter gold #fbbf24, violet-white at higher opacity</div>
+  <p style="color:#ede9fe; font-size:0.95rem; line-height:1.6; opacity:0.85; margin-bottom:0.8rem;">You are safe, deeply rooted, and fully supported by this earth.</p>
+  <p style="color:#ede9fe; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.75;">Language · Narration Voice</p>
+  <div style="color:#fbbf24; font-size:2rem; letter-spacing:12px; font-weight:100; margin-top:0.8rem; text-shadow: 0 0 15px rgba(251,191,36,0.5);">YAM</div>
+  <div class="fix-note">Gold brightened to #fbbf24. Violet-white opacity raised to 0.85 for labels — both more visible.</div>
+</div>
+
+<p class="subtitle" style="margin-top:1rem;">Click your preferred fix and confirm in the terminal</p>

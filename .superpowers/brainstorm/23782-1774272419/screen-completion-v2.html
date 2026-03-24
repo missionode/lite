@@ -1,0 +1,171 @@
+<style>
+  .phone-frame {
+    width: 320px;
+    margin: 1rem auto;
+    border-radius: 36px;
+    overflow: hidden;
+    border: 1.5px solid rgba(251,191,36,0.2);
+    box-shadow: 0 0 60px rgba(124,58,237,0.3);
+    background: #000;
+  }
+  .phone-inner {
+    padding: 0;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .backdrop {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.4) 0%, transparent 65%),
+      radial-gradient(ellipse at 80% 20%, rgba(167,139,250,0.15) 0%, transparent 40%);
+    filter: blur(2px);
+  }
+  .star { position: absolute; border-radius: 50%; background: #fff; animation: twinkle 3s infinite ease-in-out; }
+  @keyframes twinkle { 0%,100%{opacity:0.15;} 50%{opacity:0.7;} }
+  .gold-burst {
+    position: absolute;
+    width: 300px; height: 300px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 65%);
+    animation: burstPulse 3s infinite ease-in-out;
+    pointer-events: none;
+  }
+  @keyframes burstPulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+  }
+
+  .modal-card {
+    background: rgba(10,0,20,0.88);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 28px;
+    padding: 2rem 1.8rem;
+    width: 85%;
+    text-align: center;
+    position: relative;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 40px rgba(124,58,237,0.3), 0 0 80px rgba(251,191,36,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .completion-icon {
+    font-size: 3rem;
+    animation: iconFloat 4s infinite ease-in-out;
+    filter: drop-shadow(0 0 20px rgba(251,191,36,0.6));
+  }
+  @keyframes iconFloat {
+    0%,100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 15px rgba(251,191,36,0.5)); }
+    50% { transform: scale(1.08) translateY(-4px); filter: drop-shadow(0 0 30px rgba(251,191,36,0.9)); }
+  }
+  .gold-line {
+    width: 36px; height: 1px;
+    background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+  }
+  .comp-title {
+    font-size: 1rem;
+    font-weight: 200;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #ede9fe;
+  }
+  .comp-message {
+    font-size: 0.75rem;
+    color: #ffffff;
+    opacity: 0.55;
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+
+  /* Stats — vertical list, compact */
+  .comp-stats {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.8rem 1rem;
+    background: rgba(251,191,36,0.04);
+    border-radius: 14px;
+    border: 1px solid rgba(251,191,36,0.1);
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-lbl {
+    font-size: 0.62rem;
+    color: #ede9fe;
+    opacity: 0.5;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .stat-val {
+    font-size: 0.9rem;
+    color: #fbbf24;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(251,191,36,0.4);
+  }
+
+  .return-btn {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-radius: 40px;
+    padding: 13px 0;
+    width: 100%;
+    color: #ede9fe;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+  }
+</style>
+
+<h2>Completion Screen — Fixed</h2>
+<p class="subtitle">Stats now in a vertical list — no overflow</p>
+
+<div class="phone-frame">
+  <div class="phone-inner">
+    <div class="backdrop"></div>
+    <div class="gold-burst"></div>
+    <div class="star" style="width:2px;height:2px;top:6%;left:15%;animation-delay:0s;"></div>
+    <div class="star" style="width:1px;height:1px;top:10%;left:80%;animation-delay:0.8s;"></div>
+    <div class="star" style="width:2px;height:2px;top:85%;left:75%;animation-delay:1.4s;"></div>
+    <div class="star" style="width:1px;height:1px;top:80%;left:20%;animation-delay:0.4s;"></div>
+
+    <div class="modal-card">
+      <div class="completion-icon">🕉️</div>
+      <div class="gold-line"></div>
+      <div class="comp-title">Journey Complete</div>
+      <div class="gold-line"></div>
+      <div class="comp-message">Meditation completed. Stay blessed.</div>
+
+      <div class="comp-stats">
+        <div class="stat-row">
+          <div class="stat-lbl">Session Time</div>
+          <div class="stat-val">35 mins</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-lbl">Total Journeys</div>
+          <div class="stat-val">13</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-lbl">Day Streak</div>
+          <div class="stat-val">7 days</div>
+        </div>
+      </div>
+
+      <div class="return-btn">Return to Room</div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:1.5rem;">Stats are now a clean vertical list — no overflow. Does this look right?</p>

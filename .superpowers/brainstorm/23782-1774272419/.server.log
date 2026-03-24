@@ -1,0 +1,8 @@
+{"type":"server-started","port":64082,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:64082","screen_dir":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-meditation.html"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-breathing.html"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-config.html"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-lobby.html"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-completion.html"}
+{"type":"screen-added","file":"/Users/syamnath/Desktop/Projects/lite/.superpowers/brainstorm/23782-1774272419/screen-completion-v2.html"}
+{"type":"server-stopped","reason":"idle timeout"}

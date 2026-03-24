@@ -1,0 +1,151 @@
+<style>
+  .phone-frame {
+    width: 320px;
+    margin: 1rem auto;
+    border-radius: 36px;
+    overflow: hidden;
+    border: 1.5px solid rgba(251,191,36,0.2);
+    box-shadow: 0 0 60px rgba(124,58,237,0.3);
+    background: #000;
+  }
+  .phone-inner {
+    padding: 2.5rem 1.5rem 2rem;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    gap: 1.5rem;
+  }
+  .nebula {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(109,40,217,0.15) 0%, transparent 45%);
+    pointer-events: none;
+  }
+  .star { position: absolute; border-radius: 50%; background: #fff; animation: twinkle 3s infinite ease-in-out; }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.15; } 50% { opacity: 0.65; }
+  }
+
+  .breath-instruction {
+    font-size: 1.1rem;
+    letter-spacing: 6px;
+    font-weight: 300;
+    color: #ede9fe;
+    opacity: 0.85;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  /* Mandala ring container */
+  .mandala-container {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Outer gold mandala ring */
+  .mandala-ring-outer {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(251,191,36,0.5);
+    box-shadow: 0 0 20px rgba(251,191,36,0.2), inset 0 0 20px rgba(251,191,36,0.05);
+    animation: mandalaPulse 4s ease-in-out infinite;
+  }
+  /* Middle dashed ring */
+  .mandala-ring-mid {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    border: 1px dashed rgba(251,191,36,0.2);
+    animation: mandalaSpin 20s linear infinite;
+  }
+  /* Inner violet ring */
+  .mandala-ring-inner {
+    position: absolute;
+    inset: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(124,58,237,0.3);
+    animation: mandalaPulse 4s ease-in-out infinite reverse;
+  }
+  @keyframes mandalaPulse {
+    0%,100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.04); opacity: 1; }
+  }
+  @keyframes mandalaSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* The breathing dot — now a cosmic orb */
+  .breath-orb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #a78bfa, #7c3aed 60%, #4c1d95);
+    box-shadow: 0 0 20px rgba(124,58,237,0.9), 0 0 50px rgba(124,58,237,0.4);
+    position: relative;
+    animation: orbBreathe 4s ease-in-out infinite;
+    transition: transform 4s linear;
+    transform: scale(5);
+  }
+  @keyframes orbBreathe {
+    0%,100% { box-shadow: 0 0 20px rgba(124,58,237,0.9), 0 0 50px rgba(124,58,237,0.4); }
+    50% { box-shadow: 0 0 35px rgba(167,139,250,1), 0 0 80px rgba(124,58,237,0.6); }
+  }
+
+  .breath-timer {
+    font-size: 3.5rem;
+    font-weight: 100;
+    letter-spacing: 4px;
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251,191,36,0.4);
+    position: relative;
+  }
+
+  .change-list { font-size: 0.8rem; opacity: 0.7; line-height: 2; padding-left: 1rem; }
+</style>
+
+<h2>Section 2 — Breathing Screen</h2>
+<p class="subtitle">Box breathing circle redesigned with mandala rings</p>
+
+<div class="phone-frame">
+  <div class="phone-inner">
+    <div class="nebula"></div>
+    <div class="star" style="width:2px;height:2px;top:6%;left:18%;animation-delay:0s;"></div>
+    <div class="star" style="width:1px;height:1px;top:10%;left:78%;animation-delay:0.7s;"></div>
+    <div class="star" style="width:2px;height:2px;top:85%;left:82%;animation-delay:1.2s;"></div>
+    <div class="star" style="width:1px;height:1px;top:78%;left:12%;animation-delay:1.8s;"></div>
+
+    <div class="breath-instruction">Inhale</div>
+
+    <div class="mandala-container">
+      <div class="mandala-ring-outer"></div>
+      <div class="mandala-ring-mid"></div>
+      <div class="mandala-ring-inner"></div>
+      <div class="breath-orb"></div>
+    </div>
+
+    <div class="breath-timer">04</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:1.5rem;">
+  <h3 style="font-size:0.85rem; margin-bottom:0.8rem;">What's changed</h3>
+  <ul class="change-list">
+    <li>Plain white border → three concentric rings (gold outer, dashed gold mid, violet inner)</li>
+    <li>Middle ring slowly rotates — feels alive and sacred</li>
+    <li>Breathing dot → cosmic violet orb with deep glow</li>
+    <li>Timer text in sacred gold</li>
+    <li>Instruction text brighter (violet-white at 0.85)</li>
+    <li>Nebula + stars behind everything</li>
+  </ul>
+</div>
+
+<p class="subtitle" style="margin-top:1rem;">Does this breathing screen look right?</p>

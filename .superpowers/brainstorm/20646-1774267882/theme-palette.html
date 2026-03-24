@@ -1,0 +1,74 @@
+<style>
+  .palette-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+  .swatch { border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .swatch-color { width: 100%; height: 48px; border-radius: 10px; margin-bottom: 0.4rem; }
+  .swatch-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .swatch-value { font-size: 0.7rem; opacity: 0.5; font-family: monospace; }
+  .swatch-desc { font-size: 0.72rem; opacity: 0.65; line-height: 1.4; margin-top: 0.2rem; }
+
+  .preview-strip {
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    background: #000000;
+    border: 1px solid rgba(245,158,11,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-strip::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.25) 0%, transparent 65%),
+                radial-gradient(ellipse at 80% 20%, rgba(109,40,217,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .preview-title { font-size: 1.4rem; letter-spacing: 10px; font-weight: 100; text-transform: uppercase; color: #ede9fe; margin-bottom: 0.3rem; position: relative; }
+  .preview-sub { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.4; color: #fde68a; position: relative; }
+  .preview-mantra { font-size: 2.2rem; letter-spacing: 14px; font-weight: 100; color: #f59e0b; margin-top: 1rem; text-shadow: 0 0 20px rgba(245,158,11,0.4); position: relative; }
+  .preview-btn {
+    display: inline-block; margin-top: 1.2rem; padding: 12px 28px;
+    border-radius: 40px; font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    box-shadow: 0 8px 24px rgba(124,58,237,0.4);
+    color: #ede9fe; cursor: pointer; position: relative;
+  }
+</style>
+
+<h2>Section 1 of 3 — Color & Theme System</h2>
+<p class="subtitle">New CSS variable palette replacing the current one</p>
+
+<div class="palette-grid">
+  <div class="swatch" style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3);">
+    <div class="swatch-color" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); box-shadow: 0 4px 20px rgba(124,58,237,0.5);"></div>
+    <div class="swatch-name" style="color:#c4b5fd;">Primary — Cosmic Violet</div>
+    <div class="swatch-value">#7c3aed</div>
+    <div class="swatch-desc">Replaces current #8e44ad. Deeper, richer, more space-like.</div>
+  </div>
+  <div class="swatch" style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);">
+    <div class="swatch-color" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 20px rgba(245,158,11,0.4);"></div>
+    <div class="swatch-name" style="color:#fde68a;">Accent — Sacred Gold</div>
+    <div class="swatch-value">#f59e0b</div>
+    <div class="swatch-desc">Replaces #f1c40f. Warmer amber tone — less neon, more ancient.</div>
+  </div>
+  <div class="swatch" style="background: rgba(109,40,217,0.08); border: 1px solid rgba(109,40,217,0.2);">
+    <div class="swatch-color" style="background: radial-gradient(circle at 30% 30%, rgba(124,58,237,0.4), rgba(30,10,60,0.9)); border: 1px solid rgba(124,58,237,0.2);"></div>
+    <div class="swatch-name" style="color:#a78bfa;">Glass Surface</div>
+    <div class="swatch-value">rgba(124,58,237,0.04)</div>
+    <div class="swatch-desc">Glass cards get a faint violet tint instead of pure white. Borders use gold at 15% opacity.</div>
+  </div>
+  <div class="swatch" style="background: rgba(237,233,254,0.05); border: 1px solid rgba(237,233,254,0.1);">
+    <div class="swatch-color" style="background: linear-gradient(180deg, #ede9fe 0%, #ddd6fe 100%);"></div>
+    <div class="swatch-name" style="color:#ede9fe;">Text — Cosmic White</div>
+    <div class="swatch-value">#ede9fe</div>
+    <div class="swatch-desc">Replaces neutral #f0f0f0. Slightly violet-tinted white — feels part of the cosmic palette.</div>
+  </div>
+</div>
+
+<div class="preview-strip">
+  <div class="preview-title">Chakra Meditation</div>
+  <div class="preview-sub">Heart Chakra · Anahata · 639hz</div>
+  <div class="preview-mantra">Y A M</div>
+  <div class="preview-btn">Begin Journey</div>
+</div>
+
+<p class="subtitle" style="margin-top:1.5rem;">Does this color palette look right? ↓ confirm or let me know what to change</p>

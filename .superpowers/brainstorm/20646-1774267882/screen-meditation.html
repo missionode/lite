@@ -1,0 +1,229 @@
+<style>
+  .phone-frame {
+    width: 320px;
+    margin: 1rem auto;
+    border-radius: 36px;
+    overflow: hidden;
+    border: 1.5px solid rgba(251,191,36,0.2);
+    box-shadow: 0 0 60px rgba(124,58,237,0.3), 0 0 120px rgba(124,58,237,0.1);
+    position: relative;
+    background: #000;
+  }
+  .phone-inner {
+    padding: 2rem 1.5rem 1.5rem;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Cosmic nebula background layers */
+  .nebula {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 20% 70%, rgba(109,40,217,0.2) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 60%, rgba(167,139,250,0.12) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  /* Stars */
+  .stars {
+    position: absolute; inset: 0; pointer-events: none;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle 3s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.3); }
+  }
+
+  /* Timer */
+  .med-timer {
+    font-size: 0.8rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 4px;
+    color: #ede9fe;
+    opacity: 0.45;
+    position: relative;
+    margin-bottom: 1.5rem;
+    align-self: center;
+  }
+
+  /* Chakra symbol area */
+  .chakra-area {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0.5rem auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Outer gold ring */
+  .gold-ring {
+    position: absolute; inset: -12px;
+    border-radius: 50%;
+    border: 1px solid rgba(251,191,36,0.35);
+    box-shadow: 0 0 20px rgba(251,191,36,0.15), inset 0 0 20px rgba(251,191,36,0.05);
+    animation: ringPulse 4s infinite ease-in-out;
+  }
+  @keyframes ringPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+  }
+  /* Inner violet glow disc */
+  .glow-disc {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
+    filter: blur(15px);
+  }
+  /* Symbol placeholder */
+  .symbol-placeholder {
+    width: 100px; height: 100px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 20px rgba(167,139,250,0.8));
+  }
+
+  /* Mantra */
+  .med-mantra {
+    font-size: 2.2rem;
+    letter-spacing: 14px;
+    font-weight: 100;
+    color: #fbbf24;
+    text-shadow: 0 0 25px rgba(251,191,36,0.5), 0 0 60px rgba(251,191,36,0.2);
+    position: relative;
+    margin-bottom: 0.8rem;
+    animation: goldShimmer 4s infinite ease-in-out;
+  }
+  @keyframes goldShimmer {
+    0%, 100% { text-shadow: 0 0 20px rgba(251,191,36,0.4); color: #fbbf24; }
+    50% { text-shadow: 0 0 35px rgba(251,191,36,0.8), 0 0 70px rgba(251,191,36,0.3); color: #fde68a; }
+  }
+
+  /* Narration text */
+  .med-narration {
+    font-size: 0.8rem;
+    color: #ffffff;
+    opacity: 0.65;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    text-align: center;
+    max-width: 240px;
+    position: relative;
+    margin-bottom: 1.2rem;
+  }
+
+  /* Progress dots */
+  .med-dots {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    margin-bottom: 1.4rem;
+  }
+  .mdot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .mdot.active {
+    background: #fbbf24;
+    box-shadow: 0 0 10px rgba(251,191,36,0.8);
+    transform: scale(2.2);
+  }
+  .mdot.done {
+    background: rgba(124,58,237,0.5);
+  }
+
+  /* Controls */
+  .med-controls {
+    display: flex;
+    gap: 2rem;
+    position: relative;
+  }
+  .ctrl-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(251,191,36,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    color: #ede9fe;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+</style>
+
+<h2>Section 2 — Meditation Screen</h2>
+<p class="subtitle">New cosmic + sacred gold treatment for the main session view</p>
+
+<div class="phone-frame">
+  <div class="phone-inner">
+    <div class="nebula"></div>
+
+    <!-- Stars -->
+    <div class="stars">
+      <div class="star" style="width:2px;height:2px;top:8%;left:15%;animation-delay:0s;"></div>
+      <div class="star" style="width:1px;height:1px;top:12%;left:72%;animation-delay:0.5s;"></div>
+      <div class="star" style="width:2px;height:2px;top:22%;left:88%;animation-delay:1s;"></div>
+      <div class="star" style="width:1px;height:1px;top:35%;left:8%;animation-delay:1.5s;"></div>
+      <div class="star" style="width:2px;height:2px;top:55%;left:92%;animation-delay:0.8s;"></div>
+      <div class="star" style="width:1px;height:1px;top:68%;left:25%;animation-delay:1.2s;"></div>
+      <div class="star" style="width:2px;height:2px;top:80%;left:60%;animation-delay:2s;"></div>
+      <div class="star" style="width:1px;height:1px;top:90%;left:40%;animation-delay:0.3s;"></div>
+      <div class="star" style="width:1px;height:1px;top:5%;left:45%;animation-delay:1.7s;"></div>
+      <div class="star" style="width:2px;height:2px;top:45%;left:50%;animation-delay:2.5s;"></div>
+    </div>
+
+    <div class="med-timer">03:42</div>
+
+    <div class="chakra-area">
+      <div class="glow-disc"></div>
+      <div class="gold-ring"></div>
+      <div class="symbol-placeholder">🪷</div>
+    </div>
+
+    <div class="med-mantra">YAM</div>
+    <div class="med-narration">Feel a vibrant green light glowing in your chest, radiating love outward in all directions.</div>
+
+    <div class="med-dots">
+      <div class="mdot done"></div>
+      <div class="mdot done"></div>
+      <div class="mdot done"></div>
+      <div class="mdot active"></div>
+      <div class="mdot"></div>
+      <div class="mdot"></div>
+      <div class="mdot"></div>
+    </div>
+
+    <div class="med-controls">
+      <div class="ctrl-btn">🎚</div>
+      <div class="ctrl-btn">II</div>
+      <div class="ctrl-btn">✕</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:1.5rem;">
+  <h3 style="font-size:0.85rem; margin-bottom:0.8rem;">What's changed</h3>
+  <ul style="font-size:0.8rem; opacity:0.7; line-height:2; padding-left:1rem;">
+    <li>Multi-layer nebula gradient behind everything (purple depth)</li>
+    <li>Twinkling star field on the background canvas</li>
+    <li>Gold pulsing ring around chakra symbol</li>
+    <li>Mantra text in gold with breathing shimmer animation</li>
+    <li>Active progress dot glows gold</li>
+    <li>Completed dots shift to violet</li>
+    <li>Control buttons get subtle gold border tint</li>
+  </ul>
+</div>
+
+<p class="subtitle" style="margin-top:1rem;">Does this meditation screen look right? Let me know and I'll move to the next screen.</p>

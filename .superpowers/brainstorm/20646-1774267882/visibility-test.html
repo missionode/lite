@@ -1,0 +1,77 @@
+<style>
+  .test-section { margin-bottom: 2rem; }
+  .test-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.4; margin-bottom: 0.8rem; }
+  .test-row { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.2rem; border-radius: 14px; margin-bottom: 0.8rem; }
+
+  /* Current vs Proposed side by side */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .compare-box { padding: 1.2rem; border-radius: 14px; background: #000; border: 1px solid rgba(255,255,255,0.08); }
+  .compare-box h4 { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1rem; opacity: 0.4; }
+
+  /* Proposed fixes */
+  .fix-option { padding: 1.2rem; border-radius: 14px; background: #000; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; }
+  .fix-option.selected { border-color: #a78bfa; }
+  .fix-tag { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.4; margin-bottom: 0.8rem; }
+</style>
+
+<h2>Visibility Check</h2>
+<p class="subtitle">Current vs Proposed — and two fixes to choose from</p>
+
+<!-- TEXT VISIBILITY -->
+<div class="test-section">
+  <div class="test-label">Issue 1 — Body & Narration Text</div>
+  <div class="compare">
+    <div class="compare-box">
+      <h4>Current</h4>
+      <p style="color:#f0f0f0; font-size:0.95rem; line-height:1.6; opacity:0.6;">You are safe, deeply rooted, and fully supported by this earth.</p>
+      <p style="color:#f0f0f0; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-top:0.8rem;">Language</p>
+    </div>
+    <div class="compare-box" style="border-color:rgba(124,58,237,0.2);">
+      <h4>Proposed #ede9fe</h4>
+      <p style="color:#ede9fe; font-size:0.95rem; line-height:1.6; opacity:0.6;">You are safe, deeply rooted, and fully supported by this earth.</p>
+      <p style="color:#ede9fe; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-top:0.8rem;">Language</p>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; opacity:0.5; line-height:1.5;">⚠️ At 60% opacity, <strong style="color:#ede9fe;">#ede9fe</strong> (violet-white) is slightly dimmer than pure white because it carries a tint. Small labels may become too faint.</p>
+</div>
+
+<!-- GOLD VISIBILITY -->
+<div class="test-section">
+  <div class="test-label">Issue 2 — Sacred Gold on Black</div>
+  <div class="compare">
+    <div class="compare-box">
+      <h4>Current #f1c40f (neon yellow)</h4>
+      <div style="color:#f1c40f; font-size:2rem; letter-spacing:12px; font-weight:100;">5.0 mins</div>
+      <div style="color:#f1c40f; font-size:0.7rem; letter-spacing:2px; margin-top:0.5rem; opacity:0.8;">TIMER DISPLAY</div>
+    </div>
+    <div class="compare-box" style="border-color:rgba(245,158,11,0.2);">
+      <h4>Proposed #f59e0b (amber)</h4>
+      <div style="color:#f59e0b; font-size:2rem; letter-spacing:12px; font-weight:100;">5.0 mins</div>
+      <div style="color:#f59e0b; font-size:0.7rem; letter-spacing:2px; margin-top:0.5rem; opacity:0.8;">TIMER DISPLAY</div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; opacity:0.5; line-height:1.5;">⚠️ <strong style="color:#f59e0b;">#f59e0b</strong> is darker than the current yellow — it looks beautiful as a large accent but can be hard to read as small text at reduced opacity.</p>
+</div>
+
+<!-- FIX OPTIONS -->
+<div class="test-section">
+  <div class="test-label">Choose a fix — click to select</div>
+
+  <div class="fix-option" data-choice="fix-a" onclick="toggleSelect(this)" style="margin-bottom:0.8rem;">
+    <div class="fix-tag">Fix A — Keep gold for accents only, use pure white for all body text</div>
+    <p style="color:#ffffff; font-size:0.95rem; line-height:1.6; opacity:0.7; margin-bottom:0.8rem;">You are safe, deeply rooted, and fully supported by this earth.</p>
+    <p style="color:#ffffff; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.5;">Language · Narration Voice</p>
+    <div style="color:#f59e0b; font-size:2rem; letter-spacing:12px; font-weight:100; margin-top:0.8rem;">YAM</div>
+    <p style="font-size:0.75rem; opacity:0.4; margin-top:0.5rem;">Body text = pure #ffffff. Gold reserved for mantra, timer, active highlights only.</p>
+  </div>
+
+  <div class="fix-option" data-choice="fix-b" onclick="toggleSelect(this)">
+    <div class="fix-tag">Fix B — Lighten gold to #fbbf24, keep violet-white for body text</div>
+    <p style="color:#ede9fe; font-size:0.95rem; line-height:1.6; opacity:0.8; margin-bottom:0.8rem;">You are safe, deeply rooted, and fully supported by this earth.</p>
+    <p style="color:#ede9fe; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; opacity:0.7;">Language · Narration Voice</p>
+    <div style="color:#fbbf24; font-size:2rem; letter-spacing:12px; font-weight:100; margin-top:0.8rem;">YAM</div>
+    <p style="font-size:0.75rem; opacity:0.4; margin-top:0.5rem;">Gold brightened to #fbbf24 (more visible). Violet-white opacity raised to 0.8 for labels.</p>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:1rem;">Click a fix option and let me know in the terminal</p>
