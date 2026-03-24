@@ -903,8 +903,12 @@ function attachEventListeners() {
     });
     function updateSessionEstimate() {
         const isHigh = document.getElementById('high-energy-toggle').checked;
-        const chakraCount = isHigh ? 1 : state.selectedChakras.length;
-        const estimate = Math.round(state.timePerChakra * chakraCount + 5);
+        // Accounts for chanting + narration overhead (~2 min/chakra) + fixed overhead + hooponopono (~2 min)
+        // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
+        // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
+        const estimate = isHigh
+            ? Math.round(state.timePerChakra + 9)
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 12);
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
 
