@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v6';
+const CACHE_NAME = 'chakra-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -26,7 +26,8 @@ const ASSETS = [
   './audio/YAM.mp3',
   './audio/HAM.mp3',
   './audio/AUM.mp3',
-  './audio/HREEM.mp3'
+  './audio/HREEM.mp3',
+  './audio/OM.mp3'
 ];
 
 self.addEventListener('install', (event) => {

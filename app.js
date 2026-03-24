@@ -4,7 +4,7 @@ const MANTRA_AUDIO_MAP = {
     solar:       'audio/RAM.mp3',
     heart:       'audio/YAM.mp3',
     throat:      'audio/HAM.mp3',
-    thirdeye:    null,               // OM — silence
+    thirdeye:    'audio/OM.mp3',
     crown:       'audio/AUM.mp3',
     high_energy: 'audio/HREEM.mp3'
 };
