@@ -397,6 +397,7 @@ class MeditationController {
                 await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
                 if (this.isMeditationActive) {
                     await this.handleSilence();
+                    if (this.isMeditationActive) await this.runHooponopono();
                     this.finish();
                 }
             } else {
@@ -534,6 +535,7 @@ class MeditationController {
         }
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
+        if (this.isMeditationActive) { await this.runHooponopono(); }
         if (this.isMeditationActive) { this.finish(); }
     }
 
@@ -544,6 +546,37 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = this.scripts.closing[state.language];
         await this.narrate(closingText);
+        await new Promise(r => setTimeout(r, 3000));
+    }
+
+    async runHooponopono() {
+        // Visual: warm gold aura, dim chakra symbol, star marker in mantra display
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
+        aura.style.opacity = '1';
+        document.getElementById('chakra-symbol').style.opacity = '0.1';
+        document.getElementById('mantra-display').textContent = '✦';
+        document.getElementById('narration-text').textContent = '';
+
+        // Intro: "Repeat each phrase gently in your heart"
+        await this.narrate(this.scripts.hooponopono.intro[state.language]);
+        await new Promise(r => setTimeout(r, 2000));
+
+        // 3 cycles of the 4 phrases
+        const phrases = this.scripts.hooponopono.phrases[state.language];
+        for (let cycle = 0; cycle < 3; cycle++) {
+            if (!this.isMeditationActive) return;
+            for (const phrase of phrases) {
+                if (!this.isMeditationActive) return;
+                document.getElementById('narration-text').textContent = phrase;
+                await this.narrate(phrase);
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        }
+
+        // Closing breath
+        document.getElementById('narration-text').textContent = '';
+        await this.narrate(this.scripts.hooponopono.closing[state.language]);
         await new Promise(r => setTimeout(r, 3000));
     }
 
