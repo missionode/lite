@@ -769,7 +769,7 @@ const state = {
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.0,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.06,
-    volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.5,
+    volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.8,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
