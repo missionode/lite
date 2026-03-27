@@ -690,6 +690,7 @@ class MeditationController {
     }
 
     async handleSilence() {
+        this.visual.stop();
         document.getElementById('mantra-display').textContent = "SILENCE";
         document.getElementById('chakra-symbol').style.opacity = "0.2";
         this.audio.stopDrone();
