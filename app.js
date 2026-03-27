@@ -412,7 +412,7 @@ class MeditationController {
         const tutorial = document.getElementById('breathing-tutorial');
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
-        
+
         showScreen(screen);
         tutorial.classList.remove('hidden');
         tutorial.style.opacity = "1";
@@ -421,11 +421,33 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
 
+        // Moon Phase opening line
+        const phase = getMoonPhase();
+        const moonText = this.scripts.intro.moon[`${phase}_${state.language}`];
+        if (moonText && this.isMeditationActive) {
+            tutTitle.textContent = state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon";
+            tutText.textContent = moonText;
+            await this.narrate(moonText);
+            await new Promise(r => setTimeout(r, 1000));
+        }
+
+        // Main gratitude + body scan
+        if (!this.isMeditationActive) return;
         tutTitle.textContent = state.language === 'ml' ? "കൃതജ്ഞത" : "Gratitude";
         const text = this.scripts.intro[`gratitude_${state.language}`];
         tutText.textContent = text;
-
         await this.narrate(text);
+
+        // Intention Seed — woven in after gratitude
+        if (this.isMeditationActive && state.intention && state.intention.trim()) {
+            const intentionText = state.language === 'ml'
+                ? `ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: ${state.intention.trim()}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്ര മുഴുവൻ അത് ഉള്ളിൽ ജ്വലിക്കട്ടെ.`
+                : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
+            tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
+            tutText.textContent = intentionText;
+            await this.narrate(intentionText);
+        }
+
         if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
     }
 
@@ -638,8 +660,17 @@ class MeditationController {
         const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
+
+        // Subliminal whisper — fires 30s into mantra, non-blocking
+        const subliminalDelay = Math.min(30000, chantDurationMs * 0.3);
+        const subliminalTimer = setTimeout(() => {
+            if (this.isMeditationActive && !this.isPaused) {
+                this.narrateSubliminal(chakra[`affirmation_${state.language}`]);
+            }
+        }, subliminalDelay);
+
         while (elapsed < chantDurationMs) {
-            if (!this.isMeditationActive) break;
+            if (!this.isMeditationActive) { clearTimeout(subliminalTimer); break; }
             if (!this.isPaused) {
                 elapsed += 100;
                 const remaining = Math.max(0, chantDurationMs - elapsed);
@@ -681,12 +712,25 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                utterance.rate = 0.65; utterance.pitch = 0.85; utterance.volume = state.volVoice;
+                utterance.rate   = state.sleepMode ? 0.50 : 0.65;
+                utterance.pitch  = state.sleepMode ? 0.70 : 0.85;
+                utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, state.sleepMode ? 900 : 500));
         }
+    }
+
+    // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
+    narrateSubliminal(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+        if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
+        utterance.rate   = state.sleepMode ? 0.45 : 0.55;
+        utterance.pitch  = state.sleepMode ? 0.65 : 0.75;
+        utterance.volume = state.volVoice * 0.05;
+        window.speechSynthesis.speak(utterance);
     }
 
     async handleSilence() {
@@ -723,6 +767,9 @@ class MeditationController {
             Math.round(state.stats.time) + ' mins';
         document.getElementById('stat-total-journeys').textContent =
             state.stats.journeys;
+        // Lift sleep mode dimming once session ends
+        document.body.classList.remove('sleep-mode-active');
+
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
@@ -730,12 +777,26 @@ class MeditationController {
         title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
         msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
         btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+
+        // Journal: reset textarea, show last entry date, localise prompt
+        document.getElementById('journal-entry').value = '';
+        document.getElementById('journal-prompt').textContent = state.language === 'ml'
+            ? 'എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?'
+            : 'What shifted? What are you calling in?';
+        document.getElementById('save-journal').textContent = state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry';
+        const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+        const lastInfo = document.getElementById('last-journal-info');
+        lastInfo.textContent = journalEntries.length > 0
+            ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + journalEntries[0].date
+            : '';
+
         modal.classList.remove('hidden');
     }
 
     stop() {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
+        document.body.classList.remove('sleep-mode-active');
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         showScreen(lobbyScreen);
@@ -775,8 +836,22 @@ const state = {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
     },
-    selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']
+    selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
+    intention: localStorage.getItem('chakra_intention') || '',
+    sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true'
 };
+
+// ── Moon Phase Calculator ─────────────────────────────────────────────────────
+function getMoonPhase() {
+    const knownNewMoon = new Date('2025-01-29T12:35:00Z');
+    const lunarCycle  = 29.53058770576;
+    const daysSince   = (Date.now() - knownNewMoon.getTime()) / 86400000;
+    const pos         = ((daysSince % lunarCycle) + lunarCycle) % lunarCycle;
+    if (pos < 7.38)  return 'new';
+    if (pos < 14.77) return 'waxing';
+    if (pos < 22.15) return 'full';
+    return 'waning';
+}
 
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -864,6 +939,8 @@ function loadPreferences() {
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
         cb.checked = state.selectedChakras.includes(cb.value);
     });
+    document.getElementById('intention-input').value = state.intention;
+    document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
 }
 
 function checkFirstTime() {
@@ -926,6 +1003,8 @@ function attachEventListeners() {
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
         meditation.chakraOrder = state.selectedChakras;
+        // Apply sleep mode dim class at session start
+        if (state.sleepMode) document.body.classList.add('sleep-mode-active');
         meditation.start();
     });
     document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
@@ -933,6 +1012,36 @@ function attachEventListeners() {
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
         showScreen(lobbyScreen);
+    });
+
+    // Intention input
+    document.getElementById('intention-input').addEventListener('input', (e) => {
+        state.intention = e.target.value;
+        localStorage.setItem('chakra_intention', state.intention);
+    });
+
+    // Sleep mode toggle
+    document.getElementById('sleep-mode-toggle').addEventListener('change', (e) => {
+        state.sleepMode = e.target.checked;
+        localStorage.setItem('chakra_sleep_mode', state.sleepMode);
+    });
+
+    // Journal save
+    document.getElementById('save-journal').addEventListener('click', () => {
+        const entry = document.getElementById('journal-entry').value.trim();
+        if (!entry) return;
+        const entries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+        entries.unshift({ date: new Date().toLocaleDateString(), text: entry });
+        localStorage.setItem('chakra_journal', JSON.stringify(entries.slice(0, 50)));
+        document.getElementById('journal-entry').value = '';
+        const info = document.getElementById('last-journal-info');
+        info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
+        setTimeout(() => {
+            const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+            info.textContent = saved.length > 0
+                ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
+                : '';
+        }, 2000);
     });
     const mixer = document.getElementById('volume-mixer');
     document.getElementById('btn-mixer').addEventListener('click', () => mixer.classList.toggle('hidden'));

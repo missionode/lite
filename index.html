@@ -74,10 +74,19 @@
                 <span id="time-display">5.0 mins</span>
             </div>
 
+            <!-- Intention Seed -->
+            <div class="config-group" style="margin-top: 1rem;">
+                <label for="intention-input" id="intention-label">What are you calling in today?</label>
+                <input type="text" id="intention-input" placeholder="e.g. abundance, clarity, love..." autocomplete="off">
+            </div>
+
             <!-- High Energy Mode Toggle -->
-            <div class="config-group" style="margin-top: 1rem; align-items:center;">
+            <div class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; gap: 1.5rem; justify-content: center;">
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
-                    <input type="checkbox" id="high-energy-toggle"> High Energy Mode (HRIM)
+                    <input type="checkbox" id="high-energy-toggle"> High Energy (HRIM)
+                </label>
+                <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
+                    <input type="checkbox" id="sleep-mode-toggle"> 🌙 Sleep Mode
                 </label>
             </div>
 
@@ -171,7 +180,14 @@
                         <span class="stat-val" id="stat-total-journeys">—</span>
                     </div>
                 </div>
-                <button id="close-completion" class="primary-btn">Return to Room</button>
+                <!-- Journal Section -->
+                <div id="journal-section" style="margin-top: 1.5rem; text-align: left; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.2rem;">
+                    <p id="journal-prompt" style="font-size: 0.82rem; opacity: 0.65; margin-bottom: 0.6rem; letter-spacing: 0.03em;">What shifted? What are you calling in?</p>
+                    <textarea id="journal-entry" rows="3" placeholder="Write freely..." style="width:100%; box-sizing:border-box; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: rgba(255,255,255,0.9); padding: 0.75rem; font-size: 0.88rem; resize: none; font-family: inherit; outline: none;"></textarea>
+                    <button id="save-journal" class="secondary-btn" style="margin-top: 0.5rem; width: 100%;">Save Entry</button>
+                    <p id="last-journal-info" style="font-size: 0.72rem; opacity: 0.38; margin-top: 0.4rem; text-align: center;"></p>
+                </div>
+                <button id="close-completion" class="primary-btn" style="margin-top: 1rem;">Return to Room</button>
             </div>
         </div>
     </div>
