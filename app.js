@@ -398,6 +398,7 @@ class MeditationController {
                 await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
                 if (this.isMeditationActive) {
                     await this.handleSilence();
+                    if (this.isMeditationActive) await this.runClosing();
                     if (this.isMeditationActive) await this.runHooponopono();
                     this.finish();
                 }
@@ -569,6 +570,13 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = this.scripts.closing[state.language];
         await this.narrate(closingText);
+        await new Promise(r => setTimeout(r, 2000));
+        // Full-body health affirmation — head to toe
+        const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
+        if (healthAffirmation && this.isMeditationActive) {
+            document.getElementById('mantra-display').textContent = "✦ BODY ✦";
+            await this.narrate(healthAffirmation);
+        }
         await new Promise(r => setTimeout(r, 3000));
     }
 
@@ -704,7 +712,7 @@ class MeditationController {
     }
 
     async narrate(text) {
-        const sentences = text.split(/[.!?]/).filter(s => s.trim().length > 0);
+        const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
