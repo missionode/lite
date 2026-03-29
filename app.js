@@ -92,8 +92,10 @@ class AudioEngine {
         this.ctx = null;
         this.droneOscillators = [];
         this.elementalNodes = [];
+        this.binauralNodes = []; // New: Binaural Beat Layer
         this.masterGain = null;
         this.reverbNode = null;
+        this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.isInitialized = false;
 
@@ -108,54 +110,45 @@ class AudioEngine {
         this.masterCompressor = null;
         this.presenceFilter = null;
         this.lowCutFilter = null;
+        this.mantraPresenceLFO = null; // New: Organic Mantra Motion
     }
 
     async init() {
         if (this.isInitialized) return;
-        // Use hardware native sample rate for maximum clarity
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // 1. Master Gain (Final Volume)
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
-        // 2. Presence EQ (Sharpness/Clarity)
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(4, this.ctx.currentTime); // 4dB of "Air"
+        this.presenceFilter.gain.setValueAtTime(4, this.ctx.currentTime);
 
-        // 3. Mud-Cut Filter (Clarity)
-        // Removes low-end rumble from Reverb and Music
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
         this.lowCutFilter.frequency.setValueAtTime(150, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
-        // 4. Master Compressor (Studio Glue)
         this.masterCompressor = this.ctx.createDynamicsCompressor();
         this.masterCompressor.threshold.setValueAtTime(-20, this.ctx.currentTime);
-        this.masterCompressor.knee.setValueAtTime(40, this.ctx.currentTime); // Softer knee for "Musical" feel
-        this.masterCompressor.ratio.setValueAtTime(4, this.ctx.currentTime); // Lower ratio is more transparent
+        this.masterCompressor.knee.setValueAtTime(40, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(4, this.ctx.currentTime); 
         this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime);
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
-        // Background Music Gain
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
         
-        // Studio "Voice Pocket" Filter for Music
         this.bgMusicEQ = this.ctx.createBiquadFilter();
         this.bgMusicEQ.type = 'peaking';
-        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); // Mid-range clarity zone
+        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
         this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
-        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); // Start neutral
+        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); 
 
-        // Music goes through EQ -> Mud-Cut -> Mastering
         this.bgMusicGain.connect(this.bgMusicEQ);
         this.bgMusicEQ.connect(this.lowCutFilter);
 
-        // Dedicated Bell Gain (Pure bypass)
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
@@ -169,8 +162,11 @@ class AudioEngine {
         pannerLfo.connect(this.pannerNode.pan);
         pannerLfo.start();
 
+        // New: Studio Reverb Chain with Wet/Dry control for "Swells"
         this.reverbNode = this.ctx.createConvolver();
-        this.reverbNode.buffer = this.createImpulseResponse(4, 3);
+        this.reverbNode.buffer = this.createImpulseResponse(5, 4); // Longer, lusher reverb
+        this.reverbWet = this.ctx.createGain();
+        this.reverbWet.gain.value = 0.3; // Base wetness
 
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.6;
@@ -180,24 +176,31 @@ class AudioEngine {
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
 
-        // Chain logic: 
-        // Sources -> Panner -> Mud-Cut -> Reverb -> Presence -> Compressor
         this.masterGain.connect(this.delayNode);
         this.masterGain.connect(this.pannerNode);
         this.delayNode.connect(this.pannerNode);
         
         this.pannerNode.connect(this.lowCutFilter);
-        this.lowCutFilter.connect(this.reverbNode);
         
-        this.reverbNode.connect(this.presenceFilter);
-        this.lowCutFilter.connect(this.presenceFilter); // Also Presence for Music
+        // Reverb Routing: Parallel signal to reverbWet
+        this.lowCutFilter.connect(this.reverbNode);
+        this.reverbNode.connect(this.reverbWet);
+        this.reverbWet.connect(this.presenceFilter);
+        
+        this.lowCutFilter.connect(this.presenceFilter); // Dry signal
         
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
 
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
-        this.mantraGain.connect(this.lowCutFilter);
+        
+        // New: Mantra Organic Presence Filter
+        this.mantraFilter = this.ctx.createBiquadFilter();
+        this.mantraFilter.type = 'lowpass';
+        this.mantraFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
+        this.mantraGain.connect(this.mantraFilter);
+        this.mantraFilter.connect(this.lowCutFilter);
 
         this.isInitialized = true;
     }
@@ -268,8 +271,9 @@ class AudioEngine {
 
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
-        // Use a static impulse response if already created
-        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(4, 3);
+        this.stopBinaural();
+
+        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(5, 4);
         this.reverbNode.buffer = this._staticImpulse;
         
         this.startElementalLayer(index);
@@ -283,14 +287,8 @@ class AudioEngine {
         lfo.start();
         this.vibrationLFO = lfo;
 
-        // Reduced harmonics to save CPU
-        const harmonics = [
-            { f: 1.0, g: 0.2, type: 'sine' },
-            { f: 0.5, g: 0.15, type: 'sine' }
-        ];
-
+        const harmonics = [{ f: 1.0, g: 0.2, type: 'sine' }, { f: 0.5, g: 0.15, type: 'sine' }];
         harmonics.forEach((h) => {
-            // Reduced detuned oscillators from 3 to 1
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = h.type;
@@ -308,6 +306,47 @@ class AudioEngine {
             osc.start();
             this.droneOscillators.push({ osc, gain });
         });
+
+        // New: Binaural Beat Layer (Deep Alpha/Theta)
+        const leftOsc = this.ctx.createOscillator();
+        const rightOsc = this.ctx.createOscillator();
+        const leftPanner = this.ctx.createStereoPanner();
+        const rightPanner = this.ctx.createStereoPanner();
+        const binauralGain = this.ctx.createGain();
+
+        leftPanner.pan.setValueAtTime(-1, this.ctx.currentTime);
+        rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
+        
+        // 7.83Hz Schumann Resonance offset
+        leftOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+        rightOsc.frequency.setValueAtTime(baseFreq + 7.83, this.ctx.currentTime);
+        
+        binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        binauralGain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 10); // Very subtle
+
+        leftOsc.connect(leftPanner);
+        rightOsc.connect(rightPanner);
+        leftPanner.connect(binauralGain);
+        rightPanner.connect(binauralGain);
+        binauralGain.connect(this.lowCutFilter);
+
+        leftOsc.start();
+        rightOsc.start();
+        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+    }
+
+    stopBinaural() {
+        this.binauralNodes.forEach(node => {
+            if (node instanceof AudioParam) return;
+            try { 
+                if (node.gain) {
+                    node.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 5);
+                } else {
+                    node.stop(this.ctx.currentTime + 5); 
+                }
+            } catch(e) {}
+        });
+        this.binauralNodes = [];
     }
 
     stopDrone() {
@@ -350,7 +389,17 @@ class AudioEngine {
         this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
         this.mantraLoop.start();
 
-        // Fade in mantra, fade down drone
+        // New: Organic Mantra Motion (LFO Presence)
+        const lfo = this.ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); // Very slow breathing
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.setValueAtTime(1500, this.ctx.currentTime); // Depth of filter movement
+        lfo.connect(lfoGain);
+        lfoGain.connect(this.mantraFilter.frequency);
+        lfo.start();
+        this.mantraPresenceLFO = lfo;
+
         const now = this.ctx.currentTime;
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(0, now);
@@ -368,6 +417,11 @@ class AudioEngine {
         if (!this.mantraLoop) return;
         const now = this.ctx.currentTime;
 
+        if (this.mantraPresenceLFO) {
+            try { this.mantraPresenceLFO.stop(); } catch(e) {}
+            this.mantraPresenceLFO = null;
+        }
+
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
         this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
@@ -379,6 +433,17 @@ class AudioEngine {
 
         this.mantraLoop.stop(4);
         this.mantraLoop = null;
+    }
+
+    // New: Studio Reverb Swell for Transitions
+    triggerReverbSwell(duration = 4) {
+        const now = this.ctx.currentTime;
+        this.reverbWet.gain.cancelScheduledValues(now);
+        this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
+        
+        // Swell up to 0.8 wetness then back down
+        this.reverbWet.gain.linearRampToValueAtTime(0.8, now + (duration * 0.5));
+        this.reverbWet.gain.linearRampToValueAtTime(0.3, now + duration);
     }
 
     async startBackgroundMusic() {
@@ -854,6 +919,10 @@ class MeditationController {
 
         // 2.5 second gap after narration stops
         await new Promise(r => setTimeout(r, 2500));
+        
+        // New: Trigger Reverb Swell as we fade music
+        this.audio.triggerReverbSwell(5);
+        
         // Fade out background music
         this.audio.fadeOutBackgroundMusic(4);
     }
