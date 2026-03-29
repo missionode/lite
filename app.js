@@ -8,8 +8,85 @@ const MANTRA_AUDIO_MAP = {
     crown:       'audio/AUM.mp3',
     high_energy: 'audio/HREEM.mp3'
 };
-
 // Audio Engine
+class SeamlessLoop {
+    constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 3) {
+        this.ctx = ctx;
+        this.buffer = buffer;
+        this.destination = destination;
+        this.targetGainValue = targetGain;
+        this.crossfadeDuration = crossfadeDuration;
+        this.activeSources = [];
+        this.nextStartTimer = null;
+        this.isRunning = false;
+    }
+
+    start() {
+        if (this.isRunning) return;
+        this.isRunning = true;
+        this._playInstance();
+    }
+
+    _playInstance() {
+        if (!this.isRunning) return;
+
+        const now = this.ctx.currentTime;
+        const source = this.ctx.createBufferSource();
+        const gain = this.ctx.createGain();
+
+        source.buffer = this.buffer;
+        source.connect(gain);
+        gain.connect(this.destination);
+
+        // Initial Fade In
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(this.targetGainValue, now + this.crossfadeDuration);
+
+        source.start(now);
+        this.activeSources.push({ source, gain });
+
+        // Schedule next instance and current fade out
+        const duration = this.buffer.duration;
+        const nextStartTime = now + duration - this.crossfadeDuration;
+
+        // Schedule fade out for this instance
+        gain.gain.setValueAtTime(this.targetGainValue, nextStartTime);
+        gain.gain.linearRampToValueAtTime(0, nextStartTime + this.crossfadeDuration);
+
+        // Remove from tracking and stop after fade out
+        setTimeout(() => {
+            try { source.stop(); } catch(e) {}
+            this.activeSources = this.activeSources.filter(s => s.source !== source);
+        }, (duration + 1) * 1000);
+
+        // Recursively schedule next
+        const delayMs = (duration - this.crossfadeDuration) * 1000;
+        this.nextStartTimer = setTimeout(() => this._playInstance(), delayMs);
+    }
+
+    setGain(value) {
+        this.targetGainValue = value;
+        this.activeSources.forEach(s => {
+            const now = this.ctx.currentTime;
+            s.gain.gain.cancelScheduledValues(now);
+            // Increased to 2.0s for a more organic volume transition
+            s.gain.gain.linearRampToValueAtTime(value, now + 2.0);
+        });
+    }
+
+    stop(fadeTime = 4) {
+        this.isRunning = false;
+        if (this.nextStartTimer) clearTimeout(this.nextStartTimer);
+
+        const now = this.ctx.currentTime;
+        this.activeSources.forEach(s => {
+            s.gain.gain.cancelScheduledValues(now);
+            s.gain.gain.linearRampToValueAtTime(0, now + fadeTime);
+            setTimeout(() => { try { s.source.stop(); } catch(e) {} }, (fadeTime + 1.0) * 1000);
+        });
+        this.activeSources = [];
+    }
+    }
 class AudioEngine {
     constructor() {
         this.ctx = null;
@@ -19,12 +96,14 @@ class AudioEngine {
         this.reverbNode = null;
         this.pannerNode = null;
         this.isInitialized = false;
-        this.mantraSource = null;
-        this.mantraGain = null;
+
+        // Looping Managers
+        this.mantraLoop = null;
+        this.bgMusicLoop = null;
+
         this.mantraBuffer = {};
-        this.bgMusicSource = null;
         this.bgMusicBuffer = null;
-        
+
         // Studio Mastering Nodes
         this.masterCompressor = null;
         this.presenceFilter = null;
@@ -64,8 +143,17 @@ class AudioEngine {
         // Background Music Gain
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
-        // Music goes through the Mud-Cut first, then Mastering
-        this.bgMusicGain.connect(this.lowCutFilter);
+        
+        // Studio "Voice Pocket" Filter for Music
+        this.bgMusicEQ = this.ctx.createBiquadFilter();
+        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); // Mid-range clarity zone
+        this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
+        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); // Start neutral
+
+        // Music goes through EQ -> Mud-Cut -> Mastering
+        this.bgMusicGain.connect(this.bgMusicEQ);
+        this.bgMusicEQ.connect(this.lowCutFilter);
 
         // Dedicated Bell Gain (Pure bypass)
         this.bellGain = this.ctx.createGain();
@@ -248,7 +336,7 @@ class AudioEngine {
 
     async playMantraTrack(key) {
         const filePath = MANTRA_AUDIO_MAP[key];
-        if (!filePath) return; // silence (thirdeye / OM)
+        if (!filePath) return;
 
         this.stopMantraTrack();
 
@@ -258,18 +346,16 @@ class AudioEngine {
             this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
         }
 
-        const source = this.ctx.createBufferSource();
-        source.buffer = this.mantraBuffer[key];
-        source.loop = true;
-        source.connect(this.mantraGain);
-        source.start();
-        this.mantraSource = source;
+        // Standardized to 3.0s crossfade
+        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+        this.mantraLoop.start();
 
         // Fade in mantra, fade down drone
         const now = this.ctx.currentTime;
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(0, now);
         this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 5);
+        this.mantraLoop.setGain(state.volMantra);
 
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
@@ -279,57 +365,74 @@ class AudioEngine {
     }
 
     stopMantraTrack() {
-        if (!this.mantraSource) return;
+        if (!this.mantraLoop) return;
         const now = this.ctx.currentTime;
 
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
         this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
-
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
         }
 
-        const src = this.mantraSource;
-        this.mantraSource = null;
-        setTimeout(() => { try { src.stop(); } catch(e) {} }, 4100);
+        this.mantraLoop.stop(4);
+        this.mantraLoop = null;
     }
 
-    async playBackgroundMusic() {
+    async startBackgroundMusic() {
         if (!this.bgMusicBuffer) {
             const response = await fetch('audio/background_music.mp3');
             const arrayBuffer = await response.arrayBuffer();
             this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         }
         
-        if (this.bgMusicSource) {
-            try { this.bgMusicSource.stop(); } catch(e) {}
+        if (this.bgMusicLoop) {
+            this.bgMusicLoop.stop(0);
         }
 
-        this.bgMusicSource = this.ctx.createBufferSource();
-        this.bgMusicSource.buffer = this.bgMusicBuffer;
-        this.bgMusicSource.loop = true;
-        this.bgMusicSource.connect(this.bgMusicGain);
-        this.bgMusicSource.start();
+        // Standardized to 3.0s crossfade
+        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
+        this.bgMusicLoop.start();
+    }
 
+    fadeInBackgroundMusic(duration = 4, isDucked = false) {
+        if (!this.bgMusicLoop) return;
+        const targetVol = isDucked ? state.volMusic * 0.45 : state.volMusic;
+        const targetEQ = isDucked ? -8 : 0; 
+        
+        const now = this.ctx.currentTime;
+        // Studio Trick: We use the dedicated bgMusicGain for the volume fades
+        this.bgMusicGain.gain.cancelScheduledValues(now);
+        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
+        this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration); 
+        
+        this.bgMusicEQ.gain.cancelScheduledValues(now);
+        this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
+        
+        // Ensure the loop itself is running at a base gain of 1.0 so the bgMusicGain handles the mix
+        this.bgMusicLoop.setGain(1.0);
+    }
+
+    fadeOutBackgroundMusic(duration = 4) {
+        if (!this.bgMusicLoop) return;
         const now = this.ctx.currentTime;
         this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(0, now);
-        this.bgMusicGain.gain.linearRampToValueAtTime(state.volMusic, now + 3); 
+        this.bgMusicEQ.gain.cancelScheduledValues(now);
+        
+        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
+        this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
+        this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
+        
+        this.bgMusicLoop.setGain(0);
     }
 
     stopBackgroundMusic() {
-        if (!this.bgMusicSource) return;
-        const now = this.ctx.currentTime;
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
-        this.bgMusicGain.gain.linearRampToValueAtTime(0, now + 3);
-        
-        const src = this.bgMusicSource;
-        this.bgMusicSource = null;
-        setTimeout(() => { try { src.stop(); } catch(e) {} }, 3100);
+        if (this.bgMusicLoop) {
+            this.bgMusicLoop.stop(2);
+            this.bgMusicLoop = null;
+        }
     }
 
     playSingingBowl() {
@@ -390,6 +493,9 @@ class MeditationController {
         }
 
         await this.audio.init();
+        // Start background music looping silently immediately
+        await this.audio.startBackgroundMusic();
+
         await wakeLock.request();
         this.isMeditationActive = true;
         this.isPaused = false;
@@ -398,9 +504,19 @@ class MeditationController {
         document.getElementById('pause-meditation').textContent = 'II';
         document.getElementById('completion-modal').classList.add('hidden');
 
+        // Initial Settle (2 seconds)
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
         if (this.isMeditationActive) await this.runGratitude();
+
+        // Settle before breathing (2 seconds)
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
         if (this.isMeditationActive) await this.runBoxBreathing();
         
+        // Settle after breathing (3 seconds)
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+
         if (this.isMeditationActive) {
             showScreen(meditationScreen);
             if (this.isHighEnergy) {
@@ -678,16 +794,8 @@ class MeditationController {
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
 
-        // Subliminal whisper — fires 30s into mantra, non-blocking
-        const subliminalDelay = Math.min(30000, chantDurationMs * 0.3);
-        const subliminalTimer = setTimeout(() => {
-            if (this.isMeditationActive && !this.isPaused) {
-                this.narrateSubliminal(chakra[`affirmation_${state.language}`]);
-            }
-        }, subliminalDelay);
-
         while (elapsed < chantDurationMs) {
-            if (!this.isMeditationActive) { clearTimeout(subliminalTimer); break; }
+            if (!this.isMeditationActive) break;
             if (!this.isPaused) {
                 elapsed += 100;
                 const remaining = Math.max(0, chantDurationMs - elapsed);
@@ -720,8 +828,8 @@ class MeditationController {
     }
 
     async narrate(text) {
-        // Start background music
-        await this.audio.playBackgroundMusic();
+        // Fade in background music with intelligent ducking
+        this.audio.fadeInBackgroundMusic(4, true);
         // 2.5 second gap before narration starts
         await new Promise(r => setTimeout(r, 2500));
 
@@ -733,9 +841,9 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                // Authoritative Tuning: Deep pitch, confident rate
-                utterance.rate   = state.sleepMode ? 0.55 : 0.68;
-                utterance.pitch  = state.sleepMode ? 0.70 : 0.78;
+                // Studio Clarity: Slightly faster rate and higher pitch for "Sharpness"
+                utterance.rate   = state.sleepMode ? 0.60 : 0.72;
+                utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
@@ -746,8 +854,8 @@ class MeditationController {
 
         // 2.5 second gap after narration stops
         await new Promise(r => setTimeout(r, 2500));
-        // Stop background music
-        this.audio.stopBackgroundMusic();
+        // Fade out background music
+        this.audio.fadeOutBackgroundMusic(4);
     }
 
     // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
@@ -856,11 +964,11 @@ const state = {
     voiceName: localStorage.getItem('chakra_voice') || '',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
-    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.0,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.06,
+    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
-    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.8,
-    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.15,
+    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.45,
+    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
