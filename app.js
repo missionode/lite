@@ -22,6 +22,8 @@ class AudioEngine {
         this.mantraSource = null;
         this.mantraGain = null;
         this.mantraBuffer = {};
+        this.bgMusicSource = null;
+        this.bgMusicBuffer = null;
     }
 
     async init() {
@@ -29,6 +31,11 @@ class AudioEngine {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
+
+        // Background Music Gain
+        this.bgMusicGain = this.ctx.createGain();
+        this.bgMusicGain.gain.value = 0;
+        this.bgMusicGain.connect(this.ctx.destination);
 
         // Dedicated Bell Gain (Bypasses master drone gain)
         this.bellGain = this.ctx.createGain();
@@ -243,6 +250,42 @@ class AudioEngine {
         const src = this.mantraSource;
         this.mantraSource = null;
         setTimeout(() => { try { src.stop(); } catch(e) {} }, 4100);
+    }
+
+    async playBackgroundMusic() {
+        if (!this.bgMusicBuffer) {
+            const response = await fetch('audio/background_music.mp3');
+            const arrayBuffer = await response.arrayBuffer();
+            this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+        }
+        
+        if (this.bgMusicSource) {
+            try { this.bgMusicSource.stop(); } catch(e) {}
+        }
+
+        this.bgMusicSource = this.ctx.createBufferSource();
+        this.bgMusicSource.buffer = this.bgMusicBuffer;
+        this.bgMusicSource.loop = true;
+        this.bgMusicSource.connect(this.bgMusicGain);
+        this.bgMusicSource.start();
+
+        const now = this.ctx.currentTime;
+        this.bgMusicGain.gain.cancelScheduledValues(now);
+        this.bgMusicGain.gain.setValueAtTime(0, now);
+        // Subtle volume: 0.15 is roughly 15% - a good background level
+        this.bgMusicGain.gain.linearRampToValueAtTime(0.15, now + 3); 
+    }
+
+    stopBackgroundMusic() {
+        if (!this.bgMusicSource) return;
+        const now = this.ctx.currentTime;
+        this.bgMusicGain.gain.cancelScheduledValues(now);
+        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
+        this.bgMusicGain.gain.linearRampToValueAtTime(0, now + 3);
+        
+        const src = this.bgMusicSource;
+        this.bgMusicSource = null;
+        setTimeout(() => { try { src.stop(); } catch(e) {} }, 3100);
     }
 
     playSingingBowl() {
@@ -712,6 +755,11 @@ class MeditationController {
     }
 
     async narrate(text) {
+        // Start background music
+        await this.audio.playBackgroundMusic();
+        // 2.5 second gap before narration starts
+        await new Promise(r => setTimeout(r, 2500));
+
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
@@ -722,12 +770,17 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
                 utterance.rate   = state.sleepMode ? 0.50 : 0.65;
                 utterance.pitch  = state.sleepMode ? 0.70 : 0.85;
-                utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
+                utterance.volume = state.sleepMode ? state.volVoice * 0.69 : state.volVoice;
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
             await new Promise(r => setTimeout(r, state.sleepMode ? 900 : 500));
         }
+
+        // 2.5 second gap after narration stops
+        await new Promise(r => setTimeout(r, 2500));
+        // Stop background music
+        this.audio.stopBackgroundMusic();
     }
 
     // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
@@ -762,7 +815,7 @@ class MeditationController {
     }
 
     finish() {
-        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); wakeLock.release();
+        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -802,7 +855,7 @@ class MeditationController {
     }
 
     stop() {
-        this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
         document.body.classList.remove('sleep-mode-active');
         document.getElementById('aura-bg').style.opacity = "0";
