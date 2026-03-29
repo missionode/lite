@@ -745,9 +745,8 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            // Normal calm speed, no longer stretchy
-            utterance.rate = 0.8; 
-            utterance.pitch = 0.9; 
+            utterance.rate = 0.72; 
+            utterance.pitch = 0.82; 
             utterance.volume = state.volVoice * 0.6;
             utterance.onend = resolve;
             window.speechSynthesis.speak(utterance);
@@ -768,13 +767,15 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                utterance.rate   = state.sleepMode ? 0.50 : 0.65;
-                utterance.pitch  = state.sleepMode ? 0.70 : 0.85;
-                utterance.volume = state.sleepMode ? state.volVoice * 0.69 : state.volVoice;
+                // Authoritative Tuning: Deep pitch, confident rate
+                utterance.rate   = state.sleepMode ? 0.55 : 0.68;
+                utterance.pitch  = state.sleepMode ? 0.70 : 0.78;
+                utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
-            await new Promise(r => setTimeout(r, state.sleepMode ? 900 : 500));
+            // Increased pause between sentences for "Authoritative" weight
+            await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
 
         // 2.5 second gap after narration stops
@@ -961,15 +962,28 @@ function setupVoices() {
 
 function autoSelectVoice() {
     let bestVoice = null;
+    const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
+    
+    const findBestInList = (list) => {
+        // First try premium voices
+        let premium = list.find(v => premiumKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+        if (premium) return premium;
+        // Then return the first in the list
+        return list[0];
+    };
+
     if (state.language === 'ml') {
-        // Broad search for Malayalam
-        bestVoice = state.voices.find(v => v.lang === 'ml-IN' || v.lang === 'ml_IN') || 
-                    state.voices.find(v => v.lang.startsWith('ml')) ||
-                    state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
+        const mlVoices = state.voices.filter(v => v.lang.startsWith('ml'));
+        if (mlVoices.length > 0) {
+            bestVoice = findBestInList(mlVoices);
+        } else {
+            bestVoice = state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
+        }
     } else {
-        // Standard English selection
-        bestVoice = state.voices.find(v => v.lang === 'en-US' || v.lang === 'en_US') || 
-                    state.voices.find(v => v.lang.startsWith('en'));
+        const enVoices = state.voices.filter(v => v.lang.startsWith('en'));
+        if (enVoices.length > 0) {
+            bestVoice = findBestInList(enVoices);
+        }
     }
     
     if (bestVoice) {
