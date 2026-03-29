@@ -20,9 +20,8 @@
 <body>
     <div id="nebula-bg"></div>
     <div id="app">
-        <!-- Background Aura & Particles -->
+        <!-- Background Aura -->
         <div id="aura-bg"></div>
-        <canvas id="particle-canvas"></canvas>
 
         <!-- Configuration Screen -->
         <section id="config-screen" class="screen">
@@ -156,6 +155,10 @@
                 <div class="mixer-row">
                     <label>Mantra</label>
                     <input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8">
+                </div>
+                <div class="mixer-row">
+                    <label>Music</label>
+                    <input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15">
                 </div>
                 <button id="close-mixer" class="secondary-btn" style="margin-top:1rem;">Close</button>
             </div>

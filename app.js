@@ -89,12 +89,14 @@ class AudioEngine {
     }
 
     createNoiseBuffer() {
+        if (this._cachedNoise) return this._cachedNoise;
         const bufferSize = this.ctx.sampleRate * 2;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
             data[i] = Math.random() * 2 - 1;
         }
+        this._cachedNoise = buffer;
         return buffer;
     }
 
@@ -135,9 +137,10 @@ class AudioEngine {
 
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
-        const reverbDuration = 2 + (index * 0.5);
-        const reverbDecay = 1 + (index * 0.5);
-        this.reverbNode.buffer = this.createImpulseResponse(reverbDuration, reverbDecay);
+        // Use a static impulse response if already created
+        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(4, 3);
+        this.reverbNode.buffer = this._staticImpulse;
+        
         this.startElementalLayer(index);
         
         const lfo = this.ctx.createOscillator();
@@ -149,31 +152,30 @@ class AudioEngine {
         lfo.start();
         this.vibrationLFO = lfo;
 
+        // Reduced harmonics to save CPU
         const harmonics = [
             { f: 1.0, g: 0.2, type: 'sine' },
-            { f: 0.5, g: 0.15, type: 'sine' },
-            { f: 1.5, g: 0.08, type: 'sine' }
+            { f: 0.5, g: 0.15, type: 'sine' }
         ];
 
         harmonics.forEach((h) => {
-            [-0.001, 0, 0.001].forEach(offset => {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = h.type;
-                osc.frequency.setValueAtTime(baseFreq * (h.f + offset), this.ctx.currentTime);
-                lfoGain.connect(osc.frequency);
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(baseFreq * 1.2, this.ctx.currentTime);
-                filter.Q.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(h.g / 3, this.ctx.currentTime + 5);
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.masterGain);
-                osc.start();
-                this.droneOscillators.push({ osc, gain });
-            });
+            // Reduced detuned oscillators from 3 to 1
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = h.type;
+            osc.frequency.setValueAtTime(baseFreq * h.f, this.ctx.currentTime);
+            lfoGain.connect(osc.frequency);
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(baseFreq * 1.2, this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.1, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(h.g, this.ctx.currentTime + 5);
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start();
+            this.droneOscillators.push({ osc, gain });
         });
     }
 
@@ -272,8 +274,7 @@ class AudioEngine {
         const now = this.ctx.currentTime;
         this.bgMusicGain.gain.cancelScheduledValues(now);
         this.bgMusicGain.gain.setValueAtTime(0, now);
-        // Subtle volume: 0.15 is roughly 15% - a good background level
-        this.bgMusicGain.gain.linearRampToValueAtTime(0.15, now + 3); 
+        this.bgMusicGain.gain.linearRampToValueAtTime(state.volMusic, now + 3); 
     }
 
     stopBackgroundMusic() {
@@ -318,90 +319,12 @@ class VisualEngine {
     constructor() {
         this.symbolImg = document.getElementById('chakra-symbol');
         this.glow = document.getElementById('glow-effect');
-        this.animationId = null;
-        this.canvas = document.getElementById('particle-canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.stars = [];
-        this.starsAnimId = null;
-        this.particleColor = '#ffffff';
-        this.isEmitting = false;
-        window.addEventListener('resize', () => this.resizeCanvas());
-        this.resizeCanvas();
-        this.generateStars();
-        this.animateStars();
     }
-    resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        if (this.stars && this.stars.length > 0) this.generateStars();
-    }
-    generateStars() {
-        this.stars = [];
-        const count = 60;
-        for (let i = 0; i < count; i++) {
-            this.stars.push({
-                x: Math.random() * this.canvas.width,
-                y: Math.random() * this.canvas.height,
-                radius: 0.5 + Math.random() * 1.0,
-                baseOpacity: 0.1 + Math.random() * 0.4,
-                phase: Math.random() * Math.PI * 2,
-                speed: 0.3 + Math.random() * 0.9
-            });
-        }
-    }
-    animateStars() {
-        const ctx = this.ctx;
-        const draw = (time) => {
-            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            const t = time * 0.001;
-            this.stars.forEach(star => {
-                const opacity = star.baseOpacity + (1 - star.baseOpacity) * 0.5 * (1 + Math.sin(t * star.speed + star.phase));
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-                ctx.fill();
-            });
-            this.starsAnimId = requestAnimationFrame(draw);
-        };
-        this.starsAnimId = requestAnimationFrame(draw);
-    }
-    emitParticles() {
-        if (!this.isEmitting) return;
-        // Faster emission for a richer feel
-        if (Math.random() > 0.6) {
-            this.particles.push({
-                x: this.canvas.width / 2,
-                y: this.canvas.height / 2,
-                vx: (Math.random() - 0.5) * 1.5,
-                vy: (Math.random() - 0.5) * 1.5,
-                life: 1.0,
-                // Dynamic Radius
-                radius: Math.random() * 5 + 2,
-                maxRadius: Math.random() * 30 + 10,
-                growth: Math.random() * 0.2 + 0.1
-            });
-        }
-    }
-
     startPulsing(color) {
-        this.particleColor = color;
-        this.isEmitting = true;
-        let scale = 1;
-        let direction = 1;
-        const animate = () => {
-            scale += 0.0001 * direction; 
-            if (scale > 1.02 || scale < 1.0) direction *= -1;
-            this.symbolImg.style.transform = `scale(${scale})`;
-            this.glow.style.boxShadow = `0 0 60px 20px ${color}`;
-            this.glow.style.background = color;
-            this.glow.style.opacity = 0.15 + (scale - 1) * 2;
-            this.animationId = requestAnimationFrame(animate);
-        };
-        animate();
+        this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
-        cancelAnimationFrame(this.animationId);
-        this.isEmitting = false;
+        // No loops to stop
     }
 }
 
@@ -894,6 +817,7 @@ const state = {
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.06,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.8,
+    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.15,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -1009,6 +933,7 @@ function loadPreferences() {
     document.getElementById('vol-drone').value = state.volDrone;
     document.getElementById('vol-bell').value = state.volBell;
     document.getElementById('vol-mantra').value = state.volMantra;
+    document.getElementById('vol-music').value = state.volMusic;
     document.getElementById('stat-journeys').textContent = state.stats.journeys;
     document.getElementById('stat-time').textContent = state.stats.time;
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
@@ -1142,6 +1067,13 @@ function attachEventListeners() {
         localStorage.setItem('chakra_vol_mantra', state.volMantra);
         if (audio.mantraGain && audio.mantraSource) {
             audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
+        }
+    });
+    document.getElementById('vol-music').addEventListener('input', (e) => {
+        state.volMusic = parseFloat(e.target.value);
+        localStorage.setItem('chakra_vol_music', state.volMusic);
+        if (audio.bgMusicGain && audio.bgMusicSource) {
+            audio.bgMusicGain.gain.setValueAtTime(state.volMusic, audio.ctx.currentTime);
         }
     });
     if ('mediaSession' in navigator) {
