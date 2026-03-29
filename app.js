@@ -24,20 +24,50 @@ class AudioEngine {
         this.mantraBuffer = {};
         this.bgMusicSource = null;
         this.bgMusicBuffer = null;
+        
+        // Studio Mastering Nodes
+        this.masterCompressor = null;
+        this.presenceFilter = null;
+        this.lowCutFilter = null;
     }
 
     async init() {
         if (this.isInitialized) return;
+        // Use hardware native sample rate for maximum clarity
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // 1. Master Gain (Final Volume)
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
+
+        // 2. Presence EQ (Sharpness/Clarity)
+        this.presenceFilter = this.ctx.createBiquadFilter();
+        this.presenceFilter.type = 'highshelf';
+        this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(4, this.ctx.currentTime); // 4dB of "Air"
+
+        // 3. Mud-Cut Filter (Clarity)
+        // Removes low-end rumble from Reverb and Music
+        this.lowCutFilter = this.ctx.createBiquadFilter();
+        this.lowCutFilter.type = 'highpass';
+        this.lowCutFilter.frequency.setValueAtTime(150, this.ctx.currentTime);
+        this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+
+        // 4. Master Compressor (Studio Glue)
+        this.masterCompressor = this.ctx.createDynamicsCompressor();
+        this.masterCompressor.threshold.setValueAtTime(-20, this.ctx.currentTime);
+        this.masterCompressor.knee.setValueAtTime(40, this.ctx.currentTime); // Softer knee for "Musical" feel
+        this.masterCompressor.ratio.setValueAtTime(4, this.ctx.currentTime); // Lower ratio is more transparent
+        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime);
+        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
         // Background Music Gain
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
-        this.bgMusicGain.connect(this.ctx.destination);
+        // Music goes through the Mud-Cut first, then Mastering
+        this.bgMusicGain.connect(this.lowCutFilter);
 
-        // Dedicated Bell Gain (Bypasses master drone gain)
+        // Dedicated Bell Gain (Pure bypass)
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
@@ -62,15 +92,24 @@ class AudioEngine {
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
 
+        // Chain logic: 
+        // Sources -> Panner -> Mud-Cut -> Reverb -> Presence -> Compressor
         this.masterGain.connect(this.delayNode);
         this.masterGain.connect(this.pannerNode);
         this.delayNode.connect(this.pannerNode);
-        this.pannerNode.connect(this.reverbNode);
-        this.reverbNode.connect(this.ctx.destination);
+        
+        this.pannerNode.connect(this.lowCutFilter);
+        this.lowCutFilter.connect(this.reverbNode);
+        
+        this.reverbNode.connect(this.presenceFilter);
+        this.lowCutFilter.connect(this.presenceFilter); // Also Presence for Music
+        
+        this.presenceFilter.connect(this.masterCompressor);
+        this.masterCompressor.connect(this.ctx.destination);
 
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
-        this.mantraGain.connect(this.reverbNode);
+        this.mantraGain.connect(this.lowCutFilter);
 
         this.isInitialized = true;
     }
@@ -82,7 +121,9 @@ class AudioEngine {
         for (let channel = 0; channel < 2; channel++) {
             const data = buffer.getChannelData(channel);
             for (let i = 0; i < length; i++) {
-                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+                // Organic studio decay: Combining noise with a subtle sine-sweep feeling
+                const envelope = Math.pow(1 - i / length, decay);
+                data[i] = (Math.random() * 2 - 1) * envelope;
             }
         }
         return buffer;
@@ -118,13 +159,15 @@ class AudioEngine {
         if (index === 0 || index === 1) {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(index === 0 ? 100 : 300, this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.2, this.ctx.currentTime);
         } else if (index === 2 || index === 3) {
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(index === 2 ? 800 : 1500, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); // Narrower, cleaner band
         } else {
             filter.type = 'highpass';
-            filter.frequency.setValueAtTime(3000 + (index * 500), this.ctx.currentTime);
+            filter.frequency.setValueAtTime(4000 + (index * 400), this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.5, this.ctx.currentTime);
         }
 
         noiseSrc.connect(filter);
