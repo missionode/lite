@@ -618,7 +618,7 @@ class MeditationController {
         if (moonText && this.isMeditationActive) {
             tutTitle.textContent = state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon";
             tutText.textContent = moonText;
-            await this.narrate(moonText);
+            await this.narrate(moonText, false); // Keep music playing
             await new Promise(r => setTimeout(r, 1000));
         }
 
@@ -627,16 +627,18 @@ class MeditationController {
         tutTitle.textContent = state.language === 'ml' ? "കൃതജ്ഞത" : "Gratitude";
         const text = this.scripts.intro[`gratitude_${state.language}`];
         tutText.textContent = text;
-        await this.narrate(text);
 
-        // Intention Seed — woven in after gratitude
-        if (this.isMeditationActive && state.intention && state.intention.trim()) {
+        if (state.intention && state.intention.trim()) {
+            await this.narrate(text, false); // Still keep music playing for next part
+            
             const intentionText = state.language === 'ml'
                 ? `ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: ${state.intention.trim()}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്ര മുഴുവൻ അത് ഉള്ളിൽ ജ്വലിക്കട്ടെ.`
                 : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
             tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
             tutText.textContent = intentionText;
-            await this.narrate(intentionText);
+            await this.narrate(intentionText, true); // Now fade music out after intention
+        } else {
+            await this.narrate(text, true); // No intention? Fade out now.
         }
 
         if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
@@ -771,7 +773,6 @@ class MeditationController {
     }
 
     async runHooponopono() {
-        // Visual: warm gold aura, dim chakra symbol, star marker in mantra display
         const aura = document.getElementById('aura-bg');
         aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
         aura.style.opacity = '1';
@@ -779,25 +780,29 @@ class MeditationController {
         document.getElementById('mantra-display').textContent = '✦';
         document.getElementById('narration-text').textContent = '';
 
-        // Intro: "Repeat each phrase gently in your heart"
-        await this.narrate(this.scripts.hooponopono.intro[state.language]);
+        // Intro: "Repeat each phrase gently in your heart" - Keep music playing
+        await this.narrate(this.scripts.hooponopono.intro[state.language], false);
         await new Promise(r => setTimeout(r, 2000));
 
         // 3 cycles of the 4 phrases
         const phrases = this.scripts.hooponopono.phrases[state.language];
         for (let cycle = 0; cycle < 3; cycle++) {
             if (!this.isMeditationActive) return;
-            for (const phrase of phrases) {
+            for (let i = 0; i < phrases.length; i++) {
                 if (!this.isMeditationActive) return;
+                const phrase = phrases[i];
                 document.getElementById('narration-text').textContent = phrase;
-                await this.narrate(phrase);
+                
+                // Keep music for all phrases, fade out only on the very last phrase of the last cycle
+                const isLast = (cycle === 2 && i === phrases.length - 1);
+                await this.narrate(phrase, false); // Keep music for phrases
                 await new Promise(r => setTimeout(r, 2000));
             }
         }
 
-        // Closing breath
+        // Closing breath - Final fade out
         document.getElementById('narration-text').textContent = '';
-        await this.narrate(this.scripts.hooponopono.closing[state.language]);
+        await this.narrate(this.scripts.hooponopono.closing[state.language], true);
         await new Promise(r => setTimeout(r, 3000));
     }
 
@@ -892,9 +897,10 @@ class MeditationController {
         });
     }
 
-    async narrate(text) {
-        // Fade in background music with intelligent ducking
+    async narrate(text, fadeOut = true) {
+        // Fade in background music with intelligent ducking (stays active if already playing)
         this.audio.fadeInBackgroundMusic(4, true);
+        
         // 2.5 second gap before narration starts
         await new Promise(r => setTimeout(r, 2500));
 
@@ -902,29 +908,35 @@ class MeditationController {
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+            
+            const narrationTextEl = document.getElementById('narration-text');
+            if (narrationTextEl) narrationTextEl.textContent = sentence.trim();
+
             await new Promise(resolve => {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                // Studio Clarity: Slightly faster rate and higher pitch for "Sharpness"
+                
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
-            // Increased pause between sentences for "Authoritative" weight
+            
             await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
 
-        // 2.5 second gap after narration stops
-        await new Promise(r => setTimeout(r, 2500));
-        
-        // New: Trigger Reverb Swell as we fade music
-        this.audio.triggerReverbSwell(5);
-        
-        // Fade out background music
-        this.audio.fadeOutBackgroundMusic(4);
+        if (fadeOut) {
+            // 2.5 second gap after ALL sentences are finished
+            await new Promise(r => setTimeout(r, 2500));
+            
+            // Trigger Reverb Swell as we finally transition away from narration
+            this.audio.triggerReverbSwell(5);
+            
+            // Fade out background music only once at the very end
+            this.audio.fadeOutBackgroundMusic(4);
+        }
     }
 
     // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
