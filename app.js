@@ -132,10 +132,10 @@ class AudioEngine {
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-20, this.ctx.currentTime);
-        this.masterCompressor.knee.setValueAtTime(40, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(4, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime);
+        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); // Deeper threshold for consistent glue
+        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); // More musical, transparent ratio
+        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); // Fast studio-grade attack
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
@@ -591,8 +591,7 @@ class MeditationController {
 
         if (this.isMeditationActive) await this.runGratitude();
 
-        // Settle before breathing (2 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+        // Removed redundant settle pause (already handled by narrate ending and gratitude end)
 
         if (this.isMeditationActive) await this.runBoxBreathing();
         
@@ -653,12 +652,12 @@ class MeditationController {
                 : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
             tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
             tutText.textContent = intentionText;
-            await this.narrate(intentionText, true); // Now fade music out after intention
+            await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
-            await this.narrate(text, true); // No intention? Fade out now.
+            await this.narrate(text, false); // No intention? Still keep music playing.
         }
 
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+        // Removed redundant pause before breathing - transition is now immediate and musical
     }
 
     async runBoxBreathing() {
@@ -931,8 +930,8 @@ class MeditationController {
         // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
         
-        // 2.5 second gap before narration starts
-        await new Promise(r => setTimeout(r, 2500));
+        // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
+        await new Promise(r => setTimeout(r, 1200));
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
