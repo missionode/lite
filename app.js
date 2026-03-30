@@ -81,6 +81,7 @@ class SeamlessLoop {
         const now = this.ctx.currentTime;
         this.activeSources.forEach(s => {
             s.gain.gain.cancelScheduledValues(now);
+            s.gain.gain.setValueAtTime(s.gain.gain.value, now);
             s.gain.gain.linearRampToValueAtTime(0, now + fadeTime);
             setTimeout(() => { try { s.source.stop(); } catch(e) {} }, (fadeTime + 1.0) * 1000);
         });
@@ -336,13 +337,16 @@ class AudioEngine {
     }
 
     stopBinaural() {
+        const now = this.ctx.currentTime;
         this.binauralNodes.forEach(node => {
             if (node instanceof AudioParam) return;
             try { 
                 if (node.gain) {
-                    node.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 5);
+                    node.gain.cancelScheduledValues(now);
+                    node.gain.setValueAtTime(node.gain.value, now);
+                    node.gain.linearRampToValueAtTime(0, now + 5);
                 } else {
-                    node.stop(this.ctx.currentTime + 5); 
+                    node.stop(now + 5); 
                 }
             } catch(e) {}
         });
@@ -350,24 +354,26 @@ class AudioEngine {
     }
 
     stopDrone() {
+        this.stopBinaural();
+        const now = this.ctx.currentTime;
         if (this.vibrationLFO) {
-            try { this.vibrationLFO.stop(this.ctx.currentTime + 5); } catch(e) {}
+            try { this.vibrationLFO.stop(now + 5); } catch(e) {}
             this.vibrationLFO = null;
         }
         this.droneOscillators.forEach(({ osc, gain }) => {
             const currentVal = gain.gain.value;
-            gain.gain.cancelScheduledValues(this.ctx.currentTime);
-            gain.gain.setValueAtTime(currentVal, this.ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 5);
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(currentVal, now);
+            gain.gain.linearRampToValueAtTime(0, now + 5);
             setTimeout(() => { try { osc.stop(); } catch(e) {} }, 5100);
         });
         this.droneOscillators = [];
 
         this.elementalNodes.forEach(({ src, gain }) => {
             const currentVal = gain.gain.value;
-            gain.gain.cancelScheduledValues(this.ctx.currentTime);
-            gain.gain.setValueAtTime(currentVal, this.ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 5);
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(currentVal, now);
+            gain.gain.linearRampToValueAtTime(0, now + 5);
             setTimeout(() => { try { src.stop(); } catch(e) {} }, 5100);
         });
         this.elementalNodes = [];
@@ -807,6 +813,7 @@ class MeditationController {
     }
 
     async handleInterval() {
+        this.audio.stopDrone();
         const timerEl = document.getElementById('timer-display');
         document.getElementById('mantra-display').textContent = "BREATHE";
         document.getElementById('chakra-symbol').style.opacity = "0.3";
@@ -852,13 +859,21 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
         aura.style.opacity = "1";
         const index = this.chakraOrder.indexOf(key);
-        this.audio.startDrone(chakra.frequency, index);
+
+        if (key === 'thirdeye') {
+            this.audio.stopDrone();
+        } else {
+            this.audio.startDrone(chakra.frequency, index);
+        }
+
         this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
         if (!this.isMeditationActive) return;
 
         // Start looping mantra audio track (fades in, drone fades down)
-        await this.audio.playMantraTrack(key);
+        if (key !== 'thirdeye') {
+            await this.audio.playMantraTrack(key);
+        }
 
         const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
         let elapsed = 0;
@@ -878,8 +893,14 @@ class MeditationController {
         timerEl.textContent = "00:00";
 
         // Fade out mantra, restore drone before affirmation
-        this.audio.stopMantraTrack();
-        await new Promise(r => setTimeout(r, 4000));
+        if (key !== 'thirdeye') {
+            this.audio.stopMantraTrack();
+            await new Promise(r => setTimeout(r, 4000));
+        } else {
+            // Restore drone for Ajna affirmation
+            this.audio.startDrone(chakra.frequency, index);
+            await new Promise(r => setTimeout(r, 2000));
+        }
 
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
     }
