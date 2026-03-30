@@ -196,10 +196,10 @@ class AudioEngine {
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
         
-        // New: Mantra Organic Presence Filter
+        // New: Mantra Organic Presence Filter - Lowered base for hiss reduction
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
+        this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
@@ -404,12 +404,12 @@ class AudioEngine {
         this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
         this.mantraLoop.start();
 
-        // New: Organic Mantra Motion (LFO Presence)
+        // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); // Very slow breathing
+        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); 
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(1500, this.ctx.currentTime); // Depth of filter movement
+        lfoGain.gain.setValueAtTime(400, this.ctx.currentTime); // Softened to remove "whooshing" noise
         lfo.connect(lfoGain);
         lfoGain.connect(this.mantraFilter.frequency);
         lfo.start();
@@ -426,6 +426,13 @@ class AudioEngine {
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
         }
+
+        // Explicitly fade out any elemental noise during mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0, now + 5);
+        });
     }
 
     stopMantraTrack() {
@@ -445,6 +452,13 @@ class AudioEngine {
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
         }
+
+        // Restore elemental layer subtly after mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0.015, now + 4);
+        });
 
         this.mantraLoop.stop(4);
         this.mantraLoop = null;
