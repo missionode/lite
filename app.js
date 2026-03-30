@@ -897,8 +897,8 @@ class MeditationController {
         });
     }
 
-    async narrate(text, fadeOut = true) {
-        // Fade in background music with intelligent ducking (stays active if already playing)
+    async narrate(text, fadeOut = false) {
+        // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
         
         // 2.5 second gap before narration starts
@@ -917,6 +917,7 @@ class MeditationController {
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
                 
+                // Studio Clarity
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
@@ -928,13 +929,9 @@ class MeditationController {
         }
 
         if (fadeOut) {
-            // 2.5 second gap after ALL sentences are finished
+            // Only fade out if explicitly requested (e.g. right before mantra)
             await new Promise(r => setTimeout(r, 2500));
-            
-            // Trigger Reverb Swell as we finally transition away from narration
             this.audio.triggerReverbSwell(5);
-            
-            // Fade out background music only once at the very end
             this.audio.fadeOutBackgroundMusic(4);
         }
     }
