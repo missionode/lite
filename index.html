@@ -61,7 +61,33 @@
                 </div>
             </div>
 
-            <button id="save-config" class="primary-btn">Start Meditation</button>
+            <div class="config-group" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                <label>Audio Levels</label>
+                <div class="settings-mixer" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; margin: 0.5rem auto 0;">
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Voice</label>
+                        <input type="range" id="settings-vol-voice" min="0" max="2" step="0.1" value="1.1">
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Drone</label>
+                        <input type="range" id="settings-vol-drone" min="0" max="0.2" step="0.01" value="0.05">
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Bell</label>
+                        <input type="range" id="settings-vol-bell" min="0" max="1" step="0.1" value="0.05">
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Mantra</label>
+                        <input type="range" id="settings-vol-mantra" min="0" max="1" step="0.05" value="0.45">
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Music</label>
+                        <input type="range" id="settings-vol-music" min="0" max="0.5" step="0.01" value="0.30">
+                    </div>
+                </div>
+            </div>
+
+            <button id="save-config" class="primary-btn" style="margin-top: 2rem;">Start Meditation</button>
         </section>
 
         <!-- Lobby Screen -->

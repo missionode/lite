@@ -1158,11 +1158,21 @@ function loadPreferences() {
     const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
     timeSlider.style.setProperty('--range-fill', pctInit);
     timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
+    
+    // Sync Mixer Sliders
     document.getElementById('vol-voice').value = state.volVoice;
     document.getElementById('vol-drone').value = state.volDrone;
     document.getElementById('vol-bell').value = state.volBell;
     document.getElementById('vol-mantra').value = state.volMantra;
     document.getElementById('vol-music').value = state.volMusic;
+
+    // Sync Settings Sliders
+    document.getElementById('settings-vol-voice').value = state.volVoice;
+    document.getElementById('settings-vol-drone').value = state.volDrone;
+    document.getElementById('settings-vol-bell').value = state.volBell;
+    document.getElementById('settings-vol-mantra').value = state.volMantra;
+    document.getElementById('settings-vol-music').value = state.volMusic;
+
     document.getElementById('stat-journeys').textContent = state.stats.journeys;
     document.getElementById('stat-time').textContent = state.stats.time;
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
@@ -1275,36 +1285,52 @@ function attachEventListeners() {
     const mixer = document.getElementById('volume-mixer');
     document.getElementById('btn-mixer').addEventListener('click', () => mixer.classList.toggle('hidden'));
     document.getElementById('close-mixer').addEventListener('click', () => mixer.classList.add('hidden'));
-    document.getElementById('vol-voice').addEventListener('input', (e) => {
-        state.volVoice = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_voice', state.volVoice);
-    });
-    document.getElementById('vol-drone').addEventListener('input', (e) => {
-        state.volDrone = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_drone', state.volDrone);
+    // Unified Volume Handlers
+    const syncVolume = (key, value, elements) => {
+        state[key] = parseFloat(value);
+        localStorage.setItem(`chakra_${key.replace('vol', 'vol_').toLowerCase()}`, state[key]);
+        elements.forEach(el => { if (el) el.value = value; });
+    };
+
+    // Voice
+    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')];
+    volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volVoice', e.target.value, volVoiceEls);
+    }));
+
+    // Drone
+    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')];
+    volDroneEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volDrone', e.target.value, volDroneEls);
         if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
-    });
-    document.getElementById('vol-bell').addEventListener('input', (e) => {
-        state.volBell = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_bell', state.volBell);
-        if (audio.bellGain) {
-            audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
-        }
-    });
-    document.getElementById('vol-mantra').addEventListener('input', (e) => {
-        state.volMantra = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_mantra', state.volMantra);
-        if (audio.mantraGain && audio.mantraSource) {
+    }));
+
+    // Bell
+    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')];
+    volBellEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volBell', e.target.value, volBellEls);
+        if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
+    }));
+
+    // Mantra
+    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')];
+    volMantraEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volMantra', e.target.value, volMantraEls);
+        if (audio.mantraGain && audio.mantraLoop) {
             audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
         }
-    });
-    document.getElementById('vol-music').addEventListener('input', (e) => {
-        state.volMusic = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_music', state.volMusic);
-        if (audio.bgMusicGain && audio.bgMusicSource) {
+    }));
+
+    // Music
+    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')];
+    volMusicEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volMusic', e.target.value, volMusicEls);
+        if (audio.bgMusicGain && audio.bgMusicLoop) {
+            // Note: fadeIn/fadeOut and ducking logic will use the new state.volMusic on their next trigger
+            // For immediate feedback during play:
             audio.bgMusicGain.gain.setValueAtTime(state.volMusic, audio.ctx.currentTime);
         }
-    });
+    }));
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: 'Chakra Meditation', artist: 'Mahakatha Vibe',

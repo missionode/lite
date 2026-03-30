@@ -322,7 +322,7 @@ input[type="range"]::-moz-range-progress {
     opacity: 0.4;
     letter-spacing: 3px;
     position: absolute;
-    top: .22.1rem;
+    top: 22.1rem;
     right: 0;
     left: 0;
     margin-left: auto;
