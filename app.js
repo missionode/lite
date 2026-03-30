@@ -124,7 +124,7 @@ class AudioEngine {
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(4, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime); // Moderated for crispness without hiss
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -357,6 +357,14 @@ class AudioEngine {
     stopDrone() {
         this.stopBinaural();
         const now = this.ctx.currentTime;
+        
+        // Reset reverb wetness during stop to clear any active swells
+        if (this.reverbWet) {
+            this.reverbWet.gain.cancelScheduledValues(now);
+            this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
+            this.reverbWet.gain.linearRampToValueAtTime(0.3, now + 4);
+        }
+
         if (this.vibrationLFO) {
             try { this.vibrationLFO.stop(now + 5); } catch(e) {}
             this.vibrationLFO = null;
@@ -481,6 +489,7 @@ class AudioEngine {
         this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration); 
         
         this.bgMusicEQ.gain.cancelScheduledValues(now);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
         // Ensure the loop itself is running at a base gain of 1.0 so the bgMusicGain handles the mix
@@ -495,6 +504,7 @@ class AudioEngine {
         
         this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
         this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
         
         this.bgMusicLoop.setGain(0);
