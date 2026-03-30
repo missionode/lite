@@ -323,13 +323,14 @@ class AudioEngine {
         rightOsc.frequency.setValueAtTime(baseFreq + 7.83, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        binauralGain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 10); // Very subtle
+        binauralGain.gain.linearRampToValueAtTime(0.008, this.ctx.currentTime + 10); // Subtle, crisp layer
 
         leftOsc.connect(leftPanner);
         rightOsc.connect(rightPanner);
         leftPanner.connect(binauralGain);
         rightPanner.connect(binauralGain);
-        binauralGain.connect(this.lowCutFilter);
+        // Connect to masterGain so it ducks during mantra and respects drone volume
+        binauralGain.connect(this.masterGain);
 
         leftOsc.start();
         rightOsc.start();
@@ -871,9 +872,7 @@ class MeditationController {
         if (!this.isMeditationActive) return;
 
         // Start looping mantra audio track (fades in, drone fades down)
-        if (key !== 'thirdeye') {
-            await this.audio.playMantraTrack(key);
-        }
+        await this.audio.playMantraTrack(key);
 
         const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
         let elapsed = 0;
@@ -893,13 +892,13 @@ class MeditationController {
         timerEl.textContent = "00:00";
 
         // Fade out mantra, restore drone before affirmation
-        if (key !== 'thirdeye') {
-            this.audio.stopMantraTrack();
-            await new Promise(r => setTimeout(r, 4000));
-        } else {
+        this.audio.stopMantraTrack();
+        if (key === 'thirdeye') {
             // Restore drone for Ajna affirmation
             this.audio.startDrone(chakra.frequency, index);
             await new Promise(r => setTimeout(r, 2000));
+        } else {
+            await new Promise(r => setTimeout(r, 4000));
         }
 
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
