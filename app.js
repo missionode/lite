@@ -184,6 +184,7 @@ class AudioEngine {
         // 7. High-Efficiency Algorithmic Reverb (Shimmering space without heat)
         this.reverbGain = this.ctx.createGain();
         this.reverbGain.gain.value = 0.35;
+        this.reverbWet = this.reverbGain; // Alias for reverb swell control
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
         this.reverbFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
