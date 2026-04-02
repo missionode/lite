@@ -254,6 +254,18 @@ class AudioEngine {
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
+        // Pre-load all mantras to prevent hanging during the journey
+        const preloads = Object.entries(MANTRA_AUDIO_MAP).map(async ([key, path]) => {
+            try {
+                const response = await fetch(path);
+                const arrayBuffer = await response.arrayBuffer();
+                this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
+            } catch (e) {
+                console.warn(`Failed to pre-load mantra: ${key}`, e);
+            }
+        });
+        await Promise.all(preloads);
+
         this.isInitialized = true;
     }
 
@@ -450,16 +462,12 @@ class AudioEngine {
     }
 
     async playMantraTrack(key) {
-        const filePath = MANTRA_AUDIO_MAP[key];
-        if (!filePath) return;
+        if (!this.mantraBuffer[key]) {
+            console.warn(`Mantra buffer not found for ${key}`);
+            return;
+        }
 
         this.stopMantraTrack();
-
-        if (!this.mantraBuffer[key]) {
-            const response = await fetch(filePath);
-            const arrayBuffer = await response.arrayBuffer();
-            this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
-        }
 
         // Standardized to 3.0s crossfade
         this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
