@@ -127,10 +127,17 @@ class AudioEngine {
         this.masterGain.gain.value = state.volDrone; 
 
         // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
-        // Adds "expensive" sparkle and clarity to the high end
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.05); // Very subtle saturation
+        this.exciter.curve = this.makeDistortionCurve(0.05); 
         
+        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
+        // This 'carves' a space for the voice so it sounds crystal clear
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
@@ -186,16 +193,19 @@ class AudioEngine {
         pannerLfoX.start();
         pannerLfoZ.start();
 
-        // New: Studio Reverb Chain with Wet/Dry control
-        this.reverbNode = this.ctx.createConvolver();
-        this.reverbNode.buffer = this.createImpulseResponse(5, 4); 
-        this.reverbWet = this.ctx.createGain();
-        this.reverbWet.gain.value = 0.3; 
+        // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
+        // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
+        this.reverbGain = this.ctx.createGain();
+        this.reverbGain.gain.value = 0.3;
+        
+        this.reverbFilter = this.ctx.createBiquadFilter();
+        this.reverbFilter.type = 'lowpass';
+        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
 
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.6;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.3;
+        this.delayFeedback.gain.value = 0.45; // Lush feedback
 
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -206,14 +216,17 @@ class AudioEngine {
         
         this.pannerNode.connect(this.lowCutFilter);
         
-        // Reverb Routing
-        this.lowCutFilter.connect(this.reverbNode);
-        this.reverbNode.connect(this.reverbWet);
-        this.reverbWet.connect(this.exciter); // Run through Exciter
+        // Final Studio Chain: Sidechain -> Exciter -> Presence -> Master Compressor
+        this.lowCutFilter.connect(this.voiceCarveFilter);
+        this.voiceCarveFilter.connect(this.exciter);
         
-        this.lowCutFilter.connect(this.exciter); // Dry signal also through Exciter
+        // Reverb Routing (Parallel)
+        this.exciter.connect(this.reverbGain);
+        this.reverbGain.connect(this.reverbFilter);
+        this.reverbFilter.connect(this.presenceFilter);
         
-        this.exciter.connect(this.presenceFilter);
+        this.exciter.connect(this.presenceFilter); // Dry signal
+        
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
 
@@ -978,15 +991,21 @@ class MeditationController {
     async narrate(text, fadeOut = false) {
         // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
-        
+
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
+
+        // Activate Frequency Carving (-8dB notch at 2.5kHz) to 'seat' the voice in the mix
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-8, this.audio.ctx.currentTime + 1.5);
+        }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
-            
+
             const narrationTextEl = document.getElementById('narration-text');
             if (narrationTextEl) narrationTextEl.textContent = sentence.trim();
 
@@ -994,7 +1013,7 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                
+
                 // Studio Clarity
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
@@ -1002,12 +1021,16 @@ class MeditationController {
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
-            
+
             await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
 
-        if (fadeOut) {
-            // Only fade out if explicitly requested (e.g. right before mantra)
+        // Release Frequency Carving after narration ends
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 3);
+        }
+
+        if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
             await new Promise(r => setTimeout(r, 2500));
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
