@@ -1086,7 +1086,7 @@ const state = {
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.45,
     volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
