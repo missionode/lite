@@ -1045,11 +1045,13 @@ class MeditationController {
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
 
-                // Watchdog Jugad: If browser fails to fire onend, resolve after calculation + 2s buffer
+                // Watchdog: If browser fails to fire onend, resolve after estimate + buffer
+                // Cap at 15s max to prevent very long sentences from causing apparent stuck states
+                const estimatedMs = Math.min(sentence.length * 80, 12000) + 3000;
                 const safetyTimeout = setTimeout(() => {
                     console.warn("Speech watchdog triggered - moving forward.");
                     resolve();
-                }, (sentence.length * 150) + 3000);
+                }, estimatedMs);
 
                 utterance.onend = () => {
                     clearTimeout(safetyTimeout);
@@ -1384,7 +1386,10 @@ function attachEventListeners() {
         meditation.chakraOrder = state.selectedChakras;
         // Apply sleep mode dim class at session start
         if (state.sleepMode) document.body.classList.add('sleep-mode-active');
-        meditation.start();
+        meditation.start().catch(err => {
+            console.error('Meditation session error:', err);
+            meditation.stop();
+        });
     });
     document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
     document.getElementById('stop-meditation').addEventListener('click', () => meditation.stop());
