@@ -117,7 +117,7 @@ class AudioEngine {
     async init() {
         if (this.isInitialized) return;
         
-        // Upgrade 1: Optimize context for playback fidelity rather than low latency
+        // Studio Context Optimized for Fidelity (Playback Mode)
         this.ctx = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'playback',
             sampleRate: 48000
@@ -126,30 +126,35 @@ class AudioEngine {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
-        // Upgrade 2: Studio Tube Warmth (WaveShaper)
-        // Adjusted curve to "round off" sharp edges for a cooler, analog feel
+        // 1. Studio Tube Warmth (WaveShaper) - Rounds edges for a "Cool" feel
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeWarmthCurve(0.1); 
+        this.exciter.curve = this.makeWarmthCurve(0.12); 
         
-        // Upgrade 6: The "Comfort Dip" (-3dB at 3.2kHz)
-        // Removes the "hot edges" that cause ear fatigue
+        // 2. The "Comfort Dip" (-3.5dB at 3.2kHz) - Removes digital harshness
         this.comfortFilter = this.ctx.createBiquadFilter();
         this.comfortFilter.type = 'peaking';
         this.comfortFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
         this.comfortFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
-        this.comfortFilter.gain.setValueAtTime(-3, this.ctx.currentTime);
+        this.comfortFilter.gain.setValueAtTime(-3.5, this.ctx.currentTime);
 
+        // 3. Frequency Carving Filter - Creates space for the voice
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
+        // 4. "Silk" Tilt Filter (High-End Softening)
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(-1.5, this.ctx.currentTime); // "Silk" roll-off
+        this.presenceFilter.frequency.setValueAtTime(8500, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(-2, this.ctx.currentTime);
 
-        // Upgrade 7: Low-End "Body" Filter
+        // 5. Low-End "Body" Filter (Analog Weight)
         this.warmthFilter = this.ctx.createBiquadFilter();
         this.warmthFilter.type = 'lowshelf';
-        this.warmthFilter.frequency.setValueAtTime(250, this.ctx.currentTime);
-        this.warmthFilter.gain.setValueAtTime(2, this.ctx.currentTime); 
-
+        this.warmthFilter.frequency.setValueAtTime(220, this.ctx.currentTime);
+        this.warmthFilter.gain.setValueAtTime(2.5, this.ctx.currentTime); 
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -163,84 +168,86 @@ class AudioEngine {
         this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
-        this.bgMusicGain = this.ctx.createGain();
-        this.bgMusicGain.gain.value = 0;
-        
-        this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'peaking';
-        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
-        this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
-        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); 
-
-        this.bgMusicGain.connect(this.bgMusicEQ);
-        this.bgMusicEQ.connect(this.lowCutFilter);
-
-        this.bellGain = this.ctx.createGain();
-        this.bellGain.gain.value = state.volBell;
-        this.bellGain.connect(this.ctx.destination);
-
-        // Upgrade 3: High-Resolution 3D Panning (HRTF)
-        // Replaces simple StereoPanner with a 3D soundstage
+        // 6. High-Resolution 3D Panning (HRTF Soundstage)
         this.pannerNode = this.ctx.createPanner();
         this.pannerNode.panningModel = 'HRTF';
         this.pannerNode.distanceModel = 'exponential';
         
-        // Slow orbital motion
         const pannerLfoX = this.ctx.createOscillator();
-        const pannerLfoZ = this.ctx.createOscillator();
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = 5; // Orbit radius
-
-        pannerLfoX.frequency.setValueAtTime(0.04, this.ctx.currentTime);
-        pannerLfoZ.frequency.setValueAtTime(0.04, this.ctx.currentTime);
-        
-        // Phase shift for circular motion
+        lfoGain.gain.value = 6; 
+        pannerLfoX.frequency.setValueAtTime(0.03, this.ctx.currentTime);
         pannerLfoX.connect(lfoGain);
         lfoGain.connect(this.pannerNode.positionX);
-        
         pannerLfoX.start();
-        pannerLfoZ.start();
 
-        // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
-        // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
+        // 7. High-Efficiency Algorithmic Reverb (Shimmering space without heat)
         this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.3;
-        
+        this.reverbGain.gain.value = 0.35;
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
+        this.reverbFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
 
         this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.6;
+        this.delayNode.delayTime.value = 0.65;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.45; // Lush feedback
-
+        this.delayFeedback.gain.value = 0.42;
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
 
+        // 8. Aura Glow Engine (Spectral Shifting Halo)
+        this.auraGain = this.ctx.createGain();
+        this.auraGain.gain.value = 0.06;
+        this.auraFilter = this.ctx.createBiquadFilter();
+        this.auraFilter.type = 'notch';
+        this.auraFilter.Q.setValueAtTime(12, this.ctx.currentTime);
+        const auraLfo = this.ctx.createOscillator();
+        auraLfo.frequency.setValueAtTime(0.06, this.ctx.currentTime);
+        const auraLfoGain = this.ctx.createGain();
+        auraLfoGain.gain.value = 2500;
+        auraLfo.connect(auraLfoGain);
+        auraLfoGain.connect(this.auraFilter.frequency);
+        auraLfo.start();
+
+        // Routing Chain
         this.masterGain.connect(this.delayNode);
         this.masterGain.connect(this.pannerNode);
-        this.delayNode.connect(this.pannerNode);
+        this.masterGain.connect(this.auraGain); // Feed to Aura Glow
         
+        this.auraGain.connect(this.auraFilter);
+        this.auraFilter.connect(this.reverbGain); // Aura feeds reverb for halo effect
+
+        this.delayNode.connect(this.pannerNode);
         this.pannerNode.connect(this.lowCutFilter);
         
-        // Final Studio Chain: Sidechain -> Exciter -> Presence -> Master Compressor
         this.lowCutFilter.connect(this.voiceCarveFilter);
-        this.voiceCarveFilter.connect(this.exciter);
+        this.voiceCarveFilter.connect(this.comfortFilter);
+        this.comfortFilter.connect(this.warmthFilter);
+        this.warmthFilter.connect(this.exciter);
         
-        // Reverb Routing (Parallel)
         this.exciter.connect(this.reverbGain);
         this.reverbGain.connect(this.reverbFilter);
         this.reverbFilter.connect(this.presenceFilter);
         
-        this.exciter.connect(this.presenceFilter); // Dry signal
-        
+        this.exciter.connect(this.presenceFilter); 
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
 
+        // Bell Routing (Independent)
+        this.bellGain = this.ctx.createGain();
+        this.bellGain.gain.value = state.volBell;
+        this.bellGain.connect(this.ctx.destination);
+
+        this.bgMusicGain = this.ctx.createGain();
+        this.bgMusicGain.gain.value = 0;
+        this.bgMusicEQ = this.ctx.createBiquadFilter();
+        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
+        this.bgMusicGain.connect(this.bgMusicEQ);
+        this.bgMusicEQ.connect(this.lowCutFilter);
+
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
-        
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
         this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
@@ -250,14 +257,12 @@ class AudioEngine {
         this.isInitialized = true;
     }
 
-    makeDistortionCurve(amount) {
-        const k = amount * 100;
+    makeWarmthCurve(amount) {
         const n_samples = 44100;
         const curve = new Float32Array(n_samples);
-        const deg = Math.PI / 180;
         for (let i = 0; i < n_samples; ++i) {
             const x = (i * 2) / n_samples - 1;
-            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+            curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
         }
         return curve;
     }
