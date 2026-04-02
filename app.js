@@ -847,12 +847,15 @@ class MeditationController {
     }
 
     async runClosing() {
+        if (!this.isMeditationActive) return;
         document.getElementById('mantra-display').textContent = "✦";
         document.getElementById('chakra-symbol').style.opacity = "0.4";
         const aura = document.getElementById('aura-bg');
         aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = this.scripts.closing[state.language];
         await this.narrate(closingText);
+        
+        if (!this.isMeditationActive) return;
         await new Promise(r => setTimeout(r, 2000));
         // Full-body health affirmation — head to toe
         const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
@@ -860,10 +863,11 @@ class MeditationController {
             document.getElementById('mantra-display').textContent = "✦ BODY ✦";
             await this.narrate(healthAffirmation);
         }
-        await new Promise(r => setTimeout(r, 3000));
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
     }
 
     async runHooponopono() {
+        if (!this.isMeditationActive) return;
         const aura = document.getElementById('aura-bg');
         aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
         aura.style.opacity = '1';
@@ -873,28 +877,29 @@ class MeditationController {
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(this.scripts.hooponopono.intro[state.language], false);
+        if (!this.isMeditationActive) return;
         await new Promise(r => setTimeout(r, 2000));
 
         // 3 cycles of the 4 phrases
         const phrases = this.scripts.hooponopono.phrases[state.language];
         for (let cycle = 0; cycle < 3; cycle++) {
-            if (!this.isMeditationActive) return;
+            if (!this.isMeditationActive) break;
             for (let i = 0; i < phrases.length; i++) {
-                if (!this.isMeditationActive) return;
+                if (!this.isMeditationActive) break;
                 const phrase = phrases[i];
                 document.getElementById('narration-text').textContent = phrase;
                 
-                // Keep music for all phrases, fade out only on the very last phrase of the last cycle
-                const isLast = (cycle === 2 && i === phrases.length - 1);
-                await this.narrate(phrase, false); // Keep music for phrases
-                await new Promise(r => setTimeout(r, 2000));
+                // Keep music for all phrases
+                await this.narrate(phrase, false);
+                if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
             }
         }
 
+        if (!this.isMeditationActive) return;
         // Closing breath - Final fade out
         document.getElementById('narration-text').textContent = '';
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
-        await new Promise(r => setTimeout(r, 3000));
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
     }
 
     async handleInterval() {
