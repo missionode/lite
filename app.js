@@ -679,7 +679,12 @@ class MeditationController {
         if (this.isMeditationActive) await this.runBoxBreathing();
 
         if (this.isMeditationActive) {
+            // Show meditation screen BEFORE final transition narration so user sees the text
             showScreen(meditationScreen);
+            
+            // Studio Reset: Clear any pending speech to ensure a fresh start for Chakras
+            window.speechSynthesis.cancel();
+            
             // Settle after screen transition (3 seconds)
             await new Promise(r => setTimeout(r, 3000));
 
@@ -695,7 +700,8 @@ class MeditationController {
                 await this.runSequence();
             }
         }
-        }
+    }
+
     async runGratitude() {
         const screen = document.getElementById('breathing-screen');
         const tutorial = document.getElementById('breathing-tutorial');
@@ -801,15 +807,10 @@ class MeditationController {
         // Intimate Completion
         if (this.isMeditationActive) {
             instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ." : "Breathing exercise is complete. Stay still for a moment.";
-            await this.narrate(completeText);
-            
-            // 5 second interval before Chakra Journey starts
-            instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
-            await new Promise(r => setTimeout(r, 5000));
+            // Wait 2 seconds for user to notice completion
+            await new Promise(r => setTimeout(r, 2000));
         }
-    }
-
+        }
     async narrateSoft(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
