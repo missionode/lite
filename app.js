@@ -126,22 +126,30 @@ class AudioEngine {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
-        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
+        // Upgrade 2: Studio Tube Warmth (WaveShaper)
+        // Adjusted curve to "round off" sharp edges for a cooler, analog feel
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.05); 
+        this.exciter.curve = this.makeWarmthCurve(0.1); 
         
-        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
-        // This 'carves' a space for the voice so it sounds crystal clear
-        this.voiceCarveFilter = this.ctx.createBiquadFilter();
-        this.voiceCarveFilter.type = 'peaking';
-        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
-        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
-        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+        // Upgrade 6: The "Comfort Dip" (-3dB at 3.2kHz)
+        // Removes the "hot edges" that cause ear fatigue
+        this.comfortFilter = this.ctx.createBiquadFilter();
+        this.comfortFilter.type = 'peaking';
+        this.comfortFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
+        this.comfortFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+        this.comfortFilter.gain.setValueAtTime(-3, this.ctx.currentTime);
 
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime);
+        this.presenceFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(-1.5, this.ctx.currentTime); // "Silk" roll-off
+
+        // Upgrade 7: Low-End "Body" Filter
+        this.warmthFilter = this.ctx.createBiquadFilter();
+        this.warmthFilter.type = 'lowshelf';
+        this.warmthFilter.frequency.setValueAtTime(250, this.ctx.currentTime);
+        this.warmthFilter.gain.setValueAtTime(2, this.ctx.currentTime); 
+
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
