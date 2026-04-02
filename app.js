@@ -116,15 +116,25 @@ class AudioEngine {
 
     async init() {
         if (this.isInitialized) return;
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Upgrade 1: Optimize context for playback fidelity rather than low latency
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)({
+            latencyHint: 'playback',
+            sampleRate: 48000
+        });
         
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
+        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
+        // Adds "expensive" sparkle and clarity to the high end
+        this.exciter = this.ctx.createWaveShaper();
+        this.exciter.curve = this.makeDistortionCurve(0.05); // Very subtle saturation
+        
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime); // Moderated for crispness without hiss
+        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -132,10 +142,10 @@ class AudioEngine {
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); // Deeper threshold for consistent glue
+        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
         this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); // More musical, transparent ratio
-        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); // Fast studio-grade attack
+        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); 
+        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
@@ -154,20 +164,33 @@ class AudioEngine {
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
 
-        this.pannerNode = this.ctx.createStereoPanner();
-        this.pannerNode.pan.value = 0;
+        // Upgrade 3: High-Resolution 3D Panning (HRTF)
+        // Replaces simple StereoPanner with a 3D soundstage
+        this.pannerNode = this.ctx.createPanner();
+        this.pannerNode.panningModel = 'HRTF';
+        this.pannerNode.distanceModel = 'exponential';
         
-        const pannerLfo = this.ctx.createOscillator();
-        pannerLfo.type = 'sine';
-        pannerLfo.frequency.setValueAtTime(0.05, this.ctx.currentTime);
-        pannerLfo.connect(this.pannerNode.pan);
-        pannerLfo.start();
+        // Slow orbital motion
+        const pannerLfoX = this.ctx.createOscillator();
+        const pannerLfoZ = this.ctx.createOscillator();
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 5; // Orbit radius
 
-        // New: Studio Reverb Chain with Wet/Dry control for "Swells"
+        pannerLfoX.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        pannerLfoZ.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        
+        // Phase shift for circular motion
+        pannerLfoX.connect(lfoGain);
+        lfoGain.connect(this.pannerNode.positionX);
+        
+        pannerLfoX.start();
+        pannerLfoZ.start();
+
+        // New: Studio Reverb Chain with Wet/Dry control
         this.reverbNode = this.ctx.createConvolver();
-        this.reverbNode.buffer = this.createImpulseResponse(5, 4); // Longer, lusher reverb
+        this.reverbNode.buffer = this.createImpulseResponse(5, 4); 
         this.reverbWet = this.ctx.createGain();
-        this.reverbWet.gain.value = 0.3; // Base wetness
+        this.reverbWet.gain.value = 0.3; 
 
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.6;
@@ -183,20 +206,20 @@ class AudioEngine {
         
         this.pannerNode.connect(this.lowCutFilter);
         
-        // Reverb Routing: Parallel signal to reverbWet
+        // Reverb Routing
         this.lowCutFilter.connect(this.reverbNode);
         this.reverbNode.connect(this.reverbWet);
-        this.reverbWet.connect(this.presenceFilter);
+        this.reverbWet.connect(this.exciter); // Run through Exciter
         
-        this.lowCutFilter.connect(this.presenceFilter); // Dry signal
+        this.lowCutFilter.connect(this.exciter); // Dry signal also through Exciter
         
+        this.exciter.connect(this.presenceFilter);
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
 
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
         
-        // New: Mantra Organic Presence Filter - Lowered base for hiss reduction
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
         this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
@@ -204,6 +227,18 @@ class AudioEngine {
         this.mantraFilter.connect(this.lowCutFilter);
 
         this.isInitialized = true;
+    }
+
+    makeDistortionCurve(amount) {
+        const k = amount * 100;
+        const n_samples = 44100;
+        const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < n_samples; ++i) {
+            const x = (i * 2) / n_samples - 1;
+            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+        }
+        return curve;
     }
 
     createImpulseResponse(duration, decay) {
