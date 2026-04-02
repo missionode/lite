@@ -688,7 +688,7 @@ class MeditationController {
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
         tutTitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കാം" : "Preparation";
-        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി ഇരിക്കുക. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
+        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
         tutText.textContent = text;
 
         // Narrate the preparation instruction
