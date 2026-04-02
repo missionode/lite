@@ -185,6 +185,7 @@ class AudioEngine {
         this.reverbGain = this.ctx.createGain();
         this.reverbGain.gain.value = 0.35;
         this.reverbWet = this.reverbGain; // Alias for reverb swell control
+        this.reverbNode = this.ctx.createConvolver();
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
         this.reverbFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
