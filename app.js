@@ -807,10 +807,10 @@ class MeditationController {
         // Intimate Completion
         if (this.isMeditationActive) {
             instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            // Wait 2 seconds for user to notice completion
-            await new Promise(r => setTimeout(r, 2000));
+            // Immediate transition - start() will handle the rest
+            await new Promise(r => setTimeout(r, 1000));
         }
-        }
+    }
     async narrateSoft(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
