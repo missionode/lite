@@ -677,12 +677,12 @@ class MeditationController {
         // Removed redundant settle pause (already handled by narrate ending and gratitude end)
 
         if (this.isMeditationActive) await this.runBoxBreathing();
-        
-        // Settle after breathing (3 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
 
         if (this.isMeditationActive) {
             showScreen(meditationScreen);
+            // Settle after screen transition (3 seconds)
+            await new Promise(r => setTimeout(r, 3000));
+
             if (this.isHighEnergy) {
                 await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
                 if (this.isMeditationActive) {
@@ -695,8 +695,7 @@ class MeditationController {
                 await this.runSequence();
             }
         }
-    }
-
+        }
     async runGratitude() {
         const screen = document.getElementById('breathing-screen');
         const tutorial = document.getElementById('breathing-tutorial');
@@ -1044,10 +1043,23 @@ class MeditationController {
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
-                utterance.onend = resolve;
+
+                // Watchdog Jugad: If browser fails to fire onend, resolve after calculation + 2s buffer
+                const safetyTimeout = setTimeout(() => {
+                    console.warn("Speech watchdog triggered - moving forward.");
+                    resolve();
+                }, (sentence.length * 150) + 3000);
+
+                utterance.onend = () => {
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                };
+                utterance.onerror = () => {
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                };
                 window.speechSynthesis.speak(utterance);
             });
-
             await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
 
