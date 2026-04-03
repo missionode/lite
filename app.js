@@ -114,13 +114,19 @@ class AudioEngine {
     }
 
     async init() {
-        if (this.isInitialized) return;
+        if (this.isInitialized) {
+            if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
+            return;
+        }
         
         // Upgrade 1: Optimize context for playback fidelity rather than low latency
         this.ctx = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'playback',
             sampleRate: 48000
         });
+
+        // Crucial for mobile: Resume context on user gesture
+        if (this.ctx.state === 'suspended') await this.ctx.resume();
         
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
@@ -665,48 +671,55 @@ class MeditationController {
     }
 
     async start() {
-        if (!this.scripts) {
-            const response = await fetch('scripts.json');
-            this.scripts = await response.json();
-        }
-
-        await this.audio.init();
-        // Start background music looping silently immediately
-        await this.audio.startBackgroundMusic();
-
-        await wakeLock.request();
-        this.isMeditationActive = true;
-        this.isPaused = false;
-        this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
-        
-        document.getElementById('pause-meditation').textContent = 'II';
-        document.getElementById('completion-modal').classList.add('hidden');
-
-        // Initial Settle (2 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
-
-        if (this.isMeditationActive) await this.runGratitude();
-
-        // Removed redundant settle pause (already handled by narrate ending and gratitude end)
-
-        if (this.isMeditationActive) await this.runBoxBreathing();
-        
-        // Settle after breathing (3 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
-
-        if (this.isMeditationActive) {
-            showScreen(meditationScreen);
-            if (this.isHighEnergy) {
-                await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
-                if (this.isMeditationActive) {
-                    await this.handleSilence();
-                    if (this.isMeditationActive) await this.runClosing();
-                    if (this.isMeditationActive) await this.runHooponopono();
-                    this.finish();
-                }
-            } else {
-                await this.runSequence();
+        try {
+            // Immediate visual feedback for mobile
+            showScreen(document.getElementById('breathing-screen'));
+            document.getElementById('completion-modal').classList.add('hidden');
+            
+            if (!this.scripts) {
+                const response = await fetch('scripts.json');
+                this.scripts = await response.json();
             }
+
+            await this.audio.init();
+            // Start background music looping silently immediately
+            await this.audio.startBackgroundMusic();
+
+            try { await wakeLock.request(); } catch(e) { console.warn("Wake lock failed", e); }
+            
+            this.isMeditationActive = true;
+            this.isPaused = false;
+            this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
+            
+            document.getElementById('pause-meditation').textContent = 'II';
+
+            // Initial Settle (2 seconds)
+            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
+            if (this.isMeditationActive) await this.runGratitude();
+            if (this.isMeditationActive) await this.runBoxBreathing();
+            
+            // Settle after breathing (3 seconds)
+            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+
+            if (this.isMeditationActive) {
+                showScreen(meditationScreen);
+                if (this.isHighEnergy) {
+                    await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
+                    if (this.isMeditationActive) {
+                        await this.handleSilence();
+                        if (this.isMeditationActive) await this.runClosing();
+                        if (this.isMeditationActive) await this.runHooponopono();
+                        this.finish();
+                    }
+                } else {
+                    await this.runSequence();
+                }
+            }
+        } catch (err) {
+            console.error("Critical Start Failure:", err);
+            alert("Unable to start meditation. Please ensure you have a stable connection and try again.");
+            this.stop();
         }
     }
 
