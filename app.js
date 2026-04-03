@@ -1,3 +1,11 @@
+// ── GLOBAL ERROR CATCHER (Mobile Debugging) ──────────────────────────────────
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    // Only alert for actual crashes to avoid noise, but ensure we see the "Killer" bugs
+    if (msg.toLowerCase().indexOf("script error") > -1) return;
+    alert("App Error: " + msg + "\nLine: " + lineNo);
+    return false;
+};
+
 const MANTRA_AUDIO_MAP = {
     root:        'audio/LAM.mp3',
     sacral:      'audio/VAM.mp3',
@@ -9,11 +17,20 @@ const MANTRA_AUDIO_MAP = {
     high_energy: 'audio/HREEM.mp3'
 };
 
-// Screen Elements
+// ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
+
+const languageSelect = document.getElementById('language-select');
+const voiceSelect = document.getElementById('voice-select');
+const testVoiceBtn = document.getElementById('test-voice');
+const saveConfigBtn = document.getElementById('save-config');
+const timeSlider = document.getElementById('time-per-chakra');
+const timeDisplay = document.getElementById('time-display');
+const startMeditationBtn = document.getElementById('start-meditation');
+const openSettingsBtn = document.getElementById('open-settings');
 
 // Audio Engine
 class SeamlessLoop {
@@ -1231,15 +1248,6 @@ function getMoonPhase() {
     if (pos < 22.15) return 'full';
     return 'waning';
 }
-
-const languageSelect = document.getElementById('language-select');
-const voiceSelect = document.getElementById('voice-select');
-const testVoiceBtn = document.getElementById('test-voice');
-const saveConfigBtn = document.getElementById('save-config');
-const timeSlider = document.getElementById('time-per-chakra');
-const timeDisplay = document.getElementById('time-display');
-const startMeditationBtn = document.getElementById('start-meditation');
-const openSettingsBtn = document.getElementById('open-settings');
 
 function init() {
     setupVoices();
