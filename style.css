@@ -268,26 +268,18 @@ input[type="range"]::-moz-range-progress {
     position: absolute;
     inset: -12px;
     border-radius: 50%;
-    border: 1px solid rgba(251, 191, 36, 0.35);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15), inset 0 0 20px rgba(251, 191, 36, 0.05);
+    border: 1px solid rgba(251, 191, 36, 0.25);
     pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .chakra-gold-ring { animation: goldRingPulse 4s ease-in-out infinite; }
-    #mantra-display { animation: goldShimmer 4s ease-in-out infinite; }
-    .cosmic-entrance { animation: cosmicEntrance 1.2s ease-out forwards; }
-    .gold-burst { animation: burstPulse 3s ease-in-out infinite; }
 }
 
 #chakra-symbol {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 25px var(--primary-color));
     z-index: 2;
     position: relative;
-    transition: transform 0.5s ease, opacity 1s ease;
+    transition: opacity 1s ease;
+    /* Removed drop-shadow filter to save GPU power */
 }
 
 #glow-effect {
@@ -297,12 +289,13 @@ input[type="range"]::-moz-range-progress {
     transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 70%);
     border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.15;
+    filter: blur(30px); /* Reduced blur radius */
+    opacity: 0.5;
     z-index: 1;
-    transition: background 2s ease, opacity 2s ease;
+    transition: background 2s ease;
+    will-change: background; /* Hardware acceleration hint */
 }
 
 #mantra-display {
@@ -311,8 +304,8 @@ input[type="range"]::-moz-range-progress {
     font-weight: 100;
     text-transform: uppercase;
     margin-top: 1rem;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1);
     color: var(--accent-color);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
 #narration-text {
@@ -332,7 +325,7 @@ input[type="range"]::-moz-range-progress {
     opacity: 0.4;
     letter-spacing: 3px;
     position: absolute;
-    top: .1rem;
+    top: 22.1rem;
     right: 0;
     left: 0;
     margin-left: auto;
@@ -587,161 +580,10 @@ input[type="range"]::-moz-range-progress {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 65%);
     border-radius: 50%;
     z-index: 0;
     pointer-events: none;
-}
-
-.gold-line {
-    width: 40px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-    margin: 0.5rem auto;
-    opacity: 0.7;
-    border-radius: 1px;
-}
-
-.comp-stats {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.8rem 1rem;
-    background: rgba(251, 191, 36, 0.04);
-    border-radius: 14px;
-    border: 1px solid rgba(251, 191, 36, 0.1);
-    margin-bottom: 0.5rem;
-}
-
-.stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.stat-lbl {
-    font-size: 0.62rem;
-    color: var(--text-color);
-    opacity: 0.5;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.stat-val {
-    font-size: 0.9rem;
-    color: var(--accent-color);
-    font-weight: 300;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-}
-
-.completion-icon {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
-    filter: drop-shadow(0 0 20px var(--primary-color));
-    animation: pulseIcon 3s infinite ease-in-out;
-}
-
-#completion-title {
-    font-weight: 200;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-}
-
-#completion-message {
-    opacity: 0.7;
-    margin-bottom: 2rem;
-    letter-spacing: 1px;
-}
-
-@keyframes pulseIcon {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-    to { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-
-.mandala-ring-outer,
-.mandala-ring-mid,
-.mandala-ring-inner {
-    position: absolute;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-}
-
-.mandala-ring-outer {
-    width: 240px;
-    height: 240px;
-    transform: translate(-50%, -50%);
-    border: 1px solid rgba(251, 191, 36, 0.5);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.2), inset 0 0 20px rgba(251, 191, 36, 0.05);
-    animation: ringPulse 4s ease-in-out infinite;
-}
-
-.mandala-ring-mid {
-    width: 216px;
-    height: 216px;
-    transform: translate(-50%, -50%);
-    border: 1px dashed rgba(251, 191, 36, 0.2);
-    animation: mandalaSpin 20s linear infinite;
-}
-
-.mandala-ring-inner {
-    width: 192px;
-    height: 192px;
-    transform: translate(-50%, -50%);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    animation: ringPulse 4s ease-in-out infinite reverse;
-}
-
-@keyframes ringPulse {
-    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
-}
-
-@keyframes goldRingPulse {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.03); }
-}
-
-@keyframes mandalaSpin {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes burstPulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-}
-
-@keyframes goldShimmer {
-    0%, 100% {
-        text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-        color: var(--accent-color);
-    }
-    50% {
-        text-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.3);
-        color: var(--accent-glow);
-    }
-}
-
-@keyframes cosmicEntrance {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-        filter: drop-shadow(0 0 0px transparent);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-        filter: drop-shadow(0 0 25px var(--primary-color));
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -763,4 +605,52 @@ input[type="range"]::-moz-range-progress {
     }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
+}
+
+/* ── Sleep Mode Optimization ────────────────────────────────────────────────── */
+body.sleep-mode-active #app {
+    filter: brightness(0.18);
+    transition: filter 3s ease;
+}
+
+body.sleep-mode-active #aura-bg,
+body.sleep-mode-active #nebula-bg,
+body.sleep-mode-active .tutorial-overlay,
+body.sleep-mode-active .modal,
+body.sleep-mode-active #volume-mixer {
+    backdrop-filter: none !important; /* Huge GPU saving */
+    -webkit-backdrop-filter: none !important;
+}
+
+body.sleep-mode-active #breathing-circle {
+    opacity: 0.4;
+    box-shadow: none; /* Reduce paint cost */
+}
+
+body.sleep-mode-active #glow-effect {
+    filter: none; /* Disable expensive blur in sleep mode */
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Intention Input ─────────────────────────────────────────────────────────── */
+#intention-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.9);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-top: 0.4rem;
+}
+#intention-input:focus {
+    border-color: rgba(255,255,255,0.35);
+}
+#intention-input::placeholder {
+    color: rgba(255,255,255,0.25);
+    font-style: italic;
 }

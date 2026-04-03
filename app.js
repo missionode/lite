@@ -5,10 +5,9 @@ const MANTRA_AUDIO_MAP = {
     heart:       'audio/YAM.mp3',
     throat:      'audio/HAM.mp3',
     thirdeye:    'audio/OM.mp3',
-    crown:       'audio/OM.mp3',
+    crown:       'audio/AUM.mp3',
     high_energy: 'audio/HREEM.mp3'
 };
-
 // Audio Engine
 class SeamlessLoop {
     constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 3) {
@@ -70,6 +69,7 @@ class SeamlessLoop {
         this.activeSources.forEach(s => {
             const now = this.ctx.currentTime;
             s.gain.gain.cancelScheduledValues(now);
+            // Increased to 2.0s for a more organic volume transition
             s.gain.gain.linearRampToValueAtTime(value, now + 2.0);
         });
     }
@@ -87,47 +87,51 @@ class SeamlessLoop {
         });
         this.activeSources = [];
     }
-}
-
+    }
 class AudioEngine {
     constructor() {
         this.ctx = null;
         this.droneOscillators = [];
         this.elementalNodes = [];
-        this.binauralNodes = [];
+        this.binauralNodes = []; // New: Binaural Beat Layer
         this.masterGain = null;
         this.reverbNode = null;
-        this.reverbWet = null;
+        this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.isInitialized = false;
+
+        // Looping Managers
         this.mantraLoop = null;
         this.bgMusicLoop = null;
+
         this.mantraBuffer = {};
         this.bgMusicBuffer = null;
+
+        // Studio Mastering Nodes
         this.masterCompressor = null;
         this.presenceFilter = null;
         this.lowCutFilter = null;
-        this.mantraPresenceLFO = null;
+        this.mantraPresenceLFO = null; // New: Organic Mantra Motion
     }
 
     async init() {
         if (this.isInitialized) return;
+        
+        // Upgrade 1: Optimize context for playback fidelity rather than low latency
         this.ctx = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'playback',
             sampleRate: 48000
         });
+        
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
+        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeWarmthCurve(0.12); 
+        this.exciter.curve = this.makeDistortionCurve(0.05); 
         
-        this.comfortFilter = this.ctx.createBiquadFilter();
-        this.comfortFilter.type = 'peaking';
-        this.comfortFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
-        this.comfortFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
-        this.comfortFilter.gain.setValueAtTime(-3.5, this.ctx.currentTime);
-
+        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
+        // This 'carves' a space for the voice so it sounds crystal clear
         this.voiceCarveFilter = this.ctx.createBiquadFilter();
         this.voiceCarveFilter.type = 'peaking';
         this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
@@ -136,13 +140,8 @@ class AudioEngine {
 
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(8500, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(-2, this.ctx.currentTime);
-
-        this.warmthFilter = this.ctx.createBiquadFilter();
-        this.warmthFilter.type = 'lowshelf';
-        this.warmthFilter.frequency.setValueAtTime(220, this.ctx.currentTime);
-        this.warmthFilter.gain.setValueAtTime(2.5, this.ctx.currentTime); 
+        this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -151,147 +150,183 @@ class AudioEngine {
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
         this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
+        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
         this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); 
         this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
-        this.pannerNode = this.ctx.createPanner();
-        this.pannerNode.panningModel = 'HRTF';
-        this.pannerNode.distanceModel = 'exponential';
+        this.bgMusicGain = this.ctx.createGain();
+        this.bgMusicGain.gain.value = 0;
         
-        const pannerLfoX = this.ctx.createOscillator();
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = 6; 
-        pannerLfoX.frequency.setValueAtTime(0.03, this.ctx.currentTime);
-        pannerLfoX.connect(lfoGain);
-        lfoGain.connect(this.pannerNode.positionX);
-        pannerLfoX.start();
+        this.bgMusicEQ = this.ctx.createBiquadFilter();
+        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
+        this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
+        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); 
 
-        this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.35;
-        this.reverbFilter = this.ctx.createBiquadFilter();
-        this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
-
-        this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.65;
-        this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.42;
-        this.delayNode.connect(this.delayFeedback);
-        this.delayFeedback.connect(this.delayNode);
-
-        this.auraGain = this.ctx.createGain();
-        this.auraGain.gain.value = 0.06;
-        this.auraFilter = this.ctx.createBiquadFilter();
-        this.auraFilter.type = 'notch';
-        this.auraFilter.Q.setValueAtTime(12, this.ctx.currentTime);
-        const auraLfo = this.ctx.createOscillator();
-        auraLfo.frequency.setValueAtTime(0.06, this.ctx.currentTime);
-        const auraLfoGain = this.ctx.createGain();
-        auraLfoGain.gain.value = 2500;
-        auraLfo.connect(auraLfoGain);
-        auraLfoGain.connect(this.auraFilter.frequency);
-        auraLfo.start();
-
-        this.masterGain.connect(this.delayNode);
-        this.masterGain.connect(this.pannerNode);
-        this.masterGain.connect(this.auraGain); 
-        this.auraGain.connect(this.auraFilter);
-        this.auraFilter.connect(this.reverbGain); 
-        this.delayNode.connect(this.pannerNode);
-        this.pannerNode.connect(this.lowCutFilter);
-        this.lowCutFilter.connect(this.voiceCarveFilter);
-        this.voiceCarveFilter.connect(this.comfortFilter);
-        this.comfortFilter.connect(this.warmthFilter);
-        this.warmthFilter.connect(this.exciter);
-        this.exciter.connect(this.reverbGain);
-        this.reverbGain.connect(this.reverbFilter);
-        this.reverbFilter.connect(this.presenceFilter);
-        this.exciter.connect(this.presenceFilter); 
-        this.presenceFilter.connect(this.masterCompressor);
-        this.masterCompressor.connect(this.ctx.destination);
+        this.bgMusicGain.connect(this.bgMusicEQ);
+        this.bgMusicEQ.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
 
-        this.bgMusicGain = this.ctx.createGain();
-        this.bgMusicGain.gain.value = 0;
-        this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'peaking';
-        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
-        this.bgMusicGain.connect(this.bgMusicEQ);
-        this.bgMusicEQ.connect(this.lowCutFilter);
+        // Upgrade 3: High-Resolution 3D Panning (HRTF)
+        // Replaces simple StereoPanner with a 3D soundstage
+        this.pannerNode = this.ctx.createPanner();
+        this.pannerNode.panningModel = 'HRTF';
+        this.pannerNode.distanceModel = 'exponential';
+        
+        // Slow orbital motion
+        const pannerLfoX = this.ctx.createOscillator();
+        const pannerLfoZ = this.ctx.createOscillator();
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 5; // Orbit radius
+
+        pannerLfoX.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        pannerLfoZ.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        
+        // Phase shift for circular motion
+        pannerLfoX.connect(lfoGain);
+        lfoGain.connect(this.pannerNode.positionX);
+        
+        pannerLfoX.start();
+        pannerLfoZ.start();
+
+        // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
+        // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
+        this.reverbGain = this.ctx.createGain();
+        this.reverbGain.gain.value = 0.3;
+        
+        this.reverbFilter = this.ctx.createBiquadFilter();
+        this.reverbFilter.type = 'lowpass';
+        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
+
+        this.delayNode = this.ctx.createDelay();
+        this.delayNode.delayTime.value = 0.6;
+        this.delayFeedback = this.ctx.createGain();
+        this.delayFeedback.gain.value = 0.45; // Lush feedback
+
+        this.delayNode.connect(this.delayFeedback);
+        this.delayFeedback.connect(this.delayNode);
+
+        this.masterGain.connect(this.delayNode);
+        this.masterGain.connect(this.pannerNode);
+        this.delayNode.connect(this.pannerNode);
+        
+        this.pannerNode.connect(this.lowCutFilter);
+        
+        // Final Studio Chain: Sidechain -> Exciter -> Presence -> Master Compressor
+        this.lowCutFilter.connect(this.voiceCarveFilter);
+        this.voiceCarveFilter.connect(this.exciter);
+        
+        // Reverb Routing (Parallel)
+        this.exciter.connect(this.reverbGain);
+        this.reverbGain.connect(this.reverbFilter);
+        this.reverbFilter.connect(this.presenceFilter);
+        
+        this.exciter.connect(this.presenceFilter); // Dry signal
+        
+        this.presenceFilter.connect(this.masterCompressor);
+        this.masterCompressor.connect(this.ctx.destination);
 
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
+        
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
         this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
-        const preloads = Object.entries(MANTRA_AUDIO_MAP).map(async ([key, path]) => {
-            try {
-                const response = await fetch(path);
-                const arrayBuffer = await response.arrayBuffer();
-                this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
-            } catch (e) { console.warn(`Failed to pre-load mantra: ${key}`, e); }
-        });
-        await Promise.all(preloads);
         this.isInitialized = true;
     }
 
-    makeWarmthCurve(amount) {
+    makeDistortionCurve(amount) {
+        const k = amount * 100;
         const n_samples = 44100;
         const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
         for (let i = 0; i < n_samples; ++i) {
             const x = (i * 2) / n_samples - 1;
-            curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
+            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
         }
         return curve;
     }
 
+    createImpulseResponse(duration, decay) {
+        const sampleRate = this.ctx.sampleRate;
+        const length = sampleRate * duration;
+        const buffer = this.ctx.createBuffer(2, length, sampleRate);
+        for (let channel = 0; channel < 2; channel++) {
+            const data = buffer.getChannelData(channel);
+            for (let i = 0; i < length; i++) {
+                // Organic studio decay: Combining noise with a subtle sine-sweep feeling
+                const envelope = Math.pow(1 - i / length, decay);
+                data[i] = (Math.random() * 2 - 1) * envelope;
+            }
+        }
+        return buffer;
+    }
+
     createNoiseBuffer() {
+        if (this._cachedNoise) return this._cachedNoise;
         const bufferSize = this.ctx.sampleRate * 2;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        this._cachedNoise = buffer;
         return buffer;
     }
 
     startElementalLayer(index) {
-        this.elementalNodes.forEach(n => { try { n.src.stop(); } catch(e) {} });
+        this.elementalNodes.forEach(n => {
+            try { n.src.stop(); } catch(e) {}
+        });
         this.elementalNodes = [];
+
         const noiseSrc = this.ctx.createBufferSource();
         noiseSrc.buffer = this.createNoiseBuffer();
         noiseSrc.loop = true;
+
         const filter = this.ctx.createBiquadFilter();
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 5);
+
         if (index === 0 || index === 1) {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(index === 0 ? 100 : 300, this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.2, this.ctx.currentTime);
         } else if (index === 2 || index === 3) {
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(index === 2 ? 800 : 1500, this.ctx.currentTime);
-            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); 
+            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); // Narrower, cleaner band
         } else {
             filter.type = 'highpass';
             filter.frequency.setValueAtTime(4000 + (index * 400), this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.5, this.ctx.currentTime);
         }
+
         noiseSrc.connect(filter);
         filter.connect(gain);
         gain.connect(this.masterGain);
         noiseSrc.start();
+        
         this.elementalNodes.push({ src: noiseSrc, gain: gain });
     }
 
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
         this.stopBinaural();
+
+        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(5, 4);
+        this.reverbNode.buffer = this._staticImpulse;
+        
         this.startElementalLayer(index);
+        
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
         lfo.frequency.setValueAtTime(0.05, this.ctx.currentTime);
@@ -300,6 +335,7 @@ class AudioEngine {
         lfo.connect(lfoGain);
         lfo.start();
         this.vibrationLFO = lfo;
+
         const harmonics = [{ f: 1.0, g: 0.2, type: 'sine' }, { f: 0.5, g: 0.15, type: 'sine' }];
         harmonics.forEach((h) => {
             const osc = this.ctx.createOscillator();
@@ -319,22 +355,31 @@ class AudioEngine {
             osc.start();
             this.droneOscillators.push({ osc, gain });
         });
+
+        // New: Binaural Beat Layer (Deep Alpha/Theta)
         const leftOsc = this.ctx.createOscillator();
         const rightOsc = this.ctx.createOscillator();
         const leftPanner = this.ctx.createStereoPanner();
         const rightPanner = this.ctx.createStereoPanner();
         const binauralGain = this.ctx.createGain();
+
         leftPanner.pan.setValueAtTime(-1, this.ctx.currentTime);
         rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
+        
+        // 7.83Hz Schumann Resonance offset
         leftOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
         rightOsc.frequency.setValueAtTime(baseFreq + 7.83, this.ctx.currentTime);
+        
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        binauralGain.gain.linearRampToValueAtTime(0.008, this.ctx.currentTime + 10); 
+        binauralGain.gain.linearRampToValueAtTime(0.008, this.ctx.currentTime + 10); // Subtle, crisp layer
+
         leftOsc.connect(leftPanner);
         rightOsc.connect(rightPanner);
         leftPanner.connect(binauralGain);
         rightPanner.connect(binauralGain);
+        // Connect to masterGain so it ducks during mantra and respects drone volume
         binauralGain.connect(this.masterGain);
+
         leftOsc.start();
         rightOsc.start();
         this.binauralNodes = [leftOsc, rightOsc, binauralGain];
@@ -349,7 +394,9 @@ class AudioEngine {
                     node.gain.cancelScheduledValues(now);
                     node.gain.setValueAtTime(node.gain.value, now);
                     node.gain.linearRampToValueAtTime(0, now + 5);
-                } else { node.stop(now + 5); }
+                } else {
+                    node.stop(now + 5); 
+                }
             } catch(e) {}
         });
         this.binauralNodes = [];
@@ -358,7 +405,18 @@ class AudioEngine {
     stopDrone() {
         this.stopBinaural();
         const now = this.ctx.currentTime;
-        if (this.vibrationLFO) { try { this.vibrationLFO.stop(now + 5); } catch(e) {} this.vibrationLFO = null; }
+        
+        // Reset reverb wetness during stop to clear any active swells
+        if (this.reverbWet) {
+            this.reverbWet.gain.cancelScheduledValues(now);
+            this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
+            this.reverbWet.gain.linearRampToValueAtTime(0.3, now + 4);
+        }
+
+        if (this.vibrationLFO) {
+            try { this.vibrationLFO.stop(now + 5); } catch(e) {}
+            this.vibrationLFO = null;
+        }
         this.droneOscillators.forEach(({ osc, gain }) => {
             const currentVal = gain.gain.value;
             gain.gain.cancelScheduledValues(now);
@@ -367,6 +425,7 @@ class AudioEngine {
             setTimeout(() => { try { osc.stop(); } catch(e) {} }, 5100);
         });
         this.droneOscillators = [];
+
         this.elementalNodes.forEach(({ src, gain }) => {
             const currentVal = gain.gain.value;
             gain.gain.cancelScheduledValues(now);
@@ -378,28 +437,61 @@ class AudioEngine {
     }
 
     async playMantraTrack(key) {
-        if (!this.mantraBuffer[key]) return;
+        const filePath = MANTRA_AUDIO_MAP[key];
+        if (!filePath) return;
+
         this.stopMantraTrack();
-        const source = this.ctx.createBufferSource();
-        source.buffer = this.mantraBuffer[key];
-        source.loop = true;
-        source.connect(this.mantraGain);
-        source.start();
-        this.mantraSource = source;
+
+        if (!this.mantraBuffer[key]) {
+            const response = await fetch(filePath);
+            const arrayBuffer = await response.arrayBuffer();
+            this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
+        }
+
+        // Standardized to 3.0s crossfade
+        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+        this.mantraLoop.start();
+
+        // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
+        const lfo = this.ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); 
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.setValueAtTime(400, this.ctx.currentTime); // Softened to remove "whooshing" noise
+        lfo.connect(lfoGain);
+        lfoGain.connect(this.mantraFilter.frequency);
+        lfo.start();
+        this.mantraPresenceLFO = lfo;
+
         const now = this.ctx.currentTime;
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(0, now);
         this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 5);
+        this.mantraLoop.setGain(state.volMantra);
+
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
         }
+
+        // Explicitly fade out any elemental noise during mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0, now + 5);
+        });
     }
 
     stopMantraTrack() {
-        if (!this.mantraSource) return;
+        if (!this.mantraLoop) return;
         const now = this.ctx.currentTime;
+
+        if (this.mantraPresenceLFO) {
+            try { this.mantraPresenceLFO.stop(); } catch(e) {}
+            this.mantraPresenceLFO = null;
+        }
+
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
         this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
@@ -408,34 +500,61 @@ class AudioEngine {
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
         }
-        const src = this.mantraSource;
-        this.mantraSource = null;
-        setTimeout(() => { try { src.stop(); } catch(e) {} }, 4100);
+
+        // Restore elemental layer subtly after mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0.015, now + 4);
+        });
+
+        this.mantraLoop.stop(4);
+        this.mantraLoop = null;
+    }
+
+    // New: Studio Reverb Swell for Transitions
+    triggerReverbSwell(duration = 4) {
+        const now = this.ctx.currentTime;
+        this.reverbWet.gain.cancelScheduledValues(now);
+        this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
+        
+        // Swell up to 0.8 wetness then back down
+        this.reverbWet.gain.linearRampToValueAtTime(0.8, now + (duration * 0.5));
+        this.reverbWet.gain.linearRampToValueAtTime(0.3, now + duration);
     }
 
     async startBackgroundMusic() {
         if (!this.bgMusicBuffer) {
-            try {
-                const response = await fetch('audio/background_music.mp3');
-                const arrayBuffer = await response.arrayBuffer();
-                this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-            } catch (e) { return; }
+            const response = await fetch('audio/background_music.mp3');
+            const arrayBuffer = await response.arrayBuffer();
+            this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         }
-        if (this.bgMusicLoop) this.bgMusicLoop.stop(0);
-        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 5.0);
+        
+        if (this.bgMusicLoop) {
+            this.bgMusicLoop.stop(0);
+        }
+
+        // Standardized to 3.0s crossfade
+        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
         this.bgMusicLoop.start();
     }
 
-    fadeInBackgroundMusic(duration = 4, ducked = false) {
+    fadeInBackgroundMusic(duration = 4, isDucked = false) {
         if (!this.bgMusicLoop) return;
+        const targetVol = isDucked ? state.volMusic * 0.45 : state.volMusic;
+        const targetEQ = isDucked ? -8 : 0; 
+        
         const now = this.ctx.currentTime;
-        const targetVol = ducked ? state.volMusic * 0.4 : state.volMusic;
+        // Studio Trick: We use the dedicated bgMusicGain for the volume fades
         this.bgMusicGain.gain.cancelScheduledValues(now);
         this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
         this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration); 
+        
         this.bgMusicEQ.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(ducked ? 3 : 0, now + duration);
+        this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
+        
+        // Ensure the loop itself is running at a base gain of 1.0 so the bgMusicGain handles the mix
         this.bgMusicLoop.setGain(1.0);
     }
 
@@ -443,18 +562,21 @@ class AudioEngine {
         if (!this.bgMusicLoop) return;
         const now = this.ctx.currentTime;
         this.bgMusicGain.gain.cancelScheduledValues(now);
+        this.bgMusicEQ.gain.cancelScheduledValues(now);
+        
         this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
         this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
+        this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
+        
         this.bgMusicLoop.setGain(0);
     }
 
-    triggerReverbSwell(duration = 5) {
-        if (!this.reverbGain) return;
-        const now = this.ctx.currentTime;
-        this.reverbGain.gain.cancelScheduledValues(now);
-        this.reverbGain.gain.setValueAtTime(this.reverbGain.gain.value, now);
-        this.reverbGain.gain.linearRampToValueAtTime(0.7, now + duration / 2);
-        this.reverbGain.gain.linearRampToValueAtTime(0.35, now + duration);
+    stopBackgroundMusic() {
+        if (this.bgMusicLoop) {
+            this.bgMusicLoop.stop(2);
+            this.bgMusicLoop = null;
+        }
     }
 
     playSingingBowl() {
@@ -475,7 +597,7 @@ class AudioEngine {
             gain.gain.exponentialRampToValueAtTime(0.001, now + 8);
             osc.connect(filter);
             filter.connect(gain);
-            gain.connect(this.bellGain);
+            gain.connect(this.bellGain); // Use dedicated bell gain
             osc.start(now);
             osc.stop(now + 8.1);
         });
@@ -487,64 +609,13 @@ class VisualEngine {
     constructor() {
         this.symbolImg = document.getElementById('chakra-symbol');
         this.glow = document.getElementById('glow-effect');
-        this.animationId = null;
-        this.canvas = document.getElementById('particle-canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.stars = [];
-        this.starsAnimId = null;
-        window.addEventListener('resize', () => this.resizeCanvas());
-        this.resizeCanvas();
-        this.generateStars();
-        this.animateStars();
-    }
-    resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.generateStars();
-    }
-    generateStars() {
-        this.stars = [];
-        for (let i = 0; i < 60; i++) {
-            this.stars.push({
-                x: Math.random() * this.canvas.width,
-                y: Math.random() * this.canvas.height,
-                radius: 0.5 + Math.random() * 1.0,
-                baseOpacity: 0.1 + Math.random() * 0.4,
-                phase: Math.random() * Math.PI * 2,
-                speed: 0.3 + Math.random() * 0.9
-            });
-        }
-    }
-    animateStars() {
-        const draw = (time) => {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            const t = time * 0.001;
-            this.stars.forEach(star => {
-                const opacity = star.baseOpacity + (1 - star.baseOpacity) * 0.5 * (1 + Math.sin(t * star.speed + star.phase));
-                this.ctx.beginPath();
-                this.ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-                this.ctx.fill();
-            });
-            this.starsAnimId = requestAnimationFrame(draw);
-        };
-        this.starsAnimId = requestAnimationFrame(draw);
     }
     startPulsing(color) {
-        let scale = 1;
-        let direction = 1;
-        const animate = () => {
-            scale += 0.0001 * direction; 
-            if (scale > 1.02 || scale < 1.0) direction *= -1;
-            this.symbolImg.style.transform = `scale(${scale})`;
-            this.glow.style.boxShadow = `0 0 60px 20px ${color}`;
-            this.glow.style.background = color;
-            this.glow.style.opacity = 0.15 + (scale - 1) * 2;
-            this.animationId = requestAnimationFrame(animate);
-        };
-        animate();
+        this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
-    stop() { cancelAnimationFrame(this.animationId); }
+    stop() {
+        // No loops to stop
+    }
 }
 
 // Meditation Controller
@@ -564,21 +635,33 @@ class MeditationController {
             const response = await fetch('scripts.json');
             this.scripts = await response.json();
         }
+
         await this.audio.init();
-        if (this.audio.startBackgroundMusic) await this.audio.startBackgroundMusic();
+        // Start background music looping silently immediately
+        await this.audio.startBackgroundMusic();
+
         await wakeLock.request();
         this.isMeditationActive = true;
         this.isPaused = false;
         this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
+        
         document.getElementById('pause-meditation').textContent = 'II';
         document.getElementById('completion-modal').classList.add('hidden');
-        window.speechSynthesis.cancel();
+
+        // Initial Settle (2 seconds)
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
         if (this.isMeditationActive) await this.runGratitude();
+
+        // Removed redundant settle pause (already handled by narrate ending and gratitude end)
+
         if (this.isMeditationActive) await this.runBoxBreathing();
+        
+        // Settle after breathing (3 seconds)
+        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+
         if (this.isMeditationActive) {
             showScreen(meditationScreen);
-            window.speechSynthesis.cancel();
-            await new Promise(r => setTimeout(r, 3000));
             if (this.isHighEnergy) {
                 await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
                 if (this.isMeditationActive) {
@@ -587,7 +670,9 @@ class MeditationController {
                     if (this.isMeditationActive) await this.runHooponopono();
                     this.finish();
                 }
-            } else { await this.runSequence(); }
+            } else {
+                await this.runSequence();
+            }
         }
     }
 
@@ -596,34 +681,76 @@ class MeditationController {
         const tutorial = document.getElementById('breathing-tutorial');
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
+
         showScreen(screen);
         tutorial.classList.remove('hidden');
         tutorial.style.opacity = "1";
+
         const aura = document.getElementById('aura-bg');
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
+
+        // Moon Phase opening line
+        const phase = getMoonPhase();
+        const moonText = this.scripts.intro.moon[`${phase}_${state.language}`];
+        if (moonText && this.isMeditationActive) {
+            tutTitle.textContent = state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon";
+            tutText.textContent = moonText;
+            await this.narrate(moonText, false); // Keep music playing
+            await new Promise(r => setTimeout(r, 1000));
+        }
+
+        // Main gratitude + body scan
+        if (!this.isMeditationActive) return;
         tutTitle.textContent = state.language === 'ml' ? "കൃതജ്ഞത" : "Gratitude";
         const text = this.scripts.intro[`gratitude_${state.language}`];
         tutText.textContent = text;
-        await this.narrate(text, false);
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
+        if (state.intention && state.intention.trim()) {
+            await this.narrate(text, false); // Still keep music playing for next part
+            
+            const intentionText = state.language === 'ml'
+                ? `ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: ${state.intention.trim()}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്ര മുഴുവൻ അത് ഉള്ളിൽ ജ്വലിക്കട്ടെ.`
+                : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
+            tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
+            tutText.textContent = intentionText;
+            await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
+        } else {
+            await this.narrate(text, false); // No intention? Still keep music playing.
+        }
+
+        // Removed redundant pause before breathing - transition is now immediate and musical
     }
 
     async runBoxBreathing() {
+        const screen = document.getElementById('breathing-screen');
+        const tutorial = document.getElementById('breathing-tutorial');
         const instruction = document.getElementById('breathing-instruction');
         const circle = document.getElementById('breathing-circle');
         const timer = document.getElementById('breathing-timer');
-        const tutorial = document.getElementById('breathing-tutorial');
+        
+        showScreen(screen);
+        tutorial.classList.remove('hidden');
+        tutorial.style.opacity = "1";
+
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
         tutTitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കാം" : "Preparation";
-        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി ഇരിക്കുക. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
+        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
         tutText.textContent = text;
+
+        // Narrate the preparation instruction
         await this.narrate(text);
-        for (let s = 5; s > 0; s--) { if (!this.isMeditationActive) return; await new Promise(r => setTimeout(r, 1000)); }
+
+        for (let s = 5; s > 0; s--) {
+            if (!this.isMeditationActive) return;
+            await new Promise(r => setTimeout(r, 1000));
+        }
+        
         tutorial.style.opacity = "0";
         await new Promise(r => setTimeout(r, 1000));
         tutorial.classList.add('hidden');
+
         const steps = state.language === 'ml' ? [
             { text: "ശ്വാസം ഉള്ളിലേക്ക് എടുക്കുക", scale: 8 },
             { text: "നിർത്തുക", scale: 8 },
@@ -632,12 +759,16 @@ class MeditationController {
         ] : [
             { text: "Inhale", scale: 8 }, { text: "Hold", scale: 8 }, { text: "Exhale", scale: 1 }, { text: "Hold", scale: 1 }
         ];
+
         for (let cycle = 0; cycle < 4; cycle++) {
             for (const step of steps) {
                 if (!this.isMeditationActive) return;
+                
                 instruction.textContent = step.text;
                 circle.style.transform = `scale(${step.scale})`;
+                
                 this.narrateSoft(step.text);
+
                 for (let s = 4; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
@@ -646,9 +777,46 @@ class MeditationController {
                 }
             }
         }
+
+        // Intimate Completion
         if (this.isMeditationActive) {
             instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            await new Promise(r => setTimeout(r, 1000));
+            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ." : "Breathing exercise is complete. Stay still for a moment.";
+            await this.narrate(completeText);
+            
+            // 5 second interval before Chakra Journey starts
+            instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            await new Promise(r => setTimeout(r, 5000));
+        }
+    }
+
+    async narrateSoft(text) {
+        return new Promise(resolve => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                utterance.lang = selectedVoice.lang;
+            }
+            utterance.rate = 0.6;   // Slow
+            utterance.pitch = 0.8;  // Calm
+            utterance.volume = state.volVoice * 0.4; // Soft volume
+            utterance.onend = resolve;
+            window.speechSynthesis.speak(utterance);
+        });
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        const btn = document.getElementById('pause-meditation');
+        btn.textContent = this.isPaused ? '▶' : 'II';
+        
+        if (this.isPaused) {
+            window.speechSynthesis.pause();
+            if (this.audio.ctx) this.audio.ctx.suspend();
+        } else {
+            window.speechSynthesis.resume();
+            if (this.audio.ctx) this.audio.ctx.resume();
         }
     }
 
@@ -659,57 +827,66 @@ class MeditationController {
             await this.meditateOnChakra(this.scripts[key], key);
             if (i < this.chakraOrder.length - 1 && this.isMeditationActive) await this.handleInterval();
         }
-        if (this.isMeditationActive) await this.handleSilence();
-        if (this.isMeditationActive) await this.runClosing();
-        if (this.isMeditationActive) await this.runHooponopono();
-        if (this.isMeditationActive) this.finish();
+        if (this.isMeditationActive) { await this.handleSilence(); }
+        if (this.isMeditationActive) { await this.runClosing(); }
+        if (this.isMeditationActive) { await this.runHooponopono(); }
+        if (this.isMeditationActive) { this.finish(); }
     }
 
     async runClosing() {
-        if (!this.isMeditationActive) return;
         document.getElementById('mantra-display').textContent = "✦";
         document.getElementById('chakra-symbol').style.opacity = "0.4";
         const aura = document.getElementById('aura-bg');
         aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
-        await this.narrate(this.scripts.closing[state.language]);
-        if (!this.isMeditationActive) return;
+        const closingText = this.scripts.closing[state.language];
+        await this.narrate(closingText);
         await new Promise(r => setTimeout(r, 2000));
+        // Full-body health affirmation — head to toe
         const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
         if (healthAffirmation && this.isMeditationActive) {
             document.getElementById('mantra-display').textContent = "✦ BODY ✦";
             await this.narrate(healthAffirmation);
         }
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 3000));
     }
 
     async runHooponopono() {
-        if (!this.isMeditationActive) return;
         const aura = document.getElementById('aura-bg');
         aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
         aura.style.opacity = '1';
         document.getElementById('chakra-symbol').style.opacity = '0.1';
         document.getElementById('mantra-display').textContent = '✦';
+        document.getElementById('narration-text').textContent = '';
+
+        // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(this.scripts.hooponopono.intro[state.language], false);
-        if (!this.isMeditationActive) return;
         await new Promise(r => setTimeout(r, 2000));
+
+        // 3 cycles of the 4 phrases
         const phrases = this.scripts.hooponopono.phrases[state.language];
         for (let cycle = 0; cycle < 3; cycle++) {
-            if (!this.isMeditationActive) break;
-            for (const phrase of phrases) {
-                if (!this.isMeditationActive) break;
+            if (!this.isMeditationActive) return;
+            for (let i = 0; i < phrases.length; i++) {
+                if (!this.isMeditationActive) return;
+                const phrase = phrases[i];
                 document.getElementById('narration-text').textContent = phrase;
-                await this.narrate(phrase, false);
-                if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+                
+                // Keep music for all phrases, fade out only on the very last phrase of the last cycle
+                const isLast = (cycle === 2 && i === phrases.length - 1);
+                await this.narrate(phrase, false); // Keep music for phrases
+                await new Promise(r => setTimeout(r, 2000));
             }
         }
-        if (!this.isMeditationActive) return;
+
+        // Closing breath - Final fade out
         document.getElementById('narration-text').textContent = '';
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 3000));
     }
 
     async handleInterval() {
         this.audio.stopDrone();
+        const timerEl = document.getElementById('timer-display');
         document.getElementById('mantra-display').textContent = "BREATHE";
         document.getElementById('chakra-symbol').style.opacity = "0.3";
         this.visual.stop();
@@ -723,7 +900,8 @@ class MeditationController {
             if (!this.isPaused) {
                 elapsed += 100;
                 const remaining = Math.max(0, intervalMs - elapsed);
-                document.getElementById('timer-display').textContent = `00:${Math.ceil(remaining / 1000).toString().padStart(2, '0')}`;
+                const secs = Math.ceil(remaining / 1000);
+                timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
@@ -732,8 +910,14 @@ class MeditationController {
     async meditateOnChakra(chakra, key) {
         if (!this.isMeditationActive) return;
         const symbolEl = document.getElementById('chakra-symbol');
-        symbolEl.style.opacity = '1';
+        symbolEl.style.opacity = '';   // clear any inline opacity
+        symbolEl.classList.remove('cosmic-entrance');
+        // Force reflow to restart animation
+        void symbolEl.offsetWidth;
+        symbolEl.classList.add('cosmic-entrance');
+        setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
         symbolEl.src = chakra.symbol;
+        symbolEl.style.opacity = "1";
         document.getElementById('mantra-display').textContent = chakra.mantra;
         document.getElementById('mantra-display').style.color = chakra.color;
         document.body.style.setProperty('--primary-color', chakra.color);
@@ -746,13 +930,25 @@ class MeditationController {
         const aura = document.getElementById('aura-bg');
         aura.style.background = `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
         aura.style.opacity = "1";
-        if (key === 'thirdeye') { this.audio.stopDrone(); } else { this.audio.startDrone(chakra.frequency, this.chakraOrder.indexOf(key)); }
+        const index = this.chakraOrder.indexOf(key);
+
+        if (key === 'thirdeye') {
+            this.audio.stopDrone();
+        } else {
+            this.audio.startDrone(chakra.frequency, index);
+        }
+
         this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
         if (!this.isMeditationActive) return;
+
+        // Start looping mantra audio track (fades in, drone fades down)
         await this.audio.playMantraTrack(key);
+
         const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
         let elapsed = 0;
+        const timerEl = document.getElementById('timer-display');
+
         while (elapsed < chantDurationMs) {
             if (!this.isMeditationActive) break;
             if (!this.isPaused) {
@@ -760,13 +956,22 @@ class MeditationController {
                 const remaining = Math.max(0, chantDurationMs - elapsed);
                 const mins = Math.floor(remaining / 60000);
                 const secs = Math.floor((remaining % 60000) / 1000);
-                document.getElementById('timer-display').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
-        document.getElementById('timer-display').textContent = "00:00";
+        timerEl.textContent = "00:00";
+
+        // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
-        if (key === 'thirdeye') { this.audio.startDrone(chakra.frequency, this.chakraOrder.indexOf(key)); await new Promise(r => setTimeout(r, 2000)); } else { await new Promise(r => setTimeout(r, 4000)); }
+        if (key === 'thirdeye') {
+            // Restore drone for Ajna affirmation
+            this.audio.startDrone(chakra.frequency, index);
+            await new Promise(r => setTimeout(r, 2000));
+        } else {
+            await new Promise(r => setTimeout(r, 4000));
+        }
+
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
     }
 
@@ -775,80 +980,96 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.8; utterance.pitch = 0.9; utterance.volume = state.volVoice * 0.6;
-            utterance.onend = resolve;
-            window.speechSynthesis.speak(utterance);
-        });
-    }
-
-    async narrateSoft(text) {
-        return new Promise(resolve => {
-            const utterance = new SpeechSynthesisUtterance(text);
-            const selectedVoice = state.voices.find(v => v.name === state.voiceName);
-            if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.6; utterance.pitch = 0.8; utterance.volume = state.volVoice * 0.4;
+            utterance.rate = 0.72; 
+            utterance.pitch = 0.82; 
+            utterance.volume = state.volVoice * 0.6;
             utterance.onend = resolve;
             window.speechSynthesis.speak(utterance);
         });
     }
 
     async narrate(text, fadeOut = false) {
-        if (this.audio.bgMusicLoop) this.audio.fadeInBackgroundMusic(4, true);
+        // Ensure background music is active at ducked level
+        this.audio.fadeInBackgroundMusic(4, true);
+
+        // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
+
+        // Activate Frequency Carving (-8dB notch at 2.5kHz) to 'seat' the voice in the mix
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
             this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-8, this.audio.ctx.currentTime + 1.5);
         }
+
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+
             const narrationTextEl = document.getElementById('narration-text');
             if (narrationTextEl) narrationTextEl.textContent = sentence.trim();
+
             await new Promise(resolve => {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                utterance.rate = state.sleepMode ? 0.60 : 0.72; utterance.pitch = state.sleepMode ? 0.75 : 0.88;
+
+                // Studio Clarity
+                utterance.rate   = state.sleepMode ? 0.60 : 0.72;
+                utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
-                const safetyTimeout = setTimeout(() => { resolve(); }, (sentence.length * 150) + 3000);
-                utterance.onend = () => { clearTimeout(safetyTimeout); resolve(); };
-                utterance.onerror = () => { clearTimeout(safetyTimeout); resolve(); };
+                utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
+
             await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
-        if (this.audio.voiceCarveFilter) { this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 3); }
-        if (fadeOut) { await new Promise(r => setTimeout(r, 2500)); this.audio.triggerReverbSwell(5); this.audio.fadeOutBackgroundMusic(4); }
+
+        // Release Frequency Carving after narration ends
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 3);
+        }
+
+        if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
+            await new Promise(r => setTimeout(r, 2500));
+            this.audio.triggerReverbSwell(5);
+            this.audio.fadeOutBackgroundMusic(4);
+        }
+    }
+
+    // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
+    narrateSubliminal(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+        if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
+        utterance.rate   = state.sleepMode ? 0.45 : 0.55;
+        utterance.pitch  = state.sleepMode ? 0.65 : 0.75;
+        utterance.volume = state.volVoice * 0.05;
+        window.speechSynthesis.speak(utterance);
     }
 
     async handleSilence() {
-        if (!this.isMeditationActive) return;
         this.visual.stop();
         document.getElementById('mantra-display').textContent = "SILENCE";
         document.getElementById('chakra-symbol').style.opacity = "0.2";
         this.audio.stopDrone();
         let elapsed = 0;
         const silenceTime = 60000;
+        const timerEl = document.getElementById('timer-display');
         while (elapsed < silenceTime) {
             if (!this.isMeditationActive) break;
             if (!this.isPaused) {
                 elapsed += 100;
-                document.getElementById('timer-display').textContent = `00:${Math.ceil((silenceTime - elapsed) / 1000).toString().padStart(2, '0')}`;
+                const remaining = silenceTime - elapsed;
+                const secs = Math.ceil(remaining / 1000);
+                timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
     }
 
-    togglePause() {
-        this.isPaused = !this.isPaused;
-        document.getElementById('pause-meditation').textContent = this.isPaused ? '▶' : 'II';
-        if (this.isPaused) { window.speechSynthesis.pause(); if (this.audio.ctx) this.audio.ctx.suspend(); }
-        else { window.speechSynthesis.resume(); if (this.audio.ctx) this.audio.ctx.resume(); }
-    }
-
     finish() {
-        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); wakeLock.release();
+        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -857,27 +1078,54 @@ class MeditationController {
         localStorage.setItem('chakra_stats_time', state.stats.time);
         document.getElementById('stat-journeys').textContent = state.stats.journeys;
         document.getElementById('stat-time').textContent = state.stats.time;
-        document.getElementById('stat-session-time').textContent = Math.round(state.stats.time) + ' mins';
-        document.getElementById('stat-total-journeys').textContent = state.stats.journeys;
+        document.getElementById('stat-session-time').textContent =
+            Math.round(state.stats.time) + ' mins';
+        document.getElementById('stat-total-journeys').textContent =
+            state.stats.journeys;
+        // Lift sleep mode dimming once session ends
+        document.body.classList.remove('sleep-mode-active');
+
         const modal = document.getElementById('completion-modal');
-        document.getElementById('completion-title').textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
-        document.getElementById('completion-message').textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
-        document.getElementById('close-completion').textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+        const title = document.getElementById('completion-title');
+        const msg = document.getElementById('completion-message');
+        const btn = document.getElementById('close-completion');
+        title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
+        msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
+        btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+
+        // Journal: reset textarea, show last entry date, localise prompt
+        document.getElementById('journal-entry').value = '';
+        document.getElementById('journal-prompt').textContent = state.language === 'ml'
+            ? 'എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?'
+            : 'What shifted? What are you calling in?';
+        document.getElementById('save-journal').textContent = state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry';
+        const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+        const lastInfo = document.getElementById('last-journal-info');
+        lastInfo.textContent = journalEntries.length > 0
+            ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + journalEntries[0].date
+            : '';
+
         modal.classList.remove('hidden');
     }
 
     stop() {
-        this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
+        document.body.classList.remove('sleep-mode-active');
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         showScreen(lobbyScreen);
     }
 }
 
+// Wake Lock Manager
 class WakeLockManager {
     constructor() { this.wakeLock = null; }
-    async request() { if ('wakeLock' in navigator) { try { this.wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} } }
+    async request() {
+        if ('wakeLock' in navigator) {
+            try { this.wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
+        }
+    }
     release() { if (this.wakeLock !== null) { this.wakeLock.release(); this.wakeLock = null; } }
 }
 
@@ -904,8 +1152,22 @@ const state = {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
     },
-    selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']
+    selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
+    intention: localStorage.getItem('chakra_intention') || '',
+    sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true'
 };
+
+// ── Moon Phase Calculator ─────────────────────────────────────────────────────
+function getMoonPhase() {
+    const knownNewMoon = new Date('2025-01-29T12:35:00Z');
+    const lunarCycle  = 29.53058770576;
+    const daysSince   = (Date.now() - knownNewMoon.getTime()) / 86400000;
+    const pos         = ((daysSince % lunarCycle) + lunarCycle) % lunarCycle;
+    if (pos < 7.38)  return 'new';
+    if (pos < 14.77) return 'waxing';
+    if (pos < 22.15) return 'full';
+    return 'waning';
+}
 
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -954,15 +1216,34 @@ function setupVoices() {
 
 function autoSelectVoice() {
     let bestVoice = null;
+    const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
+    
+    const findBestInList = (list) => {
+        // First try premium voices
+        let premium = list.find(v => premiumKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+        if (premium) return premium;
+        // Then return the first in the list
+        return list[0];
+    };
+
     if (state.language === 'ml') {
-        bestVoice = state.voices.find(v => v.lang === 'ml-IN' || v.lang === 'ml_IN') || 
-                    state.voices.find(v => v.lang.startsWith('ml')) ||
-                    state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
+        const mlVoices = state.voices.filter(v => v.lang.startsWith('ml'));
+        if (mlVoices.length > 0) {
+            bestVoice = findBestInList(mlVoices);
+        } else {
+            bestVoice = state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
+        }
     } else {
-        bestVoice = state.voices.find(v => v.lang === 'en-US' || v.lang === 'en_US') || 
-                    state.voices.find(v => v.lang.startsWith('en'));
+        const enVoices = state.voices.filter(v => v.lang.startsWith('en'));
+        if (enVoices.length > 0) {
+            bestVoice = findBestInList(enVoices);
+        }
     }
-    if (bestVoice) { state.voiceName = bestVoice.name; voiceSelect.value = bestVoice.name; }
+    
+    if (bestVoice) {
+        state.voiceName = bestVoice.name;
+        voiceSelect.value = bestVoice.name;
+    }
 }
 
 function testVoice() {
@@ -978,15 +1259,28 @@ function loadPreferences() {
     const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
     timeSlider.style.setProperty('--range-fill', pctInit);
     timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
+    
+    // Sync Mixer Sliders
     document.getElementById('vol-voice').value = state.volVoice;
     document.getElementById('vol-drone').value = state.volDrone;
     document.getElementById('vol-bell').value = state.volBell;
     document.getElementById('vol-mantra').value = state.volMantra;
+    document.getElementById('vol-music').value = state.volMusic;
+
+    // Sync Settings Sliders
+    document.getElementById('settings-vol-voice').value = state.volVoice;
+    document.getElementById('settings-vol-drone').value = state.volDrone;
+    document.getElementById('settings-vol-bell').value = state.volBell;
+    document.getElementById('settings-vol-mantra').value = state.volMantra;
+    document.getElementById('settings-vol-music').value = state.volMusic;
+
     document.getElementById('stat-journeys').textContent = state.stats.journeys;
     document.getElementById('stat-time').textContent = state.stats.time;
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
         cb.checked = state.selectedChakras.includes(cb.value);
     });
+    document.getElementById('intention-input').value = state.intention;
+    document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
 }
 
 function checkFirstTime() {
@@ -1027,11 +1321,15 @@ function attachEventListeners() {
     });
     function updateSessionEstimate() {
         const isHigh = document.getElementById('high-energy-toggle').checked;
+        // Accounts for chanting + narration overhead (~2 min/chakra) + fixed overhead + hooponopono (~2 min)
+        // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
+        // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
         const estimate = isHigh
             ? Math.round(state.timePerChakra + 9)
             : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 12);
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
+
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
         timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
@@ -1040,10 +1338,13 @@ function attachEventListeners() {
         e.target.style.setProperty('--range-fill', pct);
         updateSessionEstimate();
     });
+
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
         meditation.chakraOrder = state.selectedChakras;
+        // Apply sleep mode dim class at session start
+        if (state.sleepMode) document.body.classList.add('sleep-mode-active');
         meditation.start();
     });
     document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
@@ -1052,24 +1353,105 @@ function attachEventListeners() {
         document.getElementById('completion-modal').classList.add('hidden');
         showScreen(lobbyScreen);
     });
+
+    // Intention input
+    document.getElementById('intention-input').addEventListener('input', (e) => {
+        state.intention = e.target.value;
+        localStorage.setItem('chakra_intention', state.intention);
+    });
+
+    // Sleep mode toggle
+    document.getElementById('sleep-mode-toggle').addEventListener('change', (e) => {
+        state.sleepMode = e.target.checked;
+        localStorage.setItem('chakra_sleep_mode', state.sleepMode);
+    });
+
+    // Journal save
+    document.getElementById('save-journal').addEventListener('click', () => {
+        const entry = document.getElementById('journal-entry').value.trim();
+        if (!entry) return;
+        const entries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+        entries.unshift({ date: new Date().toLocaleDateString(), text: entry });
+        localStorage.setItem('chakra_journal', JSON.stringify(entries.slice(0, 50)));
+        document.getElementById('journal-entry').value = '';
+        const info = document.getElementById('last-journal-info');
+        info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
+        setTimeout(() => {
+            const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+            info.textContent = saved.length > 0
+                ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
+                : '';
+        }, 2000);
+    });
     const mixer = document.getElementById('volume-mixer');
     document.getElementById('btn-mixer').addEventListener('click', () => mixer.classList.toggle('hidden'));
     document.getElementById('close-mixer').addEventListener('click', () => mixer.classList.add('hidden'));
-    document.getElementById('vol-voice').addEventListener('input', (e) => { state.volVoice = parseFloat(e.target.value); localStorage.setItem('chakra_vol_voice', state.volVoice); });
-    document.getElementById('vol-drone').addEventListener('input', (e) => {
-        state.volDrone = parseFloat(e.target.value);
-        localStorage.setItem('chakra_vol_drone', state.volDrone);
+    // Unified Volume Handlers
+    const syncVolume = (key, value, elements) => {
+        state[key] = parseFloat(value);
+        localStorage.setItem(`chakra_${key.replace('vol', 'vol_').toLowerCase()}`, state[key]);
+        elements.forEach(el => { if (el) el.value = value; });
+    };
+
+    // Voice
+    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')];
+    volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volVoice', e.target.value, volVoiceEls);
+    }));
+
+    // Drone
+    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')];
+    volDroneEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volDrone', e.target.value, volDroneEls);
         if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
-    });
-    document.getElementById('vol-bell').addEventListener('input', (e) => { state.volBell = parseFloat(e.target.value); localStorage.setItem('chakra_vol_bell', state.volBell); if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime); });
-    document.getElementById('vol-mantra').addEventListener('input', (e) => { state.volMantra = parseFloat(e.target.value); localStorage.setItem('chakra_vol_mantra', state.volMantra); if (audio.mantraGain && audio.mantraSource) audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime); });
+    }));
+
+    // Bell
+    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')];
+    volBellEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volBell', e.target.value, volBellEls);
+        if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
+    }));
+
+    // Mantra
+    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')];
+    volMantraEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volMantra', e.target.value, volMantraEls);
+        if (audio.mantraGain && audio.mantraLoop) {
+            audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
+        }
+    }));
+
+    // Music
+    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')];
+    volMusicEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volMusic', e.target.value, volMusicEls);
+        if (audio.bgMusicGain && audio.bgMusicLoop) {
+            // Note: fadeIn/fadeOut and ducking logic will use the new state.volMusic on their next trigger
+            // For immediate feedback during play:
+            audio.bgMusicGain.gain.setValueAtTime(state.volMusic, audio.ctx.currentTime);
+        }
+    }));
     if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({ title: 'Chakra Meditation', artist: 'Mahakatha Vibe', artwork: [{ src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }] });
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: 'Chakra Meditation', artist: 'Mahakatha Vibe',
+            artwork: [
+                { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
+            ]
+        });
         navigator.mediaSession.setActionHandler('play', () => { if (meditation.isPaused) meditation.togglePause(); });
         navigator.mediaSession.setActionHandler('pause', () => { if (!meditation.isPaused) meditation.togglePause(); });
         navigator.mediaSession.setActionHandler('stop', () => meditation.stop());
     }
-    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => { cb.addEventListener('change', () => { cb.closest('.checkbox-label').classList.toggle('chip-active', cb.checked); }); if (cb.checked) cb.closest('.checkbox-label').classList.add('chip-active'); });
+    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            cb.closest('.checkbox-label').classList.toggle('chip-active', cb.checked);
+        });
+        // Set initial state
+        if (cb.checked) cb.closest('.checkbox-label').classList.add('chip-active');
+    });
+
+    // Initial estimate on load
     updateSessionEstimate();
 }
 
