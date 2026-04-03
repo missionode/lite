@@ -95,7 +95,6 @@ class AudioEngine {
         this.elementalNodes = [];
         this.binauralNodes = []; // New: Binaural Beat Layer
         this.masterGain = null;
-        this.reverbNode = null;
         this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.isInitialized = false;
