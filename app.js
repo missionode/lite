@@ -1105,6 +1105,20 @@ class MeditationController {
     }
 
     async narrate(text, fadeOut = false) {
+        if (!window.speechSynthesis) return;
+
+        // Cancel any queued speech to prevent buildup on mobile
+        window.speechSynthesis.cancel();
+
+        // Wait for voices if they haven't loaded yet (mobile browsers load asynchronously)
+        let voiceWait = 0;
+        while (state.voices.length === 0 && voiceWait < 20) {
+            await new Promise(r => setTimeout(r, 100));
+            state.voices = window.speechSynthesis.getVoices();
+            voiceWait++;
+        }
+        if (!state.voiceName && state.voices.length > 0) autoSelectVoice();
+
         // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
 
@@ -1347,14 +1361,51 @@ function setupVoices() {
         if (!state.voiceName) autoSelectVoice();
         return true;
     };
+
+    // Strategy 1: standard event
     window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    // Strategy 2: immediate attempt, then poll (critical for iOS Safari)
     if (!loadVoices()) {
-        // Fallback polling for browsers (iOS Safari etc.) where onvoiceschanged never fires
         let attempts = 0;
         const poll = setInterval(() => {
-            if (loadVoices() || ++attempts >= 20) clearInterval(poll);
-        }, 250);
+            const success = loadVoices();
+            attempts++;
+            if (success || attempts > 30) {
+                clearInterval(poll);
+                if (!success && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    // iOS requires a user gesture before voices become available
+                    const voiceStatus = document.getElementById('voice-status');
+                    if (voiceStatus) {
+                        voiceStatus.textContent = 'Tap anywhere to enable voice';
+                        voiceStatus.style.display = 'block';
+                    }
+                    document.body.addEventListener('touchstart', function enableVoice() {
+                        const dummy = new SpeechSynthesisUtterance('');
+                        window.speechSynthesis.speak(dummy);
+                        window.speechSynthesis.cancel();
+                        loadVoices();
+                        document.body.removeEventListener('touchstart', enableVoice);
+                        const voiceStatus = document.getElementById('voice-status');
+                        if (voiceStatus) voiceStatus.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }, 200);
     }
+
+    // Strategy 3: pre-warm speech synthesis on first user interaction
+    const warmup = () => {
+        const dummy = new SpeechSynthesisUtterance('');
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+        window.speechSynthesis.cancel();
+        loadVoices();
+        document.removeEventListener('click', warmup);
+        document.removeEventListener('touchstart', warmup);
+    };
+    document.addEventListener('click', warmup);
+    document.addEventListener('touchstart', warmup);
 }
 
 function autoSelectVoice() {
