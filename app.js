@@ -8,6 +8,13 @@ const MANTRA_AUDIO_MAP = {
     crown:       'audio/AUM.mp3',
     high_energy: 'audio/HREEM.mp3'
 };
+
+// Screen Elements
+const configScreen = document.getElementById('config-screen');
+const lobbyScreen = document.getElementById('lobby-screen');
+const meditationScreen = document.getElementById('meditation-screen');
+const breathingScreen = document.getElementById('breathing-screen');
+
 // Audio Engine
 class SeamlessLoop {
     constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
@@ -673,7 +680,7 @@ class MeditationController {
     async start() {
         try {
             // Immediate visual feedback for mobile
-            showScreen(document.getElementById('breathing-screen'));
+            showScreen(breathingScreen);
             document.getElementById('completion-modal').classList.add('hidden');
             
             if (!this.scripts) {
@@ -1225,9 +1232,6 @@ function getMoonPhase() {
     return 'waning';
 }
 
-const configScreen = document.getElementById('config-screen');
-const lobbyScreen = document.getElementById('lobby-screen');
-const meditationScreen = document.getElementById('meditation-screen');
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
 const testVoiceBtn = document.getElementById('test-voice');
@@ -1354,8 +1358,10 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    [configScreen, lobbyScreen, meditationScreen, document.getElementById('breathing-screen')].forEach(s => s.classList.add('hidden'));
-    screen.classList.remove('hidden');
+    [configScreen, lobbyScreen, meditationScreen, breathingScreen].forEach(s => {
+        if (s) s.classList.add('hidden');
+    });
+    if (screen) screen.classList.remove('hidden');
 }
 
 function attachEventListeners() {
