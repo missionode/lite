@@ -1258,23 +1258,50 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
+    let retryCount = 0;
+    const maxRetries = 12; // 3 seconds total
+
     const loadVoices = () => {
-        state.voices = window.speechSynthesis.getVoices();
+        const availableVoices = window.speechSynthesis.getVoices();
+        
+        if (availableVoices.length === 0 && retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(loadVoices, 250);
+            return;
+        }
+
+        state.voices = availableVoices;
         voiceSelect.innerHTML = '';
-        state.voices.forEach(voice => {
+
+        if (state.voices.length === 0) {
             const option = document.createElement('option');
-            option.value = voice.name;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            if (voice.name === state.voiceName) option.selected = true;
+            option.textContent = "Default System Voice";
+            option.value = "";
             voiceSelect.appendChild(option);
-        });
-        if (!state.voiceName) autoSelectVoice();
+        } else {
+            state.voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                if (voice.name === state.voiceName) option.selected = true;
+                voiceSelect.appendChild(option);
+            });
+        }
+        
+        if (!state.voiceName || !state.voices.find(v => v.name === state.voiceName)) {
+            autoSelectVoice();
+        }
     };
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices();
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+    }
 }
 
 function autoSelectVoice() {
+    if (!state.voices || state.voices.length === 0) return;
+    
     let bestVoice = null;
     const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
     
