@@ -1347,83 +1347,57 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
-    // Wake up the speech engine immediately (critical for mobile Chrome/Brave/Safari)
-    if ('speechSynthesis' in window) {
-        try {
-            const dummy = new SpeechSynthesisUtterance('');
-            dummy.volume = 0;
-            window.speechSynthesis.speak(dummy);
-        } catch(e) { /* silently ignore — some browsers block speak() before user interaction */ }
-    }
+    if (!('speechSynthesis' in window)) return;
 
-    const loadVoices = () => {
-        state.voices = window.speechSynthesis.getVoices();
-        voiceSelect.innerHTML = '';
-
-        if (state.voices.length === 0) {
-            // Fallback: show System Default so the dropdown is never stuck and voiceName gets a value
-            const option = document.createElement('option');
-            option.value = 'Default';
-            option.textContent = 'System Default Voice';
-            voiceSelect.appendChild(option);
-            if (!state.voiceName) { state.voiceName = 'Default'; voiceSelect.value = 'Default'; }
-            return false;
-        }
-        state.voices.forEach(voice => {
-            const option = document.createElement('option');
-            option.value = voice.name;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            if (voice.name === state.voiceName) option.selected = true;
-            voiceSelect.appendChild(option);
-        });
-        if (!state.voiceName) autoSelectVoice();
-        return true;
-    };
-
-    // Strategy 1: standard event
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    // Strategy 2: immediate attempt, then poll (critical for iOS Safari)
-    if (!loadVoices()) {
-        let attempts = 0;
-        const poll = setInterval(() => {
-            const success = loadVoices();
-            attempts++;
-            if (success || attempts > 30) {
-                clearInterval(poll);
-                if (!success && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                    // iOS requires a user gesture before voices become available
-                    const voiceStatus = document.getElementById('voice-status');
-                    if (voiceStatus) {
-                        voiceStatus.textContent = 'Tap anywhere to enable voice';
-                        voiceStatus.style.display = 'block';
-                    }
-                    document.body.addEventListener('touchstart', function enableVoice() {
-                        const dummy = new SpeechSynthesisUtterance('');
-                        window.speechSynthesis.speak(dummy);
-                        window.speechSynthesis.cancel();
-                        loadVoices();
-                        document.body.removeEventListener('touchstart', enableVoice);
-                        const voiceStatus = document.getElementById('voice-status');
-                        if (voiceStatus) voiceStatus.style.display = 'none';
-                    }, { once: true });
-                }
-            }
-        }, 200);
-    }
-
-    // Strategy 3: pre-warm speech synthesis on first user interaction
-    const warmup = () => {
+    // Wake up the speech engine (critical for mobile Chrome/Brave)
+    try {
         const dummy = new SpeechSynthesisUtterance('');
         dummy.volume = 0;
         window.speechSynthesis.speak(dummy);
-        window.speechSynthesis.cancel();
-        loadVoices();
-        document.removeEventListener('click', warmup);
-        document.removeEventListener('touchstart', warmup);
+    } catch(e) {}
+
+    let retryCount = 0;
+    const maxRetries = 10;
+
+    const loadVoices = () => {
+        const availableVoices = window.speechSynthesis.getVoices();
+
+        if (availableVoices.length > 0 || retryCount >= maxRetries) {
+            state.voices = availableVoices;
+            voiceSelect.innerHTML = '';
+
+            if (state.voices.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'System Default Voice';
+                option.value = 'Default';
+                voiceSelect.appendChild(option);
+            } else {
+                state.voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.name === state.voiceName) option.selected = true;
+                    voiceSelect.appendChild(option);
+                });
+            }
+
+            if (!voiceSelect.value || !state.voiceName) autoSelectVoice();
+            return true;
+        }
+
+        retryCount++;
+        return false;
     };
-    document.addEventListener('click', warmup);
-    document.addEventListener('touchstart', warmup);
+
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    const interval = setInterval(() => {
+        if (loadVoices()) clearInterval(interval);
+    }, 300);
+
+    setTimeout(() => clearInterval(interval), 5000);
+
+    loadVoices();
 }
 
 function autoSelectVoice() {
