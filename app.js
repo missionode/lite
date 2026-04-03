@@ -486,13 +486,21 @@ class AudioEngine {
         const now = this.ctx.currentTime;
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(0, now);
-        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 5);
+        // Ghostly 10s fade-in for maximum relaxation
+        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 10);
         this.mantraLoop.setGain(state.volMantra);
 
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
+            // Deeper ducking (to 15%) to create a "cradle" for the voice
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
+        }
+
+        // Deep spectral carving on BG music when mantra is active
+        if (this.bgMusicEQ) {
+            this.bgMusicEQ.gain.cancelScheduledValues(now);
+            this.bgMusicEQ.gain.linearRampToValueAtTime(-12, now + 8); // Hollow out space
         }
 
         // Explicitly fade out any elemental noise during mantra
@@ -514,11 +522,17 @@ class AudioEngine {
 
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
-        this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
+        this.mantraGain.gain.linearRampToValueAtTime(0, now + 8); // Gentler exit
+
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 6);
+        }
+
+        if (this.bgMusicEQ) {
+            this.bgMusicEQ.gain.cancelScheduledValues(now);
+            this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + 6); // Restore spectrum
         }
 
         // Restore elemental layer subtly after mantra
@@ -1166,7 +1180,7 @@ const state = {
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
-    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.45,
+    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.35,
     volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
