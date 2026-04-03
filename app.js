@@ -197,6 +197,7 @@ class AudioEngine {
         // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
         this.reverbGain = this.ctx.createGain();
         this.reverbGain.gain.value = 0.45; // Lush divine aura
+        this.reverbWet = this.reverbGain; // Map wet control to gain node
         
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
@@ -341,9 +342,6 @@ class AudioEngine {
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
         this.stopBinaural();
-
-        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(5, 4);
-        this.reverbNode.buffer = this._staticImpulse;
         
         this.startElementalLayer(index);
         
