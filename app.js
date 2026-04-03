@@ -1258,41 +1258,21 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
-    let retryCount = 0;
-    const maxRetries = 12; // 3 seconds total
-
     const loadVoices = () => {
-        const availableVoices = window.speechSynthesis.getVoices();
+        state.voices = window.speechSynthesis.getVoices();
+        if (state.voices.length === 0) return;
         
-        if (availableVoices.length === 0 && retryCount < maxRetries) {
-            retryCount++;
-            setTimeout(loadVoices, 250);
-            return;
-        }
-
-        state.voices = availableVoices;
         voiceSelect.innerHTML = '';
-
-        if (state.voices.length === 0) {
+        state.voices.forEach(voice => {
             const option = document.createElement('option');
-            option.textContent = "Default System Voice";
-            option.value = "";
+            option.value = voice.name;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            if (voice.name === state.voiceName) option.selected = true;
             voiceSelect.appendChild(option);
-        } else {
-            state.voices.forEach(voice => {
-                const option = document.createElement('option');
-                option.value = voice.name;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                if (voice.name === state.voiceName) option.selected = true;
-                voiceSelect.appendChild(option);
-            });
-        }
-        
-        if (!state.voiceName || !state.voices.find(v => v.name === state.voiceName)) {
-            autoSelectVoice();
-        }
+        });
+        if (!state.voiceName || !state.voices.find(v => v.name === state.voiceName)) autoSelectVoice();
     };
-
+    
     if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = loadVoices;
         loadVoices();
