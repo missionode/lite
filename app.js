@@ -8,9 +8,16 @@ const MANTRA_AUDIO_MAP = {
     crown:       'audio/AUM.mp3',
     high_energy: 'audio/HREEM.mp3'
 };
+
+// Screen Elements
+const configScreen = document.getElementById('config-screen');
+const lobbyScreen = document.getElementById('lobby-screen');
+const meditationScreen = document.getElementById('meditation-screen');
+const breathingScreen = document.getElementById('breathing-screen');
+
 // Audio Engine
 class SeamlessLoop {
-    constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 3) {
+    constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
         this.ctx = ctx;
         this.buffer = buffer;
         this.destination = destination;
@@ -95,7 +102,6 @@ class AudioEngine {
         this.elementalNodes = [];
         this.binauralNodes = []; // New: Binaural Beat Layer
         this.masterGain = null;
-        this.reverbNode = null;
         this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.isInitialized = false;
@@ -115,53 +121,51 @@ class AudioEngine {
     }
 
     async init() {
-        if (this.isInitialized) return;
+        if (this.isInitialized) {
+            if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
+            return;
+        }
         
         // Upgrade 1: Optimize context for playback fidelity rather than low latency
         this.ctx = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'playback',
             sampleRate: 48000
         });
+
+        // Crucial for mobile: Resume context on user gesture
+        if (this.ctx.state === 'suspended') await this.ctx.resume();
         
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
-        // Upgrade 2: Studio Tube Warmth (WaveShaper)
-        // Adjusted curve to "round off" sharp edges for a cooler, analog feel
+        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeWarmthCurve(0.1); 
+        this.exciter.curve = this.makeDistortionCurve(0.05); 
         
-        // Upgrade 6: The "Comfort Dip" (-3dB at 3.2kHz)
-        // Removes the "hot edges" that cause ear fatigue
-        this.comfortFilter = this.ctx.createBiquadFilter();
-        this.comfortFilter.type = 'peaking';
-        this.comfortFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
-        this.comfortFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
-        this.comfortFilter.gain.setValueAtTime(-3, this.ctx.currentTime);
+        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
+        // This 'carves' a space for the voice so it sounds crystal clear
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(-1.5, this.ctx.currentTime); // "Silk" roll-off
-
-        // Upgrade 7: Low-End "Body" Filter
-        this.warmthFilter = this.ctx.createBiquadFilter();
-        this.warmthFilter.type = 'lowshelf';
-        this.warmthFilter.frequency.setValueAtTime(250, this.ctx.currentTime);
-        this.warmthFilter.gain.setValueAtTime(2, this.ctx.currentTime); 
-
+        this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(-1, this.ctx.currentTime); // Removed the 'edge'
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
-        this.lowCutFilter.frequency.setValueAtTime(150, this.ctx.currentTime);
-        this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+        this.lowCutFilter.frequency.setValueAtTime(95, this.ctx.currentTime); // Deeper warmth
+        this.lowCutFilter.Q.setValueAtTime(0.4, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
-        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
-        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+        this.masterCompressor.threshold.setValueAtTime(-26, this.ctx.currentTime); 
+        this.masterCompressor.knee.setValueAtTime(35, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(2.5, this.ctx.currentTime); // Smoother compression
+        this.masterCompressor.attack.setValueAtTime(0.005, this.ctx.currentTime); 
+        this.masterCompressor.release.setValueAtTime(0.35, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
@@ -204,16 +208,17 @@ class AudioEngine {
         // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
         // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
         this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.3;
+        this.reverbGain.gain.value = 0.45; // Lush divine aura
+        this.reverbWet = this.reverbGain; // Map wet control to gain node
         
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
+        this.reverbFilter.frequency.setValueAtTime(2600, this.ctx.currentTime); // Darker, smoother reverb
 
         this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.6;
+        this.delayNode.delayTime.value = 0.65;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.45; // Lush feedback
+        this.delayFeedback.gain.value = 0.55; // Deeper feedback trails
 
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -243,7 +248,7 @@ class AudioEngine {
         
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
+        this.mantraFilter.frequency.setValueAtTime(3600, this.ctx.currentTime); // "Cools" the mantra edge
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
@@ -291,6 +296,7 @@ class AudioEngine {
 
     startElementalLayer(index) {
         this.elementalNodes.forEach(n => {
+            try { n.lfo.stop(); } catch(e) {}
             try { n.src.stop(); } catch(e) {}
         });
         this.elementalNodes = [];
@@ -304,6 +310,25 @@ class AudioEngine {
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 5);
 
+        // New: Dynamic Breeze Modulation
+        const breezeLfo = this.ctx.createOscillator();
+        breezeLfo.type = 'sine';
+        breezeLfo.frequency.setValueAtTime(0.03 + (Math.random() * 0.02), this.ctx.currentTime); // Natural variance
+
+        const breezeGainMod = this.ctx.createGain();
+        breezeGainMod.gain.setValueAtTime(0.006, this.ctx.currentTime); // Subtle volume "waft"
+        
+        const breezeFreqMod = this.ctx.createGain();
+        // High chakras (Air/Ether) get wider, breezier frequency shifts
+        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1500 : 500, this.ctx.currentTime); 
+
+        breezeLfo.connect(breezeGainMod);
+        breezeGainMod.connect(gain.gain);
+        
+        breezeLfo.connect(breezeFreqMod);
+        breezeFreqMod.connect(filter.frequency);
+        breezeLfo.start();
+
         if (index === 0 || index === 1) {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(index === 0 ? 100 : 300, this.ctx.currentTime);
@@ -311,7 +336,7 @@ class AudioEngine {
         } else if (index === 2 || index === 3) {
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(index === 2 ? 800 : 1500, this.ctx.currentTime);
-            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); // Narrower, cleaner band
+            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); 
         } else {
             filter.type = 'highpass';
             filter.frequency.setValueAtTime(4000 + (index * 400), this.ctx.currentTime);
@@ -323,15 +348,12 @@ class AudioEngine {
         gain.connect(this.masterGain);
         noiseSrc.start();
         
-        this.elementalNodes.push({ src: noiseSrc, gain: gain });
+        this.elementalNodes.push({ src: noiseSrc, gain: gain, lfo: breezeLfo });
     }
 
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
         this.stopBinaural();
-
-        if (!this._staticImpulse) this._staticImpulse = this.createImpulseResponse(5, 4);
-        this.reverbNode.buffer = this._staticImpulse;
         
         this.startElementalLayer(index);
         
@@ -434,12 +456,15 @@ class AudioEngine {
         });
         this.droneOscillators = [];
 
-        this.elementalNodes.forEach(({ src, gain }) => {
+        this.elementalNodes.forEach(({ src, gain, lfo }) => {
             const currentVal = gain.gain.value;
             gain.gain.cancelScheduledValues(now);
             gain.gain.setValueAtTime(currentVal, now);
             gain.gain.linearRampToValueAtTime(0, now + 5);
-            setTimeout(() => { try { src.stop(); } catch(e) {} }, 5100);
+            setTimeout(() => { 
+                try { lfo.stop(); } catch(e) {}
+                try { src.stop(); } catch(e) {} 
+            }, 5100);
         });
         this.elementalNodes = [];
     }
@@ -456,16 +481,16 @@ class AudioEngine {
             this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
         }
 
-        // Standardized to 3.0s crossfade
-        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+        // Standardized to 5.0s crossfade
+        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 5.0);
         this.mantraLoop.start();
 
         // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); 
+        lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(400, this.ctx.currentTime); // Softened to remove "whooshing" noise
+        lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
         lfo.connect(lfoGain);
         lfoGain.connect(this.mantraFilter.frequency);
         lfo.start();
@@ -474,13 +499,21 @@ class AudioEngine {
         const now = this.ctx.currentTime;
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(0, now);
-        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 5);
+        // Ghostly 10s fade-in for maximum relaxation
+        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 10);
         this.mantraLoop.setGain(state.volMantra);
 
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
+            // Deeper ducking (to 15%) to create a "cradle" for the voice
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
+        }
+
+        // Deep spectral carving on BG music when mantra is active
+        if (this.bgMusicEQ) {
+            this.bgMusicEQ.gain.cancelScheduledValues(now);
+            this.bgMusicEQ.gain.linearRampToValueAtTime(-12, now + 8); // Hollow out space
         }
 
         // Explicitly fade out any elemental noise during mantra
@@ -502,11 +535,17 @@ class AudioEngine {
 
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
-        this.mantraGain.gain.linearRampToValueAtTime(0, now + 4);
+        this.mantraGain.gain.linearRampToValueAtTime(0, now + 8); // Gentler exit
+
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
+            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 6);
+        }
+
+        if (this.bgMusicEQ) {
+            this.bgMusicEQ.gain.cancelScheduledValues(now);
+            this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + 6); // Restore spectrum
         }
 
         // Restore elemental layer subtly after mantra
@@ -542,8 +581,8 @@ class AudioEngine {
             this.bgMusicLoop.stop(0);
         }
 
-        // Standardized to 3.0s crossfade
-        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
+        // Standardized to 5.0s crossfade
+        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 5.0);
         this.bgMusicLoop.start();
     }
 
@@ -639,48 +678,55 @@ class MeditationController {
     }
 
     async start() {
-        if (!this.scripts) {
-            const response = await fetch('scripts.json');
-            this.scripts = await response.json();
-        }
-
-        await this.audio.init();
-        // Start background music looping silently immediately
-        await this.audio.startBackgroundMusic();
-
-        await wakeLock.request();
-        this.isMeditationActive = true;
-        this.isPaused = false;
-        this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
-        
-        document.getElementById('pause-meditation').textContent = 'II';
-        document.getElementById('completion-modal').classList.add('hidden');
-
-        // Initial Settle (2 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
-
-        if (this.isMeditationActive) await this.runGratitude();
-
-        // Removed redundant settle pause (already handled by narrate ending and gratitude end)
-
-        if (this.isMeditationActive) await this.runBoxBreathing();
-        
-        // Settle after breathing (3 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
-
-        if (this.isMeditationActive) {
-            showScreen(meditationScreen);
-            if (this.isHighEnergy) {
-                await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
-                if (this.isMeditationActive) {
-                    await this.handleSilence();
-                    if (this.isMeditationActive) await this.runClosing();
-                    if (this.isMeditationActive) await this.runHooponopono();
-                    this.finish();
-                }
-            } else {
-                await this.runSequence();
+        try {
+            // Immediate visual feedback for mobile
+            showScreen(breathingScreen);
+            document.getElementById('completion-modal').classList.add('hidden');
+            
+            if (!this.scripts) {
+                const response = await fetch('scripts.json');
+                this.scripts = await response.json();
             }
+
+            await this.audio.init();
+            // Start background music looping silently immediately
+            await this.audio.startBackgroundMusic();
+
+            try { await wakeLock.request(); } catch(e) { console.warn("Wake lock failed", e); }
+            
+            this.isMeditationActive = true;
+            this.isPaused = false;
+            this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
+            
+            document.getElementById('pause-meditation').textContent = 'II';
+
+            // Initial Settle (2 seconds)
+            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+
+            if (this.isMeditationActive) await this.runGratitude();
+            if (this.isMeditationActive) await this.runBoxBreathing();
+            
+            // Settle after breathing (3 seconds)
+            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+
+            if (this.isMeditationActive) {
+                showScreen(meditationScreen);
+                if (this.isHighEnergy) {
+                    await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
+                    if (this.isMeditationActive) {
+                        await this.handleSilence();
+                        if (this.isMeditationActive) await this.runClosing();
+                        if (this.isMeditationActive) await this.runHooponopono();
+                        this.finish();
+                    }
+                } else {
+                    await this.runSequence();
+                }
+            }
+        } catch (err) {
+            console.error("Critical Start Failure:", err);
+            alert("Unable to start meditation. Please ensure you have a stable connection and try again.");
+            this.stop();
         }
     }
 
@@ -889,8 +935,11 @@ class MeditationController {
         // Closing breath - Final fade out
         document.getElementById('narration-text').textContent = '';
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
-        await new Promise(r => setTimeout(r, 3000));
-    }
+
+        // Extended rest (8 seconds) to allow the "Divine Aura" and background music 
+        // to fade out completely into a peaceful silence.
+        await new Promise(r => setTimeout(r, 8000));
+        this.finish();
 
     async handleInterval() {
         this.audio.stopDrone();
@@ -1077,7 +1126,13 @@ class MeditationController {
     }
 
     finish() {
-        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); wakeLock.release();
+        this.isMeditationActive = false; 
+        this.visual.stop(); 
+        this.audio.stopDrone(); 
+        this.audio.stopMantraTrack(); 
+        this.audio.fadeOutBackgroundMusic(6); // Final long 6s fade out
+        setTimeout(() => this.audio.stopBackgroundMusic(), 6500);
+        wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -1154,7 +1209,7 @@ const state = {
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
-    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.45,
+    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.35,
     volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
@@ -1177,9 +1232,6 @@ function getMoonPhase() {
     return 'waning';
 }
 
-const configScreen = document.getElementById('config-screen');
-const lobbyScreen = document.getElementById('lobby-screen');
-const meditationScreen = document.getElementById('meditation-screen');
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
 const testVoiceBtn = document.getElementById('test-voice');
@@ -1306,8 +1358,10 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    [configScreen, lobbyScreen, meditationScreen, document.getElementById('breathing-screen')].forEach(s => s.classList.add('hidden'));
-    screen.classList.remove('hidden');
+    [configScreen, lobbyScreen, meditationScreen, breathingScreen].forEach(s => {
+        if (s) s.classList.add('hidden');
+    });
+    if (screen) screen.classList.remove('hidden');
 }
 
 function attachEventListeners() {
