@@ -870,7 +870,29 @@ class MeditationController {
             utterance.rate = 0.6;   // Slow
             utterance.pitch = 0.8;  // Calm
             utterance.volume = state.volVoice * 0.4; // Soft volume
-            utterance.onend = resolve;
+            
+            let isResolved = false;
+            const safetyTimeout = setTimeout(() => {
+                if (!isResolved) {
+                    isResolved = true;
+                    resolve();
+                }
+            }, (text.length * 150) + 2000);
+
+            utterance.onend = () => {
+                if (!isResolved) {
+                    isResolved = true;
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                }
+            };
+            utterance.onerror = () => {
+                if (!isResolved) {
+                    isResolved = true;
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                }
+            };
             window.speechSynthesis.speak(utterance);
         });
     }
@@ -1055,7 +1077,29 @@ class MeditationController {
             utterance.rate = 0.72; 
             utterance.pitch = 0.82; 
             utterance.volume = state.volVoice * 0.6;
-            utterance.onend = resolve;
+            
+            let isResolved = false;
+            const safetyTimeout = setTimeout(() => {
+                if (!isResolved) {
+                    isResolved = true;
+                    resolve();
+                }
+            }, (text.length * 150) + 2000);
+
+            utterance.onend = () => {
+                if (!isResolved) {
+                    isResolved = true;
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                }
+            };
+            utterance.onerror = () => {
+                if (!isResolved) {
+                    isResolved = true;
+                    clearTimeout(safetyTimeout);
+                    resolve();
+                }
+            };
             window.speechSynthesis.speak(utterance);
         });
     }
@@ -1090,7 +1134,32 @@ class MeditationController {
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
                 utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
-                utterance.onend = resolve;
+                
+                // SAFETY: Browser Bug Fix
+                // Chrome/Brave sometimes fails to fire 'onend'. 
+                // We add a timeout as a fallback so the app never hangs.
+                let isResolved = false;
+                const safetyTimeout = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        resolve();
+                    }
+                }, (sentence.length * 150) + 2000); // 150ms per char + 2s buffer
+
+                utterance.onend = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(safetyTimeout);
+                        resolve();
+                    }
+                };
+                utterance.onerror = () => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        clearTimeout(safetyTimeout);
+                        resolve();
+                    }
+                };
                 window.speechSynthesis.speak(utterance);
             });
 
