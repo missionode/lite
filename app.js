@@ -1259,23 +1259,42 @@ function registerServiceWorker() {
 
 function setupVoices() {
     const loadVoices = () => {
-        state.voices = window.speechSynthesis.getVoices();
-        if (state.voices.length === 0) return;
-        
+        const availableVoices = window.speechSynthesis.getVoices();
+        if (!availableVoices || availableVoices.length === 0) return;
+
+        state.voices = availableVoices;
         voiceSelect.innerHTML = '';
         state.voices.forEach(voice => {
             const option = document.createElement('option');
             option.value = voice.name;
             option.textContent = `${voice.name} (${voice.lang})`;
-            if (voice.name === state.voiceName) option.selected = true;
             voiceSelect.appendChild(option);
         });
-        if (!state.voiceName || !state.voices.find(v => v.name === state.voiceName)) autoSelectVoice();
+
+        // 1. Try to restore the exact saved voice from localStorage
+        if (state.voiceName) {
+            voiceSelect.value = state.voiceName;
+        }
+        
+        // 2. If the saved voice is no longer available, or this is first run, auto-select based on language
+        if (!voiceSelect.value || !state.voiceName) {
+            autoSelectVoice();
+        }
     };
-    
+
     if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = loadVoices;
+        // Kickstart immediately
         loadVoices();
+        // Robust polling: Check every 500ms until voices are found
+        const voiceInterval = setInterval(() => {
+            loadVoices();
+            if (state.voices && state.voices.length > 0) {
+                clearInterval(voiceInterval);
+            }
+        }, 500);
+        // Safety timeout: stop polling after 10 seconds anyway
+        setTimeout(() => clearInterval(voiceInterval), 10000);
     }
 }
 
@@ -1309,7 +1328,8 @@ function autoSelectVoice() {
     
     if (bestVoice) {
         state.voiceName = bestVoice.name;
-        voiceSelect.value = bestVoice.name;
+        localStorage.setItem('chakra_voice', state.voiceName);
+        if (voiceSelect) voiceSelect.value = state.voiceName;
     }
 }
 
