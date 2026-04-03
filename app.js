@@ -1258,43 +1258,61 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
+    // Wake up the speech engine (especially critical for mobile Chrome/Brave)
+    if ('speechSynthesis' in window) {
+        const dummy = new SpeechSynthesisUtterance("");
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+    }
+
+    let retryCount = 0;
+    const maxRetries = 10; 
+
     const loadVoices = () => {
         const availableVoices = window.speechSynthesis.getVoices();
-        if (!availableVoices || availableVoices.length === 0) return;
+        
+        // If we found voices, or we've hit our limit, proceed
+        if (availableVoices.length > 0 || retryCount >= maxRetries) {
+            state.voices = availableVoices;
+            voiceSelect.innerHTML = '';
 
-        state.voices = availableVoices;
-        voiceSelect.innerHTML = '';
-        state.voices.forEach(voice => {
-            const option = document.createElement('option');
-            option.value = voice.name;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            voiceSelect.appendChild(option);
-        });
+            if (state.voices.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = "System Default Voice";
+                option.value = "Default";
+                voiceSelect.appendChild(option);
+            } else {
+                state.voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.name === state.voiceName) option.selected = true;
+                    voiceSelect.appendChild(option);
+                });
+            }
 
-        // 1. Try to restore the exact saved voice from localStorage
-        if (state.voiceName) {
-            voiceSelect.value = state.voiceName;
+            if (!voiceSelect.value || !state.voiceName) {
+                autoSelectVoice();
+            }
+            return true; // Success
         }
         
-        // 2. If the saved voice is no longer available, or this is first run, auto-select based on language
-        if (!voiceSelect.value || !state.voiceName) {
-            autoSelectVoice();
-        }
+        retryCount++;
+        return false; // Still waiting
     };
 
     if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = loadVoices;
-        // Kickstart immediately
-        loadVoices();
-        // Robust polling: Check every 500ms until voices are found
-        const voiceInterval = setInterval(() => {
-            loadVoices();
-            if (state.voices && state.voices.length > 0) {
-                clearInterval(voiceInterval);
-            }
-        }, 500);
-        // Safety timeout: stop polling after 10 seconds anyway
-        setTimeout(() => clearInterval(voiceInterval), 10000);
+        
+        // Polling loop
+        const interval = setInterval(() => {
+            if (loadVoices()) clearInterval(interval);
+        }, 300);
+
+        // Safety timeout
+        setTimeout(() => clearInterval(interval), 5000);
+        
+        loadVoices(); // Initial check
     }
 }
 
