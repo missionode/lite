@@ -915,8 +915,11 @@ class MeditationController {
         // Closing breath - Final fade out
         document.getElementById('narration-text').textContent = '';
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
-        await new Promise(r => setTimeout(r, 3000));
-    }
+
+        // Extended rest (8 seconds) to allow the "Divine Aura" and background music 
+        // to fade out completely into a peaceful silence.
+        await new Promise(r => setTimeout(r, 8000));
+        this.finish();
 
     async handleInterval() {
         this.audio.stopDrone();
@@ -1103,7 +1106,13 @@ class MeditationController {
     }
 
     finish() {
-        this.isMeditationActive = false; this.visual.stop(); this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); wakeLock.release();
+        this.isMeditationActive = false; 
+        this.visual.stop(); 
+        this.audio.stopDrone(); 
+        this.audio.stopMantraTrack(); 
+        this.audio.fadeOutBackgroundMusic(6); // Final long 6s fade out
+        setTimeout(() => this.audio.stopBackgroundMusic(), 6500);
+        wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
