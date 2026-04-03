@@ -1335,6 +1335,7 @@ function registerServiceWorker() {
 function setupVoices() {
     const loadVoices = () => {
         state.voices = window.speechSynthesis.getVoices();
+        if (state.voices.length === 0) return;
         voiceSelect.innerHTML = '';
         state.voices.forEach(voice => {
             const option = document.createElement('option');
