@@ -279,7 +279,6 @@ input[type="range"]::-moz-range-progress {
     z-index: 2;
     position: relative;
     transition: opacity 1s ease;
-    /* Removed drop-shadow filter to save GPU power */
 }
 
 #glow-effect {
@@ -289,13 +288,12 @@ input[type="range"]::-moz-range-progress {
     transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
     border-radius: 50%;
-    filter: blur(30px); /* Reduced blur radius */
+    filter: blur(40px);
     opacity: 0.5;
     z-index: 1;
     transition: background 2s ease;
-    will-change: background; /* Hardware acceleration hint */
 }
 
 #mantra-display {
@@ -305,7 +303,6 @@ input[type="range"]::-moz-range-progress {
     text-transform: uppercase;
     margin-top: 1rem;
     color: var(--accent-color);
-    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
 #narration-text {
@@ -607,29 +604,13 @@ input[type="range"]::-moz-range-progress {
     #mantra-display { font-size: 2.5rem; }
 }
 
-/* ── Sleep Mode Optimization ────────────────────────────────────────────────── */
+/* ── Sleep Mode ──────────────────────────────────────────────────────────────── */
 body.sleep-mode-active #app {
     filter: brightness(0.18);
     transition: filter 3s ease;
 }
-
-body.sleep-mode-active #aura-bg,
-body.sleep-mode-active #nebula-bg,
-body.sleep-mode-active .tutorial-overlay,
-body.sleep-mode-active .modal,
-body.sleep-mode-active #volume-mixer {
-    backdrop-filter: none !important; /* Huge GPU saving */
-    -webkit-backdrop-filter: none !important;
-}
-
 body.sleep-mode-active #breathing-circle {
     opacity: 0.4;
-    box-shadow: none; /* Reduce paint cost */
-}
-
-body.sleep-mode-active #glow-effect {
-    filter: none; /* Disable expensive blur in sleep mode */
-    background: rgba(255, 255, 255, 0.05);
 }
 
 /* ── Intention Input ─────────────────────────────────────────────────────────── */
