@@ -283,6 +283,7 @@ class AudioEngine {
 
     startElementalLayer(index) {
         this.elementalNodes.forEach(n => {
+            try { n.lfo.stop(); } catch(e) {}
             try { n.src.stop(); } catch(e) {}
         });
         this.elementalNodes = [];
@@ -296,6 +297,25 @@ class AudioEngine {
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 5);
 
+        // New: Dynamic Breeze Modulation
+        const breezeLfo = this.ctx.createOscillator();
+        breezeLfo.type = 'sine';
+        breezeLfo.frequency.setValueAtTime(0.03 + (Math.random() * 0.02), this.ctx.currentTime); // Natural variance
+
+        const breezeGainMod = this.ctx.createGain();
+        breezeGainMod.gain.setValueAtTime(0.006, this.ctx.currentTime); // Subtle volume "waft"
+        
+        const breezeFreqMod = this.ctx.createGain();
+        // High chakras (Air/Ether) get wider, breezier frequency shifts
+        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1500 : 500, this.ctx.currentTime); 
+
+        breezeLfo.connect(breezeGainMod);
+        breezeGainMod.connect(gain.gain);
+        
+        breezeLfo.connect(breezeFreqMod);
+        breezeFreqMod.connect(filter.frequency);
+        breezeLfo.start();
+
         if (index === 0 || index === 1) {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(index === 0 ? 100 : 300, this.ctx.currentTime);
@@ -303,7 +323,7 @@ class AudioEngine {
         } else if (index === 2 || index === 3) {
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(index === 2 ? 800 : 1500, this.ctx.currentTime);
-            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); // Narrower, cleaner band
+            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); 
         } else {
             filter.type = 'highpass';
             filter.frequency.setValueAtTime(4000 + (index * 400), this.ctx.currentTime);
@@ -315,7 +335,7 @@ class AudioEngine {
         gain.connect(this.masterGain);
         noiseSrc.start();
         
-        this.elementalNodes.push({ src: noiseSrc, gain: gain });
+        this.elementalNodes.push({ src: noiseSrc, gain: gain, lfo: breezeLfo });
     }
 
     startDrone(baseFreq, index = 0) {
@@ -426,12 +446,15 @@ class AudioEngine {
         });
         this.droneOscillators = [];
 
-        this.elementalNodes.forEach(({ src, gain }) => {
+        this.elementalNodes.forEach(({ src, gain, lfo }) => {
             const currentVal = gain.gain.value;
             gain.gain.cancelScheduledValues(now);
             gain.gain.setValueAtTime(currentVal, now);
             gain.gain.linearRampToValueAtTime(0, now + 5);
-            setTimeout(() => { try { src.stop(); } catch(e) {} }, 5100);
+            setTimeout(() => { 
+                try { lfo.stop(); } catch(e) {}
+                try { src.stop(); } catch(e) {} 
+            }, 5100);
         });
         this.elementalNodes = [];
     }
