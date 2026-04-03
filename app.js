@@ -10,7 +10,7 @@ const MANTRA_AUDIO_MAP = {
 };
 // Audio Engine
 class SeamlessLoop {
-    constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 3) {
+    constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
         this.ctx = ctx;
         this.buffer = buffer;
         this.destination = destination;
@@ -141,19 +141,19 @@ class AudioEngine {
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(-1, this.ctx.currentTime); // Removed the 'edge'
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
-        this.lowCutFilter.frequency.setValueAtTime(150, this.ctx.currentTime);
-        this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+        this.lowCutFilter.frequency.setValueAtTime(95, this.ctx.currentTime); // Deeper warmth
+        this.lowCutFilter.Q.setValueAtTime(0.4, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
-        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
-        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+        this.masterCompressor.threshold.setValueAtTime(-26, this.ctx.currentTime); 
+        this.masterCompressor.knee.setValueAtTime(35, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(2.5, this.ctx.currentTime); // Smoother compression
+        this.masterCompressor.attack.setValueAtTime(0.005, this.ctx.currentTime); 
+        this.masterCompressor.release.setValueAtTime(0.35, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
@@ -196,16 +196,16 @@ class AudioEngine {
         // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
         // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
         this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.3;
+        this.reverbGain.gain.value = 0.45; // Lush divine aura
         
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
+        this.reverbFilter.frequency.setValueAtTime(2600, this.ctx.currentTime); // Darker, smoother reverb
 
         this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.6;
+        this.delayNode.delayTime.value = 0.65;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.45; // Lush feedback
+        this.delayFeedback.gain.value = 0.55; // Deeper feedback trails
 
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -235,7 +235,7 @@ class AudioEngine {
         
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
+        this.mantraFilter.frequency.setValueAtTime(3600, this.ctx.currentTime); // "Cools" the mantra edge
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
@@ -448,16 +448,16 @@ class AudioEngine {
             this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
         }
 
-        // Standardized to 3.0s crossfade
-        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+        // Standardized to 5.0s crossfade
+        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 5.0);
         this.mantraLoop.start();
 
         // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); 
+        lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(400, this.ctx.currentTime); // Softened to remove "whooshing" noise
+        lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
         lfo.connect(lfoGain);
         lfoGain.connect(this.mantraFilter.frequency);
         lfo.start();
@@ -534,8 +534,8 @@ class AudioEngine {
             this.bgMusicLoop.stop(0);
         }
 
-        // Standardized to 3.0s crossfade
-        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
+        // Standardized to 5.0s crossfade
+        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 5.0);
         this.bgMusicLoop.start();
     }
 
