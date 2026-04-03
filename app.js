@@ -1347,10 +1347,24 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
+    // Wake up the speech engine immediately (critical for mobile Chrome/Brave/Safari)
+    const dummy = new SpeechSynthesisUtterance('');
+    dummy.volume = 0;
+    window.speechSynthesis.speak(dummy);
+
     const loadVoices = () => {
         state.voices = window.speechSynthesis.getVoices();
-        if (state.voices.length === 0) return false;
         voiceSelect.innerHTML = '';
+
+        if (state.voices.length === 0) {
+            // Fallback: show System Default so the dropdown is never stuck and voiceName gets a value
+            const option = document.createElement('option');
+            option.value = 'Default';
+            option.textContent = 'System Default Voice';
+            voiceSelect.appendChild(option);
+            if (!state.voiceName) { state.voiceName = 'Default'; voiceSelect.value = 'Default'; }
+            return false;
+        }
         state.voices.forEach(voice => {
             const option = document.createElement('option');
             option.value = voice.name;
