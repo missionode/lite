@@ -1333,67 +1333,23 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
-    // Wake up the speech engine (especially critical for mobile Chrome/Brave)
-    if ('speechSynthesis' in window) {
-        const dummy = new SpeechSynthesisUtterance("");
-        dummy.volume = 0;
-        window.speechSynthesis.speak(dummy);
-    }
-
-    let retryCount = 0;
-    const maxRetries = 10; 
-
     const loadVoices = () => {
-        const availableVoices = window.speechSynthesis.getVoices();
-        
-        // If we found voices, or we've hit our limit, proceed
-        if (availableVoices.length > 0 || retryCount >= maxRetries) {
-            state.voices = availableVoices;
-            voiceSelect.innerHTML = '';
-
-            if (state.voices.length === 0) {
-                const option = document.createElement('option');
-                option.textContent = "System Default Voice";
-                option.value = "Default";
-                voiceSelect.appendChild(option);
-            } else {
-                state.voices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.name;
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    if (voice.name === state.voiceName) option.selected = true;
-                    voiceSelect.appendChild(option);
-                });
-            }
-
-            if (!voiceSelect.value || !state.voiceName) {
-                autoSelectVoice();
-            }
-            return true; // Success
-        }
-        
-        retryCount++;
-        return false; // Still waiting
+        state.voices = window.speechSynthesis.getVoices();
+        voiceSelect.innerHTML = '';
+        state.voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.name;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            if (voice.name === state.voiceName) option.selected = true;
+            voiceSelect.appendChild(option);
+        });
+        if (!state.voiceName) autoSelectVoice();
     };
-
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-        
-        // Polling loop
-        const interval = setInterval(() => {
-            if (loadVoices()) clearInterval(interval);
-        }, 300);
-
-        // Safety timeout
-        setTimeout(() => clearInterval(interval), 5000);
-        
-        loadVoices(); // Initial check
-    }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
 }
 
 function autoSelectVoice() {
-    if (!state.voices || state.voices.length === 0) return;
-    
     let bestVoice = null;
     const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
     
@@ -1421,8 +1377,7 @@ function autoSelectVoice() {
     
     if (bestVoice) {
         state.voiceName = bestVoice.name;
-        localStorage.setItem('chakra_voice', state.voiceName);
-        if (voiceSelect) voiceSelect.value = state.voiceName;
+        voiceSelect.value = bestVoice.name;
     }
 }
 
