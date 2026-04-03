@@ -1348,9 +1348,13 @@ function registerServiceWorker() {
 
 function setupVoices() {
     // Wake up the speech engine immediately (critical for mobile Chrome/Brave/Safari)
-    const dummy = new SpeechSynthesisUtterance('');
-    dummy.volume = 0;
-    window.speechSynthesis.speak(dummy);
+    if ('speechSynthesis' in window) {
+        try {
+            const dummy = new SpeechSynthesisUtterance('');
+            dummy.volume = 0;
+            window.speechSynthesis.speak(dummy);
+        } catch(e) { /* silently ignore — some browsers block speak() before user interaction */ }
+    }
 
     const loadVoices = () => {
         state.voices = window.speechSynthesis.getVoices();
