@@ -1335,7 +1335,7 @@ function registerServiceWorker() {
 function setupVoices() {
     const loadVoices = () => {
         state.voices = window.speechSynthesis.getVoices();
-        if (state.voices.length === 0) return;
+        if (state.voices.length === 0) return false;
         voiceSelect.innerHTML = '';
         state.voices.forEach(voice => {
             const option = document.createElement('option');
@@ -1345,9 +1345,16 @@ function setupVoices() {
             voiceSelect.appendChild(option);
         });
         if (!state.voiceName) autoSelectVoice();
+        return true;
     };
     window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices();
+    if (!loadVoices()) {
+        // Fallback polling for browsers (iOS Safari etc.) where onvoiceschanged never fires
+        let attempts = 0;
+        const poll = setInterval(() => {
+            if (loadVoices() || ++attempts >= 20) clearInterval(poll);
+        }, 250);
+    }
 }
 
 function autoSelectVoice() {
