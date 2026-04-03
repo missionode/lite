@@ -116,15 +116,32 @@ class AudioEngine {
 
     async init() {
         if (this.isInitialized) return;
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Upgrade 1: Optimize context for playback fidelity rather than low latency
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)({
+            latencyHint: 'playback',
+            sampleRate: 48000
+        });
         
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
+        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
+        this.exciter = this.ctx.createWaveShaper();
+        this.exciter.curve = this.makeDistortionCurve(0.05); 
+        
+        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
+        // This 'carves' a space for the voice so it sounds crystal clear
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
         this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(4, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(2, this.ctx.currentTime);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -132,10 +149,10 @@ class AudioEngine {
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-20, this.ctx.currentTime);
-        this.masterCompressor.knee.setValueAtTime(40, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(4, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime);
+        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
+        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(3, this.ctx.currentTime); 
+        this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime); 
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
@@ -154,25 +171,41 @@ class AudioEngine {
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
 
-        this.pannerNode = this.ctx.createStereoPanner();
-        this.pannerNode.pan.value = 0;
+        // Upgrade 3: High-Resolution 3D Panning (HRTF)
+        // Replaces simple StereoPanner with a 3D soundstage
+        this.pannerNode = this.ctx.createPanner();
+        this.pannerNode.panningModel = 'HRTF';
+        this.pannerNode.distanceModel = 'exponential';
         
-        const pannerLfo = this.ctx.createOscillator();
-        pannerLfo.type = 'sine';
-        pannerLfo.frequency.setValueAtTime(0.05, this.ctx.currentTime);
-        pannerLfo.connect(this.pannerNode.pan);
-        pannerLfo.start();
+        // Slow orbital motion
+        const pannerLfoX = this.ctx.createOscillator();
+        const pannerLfoZ = this.ctx.createOscillator();
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 5; // Orbit radius
 
-        // New: Studio Reverb Chain with Wet/Dry control for "Swells"
-        this.reverbNode = this.ctx.createConvolver();
-        this.reverbNode.buffer = this.createImpulseResponse(5, 4); // Longer, lusher reverb
-        this.reverbWet = this.ctx.createGain();
-        this.reverbWet.gain.value = 0.3; // Base wetness
+        pannerLfoX.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        pannerLfoZ.frequency.setValueAtTime(0.04, this.ctx.currentTime);
+        
+        // Phase shift for circular motion
+        pannerLfoX.connect(lfoGain);
+        lfoGain.connect(this.pannerNode.positionX);
+        
+        pannerLfoX.start();
+        pannerLfoZ.start();
+
+        // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
+        // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
+        this.reverbGain = this.ctx.createGain();
+        this.reverbGain.gain.value = 0.3;
+        
+        this.reverbFilter = this.ctx.createBiquadFilter();
+        this.reverbFilter.type = 'lowpass';
+        this.reverbFilter.frequency.setValueAtTime(3000, this.ctx.currentTime);
 
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.6;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.3;
+        this.delayFeedback.gain.value = 0.45; // Lush feedback
 
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -183,12 +216,16 @@ class AudioEngine {
         
         this.pannerNode.connect(this.lowCutFilter);
         
-        // Reverb Routing: Parallel signal to reverbWet
-        this.lowCutFilter.connect(this.reverbNode);
-        this.reverbNode.connect(this.reverbWet);
-        this.reverbWet.connect(this.presenceFilter);
+        // Final Studio Chain: Sidechain -> Exciter -> Presence -> Master Compressor
+        this.lowCutFilter.connect(this.voiceCarveFilter);
+        this.voiceCarveFilter.connect(this.exciter);
         
-        this.lowCutFilter.connect(this.presenceFilter); // Dry signal
+        // Reverb Routing (Parallel)
+        this.exciter.connect(this.reverbGain);
+        this.reverbGain.connect(this.reverbFilter);
+        this.reverbFilter.connect(this.presenceFilter);
+        
+        this.exciter.connect(this.presenceFilter); // Dry signal
         
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
@@ -196,14 +233,25 @@ class AudioEngine {
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
         
-        // New: Mantra Organic Presence Filter
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
+        this.mantraFilter.frequency.setValueAtTime(5000, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
         this.isInitialized = true;
+    }
+
+    makeDistortionCurve(amount) {
+        const k = amount * 100;
+        const n_samples = 44100;
+        const curve = new Float32Array(n_samples);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < n_samples; ++i) {
+            const x = (i * 2) / n_samples - 1;
+            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+        }
+        return curve;
     }
 
     createImpulseResponse(duration, decay) {
@@ -357,6 +405,14 @@ class AudioEngine {
     stopDrone() {
         this.stopBinaural();
         const now = this.ctx.currentTime;
+        
+        // Reset reverb wetness during stop to clear any active swells
+        if (this.reverbWet) {
+            this.reverbWet.gain.cancelScheduledValues(now);
+            this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
+            this.reverbWet.gain.linearRampToValueAtTime(0.3, now + 4);
+        }
+
         if (this.vibrationLFO) {
             try { this.vibrationLFO.stop(now + 5); } catch(e) {}
             this.vibrationLFO = null;
@@ -396,12 +452,12 @@ class AudioEngine {
         this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
         this.mantraLoop.start();
 
-        // New: Organic Mantra Motion (LFO Presence)
+        // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); // Very slow breathing
+        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); 
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(1500, this.ctx.currentTime); // Depth of filter movement
+        lfoGain.gain.setValueAtTime(400, this.ctx.currentTime); // Softened to remove "whooshing" noise
         lfo.connect(lfoGain);
         lfoGain.connect(this.mantraFilter.frequency);
         lfo.start();
@@ -418,6 +474,13 @@ class AudioEngine {
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.25, now + 5);
         }
+
+        // Explicitly fade out any elemental noise during mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0, now + 5);
+        });
     }
 
     stopMantraTrack() {
@@ -437,6 +500,13 @@ class AudioEngine {
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 4);
         }
+
+        // Restore elemental layer subtly after mantra
+        this.elementalNodes.forEach(({ gain }) => {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0.015, now + 4);
+        });
 
         this.mantraLoop.stop(4);
         this.mantraLoop = null;
@@ -481,6 +551,7 @@ class AudioEngine {
         this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration); 
         
         this.bgMusicEQ.gain.cancelScheduledValues(now);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
         // Ensure the loop itself is running at a base gain of 1.0 so the bgMusicGain handles the mix
@@ -495,6 +566,7 @@ class AudioEngine {
         
         this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
         this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
         
         this.bgMusicLoop.setGain(0);
@@ -581,8 +653,7 @@ class MeditationController {
 
         if (this.isMeditationActive) await this.runGratitude();
 
-        // Settle before breathing (2 seconds)
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+        // Removed redundant settle pause (already handled by narrate ending and gratitude end)
 
         if (this.isMeditationActive) await this.runBoxBreathing();
         
@@ -643,12 +714,12 @@ class MeditationController {
                 : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
             tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
             tutText.textContent = intentionText;
-            await this.narrate(intentionText, true); // Now fade music out after intention
+            await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
-            await this.narrate(text, true); // No intention? Fade out now.
+            await this.narrate(text, false); // No intention? Still keep music playing.
         }
 
-        if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+        // Removed redundant pause before breathing - transition is now immediate and musical
     }
 
     async runBoxBreathing() {
@@ -665,7 +736,7 @@ class MeditationController {
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
         tutTitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കാം" : "Preparation";
-        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി ഇരിക്കുക. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
+        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. നമുക്ക് ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
         tutText.textContent = text;
 
         // Narrate the preparation instruction
@@ -920,15 +991,21 @@ class MeditationController {
     async narrate(text, fadeOut = false) {
         // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
-        
-        // 2.5 second gap before narration starts
-        await new Promise(r => setTimeout(r, 2500));
+
+        // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
+        await new Promise(r => setTimeout(r, 1200));
+
+        // Activate Frequency Carving (-8dB notch at 2.5kHz) to 'seat' the voice in the mix
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-8, this.audio.ctx.currentTime + 1.5);
+        }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
         for (const sentence of sentences) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
-            
+
             const narrationTextEl = document.getElementById('narration-text');
             if (narrationTextEl) narrationTextEl.textContent = sentence.trim();
 
@@ -936,7 +1013,7 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-                
+
                 // Studio Clarity
                 utterance.rate   = state.sleepMode ? 0.60 : 0.72;
                 utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
@@ -944,12 +1021,16 @@ class MeditationController {
                 utterance.onend = resolve;
                 window.speechSynthesis.speak(utterance);
             });
-            
+
             await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
         }
 
-        if (fadeOut) {
-            // Only fade out if explicitly requested (e.g. right before mantra)
+        // Release Frequency Carving after narration ends
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 3);
+        }
+
+        if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
             await new Promise(r => setTimeout(r, 2500));
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
@@ -1063,7 +1144,7 @@ const state = {
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.45,
     volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
