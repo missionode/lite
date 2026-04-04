@@ -1111,15 +1111,6 @@ class MeditationController {
         // Cancel any queued speech to prevent buildup on mobile
         window.speechSynthesis.cancel();
 
-        // Wait for voices if they haven't loaded yet (mobile browsers load asynchronously)
-        let voiceWait = 0;
-        while (state.voices.length === 0 && voiceWait < 20) {
-            await new Promise(r => setTimeout(r, 100));
-            state.voices = window.speechSynthesis.getVoices();
-            voiceWait++;
-        }
-        if (!state.voiceName && state.voices.length > 0) autoSelectVoice();
-
         // Ensure background music is active at ducked level
         this.audio.fadeInBackgroundMusic(4, true);
 
@@ -1350,58 +1341,56 @@ function registerServiceWorker() {
 function setupVoices() {
     if (!('speechSynthesis' in window)) return;
 
-    // Wake up the speech engine (critical for mobile Chrome/Brave)
-    try {
-        const dummy = new SpeechSynthesisUtterance('');
-        dummy.volume = 0;
-        window.speechSynthesis.speak(dummy);
-    } catch(e) {}
+    const updateUI = () => {
+        voiceSelect.innerHTML = '';
+        
+        // Always ensure a "System Default" is available immediately
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = "Default";
+        defaultOpt.textContent = "System Default Voice";
+        voiceSelect.appendChild(defaultOpt);
 
-    let retryCount = 0;
-    const maxRetries = 10;
+        state.voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.name;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            voiceSelect.appendChild(option);
+        });
+
+        // Restore saved voice or stick to Default
+        if (state.voiceName && state.voiceName !== "Default" && state.voices.find(v => v.name === state.voiceName)) {
+            voiceSelect.value = state.voiceName;
+        } else {
+            voiceSelect.value = "Default";
+        }
+    };
+
+    // Immediate UI setup with just the Default option
+    updateUI();
 
     const loadVoices = () => {
-        const availableVoices = window.speechSynthesis.getVoices();
-
-        if (availableVoices.length > 0 || retryCount >= maxRetries) {
-            state.voices = availableVoices;
-            voiceSelect.innerHTML = '';
-
-            if (state.voices.length === 0) {
-                const option = document.createElement('option');
-                option.textContent = 'System Default Voice';
-                option.value = 'Default';
-                voiceSelect.appendChild(option);
-            } else {
-                state.voices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.name;
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    if (voice.name === state.voiceName) option.selected = true;
-                    voiceSelect.appendChild(option);
-                });
-            }
-
-            if (!voiceSelect.value || !state.voiceName) autoSelectVoice();
-            return true;
-        }
-
-        retryCount++;
-        return false;
+        state.voices = window.speechSynthesis.getVoices();
+        updateUI();
     };
 
     window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices(); // Initial check
 
-    const interval = setInterval(() => {
-        if (loadVoices()) clearInterval(interval);
-    }, 300);
-
-    setTimeout(() => clearInterval(interval), 5000);
-
-    loadVoices();
+    // Try a one-time "wake up" request
+    try {
+        const dummy = new SpeechSynthesisUtterance("");
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+    } catch(e) {}
 }
 
 function autoSelectVoice() {
+    if (!state.voices || state.voices.length === 0) {
+        state.voiceName = "Default";
+        if (voiceSelect) voiceSelect.value = "Default";
+        return;
+    }
+    
     let bestVoice = null;
     const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
     
