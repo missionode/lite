@@ -969,6 +969,7 @@ class MeditationController {
         // to fade out completely into a peaceful silence.
         await new Promise(r => setTimeout(r, 8000));
         this.finish();
+    }
 
     async handleInterval() {
         this.audio.stopDrone();
