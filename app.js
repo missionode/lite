@@ -832,9 +832,9 @@ class MeditationController {
 
         const steps = state.language === 'ml' ? [
             { text: "ശ്വാസം ഉള്ളിലേക്ക് എടുക്കുക", scale: 8 },
-            { text: "നിർത്തുക", scale: 8 },
+            { text: ".", scale: 8 },
             { text: "ശ്വാസം പുറത്തേക്ക് വിടുക", scale: 1 },
-            { text: "നിർത്തുക", scale: 1 }
+            { text: ".", scale: 1 }
         ] : [
             { text: "Inhale", scale: 8 }, { text: "Hold", scale: 8 }, { text: "Exhale", scale: 1 }, { text: "Hold", scale: 1 }
         ];
