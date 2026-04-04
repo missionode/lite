@@ -624,15 +624,12 @@ class AudioEngine {
         const now = this.ctx.currentTime;
         this.bgMusicGain.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.cancelScheduledValues(now);
-        
+
         this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
         this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
-        
-        this.bgMusicLoop.setGain(0);
     }
-
     stopBackgroundMusic() {
         if (this.bgMusicLoop) {
             this.bgMusicLoop.stop(2);
@@ -965,9 +962,9 @@ class MeditationController {
         document.getElementById('narration-text').textContent = '';
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
 
-        // Extended rest (8 seconds) to allow the "Divine Aura" and background music 
+        // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
-        await new Promise(r => setTimeout(r, 8000));
+        await new Promise(r => setTimeout(r, 15000));
         this.finish();
     }
 
@@ -1199,8 +1196,8 @@ class MeditationController {
         this.visual.stop(); 
         this.audio.stopDrone(); 
         this.audio.stopMantraTrack(); 
-        this.audio.fadeOutBackgroundMusic(6); // Final long 6s fade out
-        setTimeout(() => this.audio.stopBackgroundMusic(), 6500);
+        this.audio.fadeOutBackgroundMusic(12); // Long 12s final fade out
+        setTimeout(() => this.audio.stopBackgroundMusic(), 13000);
         wakeLock.release();
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
