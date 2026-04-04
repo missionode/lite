@@ -693,6 +693,15 @@ class MeditationController {
 
     async start() {
         try {
+            // CRITICAL: Immediate mobile speech unlock on first user gesture
+            if ('speechSynthesis' in window) {
+                try {
+                    const unlock = new SpeechSynthesisUtterance("");
+                    unlock.volume = 0;
+                    window.speechSynthesis.speak(unlock);
+                } catch(e) {}
+            }
+
             // Immediate visual feedback for mobile
             showScreen(breathingScreen);
             document.getElementById('completion-modal').classList.add('hidden');
@@ -864,36 +873,18 @@ class MeditationController {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-                utterance.lang = selectedVoice.lang;
-            }
-            utterance.rate = 0.6;   // Slow
-            utterance.pitch = 0.8;  // Calm
-            utterance.volume = state.volVoice * 0.4; // Soft volume
+            if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
+            utterance.rate = 0.65;   // Stable slow
+            utterance.pitch = 0.9;
+            utterance.volume = 1.0;  // Normalized for mobile
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
-                if (!isResolved) {
-                    isResolved = true;
-                    resolve();
-                }
-            }, (text.length * 150) + 2000);
+                if (!isResolved) { isResolved = true; resolve(); }
+            }, (text.length * 200) + 3000);
 
-            utterance.onend = () => {
-                if (!isResolved) {
-                    isResolved = true;
-                    clearTimeout(safetyTimeout);
-                    resolve();
-                }
-            };
-            utterance.onerror = () => {
-                if (!isResolved) {
-                    isResolved = true;
-                    clearTimeout(safetyTimeout);
-                    resolve();
-                }
-            };
+            utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
+            utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             window.speechSynthesis.speak(utterance);
         });
     }
@@ -1075,32 +1066,17 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.72; 
-            utterance.pitch = 0.82; 
-            utterance.volume = state.volVoice * 0.6;
+            utterance.rate = 0.7; 
+            utterance.pitch = 0.9; 
+            utterance.volume = 1.0; // Normalized for mobile
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
-                if (!isResolved) {
-                    isResolved = true;
-                    resolve();
-                }
-            }, (text.length * 150) + 2000);
+                if (!isResolved) { isResolved = true; resolve(); }
+            }, (text.length * 200) + 3000);
 
-            utterance.onend = () => {
-                if (!isResolved) {
-                    isResolved = true;
-                    clearTimeout(safetyTimeout);
-                    resolve();
-                }
-            };
-            utterance.onerror = () => {
-                if (!isResolved) {
-                    isResolved = true;
-                    clearTimeout(safetyTimeout);
-                    resolve();
-                }
-            };
+            utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
+            utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             window.speechSynthesis.speak(utterance);
         });
     }
@@ -1137,9 +1113,9 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity
-                utterance.rate   = state.sleepMode ? 0.60 : 0.72;
-                utterance.pitch  = state.sleepMode ? 0.75 : 0.88;
-                utterance.volume = state.sleepMode ? state.volVoice * 0.55 : state.volVoice;
+                utterance.rate   = state.sleepMode ? 0.65 : 0.75;
+                utterance.pitch  = 0.9;
+                utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
                 // Chrome/Brave sometimes fails to fire 'onend'. 
@@ -1147,10 +1123,11 @@ class MeditationController {
                 let isResolved = false;
                 const safetyTimeout = setTimeout(() => {
                     if (!isResolved) {
+                        console.warn("Safety Timeout: Speech engine hung.");
                         isResolved = true;
                         resolve();
                     }
-                }, (sentence.length * 150) + 2000); // 150ms per char + 2s buffer
+                }, (sentence.length * 200) + 3000); // More generous buffer
 
                 utterance.onend = () => {
                     if (!isResolved) {
@@ -1159,7 +1136,8 @@ class MeditationController {
                         resolve();
                     }
                 };
-                utterance.onerror = () => {
+                utterance.onerror = (e) => {
+                    console.error("SpeechSynthesis Error:", e);
                     if (!isResolved) {
                         isResolved = true;
                         clearTimeout(safetyTimeout);
@@ -1169,7 +1147,7 @@ class MeditationController {
                 window.speechSynthesis.speak(utterance);
             });
 
-            await new Promise(r => setTimeout(r, state.sleepMode ? 2000 : 1500));
+            await new Promise(r => setTimeout(r, 1500));
         }
 
         // Release Frequency Carving after narration ends
@@ -1373,10 +1351,22 @@ async function forceAppUpdate() {
 function setupVoices() {
     if (!('speechSynthesis' in window)) return;
 
-    const updateUI = () => {
+    const getVoicesAsync = () => {
+        return new Promise(resolve => {
+            let v = window.speechSynthesis.getVoices();
+            if (v.length > 0) return resolve(v);
+            window.speechSynthesis.onvoiceschanged = () => {
+                resolve(window.speechSynthesis.getVoices());
+            };
+            // Fallback for browsers that don't fire onvoiceschanged
+            setTimeout(() => resolve(window.speechSynthesis.getVoices()), 3000);
+        });
+    };
+
+    const updateUI = (availableVoices) => {
+        state.voices = availableVoices || [];
         voiceSelect.innerHTML = '';
         
-        // Always ensure a "System Default" is available immediately
         const defaultOpt = document.createElement('option');
         defaultOpt.value = "Default";
         defaultOpt.textContent = "System Default Voice";
@@ -1389,31 +1379,14 @@ function setupVoices() {
             voiceSelect.appendChild(option);
         });
 
-        // Restore saved voice or stick to Default
-        if (state.voiceName && state.voiceName !== "Default" && state.voices.find(v => v.name === state.voiceName)) {
+        if (state.voiceName && state.voices.find(v => v.name === state.voiceName)) {
             voiceSelect.value = state.voiceName;
         } else {
             voiceSelect.value = "Default";
         }
     };
 
-    // Immediate UI setup with just the Default option
-    updateUI();
-
-    const loadVoices = () => {
-        state.voices = window.speechSynthesis.getVoices();
-        updateUI();
-    };
-
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices(); // Initial check
-
-    // Try a one-time "wake up" request
-    try {
-        const dummy = new SpeechSynthesisUtterance("");
-        dummy.volume = 0;
-        window.speechSynthesis.speak(dummy);
-    } catch(e) {}
+    getVoicesAsync().then(updateUI);
 }
 
 function autoSelectVoice() {
