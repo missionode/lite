@@ -1351,42 +1351,63 @@ async function forceAppUpdate() {
 function setupVoices() {
     if (!('speechSynthesis' in window)) return;
 
-    const getVoicesAsync = () => {
-        return new Promise(resolve => {
-            let v = window.speechSynthesis.getVoices();
-            if (v.length > 0) return resolve(v);
-            window.speechSynthesis.onvoiceschanged = () => {
-                resolve(window.speechSynthesis.getVoices());
-            };
-            // Fallback for browsers that don't fire onvoiceschanged
-            setTimeout(() => resolve(window.speechSynthesis.getVoices()), 3000);
-        });
+    // Immediate UI setup with Default option
+    const initUI = () => {
+        voiceSelect.innerHTML = '';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = "Default";
+        defaultOpt.textContent = "System Default Voice";
+        voiceSelect.appendChild(defaultOpt);
+        voiceSelect.value = "Default";
     };
+    initUI();
 
     const updateUI = (availableVoices) => {
-        state.voices = availableVoices || [];
+        if (!availableVoices || availableVoices.length === 0) return;
+        
+        // Save current selection
+        const currentVal = voiceSelect.value;
         voiceSelect.innerHTML = '';
         
+        // Re-add Default
         const defaultOpt = document.createElement('option');
         defaultOpt.value = "Default";
         defaultOpt.textContent = "System Default Voice";
         voiceSelect.appendChild(defaultOpt);
 
-        state.voices.forEach(voice => {
+        availableVoices.forEach(voice => {
             const option = document.createElement('option');
             option.value = voice.name;
             option.textContent = `${voice.name} (${voice.lang})`;
             voiceSelect.appendChild(option);
         });
 
-        if (state.voiceName && state.voices.find(v => v.name === state.voiceName)) {
+        // Restore selection if it exists in the new list
+        if (state.voiceName && availableVoices.find(v => v.name === state.voiceName)) {
             voiceSelect.value = state.voiceName;
         } else {
-            voiceSelect.value = "Default";
+            voiceSelect.value = currentVal;
         }
+        state.voices = availableVoices;
     };
 
-    getVoicesAsync().then(updateUI);
+    // Try to load voices immediately
+    let initialVoices = window.speechSynthesis.getVoices();
+    if (initialVoices.length > 0) {
+        updateUI(initialVoices);
+    }
+
+    // Listen for updates in background
+    window.speechSynthesis.onvoiceschanged = () => {
+        updateUI(window.speechSynthesis.getVoices());
+    };
+
+    // One-time "wake up" request
+    try {
+        const dummy = new SpeechSynthesisUtterance("");
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+    } catch(e) {}
 }
 
 function autoSelectVoice() {
