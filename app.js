@@ -857,7 +857,7 @@ class MeditationController {
         // Intimate Completion
         if (this.isMeditationActive) {
             instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ." : "Breathing exercise is complete. Stay still for a moment.";
+            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ. ശ്വാസോശ്വാസം സാധാരണ രീതിയിൽ കൊണ്ട് വരൂ " : "Breathing exercise is complete. Stay still for a moment.";
             await this.narrate(completeText);
             
             // 5 second interval before Chakra Journey starts
