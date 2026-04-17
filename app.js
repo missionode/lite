@@ -893,6 +893,9 @@ class MeditationController {
         
         if (this.isPaused) {
             window.speechSynthesis.pause();
+            // Force cancel to resolve pending narration promises and prevent browser hangs on resume.
+            // Our narrate() loop will detect this and replay the interrupted sentence on resume.
+            window.speechSynthesis.cancel();
             if (this.audio.ctx) this.audio.ctx.suspend();
         } else {
             window.speechSynthesis.resume();
@@ -1098,8 +1101,11 @@ class MeditationController {
         }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
-        for (const sentence of sentences) {
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i];
             if (!this.isMeditationActive) break;
+            
+            // Wait while paused
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
 
             const narrationTextEl = document.getElementById('narration-text');
@@ -1144,6 +1150,13 @@ class MeditationController {
                 };
                 window.speechSynthesis.speak(utterance);
             });
+
+            // If we were paused during this sentence, it was cancelled by togglePause().
+            // We decrement 'i' to replay this sentence once we resume.
+            if (this.isPaused && this.isMeditationActive) {
+                i--;
+                continue;
+            }
 
             await new Promise(r => setTimeout(r, 1500));
         }
