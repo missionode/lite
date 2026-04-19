@@ -22,6 +22,8 @@ const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
+const icebreakerScreen = document.getElementById('icebreaker-screen');
+const icebreakerTimer = document.getElementById('icebreaker-timer');
 
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
@@ -700,7 +702,7 @@ class MeditationController {
             }
 
             // Immediate visual feedback for mobile
-            showScreen(breathingScreen);
+            showScreen(icebreakerScreen);
             document.getElementById('completion-modal').classList.add('hidden');
             
             if (!this.scripts) {
@@ -719,6 +721,22 @@ class MeditationController {
             this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
             
             document.getElementById('pause-meditation').textContent = 'II';
+
+            // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
+            // Localize Icebreaker UI
+            document.getElementById('icebreaker-title').textContent = state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving";
+            document.getElementById('icebreaker-subtitle').textContent = state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space";
+
+            this.audio.fadeInBackgroundMusic(60); 
+            for (let i = 60; i > 0; i--) {
+                if (!this.isMeditationActive) return;
+                while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+                if (icebreakerTimer) icebreakerTimer.textContent = i;
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            // Transition to Preparation
+            showScreen(breathingScreen);
 
             // Initial Settle (2 seconds)
             if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
@@ -1113,6 +1131,10 @@ class MeditationController {
 
             await new Promise(resolve => {
                 const utterance = new SpeechSynthesisUtterance(sentence);
+                
+                // Fallback language identification
+                utterance.lang = state.language === 'ml' ? 'ml-IN' : 'en-US';
+
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
@@ -1462,6 +1484,9 @@ function loadPreferences() {
     });
     document.getElementById('intention-input').value = state.intention;
     document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
+    
+    // Ensure voice matches the loaded language
+    autoSelectVoice();
 }
 
 function checkFirstTime() {
@@ -1479,8 +1504,10 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    [configScreen, lobbyScreen, meditationScreen, document.getElementById('breathing-screen')].forEach(s => s.classList.add('hidden'));
-    screen.classList.remove('hidden');
+    [configScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
+        if (s) s.classList.add('hidden');
+    });
+    if (screen) screen.classList.remove('hidden');
 }
 
 function attachEventListeners() {
