@@ -145,10 +145,10 @@ class AudioEngine {
             return;
         }
         
-        // Upgrade 1: Optimize context for playback fidelity rather than low latency
+        // Upgrade 1: Optimize context for playback fidelity
         this.ctx = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'playback',
-            sampleRate: 48000
+            sampleRate: 44100
         });
 
         // Crucial for mobile: Resume context on user gesture
@@ -157,12 +157,12 @@ class AudioEngine {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
-        // Upgrade 2: Studio Harmonic Exciter (WaveShaper)
+        // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
+        // Fixed: Standard soft-clipping curve that maintains volume
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.05); 
+        this.exciter.curve = this.makeDistortionCurve(0.02); 
         
-        // Upgrade 4: Frequency Carving Filter (The 'International' Mix Secret)
-        // This 'carves' a space for the voice so it sounds crystal clear
+        // Upgrade 4: Frequency Carving Filter
         this.voiceCarveFilter = this.ctx.createBiquadFilter();
         this.voiceCarveFilter.type = 'peaking';
         this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
@@ -171,20 +171,20 @@ class AudioEngine {
 
         this.presenceFilter = this.ctx.createBiquadFilter();
         this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(10000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(-1, this.ctx.currentTime); // Removed the 'edge'
+        this.presenceFilter.frequency.setValueAtTime(8000, this.ctx.currentTime); // Lowered from 10k for warmth
+        this.presenceFilter.gain.setValueAtTime(-2, this.ctx.currentTime); // Subtle cut for comfort
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
-        this.lowCutFilter.frequency.setValueAtTime(95, this.ctx.currentTime); // Deeper warmth
-        this.lowCutFilter.Q.setValueAtTime(0.4, this.ctx.currentTime);
+        this.lowCutFilter.frequency.setValueAtTime(80, this.ctx.currentTime); // Warm bottom
+        this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-26, this.ctx.currentTime); 
-        this.masterCompressor.knee.setValueAtTime(35, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(2.5, this.ctx.currentTime); // Smoother compression
-        this.masterCompressor.attack.setValueAtTime(0.005, this.ctx.currentTime); 
-        this.masterCompressor.release.setValueAtTime(0.35, this.ctx.currentTime);
+        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
+        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
+        this.masterCompressor.ratio.setValueAtTime(3.0, this.ctx.currentTime); 
+        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime); 
+        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
@@ -202,42 +202,32 @@ class AudioEngine {
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
 
-        // Upgrade 3: High-Resolution 3D Panning (HRTF)
-        // Replaces simple StereoPanner with a 3D soundstage
-        this.pannerNode = this.ctx.createPanner();
-        this.pannerNode.panningModel = 'HRTF';
-        this.pannerNode.distanceModel = 'exponential';
+        // Fixed: Use StereoPanner instead of HRTF Panner for better stability and less strain
+        this.pannerNode = this.ctx.createStereoPanner();
         
-        // Slow orbital motion
-        const pannerLfoX = this.ctx.createOscillator();
-        const pannerLfoZ = this.ctx.createOscillator();
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = 5; // Orbit radius
+        // Gentle Panning LFO
+        const pannerLfo = this.ctx.createOscillator();
+        const pannerLfoGain = this.ctx.createGain();
+        pannerLfo.type = 'sine';
+        pannerLfo.frequency.setValueAtTime(0.03, this.ctx.currentTime);
+        pannerLfoGain.gain.setValueAtTime(0.3, this.ctx.currentTime); // Max 30% pan
+        pannerLfo.connect(pannerLfoGain);
+        pannerLfoGain.connect(this.pannerNode.pan);
+        pannerLfo.start();
 
-        pannerLfoX.frequency.setValueAtTime(0.04, this.ctx.currentTime);
-        pannerLfoZ.frequency.setValueAtTime(0.04, this.ctx.currentTime);
-        
-        // Phase shift for circular motion
-        pannerLfoX.connect(lfoGain);
-        lfoGain.connect(this.pannerNode.positionX);
-        
-        pannerLfoX.start();
-        pannerLfoZ.start();
-
-        // Upgrade 5: High-Efficiency Algorithmic Reverb (CPU/Heat Fix)
-        // Replaces power-hungry Convolver with shimmering studio algorithmic reverb
+        // Upgrade 5: Algorithmic Reverb Swell
         this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.45; // Lush divine aura
-        this.reverbWet = this.reverbGain; // Map wet control to gain node
+        this.reverbGain.gain.value = 0.35; 
+        this.reverbWet = this.reverbGain; 
         
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(2600, this.ctx.currentTime); // Darker, smoother reverb
+        this.reverbFilter.frequency.setValueAtTime(2200, this.ctx.currentTime); // Even smoother
 
         this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.65;
+        this.delayNode.delayTime.value = 0.8; // Longer, deeper delay
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.55; // Deeper feedback trails
+        this.delayFeedback.gain.value = 0.45;
 
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -248,16 +238,14 @@ class AudioEngine {
         
         this.pannerNode.connect(this.lowCutFilter);
         
-        // Final Studio Chain: Sidechain -> Exciter -> Presence -> Master Compressor
         this.lowCutFilter.connect(this.voiceCarveFilter);
         this.voiceCarveFilter.connect(this.exciter);
         
-        // Reverb Routing (Parallel)
         this.exciter.connect(this.reverbGain);
         this.reverbGain.connect(this.reverbFilter);
         this.reverbFilter.connect(this.presenceFilter);
         
-        this.exciter.connect(this.presenceFilter); // Dry signal
+        this.exciter.connect(this.presenceFilter); // Dry
         
         this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
@@ -267,7 +255,7 @@ class AudioEngine {
         
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(3600, this.ctx.currentTime); // "Cools" the mantra edge
+        this.mantraFilter.frequency.setValueAtTime(3200, this.ctx.currentTime); // Lower cutoff for warmth
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
@@ -275,13 +263,12 @@ class AudioEngine {
     }
 
     makeDistortionCurve(amount) {
-        const k = amount * 100;
         const n_samples = 44100;
         const curve = new Float32Array(n_samples);
-        const deg = Math.PI / 180;
         for (let i = 0; i < n_samples; ++i) {
             const x = (i * 2) / n_samples - 1;
-            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+            // Standard Sigmoid Soft Clipping
+            curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
         }
         return curve;
     }
@@ -293,7 +280,6 @@ class AudioEngine {
         for (let channel = 0; channel < 2; channel++) {
             const data = buffer.getChannelData(channel);
             for (let i = 0; i < length; i++) {
-                // Organic studio decay: Combining noise with a subtle sine-sweep feeling
                 const envelope = Math.pow(1 - i / length, decay);
                 data[i] = (Math.random() * 2 - 1) * envelope;
             }
@@ -327,19 +313,17 @@ class AudioEngine {
         const filter = this.ctx.createBiquadFilter();
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.015, this.ctx.currentTime + 5);
+        gain.gain.linearRampToValueAtTime(0.012, this.ctx.currentTime + 5); // Reduced noise floor
 
-        // New: Dynamic Breeze Modulation
         const breezeLfo = this.ctx.createOscillator();
         breezeLfo.type = 'sine';
-        breezeLfo.frequency.setValueAtTime(0.03 + (Math.random() * 0.02), this.ctx.currentTime); // Natural variance
+        breezeLfo.frequency.setValueAtTime(0.02 + (Math.random() * 0.02), this.ctx.currentTime); 
 
         const breezeGainMod = this.ctx.createGain();
-        breezeGainMod.gain.setValueAtTime(0.006, this.ctx.currentTime); // Subtle volume "waft"
+        breezeGainMod.gain.setValueAtTime(0.004, this.ctx.currentTime); 
         
         const breezeFreqMod = this.ctx.createGain();
-        // High chakras (Air/Ether) get wider, breezier frequency shifts
-        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1500 : 500, this.ctx.currentTime); 
+        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1200 : 400, this.ctx.currentTime); 
 
         breezeLfo.connect(breezeGainMod);
         breezeGainMod.connect(gain.gain);
@@ -350,16 +334,16 @@ class AudioEngine {
 
         if (index === 0 || index === 1) {
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(index === 0 ? 100 : 300, this.ctx.currentTime);
+            filter.frequency.setValueAtTime(index === 0 ? 100 : 250, this.ctx.currentTime);
             filter.Q.setValueAtTime(0.2, this.ctx.currentTime);
         } else if (index === 2 || index === 3) {
             filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(index === 2 ? 800 : 1500, this.ctx.currentTime);
-            filter.Q.setValueAtTime(2.0, this.ctx.currentTime); 
+            filter.frequency.setValueAtTime(index === 2 ? 700 : 1200, this.ctx.currentTime);
+            filter.Q.setValueAtTime(1.5, this.ctx.currentTime); 
         } else {
             filter.type = 'highpass';
-            filter.frequency.setValueAtTime(4000 + (index * 400), this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+            filter.frequency.setValueAtTime(3500 + (index * 300), this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.4, this.ctx.currentTime);
         }
 
         noiseSrc.connect(filter);
@@ -375,29 +359,34 @@ class AudioEngine {
         this.stopBinaural();
         
         this.startElementalLayer(index);
+
+        // Fixed: Use sub-harmonics for high-frequency chakras to prevent ear fatigue
+        let droneFreq = baseFreq;
+        if (baseFreq > 600) droneFreq = baseFreq / 2; // Throat, Third Eye, Crown drop one octave
+        if (baseFreq > 900) droneFreq = baseFreq / 4; // Crown drops two octaves for warmth
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.05, this.ctx.currentTime);
+        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); // Slower motion
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(baseFreq * 0.002, this.ctx.currentTime);
+        lfoGain.gain.setValueAtTime(droneFreq * 0.0015, this.ctx.currentTime);
         lfo.connect(lfoGain);
         lfo.start();
         this.vibrationLFO = lfo;
 
-        const harmonics = [{ f: 1.0, g: 0.2, type: 'sine' }, { f: 0.5, g: 0.15, type: 'sine' }];
+        const harmonics = [{ f: 1.0, g: 0.18, type: 'sine' }, { f: 0.5, g: 0.12, type: 'sine' }];
         harmonics.forEach((h) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = h.type;
-            osc.frequency.setValueAtTime(baseFreq * h.f, this.ctx.currentTime);
+            osc.frequency.setValueAtTime(droneFreq * h.f, this.ctx.currentTime);
             lfoGain.connect(osc.frequency);
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(baseFreq * 1.2, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.1, this.ctx.currentTime);
+            filter.frequency.setValueAtTime(droneFreq * 1.1, this.ctx.currentTime);
+            filter.Q.setValueAtTime(0.5, this.ctx.currentTime); // Slightly steeper for comfort
             gain.gain.setValueAtTime(0, this.ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(h.g, this.ctx.currentTime + 5);
+            gain.gain.linearRampToValueAtTime(h.g, this.ctx.currentTime + 6);
             osc.connect(filter);
             filter.connect(gain);
             gain.connect(this.masterGain);
@@ -405,7 +394,10 @@ class AudioEngine {
             this.droneOscillators.push({ osc, gain });
         });
 
-        // New: Binaural Beat Layer (Deep Alpha/Theta)
+        // Fixed: Binaural Beat Layer Carrier Frequency Capping
+        // High carrier frequencies for binaural beats (e.g. 963Hz) can be very uncomfortable
+        const binauralCarrier = Math.min(droneFreq, 400); 
+
         const leftOsc = this.ctx.createOscillator();
         const rightOsc = this.ctx.createOscillator();
         const leftPanner = this.ctx.createStereoPanner();
@@ -415,18 +407,16 @@ class AudioEngine {
         leftPanner.pan.setValueAtTime(-1, this.ctx.currentTime);
         rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
         
-        // 7.83Hz Schumann Resonance offset
-        leftOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
-        rightOsc.frequency.setValueAtTime(baseFreq + 7.83, this.ctx.currentTime);
+        leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
+        rightOsc.frequency.setValueAtTime(binauralCarrier + 7.83, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        binauralGain.gain.linearRampToValueAtTime(0.008, this.ctx.currentTime + 10); // Subtle, crisp layer
+        binauralGain.gain.linearRampToValueAtTime(0.006, this.ctx.currentTime + 10); 
 
         leftOsc.connect(leftPanner);
         rightOsc.connect(rightPanner);
         leftPanner.connect(binauralGain);
         rightPanner.connect(binauralGain);
-        // Connect to masterGain so it ducks during mantra and respects drone volume
         binauralGain.connect(this.masterGain);
 
         leftOsc.start();
@@ -497,8 +487,8 @@ class AudioEngine {
             this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
         }
 
-        // Standardized to 5.0s crossfade
-        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 5.0);
+        // Standardized to 3.0s crossfade
+        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
         this.mantraLoop.start();
 
         // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
