@@ -189,14 +189,20 @@ class AudioEngine {
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
         
+        // Deep Spectrum Carving: Create a "cradle" for the voice/mantra
         this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.type = 'notch';
         this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
-        this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
-        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); 
+        this.bgMusicEQ.Q.setValueAtTime(1.5, this.ctx.currentTime);
+
+        // Warm Filter: Remove all sharp highs from background music
+        this.bgMusicLPF = this.ctx.createBiquadFilter();
+        this.bgMusicLPF.type = 'lowpass';
+        this.bgMusicLPF.frequency.setValueAtTime(1800, this.ctx.currentTime);
 
         this.bgMusicGain.connect(this.bgMusicEQ);
-        this.bgMusicEQ.connect(this.lowCutFilter);
+        this.bgMusicEQ.connect(this.bgMusicLPF);
+        this.bgMusicLPF.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -408,7 +414,8 @@ class AudioEngine {
         rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
         
         leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
-        rightOsc.frequency.setValueAtTime(binauralCarrier + 7.83, this.ctx.currentTime);
+        // Fixed: Removed the +7.83Hz wobble. Pure stillness at 80Hz.
+        rightOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
         // Drastically reduced volume (0.002) for a "feeble" background effect
