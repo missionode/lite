@@ -160,7 +160,7 @@ class AudioEngine {
         // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
         // Fixed: Standard soft-clipping curve that maintains volume
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.02); 
+        this.exciter.curve = this.makeDistortionCurve(0.002); 
         
         // Upgrade 4: Frequency Carving Filter
         this.voiceCarveFilter = this.ctx.createBiquadFilter();
@@ -362,19 +362,20 @@ class AudioEngine {
 
         // Fixed: Use sub-harmonics for high-frequency chakras to prevent ear fatigue
         let droneFreq = baseFreq;
-        if (baseFreq > 600) droneFreq = baseFreq / 2; // Throat, Third Eye, Crown drop one octave
-        if (baseFreq > 900) droneFreq = baseFreq / 4; // Crown drops two octaves for warmth
+        if (baseFreq > 600) droneFreq = baseFreq / 2; 
+        if (baseFreq > 900) droneFreq = baseFreq / 4; 
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); // Slower motion
+        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); 
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(droneFreq * 0.0015, this.ctx.currentTime);
+        lfoGain.gain.setValueAtTime(droneFreq * 0.001, this.ctx.currentTime);
         lfo.connect(lfoGain);
         lfo.start();
         this.vibrationLFO = lfo;
 
-        const harmonics = [{ f: 1.0, g: 0.18, type: 'sine' }, { f: 0.5, g: 0.12, type: 'sine' }];
+        // Drastically reduced gains (0.06 and 0.03) to make the drone "feeble"
+        const harmonics = [{ f: 1.0, g: 0.06, type: 'sine' }, { f: 0.5, g: 0.03, type: 'sine' }];
         harmonics.forEach((h) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
@@ -384,7 +385,7 @@ class AudioEngine {
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(droneFreq * 1.1, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.5, this.ctx.currentTime); // Slightly steeper for comfort
+            filter.Q.setValueAtTime(0.5, this.ctx.currentTime); 
             gain.gain.setValueAtTime(0, this.ctx.currentTime);
             gain.gain.linearRampToValueAtTime(h.g, this.ctx.currentTime + 6);
             osc.connect(filter);
@@ -394,9 +395,8 @@ class AudioEngine {
             this.droneOscillators.push({ osc, gain });
         });
 
-        // Fixed: Binaural Beat Layer Carrier Frequency Capping
-        // High carrier frequencies for binaural beats (e.g. 963Hz) can be very uncomfortable
-        const binauralCarrier = Math.min(droneFreq, 400); 
+        // Fixed: Lowered carrier to 80Hz for deep comfort
+        const binauralCarrier = Math.min(droneFreq, 80); 
 
         const leftOsc = this.ctx.createOscillator();
         const rightOsc = this.ctx.createOscillator();
@@ -411,7 +411,8 @@ class AudioEngine {
         rightOsc.frequency.setValueAtTime(binauralCarrier + 7.83, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        binauralGain.gain.linearRampToValueAtTime(0.006, this.ctx.currentTime + 10); 
+        // Drastically reduced volume (0.002) for a "feeble" background effect
+        binauralGain.gain.linearRampToValueAtTime(0.002, this.ctx.currentTime + 10); 
 
         leftOsc.connect(leftPanner);
         rightOsc.connect(rightPanner);
@@ -895,6 +896,9 @@ class MeditationController {
             }
 
             await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
+            
+            // Restore music to full volume after intro narration for the stillness period
+            this.audio.fadeInBackgroundMusic(4, false);
 
             // 5 Minute (300 seconds) Countdown
             const totalSeconds = 300;
@@ -909,6 +913,8 @@ class MeditationController {
                 // At 1 minute remaining, narrate the transition to hypnagogic state
                 if (i === transitionSecond) {
                     await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
+                    // Restore music to full volume again after this narration
+                    this.audio.fadeInBackgroundMusic(4, false);
                 }
 
                 await new Promise(r => setTimeout(r, 1000));
