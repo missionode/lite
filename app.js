@@ -696,7 +696,7 @@ class MeditationController {
             document.getElementById('completion-modal').classList.add('hidden');
             
             if (!this.scripts) {
-                const response = await fetch('scripts.json');
+                const response = await fetch('scripts.json?v=' + Date.now());
                 this.scripts = await response.json();
             }
 
@@ -733,6 +733,7 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.runGratitude();
             if (this.isMeditationActive) await this.runBoxBreathing();
+            if (this.isMeditationActive) await this.runCorpsePose();
             
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);
@@ -871,6 +872,54 @@ class MeditationController {
             // 5 second interval before Chakra Journey starts
             instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
             await new Promise(r => setTimeout(r, 5000));
+        }
+    }
+
+    async runCorpsePose() {
+        try {
+            if (!this.isMeditationActive) return;
+
+            // Use the Icebreaker screen for the clean, minimal aesthetic with a large timer
+            showScreen(icebreakerScreen);
+            const title = document.getElementById('icebreaker-title');
+            const subtitle = document.getElementById('icebreaker-subtitle');
+            const timer = document.getElementById('icebreaker-timer');
+
+            title.textContent = state.language === 'ml' ? "ശവാസനം" : "Corpse Pose";
+            subtitle.textContent = state.language === 'ml' ? "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക" : "Surrender your body completely to the earth";
+
+            // Narration: Intro to the pose
+            if (!this.scripts.corpse_pose) {
+                console.error("Scripts.corpse_pose is missing!", this.scripts);
+                throw new Error("Missing corpse_pose scripts");
+            }
+
+            await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
+
+            // 5 Minute (300 seconds) Countdown
+            const totalSeconds = 300;
+            const transitionSecond = 60; // 1 minute remaining mark
+
+            for (let i = totalSeconds; i > 0; i--) {
+                if (!this.isMeditationActive) return;
+                while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+                
+                if (timer) timer.textContent = i;
+
+                // At 1 minute remaining, narrate the transition to hypnagogic state
+                if (i === transitionSecond) {
+                    await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
+                }
+
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            // Final settle before Chakra Journey
+            subtitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            await new Promise(r => setTimeout(r, 3000));
+        } catch (e) {
+            console.error("Error in runCorpsePose:", e);
+            throw e; // Rethrow to trigger the main alert in start()
         }
     }
 
@@ -1523,8 +1572,8 @@ function attachEventListeners() {
         // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
         // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + 9)
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 12);
+            ? Math.round(state.timePerChakra + 14) // +5 for corpse pose
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 17); // +5 for corpse pose
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
 
