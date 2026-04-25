@@ -941,9 +941,9 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.65;   // Stable slow
-            utterance.pitch = 0.9;
-            utterance.volume = 1.0;  // Normalized for mobile
+            utterance.rate = 0.8;   // Sweet flow
+            utterance.pitch = 1.05;
+            utterance.volume = 1.0; 
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1137,9 +1137,9 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.7; 
-            utterance.pitch = 0.9; 
-            utterance.volume = 1.0; // Normalized for mobile
+            utterance.rate = 0.8; 
+            utterance.pitch = 1.05; 
+            utterance.volume = 1.0; 
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1164,10 +1164,10 @@ class MeditationController {
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
 
-        // Activate Frequency Carving (-8dB notch at 2.5kHz) to 'seat' the voice in the mix
+        // Activate Frequency Carving (-4dB notch at 2.5kHz) to 'seat' the voice gently
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-8, this.audio.ctx.currentTime + 1.5);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-4, this.audio.ctx.currentTime + 1.5);
         }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
@@ -1191,8 +1191,8 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity
-                utterance.rate   = state.sleepMode ? 0.65 : 0.75;
-                utterance.pitch  = 0.9;
+                utterance.rate   = state.sleepMode ? 0.75 : 0.85;
+                utterance.pitch  = 1.05;
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
