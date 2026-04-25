@@ -1352,11 +1352,11 @@ const state = {
     voiceName: localStorage.getItem('chakra_voice') || '',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
-    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
+    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.35,
-    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
+    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.20,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
