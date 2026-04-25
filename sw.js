@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v1.1.74';
+const CACHE_NAME = 'chakra-v1.1.75';
 const ASSETS = [
   './',
   './index.html',

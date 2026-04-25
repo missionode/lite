@@ -941,7 +941,7 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.8;   // Sweet flow
+            utterance.rate = 0.7;   // Breath-aligned flow
             utterance.pitch = 1.05;
             utterance.volume = 1.0; 
             
@@ -1137,7 +1137,7 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.8; 
+            utterance.rate = 0.7; 
             utterance.pitch = 1.05; 
             utterance.volume = 1.0; 
             
@@ -1190,8 +1190,8 @@ class MeditationController {
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
-                // Studio Clarity
-                utterance.rate   = state.sleepMode ? 0.75 : 0.85;
+                // Studio Clarity: Breath-aligned pacing
+                utterance.rate   = state.sleepMode ? 0.62 : 0.72;
                 utterance.pitch  = 1.05;
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
@@ -1232,7 +1232,8 @@ class MeditationController {
                 continue;
             }
 
-            await new Promise(r => setTimeout(r, 1500));
+            // Increased space (2.5s) between sentences for deep absorption
+            await new Promise(r => setTimeout(r, 2500));
         }
 
         // Release Frequency Carving after narration ends
