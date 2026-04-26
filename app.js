@@ -862,7 +862,7 @@ class MeditationController {
                 
                 this.narrateSoft(step.text);
 
-                for (let s = 4; s > 0; s--) {
+                for (let s = 8; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
                     while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
@@ -1586,8 +1586,8 @@ function attachEventListeners() {
         // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
         // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + 14) // +5 for corpse pose
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 17); // +5 for corpse pose
+            ? Math.round(state.timePerChakra + 15) // +1 for longer breathing
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 18); // +1 for longer breathing
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
 

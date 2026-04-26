@@ -520,7 +520,7 @@ input[type="range"]::-moz-range-progress {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    transition: transform 4s linear;
+    transition: transform 8s linear;
     background: radial-gradient(circle at 35% 35%, #a78bfa, #7c3aed 60%, #4c1d95);
     box-shadow: 0 0 20px rgba(124, 58, 237, 0.9), 0 0 50px rgba(124, 58, 237, 0.4);
     position: relative;
