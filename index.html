@@ -83,7 +83,34 @@
                     </div>
                     <div class="mixer-row">
                         <label style="font-size: 0.8rem; width: 60px; text-align: left;">Music</label>
-                        <input type="range" id="settings-vol-music" min="0" max="0.5" step="0.01" value="0.30">
+                        <input type="range" id="settings-vol-music" min="0" max="0.5" step="0.01" value="0.20">
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Timings Settings -->
+            <div class="config-group" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                <label>Journey Timings</label>
+                <div class="settings-mixer" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; margin: 0.5rem auto 0;">
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Arriving</label>
+                        <input type="range" id="time-icebreaker" min="10" max="120" step="5" value="60">
+                        <span id="display-icebreaker" style="font-size: 0.7rem; width: 30px;">60s</span>
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Breathing</label>
+                        <input type="range" id="time-breathing" min="4" max="16" step="1" value="8">
+                        <span id="display-breathing" style="font-size: 0.7rem; width: 30px;">8s</span>
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Corpse Pose</label>
+                        <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
+                        <span id="display-corpse" style="font-size: 0.7rem; width: 30px;">300s</span>
+                    </div>
+                    <div class="mixer-row">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Interval</label>
+                        <input type="range" id="time-interval" min="2" max="20" step="1" value="9">
+                        <span id="display-interval" style="font-size: 0.7rem; width: 30px;">9s</span>
                     </div>
                 </div>
             </div>
