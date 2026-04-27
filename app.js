@@ -160,7 +160,7 @@ class AudioEngine {
         // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
         // Fixed: Standard soft-clipping curve that maintains volume
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.02); 
+        this.exciter.curve = this.makeDistortionCurve(0.002); 
         
         // Upgrade 4: Frequency Carving Filter
         this.voiceCarveFilter = this.ctx.createBiquadFilter();
@@ -189,14 +189,20 @@ class AudioEngine {
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
         
+        // Deep Spectrum Carving: Create a "cradle" for the voice/mantra
         this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.type = 'notch';
         this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
-        this.bgMusicEQ.Q.setValueAtTime(1, this.ctx.currentTime);
-        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime); 
+        this.bgMusicEQ.Q.setValueAtTime(1.5, this.ctx.currentTime);
+
+        // Warm Filter: Remove all sharp highs from background music
+        this.bgMusicLPF = this.ctx.createBiquadFilter();
+        this.bgMusicLPF.type = 'lowpass';
+        this.bgMusicLPF.frequency.setValueAtTime(1800, this.ctx.currentTime);
 
         this.bgMusicGain.connect(this.bgMusicEQ);
-        this.bgMusicEQ.connect(this.lowCutFilter);
+        this.bgMusicEQ.connect(this.bgMusicLPF);
+        this.bgMusicLPF.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -362,19 +368,20 @@ class AudioEngine {
 
         // Fixed: Use sub-harmonics for high-frequency chakras to prevent ear fatigue
         let droneFreq = baseFreq;
-        if (baseFreq > 600) droneFreq = baseFreq / 2; // Throat, Third Eye, Crown drop one octave
-        if (baseFreq > 900) droneFreq = baseFreq / 4; // Crown drops two octaves for warmth
+        if (baseFreq > 600) droneFreq = baseFreq / 2; 
+        if (baseFreq > 900) droneFreq = baseFreq / 4; 
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); // Slower motion
+        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); 
         const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(droneFreq * 0.0015, this.ctx.currentTime);
+        lfoGain.gain.setValueAtTime(droneFreq * 0.001, this.ctx.currentTime);
         lfo.connect(lfoGain);
         lfo.start();
         this.vibrationLFO = lfo;
 
-        const harmonics = [{ f: 1.0, g: 0.18, type: 'sine' }, { f: 0.5, g: 0.12, type: 'sine' }];
+        // Drastically reduced gains (0.06 and 0.03) to make the drone "feeble"
+        const harmonics = [{ f: 1.0, g: 0.06, type: 'sine' }, { f: 0.5, g: 0.03, type: 'sine' }];
         harmonics.forEach((h) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
@@ -384,7 +391,7 @@ class AudioEngine {
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(droneFreq * 1.1, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.5, this.ctx.currentTime); // Slightly steeper for comfort
+            filter.Q.setValueAtTime(0.5, this.ctx.currentTime); 
             gain.gain.setValueAtTime(0, this.ctx.currentTime);
             gain.gain.linearRampToValueAtTime(h.g, this.ctx.currentTime + 6);
             osc.connect(filter);
@@ -394,9 +401,8 @@ class AudioEngine {
             this.droneOscillators.push({ osc, gain });
         });
 
-        // Fixed: Binaural Beat Layer Carrier Frequency Capping
-        // High carrier frequencies for binaural beats (e.g. 963Hz) can be very uncomfortable
-        const binauralCarrier = Math.min(droneFreq, 400); 
+        // Fixed: Lowered carrier to 80Hz for deep comfort
+        const binauralCarrier = Math.min(droneFreq, 80); 
 
         const leftOsc = this.ctx.createOscillator();
         const rightOsc = this.ctx.createOscillator();
@@ -408,10 +414,12 @@ class AudioEngine {
         rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
         
         leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
-        rightOsc.frequency.setValueAtTime(binauralCarrier + 7.83, this.ctx.currentTime);
+        // Fixed: Removed the +7.83Hz wobble. Pure stillness at 80Hz.
+        rightOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        binauralGain.gain.linearRampToValueAtTime(0.006, this.ctx.currentTime + 10); 
+        // Drastically reduced volume (0.002) for a "feeble" background effect
+        binauralGain.gain.linearRampToValueAtTime(0.002, this.ctx.currentTime + 10); 
 
         leftOsc.connect(leftPanner);
         rightOsc.connect(rightPanner);
@@ -696,7 +704,7 @@ class MeditationController {
             document.getElementById('completion-modal').classList.add('hidden');
             
             if (!this.scripts) {
-                const response = await fetch('scripts.json');
+                const response = await fetch('scripts.json?v=' + Date.now());
                 this.scripts = await response.json();
             }
 
@@ -733,6 +741,7 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.runGratitude();
             if (this.isMeditationActive) await this.runBoxBreathing();
+            if (this.isMeditationActive) await this.runCorpsePose();
             
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);
@@ -853,7 +862,7 @@ class MeditationController {
                 
                 this.narrateSoft(step.text);
 
-                for (let s = 4; s > 0; s--) {
+                for (let s = 8; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
                     while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
@@ -874,14 +883,67 @@ class MeditationController {
         }
     }
 
+    async runCorpsePose() {
+        try {
+            if (!this.isMeditationActive) return;
+
+            // Use the Icebreaker screen for the clean, minimal aesthetic with a large timer
+            showScreen(icebreakerScreen);
+            const title = document.getElementById('icebreaker-title');
+            const subtitle = document.getElementById('icebreaker-subtitle');
+            const timer = document.getElementById('icebreaker-timer');
+
+            title.textContent = state.language === 'ml' ? "ശവാസനം" : "Corpse Pose";
+            subtitle.textContent = state.language === 'ml' ? "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക" : "Surrender your body completely to the earth";
+
+            // Narration: Intro to the pose
+            if (!this.scripts.corpse_pose) {
+                console.error("Scripts.corpse_pose is missing!", this.scripts);
+                throw new Error("Missing corpse_pose scripts");
+            }
+
+            await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
+            
+            // Restore music to full volume after intro narration for the stillness period
+            this.audio.fadeInBackgroundMusic(4, false);
+
+            // 5 Minute (300 seconds) Countdown
+            const totalSeconds = 300;
+            const transitionSecond = 60; // 1 minute remaining mark
+
+            for (let i = totalSeconds; i > 0; i--) {
+                if (!this.isMeditationActive) return;
+                while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+                
+                if (timer) timer.textContent = i;
+
+                // At 1 minute remaining, narrate the transition to hypnagogic state
+                if (i === transitionSecond) {
+                    await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
+                    // Restore music to full volume again after this narration
+                    this.audio.fadeInBackgroundMusic(4, false);
+                }
+
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            // Final settle before Chakra Journey
+            subtitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            await new Promise(r => setTimeout(r, 3000));
+        } catch (e) {
+            console.error("Error in runCorpsePose:", e);
+            throw e; // Rethrow to trigger the main alert in start()
+        }
+    }
+
     async narrateSoft(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.65;   // Stable slow
-            utterance.pitch = 0.9;
-            utterance.volume = 1.0;  // Normalized for mobile
+            utterance.rate = 0.7;   // Breath-aligned flow
+            utterance.pitch = 1.05;
+            utterance.volume = 1.0; 
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1076,8 +1138,8 @@ class MeditationController {
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
             utterance.rate = 0.7; 
-            utterance.pitch = 0.9; 
-            utterance.volume = 1.0; // Normalized for mobile
+            utterance.pitch = 1.05; 
+            utterance.volume = 1.0; 
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1102,10 +1164,10 @@ class MeditationController {
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
 
-        // Activate Frequency Carving (-8dB notch at 2.5kHz) to 'seat' the voice in the mix
+        // Activate Frequency Carving (-4dB notch at 2.5kHz) to 'seat' the voice gently
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-8, this.audio.ctx.currentTime + 1.5);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-4, this.audio.ctx.currentTime + 1.5);
         }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
@@ -1128,9 +1190,9 @@ class MeditationController {
                 const selectedVoice = state.voices.find(v => v.name === state.voiceName);
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
-                // Studio Clarity
-                utterance.rate   = state.sleepMode ? 0.65 : 0.75;
-                utterance.pitch  = 0.9;
+                // Studio Clarity: Breath-aligned pacing
+                utterance.rate   = state.sleepMode ? 0.62 : 0.72;
+                utterance.pitch  = 1.05;
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
@@ -1170,7 +1232,8 @@ class MeditationController {
                 continue;
             }
 
-            await new Promise(r => setTimeout(r, 1500));
+            // Increased space (2.5s) between sentences for deep absorption
+            await new Promise(r => setTimeout(r, 2500));
         }
 
         // Release Frequency Carving after narration ends
@@ -1297,11 +1360,11 @@ const state = {
     voiceName: localStorage.getItem('chakra_voice') || '',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
-    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 1.1,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.01,
+    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
+    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
     volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
     volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.35,
-    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.30,
+    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.20,
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -1523,8 +1586,8 @@ function attachEventListeners() {
         // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
         // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + 9)
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 12);
+            ? Math.round(state.timePerChakra + 15) // +1 for longer breathing
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 18); // +1 for longer breathing
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
 
