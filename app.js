@@ -725,8 +725,8 @@ class MeditationController {
             document.getElementById('icebreaker-title').textContent = state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving";
             document.getElementById('icebreaker-subtitle').textContent = state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space";
 
-            this.audio.fadeInBackgroundMusic(60); 
-            for (let i = 60; i > 0; i--) {
+            this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
+            for (let i = state.timeIcebreaker; i > 0; i--) {
                 if (!this.isMeditationActive) return;
                 while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
                 if (icebreakerTimer) icebreakerTimer.textContent = i;
@@ -858,11 +858,13 @@ class MeditationController {
                 if (!this.isMeditationActive) return;
                 
                 instruction.textContent = step.text;
+                // Sync visual timing with configurable breathing duration
+                circle.style.transition = `transform ${state.timeBreathing}s linear`;
                 circle.style.transform = `scale(${step.scale})`;
                 
                 this.narrateSoft(step.text);
 
-                for (let s = 8; s > 0; s--) {
+                for (let s = state.timeBreathing; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
                     while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
@@ -907,10 +909,9 @@ class MeditationController {
             // Restore music to full volume after intro narration for the stillness period
             this.audio.fadeInBackgroundMusic(4, false);
 
-            // 5 Minute (300 seconds) Countdown
-            const totalSeconds = 300;
+            // Configurable Duration Countdown
+            const totalSeconds = state.timeCorpse;
             const transitionSecond = 60; // 1 minute remaining mark
-
             for (let i = totalSeconds; i > 0; i--) {
                 if (!this.isMeditationActive) return;
                 while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
@@ -1050,7 +1051,7 @@ class MeditationController {
         await new Promise(r => setTimeout(r, 2000));
         const breatheText = state.language === 'ml' ? "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ" : "Take a break... breathe and prepare... for the next chakra";
         this.narrateFeeble(breatheText);
-        const intervalMs = 9000;
+        const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
         while (elapsed < intervalMs) {
             if (!this.isMeditationActive) break;
@@ -1371,7 +1372,12 @@ const state = {
     },
     selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
     intention: localStorage.getItem('chakra_intention') || '',
-    sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true'
+    sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
+    // Journey Timings (in seconds)
+    timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
+    timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
+    timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
+    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9
 };
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -1537,6 +1543,19 @@ function loadPreferences() {
     });
     document.getElementById('intention-input').value = state.intention;
     document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
+
+    // Sync Journey Timings Sliders
+    document.getElementById('time-icebreaker').value = state.timeIcebreaker;
+    document.getElementById('display-icebreaker').textContent = state.timeIcebreaker + 's';
+    
+    document.getElementById('time-breathing').value = state.timeBreathing;
+    document.getElementById('display-breathing').textContent = state.timeBreathing + 's';
+    
+    document.getElementById('time-corpse').value = state.timeCorpse;
+    document.getElementById('display-corpse').textContent = state.timeCorpse + 's';
+    
+    document.getElementById('time-interval').value = state.timeInterval;
+    document.getElementById('display-interval').textContent = state.timeInterval + 's';
     
     // Ensure voice matches the loaded language
     autoSelectVoice();
@@ -1586,10 +1605,36 @@ function attachEventListeners() {
         // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
         // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + 15) // +1 for longer breathing
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + 18); // +1 for longer breathing
+            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + 8) 
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + 12);
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
+
+    // Timing Sliders Listeners
+    document.getElementById('time-icebreaker').addEventListener('input', (e) => {
+        state.timeIcebreaker = parseInt(e.target.value);
+        document.getElementById('display-icebreaker').textContent = state.timeIcebreaker + 's';
+        localStorage.setItem('chakra_time_icebreaker', state.timeIcebreaker);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-breathing').addEventListener('input', (e) => {
+        state.timeBreathing = parseInt(e.target.value);
+        document.getElementById('display-breathing').textContent = state.timeBreathing + 's';
+        localStorage.setItem('chakra_time_breathing', state.timeBreathing);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-corpse').addEventListener('input', (e) => {
+        state.timeCorpse = parseInt(e.target.value);
+        document.getElementById('display-corpse').textContent = state.timeCorpse + 's';
+        localStorage.setItem('chakra_time_corpse', state.timeCorpse);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-interval').addEventListener('input', (e) => {
+        state.timeInterval = parseInt(e.target.value);
+        document.getElementById('display-interval').textContent = state.timeInterval + 's';
+        localStorage.setItem('chakra_time_interval', state.timeInterval);
+        updateSessionEstimate();
+    });
 
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
