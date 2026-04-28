@@ -163,20 +163,22 @@ class AudioEngine {
         this.exciter.curve = this.makeDistortionCurve(0.002); 
         
         // Upgrade 4: Frequency Carving Filter
-        this.voiceCarveFilter = this.ctx.createBiquadFilter();
-        this.voiceCarveFilter.type = 'peaking';
-        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
-        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
-        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+        if (state.audioFilters) {
+            this.voiceCarveFilter = this.ctx.createBiquadFilter();
+            this.voiceCarveFilter.type = 'peaking';
+            this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+            this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+            this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
-        this.presenceFilter = this.ctx.createBiquadFilter();
-        this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(8000, this.ctx.currentTime); // Lowered from 10k for warmth
-        this.presenceFilter.gain.setValueAtTime(-2, this.ctx.currentTime); // Subtle cut for comfort
+            this.presenceFilter = this.ctx.createBiquadFilter();
+            this.presenceFilter.type = 'highshelf';
+            this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
+            this.presenceFilter.gain.setValueAtTime(-6, this.ctx.currentTime);
+        }
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
-        this.lowCutFilter.frequency.setValueAtTime(80, this.ctx.currentTime); // Warm bottom
+        this.lowCutFilter.frequency.setValueAtTime(80, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
@@ -189,16 +191,15 @@ class AudioEngine {
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
         
-        // Deep Spectrum Carving: Create a "cradle" for the voice/mantra
+        // Deep Spectrum Carving
         this.bgMusicEQ = this.ctx.createBiquadFilter();
         this.bgMusicEQ.type = 'notch';
         this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
         this.bgMusicEQ.Q.setValueAtTime(1.5, this.ctx.currentTime);
 
-        // Warm Filter: Remove all sharp highs from background music
         this.bgMusicLPF = this.ctx.createBiquadFilter();
         this.bgMusicLPF.type = 'lowpass';
-        this.bgMusicLPF.frequency.setValueAtTime(1800, this.ctx.currentTime);
+        this.bgMusicLPF.frequency.setValueAtTime(state.audioFilters ? 1200 : 20000, this.ctx.currentTime);
 
         this.bgMusicGain.connect(this.bgMusicEQ);
         this.bgMusicEQ.connect(this.bgMusicLPF);
@@ -208,30 +209,27 @@ class AudioEngine {
         this.bellGain.gain.value = state.volBell;
         this.bellGain.connect(this.ctx.destination);
 
-        // Fixed: Use StereoPanner instead of HRTF Panner for better stability and less strain
         this.pannerNode = this.ctx.createStereoPanner();
         
-        // Gentle Panning LFO
         const pannerLfo = this.ctx.createOscillator();
         const pannerLfoGain = this.ctx.createGain();
         pannerLfo.type = 'sine';
         pannerLfo.frequency.setValueAtTime(0.03, this.ctx.currentTime);
-        pannerLfoGain.gain.setValueAtTime(0.3, this.ctx.currentTime); // Max 30% pan
+        pannerLfoGain.gain.setValueAtTime(0.3, this.ctx.currentTime);
         pannerLfo.connect(pannerLfoGain);
         pannerLfoGain.connect(this.pannerNode.pan);
         pannerLfo.start();
 
-        // Upgrade 5: Algorithmic Reverb Swell
         this.reverbGain = this.ctx.createGain();
         this.reverbGain.gain.value = 0.35; 
         this.reverbWet = this.reverbGain; 
         
         this.reverbFilter = this.ctx.createBiquadFilter();
         this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(2200, this.ctx.currentTime); // Even smoother
+        this.reverbFilter.frequency.setValueAtTime(state.audioFilters ? 1500 : 20000, this.ctx.currentTime);
 
         this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.8; // Longer, deeper delay
+        this.delayNode.delayTime.value = 0.8;
         this.delayFeedback = this.ctx.createGain();
         this.delayFeedback.gain.value = 0.45;
 
@@ -244,16 +242,25 @@ class AudioEngine {
         
         this.pannerNode.connect(this.lowCutFilter);
         
-        this.lowCutFilter.connect(this.voiceCarveFilter);
-        this.voiceCarveFilter.connect(this.exciter);
+        let lastNode = this.lowCutFilter;
+        if (this.voiceCarveFilter) {
+            lastNode.connect(this.voiceCarveFilter);
+            lastNode = this.voiceCarveFilter;
+        }
+        lastNode.connect(this.exciter);
         
         this.exciter.connect(this.reverbGain);
         this.reverbGain.connect(this.reverbFilter);
-        this.reverbFilter.connect(this.presenceFilter);
         
-        this.exciter.connect(this.presenceFilter); // Dry
+        if (this.presenceFilter) {
+            this.reverbFilter.connect(this.presenceFilter);
+            this.exciter.connect(this.presenceFilter);
+            this.presenceFilter.connect(this.masterCompressor);
+        } else {
+            this.reverbFilter.connect(this.masterCompressor);
+            this.exciter.connect(this.masterCompressor);
+        }
         
-        this.presenceFilter.connect(this.masterCompressor);
         this.masterCompressor.connect(this.ctx.destination);
 
         this.mantraGain = this.ctx.createGain();
@@ -261,7 +268,7 @@ class AudioEngine {
         
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(3200, this.ctx.currentTime); // Lower cutoff for warmth
+        this.mantraFilter.frequency.setValueAtTime(state.audioFilters ? 2200 : 20000, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
@@ -1373,6 +1380,7 @@ const state = {
     selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
     intention: localStorage.getItem('chakra_intention') || '',
     sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
+    audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1543,6 +1551,7 @@ function loadPreferences() {
     });
     document.getElementById('intention-input').value = state.intention;
     document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
+    document.getElementById('audio-filters-toggle').checked = state.audioFilters;
 
     // Sync Journey Timings Sliders
     document.getElementById('time-icebreaker').value = state.timeIcebreaker;
@@ -1593,6 +1602,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_voice', state.voiceName);
+        localStorage.setItem('chakra_audio_filters', document.getElementById('audio-filters-toggle').checked);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
