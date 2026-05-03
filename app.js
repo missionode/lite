@@ -34,6 +34,24 @@ const timeDisplay = document.getElementById('time-display');
 const startMeditationBtn = document.getElementById('start-meditation');
 const openSettingsBtn = document.getElementById('open-settings');
 
+// ── UTILS (Defensive Element Access) ──────────────────────────────────────────
+const getChecked = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+};
+const syncChecked = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = val;
+};
+const syncValue = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+};
+const setText = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+};
+
 // Audio Engine
 class SeamlessLoop {
     constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
@@ -723,7 +741,7 @@ class MeditationController {
             
             this.isMeditationActive = true;
             this.isPaused = false;
-            this.isHighEnergy = document.getElementById('high-energy-toggle').checked;
+            this.isHighEnergy = getChecked('high-energy-toggle');
             
             document.getElementById('pause-meditation').textContent = 'II';
 
@@ -1543,43 +1561,44 @@ function loadPreferences() {
     timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
     
     // Sync Mixer Sliders
-    document.getElementById('vol-voice').value = state.volVoice;
-    document.getElementById('vol-drone').value = state.volDrone;
-    document.getElementById('vol-bell').value = state.volBell;
-    document.getElementById('vol-mantra').value = state.volMantra;
-    document.getElementById('vol-music').value = state.volMusic;
+    syncValue('vol-voice', state.volVoice);
+    syncValue('vol-drone', state.volDrone);
+    syncValue('vol-bell', state.volBell);
+    syncValue('vol-mantra', state.volMantra);
+    syncValue('vol-music', state.volMusic);
 
     // Sync Settings Sliders
-    document.getElementById('settings-vol-voice').value = state.volVoice;
-    document.getElementById('settings-vol-drone').value = state.volDrone;
-    document.getElementById('settings-vol-bell').value = state.volBell;
-    document.getElementById('settings-vol-mantra').value = state.volMantra;
-    document.getElementById('settings-vol-music').value = state.volMusic;
+    syncValue('settings-vol-voice', state.volVoice);
+    syncValue('settings-vol-drone', state.volDrone);
+    syncValue('settings-vol-bell', state.volBell);
+    syncValue('settings-vol-mantra', state.volMantra);
+    syncValue('settings-vol-music', state.volMusic);
 
-    document.getElementById('stat-journeys').textContent = state.stats.journeys;
-    document.getElementById('stat-time').textContent = state.stats.time;
+    setText('stat-journeys', state.stats.journeys);
+    setText('stat-time', state.stats.time);
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
         cb.checked = state.selectedChakras.includes(cb.value);
     });
-    document.getElementById('intention-input').value = state.intention;
-    document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
-    document.getElementById('audio-filters-toggle').checked = state.audioFilters;
-    document.getElementById('reverse-journey-toggle').checked = state.reverseJourney;
-    document.getElementById('box-meditation-toggle').checked = state.boxMeditation;
-    document.getElementById('hooponopono-toggle').checked = state.hooponopono;
+    syncValue('intention-input', state.intention);
+    
+    syncChecked('sleep-mode-toggle', state.sleepMode);
+    syncChecked('audio-filters-toggle', state.audioFilters);
+    syncChecked('reverse-journey-toggle', state.reverseJourney);
+    syncChecked('box-meditation-toggle', state.boxMeditation);
+    syncChecked('hooponopono-toggle', state.hooponopono);
 
     // Sync Journey Timings Sliders
-    document.getElementById('time-icebreaker').value = state.timeIcebreaker;
-    document.getElementById('display-icebreaker').textContent = state.timeIcebreaker + 's';
+    syncValue('time-icebreaker', state.timeIcebreaker);
+    setText('display-icebreaker', state.timeIcebreaker + 's');
     
-    document.getElementById('time-breathing').value = state.timeBreathing;
-    document.getElementById('display-breathing').textContent = state.timeBreathing + 's';
+    syncValue('time-breathing', state.timeBreathing);
+    setText('display-breathing', state.timeBreathing + 's');
     
-    document.getElementById('time-corpse').value = state.timeCorpse;
-    document.getElementById('display-corpse').textContent = state.timeCorpse + 's';
+    syncValue('time-corpse', state.timeCorpse);
+    setText('display-corpse', state.timeCorpse + 's');
     
-    document.getElementById('time-interval').value = state.timeInterval;
-    document.getElementById('display-interval').textContent = state.timeInterval + 's';
+    syncValue('time-interval', state.timeInterval);
+    setText('display-interval', state.timeInterval + 's');
     
     // Ensure voice matches the loaded language
     autoSelectVoice();
@@ -1617,10 +1636,10 @@ function attachEventListeners() {
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_voice', state.voiceName);
-        state.audioFilters = document.getElementById('audio-filters-toggle').checked;
-        state.reverseJourney = document.getElementById('reverse-journey-toggle').checked;
-        state.boxMeditation = document.getElementById('box-meditation-toggle').checked;
-        state.hooponopono = document.getElementById('hooponopono-toggle').checked;
+        state.audioFilters = getChecked('audio-filters-toggle');
+        state.reverseJourney = getChecked('reverse-journey-toggle');
+        state.boxMeditation = getChecked('box-meditation-toggle');
+        state.hooponopono = getChecked('hooponopono-toggle');
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
@@ -1632,9 +1651,9 @@ function attachEventListeners() {
         aura.style.opacity = '1';
     });
     function updateSessionEstimate() {
-        const isHigh = document.getElementById('high-energy-toggle').checked;
-        const hasBox = document.getElementById('box-meditation-toggle').checked;
-        const hasHooponopono = document.getElementById('hooponopono-toggle').checked;
+        const isHigh = getChecked('high-energy-toggle');
+        const hasBox = getChecked('box-meditation-toggle');
+        const hasHooponopono = getChecked('hooponopono-toggle');
         
         let overhead = 5; // base overhead (gratitude, corpse, silence, etc)
         if (hasBox) overhead += 4; // box breathing cycles + narration
