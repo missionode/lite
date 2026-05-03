@@ -743,12 +743,12 @@ class MeditationController {
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
             
-            document.getElementById('pause-meditation').textContent = 'II';
+            setText('pause-meditation', 'II');
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
-            document.getElementById('icebreaker-title').textContent = state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving";
-            document.getElementById('icebreaker-subtitle').textContent = state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space";
+            setText('icebreaker-title', state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving");
+            setText('icebreaker-subtitle', state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space");
 
             this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
             for (let i = state.timeIcebreaker; i > 0; i--) {
@@ -1019,17 +1019,18 @@ class MeditationController {
     }
 
     async runClosing() {
-        document.getElementById('mantra-display').textContent = "✦";
-        document.getElementById('chakra-symbol').style.opacity = "0.4";
+        setText('mantra-display', "✦");
+        const symbolEl = document.getElementById('chakra-symbol');
+        if (symbolEl) symbolEl.style.opacity = "0.4";
         const aura = document.getElementById('aura-bg');
-        aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
+        if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = this.scripts.closing[state.language];
         await this.narrate(closingText);
         await new Promise(r => setTimeout(r, 2000));
         // Full-body health affirmation — head to toe
         const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
         if (healthAffirmation && this.isMeditationActive) {
-            document.getElementById('mantra-display').textContent = "✦ BODY ✦";
+            setText('mantra-display', "✦ BODY ✦");
             await this.narrate(healthAffirmation);
         }
         await new Promise(r => setTimeout(r, 3000));
@@ -1037,11 +1038,15 @@ class MeditationController {
 
     async runHooponopono() {
         const aura = document.getElementById('aura-bg');
-        aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
-        aura.style.opacity = '1';
-        document.getElementById('chakra-symbol').style.opacity = '0.1';
-        document.getElementById('mantra-display').textContent = '✦';
-        document.getElementById('narration-text').textContent = '';
+        if (aura) {
+            aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
+            aura.style.opacity = '1';
+        }
+        const symbolEl = document.getElementById('chakra-symbol');
+        if (symbolEl) symbolEl.style.opacity = '0.1';
+        
+        setText('mantra-display', '✦');
+        setText('narration-text', '');
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(this.scripts.hooponopono.intro[state.language], false);
@@ -1054,7 +1059,7 @@ class MeditationController {
             for (let i = 0; i < phrases.length; i++) {
                 if (!this.isMeditationActive) return;
                 const phrase = phrases[i];
-                document.getElementById('narration-text').textContent = phrase;
+                setText('narration-text', phrase);
                 
                 // Keep music for all phrases, fade out only on the very last phrase of the last cycle
                 const isLast = (cycle === 2 && i === phrases.length - 1);
@@ -1064,7 +1069,7 @@ class MeditationController {
         }
 
         // Closing breath - Final fade out
-        document.getElementById('narration-text').textContent = '';
+        setText('narration-text', '');
         await this.narrate(this.scripts.hooponopono.closing[state.language], true);
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
@@ -1075,8 +1080,9 @@ class MeditationController {
     async handleInterval() {
         this.audio.stopDrone();
         const timerEl = document.getElementById('timer-display');
-        document.getElementById('mantra-display').textContent = "BREATHE";
-        document.getElementById('chakra-symbol').style.opacity = "0.3";
+        setText('mantra-display', "BREATHE");
+        const symbolEl = document.getElementById('chakra-symbol');
+        if (symbolEl) symbolEl.style.opacity = "0.3";
         this.visual.stop();
         await new Promise(r => setTimeout(r, 2000));
         const breatheText = state.language === 'ml' ? "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ" : "Take a break... breathe and prepare... for the next chakra";
@@ -1089,7 +1095,7 @@ class MeditationController {
                 elapsed += 100;
                 const remaining = Math.max(0, intervalMs - elapsed);
                 const secs = Math.ceil(remaining / 1000);
-                timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
+                if (timerEl) timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
@@ -1296,8 +1302,9 @@ class MeditationController {
 
     async handleSilence() {
         this.visual.stop();
-        document.getElementById('mantra-display').textContent = "SILENCE";
-        document.getElementById('chakra-symbol').style.opacity = "0.2";
+        setText('mantra-display', "SILENCE");
+        const symbolEl = document.getElementById('chakra-symbol');
+        if (symbolEl) symbolEl.style.opacity = "0.2";
         this.audio.stopDrone();
         let elapsed = 0;
         const silenceTime = 60000;
@@ -1308,7 +1315,7 @@ class MeditationController {
                 elapsed += 100;
                 const remaining = silenceTime - elapsed;
                 const secs = Math.ceil(remaining / 1000);
-                timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
+                if (timerEl) timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
@@ -1328,12 +1335,10 @@ class MeditationController {
         state.stats.journeys += 1; state.stats.time += Math.round((state.timePerChakra * this.chakraOrder.length) + 1);
         localStorage.setItem('chakra_stats_journeys', state.stats.journeys);
         localStorage.setItem('chakra_stats_time', state.stats.time);
-        document.getElementById('stat-journeys').textContent = state.stats.journeys;
-        document.getElementById('stat-time').textContent = state.stats.time;
-        document.getElementById('stat-session-time').textContent =
-            Math.round(state.stats.time) + ' mins';
-        document.getElementById('stat-total-journeys').textContent =
-            state.stats.journeys;
+        setText('stat-journeys', state.stats.journeys);
+        setText('stat-time', state.stats.time);
+        setText('stat-session-time', Math.round(state.stats.time) + ' mins');
+        setText('stat-total-journeys', state.stats.journeys);
         // Lift sleep mode dimming once session ends
         document.body.classList.remove('sleep-mode-active');
 
@@ -1341,16 +1346,16 @@ class MeditationController {
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
         const btn = document.getElementById('close-completion');
-        title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
-        msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
-        btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+        if (title) title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
+        if (msg) msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
+        if (btn) btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
 
         // Journal: reset textarea, show last entry date, localise prompt
-        document.getElementById('journal-entry').value = '';
-        document.getElementById('journal-prompt').textContent = state.language === 'ml'
+        syncValue('journal-entry', '');
+        setText('journal-prompt', state.language === 'ml'
             ? 'എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?'
-            : 'What shifted? What are you calling in?';
-        document.getElementById('save-journal').textContent = state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry';
+            : 'What shifted? What are you calling in?');
+        setText('save-journal', state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry');
         const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
         const lastInfo = document.getElementById('last-journal-info');
         lastInfo.textContent = journalEntries.length > 0
@@ -1554,11 +1559,16 @@ function testVoice() {
 }
 
 function loadPreferences() {
-    languageSelect.value = state.language;
-    timeSlider.value = state.timePerChakra;
-    const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
-    timeSlider.style.setProperty('--range-fill', pctInit);
-    timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
+    syncValue('language-select', state.language);
+    
+    const timeSlider = document.getElementById('time-per-chakra');
+    if (timeSlider) {
+        timeSlider.value = state.timePerChakra;
+        const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
+        timeSlider.style.setProperty('--range-fill', pctInit);
+    }
+    
+    setText('time-display', `${state.timePerChakra.toFixed(1)} mins`);
     
     // Sync Mixer Sliders
     syncValue('vol-voice', state.volVoice);
@@ -1608,13 +1618,17 @@ function checkFirstTime() {
     if (localStorage.getItem('chakra_configured')) {
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
-        aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
-        aura.style.opacity = '1';
+        if (aura) {
+            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+            aura.style.opacity = '1';
+        }
     } else {
         showScreen(configScreen);
         const aura = document.getElementById('aura-bg');
-        aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
-        aura.style.opacity = '1';
+        if (aura) {
+            aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
+            aura.style.opacity = '1';
+        }
     }
 }
 
@@ -1662,31 +1676,31 @@ function attachEventListeners() {
         const estimate = isHigh
             ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 3) 
             : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 7);
-        document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
+        setText('session-estimate', `~ ${estimate} min session`);
     }
 
     // Timing Sliders Listeners
     document.getElementById('time-icebreaker').addEventListener('input', (e) => {
         state.timeIcebreaker = parseInt(e.target.value);
-        document.getElementById('display-icebreaker').textContent = state.timeIcebreaker + 's';
+        setText('display-icebreaker', state.timeIcebreaker + 's');
         localStorage.setItem('chakra_time_icebreaker', state.timeIcebreaker);
         updateSessionEstimate();
     });
     document.getElementById('time-breathing').addEventListener('input', (e) => {
         state.timeBreathing = parseInt(e.target.value);
-        document.getElementById('display-breathing').textContent = state.timeBreathing + 's';
+        setText('display-breathing', state.timeBreathing + 's');
         localStorage.setItem('chakra_time_breathing', state.timeBreathing);
         updateSessionEstimate();
     });
     document.getElementById('time-corpse').addEventListener('input', (e) => {
         state.timeCorpse = parseInt(e.target.value);
-        document.getElementById('display-corpse').textContent = state.timeCorpse + 's';
+        setText('display-corpse', state.timeCorpse + 's');
         localStorage.setItem('chakra_time_corpse', state.timeCorpse);
         updateSessionEstimate();
     });
     document.getElementById('time-interval').addEventListener('input', (e) => {
         state.timeInterval = parseInt(e.target.value);
-        document.getElementById('display-interval').textContent = state.timeInterval + 's';
+        setText('display-interval', state.timeInterval + 's');
         localStorage.setItem('chakra_time_interval', state.timeInterval);
         updateSessionEstimate();
     });
@@ -1734,20 +1748,23 @@ function attachEventListeners() {
 
     // Journal save
     document.getElementById('save-journal').addEventListener('click', () => {
-        const entry = document.getElementById('journal-entry').value.trim();
+        const entryEl = document.getElementById('journal-entry');
+        const entry = entryEl ? entryEl.value.trim() : "";
         if (!entry) return;
         const entries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
         entries.unshift({ date: new Date().toLocaleDateString(), text: entry });
         localStorage.setItem('chakra_journal', JSON.stringify(entries.slice(0, 50)));
-        document.getElementById('journal-entry').value = '';
+        syncValue('journal-entry', '');
         const info = document.getElementById('last-journal-info');
-        info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
-        setTimeout(() => {
-            const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
-            info.textContent = saved.length > 0
-                ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
-                : '';
-        }, 2000);
+        if (info) {
+            info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
+            setTimeout(() => {
+                const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
+                info.textContent = saved.length > 0
+                    ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
+                    : '';
+            }, 2000);
+        }
     });
     const mixer = document.getElementById('volume-mixer');
     document.getElementById('btn-mixer').addEventListener('click', () => mixer.classList.toggle('hidden'));
