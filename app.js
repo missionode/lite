@@ -747,7 +747,7 @@ class MeditationController {
             if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
 
             if (this.isMeditationActive) await this.runGratitude();
-            if (this.isMeditationActive) await this.runBoxBreathing();
+            if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
             if (this.isMeditationActive) await this.runCorpsePose();
             
             // Immediate screen switch to meditation room for better user experience
@@ -762,7 +762,7 @@ class MeditationController {
                     if (this.isMeditationActive) {
                         await this.handleSilence();
                         if (this.isMeditationActive) await this.runClosing();
-                        if (this.isMeditationActive) await this.runHooponopono();
+                        if (this.isMeditationActive && state.hooponopono) await this.runHooponopono();
                         this.finish();
                     }
                 } else {
@@ -839,8 +839,11 @@ class MeditationController {
         const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
         tutText.textContent = text;
 
-        // Narrate the preparation instruction
-        await this.narrate(text);
+        // Fade out music before box meditation
+        this.audio.fadeOutBackgroundMusic(4);
+
+        // Narrate the preparation instruction with keepSilence = true
+        await this.narrate(text, false, true);
 
         for (let s = 5; s > 0; s--) {
             if (!this.isMeditationActive) return;
@@ -884,8 +887,11 @@ class MeditationController {
         if (this.isMeditationActive) {
             instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
             const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ. ശ്വാസോശ്വാസം സാധാരണ രീതിയിൽ കൊണ്ട് വരൂ " : "Breathing exercise is complete. Stay still for a moment.";
-            await this.narrate(completeText);
+            await this.narrate(completeText, false, true);
             
+            // Fade music back in after box meditation
+            this.audio.fadeInBackgroundMusic(4, false);
+
             // 5 second interval before Chakra Journey starts
             instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
             await new Promise(r => setTimeout(r, 5000));
@@ -990,7 +996,7 @@ class MeditationController {
         }
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
-        if (this.isMeditationActive) { await this.runHooponopono(); }
+        if (this.isMeditationActive && state.hooponopono) { await this.runHooponopono(); }
         if (this.isMeditationActive) { this.finish(); }
     }
 
@@ -1046,7 +1052,6 @@ class MeditationController {
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
         await new Promise(r => setTimeout(r, 15000));
-        this.finish();
     }
 
     async handleInterval() {
@@ -1160,14 +1165,16 @@ class MeditationController {
         });
     }
 
-    async narrate(text, fadeOut = false) {
+    async narrate(text, fadeOut = false, keepSilence = false) {
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
         window.speechSynthesis.cancel();
 
         // Ensure background music is active at ducked level
-        this.audio.fadeInBackgroundMusic(4, true);
+        if (!keepSilence) {
+            this.audio.fadeInBackgroundMusic(4, true);
+        }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
@@ -1381,6 +1388,8 @@ const state = {
     intention: localStorage.getItem('chakra_intention') || '',
     sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
+    boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
+    hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1552,6 +1561,8 @@ function loadPreferences() {
     document.getElementById('intention-input').value = state.intention;
     document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
     document.getElementById('audio-filters-toggle').checked = state.audioFilters;
+    document.getElementById('box-meditation-toggle').checked = state.boxMeditation;
+    document.getElementById('hooponopono-toggle').checked = state.hooponopono;
 
     // Sync Journey Timings Sliders
     document.getElementById('time-icebreaker').value = state.timeIcebreaker;
@@ -1602,7 +1613,12 @@ function attachEventListeners() {
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_voice', state.voiceName);
-        localStorage.setItem('chakra_audio_filters', document.getElementById('audio-filters-toggle').checked);
+        state.audioFilters = document.getElementById('audio-filters-toggle').checked;
+        state.boxMeditation = document.getElementById('box-meditation-toggle').checked;
+        state.hooponopono = document.getElementById('hooponopono-toggle').checked;
+        localStorage.setItem('chakra_audio_filters', state.audioFilters);
+        localStorage.setItem('chakra_box_meditation', state.boxMeditation);
+        localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
@@ -1611,12 +1627,16 @@ function attachEventListeners() {
     });
     function updateSessionEstimate() {
         const isHigh = document.getElementById('high-energy-toggle').checked;
-        // Accounts for chanting + narration overhead (~2 min/chakra) + fixed overhead + hooponopono (~2 min)
-        // Normal: measured 31 min for 1.0 min × 7 chakras (without hooponopono) → 7 × (1.0 + 2) + 12 ≈ 33
-        // High energy: single chakra + gratitude/breathing/silence + hooponopono, no intervals or closing
+        const hasBox = document.getElementById('box-meditation-toggle').checked;
+        const hasHooponopono = document.getElementById('hooponopono-toggle').checked;
+        
+        let overhead = 5; // base overhead (gratitude, corpse, silence, etc)
+        if (hasBox) overhead += 4; // box breathing cycles + narration
+        if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
+        
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + 8) 
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + 12);
+            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 3) 
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 7);
         document.getElementById('session-estimate').textContent = `~ ${estimate} min session`;
     }
 
@@ -1656,6 +1676,8 @@ function attachEventListeners() {
     });
 
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
         meditation.chakraOrder = state.selectedChakras;
