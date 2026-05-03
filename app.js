@@ -514,15 +514,23 @@ class AudioEngine {
 
         this.stopMantraTrack();
 
-        if (!this.mantraBuffer[key]) {
-            const response = await fetch(filePath);
-            const arrayBuffer = await response.arrayBuffer();
-            this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
-        }
+        try {
+            if (!this.mantraBuffer[key]) {
+                const response = await fetch(filePath);
+                if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${filePath}`);
+                const arrayBuffer = await response.arrayBuffer();
+                this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
+            }
 
-        // Standardized to 3.0s crossfade
-        this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
-        this.mantraLoop.start();
+            // Standardized to 3.0s crossfade
+            this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+            this.mantraLoop.start();
+        } catch (e) {
+            // SOFT FAIL: Log error but don't crash the journey. 
+            // This prevents the "Stable Connection" alert if a specific file fails.
+            console.error(`Audio Load Error (${key}):`, e);
+        }
+    }
 
         // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
         const lfo = this.ctx.createOscillator();
@@ -708,13 +716,23 @@ class MeditationController {
         this.visual = visual;
         this.scripts = null;
         this.isMeditationActive = false;
+        this.isStarting = false;
         this.isPaused = false;
         this.isHighEnergy = false;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
     async start() {
+        if (this.isStarting || this.isMeditationActive) return;
+        this.isStarting = true;
+        
         try {
+            const startBtn = document.getElementById('start-meditation');
+            if (startBtn) {
+                startBtn.disabled = true;
+                startBtn.style.opacity = "0.5";
+            }
+
             // CRITICAL: Immediate mobile speech unlock on first user gesture
             if ('speechSynthesis' in window) {
                 try {
@@ -789,8 +807,15 @@ class MeditationController {
             }
         } catch (err) {
             console.error("Critical Start Failure:", err);
-            alert("Unable to start meditation. Please ensure you have a stable connection and try again.");
+            alert("App Error: " + err.message + "\n\nPlease ensure you have a stable connection and try again.");
             this.stop();
+        } finally {
+            this.isStarting = false;
+            const startBtn = document.getElementById('start-meditation');
+            if (startBtn) {
+                startBtn.disabled = false;
+                startBtn.style.opacity = "1";
+            }
         }
     }
 
