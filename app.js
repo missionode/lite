@@ -1100,12 +1100,14 @@ class MeditationController {
         const aura = document.getElementById('aura-bg');
         aura.style.background = `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
         aura.style.opacity = "1";
-        const index = this.chakraOrder.indexOf(key);
+        
+        // Define absolute index for correct elemental layers regardless of journey order
+        const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
 
         if (key === 'thirdeye') {
             this.audio.stopDrone();
         } else {
-            this.audio.startDrone(chakra.frequency, index);
+            this.audio.startDrone(chakra.frequency, absoluteIndex);
         }
 
         this.visual.startPulsing(chakra.color);
@@ -1388,6 +1390,7 @@ const state = {
     intention: localStorage.getItem('chakra_intention') || '',
     sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
+    reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
     // Journey Timings (in seconds)
@@ -1561,6 +1564,7 @@ function loadPreferences() {
     document.getElementById('intention-input').value = state.intention;
     document.getElementById('sleep-mode-toggle').checked = state.sleepMode;
     document.getElementById('audio-filters-toggle').checked = state.audioFilters;
+    document.getElementById('reverse-journey-toggle').checked = state.reverseJourney;
     document.getElementById('box-meditation-toggle').checked = state.boxMeditation;
     document.getElementById('hooponopono-toggle').checked = state.hooponopono;
 
@@ -1614,9 +1618,11 @@ function attachEventListeners() {
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = document.getElementById('audio-filters-toggle').checked;
+        state.reverseJourney = document.getElementById('reverse-journey-toggle').checked;
         state.boxMeditation = document.getElementById('box-meditation-toggle').checked;
         state.hooponopono = document.getElementById('hooponopono-toggle').checked;
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
+        localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_configured', 'true');
@@ -1678,9 +1684,12 @@ function attachEventListeners() {
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
-        meditation.chakraOrder = state.selectedChakras;
+        let order = [...state.selectedChakras];
+        if (state.reverseJourney) order.reverse();
+        meditation.chakraOrder = order;
         // Apply sleep mode dim class at session start
         if (state.sleepMode) document.body.classList.add('sleep-mode-active');
         meditation.start();
