@@ -525,50 +525,49 @@ class AudioEngine {
             // Standardized to 3.0s crossfade
             this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
             this.mantraLoop.start();
+
+            // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
+            const lfo = this.ctx.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
+            const lfoGain = this.ctx.createGain();
+            lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
+            lfo.connect(lfoGain);
+            lfoGain.connect(this.mantraFilter.frequency);
+            lfo.start();
+            this.mantraPresenceLFO = lfo;
+
+            const now = this.ctx.currentTime;
+            this.mantraGain.gain.cancelScheduledValues(now);
+            this.mantraGain.gain.setValueAtTime(0, now);
+            // Ghostly 10s fade-in for maximum relaxation
+            this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 10);
+            this.mantraLoop.setGain(state.volMantra);
+
+            if (this.masterGain) {
+                this.masterGain.gain.cancelScheduledValues(now);
+                this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+                // Deeper ducking (to 15%) to create a "cradle" for the voice
+                this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
+            }
+
+            // Deep spectral carving on BG music when mantra is active
+            if (this.bgMusicEQ) {
+                this.bgMusicEQ.gain.cancelScheduledValues(now);
+                this.bgMusicEQ.gain.linearRampToValueAtTime(-12, now + 8); // Hollow out space
+            }
+
+            // Explicitly fade out any elemental noise during mantra
+            this.elementalNodes.forEach(({ gain }) => {
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.setValueAtTime(gain.gain.value, now);
+                gain.gain.linearRampToValueAtTime(0, now + 5);
+            });
         } catch (e) {
             // SOFT FAIL: Log error but don't crash the journey. 
             // This prevents the "Stable Connection" alert if a specific file fails.
             console.error(`Audio Load Error (${key}):`, e);
         }
-    }
-
-        // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
-        const lfo = this.ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
-        lfo.connect(lfoGain);
-        lfoGain.connect(this.mantraFilter.frequency);
-        lfo.start();
-        this.mantraPresenceLFO = lfo;
-
-        const now = this.ctx.currentTime;
-        this.mantraGain.gain.cancelScheduledValues(now);
-        this.mantraGain.gain.setValueAtTime(0, now);
-        // Ghostly 10s fade-in for maximum relaxation
-        this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 10);
-        this.mantraLoop.setGain(state.volMantra);
-
-        if (this.masterGain) {
-            this.masterGain.gain.cancelScheduledValues(now);
-            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            // Deeper ducking (to 15%) to create a "cradle" for the voice
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
-        }
-
-        // Deep spectral carving on BG music when mantra is active
-        if (this.bgMusicEQ) {
-            this.bgMusicEQ.gain.cancelScheduledValues(now);
-            this.bgMusicEQ.gain.linearRampToValueAtTime(-12, now + 8); // Hollow out space
-        }
-
-        // Explicitly fade out any elemental noise during mantra
-        this.elementalNodes.forEach(({ gain }) => {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(gain.gain.value, now);
-            gain.gain.linearRampToValueAtTime(0, now + 5);
-        });
     }
 
     stopMantraTrack() {
@@ -1187,7 +1186,7 @@ class MeditationController {
         this.audio.stopMantraTrack();
         if (key === 'thirdeye') {
             // Restore drone for Ajna affirmation
-            this.audio.startDrone(chakra.frequency, index);
+            this.audio.startDrone(chakra.frequency, absoluteIndex);
             await new Promise(r => setTimeout(r, 2000));
         } else {
             await new Promise(r => setTimeout(r, 4000));
