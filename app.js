@@ -176,9 +176,14 @@ class AudioEngine {
         this.masterGain.gain.value = state.volDrone; 
 
         // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
-        // Fixed: Standard soft-clipping curve that maintains volume
+        // Only enabled in 'Open' mode for crispness. Disabled in 'Closed' for warmth.
         this.exciter = this.ctx.createWaveShaper();
-        this.exciter.curve = this.makeDistortionCurve(0.002); 
+        if (state.eyesMode === 'open') {
+            this.exciter.curve = this.makeDistortionCurve(0.002); 
+        } else {
+            // Straight line curve = no distortion
+            this.exciter.curve = new Float32Array([-1, 1]);
+        }
         
         // Upgrade 4: Frequency Carving Filter
         if (state.audioFilters) {
@@ -191,12 +196,13 @@ class AudioEngine {
             this.presenceFilter = this.ctx.createBiquadFilter();
             this.presenceFilter.type = 'highshelf';
             this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-            this.presenceFilter.gain.setValueAtTime(-6, this.ctx.currentTime);
+            this.presenceFilter.gain.setValueAtTime(state.eyesMode === 'closed' ? -12 : -6, this.ctx.currentTime);
         }
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
-        this.lowCutFilter.frequency.setValueAtTime(80, this.ctx.currentTime);
+        // Grounding: Allow deeper frequencies in Closed mode (40Hz vs 80Hz)
+        this.lowCutFilter.frequency.setValueAtTime(state.eyesMode === 'closed' ? 40 : 80, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         this.masterCompressor = this.ctx.createDynamicsCompressor();
@@ -439,8 +445,9 @@ class AudioEngine {
         rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
         
         leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
-        // Fixed: Removed the +7.83Hz wobble. Pure stillness at 80Hz.
-        rightOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
+        // Grounding: Add 2Hz Delta pulse in Closed mode to relax forehead
+        const drift = state.eyesMode === 'closed' ? 2.0 : 0;
+        rightOsc.frequency.setValueAtTime(binauralCarrier + drift, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
         // Drastically reduced volume (0.002) for a "feeble" background effect
@@ -1152,11 +1159,7 @@ class MeditationController {
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
 
-        if (key === 'thirdeye') {
-            this.audio.stopDrone();
-        } else {
-            this.audio.startDrone(chakra.frequency, absoluteIndex);
-        }
+        this.audio.startDrone(chakra.frequency, absoluteIndex);
 
         this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
@@ -1184,13 +1187,7 @@ class MeditationController {
 
         // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
-        if (key === 'thirdeye') {
-            // Restore drone for Ajna affirmation
-            this.audio.startDrone(chakra.frequency, absoluteIndex);
-            await new Promise(r => setTimeout(r, 2000));
-        } else {
-            await new Promise(r => setTimeout(r, 4000));
-        }
+        await new Promise(r => setTimeout(r, 4000));
 
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
     }
@@ -1256,8 +1253,9 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity: Breath-aligned pacing
-                utterance.rate   = state.sleepMode ? 0.62 : 0.72;
-                utterance.pitch  = 1.05;
+                const baseRate = state.sleepMode ? 0.62 : 0.72;
+                utterance.rate   = state.eyesMode === 'closed' ? baseRate * 0.95 : baseRate;
+                utterance.pitch  = state.eyesMode === 'closed' ? 0.92 : 1.05;
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
@@ -1421,6 +1419,7 @@ document.addEventListener('visibilitychange', async () => {
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
+    eyesMode: localStorage.getItem('chakra_eyes_mode') || 'closed',
     voiceName: localStorage.getItem('chakra_voice') || '',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
@@ -1584,6 +1583,7 @@ function testVoice() {
 
 function loadPreferences() {
     syncValue('language-select', state.language);
+    syncValue('eyes-mode-select', state.eyesMode);
     
     const timeSlider = document.getElementById('time-per-chakra');
     if (timeSlider) {
@@ -1665,6 +1665,10 @@ function showScreen(screen) {
 
 function attachEventListeners() {
     languageSelect.addEventListener('change', (e) => { state.language = e.target.value; autoSelectVoice(); });
+    const eyesSelect = document.getElementById('eyes-mode-select');
+    if (eyesSelect) {
+        eyesSelect.addEventListener('change', (e) => { state.eyesMode = e.target.value; });
+    }
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
@@ -1673,6 +1677,8 @@ function attachEventListeners() {
         state.selectedChakras = checked;
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
+        state.eyesMode = document.getElementById('eyes-mode-select').value;
+        localStorage.setItem('chakra_eyes_mode', state.eyesMode);
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
         state.reverseJourney = getChecked('reverse-journey-toggle');
