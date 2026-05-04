@@ -150,6 +150,9 @@ class AudioEngine {
         this.mantraBuffer = {};
         this.bgMusicBuffer = null;
 
+        // Permanent Absolute Grounding Anchor (Closed Eyes Mode)
+        this.groundingAnchor = null;
+
         // Studio Mastering Nodes
         this.masterCompressor = null;
         this.presenceFilter = null;
@@ -286,6 +289,21 @@ class AudioEngine {
         }
         
         this.masterCompressor.connect(this.ctx.destination);
+
+        // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
+        if (state.eyesMode === 'closed') {
+            const anchorOsc = this.ctx.createOscillator();
+            const anchorGain = this.ctx.createGain();
+            anchorOsc.type = 'sine';
+            anchorOsc.frequency.setValueAtTime(40, this.ctx.currentTime); // Root-level 40Hz anchor
+            anchorGain.gain.setValueAtTime(0, this.ctx.currentTime);
+            // Feeble but permanent physical presence
+            anchorGain.gain.linearRampToValueAtTime(0.005, this.ctx.currentTime + 10);
+            anchorOsc.connect(anchorGain);
+            anchorGain.connect(this.masterGain);
+            anchorOsc.start();
+            this.groundingAnchor = { osc: anchorOsc, gain: anchorGain };
+        }
 
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
@@ -504,6 +522,16 @@ class AudioEngine {
             setTimeout(() => { try { osc.stop(); } catch(e) {} }, 5100);
         });
         this.droneOscillators = [];
+
+        if (this.groundingAnchor) {
+            const currentVal = this.groundingAnchor.gain.gain.value;
+            this.groundingAnchor.gain.gain.cancelScheduledValues(now);
+            this.groundingAnchor.gain.gain.setValueAtTime(currentVal, now);
+            this.groundingAnchor.gain.gain.linearRampToValueAtTime(0, now + 5);
+            const anchorOsc = this.groundingAnchor.osc;
+            setTimeout(() => { try { anchorOsc.stop(); } catch(e) {} }, 5100);
+            this.groundingAnchor = null;
+        }
 
         this.elementalNodes.forEach(({ src, gain }) => {
             const currentVal = gain.gain.value;
@@ -1255,7 +1283,7 @@ class MeditationController {
                 // Studio Clarity: Breath-aligned pacing
                 const baseRate = state.sleepMode ? 0.62 : 0.72;
                 utterance.rate   = state.eyesMode === 'closed' ? baseRate * 0.95 : baseRate;
-                utterance.pitch  = state.eyesMode === 'closed' ? 0.92 : 1.05;
+                utterance.pitch  = state.eyesMode === 'closed' ? 0.88 : 1.05; // Dropped further to 0.88 for body resonance
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
@@ -1363,6 +1391,8 @@ class MeditationController {
         setText('stat-total-journeys', state.stats.journeys);
         // Lift sleep mode dimming once session ends
         document.body.classList.remove('sleep-mode-active');
+        const app = document.getElementById('app');
+        if (app) app.style.opacity = "1";
 
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
@@ -1391,7 +1421,10 @@ class MeditationController {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
         document.body.classList.remove('sleep-mode-active');
-        document.getElementById('aura-bg').style.opacity = "0";
+        const app = document.getElementById('app');
+        if (app) app.style.opacity = "1";
+        const aura = document.getElementById('aura-bg');
+        if (aura) aura.style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         showScreen(lobbyScreen);
     }
@@ -1755,9 +1788,13 @@ function attachEventListeners() {
         meditation.chakraOrder = order;
         // Apply sleep mode dim class at session start
         if (state.sleepMode) document.body.classList.add('sleep-mode-active');
+        // Absolute Grounding: Dim UI for Eyes Closed mode
+        if (state.eyesMode === 'closed') {
+            const app = document.getElementById('app');
+            if (app) app.style.opacity = "0.2";
+        }
         meditation.start();
-    });
-    document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
+    });    document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
     document.getElementById('stop-meditation').addEventListener('click', () => meditation.stop());
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
