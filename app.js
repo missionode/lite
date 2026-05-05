@@ -763,6 +763,9 @@ class MeditationController {
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
         
+        // DND Reminder
+        alert("Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.");
+
         try {
             const startBtn = document.getElementById('start-meditation');
             if (startBtn) {
@@ -1172,7 +1175,19 @@ class MeditationController {
         void symbolEl.offsetWidth;
         symbolEl.classList.add('cosmic-entrance');
         setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
-        symbolEl.src = chakra.symbol;
+        
+        // Deity Image Selection
+        if (state.deityPath !== 'none') {
+            symbolEl.src = `presiding-deities/${state.deityPath}/${key}.png`;
+        } else {
+            symbolEl.src = chakra.symbol;
+        }
+        // Toggle text overlay on click of the image area for immersion
+        symbolEl.addEventListener('click', () => {
+            const overlay = document.getElementById('session-overlay');
+            if (overlay) overlay.style.display = (overlay.style.display === 'none') ? 'block' : 'none';
+        });
+
         symbolEl.style.opacity = "1";
         document.getElementById('mantra-display').textContent = chakra.mantra;
         document.getElementById('mantra-display').style.color = chakra.color;
@@ -1417,6 +1432,11 @@ class MeditationController {
             : '';
 
         modal.classList.remove('hidden');
+
+        // DND Reminder
+        setTimeout(() => {
+            alert("Meditation complete. You can now turn off 'Do Not Disturb' if you wish.");
+        }, 500);
     }
 
     stop() {
@@ -1475,6 +1495,7 @@ const state = {
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
+    deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1493,6 +1514,8 @@ function getMoonPhase() {
     if (pos < 22.15) return 'full';
     return 'waning';
 }
+
+init();
 
 function init() {
     setupVoices();
@@ -1658,6 +1681,15 @@ function loadPreferences() {
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
 
+    const deityRadios = document.getElementsByName('deity-path');
+    setTimeout(() => {
+        console.log("Setting deity radio to:", state.deityPath);
+        deityRadios.forEach(r => {
+            r.checked = (r.value === state.deityPath);
+            console.log(`Radio ${r.value} is ${r.checked}`);
+        });
+    }, 0);
+
     // Sync Journey Timings Sliders
     syncValue('time-icebreaker', state.timeIcebreaker);
     setText('display-icebreaker', state.timeIcebreaker + 's');
@@ -1723,11 +1755,15 @@ function attachEventListeners() {
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
+        const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
+        state.deityPath = selectedDeity ? selectedDeity.value : 'none';
+        
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
+        localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
@@ -1790,6 +1826,7 @@ function attachEventListeners() {
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
+
     startMeditationBtn.addEventListener('click', () => {
         let order = [...state.selectedChakras];
         if (state.reverseJourney) order.reverse();
@@ -1911,6 +1948,6 @@ function attachEventListeners() {
 
     // Initial estimate on load
     updateSessionEstimate();
-}
+} // Closes attachEventListeners
 
 init();
