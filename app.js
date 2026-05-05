@@ -199,7 +199,7 @@ class AudioEngine {
             this.presenceFilter = this.ctx.createBiquadFilter();
             this.presenceFilter.type = 'highshelf';
             this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-            this.presenceFilter.gain.setValueAtTime(state.eyesMode === 'closed' ? -12 : -6, this.ctx.currentTime);
+            this.presenceFilter.gain.setValueAtTime(state.eyesMode === 'closed' ? -6 : -3, this.ctx.currentTime);
         }
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
@@ -1254,10 +1254,10 @@ class MeditationController {
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
 
-        // Activate Frequency Carving (-4dB notch at 2.5kHz) to 'seat' the voice gently
+        // Activate Frequency Carving (+2dB boost at 2.5kHz) for speech intelligibility
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(-4, this.audio.ctx.currentTime + 1.5);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(2, this.audio.ctx.currentTime + 1.5);
         }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
@@ -1268,8 +1268,7 @@ class MeditationController {
             // Wait while paused
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
 
-            const narrationTextEl = document.getElementById('narration-text');
-            if (narrationTextEl) narrationTextEl.textContent = sentence.trim();
+            setText('narration-text', sentence.trim());
 
             await new Promise(resolve => {
                 const utterance = new SpeechSynthesisUtterance(sentence);
@@ -1283,7 +1282,7 @@ class MeditationController {
                 // Studio Clarity: Breath-aligned pacing
                 const baseRate = state.sleepMode ? 0.62 : 0.72;
                 utterance.rate   = state.eyesMode === 'closed' ? baseRate * 0.95 : baseRate;
-                utterance.pitch  = state.eyesMode === 'closed' ? 0.88 : 1.05; // Dropped further to 0.88 for body resonance
+                utterance.pitch  = state.eyesMode === 'closed' ? 0.94 : 1.05; // Balanced 0.94 for comfort
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
@@ -1323,8 +1322,8 @@ class MeditationController {
                 continue;
             }
 
-            // Increased space (2.5s) between sentences for deep absorption
-            await new Promise(r => setTimeout(r, 2500));
+            // Breath-aligned space (1.5s) between sentences for comfort
+            await new Promise(r => setTimeout(r, 1500));
         }
 
         // Release Frequency Carving after narration ends
