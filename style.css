@@ -18,27 +18,44 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-family);
-    display: flex;
-    justify-content: center;
-    align-items: safe center; /* Centered, but allows scrolling if content is tall */
-    min-height: 100vh;
     margin: 0;
-    padding: 20px 0; /* Add some vertical space for mobile */
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     user-select: none;
+}
+
+/* Centering trick that avoids top-clipping on tall content */
+body::before,
+body::after {
+    content: "";
+    flex: 1;
 }
 
 #app {
     width: 100%;
     max-width: 500px;
-    padding: 2rem;
+    padding: 2rem 1.5rem;
+    padding-top: calc(2rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
     text-align: center;
     position: relative;
     z-index: 3;
-    margin: auto; /* Ensures centering in scrollable container */
+    /* Removed margin: auto 0 to use the body::before/after trick instead */
 }
 
 #aura-bg {
@@ -602,7 +619,10 @@ input[type="range"]::-moz-range-progress {
 @media (max-width: 600px) {
     #app {
         padding: 1.5rem;
+        padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     }
+    .screen { gap: 1.5rem; }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
 }
