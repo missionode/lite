@@ -265,11 +265,6 @@ input[type="range"]::-moz-range-progress {
 }
 
 /* Meditation Styles */
-#meditation-screen {
-    display: flex;
-    flex-direction: column;
-}
-
 #chakra-container {
     width: 100%;
     position: relative;
