@@ -41,6 +41,14 @@
             </div>
 
             <div class="config-group">
+                <label for="eyes-mode-select">Eyes Mode</label>
+                <select id="eyes-mode-select">
+                    <option value="closed">Eyes Closed (Grounded & Warm)</option>
+                    <option value="open">Eyes Open (Crisp & Clear)</option>
+                </select>
+            </div>
+
+            <div class="config-group">
                 <label for="voice-select">Narration Voice</label>
                 <select id="voice-select">
                     <option value="">Detecting voices...</option>
@@ -65,12 +73,26 @@
             <div class="config-group" style="margin-top: 1rem;">
                 <label>Options</label>
                 <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> Enable Audio Filters (Warmth)</label>
+                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="box-meditation-toggle"> Box Meditation</label>
                 <label class="checkbox-label"><input type="checkbox" id="hooponopono-toggle"> Ho'oponopono</label>
+                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
             </div>
 
-            <div class="config-group" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-                <label>Audio Levels</label>
+            <div class="config-group" style="margin-top: 1rem;">
+                <label>Presiding Deities</label>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
+                    <label class="radio-label"><input type="radio" name="deity-path" value="none" checked> None</label>
+                    <label class="radio-label"><input type="radio" name="deity-path" value="shakthi"> Shakti (Feminine)</label>
+                    <label class="radio-label"><input type="radio" name="deity-path" value="shiva"> Shiva (Masculine)</label>
+                </div>
+            </div>
+
+            <p style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 1rem;">
+                💡 For best results, enable <b>Do Not Disturb</b> on your device to block notifications.
+            </p>
+
+            <div class="config-group" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">                <label>Audio Levels</label>
                 <div class="settings-mixer" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; margin: 0.5rem auto 0;">
                     <div class="mixer-row">
                         <label style="font-size: 0.8rem; width: 60px; text-align: left;">Voice</label>
@@ -180,30 +202,30 @@
 
         <!-- Meditation Screen -->
         <section id="meditation-screen" class="screen hidden">
-            <div id="timer-display" class="timer">00:00</div>
-            <div id="chakra-container">
-                <div class="chakra-gold-ring"></div>
-                <img id="chakra-symbol" src="" alt="Chakra Symbol">
+            <div id="chakra-container" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img id="chakra-symbol" src="" alt="Deity Image" style="width: 100%; height: 100%; object-fit: contain;">
                 <div id="glow-effect"></div>
             </div>
-            <div id="mantra-display"></div>
-            <div id="narration-text"></div>
-            
-            <!-- Progress Journey Dots -->
-            <div id="progress-tracker">
-                <div class="dot" data-chakra="root"></div>
-                <div class="dot" data-chakra="sacral"></div>
-                <div class="dot" data-chakra="solar"></div>
-                <div class="dot" data-chakra="heart"></div>
-                <div class="dot" data-chakra="throat"></div>
-                <div class="dot" data-chakra="thirdeye"></div>
-                <div class="dot" data-chakra="crown"></div>
+
+            <div id="session-overlay" style="padding: 10px 20px 10px 20px; margin-top: auto;">
+                <div id="timer-display" class="timer" style="position: relative; margin-bottom: 10px; font-size: 0.9rem; opacity: 0.5;">00:00</div>
+                <div id="mantra-display" style="font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px;"></div>
+                
+                <div id="progress-tracker" style="margin-top: 20px; margin-bottom: 80px; display: flex; justify-content: center; gap: 16px;">
+                    <div class="dot" data-chakra="root"></div>
+                    <div class="dot" data-chakra="sacral"></div>
+                    <div class="dot" data-chakra="solar"></div>
+                    <div class="dot" data-chakra="heart"></div>
+                    <div class="dot" data-chakra="throat"></div>
+                    <div class="dot" data-chakra="thirdeye"></div>
+                    <div class="dot" data-chakra="crown"></div>
+                </div>
             </div>
 
-            <div id="controls">
-                <button id="btn-mixer" class="icon-btn">🎚</button>
-                <button id="pause-meditation" class="icon-btn">II</button>
-                <button id="stop-meditation" class="icon-btn">✕</button>
+            <div id="controls" style="position: fixed; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 10px; backdrop-filter: blur(10px);">
+                <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
+                <button id="pause-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">II</button>
+                <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
             </div>
 
             <!-- In-Session Volume Mixer -->
@@ -262,6 +284,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.50"></script>
+    <script src="app.js?v=1.51"></script>
 </body>
 </html>

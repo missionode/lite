@@ -17,11 +17,6 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
 }
-
-html {
-    height: 100%;
-}
-
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -29,13 +24,14 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+<<<<<<< chakra-reverse-journey
+    justify-content: center;
+=======
     flex-direction: column;
     align-items: stretch; /* instead of center */
+>>>>>>> main
     min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    margin: 0;
     user-select: none;
 }
 
@@ -49,9 +45,17 @@ body {
     margin: 0 auto; /* kill auto centering */
 }
 
-#aura-bg {
+#meditation-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh !important;
+    overflow: hidden;
     position: fixed;
     top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -90,7 +94,10 @@ body {
 .screen {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 2.5rem;
+    height: 100vh;
     animation: fadeIn 1.2s ease-out;
 }
 
@@ -282,44 +289,25 @@ input[type="range"]::-moz-range-progress {
 
 /* Meditation Styles */
 #chakra-container {
+    width: 100%;
     position: relative;
-    width: 220px;
-    height: 220px;
-    margin: 0 auto;
-}
-
-.chakra-gold-ring {
-    position: absolute;
-    inset: -12px;
-    border-radius: 50%;
-    border: 1px solid rgba(251, 191, 36, 0.25);
-    pointer-events: none;
+    /* Container style moved to inline html for flex control */
 }
 
 #chakra-symbol {
     width: 100%;
-    height: 100%;
+    max-height: 55vh; /* Ensure plenty of room for controls at bottom */
     object-fit: contain;
     z-index: 2;
-    position: relative;
-    transition: opacity 1s ease;
-    /* Removed drop-shadow filter to save GPU power */
+    transition: opacity 1.2s ease;
+}
+
+.chakra-gold-ring {
+    display: none; /* Removed as requested */
 }
 
 #glow-effect {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 70%);
-    border-radius: 50%;
-    filter: blur(30px); /* Reduced blur radius */
-    opacity: 0.5;
-    z-index: 1;
-    transition: background 2s ease;
-    will-change: background; /* Hardware acceleration hint */
+    display: none;
 }
 
 #mantra-display {
