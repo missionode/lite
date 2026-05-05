@@ -738,10 +738,11 @@ class VisualEngine {
         this.glow = document.getElementById('glow-effect');
     }
     startPulsing(color) {
+        if (state.eyesMode === 'closed') return; // Absolute Blackout
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
-        // No loops to stop
+        if (this.glow) this.glow.style.background = 'transparent';
     }
 }
 
@@ -1183,15 +1184,15 @@ class MeditationController {
             } else dot.classList.remove('active', 'completed');
         });
         const aura = document.getElementById('aura-bg');
-        aura.style.background = `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
-        aura.style.opacity = "1";
+        aura.style.background = state.eyesMode === 'closed' ? 'transparent' : `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
+        aura.style.opacity = state.eyesMode === 'closed' ? "0" : "1";
         
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
 
         this.audio.startDrone(chakra.frequency, absoluteIndex);
 
-        this.visual.startPulsing(chakra.color);
+        if (state.eyesMode !== 'closed') this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
         if (!this.isMeditationActive) return;
 
@@ -1715,6 +1716,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_lang', state.language);
         state.eyesMode = document.getElementById('eyes-mode-select').value;
         localStorage.setItem('chakra_eyes_mode', state.eyesMode);
+        state.voiceName = voiceSelect.value;
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
         state.reverseJourney = getChecked('reverse-journey-toggle');
