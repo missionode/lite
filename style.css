@@ -21,6 +21,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     min-height: 100vh;
@@ -30,12 +32,12 @@ body {
 
 #app {
     width: 100%;
-    min-height: 100vh;
-    padding: 2rem 1rem;
+    max-width: 500px;
+    padding: 2rem 1.5rem;
     text-align: center;
     position: relative;
     z-index: 3;
-    overflow-y: auto;
+    margin: auto 0; /* Centering trick: stays top if tall, centers if short */
 }
 
 #meditation-screen {
@@ -92,6 +94,22 @@ body {
     gap: 2.5rem;
     height: 100vh;
     animation: fadeIn 1.2s ease-out;
+}
+
+/* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */
+.settings-screen-container {
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    .settings-screen-container {
+        gap: 1.5rem; /* Better balance for mobile settings */
+        padding-top: calc(2rem + env(safe-area-inset-top, 0px)); /* Extra room for notch */
+    }
 }
 
 .hidden {
@@ -591,7 +609,10 @@ input[type="range"]::-moz-range-progress {
 @media (max-width: 600px) {
     #app {
         padding: 1.5rem;
+        padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     }
+    .screen { gap: 1.5rem; }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
 }
