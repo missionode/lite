@@ -50,12 +50,9 @@ body::after {
     width: 100%;
     max-width: 500px;
     padding: 2rem 1.5rem;
-    padding-top: calc(2rem + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
     text-align: center;
     position: relative;
     z-index: 3;
-    /* Removed margin: auto 0 to use the body::before/after trick instead */
 }
 
 #aura-bg {
@@ -101,6 +98,23 @@ body::after {
     flex-direction: column;
     gap: 2.5rem;
     animation: fadeIn 1.2s ease-out;
+}
+
+/* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */
+.settings-screen-container {
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Start from top to prevent clipping */
+    min-height: 80vh; /* Ensure it takes enough space for centering trick */
+}
+
+@media (max-width: 600px) {
+    .settings-screen-container {
+        gap: 1.25rem; /* Tighter gap for settings on mobile */
+        padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+    }
 }
 
 .hidden {
