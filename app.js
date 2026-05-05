@@ -415,10 +415,12 @@ class AudioEngine {
         
         this.startElementalLayer(index);
 
-        // Fixed: Use sub-harmonics for high-frequency chakras to prevent ear fatigue
-        let droneFreq = baseFreq;
-        if (baseFreq > 600) droneFreq = baseFreq / 2; 
-        if (baseFreq > 900) droneFreq = baseFreq / 4; 
+        // Grounding: If Chakra Frequencies disabled, use a neutral base of 110Hz (A2)
+        const activeFreq = state.chakraFrequencies ? baseFreq : 110;
+
+        let droneFreq = activeFreq;
+        if (activeFreq > 600) droneFreq = activeFreq / 2; 
+        if (activeFreq > 900) droneFreq = activeFreq / 4; 
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
@@ -1471,6 +1473,7 @@ const state = {
     reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
+    chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1652,6 +1655,7 @@ function loadPreferences() {
     syncChecked('reverse-journey-toggle', state.reverseJourney);
     syncChecked('box-meditation-toggle', state.boxMeditation);
     syncChecked('hooponopono-toggle', state.hooponopono);
+    syncChecked('frequencies-toggle', state.chakraFrequencies);
 
     // Sync Journey Timings Sliders
     syncValue('time-icebreaker', state.timeIcebreaker);
@@ -1716,10 +1720,12 @@ function attachEventListeners() {
         state.reverseJourney = getChecked('reverse-journey-toggle');
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
+        state.chakraFrequencies = getChecked('frequencies-toggle');
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
+        localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
@@ -1780,6 +1786,7 @@ function attachEventListeners() {
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     startMeditationBtn.addEventListener('click', () => {
         let order = [...state.selectedChakras];
