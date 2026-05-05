@@ -181,6 +181,13 @@ class AudioEngine {
         this.lowCutFilter.frequency.setValueAtTime(80, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
+        // Eyes Close Mode Filter
+        this.eyesCloseFilter = this.ctx.createBiquadFilter();
+        this.eyesCloseFilter.type = 'lowpass';
+        this.eyesCloseFilter.frequency.setValueAtTime(2200, this.ctx.currentTime);
+        this.eyesCloseFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+        this.eyesCloseFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
         this.masterCompressor = this.ctx.createDynamicsCompressor();
         this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
         this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
@@ -243,6 +250,10 @@ class AudioEngine {
         this.pannerNode.connect(this.lowCutFilter);
         
         let lastNode = this.lowCutFilter;
+        // Inject Eyes Close Filter
+        lastNode.connect(this.eyesCloseFilter);
+        lastNode = this.eyesCloseFilter;
+
         if (this.voiceCarveFilter) {
             lastNode.connect(this.voiceCarveFilter);
             lastNode = this.voiceCarveFilter;
@@ -272,7 +283,16 @@ class AudioEngine {
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
+        // Apply initial Eyes Close state
+        this.toggleEyesCloseMode(state.eyesCloseMode);
+
         this.isInitialized = true;
+    }
+
+    toggleEyesCloseMode(enabled) {
+        if (!this.ctx) return;
+        const targetFreq = enabled ? 2200 : 20000;
+        this.eyesCloseFilter.frequency.exponentialRampToValueAtTime(targetFreq, this.ctx.currentTime + 0.5);
     }
 
     makeDistortionCurve(amount) {
@@ -1390,6 +1410,7 @@ const state = {
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
+    eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1563,6 +1584,8 @@ function loadPreferences() {
     document.getElementById('audio-filters-toggle').checked = state.audioFilters;
     document.getElementById('box-meditation-toggle').checked = state.boxMeditation;
     document.getElementById('hooponopono-toggle').checked = state.hooponopono;
+    document.getElementById('eyes-close-mode-toggle').checked = state.eyesCloseMode;
+    if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
     // Sync Journey Timings Sliders
     document.getElementById('time-icebreaker').value = state.timeIcebreaker;
@@ -1616,9 +1639,12 @@ function attachEventListeners() {
         state.audioFilters = document.getElementById('audio-filters-toggle').checked;
         state.boxMeditation = document.getElementById('box-meditation-toggle').checked;
         state.hooponopono = document.getElementById('hooponopono-toggle').checked;
+        state.eyesCloseMode = document.getElementById('eyes-close-mode-toggle').checked;
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
+        localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');

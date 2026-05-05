@@ -634,6 +634,22 @@ input[type="range"]::-moz-range-progress {
     #mantra-display { font-size: 2.5rem; }
 }
 
+/* ── Eyes Close Mode ────────────────────────────────────────────────────────── */
+body.eyes-close-mode {
+    filter: sepia(0.3) brightness(0.85); /* Warm tone, lower brightness */
+    transition: filter 1s ease;
+}
+
+body.eyes-close-mode #app {
+    /* Soften text and remove complex shadows */
+    text-shadow: none;
+}
+
+body.eyes-close-mode .subtitle,
+body.eyes-close-mode .timer {
+    opacity: 0.4; /* Further reduce visual noise */
+}
+
 /* ── Sleep Mode Optimization ────────────────────────────────────────────────── */
 body.sleep-mode-active #app {
     filter: brightness(0.18);
