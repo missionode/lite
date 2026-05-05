@@ -39,13 +39,6 @@ body {
     user-select: none;
 }
 
-/* Centering trick that avoids top-clipping on tall content */
-body::before,
-body::after {
-    content: "";
-    flex: 1;
-}
-
 #app {
     width: 100%;
     max-width: 500px;
@@ -53,6 +46,7 @@ body::after {
     text-align: center;
     position: relative;
     z-index: 3;
+    margin: auto 0; /* Centering trick: stays top if tall, centers if short */
 }
 
 #aura-bg {
@@ -102,18 +96,17 @@ body::after {
 
 /* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */
 .settings-screen-container {
-    padding-top: env(safe-area-inset-top, 20px);
-    padding-bottom: env(safe-area-inset-bottom, 40px);
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Start from top to prevent clipping */
-    min-height: 80vh; /* Ensure it takes enough space for centering trick */
+    justify-content: center;
 }
 
 @media (max-width: 600px) {
     .settings-screen-container {
-        gap: 1.25rem; /* Tighter gap for settings on mobile */
-        padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+        gap: 1.5rem; /* Better balance for mobile settings */
+        padding-top: calc(2rem + env(safe-area-inset-top, 0px)); /* Extra room for notch */
     }
 }
 
