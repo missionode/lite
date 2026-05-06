@@ -1644,6 +1644,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
