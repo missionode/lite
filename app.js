@@ -181,7 +181,7 @@ class AudioEngine {
         // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
         // Only enabled in 'Open' mode for crispness. Disabled in 'Closed' for warmth.
         this.exciter = this.ctx.createWaveShaper();
-        if (state.eyesMode === 'open') {
+        if (!state.eyesCloseMode) {
             this.exciter.curve = this.makeDistortionCurve(0.002); 
         } else {
             // Straight line curve = no distortion
@@ -199,13 +199,13 @@ class AudioEngine {
             this.presenceFilter = this.ctx.createBiquadFilter();
             this.presenceFilter.type = 'highshelf';
             this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-            this.presenceFilter.gain.setValueAtTime(state.eyesMode === 'closed' ? -6 : -3, this.ctx.currentTime);
+            this.presenceFilter.gain.setValueAtTime(state.eyesCloseMode ? -6 : -3, this.ctx.currentTime);
         }
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
         // Grounding: Allow deeper frequencies in Closed mode (40Hz vs 80Hz)
-        this.lowCutFilter.frequency.setValueAtTime(state.eyesMode === 'closed' ? 40 : 80, this.ctx.currentTime);
+        this.lowCutFilter.frequency.setValueAtTime(state.eyesCloseMode ? 40 : 80, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
         // Eyes Close Mode Filter
@@ -302,7 +302,7 @@ class AudioEngine {
         this.masterCompressor.connect(this.ctx.destination);
 
         // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
-        if (state.eyesMode === 'closed') {
+        if (state.eyesCloseMode) {
             const anchorOsc = this.ctx.createOscillator();
             const anchorGain = this.ctx.createGain();
             anchorOsc.type = 'sine';
@@ -486,7 +486,7 @@ class AudioEngine {
         
         leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
         // Grounding: Add 2Hz Delta pulse in Closed mode to relax forehead
-        const drift = state.eyesMode === 'closed' ? 2.0 : 0;
+        const drift = state.eyesCloseMode ? 2.0 : 0;
         rightOsc.frequency.setValueAtTime(binauralCarrier + drift, this.ctx.currentTime);
         
         binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
@@ -758,7 +758,7 @@ class VisualEngine {
         this.glow = document.getElementById('glow-effect');
     }
     startPulsing(color) {
-        if (state.eyesMode === 'closed') return; // Absolute Blackout
+        if (state.eyesCloseMode) return; // Absolute Blackout
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
@@ -1219,15 +1219,15 @@ class MeditationController {
             } else dot.classList.remove('active', 'completed');
         });
         const aura = document.getElementById('aura-bg');
-        aura.style.background = state.eyesMode === 'closed' ? 'transparent' : `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
-        aura.style.opacity = state.eyesMode === 'closed' ? "0" : "1";
+        aura.style.background = state.eyesCloseMode ? 'transparent' : `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
+        aura.style.opacity = state.eyesCloseMode ? "0" : "1";
         
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
 
         this.audio.startDrone(chakra.frequency, absoluteIndex);
 
-        if (state.eyesMode !== 'closed') this.visual.startPulsing(chakra.color);
+        if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
         await this.narrate(chakra[state.language]);
         if (!this.isMeditationActive) return;
 
@@ -1319,8 +1319,8 @@ class MeditationController {
 
                 // Studio Clarity: Breath-aligned pacing
                 const baseRate = state.sleepMode ? 0.62 : 0.72;
-                utterance.rate   = state.eyesMode === 'closed' ? baseRate * 0.95 : baseRate;
-                utterance.pitch  = state.eyesMode === 'closed' ? 0.94 : 1.05; // Balanced 0.94 for comfort
+                utterance.rate   = state.eyesCloseMode ? baseRate * 0.95 : baseRate;
+                utterance.pitch  = state.eyesCloseMode ? 0.94 : 1.05; // Balanced 0.94 for comfort
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
                 // SAFETY: Browser Bug Fix
@@ -1494,7 +1494,6 @@ document.addEventListener('visibilitychange', async () => {
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
-    eyesMode: localStorage.getItem('chakra_eyes_mode') || 'closed',
     voiceName: localStorage.getItem('chakra_voice') || '',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
@@ -1663,7 +1662,6 @@ function testVoice() {
 
 function loadPreferences() {
     syncValue('language-select', state.language);
-    syncValue('eyes-mode-select', state.eyesMode);
     
     const timeSlider = document.getElementById('time-per-chakra');
     if (timeSlider) {
@@ -1755,10 +1753,6 @@ function showScreen(screen) {
 
 function attachEventListeners() {
     languageSelect.addEventListener('change', (e) => { state.language = e.target.value; autoSelectVoice(); });
-    const eyesSelect = document.getElementById('eyes-mode-select');
-    if (eyesSelect) {
-        eyesSelect.addEventListener('change', (e) => { state.eyesMode = e.target.value; });
-    }
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
@@ -1767,8 +1761,6 @@ function attachEventListeners() {
         state.selectedChakras = checked;
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
-        state.eyesMode = document.getElementById('eyes-mode-select').value;
-        localStorage.setItem('chakra_eyes_mode', state.eyesMode);
         state.voiceName = voiceSelect.value;
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
@@ -1859,7 +1851,7 @@ function attachEventListeners() {
         // Apply sleep mode dim class at session start
         if (state.sleepMode) document.body.classList.add('sleep-mode-active');
         // Absolute Grounding: Dim UI for Eyes Closed mode
-        if (state.eyesMode === 'closed') {
+        if (state.eyesCloseMode) {
             const app = document.getElementById('app');
             if (app) app.style.opacity = "0.2";
         }
