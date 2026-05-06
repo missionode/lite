@@ -208,6 +208,13 @@ class AudioEngine {
         this.lowCutFilter.frequency.setValueAtTime(state.eyesMode === 'closed' ? 40 : 80, this.ctx.currentTime);
         this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
 
+        // Eyes Close Mode Filter
+        this.eyesCloseFilter = this.ctx.createBiquadFilter();
+        this.eyesCloseFilter.type = 'lowpass';
+        this.eyesCloseFilter.frequency.setValueAtTime(2200, this.ctx.currentTime);
+        this.eyesCloseFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+        this.eyesCloseFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
         this.masterCompressor = this.ctx.createDynamicsCompressor();
         this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
         this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
@@ -270,6 +277,10 @@ class AudioEngine {
         this.pannerNode.connect(this.lowCutFilter);
         
         let lastNode = this.lowCutFilter;
+        // Inject Eyes Close Filter
+        lastNode.connect(this.eyesCloseFilter);
+        lastNode = this.eyesCloseFilter;
+
         if (this.voiceCarveFilter) {
             lastNode.connect(this.voiceCarveFilter);
             lastNode = this.voiceCarveFilter;
@@ -314,7 +325,16 @@ class AudioEngine {
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.lowCutFilter);
 
+        // Apply initial Eyes Close state
+        this.toggleEyesCloseMode(state.eyesCloseMode);
+
         this.isInitialized = true;
+    }
+
+    toggleEyesCloseMode(enabled) {
+        if (!this.ctx) return;
+        const targetFreq = enabled ? 2200 : 20000;
+        this.eyesCloseFilter.frequency.exponentialRampToValueAtTime(targetFreq, this.ctx.currentTime + 0.5);
     }
 
     makeDistortionCurve(amount) {
@@ -1496,6 +1516,7 @@ const state = {
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
+    eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1680,13 +1701,13 @@ function loadPreferences() {
     syncChecked('box-meditation-toggle', state.boxMeditation);
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
+    syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
+    if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
     const deityRadios = document.getElementsByName('deity-path');
     setTimeout(() => {
-        console.log("Setting deity radio to:", state.deityPath);
         deityRadios.forEach(r => {
             r.checked = (r.value === state.deityPath);
-            console.log(`Radio ${r.value} is ${r.checked}`);
         });
     }, 0);
 
@@ -1755,6 +1776,7 @@ function attachEventListeners() {
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
+        state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         
@@ -1764,6 +1786,9 @@ function attachEventListeners() {
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
+        localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
+        document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
@@ -1839,8 +1864,15 @@ function attachEventListeners() {
             if (app) app.style.opacity = "0.2";
         }
         meditation.start();
-    });    document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
+    });
+    document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
     document.getElementById('stop-meditation').addEventListener('click', () => meditation.stop());
+    document.getElementById('eyes-close-mode-toggle').addEventListener('change', (e) => {
+        state.eyesCloseMode = e.target.checked;
+        localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
+        document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
+    });
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
         showScreen(lobbyScreen);
