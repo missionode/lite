@@ -784,10 +784,13 @@ class MeditationController {
         const step = 100;
         while (remaining > 0) {
             if (!this.isMeditationActive) break;
-            if (!this.isPaused) {
+            if (this.isPaused) {
+                // Keep waiting while paused
+                await new Promise(r => setTimeout(r, step));
+            } else {
                 remaining -= step;
+                await new Promise(r => setTimeout(r, step));
             }
-            await new Promise(r => setTimeout(r, step));
         }
     }
 
@@ -1104,41 +1107,19 @@ class MeditationController {
     }
 
     togglePause() {
-        console.log("MeditationController: togglePause called. Current isPaused:", this.isPaused);
+        console.log("DEBUG: togglePause called. Prev state isPaused:", this.isPaused);
         this.isPaused = !this.isPaused;
+        console.log("DEBUG: togglePause updated isPaused to:", this.isPaused);
         const btn = document.getElementById('pause-meditation');
         if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
         
         if (this.isPaused) {
             console.log("Action: Pausing session...");
-            // Speech
-            if (window.speechSynthesis) {
-                console.log("Cancelling speech...");
-                // Note: pause() before cancel() can cause hangs on Safari. Just cancel.
-                window.speechSynthesis.cancel(); 
-            }
-            // Audio Context
-            if (this.audio && this.audio.ctx) {
-                console.log("Suspending AudioContext. Current state:", this.audio.ctx.state);
-                this.audio.ctx.suspend().then(() => {
-                    console.log("AudioContext suspended successfully. State:", this.audio.ctx.state);
-                }).catch(err => {
-                    console.error("Failed to suspend AudioContext:", err);
-                });
-            }
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
+            if (this.audio && this.audio.ctx) this.audio.ctx.suspend();
         } else {
             console.log("Action: Resuming session...");
-            if (window.speechSynthesis) {
-                // resume() is not enough after cancel(), but narrate() loop will handle replay
-            }
-            if (this.audio && this.audio.ctx) {
-                console.log("Resuming AudioContext. Current state:", this.audio.ctx.state);
-                this.audio.ctx.resume().then(() => {
-                    console.log("AudioContext resumed successfully. State:", this.audio.ctx.state);
-                }).catch(err => {
-                    console.error("Failed to resume AudioContext:", err);
-                });
-            }
+            if (this.audio && this.audio.ctx) this.audio.ctx.resume();
         }
     }
 
@@ -1287,6 +1268,10 @@ class MeditationController {
 
         while (elapsed < chantDurationMs) {
             if (!this.isMeditationActive) break;
+            
+            // Explicit pause check
+            await this.pauseAwareSleep(0);
+
             if (!this.isPaused) {
                 elapsed += 100;
                 const remaining = Math.max(0, chantDurationMs - elapsed);
@@ -1943,13 +1928,13 @@ function attachEventListeners() {
 
     document.getElementById('pause-meditation').addEventListener('click', (e) => {
         console.log("Pause/Play button clicked");
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         meditation.togglePause();
     });
 
     document.getElementById('stop-meditation').addEventListener('click', (e) => {
         console.log("Stop button clicked");
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         meditation.stop();
     });
     document.getElementById('eyes-close-mode-toggle').addEventListener('change', (e) => {
