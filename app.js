@@ -779,6 +779,18 @@ class MeditationController {
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
+    async pauseAwareSleep(ms) {
+        let remaining = ms;
+        const step = 100;
+        while (remaining > 0) {
+            if (!this.isMeditationActive) break;
+            if (!this.isPaused) {
+                remaining -= step;
+            }
+            await new Promise(r => setTimeout(r, step));
+        }
+    }
+
     async start() {
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
@@ -822,6 +834,8 @@ class MeditationController {
             this.isHighEnergy = getChecked('high-energy-toggle');
             
             setText('pause-meditation', 'II');
+            const controls = document.getElementById('controls');
+            if (controls) controls.classList.remove('hidden');
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
@@ -831,16 +845,15 @@ class MeditationController {
             this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
             for (let i = state.timeIcebreaker; i > 0; i--) {
                 if (!this.isMeditationActive) return;
-                while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+                await this.pauseAwareSleep(1000);
                 if (icebreakerTimer) icebreakerTimer.textContent = i;
-                await new Promise(r => setTimeout(r, 1000));
             }
 
             // Transition to Preparation
             showScreen(breathingScreen);
 
             // Initial Settle (2 seconds)
-            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 2000));
+            if (this.isMeditationActive) await this.pauseAwareSleep(2000);
 
             if (this.isMeditationActive) await this.runGratitude();
             if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
@@ -850,7 +863,7 @@ class MeditationController {
             if (this.isMeditationActive) showScreen(meditationScreen);
             
             // Settle after breathing (3 seconds)
-            if (this.isMeditationActive) await new Promise(r => setTimeout(r, 3000));
+            if (this.isMeditationActive) await this.pauseAwareSleep(3000);
 
             if (this.isMeditationActive) {
                 if (this.isHighEnergy) {
@@ -900,7 +913,7 @@ class MeditationController {
             tutTitle.textContent = state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon";
             tutText.textContent = moonText;
             await this.narrate(moonText, false); // Keep music playing
-            await new Promise(r => setTimeout(r, 1000));
+            await this.pauseAwareSleep(1000);
         }
 
         // Main gratitude + body scan
@@ -980,8 +993,16 @@ class MeditationController {
                 for (let s = state.timeBreathing; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
-                    while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
-                    await new Promise(r => setTimeout(r, 1000));
+                    
+                    // More responsive pause: check every 100ms
+                    let elapsed = 0;
+                    while (elapsed < 1000) {
+                        if (!this.isMeditationActive) return;
+                        if (!this.isPaused) {
+                            elapsed += 100;
+                        }
+                        await new Promise(r => setTimeout(r, 100));
+                    }
                 }
             }
         }
@@ -1030,7 +1051,16 @@ class MeditationController {
             const transitionSecond = 60; // 1 minute remaining mark
             for (let i = totalSeconds; i > 0; i--) {
                 if (!this.isMeditationActive) return;
-                while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
+                
+                // More responsive pause: check every 100ms
+                let elapsed = 0;
+                while (elapsed < 1000) {
+                    if (!this.isMeditationActive) return;
+                    if (!this.isPaused) {
+                        elapsed += 100;
+                    }
+                    await new Promise(r => setTimeout(r, 100));
+                }
                 
                 if (timer) timer.textContent = i;
 
@@ -1074,19 +1104,41 @@ class MeditationController {
     }
 
     togglePause() {
+        console.log("MeditationController: togglePause called. Current isPaused:", this.isPaused);
         this.isPaused = !this.isPaused;
         const btn = document.getElementById('pause-meditation');
-        btn.textContent = this.isPaused ? '▶' : 'II';
+        if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
         
         if (this.isPaused) {
-            window.speechSynthesis.pause();
-            // Force cancel to resolve pending narration promises and prevent browser hangs on resume.
-            // Our narrate() loop will detect this and replay the interrupted sentence on resume.
-            window.speechSynthesis.cancel();
-            if (this.audio.ctx) this.audio.ctx.suspend();
+            console.log("Action: Pausing session...");
+            // Speech
+            if (window.speechSynthesis) {
+                console.log("Cancelling speech...");
+                // Note: pause() before cancel() can cause hangs on Safari. Just cancel.
+                window.speechSynthesis.cancel(); 
+            }
+            // Audio Context
+            if (this.audio && this.audio.ctx) {
+                console.log("Suspending AudioContext. Current state:", this.audio.ctx.state);
+                this.audio.ctx.suspend().then(() => {
+                    console.log("AudioContext suspended successfully. State:", this.audio.ctx.state);
+                }).catch(err => {
+                    console.error("Failed to suspend AudioContext:", err);
+                });
+            }
         } else {
-            window.speechSynthesis.resume();
-            if (this.audio.ctx) this.audio.ctx.resume();
+            console.log("Action: Resuming session...");
+            if (window.speechSynthesis) {
+                // resume() is not enough after cancel(), but narrate() loop will handle replay
+            }
+            if (this.audio && this.audio.ctx) {
+                console.log("Resuming AudioContext. Current state:", this.audio.ctx.state);
+                this.audio.ctx.resume().then(() => {
+                    console.log("AudioContext resumed successfully. State:", this.audio.ctx.state);
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext:", err);
+                });
+            }
         }
     }
 
@@ -1169,7 +1221,7 @@ class MeditationController {
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.3";
         this.visual.stop();
-        await new Promise(r => setTimeout(r, 2000));
+        await this.pauseAwareSleep(2000);
         const breatheText = state.language === 'ml' ? "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ" : "Take a break... breathe and prepare... for the next chakra";
         this.narrateFeeble(breatheText);
         const intervalMs = state.timeInterval * 1000;
@@ -1202,11 +1254,6 @@ class MeditationController {
         } else {
             symbolEl.src = chakra.symbol;
         }
-        // Toggle text overlay on click of the image area for immersion
-        symbolEl.addEventListener('click', () => {
-            const overlay = document.getElementById('session-overlay');
-            if (overlay) overlay.style.display = (overlay.style.display === 'none') ? 'block' : 'none';
-        });
 
         symbolEl.style.opacity = "1";
         document.getElementById('mantra-display').textContent = chakra.mantra;
@@ -1253,7 +1300,7 @@ class MeditationController {
 
         // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
-        await new Promise(r => setTimeout(r, 4000));
+        await this.pauseAwareSleep(4000);
 
         if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
     }
@@ -1323,14 +1370,26 @@ class MeditationController {
                 utterance.pitch  = state.eyesCloseMode ? 0.94 : 1.05; // Balanced 0.94 for comfort
                 utterance.volume = 1.0; // Boosted for mobile speakers
                 
-                // SAFETY: Browser Bug Fix
-                // Chrome/Brave sometimes fails to fire 'onend'. 
-                // We add a timeout as a fallback so the app never hangs.
                 let isResolved = false;
+                
+                // Safety: Resolve promise immediately if pause is detected
+                const pauseCheck = setInterval(() => {
+                    if (this.isPaused || !this.isMeditationActive) {
+                        if (!isResolved) {
+                            console.log("Narrate: Pause detected, resolving promise.");
+                            isResolved = true;
+                            clearInterval(pauseCheck);
+                            clearTimeout(safetyTimeout);
+                            resolve();
+                        }
+                    }
+                }, 100);
+
                 const safetyTimeout = setTimeout(() => {
                     if (!isResolved) {
                         console.warn("Safety Timeout: Speech engine hung.");
                         isResolved = true;
+                        clearInterval(pauseCheck);
                         resolve();
                     }
                 }, (sentence.length * 200) + 3000); // More generous buffer
@@ -1338,6 +1397,7 @@ class MeditationController {
                 utterance.onend = () => {
                     if (!isResolved) {
                         isResolved = true;
+                        clearInterval(pauseCheck);
                         clearTimeout(safetyTimeout);
                         resolve();
                     }
@@ -1346,6 +1406,7 @@ class MeditationController {
                     console.error("SpeechSynthesis Error:", e);
                     if (!isResolved) {
                         isResolved = true;
+                        clearInterval(pauseCheck);
                         clearTimeout(safetyTimeout);
                         resolve();
                     }
@@ -1393,18 +1454,12 @@ class MeditationController {
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.2";
         this.audio.stopDrone();
-        let elapsed = 0;
         const silenceTime = 60000;
         const timerEl = document.getElementById('timer-display');
-        while (elapsed < silenceTime) {
+        for (let i = 60; i > 0; i--) {
             if (!this.isMeditationActive) break;
-            if (!this.isPaused) {
-                elapsed += 100;
-                const remaining = silenceTime - elapsed;
-                const secs = Math.ceil(remaining / 1000);
-                if (timerEl) timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
-            }
-            await new Promise(r => setTimeout(r, 100));
+            if (timerEl) timerEl.textContent = `00:${i.toString().padStart(2, '0')}`;
+            await this.pauseAwareSleep(1000);
         }
     }
 
@@ -1430,6 +1485,10 @@ class MeditationController {
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
         if (app) app.style.opacity = "1";
+        const controls = document.getElementById('controls');
+        if (controls) controls.classList.add('hidden');
+        const mixer = document.getElementById('volume-mixer');
+        if (mixer) mixer.classList.add('hidden');
 
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
@@ -1468,6 +1527,10 @@ class MeditationController {
         const aura = document.getElementById('aura-bg');
         if (aura) aura.style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
+        const controls = document.getElementById('controls');
+        if (controls) controls.classList.add('hidden');
+        const mixer = document.getElementById('volume-mixer');
+        if (mixer) mixer.classList.add('hidden');
         showScreen(lobbyScreen);
     }
 }
@@ -1516,6 +1579,7 @@ const state = {
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
+    brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
@@ -1722,6 +1786,9 @@ function loadPreferences() {
     syncValue('time-interval', state.timeInterval);
     setText('display-interval', state.timeInterval + 's');
     
+    syncValue('brightness-slider', state.brightness);
+    document.getElementById('app').style.opacity = state.brightness;
+    
     // Ensure voice matches the loaded language
     autoSelectVoice();
 }
@@ -1844,6 +1911,16 @@ function attachEventListeners() {
     document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
 
+    // Brightness slider
+    const brightnessSlider = document.getElementById('brightness-slider');
+    if (brightnessSlider) {
+        brightnessSlider.addEventListener('input', (e) => {
+            state.brightness = parseFloat(e.target.value);
+            localStorage.setItem('chakra_brightness', state.brightness);
+            document.getElementById('app').style.opacity = state.brightness;
+        });
+    }
+
     startMeditationBtn.addEventListener('click', () => {
         let order = [...state.selectedChakras];
         if (state.reverseJourney) order.reverse();
@@ -1853,12 +1930,28 @@ function attachEventListeners() {
         // Absolute Grounding: Dim UI for Eyes Closed mode
         if (state.eyesCloseMode) {
             const app = document.getElementById('app');
-            if (app) app.style.opacity = "0.2";
+            // Combine user brightness with eyes close dimming if needed, or just use user brightness
+            // Let's use user brightness as the master, but maybe cap it at 0.7 for eyes close mode
+            const targetOpacity = Math.min(state.brightness, 0.7);
+            if (app) app.style.opacity = targetOpacity;
         }
-        meditation.start();
+        meditation.start().catch(err => {
+            console.error("Failed to start meditation:", err);
+            alert("Failed to start meditation. Check console.");
+        });
     });
-    document.getElementById('pause-meditation').addEventListener('click', () => meditation.togglePause());
-    document.getElementById('stop-meditation').addEventListener('click', () => meditation.stop());
+
+    document.getElementById('pause-meditation').addEventListener('click', (e) => {
+        console.log("Pause/Play button clicked");
+        e.stopPropagation();
+        meditation.togglePause();
+    });
+
+    document.getElementById('stop-meditation').addEventListener('click', (e) => {
+        console.log("Stop button clicked");
+        e.stopPropagation();
+        meditation.stop();
+    });
     document.getElementById('eyes-close-mode-toggle').addEventListener('change', (e) => {
         state.eyesCloseMode = e.target.checked;
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
@@ -1869,6 +1962,15 @@ function attachEventListeners() {
         document.getElementById('completion-modal').classList.add('hidden');
         showScreen(lobbyScreen);
     });
+
+    // Toggle text overlay on click of the image area for immersion
+    const symbolEl = document.getElementById('chakra-symbol');
+    if (symbolEl) {
+        symbolEl.addEventListener('click', () => {
+            const overlay = document.getElementById('session-overlay');
+            if (overlay) overlay.style.display = (overlay.style.display === 'none') ? 'block' : 'none';
+        });
+    }
 
     // Intention input
     document.getElementById('intention-input').addEventListener('input', (e) => {
@@ -1903,8 +2005,16 @@ function attachEventListeners() {
         }
     });
     const mixer = document.getElementById('volume-mixer');
-    document.getElementById('btn-mixer').addEventListener('click', () => mixer.classList.toggle('hidden'));
-    document.getElementById('close-mixer').addEventListener('click', () => mixer.classList.add('hidden'));
+    document.getElementById('btn-mixer').addEventListener('click', (e) => {
+        console.log("Mixer button clicked. Current hidden state:", mixer.classList.contains('hidden'));
+        e.stopPropagation();
+        const isHidden = mixer.classList.toggle('hidden');
+        console.log("Mixer toggled. New hidden state:", isHidden);
+    });
+    document.getElementById('close-mixer').addEventListener('click', (e) => {
+        e.stopPropagation();
+        mixer.classList.add('hidden');
+    });
     // Unified Volume Handlers
     const syncVolume = (key, value, elements) => {
         state[key] = parseFloat(value);
