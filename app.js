@@ -235,9 +235,20 @@ class AudioEngine {
         this.bgMusicLPF.type = 'lowpass';
         this.bgMusicLPF.frequency.setValueAtTime(state.audioFilters ? 1200 : 20000, this.ctx.currentTime);
 
+        // Anti-Hum Filter: Targets the resonant "drone/hum" frequency
+        this.bgMusicHumFilter = this.ctx.createBiquadFilter();
+        this.bgMusicHumFilter.type = 'peaking'; // Peaking allows us to gently dip specific mid-frequencies
+        this.bgMusicHumFilter.frequency.setValueAtTime(450, this.ctx.currentTime); 
+        this.bgMusicHumFilter.gain.setValueAtTime(0, this.ctx.currentTime); 
+
+        this.bgMusicSmoothGain = this.ctx.createGain();
+        this.bgMusicSmoothGain.gain.value = state.eyesCloseMode ? 0.7 : 1.0;
+
         this.bgMusicGain.connect(this.bgMusicEQ);
         this.bgMusicEQ.connect(this.bgMusicLPF);
-        this.bgMusicLPF.connect(this.lowCutFilter);
+        this.bgMusicLPF.connect(this.bgMusicHumFilter);
+        this.bgMusicHumFilter.connect(this.bgMusicSmoothGain);
+        this.bgMusicSmoothGain.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -333,8 +344,41 @@ class AudioEngine {
 
     toggleEyesCloseMode(enabled) {
         if (!this.ctx) return;
-        const targetFreq = enabled ? 2200 : 20000;
-        this.eyesCloseFilter.frequency.exponentialRampToValueAtTime(targetFreq, this.ctx.currentTime + 0.5);
+        const now = this.ctx.currentTime;
+
+        // Dynamic Distortion Control: Swap curves to prevent "buzzing" from soft clipping
+        if (enabled) {
+            this.exciter.curve = new Float32Array([-1, 1]); // Clean
+        } else {
+            this.exciter.curve = this.makeDistortionCurve(0.002); // Studio Polish
+        }
+
+        // Target: Deep Smoothness. Lowered cutoff from 1200Hz to 1000Hz for "Closed" mode.
+        const targetFreq = enabled ? 1000 : 20000;
+        this.eyesCloseFilter.frequency.exponentialRampToValueAtTime(targetFreq, now + 2.0);
+
+        // Recede Instruments: Reduce BG music gain by 40% (was 30%) and tighten its dedicated LPF
+        const bgSmoothGainTarget = enabled ? 0.6 : 1.0;
+        const bgLPFTarget = enabled ? 600 : (state.audioFilters ? 1200 : 20000); // 600Hz removes all percussion "bite"
+        
+        // Anti-Buzz Notch: Widened and deepened to remove the "edge"
+        const bgNotchGain = enabled ? -24 : -12; 
+        this.bgMusicEQ.gain.exponentialRampToValueAtTime(Math.abs(bgNotchGain) * -1, now + 2.5);
+        this.bgMusicEQ.frequency.exponentialRampToValueAtTime(3000, now + 2.5);
+        // Widen the notch (lower Q) to catch a broader range of buzzy harmonics
+        this.bgMusicEQ.Q.exponentialRampToValueAtTime(enabled ? 0.4 : 1.5, now + 2.0);
+
+        // Anti-Hum smoothing: Target the 450Hz resonant "humming" frequency
+        const hummingGain = enabled ? -15 : 0; // -15dB dip for the hum
+        this.bgMusicHumFilter.gain.linearRampToValueAtTime(hummingGain, now + 2.5);
+
+        this.bgMusicSmoothGain.gain.exponentialRampToValueAtTime(bgSmoothGainTarget, now + 2.5);
+        this.bgMusicLPF.frequency.exponentialRampToValueAtTime(bgLPFTarget, now + 2.5);
+
+        if (this.presenceFilter) {
+            const presenceGain = enabled ? -12 : -3; // More aggressive high-shelf cut
+            this.presenceFilter.gain.linearRampToValueAtTime(presenceGain, now + 2.0);
+        }
     }
 
     makeDistortionCurve(amount) {
