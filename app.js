@@ -690,21 +690,31 @@ class AudioEngine {
     }
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
-        if (!this.bgMusicLoop) return;
-        const targetVol = isDucked ? state.volMusic * 0.45 : state.volMusic;
-        const targetEQ = isDucked ? -8 : 0; 
+        if (!this.bgMusicLoop || !this.ctx) return;
+        
+        // Support for boolean (legacy) and numeric (fine-tuned) volume levels
+        let factor = 1.0;
+        if (isDucked === true) factor = 0.45;
+        else if (typeof isDucked === 'number') factor = isDucked;
+
+        const targetVol = state.volMusic * factor;
+        const targetEQ = factor < 1.0 ? -8 : 0; 
         
         const now = this.ctx.currentTime;
-        // Studio Trick: We use the dedicated bgMusicGain for the volume fades
+        
+        // Web Audio API Tip: exponentialRampToValueAtTime cannot start from 0.
+        // We anchor the current value, but if it's 0, we jump it to a tiny non-zero value.
+        let startVol = this.bgMusicGain.gain.value;
+        if (startVol <= 0) startVol = 0.0001;
+
         this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
-        this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration); 
+        this.bgMusicGain.gain.setValueAtTime(startVol, now);
+        this.bgMusicGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, targetVol), now + duration); 
         
         this.bgMusicEQ.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
-        // Ensure the loop itself is running at a base gain of 1.0 so the bgMusicGain handles the mix
         this.bgMusicLoop.setGain(1.0);
     }
 
@@ -1046,8 +1056,11 @@ class MeditationController {
 
             await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
             
-            // Restore music to full volume after intro narration for the stillness period
-            this.audio.fadeInBackgroundMusic(4, false);
+            // Debug: Log volume change
+            console.log("DEBUG: Transitions to Corpse Pose stillness. Reducing volume factor to 0.30");
+            
+            // Explicitly trigger the 30% volume level with a slow 12s fade
+            this.audio.fadeInBackgroundMusic(12, 0.30);
 
             // Configurable Duration Countdown
             const totalSeconds = state.timeCorpse;
@@ -1070,8 +1083,8 @@ class MeditationController {
                 // At 1 minute remaining, narrate the transition to hypnagogic state
                 if (i === transitionSecond) {
                     await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
-                    // Restore music to full volume again after this narration
-                    this.audio.fadeInBackgroundMusic(4, false);
+                    console.log("DEBUG: Restoring Corpse Pose stillness volume factor (0.30)");
+                    this.audio.fadeInBackgroundMusic(12, 0.30);
                 }
 
                 await new Promise(r => setTimeout(r, 1000));
