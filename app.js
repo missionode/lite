@@ -691,8 +691,14 @@ class AudioEngine {
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
         if (!this.bgMusicLoop) return;
-        const targetVol = isDucked ? state.volMusic * 0.45 : state.volMusic;
-        const targetEQ = isDucked ? -8 : 0; 
+        
+        // Support for boolean (legacy) and numeric (fine-tuned) volume levels
+        let factor = 1.0;
+        if (isDucked === true) factor = 0.45;
+        else if (typeof isDucked === 'number') factor = isDucked;
+
+        const targetVol = state.volMusic * factor;
+        const targetEQ = factor < 1.0 ? -8 : 0; 
         
         const now = this.ctx.currentTime;
         // Studio Trick: We use the dedicated bgMusicGain for the volume fades
@@ -1046,8 +1052,8 @@ class MeditationController {
 
             await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
             
-            // Restore music to full volume after intro narration for the stillness period
-            this.audio.fadeInBackgroundMusic(4, false);
+            // Restore music to a dimmed level for deeper relaxation during corpse pose
+            this.audio.fadeInBackgroundMusic(8, 0.25);
 
             // Configurable Duration Countdown
             const totalSeconds = state.timeCorpse;
@@ -1070,8 +1076,8 @@ class MeditationController {
                 // At 1 minute remaining, narrate the transition to hypnagogic state
                 if (i === transitionSecond) {
                     await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
-                    // Restore music to full volume again after this narration
-                    this.audio.fadeInBackgroundMusic(4, false);
+                    // Restore music to dimmed level again after this narration
+                    this.audio.fadeInBackgroundMusic(8, 0.25);
                 }
 
                 await new Promise(r => setTimeout(r, 1000));
