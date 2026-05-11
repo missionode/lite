@@ -1143,6 +1143,96 @@ class MeditationController {
         }
     }
 
+    async runYogaSession() {
+        if (!this.isMeditationActive) return;
+
+        // Transition Screen
+        showScreen(icebreakerScreen);
+        const title = document.getElementById('icebreaker-title');
+        const subtitle = document.getElementById('icebreaker-subtitle');
+        const timer = document.getElementById('icebreaker-timer');
+
+        title.textContent = state.language === 'ml' ? "യോഗ" : "Yoga Bridge";
+        subtitle.textContent = state.language === 'ml' ? "ശരീരവും മനസ്സും തമ്മിലുള്ള യോജിപ്പ്" : "Union of body and spirit";
+        
+        // Grounding Drone for Yoga (136.1 Hz - OM frequency)
+        this.audio.startDrone(136.1, 3); // Using heart-level elemental layer for warmth
+        // Keep music at 30% deep smooth level
+        this.audio.fadeInBackgroundMusic(8, 0.30);
+
+        // Intro & Preparation
+        await this.narrate(this.scripts.yoga.intro[state.language], false);
+        await this.narrate(this.scripts.yoga.preparation[state.language], false);
+
+        // Prep Countdown
+        for (let i = state.timeYogaPrep; i > 0; i--) {
+            if (!this.isMeditationActive) return;
+            if (timer) timer.textContent = i;
+            await this.pauseAwareSleep(1000);
+        }
+
+        // Switch to main display for poses
+        showScreen(meditationScreen);
+        const symbolEl = document.getElementById('chakra-symbol');
+        const mantraEl = document.getElementById('mantra-display');
+        const narrationEl = document.getElementById('narration-text');
+        const timerEl = document.getElementById('timer-display');
+        
+        // Aura for Yoga
+        const aura = document.getElementById('aura-bg');
+        aura.style.background = 'radial-gradient(circle at center, #FFD70022, transparent)';
+        aura.style.opacity = '1';
+
+        const yogaPoses = this.scripts.yoga.poses.filter(p => state.selectedYogaPoses.includes(p.id));
+
+        for (const pose of yogaPoses) {
+            if (!this.isMeditationActive) break;
+
+            // Display Pose Name
+            mantraEl.textContent = state.language === 'ml' ? pose.name_ml : pose.name_en;
+            mantraEl.style.color = "#FFD700"; // Golden Yoga Color
+            
+            // Set pose-specific image
+            const imageMap = {
+                'balasana': 'symbols/Balasana.png',
+                'paschimottanasana': 'symbols/Paschimottanasana.png',
+                'vrikshasana': 'symbols/Vrikshasana.png',
+                'adho_mukha_svanasana': 'symbols/Downward_dog.png',
+                'marjaryasana': 'symbols/Marjaryasana.png'
+            };
+            symbolEl.src = imageMap[pose.id] || "symbols/Mahashakti.png";
+            symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
+
+            // Explain Pose
+            const desc = state.language === 'ml' ? pose.desc_ml : pose.desc_en;
+            await this.narrate(desc, false);
+
+            // Hold Timer
+            let remaining = state.timeYogaPose;
+            while (remaining > 0) {
+                if (!this.isMeditationActive) break;
+                if (!this.isPaused) {
+                    timerEl.textContent = `HOLD: ${remaining}s`;
+                    remaining--;
+                }
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            
+            if (this.isMeditationActive) {
+                const nextText = state.language === 'ml' ? "അടുത്ത ഭാവത്തിലേക്ക് തയ്യാറെടുക്കുക" : "Prepare for the next pose";
+                this.narrateSoft(nextText);
+                await this.pauseAwareSleep(5000); // 5s transition gap
+            }
+        }
+
+        // Final Settle
+        if (this.isMeditationActive) {
+            const settleText = state.language === 'ml' ? "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ." : "Yoga session complete. Settle back into stillness.";
+            await this.narrate(settleText, false);
+            await this.pauseAwareSleep(5000);
+        }
+    }
+
     async narrateSoft(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
@@ -1184,8 +1274,19 @@ class MeditationController {
         for (let i = 0; i < this.chakraOrder.length; i++) {
             const key = this.chakraOrder[i];
             if (!this.isMeditationActive) break;
+            
             await this.meditateOnChakra(this.scripts[key], key);
-            if (i < this.chakraOrder.length - 1 && this.isMeditationActive) await this.handleInterval();
+
+            // Yoga Bridge: If enabled and we just finished Third Eye (or the chakra before Crown)
+            const isLastChakra = (i === this.chakraOrder.length - 1);
+            const currentChakraIsCrown = (key === 'crown');
+            const nextChakraIsCrown = (!isLastChakra && this.chakraOrder[i+1] === 'crown');
+
+            if (state.yogaBridgeEnabled && nextChakraIsCrown && this.isMeditationActive) {
+                await this.runYogaSession();
+            }
+
+            if (!isLastChakra && this.isMeditationActive) await this.handleInterval();
         }
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
@@ -1622,11 +1723,15 @@ const state = {
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
+    yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
+    selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['balasana', 'paschimottanasana', 'vrikshasana', 'adho_mukha_svanasana', 'marjaryasana'],
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
-    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9
+    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9,
+    timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
+    timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60
 };
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -1808,6 +1913,16 @@ function loadPreferences() {
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
+    // Sync Yoga Settings
+    syncChecked('yoga-bridge-toggle', state.yogaBridgeEnabled);
+    const yogaSelection = document.getElementById('yoga-pose-selection');
+    if (yogaSelection) {
+        yogaSelection.style.display = state.yogaBridgeEnabled ? 'flex' : 'none';
+        yogaSelection.querySelectorAll('input').forEach(cb => {
+            cb.checked = state.selectedYogaPoses.includes(cb.value);
+        });
+    }
+
     const deityRadios = document.getElementsByName('deity-path');
     setTimeout(() => {
         deityRadios.forEach(r => {
@@ -1827,6 +1942,12 @@ function loadPreferences() {
     
     syncValue('time-interval', state.timeInterval);
     setText('display-interval', state.timeInterval + 's');
+
+    syncValue('time-yoga-prep', state.timeYogaPrep);
+    setText('display-yoga-prep', state.timeYogaPrep + 's');
+
+    syncValue('time-yoga-pose', state.timeYogaPose);
+    setText('display-yoga-pose', state.timeYogaPose + 's');
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
@@ -1878,6 +1999,8 @@ function attachEventListeners() {
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
+        state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
+        state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         
@@ -1888,6 +2011,8 @@ function attachEventListeners() {
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
+        localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
         localStorage.setItem('chakra_configured', 'true');
@@ -1896,15 +2021,32 @@ function attachEventListeners() {
         aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
         aura.style.opacity = '1';
     });
+
+    // Yoga Bridge Toggle Listener
+    const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
+    if (yogaBridgeToggle) {
+        yogaBridgeToggle.addEventListener('change', (e) => {
+            const selection = document.getElementById('yoga-pose-selection');
+            if (selection) selection.style.display = e.target.checked ? 'flex' : 'none';
+            updateSessionEstimate();
+        });
+    }
+
     function updateSessionEstimate() {
         const isHigh = getChecked('high-energy-toggle');
         const hasBox = getChecked('box-meditation-toggle');
         const hasHooponopono = getChecked('hooponopono-toggle');
+        const hasYoga = getChecked('yoga-bridge-toggle');
         
         let overhead = 5; // base overhead (gratitude, corpse, silence, etc)
         if (hasBox) overhead += 4; // box breathing cycles + narration
         if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
         
+        if (hasYoga) {
+            const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
+            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60); // prep + poses + transition gaps
+        }
+
         const estimate = isHigh
             ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 3) 
             : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 7);
@@ -1936,6 +2078,18 @@ function attachEventListeners() {
         localStorage.setItem('chakra_time_interval', state.timeInterval);
         updateSessionEstimate();
     });
+    document.getElementById('time-yoga-prep').addEventListener('input', (e) => {
+        state.timeYogaPrep = parseInt(e.target.value);
+        setText('display-yoga-prep', state.timeYogaPrep + 's');
+        localStorage.setItem('chakra_time_yoga_prep', state.timeYogaPrep);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-yoga-pose').addEventListener('input', (e) => {
+        state.timeYogaPose = parseInt(e.target.value);
+        setText('display-yoga-pose', state.timeYogaPose + 's');
+        localStorage.setItem('chakra_time_yoga_pose', state.timeYogaPose);
+        updateSessionEstimate();
+    });
 
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
@@ -1951,6 +2105,10 @@ function attachEventListeners() {
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('yoga-bridge-toggle').addEventListener('change', updateSessionEstimate);
+    document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
+        cb.addEventListener('change', updateSessionEstimate);
+    });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
 
     // Brightness slider
