@@ -1420,8 +1420,8 @@ class MeditationController {
         setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
         
         // Deity Image Selection
-        if (state.deityPath !== 'none') {
-            symbolEl.src = `presiding-deities/${state.deityPath}/${key}.png`;
+        if (state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath]) {
+            symbolEl.src = this.scripts.deities[state.deityPath][key];
         } else {
             symbolEl.src = chakra.symbol;
         }
