@@ -73,12 +73,16 @@
                 
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
-                    <div id="yoga-pose-selection" style="display:none; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;">
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="balasana" checked> Balasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="paschimottanasana" checked> Paschimottanasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="marjaryasana" checked> Marjaryasana</label>
+                    
+                    <div id="yoga-sub-options" style="display:none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <label class="checkbox-label"><input type="checkbox" id="bath-session-toggle"> Enable Bath Session</label>
+                        <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="balasana" checked> Balasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="paschimottanasana" checked> Paschimottanasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="marjaryasana" checked> Marjaryasana</label>
+                        </div>
                     </div>
                 </div>
                 
@@ -159,6 +163,11 @@
                         <label style="font-size: 0.8rem; width: 80px; text-align: left;">Yoga Pose</label>
                         <input type="range" id="time-yoga-pose" min="30" max="300" step="10" value="60">
                         <span id="display-yoga-pose" style="font-size: 0.7rem; width: 30px;">60s</span>
+                    </div>
+                    <div class="mixer-row" id="row-bath" style="display:none;">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Bath Time</label>
+                        <input type="range" id="time-bath" min="300" max="1800" step="60" value="600">
+                        <span id="display-bath" style="font-size: 0.7rem; width: 30px;">10m</span>
                     </div>
                 </div>
             </div>
