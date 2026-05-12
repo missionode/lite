@@ -1143,8 +1143,42 @@ class MeditationController {
         }
     }
 
+    async runBathSession() {
+        if (!this.isMeditationActive) return;
+
+        showScreen(icebreakerScreen);
+        const title = document.getElementById('icebreaker-title');
+        const subtitle = document.getElementById('icebreaker-subtitle');
+        const timer = document.getElementById('icebreaker-timer');
+
+        title.textContent = state.language === 'ml' ? this.scripts.bath_session.title.ml : this.scripts.bath_session.title.en;
+        subtitle.textContent = state.language === 'ml' ? "ശുദ്ധീകരണം" : "Purification";
+
+        await this.narrate(this.scripts.bath_session.intro[state.language], false);
+        await this.narrate(this.scripts.bath_session.instructions[state.language], false);
+
+        let remaining = state.timeBath;
+        const reminderSecond = 60;
+
+        while (remaining > 0) {
+            if (!this.isMeditationActive) return;
+            if (!this.isPaused) {
+                if (timer) timer.textContent = Math.floor(remaining / 60) + ":" + (remaining % 60).toString().padStart(2, '0');
+                
+                if (remaining === reminderSecond) {
+                    this.narrateSoft(this.scripts.bath_session.reminder[state.language]);
+                }
+                remaining--;
+            }
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+
     async runYogaSession() {
         if (!this.isMeditationActive) return;
+
+        // Perform bath first
+        await this.runBathSession();
 
         // Transition Screen
         showScreen(icebreakerScreen);
@@ -1219,16 +1253,14 @@ class MeditationController {
             }
             
             if (this.isMeditationActive) {
-                const nextText = state.language === 'ml' ? "അടുത്ത ഭാവത്തിലേക്ക് തയ്യാറെടുക്കുക" : "Prepare for the next pose";
-                this.narrateSoft(nextText);
+                this.narrateSoft(this.scripts.yoga.next_pose_prompt[state.language]);
                 await this.pauseAwareSleep(5000); // 5s transition gap
             }
         }
 
         // Final Settle
         if (this.isMeditationActive) {
-            const settleText = state.language === 'ml' ? "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ." : "Yoga session complete. Settle back into stillness.";
-            await this.narrate(settleText, false);
+            await this.narrate(this.scripts.yoga.session_complete[state.language], false);
             await this.pauseAwareSleep(5000);
         }
     }
@@ -1388,8 +1420,8 @@ class MeditationController {
         setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
         
         // Deity Image Selection
-        if (state.deityPath !== 'none') {
-            symbolEl.src = `presiding-deities/${state.deityPath}/${key}.png`;
+        if (state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath]) {
+            symbolEl.src = this.scripts.deities[state.deityPath][key];
         } else {
             symbolEl.src = chakra.symbol;
         }
@@ -1722,8 +1754,10 @@ const state = {
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
+    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') !== 'false', // Default true
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
+    bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
     selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['balasana', 'paschimottanasana', 'vrikshasana', 'adho_mukha_svanasana', 'marjaryasana'],
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
@@ -1731,7 +1765,8 @@ const state = {
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
     timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9,
     timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
-    timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60
+    timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
+    timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600
 };
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -1915,12 +1950,10 @@ function loadPreferences() {
 
     // Sync Yoga Settings
     syncChecked('yoga-bridge-toggle', state.yogaBridgeEnabled);
-    const yogaSelection = document.getElementById('yoga-pose-selection');
-    if (yogaSelection) {
-        yogaSelection.style.display = state.yogaBridgeEnabled ? 'flex' : 'none';
-        yogaSelection.querySelectorAll('input').forEach(cb => {
-            cb.checked = state.selectedYogaPoses.includes(cb.value);
-        });
+    syncChecked('bath-session-toggle', state.bathSessionEnabled);
+    const yogaSubOptions = document.getElementById('yoga-sub-options');
+    if (yogaSubOptions) {
+        yogaSubOptions.style.display = state.yogaBridgeEnabled ? 'flex' : 'none';
     }
 
     const deityRadios = document.getElementsByName('deity-path');
@@ -1948,6 +1981,9 @@ function loadPreferences() {
 
     syncValue('time-yoga-pose', state.timeYogaPose);
     setText('display-yoga-pose', state.timeYogaPose + 's');
+
+    syncValue('time-bath', state.timeBath);
+    setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
@@ -1999,7 +2035,9 @@ function attachEventListeners() {
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
+        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
+        state.bathSessionEnabled = getChecked('bath-session-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
@@ -2011,7 +2049,9 @@ function attachEventListeners() {
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
+        localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
@@ -2024,21 +2064,63 @@ function attachEventListeners() {
 
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
-        document.getElementById('row-breathing').style.display = getChecked('box-meditation-toggle') ? 'flex' : 'none';
+        const boxEnabled = getChecked('box-meditation-toggle');
+        const corpseEnabled = getChecked('corpse-pose-toggle');
+        const yogaEnabled = getChecked('yoga-bridge-toggle');
+        const bathEnabled = getChecked('bath-session-toggle');
+
+        const toggleDisplay = (id, show) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.style.display = show ? 'flex' : 'none';
+        };
+
+        toggleDisplay('row-breathing', boxEnabled);
+        toggleDisplay('row-corpse', corpseEnabled);
+        toggleDisplay('row-yoga-prep', yogaEnabled);
+        toggleDisplay('row-yoga-pose', yogaEnabled);
+        toggleDisplay('row-bath', yogaEnabled && bathEnabled);
         
-        const yogaVisible = getChecked('yoga-bridge-toggle');
-        document.getElementById('row-yoga-prep').style.display = yogaVisible ? 'flex' : 'none';
-        document.getElementById('row-yoga-pose').style.display = yogaVisible ? 'flex' : 'none';
-        
-        const yogaSelection = document.getElementById('yoga-pose-selection');
-        if (yogaSelection) {
-            yogaSelection.style.display = yogaVisible ? 'flex' : 'none';
+        const yogaSubOptions = document.getElementById('yoga-sub-options');
+        if (yogaSubOptions) {
+            yogaSubOptions.style.display = yogaEnabled ? 'flex' : 'none';
         }
     }
 
     // Add listeners to toggles
     document.getElementById('box-meditation-toggle').addEventListener('change', updateTimingRowVisibility);
-    document.getElementById('yoga-bridge-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('corpse-pose-toggle').addEventListener('change', updateTimingRowVisibility);
+    // Exclusive Toggles: Yoga Bridge & Reverse Journey
+    const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
+    const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
+    
+    function enforceExclusivity(target) {
+        if (target === yogaBridgeToggle && yogaBridgeToggle.checked) {
+            reverseJourneyToggle.checked = false;
+        } else if (target === reverseJourneyToggle && reverseJourneyToggle.checked) {
+            yogaBridgeToggle.checked = false;
+        }
+        updateTimingRowVisibility();
+        updateSessionEstimate();
+    }
+
+    if (yogaBridgeToggle) {
+        yogaBridgeToggle.addEventListener('change', (e) => {
+            enforceExclusivity(e.target);
+            updateTimingRowVisibility();
+        });
+    }
+
+    const bathSessionToggle = document.getElementById('bath-session-toggle');
+    if (bathSessionToggle) {
+        bathSessionToggle.addEventListener('change', updateTimingRowVisibility);
+    }
+
+    if (reverseJourneyToggle) {
+        reverseJourneyToggle.addEventListener('change', (e) => {
+            enforceExclusivity(e.target);
+        });
+    }
     
     // Initial call
     updateTimingRowVisibility();
@@ -2048,19 +2130,22 @@ function attachEventListeners() {
         const hasBox = getChecked('box-meditation-toggle');
         const hasHooponopono = getChecked('hooponopono-toggle');
         const hasYoga = getChecked('yoga-bridge-toggle');
+        const hasCorpse = getChecked('corpse-pose-toggle');
         
-        let overhead = 5; // base overhead (gratitude, corpse, silence, etc)
+        let overhead = 5; // base overhead (gratitude, silence, etc)
         if (hasBox) overhead += 4; // box breathing cycles + narration
         if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
         
+        const corpseTime = hasCorpse ? (state.timeCorpse / 60) : 0;
+        
         if (hasYoga) {
             const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
-            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60); // prep + poses + transition gaps
+            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60) + (state.timeBath / 60); // prep + poses + transition gaps + bath
         }
 
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 3) 
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 7);
+            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + 3) 
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + corpseTime + overhead + 7);
         setText('session-estimate', `~ ${estimate} min session`);
     }
 
@@ -2099,6 +2184,12 @@ function attachEventListeners() {
         state.timeYogaPose = parseInt(e.target.value);
         setText('display-yoga-pose', state.timeYogaPose + 's');
         localStorage.setItem('chakra_time_yoga_pose', state.timeYogaPose);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-bath').addEventListener('input', (e) => {
+        state.timeBath = parseInt(e.target.value);
+        setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
+        localStorage.setItem('chakra_time_bath', state.timeBath);
         updateSessionEstimate();
     });
 

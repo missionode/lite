@@ -70,15 +70,20 @@
                 <label class="checkbox-label"><input type="checkbox" id="hooponopono-toggle"> Ho'oponopono</label>
                 <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
                 <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> Eyes Close Mode (Warmth/Comfort)</label>
+                <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle" checked> Enable Corpse Pose (Savasana)</label>
                 
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
-                    <div id="yoga-pose-selection" style="display:none; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;">
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="balasana" checked> Balasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="paschimottanasana" checked> Paschimottanasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
-                        <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="marjaryasana" checked> Marjaryasana</label>
+                    
+                    <div id="yoga-sub-options" style="display:none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <label class="checkbox-label"><input type="checkbox" id="bath-session-toggle"> Enable Bath Session</label>
+                        <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="balasana" checked> Balasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="paschimottanasana" checked> Paschimottanasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
+                            <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="marjaryasana" checked> Marjaryasana</label>
+                        </div>
                     </div>
                 </div>
                 
@@ -140,7 +145,7 @@
                         <input type="range" id="time-breathing" min="4" max="16" step="1" value="8">
                         <span id="display-breathing" style="font-size: 0.7rem; width: 30px;">8s</span>
                     </div>
-                    <div class="mixer-row">
+                    <div class="mixer-row" id="row-corpse">
                         <label style="font-size: 0.8rem; width: 80px; text-align: left;">Corpse Pose</label>
                         <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
                         <span id="display-corpse" style="font-size: 0.7rem; width: 30px;">300s</span>
@@ -160,10 +165,15 @@
                         <input type="range" id="time-yoga-pose" min="30" max="300" step="10" value="60">
                         <span id="display-yoga-pose" style="font-size: 0.7rem; width: 30px;">60s</span>
                     </div>
+                    <div class="mixer-row" id="row-bath" style="display:none;">
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Bath Time</label>
+                        <input type="range" id="time-bath" min="300" max="1800" step="60" value="600">
+                        <span id="display-bath" style="font-size: 0.7rem; width: 30px;">10m</span>
+                    </div>
                 </div>
             </div>
 
-            <button id="save-config" class="primary-btn" style="margin-top: 1rem;">Start Meditation</button>
+            <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
         </section>
 
         <!-- Lobby Screen -->
