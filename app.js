@@ -914,11 +914,10 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.runGratitude();
             if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
-            if (this.isMeditationActive) await this.runCorpsePose();
-            
+            if (this.isMeditationActive && state.corpsePoseEnabled) await this.runCorpsePose();
+
             // Immediate screen switch to meditation room for better user experience
-            if (this.isMeditationActive) showScreen(meditationScreen);
-            
+            if (this.isMeditationActive) showScreen(meditationScreen);            
             // Settle after breathing (3 seconds)
             if (this.isMeditationActive) await this.pauseAwareSleep(3000);
 
