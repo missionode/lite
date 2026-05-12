@@ -2022,15 +2022,20 @@ function attachEventListeners() {
         aura.style.opacity = '1';
     });
 
-    // Yoga Bridge Toggle Listener
-    const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
-    if (yogaBridgeToggle) {
-        yogaBridgeToggle.addEventListener('change', (e) => {
-            const selection = document.getElementById('yoga-pose-selection');
-            if (selection) selection.style.display = e.target.checked ? 'flex' : 'none';
-            updateSessionEstimate();
-        });
+    // Dynamic Setting Visibility
+    function updateTimingRowVisibility() {
+        document.getElementById('row-breathing').style.display = getChecked('box-meditation-toggle') ? 'flex' : 'none';
+        const yogaVisible = getChecked('yoga-bridge-toggle');
+        document.getElementById('row-yoga-prep').style.display = yogaVisible ? 'flex' : 'none';
+        document.getElementById('row-yoga-pose').style.display = yogaVisible ? 'flex' : 'none';
     }
+
+    // Add listeners to toggles
+    document.getElementById('box-meditation-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('yoga-bridge-toggle').addEventListener('change', updateTimingRowVisibility);
+    
+    // Initial call
+    updateTimingRowVisibility();
 
     function updateSessionEstimate() {
         const isHigh = getChecked('high-energy-toggle');
