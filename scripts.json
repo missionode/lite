@@ -205,6 +205,14 @@
         "desc_en": "On hands and knees, inhale to arch your back (Cow) and exhale to round it (Cat). This rhythmic movement synchronizes breath and spinal fluid, clearing the central energy channel.",
         "desc_ml": "കൈകളും മുട്ടുകളും തറയിൽ ഊന്നി നിന്ന് ശ്വാസമെടുത്ത് നടുവ് താഴ്ത്തുകയും (Cow) ശ്വാസം വിട്ട് നടുവ് ഉയർത്തുകയും (Cat) ചെയ്യുക. ഇത് ശ്വാസവും ചലനവും തമ്മിൽ സമന്വയിപ്പിക്കുന്നു."
       }
-    ]
+    ],
+    "next_pose_prompt": {
+      "en": "Prepare for the next pose.",
+      "ml": "അടുത്ത ഭാവത്തിലേക്ക് തയ്യാറെടുക്കുക."
+    },
+    "session_complete": {
+      "en": "Yoga session complete. Settle back into stillness.",
+      "ml": "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ."
+    }
   }
 }

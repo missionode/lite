@@ -1253,16 +1253,14 @@ class MeditationController {
             }
             
             if (this.isMeditationActive) {
-                const nextText = state.language === 'ml' ? "അടുത്ത ഭാവത്തിലേക്ക് തയ്യാറെടുക്കുക" : "Prepare for the next pose";
-                this.narrateSoft(nextText);
+                this.narrateSoft(this.scripts.yoga.next_pose_prompt[state.language]);
                 await this.pauseAwareSleep(5000); // 5s transition gap
             }
         }
 
         // Final Settle
         if (this.isMeditationActive) {
-            const settleText = state.language === 'ml' ? "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ." : "Yoga session complete. Settle back into stillness.";
-            await this.narrate(settleText, false);
+            await this.narrate(this.scripts.yoga.session_complete[state.language], false);
             await this.pauseAwareSleep(5000);
         }
     }
