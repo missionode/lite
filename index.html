@@ -70,6 +70,7 @@
                 <label class="checkbox-label"><input type="checkbox" id="hooponopono-toggle"> Ho'oponopono</label>
                 <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
                 <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> Eyes Close Mode (Warmth/Comfort)</label>
+                <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle" checked> Enable Corpse Pose (Savasana)</label>
                 
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
@@ -144,7 +145,7 @@
                         <input type="range" id="time-breathing" min="4" max="16" step="1" value="8">
                         <span id="display-breathing" style="font-size: 0.7rem; width: 30px;">8s</span>
                     </div>
-                    <div class="mixer-row">
+                    <div class="mixer-row" id="row-corpse">
                         <label style="font-size: 0.8rem; width: 80px; text-align: left;">Corpse Pose</label>
                         <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
                         <span id="display-corpse" style="font-size: 0.7rem; width: 30px;">300s</span>

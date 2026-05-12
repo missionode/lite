@@ -1756,6 +1756,7 @@ const state = {
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
+    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') !== 'false', // Default true
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
     bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
@@ -2036,6 +2037,7 @@ function attachEventListeners() {
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
+        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
@@ -2049,6 +2051,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
+        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
@@ -2064,6 +2067,7 @@ function attachEventListeners() {
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
         const boxEnabled = getChecked('box-meditation-toggle');
+        const corpseEnabled = getChecked('corpse-pose-toggle');
         const yogaEnabled = getChecked('yoga-bridge-toggle');
         const bathEnabled = getChecked('bath-session-toggle');
 
@@ -2074,6 +2078,7 @@ function attachEventListeners() {
         };
 
         toggleDisplay('row-breathing', boxEnabled);
+        toggleDisplay('row-corpse', corpseEnabled);
         toggleDisplay('row-yoga-prep', yogaEnabled);
         toggleDisplay('row-yoga-pose', yogaEnabled);
         toggleDisplay('row-bath', yogaEnabled && bathEnabled);
@@ -2086,6 +2091,7 @@ function attachEventListeners() {
 
     // Add listeners to toggles
     document.getElementById('box-meditation-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('corpse-pose-toggle').addEventListener('change', updateTimingRowVisibility);
     // Exclusive Toggles: Yoga Bridge & Reverse Journey
     const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
     const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
@@ -2126,10 +2132,13 @@ function attachEventListeners() {
         const hasBox = getChecked('box-meditation-toggle');
         const hasHooponopono = getChecked('hooponopono-toggle');
         const hasYoga = getChecked('yoga-bridge-toggle');
+        const hasCorpse = getChecked('corpse-pose-toggle');
         
-        let overhead = 5; // base overhead (gratitude, corpse, silence, etc)
+        let overhead = 5; // base overhead (gratitude, silence, etc)
         if (hasBox) overhead += 4; // box breathing cycles + narration
         if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
+        
+        const corpseTime = hasCorpse ? (state.timeCorpse / 60) : 0;
         
         if (hasYoga) {
             const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
@@ -2137,8 +2146,8 @@ function attachEventListeners() {
         }
 
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 3) 
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + (state.timeCorpse / 60) + overhead + 7);
+            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + 3) 
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + corpseTime + overhead + 7);
         setText('session-estimate', `~ ${estimate} min session`);
     }
 
