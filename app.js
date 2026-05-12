@@ -2025,9 +2025,15 @@ function attachEventListeners() {
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
         document.getElementById('row-breathing').style.display = getChecked('box-meditation-toggle') ? 'flex' : 'none';
+        
         const yogaVisible = getChecked('yoga-bridge-toggle');
         document.getElementById('row-yoga-prep').style.display = yogaVisible ? 'flex' : 'none';
         document.getElementById('row-yoga-pose').style.display = yogaVisible ? 'flex' : 'none';
+        
+        const yogaSelection = document.getElementById('yoga-pose-selection');
+        if (yogaSelection) {
+            yogaSelection.style.display = yogaVisible ? 'flex' : 'none';
+        }
     }
 
     // Add listeners to toggles
