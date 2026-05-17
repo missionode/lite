@@ -1318,8 +1318,11 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.7;   // Breath-aligned flow
-            utterance.pitch = 1.05;
+            
+            // Warmth & Comfort: Deeper pitch and slower rate for transitions
+            const baseRate = state.sleepMode ? 0.60 : 0.70;
+            utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
+            utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02;
             utterance.volume = 1.0; 
             
             let isResolved = false;
@@ -1537,9 +1540,12 @@ class MeditationController {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = state.voices.find(v => v.name === state.voiceName);
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
-            utterance.rate = 0.7; 
-            utterance.pitch = 1.05; 
-            utterance.volume = 1.0; 
+            
+            // Feeble prompts: Extra slow and deep for minimal intrusion
+            const baseRate = state.sleepMode ? 0.58 : 0.65;
+            utterance.rate   = state.eyesCloseMode ? baseRate * 0.85 : baseRate;
+            utterance.pitch  = state.eyesCloseMode ? 0.82 : 0.95; 
+            utterance.volume = 0.9; // Slightly lower volume for "feeble"
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1566,10 +1572,12 @@ class MeditationController {
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
         await new Promise(r => setTimeout(r, 1200));
 
-        // Activate Frequency Carving (+2dB boost at 2.5kHz) for speech intelligibility
+        // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(2, this.audio.ctx.currentTime + 1.5);
+            // In Eyes Close mode, we slightly dip the frequency to remove "sharpness"
+            const targetGain = state.eyesCloseMode ? -1.5 : 2; 
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(targetGain, this.audio.ctx.currentTime + 1.5);
         }
 
         const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
@@ -1592,10 +1600,10 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity: Breath-aligned pacing
-                const baseRate = state.sleepMode ? 0.62 : 0.72;
-                utterance.rate   = state.eyesCloseMode ? baseRate * 0.95 : baseRate;
-                utterance.pitch  = state.eyesCloseMode ? 0.94 : 1.05; // Balanced 0.94 for comfort
-                utterance.volume = 1.0; // Boosted for mobile speakers
+                const baseRate = state.sleepMode ? 0.60 : 0.70;
+                utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
+                utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02; // Deeper 0.88 for warmth
+                utterance.volume = 1.0; 
                 
                 let isResolved = false;
                 
@@ -1956,6 +1964,11 @@ function testVoice() {
     const utterance = new SpeechSynthesisUtterance("Testing meditation voice. ശാന്തമായി ഇരിക്കുക.");
     const selectedVoice = state.voices.find(v => v.name === voiceSelect.value);
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
+    
+    // Test with new warm settings
+    utterance.rate = 0.65;
+    utterance.pitch = 0.88;
+    
     window.speechSynthesis.speak(utterance);
 }
 
