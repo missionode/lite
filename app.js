@@ -1851,6 +1851,12 @@ function init() {
     attachEventListeners();
     checkFirstTime();
     registerServiceWorker();
+
+    // Hide splash screen after a delay for visual impact
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.classList.add('hidden');
+    }, 2500);
 }
 
 function registerServiceWorker() {

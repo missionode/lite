@@ -1,10 +1,11 @@
-const CACHE_NAME = 'chakra-v3.9';
+const CACHE_NAME = 'chakra-v4.0';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './manifest.json',
+  './Splash.png',
   './scripts.json',
   './android-chrome-192x192.png',
   './android-chrome-512x512.png',
