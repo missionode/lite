@@ -737,12 +737,13 @@ class AudioEngine {
         if (!this.bgMusicLoop || !this.ctx) return;
         
         // Support for boolean (legacy) and numeric (fine-tuned) volume levels
+        // Whisper Quality: Deeper ducking (0.28 vs 0.45) by default for intimacy
         let factor = 1.0;
-        if (isDucked === true) factor = 0.45;
+        if (isDucked === true) factor = 0.28;
         else if (typeof isDucked === 'number') factor = isDucked;
 
         const targetVol = state.volMusic * factor;
-        const targetEQ = factor < 1.0 ? -8 : 0; 
+        const targetEQ = factor < 1.0 ? -12 : 0; // Deeper -12dB cut clears space for voice
         
         const now = this.ctx.currentTime;
         
@@ -1323,7 +1324,7 @@ class MeditationController {
             const baseRate = state.sleepMode ? 0.60 : 0.70;
             utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
             utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02;
-            utterance.volume = 1.0; 
+            utterance.volume = state.volVoice; 
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1545,7 +1546,7 @@ class MeditationController {
             const baseRate = state.sleepMode ? 0.58 : 0.65;
             utterance.rate   = state.eyesCloseMode ? baseRate * 0.85 : baseRate;
             utterance.pitch  = state.eyesCloseMode ? 0.82 : 0.95; 
-            utterance.volume = 0.9; // Slightly lower volume for "feeble"
+            utterance.volume = state.volVoice * 0.9; // Relative to master voice volume
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -1603,7 +1604,7 @@ class MeditationController {
                 const baseRate = state.sleepMode ? 0.60 : 0.70;
                 utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
                 utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02; // Deeper 0.88 for warmth
-                utterance.volume = 1.0; 
+                utterance.volume = state.volVoice; 
                 
                 let isResolved = false;
                 
@@ -1968,6 +1969,7 @@ function testVoice() {
     // Test with new warm settings
     utterance.rate = 0.65;
     utterance.pitch = 0.88;
+    utterance.volume = state.volVoice;
     
     window.speechSynthesis.speak(utterance);
 }
