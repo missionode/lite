@@ -1158,7 +1158,7 @@ class MeditationController {
         await this.narrate(this.scripts.bath_session.instructions[state.language], false);
 
         let remaining = state.timeBath;
-        const reminderSecond = 60;
+        const reminderSecond = 180;
 
         while (remaining > 0) {
             if (!this.isMeditationActive) return;
