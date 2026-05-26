@@ -834,6 +834,30 @@ class MeditationController {
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
+    setupMediaSession() {
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'Chakra Meditation',
+                artist: 'Guided Journey',
+                album: 'Meditation Room',
+                artwork: [
+                    { src: 'android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+                    { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+                ]
+            });
+
+            navigator.mediaSession.setActionHandler('play', () => {
+                if (this.isPaused) this.togglePause();
+            });
+            navigator.mediaSession.setActionHandler('pause', () => {
+                if (!this.isPaused) this.togglePause();
+            });
+            navigator.mediaSession.setActionHandler('stop', () => {
+                this.stop();
+            });
+        }
+    }
+
     async pauseAwareSleep(ms) {
         let remaining = ms;
         const step = 100;
@@ -884,6 +908,11 @@ class MeditationController {
             await this.audio.init();
             // Start background music looping silently immediately
             await this.audio.startBackgroundMusic();
+
+            this.setupMediaSession();
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'playing';
+            }
 
             try { await wakeLock.request(); } catch(e) { console.warn("Wake lock failed", e); }
             
@@ -1343,6 +1372,10 @@ class MeditationController {
         console.log("DEBUG: togglePause updated isPaused to:", this.isPaused);
         const btn = document.getElementById('pause-meditation');
         if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = this.isPaused ? 'paused' : 'playing';
+        }
         
         if (this.isPaused) {
             console.log("Action: Pausing session...");
@@ -1707,6 +1740,11 @@ class MeditationController {
         this.audio.fadeOutBackgroundMusic(12); // Long 12s final fade out
         setTimeout(() => this.audio.stopBackgroundMusic(), 13000);
         wakeLock.release();
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'none';
+        }
+
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -1757,6 +1795,11 @@ class MeditationController {
     stop() {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         window.speechSynthesis.cancel();
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'none';
+        }
+
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
         if (app) app.style.opacity = "1";
