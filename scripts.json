@@ -171,20 +171,6 @@
     },
     "poses": [
       {
-        "id": "balasana",
-        "name_en": "Balasana (Child's Pose)",
-        "name_ml": "ബാലാസനം",
-        "desc_en": "Kneel on the floor, sit on your heels, and fold forward, resting your forehead on the mat. Extend your arms forward. This pose grounds your energy and calms the nervous system.",
-        "desc_ml": "മുട്ടുകുത്തി ഇരുന്നുകൊണ്ട് പതുക്കെ മുന്നോട്ട് കുനിഞ്ഞ് നെറ്റി തറയിൽ മുട്ടിക്കുക. കൈകൾ മുന്നോട്ട് നീട്ടി വെക്കുക. ഈ ആസനം ഊർജ്ജത്തെ ഭൂമിയിലേക്ക് അടുപ്പിക്കുകയും നാഡീവ്യൂഹത്തെ ശാന്തമാക്കുകയും ചെയ്യുന്നു."
-      },
-      {
-        "id": "paschimottanasana",
-        "name_en": "Paschimottanasana (Seated Forward Bend)",
-        "name_ml": "പശ്ചിമോത്താനാസനം",
-        "desc_en": "Sit with legs extended, inhale to reach up, and exhale to fold from your hips toward your feet. This stretch creates a flow of energy along your entire spine, connecting root to crown.",
-        "desc_ml": "കാലുകൾ നീട്ടിയിരുന്ന് ശ്വാസമെടുത്ത് കൈകൾ ഉയർത്തുക, ശ്വാസം വിട്ടുകൊണ്ട് ഇടുപ്പിൽ നിന്ന് മുന്നോട്ട് കുനിഞ്ഞ് പാദങ്ങളിൽ പിടിക്കാൻ ശ്രമിക്കുക. ഈ ആസനം നട്ടെല്ലിലൂടെ ഊർജ്ജപ്രവാഹം സുഗമമാക്കുന്നു."
-      },
-      {
         "id": "vrikshasana",
         "name_en": "Vrikshasana (Tree Pose)",
         "name_ml": "വൃക്ഷാസനം",
@@ -204,6 +190,20 @@
         "name_ml": "മാർജാര്യാസനം",
         "desc_en": "On hands and knees, inhale to arch your back (Cow) and exhale to round it (Cat). This rhythmic movement synchronizes breath and spinal fluid, clearing the central energy channel.",
         "desc_ml": "കൈകളും മുട്ടുകളും തറയിൽ ഊന്നി നിന്ന് ശ്വാസമെടുത്ത് നടുവ് താഴ്ത്തുകയും (Cow) ശ്വാസം വിട്ട് നടുവ് ഉയർത്തുകയും (Cat) ചെയ്യുക. ഇത് ശ്വാസവും ചലനവും തമ്മിൽ സമന്വയിപ്പിക്കുന്നു."
+      },
+      {
+        "id": "balasana",
+        "name_en": "Balasana (Child's Pose)",
+        "name_ml": "ബാലാസനം",
+        "desc_en": "Kneel on the floor, sit on your heels, and fold forward, resting your forehead on the mat. Extend your arms forward. This pose grounds your energy and calms the nervous system.",
+        "desc_ml": "മുട്ടുകുത്തി ഇരുന്നുകൊണ്ട് പതുക്കെ മുന്നോട്ട് കുനിഞ്ഞ് നെറ്റി തറയിൽ മുട്ടിക്കുക. കൈകൾ മുന്നോട്ട് നീട്ടി വെക്കുക. ഈ ആസനം ഊർജ്ജത്തെ ഭൂമിയിലേക്ക് അടുപ്പിക്കുകയും നാഡീവ്യൂഹത്തെ ശാന്തമാക്കുകയും ചെയ്യുന്നു."
+      },
+      {
+        "id": "ananda_balasana",
+        "name_en": "Ananda Balasana (Happy Baby Pose)",
+        "name_ml": "ആനന്ദ ബാലാസനം",
+        "desc_en": "Lie on your back, bend your knees toward your chest, and grab the outsides of your feet. Gently pull your knees toward the floor beside your chest. This pose opens the hips and calms the mind.",
+        "desc_ml": "മലർന്നു കിടന്ന് കാൽമുട്ടുകൾ നെഞ്ചിനോട് ചേർക്കുക, പാദങ്ങളുടെ വശങ്ങളിൽ പിടിച്ചു പതുക്കെ മുട്ടുകൾ തറയിലേക്ക് താഴ്ത്തുക. ഇത് ഇടുപ്പുകൾക്ക് വഴക്കം നൽകുകയും മനസ്സിനെ ശാന്തമാക്കുകയും ചെയ്യുന്നു."
       }
     ],
     "next_pose_prompt": {

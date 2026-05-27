@@ -1278,7 +1278,7 @@ class MeditationController {
             // Set pose-specific image
             const imageMap = {
                 'balasana': 'symbols/Balasana.png',
-                'paschimottanasana': 'symbols/Paschimottanasana.png',
+                'ananda_balasana': 'symbols/ananda_balasana.png',
                 'vrikshasana': 'symbols/Vrikshasana.png',
                 'adho_mukha_svanasana': 'symbols/Downward_dog.png',
                 'marjaryasana': 'symbols/Marjaryasana.png'
@@ -1820,7 +1820,7 @@ const state = {
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
     bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
-    selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['balasana', 'paschimottanasana', 'vrikshasana', 'adho_mukha_svanasana', 'marjaryasana'],
+    selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
