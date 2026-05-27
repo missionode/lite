@@ -178,6 +178,29 @@
                 </div>
             </div>
 
+            <!-- New Script Selection -->
+            <div class="config-group" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                <label>Script Selection</label>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <select id="script-source-select" style="width: 100%; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 5px; outline: none;">
+                        <option value="default">Default (scripts.json)</option>
+                        <option value="custom">Custom Script</option>
+                    </select>
+                    
+                    <div id="custom-script-ui" style="display: none; flex-direction: column; gap: 8px; border: 1px dashed rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.75rem; opacity: 0.7;">Upload JSON file:</div>
+                        <input type="file" id="upload-script-file" accept=".json" style="font-size: 0.75rem;">
+                        
+                        <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 5px;">Or load from URL:</div>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="script-url-input" placeholder="https://..." style="flex: 1; font-size: 0.75rem; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 4px; outline: none;">
+                            <button id="load-script-url" class="secondary-btn" style="padding: 4px 8px; font-size: 0.75rem;">Load</button>
+                        </div>
+                        <div id="script-status" style="font-size: 0.7rem; display: none; padding: 4px; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
         </section>
 

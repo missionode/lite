@@ -876,9 +876,16 @@ class MeditationController {
             showScreen(icebreakerScreen);
             document.getElementById('completion-modal').classList.add('hidden');
             
+            // Script Loading Strategy
             if (!this.scripts) {
-                const response = await fetch('scripts.json?v=' + Date.now());
-                this.scripts = await response.json();
+                if (state.scriptSource === 'custom' && state.customScript) {
+                    console.log("Loading Custom Script from local storage...");
+                    this.scripts = state.customScript;
+                } else {
+                    console.log("Loading Default Script (scripts.json)...");
+                    const response = await fetch('scripts.json?v=' + Date.now());
+                    this.scripts = await response.json();
+                }
             }
 
             await this.audio.init();
@@ -1828,7 +1835,9 @@ const state = {
     timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9,
     timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
     timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
-    timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600
+    timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
+    scriptSource: localStorage.getItem('chakra_script_source') || 'default',
+    customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -2062,6 +2071,21 @@ function loadPreferences() {
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
+
+    // Sync Script Selection
+    syncValue('script-source-select', state.scriptSource);
+    const customScriptUI = document.getElementById('custom-script-ui');
+    if (customScriptUI) {
+        customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
+    }
+    if (state.customScript) {
+        const statusEl = document.getElementById('script-status');
+        if (statusEl) {
+            statusEl.textContent = "Custom script loaded and ready.";
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#4ade80';
+        }
+    }
     
     // Ensure voice matches the loaded language
     autoSelectVoice();
@@ -2130,6 +2154,8 @@ function attachEventListeners() {
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
+        localStorage.setItem('chakra_script_source', state.scriptSource);
+
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
         localStorage.setItem('chakra_configured', 'true');
@@ -2290,6 +2316,90 @@ function attachEventListeners() {
         localStorage.setItem('chakra_time_yoga_pose', state.timeYogaPose);
         updateSessionEstimate();
     });
+
+    // Script Selection Event Listeners
+    const scriptSourceSelect = document.getElementById('script-source-select');
+    const customScriptUI = document.getElementById('custom-script-ui');
+    const uploadInput = document.getElementById('upload-script-file');
+    const urlInput = document.getElementById('script-url-input');
+    const loadUrlBtn = document.getElementById('load-script-url');
+    const scriptStatus = document.getElementById('script-status');
+
+    if (scriptSourceSelect) {
+        scriptSourceSelect.addEventListener('change', (e) => {
+            state.scriptSource = e.target.value;
+            if (customScriptUI) customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
+            localStorage.setItem('chakra_script_source', state.scriptSource);
+            // Clear cached scripts to force reload if switching
+            meditation.scripts = null;
+        });
+    }
+
+    if (uploadInput) {
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const json = JSON.parse(event.target.result);
+                    state.customScript = json;
+                    localStorage.setItem('chakra_custom_script', JSON.stringify(json));
+                    if (scriptStatus) {
+                        scriptStatus.textContent = "Script uploaded successfully!";
+                        scriptStatus.style.display = 'block';
+                        scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
+                        scriptStatus.style.color = '#4ade80';
+                    }
+                    meditation.scripts = null;
+                } catch (err) {
+                    if (scriptStatus) {
+                        scriptStatus.textContent = "Error: Invalid JSON file.";
+                        scriptStatus.style.display = 'block';
+                        scriptStatus.style.background = 'rgba(248, 113, 113, 0.2)';
+                        scriptStatus.style.color = '#f87171';
+                    }
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    if (loadUrlBtn) {
+        loadUrlBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            if (scriptStatus) {
+                scriptStatus.textContent = "Loading script from URL...";
+                scriptStatus.style.display = 'block';
+                scriptStatus.style.background = 'rgba(255, 255, 255, 0.1)';
+                scriptStatus.style.color = 'white';
+            }
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const json = await response.json();
+                state.customScript = json;
+                localStorage.setItem('chakra_custom_script', JSON.stringify(json));
+                if (scriptStatus) {
+                    scriptStatus.textContent = "Script loaded from URL successfully!";
+                    scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
+                    scriptStatus.style.color = '#4ade80';
+                }
+                meditation.scripts = null;
+            } catch (err) {
+                if (scriptStatus) {
+                    scriptStatus.textContent = `Error: ${err.message}`;
+                    scriptStatus.style.background = 'rgba(248, 113, 113, 0.2)';
+                    scriptStatus.style.color = '#f87171';
+                }
+            }
+        });
+    }
+
     document.getElementById('time-bath').addEventListener('input', (e) => {
         state.timeBath = parseInt(e.target.value);
         setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
