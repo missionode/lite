@@ -52,6 +52,47 @@ const setText = (id, txt) => {
     if (el) el.textContent = txt;
 };
 
+function setSymbolImage(src, symbolEl = document.getElementById('chakra-symbol')) {
+    if (!symbolEl || !src) return;
+
+    symbolEl.style.visibility = 'hidden';
+    symbolEl.dataset.pendingSrc = src;
+    symbolEl.onload = () => {
+        if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'visible';
+    };
+    symbolEl.onerror = () => {
+        if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'hidden';
+    };
+    symbolEl.src = src;
+
+    // Cached images may already be complete before the load callback is attached.
+    if (symbolEl.complete && symbolEl.naturalWidth > 0) symbolEl.style.visibility = 'visible';
+}
+
+function hasScriptPath(source, path) {
+    return path.split('.').reduce((value, key) => value == null ? undefined : value[key], source) != null;
+}
+
+function validateScriptBundle(scripts, options = {}) {
+    const required = [
+        'intro.gratitude_en', 'intro.gratitude_ml',
+        'intro.moon.new_en', 'intro.moon.new_ml', 'intro.moon.waxing_en', 'intro.moon.waxing_ml',
+        'intro.moon.full_en', 'intro.moon.full_ml', 'intro.moon.waning_en', 'intro.moon.waning_ml',
+        'closing.en', 'closing.ml', 'closing.affirmation_en', 'closing.affirmation_ml',
+        ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].flatMap(key => [
+            `${key}.en`, `${key}.ml`, `${key}.affirmation_en`, `${key}.affirmation_ml`,
+            `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
+        ])
+    ];
+    if (options.highEnergy) required.push('high_energy.en', 'high_energy.ml', 'high_energy.affirmation_en', 'high_energy.affirmation_ml');
+    if (options.corpse) required.push('corpse_pose.intro.en', 'corpse_pose.intro.ml', 'corpse_pose.transition.en', 'corpse_pose.transition.ml');
+    if (options.bath) required.push('bath_session.title.en', 'bath_session.title.ml', 'bath_session.intro.en', 'bath_session.intro.ml', 'bath_session.instructions.en', 'bath_session.instructions.ml', 'bath_session.reminder.en', 'bath_session.reminder.ml');
+    if (options.yoga) required.push('yoga.intro.en', 'yoga.intro.ml', 'yoga.preparation.en', 'yoga.preparation.ml', 'yoga.next_pose_prompt.en', 'yoga.next_pose_prompt.ml', 'yoga.session_complete.en', 'yoga.session_complete.ml', 'yoga.poses');
+    if (options.hooponopono) required.push('hooponopono.intro.en', 'hooponopono.intro.ml', 'hooponopono.phrases.en', 'hooponopono.phrases.ml', 'hooponopono.closing.en', 'hooponopono.closing.ml');
+    const missing = required.filter(path => !hasScriptPath(scripts, path));
+    return { valid: missing.length === 0, missing };
+}
+
 // Audio Engine
 class SeamlessLoop {
     constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
@@ -831,6 +872,7 @@ class MeditationController {
         this.isStarting = false;
         this.isPaused = false;
         this.isHighEnergy = false;
+        this.sessionStartedAt = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
@@ -888,6 +930,17 @@ class MeditationController {
                 }
             }
 
+            const scriptCheck = validateScriptBundle(this.scripts, {
+                highEnergy: getChecked('high-energy-toggle'),
+                corpse: state.corpsePoseEnabled,
+                bath: state.yogaBridgeEnabled && state.bathSessionEnabled,
+                yoga: state.yogaBridgeEnabled,
+                hooponopono: state.hooponopono
+            });
+            if (!scriptCheck.valid) {
+                throw new Error(`Script is missing required sections: ${scriptCheck.missing.slice(0, 5).join(', ')}`);
+            }
+
             await this.audio.init();
             // Start background music looping silently immediately
             await this.audio.startBackgroundMusic();
@@ -897,6 +950,7 @@ class MeditationController {
             this.isMeditationActive = true;
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
+            this.sessionStartedAt = Date.now();
             
             setText('pause-meditation', 'II');
             const controls = document.getElementById('controls');
@@ -1027,11 +1081,11 @@ class MeditationController {
 
         for (let s = 5; s > 0; s--) {
             if (!this.isMeditationActive) return;
-            await new Promise(r => setTimeout(r, 1000));
+            await this.pauseAwareSleep(1000);
         }
         
         tutorial.style.opacity = "0";
-        await new Promise(r => setTimeout(r, 1000));
+        await this.pauseAwareSleep(1000);
         tutorial.classList.add('hidden');
 
         const steps = state.language === 'ml' ? [
@@ -1082,7 +1136,7 @@ class MeditationController {
 
             // 5 second interval before Chakra Journey starts
             instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
-            await new Promise(r => setTimeout(r, 5000));
+            await this.pauseAwareSleep(5000);
         }
     }
 
@@ -1138,12 +1192,12 @@ class MeditationController {
                     this.audio.fadeInBackgroundMusic(12, 0.30);
                 }
 
-                await new Promise(r => setTimeout(r, 1000));
+                // The loop above already accounts for one second.
             }
 
             // Final settle before Chakra Journey
             subtitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
-            await new Promise(r => setTimeout(r, 3000));
+            await this.pauseAwareSleep(3000);
         } catch (e) {
             console.error("Error in runCorpsePose:", e);
             throw e; // Rethrow to trigger the main alert in start()
@@ -1177,21 +1231,22 @@ class MeditationController {
                 }
                 remaining--;
             }
-            await new Promise(r => setTimeout(r, 1000));
+            await this.pauseAwareSleep(1000);
         }
     }
 
     async runBackgroundMusicOnly() {
         this.isMeditationActive = true;
+        this.isPaused = false;
         showScreen(meditationScreen);
         
         // Wait for screen to switch
-        await new Promise(r => setTimeout(r, 200));
+        await this.pauseAwareSleep(200);
         
         // Setup simple UI
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) {
-            symbolEl.src = "symbols/root.png"; // Using a safe default
+            setSymbolImage("symbols/root.png", symbolEl); // Using a safe default
             symbolEl.style.opacity = "0.7";
         }
         
@@ -1208,33 +1263,23 @@ class MeditationController {
         this.audio.fadeInBackgroundMusic(4, false);
         this.visual.startPulsing("#7c3aed"); // Standard meditation pulse
         
-        // Setup Stop Button
+        // Reuse the global controls so Music Only has a visible stop/pause path.
         const controls = document.getElementById('controls');
-        if (controls) {
-            const stopBtn = document.createElement('button');
-            stopBtn.className = 'icon-btn';
-            stopBtn.innerHTML = 'STOP';
-            stopBtn.onclick = () => {
-                this.isMeditationActive = false;
-                this.audio.fadeOutBackgroundMusic(2);
-                this.visual.stop();
-                showScreen(lobbyScreen);
-                stopBtn.remove();
-            };
-            controls.appendChild(stopBtn);
-        }
+        if (controls) controls.classList.remove('hidden');
+        setText('pause-meditation', 'II');
+        try { await wakeLock.request(); } catch (e) {}
         
         // Keep running until isMeditationActive is false
         while (this.isMeditationActive) {
-            await new Promise(r => setTimeout(r, 1000));
+            await this.pauseAwareSleep(1000);
         }
     }
 
     async runYogaSession() {
         if (!this.isMeditationActive) return;
 
-        // Perform bath first
-        await this.runBathSession();
+        // Bath is an optional Yoga Bridge stage.
+        if (state.bathSessionEnabled) await this.runBathSession();
 
         // Transition Screen
         showScreen(icebreakerScreen);
@@ -1290,7 +1335,7 @@ class MeditationController {
                 'adho_mukha_svanasana': 'symbols/Downward_dog.png',
                 'marjaryasana': 'symbols/Marjaryasana.png'
             };
-            symbolEl.src = imageMap[pose.id] || "symbols/Mahashakti.png";
+            setSymbolImage(imageMap[pose.id] || "symbols/root.png", symbolEl);
             symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
 
             // Explain Pose
@@ -1305,7 +1350,7 @@ class MeditationController {
                     timerEl.textContent = `HOLD: ${remaining}s`;
                     remaining--;
                 }
-                await new Promise(r => setTimeout(r, 1000));
+                await this.pauseAwareSleep(1000);
             }
             
             if (this.isMeditationActive) {
@@ -1397,14 +1442,14 @@ class MeditationController {
         if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = this.scripts.closing[state.language];
         await this.narrate(closingText);
-        await new Promise(r => setTimeout(r, 2000));
+        await this.pauseAwareSleep(2000);
         // Full-body health affirmation — head to toe
         const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
         if (healthAffirmation && this.isMeditationActive) {
             setText('mantra-display', "✦ BODY ✦");
             await this.narrate(healthAffirmation);
         }
-        await new Promise(r => setTimeout(r, 3000));
+        await this.pauseAwareSleep(3000);
     }
 
     async runHooponopono() {
@@ -1421,7 +1466,7 @@ class MeditationController {
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(this.scripts.hooponopono.intro[state.language], false);
-        await new Promise(r => setTimeout(r, 2000));
+        await this.pauseAwareSleep(2000);
 
         // 3 cycles of the 4 phrases
         const phrases = this.scripts.hooponopono.phrases[state.language];
@@ -1435,7 +1480,7 @@ class MeditationController {
                 // Keep music for all phrases, fade out only on the very last phrase of the last cycle
                 const isLast = (cycle === 2 && i === phrases.length - 1);
                 await this.narrate(phrase, false); // Keep music for phrases
-                await new Promise(r => setTimeout(r, 2000));
+                await this.pauseAwareSleep(2000);
             }
         }
 
@@ -1445,7 +1490,7 @@ class MeditationController {
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
-        await new Promise(r => setTimeout(r, 15000));
+        await this.pauseAwareSleep(15000);
     }
 
     async handleInterval() {
@@ -1483,10 +1528,10 @@ class MeditationController {
         setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
         
         // Deity Image Selection
-        if (state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath]) {
-            symbolEl.src = this.scripts.deities[state.deityPath][key];
+        if (key !== 'high_energy' && state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath] && this.scripts.deities[state.deityPath][key]) {
+            setSymbolImage(this.scripts.deities[state.deityPath][key], symbolEl);
         } else {
-            symbolEl.src = chakra.symbol;
+            setSymbolImage(chakra.symbol, symbolEl);
         }
 
         symbolEl.style.opacity = "1";
@@ -1495,7 +1540,7 @@ class MeditationController {
         document.body.style.setProperty('--primary-color', chakra.color);
         document.querySelectorAll('.dot').forEach(dot => {
             if (dot.dataset.chakra === key) dot.classList.add('active');
-            else if (this.chakraOrder.indexOf(dot.dataset.chakra) < this.chakraOrder.indexOf(key)) {
+            else if (this.chakraOrder.includes(dot.dataset.chakra) && this.chakraOrder.indexOf(dot.dataset.chakra) < this.chakraOrder.indexOf(key)) {
                 dot.classList.add('completed'); dot.classList.remove('active');
             } else dot.classList.remove('active', 'completed');
         });
@@ -1578,7 +1623,7 @@ class MeditationController {
         }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
-        await new Promise(r => setTimeout(r, 1200));
+        await this.pauseAwareSleep(1200);
 
         // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
         if (this.audio.voiceCarveFilter) {
@@ -1665,7 +1710,7 @@ class MeditationController {
             }
 
             // Breath-aligned space (1.5s) between sentences for comfort
-            await new Promise(r => setTimeout(r, 1500));
+            await this.pauseAwareSleep(1500);
         }
 
         // Release Frequency Carving after narration ends
@@ -1674,7 +1719,7 @@ class MeditationController {
         }
 
         if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
-            await new Promise(r => setTimeout(r, 2500));
+            await this.pauseAwareSleep(2500);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         }
@@ -1707,7 +1752,9 @@ class MeditationController {
     }
 
     finish() {
+        const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
+        this.sessionStartedAt = null;
         this.visual.stop(); 
         this.audio.stopDrone(); 
         this.audio.stopMantraTrack(); 
@@ -1717,12 +1764,12 @@ class MeditationController {
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
-        state.stats.journeys += 1; state.stats.time += Math.round((state.timePerChakra * this.chakraOrder.length) + 1);
+        state.stats.journeys += 1; state.stats.time += sessionMinutes;
         localStorage.setItem('chakra_stats_journeys', state.stats.journeys);
         localStorage.setItem('chakra_stats_time', state.stats.time);
         setText('stat-journeys', state.stats.journeys);
         setText('stat-time', state.stats.time);
-        setText('stat-session-time', Math.round(state.stats.time) + ' mins');
+        setText('stat-session-time', sessionMinutes + ' mins');
         setText('stat-total-journeys', state.stats.journeys);
         // Lift sleep mode dimming once session ends
         document.body.classList.remove('sleep-mode-active');
@@ -1763,17 +1810,23 @@ class MeditationController {
 
     stop() {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        this.sessionStartedAt = null;
         window.speechSynthesis.cancel();
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
         if (app) app.style.opacity = "1";
-        const aura = document.getElementById('aura-bg');
-        if (aura) aura.style.opacity = "0";
+        const finishAura = document.getElementById('aura-bg');
+        if (finishAura) finishAura.style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         const controls = document.getElementById('controls');
         if (controls) controls.classList.add('hidden');
         const mixer = document.getElementById('volume-mixer');
         if (mixer) mixer.classList.add('hidden');
+        const aura = document.getElementById('aura-bg');
+        if (aura) {
+            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+            aura.style.opacity = '1';
+        }
         showScreen(lobbyScreen);
     }
 }
@@ -2030,6 +2083,7 @@ function loadPreferences() {
     syncChecked('frequencies-toggle', state.chakraFrequencies);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
     syncChecked('bg-music-mode-toggle', state.bgMusicMode);
+    syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
     // Sync Yoga Settings
@@ -2139,6 +2193,10 @@ function attachEventListeners() {
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
+        if (state.yogaBridgeEnabled && state.selectedYogaPoses.length === 0) {
+            alert("Please select at least one yoga pose or disable Yoga Bridge.");
+            return;
+        }
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         
@@ -2202,6 +2260,7 @@ function attachEventListeners() {
     const boxMeditationToggle = document.getElementById('box-meditation-toggle');
     const hooponoponoToggle = document.getElementById('hooponopono-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
+    const highEnergyToggle = document.getElementById('high-energy-toggle');
 
     function enforceMasterToggle(target) {
         if (target === bgMusicToggle && bgMusicToggle.checked) {
@@ -2211,6 +2270,7 @@ function attachEventListeners() {
             if (boxMeditationToggle) boxMeditationToggle.checked = false;
             if (hooponoponoToggle) hooponoponoToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
+            if (highEnergyToggle) highEnergyToggle.checked = false;
         } else if (target !== bgMusicToggle && target.checked) {
             // Disable BG Music Mode if any other journey feature is enabled
             if (bgMusicToggle) bgMusicToggle.checked = false;
@@ -2219,7 +2279,13 @@ function attachEventListeners() {
         // Mutual Exclusivity: Yoga Bridge & Reverse Journey
         if (target === yogaBridgeToggle && yogaBridgeToggle.checked) {
             if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
+            if (highEnergyToggle) highEnergyToggle.checked = false;
         } else if (target === reverseJourneyToggle && reverseJourneyToggle.checked) {
+            if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
+        }
+
+        if (target === highEnergyToggle && highEnergyToggle.checked) {
+            if (bgMusicToggle) bgMusicToggle.checked = false;
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
         }
 
@@ -2248,6 +2314,10 @@ function attachEventListeners() {
         });
     }
 
+    if (highEnergyToggle) {
+        highEnergyToggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
+    }
+
     [reverseJourneyToggle, boxMeditationToggle, hooponoponoToggle, corpsePoseToggle].forEach(toggle => {
         if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
     });
@@ -2256,10 +2326,15 @@ function attachEventListeners() {
     updateTimingRowVisibility();
 
     function updateSessionEstimate() {
+        if (getChecked('bg-music-mode-toggle')) {
+            setText('session-estimate', 'Music only — stop anytime');
+            return;
+        }
         const isHigh = getChecked('high-energy-toggle');
         const hasBox = getChecked('box-meditation-toggle');
         const hasHooponopono = getChecked('hooponopono-toggle');
         const hasYoga = getChecked('yoga-bridge-toggle');
+        const hasBath = getChecked('bath-session-toggle');
         const hasCorpse = getChecked('corpse-pose-toggle');
         
         let overhead = 5; // base overhead (gratitude, silence, etc)
@@ -2270,7 +2345,8 @@ function attachEventListeners() {
         
         if (hasYoga) {
             const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
-            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60) + (state.timeBath / 60); // prep + poses + transition gaps + bath
+            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60); // prep + poses + transition gaps
+            if (hasBath) overhead += state.timeBath / 60;
         }
 
         const estimate = isHigh
@@ -2344,6 +2420,14 @@ function attachEventListeners() {
             reader.onload = (event) => {
                 try {
                     const json = JSON.parse(event.target.result);
+                    const check = validateScriptBundle(json, {
+                        highEnergy: getChecked('high-energy-toggle'),
+                        corpse: getChecked('corpse-pose-toggle'),
+                        bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                        yoga: getChecked('yoga-bridge-toggle'),
+                        hooponopono: getChecked('hooponopono-toggle')
+                    });
+                    if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
                     state.customScript = json;
                     localStorage.setItem('chakra_custom_script', JSON.stringify(json));
                     if (scriptStatus) {
@@ -2382,6 +2466,14 @@ function attachEventListeners() {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const json = await response.json();
+                const check = validateScriptBundle(json, {
+                    highEnergy: getChecked('high-energy-toggle'),
+                    corpse: getChecked('corpse-pose-toggle'),
+                    bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                    yoga: getChecked('yoga-bridge-toggle'),
+                    hooponopono: getChecked('hooponopono-toggle')
+                });
+                if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
                 state.customScript = json;
                 localStorage.setItem('chakra_custom_script', JSON.stringify(json));
                 if (scriptStatus) {
@@ -2453,6 +2545,10 @@ function attachEventListeners() {
         } else {
             let order = [...state.selectedChakras];
             if (state.reverseJourney) order.reverse();
+            if (order.length === 0) {
+                alert("Please select at least one chakra before beginning the journey.");
+                return;
+            }
             meditation.chakraOrder = order;
             // Apply sleep mode dim class at session start
             if (state.sleepMode) document.body.classList.add('sleep-mode-active');
@@ -2488,6 +2584,11 @@ function attachEventListeners() {
     });
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
+        const aura = document.getElementById('aura-bg');
+        if (aura) {
+            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+            aura.style.opacity = '1';
+        }
         showScreen(lobbyScreen);
     });
 

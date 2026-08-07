@@ -1,0 +1,90 @@
+# Chakra Meditation — Technology Stack
+
+This document describes the stack that is actually implemented in this repository. It replaces the earlier Laravel/WebSocket proposal, which did not match the current application shape.
+
+## Current implementation
+
+| Area | Technology | Status / evidence |
+|---|---|---|
+| Application type | Static, single-page web application | Implemented in `index.html`, `app.js`, and `style.css` |
+| Markup | HTML5 | Five primary screens and completion modal in `index.html` |
+| Client logic | Plain modern JavaScript (ES classes, async/await) | `AudioEngine`, `VisualEngine`, `MeditationController`, and `WakeLockManager` in `app.js` |
+| Styling | Hand-authored CSS with CSS custom properties | `style.css`; no CSS framework or preprocessor |
+| Content/configuration | JSON | `scripts.json` contains bilingual narration and feature scripts |
+| Audio | Web Audio API, HTML audio buffers, MP3 assets | Procedural drones/effects plus `audio/*.mp3` in `app.js` |
+| Narration | Web Speech API (`speechSynthesis`) | Browser-provided voice discovery, language selection, and TTS in `app.js` |
+| Visuals | DOM/CSS animation and Canvas 2D star/particle effects | `VisualEngine` and `#particle-canvas` |
+| Persistence | Browser `localStorage` | Preferences, custom scripts, journal entries, and aggregate stats |
+| Offline/installability | Service Worker + Web App Manifest | `sw.js` and `manifest.json` |
+| Device integration | Screen Wake Lock API and Media Session API where supported | Session lifecycle in `app.js` |
+| Backend/API | None | No server routes, database, authentication, or WebSocket layer |
+| Dependencies/build | None required | No `package.json`, Composer project, bundler, or test runner is present |
+
+## Runtime architecture
+
+```text
+Browser
+  ├─ index.html: screen structure and controls
+  ├─ style.css: visual system, responsive layout, animations
+  ├─ app.js
+  │   ├─ state + localStorage preferences
+  │   ├─ MeditationController: journey orchestration
+  │   ├─ AudioEngine: Web Audio graph and asset playback
+  │   ├─ VisualEngine: symbols, aura, particles, progress
+  │   └─ WakeLockManager / Media Session integration
+  ├─ scripts.json: bilingual narration content
+  ├─ audio/ + symbols/ + presiding-deities/: media assets
+  └─ sw.js: cache-first static asset delivery
+```
+
+The application is designed to be served from a static HTTP(S) origin. Opening `index.html` directly from `file://` is not a supported runtime because service workers, fetch, and some browser media APIs require an origin.
+
+## Product-facing stack decisions
+
+- Keep the first release client-only. This preserves privacy and enables offline meditation without accounts or a network dependency.
+- Use the browser’s native audio and speech capabilities instead of adding a media framework. The current app needs careful user-gesture handling because browsers may suspend audio until interaction.
+- Keep scripts and media as replaceable static assets. The custom JSON upload/URL path is a runtime extension point, not a backend content-management system.
+- Treat `localStorage` as convenience persistence only. It is device-local, synchronous, unencrypted, and not suitable for cross-device history or sensitive personal records.
+- Use progressive enhancement for optional APIs. The core journey should remain usable when Wake Lock, Media Session, Canvas, or Malayalam voices are unavailable.
+- Do not use Tailwind Play CDN in production. The app remains on local hand-authored CSS to preserve offline behavior, avoid runtime network dependencies, and keep the current animation/audio presentation stable. Tailwind may be reconsidered later only through a build step that emits local static CSS.
+
+## Asset and caching behavior
+
+`sw.js` precaches the application shell, core chakra symbols, and core audio assets. Its fetch handler is cache-first and falls back to the network. The cache is versioned by `CACHE_NAME` and old caches are removed during activation.
+
+The cache list should be kept synchronized with the application. In particular, deity images, yoga pose images, backup audio, and any newly added media are not all currently listed. External Google Fonts also remain network-dependent.
+
+## Deferred technology
+
+The following are intentionally not part of the current implementation:
+
+- Laravel, PHP, PostgreSQL, Redis/Valkey, Workerman, OpenSwoole, queues, and WebSockets
+- TypeScript, Tailwind CSS, React/Vue, and a frontend build pipeline
+- Accounts, authentication, server-side journals, cloud sync, analytics, and remote content management
+
+These may become appropriate if the product later needs multi-device sync, protected content, social features, server-managed scripts, or operational reporting. They should not be introduced until that product requirement exists.
+
+## Quality and security baseline
+
+Current validation is primarily static/manual because no automated test harness is present. Before a release, validate:
+
+- JSON parsing for `scripts.json` and custom script uploads
+- Required DOM IDs and media paths
+- A real HTTP(S) runtime, service-worker registration, offline reload, and cache update behavior
+- Audio start/resume/stop, pause/resume, timer cleanup, and completion paths on mobile browsers
+- Safe handling of remote custom-script URLs, including CORS failure and untrusted content
+- Journal/privacy expectations, since entries are stored in browser storage without encryption
+- No secrets in the static bundle; the app currently has no server secrets
+
+For this client-only release, the main security boundary is untrusted browser/user content and remote custom script input. If a backend is added, authentication, authorization, storage, rate limiting, and a formal threat model must be designed at that point.
+
+## Recommended delivery profile
+
+Use any static host that serves the files over HTTPS with correct MIME types and SPA-safe asset paths. A lightweight local server is sufficient for development. No container, database, worker, or reverse proxy is required by the current codebase.
+
+## Source of truth
+
+- Product intent and implemented feature history: [`plan.md`](./plan.md), [`Phase.md`](./Phase.md)
+- User flow and reverse-engineered architecture: [`INITIAL-HANDOFF.md`](./INITIAL-HANDOFF.md)
+- Runtime implementation: [`index.html`](./index.html), [`app.js`](./app.js), [`style.css`](./style.css), [`sw.js`](./sw.js)
+- Narration content: [`scripts.json`](./scripts.json)
