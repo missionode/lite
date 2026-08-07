@@ -343,7 +343,7 @@ select:focus {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 1rem;
     width: 100%;
     margin-top: 0.25rem;
 }
@@ -355,6 +355,10 @@ select:focus {
 
 .lobby-actions .primary-btn {
     margin-top: 0;
+}
+
+.lobby-actions .link-btn {
+    margin-top: 0.25rem;
 }
 
 #lobby-screen #lobby-title {

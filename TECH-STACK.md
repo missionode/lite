@@ -12,7 +12,7 @@ This document describes the stack that is actually implemented in this repositor
 | Styling | Hand-authored CSS with CSS custom properties | `style.css`; no CSS framework or preprocessor |
 | Content/configuration | JSON | `scripts.json` contains bilingual narration and feature scripts |
 | Audio | Web Audio API, HTML audio buffers, MP3 assets | Procedural drones/effects plus `audio/*.mp3` in `app.js` |
-| Narration | Web Speech API (`speechSynthesis`) | Browser-provided voice discovery, language selection, and TTS in `app.js` |
+| Narration | Piper neural TTS in a Web Worker + Web Speech API fallback | Local ONNX/WASM Piper runtime, Malayalam/English voice registry, rolling sentence buffer, and browser voice fallback in `app.js`/`piper-worker.js` |
 | Visuals | DOM/CSS animation and Canvas 2D star/particle effects | `VisualEngine` and `#particle-canvas` |
 | Persistence | Browser `localStorage` | Preferences, custom scripts, journal entries, and aggregate stats |
 | Offline/installability | Service Worker + Web App Manifest | `sw.js` and `manifest.json` |
@@ -33,11 +33,32 @@ Browser
   │   ├─ VisualEngine: symbols, aura, particles, progress
   │   └─ WakeLockManager / Media Session integration
   ├─ scripts.json: bilingual narration content
+  ├─ piper-models.json: versioned local voice registry and model metadata
+  ├─ piper-worker.js: isolated Piper model loading and synthesis queue
+  ├─ piper/: vendored Piper phonemizer, ONNX Runtime Web, and WASM assets
   ├─ audio/ + symbols/ + presiding-deities/: media assets
   └─ sw.js: cache-first static asset delivery
 ```
 
-The application is designed to be served from a static HTTP(S) origin. Opening `index.html` directly from `file://` is not a supported runtime because service workers, fetch, and some browser media APIs require an origin.
+The application is designed to be served from a static HTTP(S) origin. Opening `index.html` directly from `file://` is not a supported runtime because service workers, fetch, and some browser media APIs require an origin. Piper binary paths resolve from the runtime module URL, so static hosts must preserve the `piper/` directory and serve `.wasm` files as binary assets.
+
+## Narration architecture
+
+Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.
+
+### Piper language-integration lessons
+
+Every new language/voice must pass these checks before being added to `piper-models.json`:
+
+- Use the exact upstream voice ID and model path. Add the matching model configuration path as well as the `.onnx` path; a model URL alone is insufficient.
+- Resolve all local ONNX, phonemizer WASM, and `.data` assets from the runtime module URL (`import.meta.url`). Relative paths can fall through to the app HTML and produce a misleading WebAssembly “expected magic word” error.
+- Verify the server response for every `.wasm` asset: it must be binary WASM (`00 61 73 6d`) with an appropriate binary content type, not an HTML fallback. Bump the Piper cache when correcting a bad asset response.
+- Do not assume model metadata is uniform. Single-speaker voices may omit or set `speaker_id_map` to `null`; only send `sid` for models with a real speaker map.
+- Confirm the model’s phonemizer/espeak language metadata and pronunciation coverage with representative native-language preview sentences, including punctuation and script-specific terms.
+- Keep browser fallback voices language-compatible. Never use an English browser voice to narrate Malayalam text, or silently preserve a saved voice after switching content languages.
+- Keep the Worker error visible in development logs. User-facing status can remain friendly, but initialization, model-config, phonemizer, decode, and synthesis errors must retain their original cause in the console.
+- Keep the model lazy-loaded and verify cold start, warm synthesis, Cache API reuse, offline behavior, cancellation, and device CPU/thermal impact separately for each language.
+- Record model provenance, size, quality, license, and upstream identifier. Engine licensing does not automatically cover redistribution of every voice model.
 
 ## Product-facing stack decisions
 

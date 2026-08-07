@@ -76,6 +76,7 @@ function hasScriptPath(source, path) {
 function validateScriptBundle(scripts, options = {}) {
     const required = [
         'intro.gratitude_en', 'intro.gratitude_ml',
+        'intro.returning_en', 'intro.returning_ml',
         'intro.moon.new_en', 'intro.moon.new_ml', 'intro.moon.waxing_en', 'intro.moon.waxing_ml',
         'intro.moon.full_en', 'intro.moon.full_ml', 'intro.moon.waning_en', 'intro.moon.waning_ml',
         'closing.en', 'closing.ml', 'closing.affirmation_en', 'closing.affirmation_ml',
@@ -91,6 +92,199 @@ function validateScriptBundle(scripts, options = {}) {
     if (options.hooponopono) required.push('hooponopono.intro.en', 'hooponopono.intro.ml', 'hooponopono.phrases.en', 'hooponopono.phrases.ml', 'hooponopono.closing.en', 'hooponopono.closing.ml');
     const missing = required.filter(path => !hasScriptPath(scripts, path));
     return { valid: missing.length === 0, missing };
+}
+
+let piperVoiceRegistry = [];
+
+function isPiperVoice(value) {
+    return typeof value === 'string' && value.startsWith('piper:');
+}
+
+function piperVoiceId(value) {
+    return isPiperVoice(value) ? value.slice('piper:'.length) : '';
+}
+
+function setVoiceStatus(message, tone = 'muted') {
+    const status = document.getElementById('voice-status');
+    if (!status) return;
+    status.textContent = message || '';
+    status.style.display = message ? 'block' : 'none';
+    status.style.color = tone === 'error' ? '#f87171' : tone === 'ready' ? '#4ade80' : '#ffa500';
+}
+
+function voiceMatchesLanguage(voice, language = state.language) {
+    if (!voice || !voice.lang) return false;
+    const prefix = language === 'ml' ? 'ml' : 'en';
+    return voice.lang.toLowerCase().startsWith(prefix);
+}
+
+function getBrowserVoiceForContent() {
+    const browserName = String(state.voiceName || '').replace(/^browser:/, '');
+    const selected = state.voices.find(voice => voice.name === browserName && voiceMatchesLanguage(voice));
+    return selected || state.voices.find(voice => voiceMatchesLanguage(voice)) || null;
+}
+
+class PiperTTS {
+    constructor(audioEngine) {
+        this.audio = audioEngine;
+        this.worker = null;
+        this.voiceId = null;
+        this.nextRequestId = 1;
+        this.queue = [];
+        this.activeJob = null;
+        this.currentSource = null;
+        this.currentResolve = null;
+        this.isCancelling = false;
+        this.paused = false;
+    }
+
+    isSupported() {
+        return typeof Worker !== 'undefined' && typeof WebAssembly !== 'undefined' &&
+            !!(this.audio && this.audio.ctx && typeof this.audio.ctx.decodeAudioData === 'function');
+    }
+
+    configure(value) {
+        const nextVoiceId = piperVoiceId(value);
+        if (!nextVoiceId) return false;
+        if (this.voiceId && this.voiceId !== nextVoiceId) {
+            this.cancel('voice changed');
+        }
+        this.voiceId = nextVoiceId;
+        return true;
+    }
+
+    ensureWorker() {
+        if (!this.worker) {
+            this.worker = new Worker('./piper-worker.js', { type: 'module' });
+            this.worker.onmessage = (event) => this.handleWorkerMessage(event.data || {});
+            this.worker.onerror = (event) => {
+                const message = event.message || 'Piper worker failed.';
+                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                if (this.activeJob) this.finishActive(new Error(message));
+            };
+        }
+        return this.worker;
+    }
+
+    request(type, payload = {}) {
+        if (!this.isSupported()) return Promise.reject(new Error('This browser cannot run Piper locally.'));
+        const requestId = `piper-${Date.now()}-${this.nextRequestId++}`;
+        return new Promise((resolve, reject) => {
+            this.queue.push({ requestId, type, payload, resolve, reject });
+            this.pump();
+        });
+    }
+
+    pump() {
+        if (this.activeJob || this.isCancelling || this.paused || this.queue.length === 0) return;
+        const job = this.queue.shift();
+        this.activeJob = job;
+        this.ensureWorker().postMessage({
+            type: job.type,
+            requestId: job.requestId,
+            voiceId: this.voiceId,
+            ...job.payload
+        });
+    }
+
+    finishActive(error, value) {
+        const job = this.activeJob;
+        this.activeJob = null;
+        if (!job) return;
+        if (error) job.reject(error);
+        else job.resolve(value);
+        this.pump();
+    }
+
+    handleWorkerMessage(message) {
+        if (message.type === 'progress') {
+            const total = Number(message.total) || 0;
+            const loaded = Number(message.loaded) || 0;
+            const percent = total > 0 ? ` ${Math.round((loaded / total) * 100)}%` : '';
+            setVoiceStatus(`Preparing Piper voice…${percent}`);
+            return;
+        }
+        if (!this.activeJob || message.requestId !== this.activeJob.requestId) return;
+        if (message.type === 'ready') {
+            setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+            this.finishActive(null, true);
+        } else if (message.type === 'audio') {
+            this.finishActive(null, message.audio);
+        } else if (message.type === 'error') {
+            console.error('[Piper] worker error:', message.error || 'Piper synthesis failed.', message);
+            this.finishActive(new Error(message.error || 'Piper synthesis failed.'));
+        }
+    }
+
+    warmup() {
+        setVoiceStatus('Preparing Piper voice…');
+        return this.request('warmup');
+    }
+
+    synthesize(text) {
+        return this.request('synthesize', { text });
+    }
+
+    async play(blob, volumeScale = 1) {
+        if (!blob) return;
+        const arrayBuffer = await blob.arrayBuffer();
+        const buffer = await this.audio.ctx.decodeAudioData(arrayBuffer);
+        if (!buffer || !this.audio.ctx) return;
+
+        return new Promise((resolve) => {
+            const source = this.audio.ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.audio.voiceGain || this.audio.ctx.destination);
+            this.currentSource = source;
+            this.currentResolve = resolve;
+            source.onended = () => {
+                if (this.currentSource === source) {
+                    this.currentSource = null;
+                    this.currentResolve = null;
+                }
+                resolve();
+            };
+            if (this.audio.voiceGain) {
+                this.audio.voiceGain.gain.setValueAtTime(state.volVoice * volumeScale, this.audio.ctx.currentTime);
+            }
+            source.start();
+        });
+    }
+
+    async preview(text) {
+        await this.warmup();
+        const blob = await this.synthesize(text);
+        await this.play(blob);
+        setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+    }
+
+    setPaused(paused) {
+        this.paused = paused;
+        if (!paused) this.pump();
+    }
+
+    cancel(reason = 'cancelled') {
+        this.isCancelling = true;
+        if (this.activeJob && this.worker) {
+            this.worker.postMessage({ type: 'cancel', requestId: this.activeJob.requestId });
+        }
+        if (this.currentSource) {
+            try { this.currentSource.stop(); } catch (error) {}
+            this.currentSource = null;
+        }
+        if (this.currentResolve) {
+            this.currentResolve();
+            this.currentResolve = null;
+        }
+        const error = new Error(`Piper ${reason}`);
+        if (this.activeJob) this.finishActive(error);
+        this.queue.splice(0).forEach(job => job.reject(error));
+        if (this.worker) this.worker.terminate();
+        this.worker = null;
+        this.activeJob = null;
+        this.isCancelling = false;
+        this.paused = false;
+    }
 }
 
 // Audio Engine
@@ -180,6 +374,7 @@ class AudioEngine {
         this.elementalNodes = [];
         this.binauralNodes = []; // New: Binaural Beat Layer
         this.masterGain = null;
+        this.voiceGain = null;
         this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.isInitialized = false;
@@ -219,6 +414,9 @@ class AudioEngine {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = state.volDrone; 
 
+        this.voiceGain = this.ctx.createGain();
+        this.voiceGain.gain.value = state.volVoice;
+
         // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
         // Only enabled in 'Open' mode for crispness. Disabled in 'Closed' for warmth.
         this.exciter = this.ctx.createWaveShaper();
@@ -252,7 +450,12 @@ class AudioEngine {
         // Eyes Close Mode Filter
         this.eyesCloseFilter = this.ctx.createBiquadFilter();
         this.eyesCloseFilter.type = 'lowpass';
-        this.eyesCloseFilter.frequency.setValueAtTime(2200, this.ctx.currentTime);
+        // Keep the voice warm without removing Malayalam consonant detail.
+        // The previous 2.2kHz ceiling was too dark for neural narration.
+        this.eyesCloseFilter.frequency.setValueAtTime(
+            state.eyesCloseMode ? 3200 : 5200,
+            this.ctx.currentTime
+        );
         this.eyesCloseFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
         this.eyesCloseFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
@@ -327,6 +530,10 @@ class AudioEngine {
         this.delayNode.connect(this.pannerNode);
         
         this.pannerNode.connect(this.lowCutFilter);
+
+        // Local Piper narration enters the same clarity/comfort chain as the
+        // existing voice mix without being coupled to the drone gain.
+        this.voiceGain.connect(this.lowCutFilter);
         
         let lastNode = this.lowCutFilter;
         // Inject Eyes Close Filter
@@ -945,6 +1152,15 @@ class MeditationController {
             // Start background music looping silently immediately
             await this.audio.startBackgroundMusic();
 
+            let piperWarmup = null;
+            if (isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName)) {
+                // Use the existing icebreaker as the first model-loading window.
+                piperWarmup = piperTTS.warmup().catch((error) => {
+                    setVoiceStatus('Piper could not load — using browser voice.', 'error');
+                    return false;
+                });
+            }
+
             try { await wakeLock.request(); } catch(e) { console.warn("Wake lock failed", e); }
             
             this.isMeditationActive = true;
@@ -967,6 +1183,8 @@ class MeditationController {
                 await this.pauseAwareSleep(1000);
                 if (icebreakerTimer) icebreakerTimer.textContent = i;
             }
+
+            if (piperWarmup) await piperWarmup;
 
             // Transition to Preparation
             showScreen(breathingScreen);
@@ -1024,13 +1242,20 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
 
-        // Moon Phase opening line
+        // First journeys use the existing moon opening. Returning visitors get
+        // an evergreen image that welcomes discovery without repeating a lesson.
+        const isReturningVisitor = state.stats.journeys > 0;
         const phase = getMoonPhase();
         const moonText = this.scripts.intro.moon[`${phase}_${state.language}`];
-        if (moonText && this.isMeditationActive) {
-            tutTitle.textContent = state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon";
-            tutText.textContent = moonText;
-            await this.narrate(moonText, false); // Keep music playing
+        const openingText = isReturningVisitor
+            ? this.scripts.intro[`returning_${state.language}`]
+            : moonText;
+        if (openingText && this.isMeditationActive) {
+            tutTitle.textContent = isReturningVisitor
+                ? (state.language === 'ml' ? "വീണ്ടും വരവ്" : "Returning")
+                : (state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon");
+            tutText.textContent = openingText;
+            await this.narrate(openingText, false); // Keep music playing
             await this.pauseAwareSleep(1000);
         }
 
@@ -1366,10 +1591,78 @@ class MeditationController {
         }
     }
 
+    shouldUsePiper() {
+        return isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName);
+    }
+
+    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1) {
+        if (!text || !this.isMeditationActive && !fadeOut) return;
+        if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
+            this.audio.voiceCarveFilter.gain.setValueAtTime(this.audio.voiceCarveFilter.gain.value, this.audio.ctx.currentTime);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(
+                state.eyesCloseMode ? 0.75 : 1.0,
+                this.audio.ctx.currentTime + 1.2
+            );
+        }
+        await this.pauseAwareSleep(1200);
+
+        const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
+        const pending = sentences.slice(0, 2).map(sentence => piperTTS.synthesize(sentence));
+        let piperFailed = false;
+
+        for (let i = 0; i < sentences.length; i++) {
+            if (!this.isMeditationActive) break;
+            while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
+
+            setText('narration-text', sentences[i]);
+            if (piperFailed) {
+                await this.narrateBrowser(sentences[i], false, true);
+                continue;
+            }
+
+            try {
+                const blob = await pending.shift();
+                if (i + 2 < sentences.length) pending.push(piperTTS.synthesize(sentences[i + 2]));
+                await piperTTS.play(blob, volumeScale);
+            } catch (error) {
+                piperFailed = true;
+                pending.forEach(job => job.catch(() => {}));
+                piperTTS.cancel('sentence failed');
+                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                await this.narrateBrowser(sentences[i], false, true);
+            }
+
+            if (i < sentences.length - 1) await this.pauseAwareSleep(1500);
+        }
+
+        if (fadeOut) {
+            await this.pauseAwareSleep(2500);
+            this.audio.triggerReverbSwell(5);
+            this.audio.fadeOutBackgroundMusic(4);
+        }
+        if (this.audio.voiceCarveFilter) {
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 2.5);
+        }
+    }
+
     async narrateSoft(text) {
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, false, false, 1); }
+            catch (error) {
+                console.error('[Piper] soft narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+            }
+        }
+        return this.narrateSoftBrowser(text);
+    }
+
+    async narrateSoftBrowser(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
-            const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+            const selectedVoice = getBrowserVoiceForContent();
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
             
             // Warmth & Comfort: Deeper pitch and slower rate for transitions
@@ -1399,9 +1692,11 @@ class MeditationController {
         if (this.isPaused) {
             console.log("Action: Pausing session...");
             if (window.speechSynthesis) window.speechSynthesis.cancel(); 
+            piperTTS.setPaused(true);
             if (this.audio && this.audio.ctx) this.audio.ctx.suspend();
         } else {
             console.log("Action: Resuming session...");
+            piperTTS.setPaused(false);
             if (this.audio && this.audio.ctx) this.audio.ctx.resume();
         }
     }
@@ -1589,9 +1884,21 @@ class MeditationController {
     }
 
     async narrateFeeble(text) {
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, false, false, 0.9); }
+            catch (error) {
+                console.error('[Piper] feeble narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+            }
+        }
+        return this.narrateFeebleBrowser(text);
+    }
+
+    async narrateFeebleBrowser(text) {
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
-            const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+            const selectedVoice = getBrowserVoiceForContent();
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
             
             // Feeble prompts: Extra slow and deep for minimal intrusion
@@ -1612,6 +1919,18 @@ class MeditationController {
     }
 
     async narrate(text, fadeOut = false, keepSilence = false) {
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1); }
+            catch (error) {
+                console.error('[Piper] narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+            }
+        }
+        return this.narrateBrowser(text, fadeOut, keepSilence);
+    }
+
+    async narrateBrowser(text, fadeOut = false, keepSilence = false) {
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
@@ -1649,7 +1968,7 @@ class MeditationController {
                 // Fallback language identification
                 utterance.lang = state.language === 'ml' ? 'ml-IN' : 'en-US';
 
-                const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+                const selectedVoice = getBrowserVoiceForContent();
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity: Breath-aligned pacing
@@ -1728,7 +2047,7 @@ class MeditationController {
     // Subliminal whisper — plays affirmation at ~5% volume under the mantra drone
     narrateSubliminal(text) {
         const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoice = state.voices.find(v => v.name === state.voiceName);
+        const selectedVoice = getBrowserVoiceForContent();
         if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
         utterance.rate   = state.sleepMode ? 0.45 : 0.55;
         utterance.pitch  = state.sleepMode ? 0.65 : 0.75;
@@ -1761,6 +2080,7 @@ class MeditationController {
         this.audio.fadeOutBackgroundMusic(12); // Long 12s final fade out
         setTimeout(() => this.audio.stopBackgroundMusic(), 13000);
         wakeLock.release();
+        piperTTS.cancel('journey finished');
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         this.audio.playSingingBowl();
@@ -1812,6 +2132,7 @@ class MeditationController {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         this.sessionStartedAt = null;
         window.speechSynthesis.cancel();
+        piperTTS.cancel('journey stopped');
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
         if (app) app.style.opacity = "1";
@@ -1845,6 +2166,7 @@ class WakeLockManager {
 const wakeLock = new WakeLockManager();
 const audio = new AudioEngine();
 const visual = new VisualEngine();
+const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
 document.addEventListener('visibilitychange', async () => {
@@ -1853,7 +2175,7 @@ document.addEventListener('visibilitychange', async () => {
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
-    voiceName: localStorage.getItem('chakra_voice') || '',
+    voiceName: localStorage.getItem('chakra_voice') || 'piper:ml_IN-arjun-medium',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
@@ -1905,9 +2227,20 @@ function getMoonPhase() {
     return 'waning';
 }
 
-init();
+async function loadPiperVoiceRegistry() {
+    try {
+        const response = await fetch('piper-models.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const json = await response.json();
+        piperVoiceRegistry = Array.isArray(json.voices) ? json.voices : [];
+    } catch (error) {
+        console.warn('Piper voice registry unavailable; browser voices remain available.', error);
+        piperVoiceRegistry = [];
+    }
+}
 
-function init() {
+async function init() {
+    await loadPiperVoiceRegistry();
     setupVoices();
     loadPreferences();
     attachEventListeners();
@@ -1930,71 +2263,65 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
-    if (!('speechSynthesis' in window)) return;
-
-    // Immediate UI setup with Default option
-    const initUI = () => {
+    const updateUI = (availableVoices = []) => {
+        state.voices = availableVoices;
+        const currentVal = state.voiceName || voiceSelect.value;
         voiceSelect.innerHTML = '';
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = "Default";
-        defaultOpt.textContent = "System Default Voice";
-        voiceSelect.appendChild(defaultOpt);
-        voiceSelect.value = "Default";
-    };
-    initUI();
 
-    const updateUI = (availableVoices) => {
-        if (!availableVoices || availableVoices.length === 0) return;
-        
-        // Save current selection
-        const currentVal = voiceSelect.value;
-        voiceSelect.innerHTML = '';
-        
-        // Re-add Default
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = "Default";
-        defaultOpt.textContent = "System Default Voice";
-        voiceSelect.appendChild(defaultOpt);
-
-        availableVoices.forEach(voice => {
+        const piperVoices = piperVoiceRegistry.filter(voice => voice.language === state.language);
+        piperVoices.forEach(voice => {
             const option = document.createElement('option');
-            option.value = voice.name;
-            option.textContent = `${voice.name} (${voice.lang})`;
+            option.value = `piper:${voice.id}`;
+            option.textContent = `${voice.label} · local`;
             voiceSelect.appendChild(option);
         });
 
-        // Restore selection if it exists in the new list
-        if (state.voiceName && availableVoices.find(v => v.name === state.voiceName)) {
-            voiceSelect.value = state.voiceName;
-        } else {
-            voiceSelect.value = currentVal;
-        }
-        state.voices = availableVoices;
+        const browserGroup = document.createElement('optgroup');
+        browserGroup.label = 'Browser fallback voices';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = 'browser:Default';
+        defaultOpt.textContent = 'System Default Voice';
+        browserGroup.appendChild(defaultOpt);
+        availableVoices.filter(voice => voiceMatchesLanguage(voice)).forEach(voice => {
+            const option = document.createElement('option');
+            option.value = `browser:${voice.name}`;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            browserGroup.appendChild(option);
+        });
+        voiceSelect.appendChild(browserGroup);
+
+        const currentExists = Array.from(voiceSelect.options).some(option => option.value === currentVal);
+        if (currentExists) voiceSelect.value = currentVal;
+        else autoSelectVoice();
     };
 
-    // Try to load voices immediately
-    let initialVoices = window.speechSynthesis.getVoices();
-    if (initialVoices.length > 0) {
-        updateUI(initialVoices);
+    updateUI('speechSynthesis' in window ? window.speechSynthesis.getVoices() : []);
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => updateUI(window.speechSynthesis.getVoices());
+        try {
+            const dummy = new SpeechSynthesisUtterance('');
+            dummy.volume = 0;
+            window.speechSynthesis.speak(dummy);
+        } catch (error) {}
     }
-
-    // Listen for updates in background
-    window.speechSynthesis.onvoiceschanged = () => {
-        updateUI(window.speechSynthesis.getVoices());
-    };
-
-    // One-time "wake up" request
-    try {
-        const dummy = new SpeechSynthesisUtterance("");
-        dummy.volume = 0;
-        window.speechSynthesis.speak(dummy);
-    } catch(e) {}
 }
 
 function autoSelectVoice() {
+    const currentPiper = piperVoiceRegistry.find(voice =>
+        isPiperVoice(state.voiceName) && piperVoiceId(state.voiceName) === voice.id && voice.language === state.language);
+    if (currentPiper) {
+        voiceSelect.value = state.voiceName;
+        return;
+    }
+    const defaultPiper = piperVoiceRegistry.find(voice => voice.language === state.language);
+    if (defaultPiper) {
+        state.voiceName = `piper:${defaultPiper.id}`;
+        voiceSelect.value = state.voiceName;
+        return;
+    }
     if (!state.voices || state.voices.length === 0) {
-        state.voiceName = "Default";
-        if (voiceSelect) voiceSelect.value = "Default";
+        state.voiceName = 'browser:Default';
+        if (voiceSelect) voiceSelect.value = state.voiceName;
         return;
     }
     
@@ -2024,14 +2351,32 @@ function autoSelectVoice() {
     }
     
     if (bestVoice) {
-        state.voiceName = bestVoice.name;
-        voiceSelect.value = bestVoice.name;
+        state.voiceName = `browser:${bestVoice.name}`;
+        voiceSelect.value = state.voiceName;
     }
 }
 
-function testVoice() {
-    const utterance = new SpeechSynthesisUtterance("Testing meditation voice. ശാന്തമായി ഇരിക്കുക.");
-    const selectedVoice = state.voices.find(v => v.name === voiceSelect.value);
+async function testVoice() {
+    const selectedValue = voiceSelect.value || state.voiceName;
+    state.voiceName = selectedValue;
+    if (isPiperVoice(selectedValue)) {
+        try {
+            if (!audio.isInitialized) await audio.init();
+            piperTTS.configure(selectedValue);
+            const sample = state.language === 'ml'
+                ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
+                : 'Breathe gently. You are safe in this moment.';
+            await piperTTS.preview(sample);
+        } catch (error) {
+            console.error('[Piper] preview failed:', error);
+            setVoiceStatus('Piper preview failed — choose a browser fallback voice.', 'error');
+        }
+        return;
+    }
+    const utterance = new SpeechSynthesisUtterance(state.language === 'ml'
+        ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
+        : 'Breathe gently. You are safe in this moment.');
+    const selectedVoice = getBrowserVoiceForContent();
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
     
     // Test with new warm settings
@@ -2039,7 +2384,7 @@ function testVoice() {
     utterance.pitch = 0.88;
     utterance.volume = state.volVoice;
     
-    window.speechSynthesis.speak(utterance);
+    if ('speechSynthesis' in window) window.speechSynthesis.speak(utterance);
 }
 
 function loadPreferences() {
@@ -2171,7 +2516,11 @@ function showScreen(screen) {
 }
 
 function attachEventListeners() {
-    languageSelect.addEventListener('change', (e) => { state.language = e.target.value; autoSelectVoice(); });
+    languageSelect.addEventListener('change', (e) => {
+        state.language = e.target.value;
+        setupVoices();
+        autoSelectVoice();
+    });
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
@@ -2655,6 +3004,7 @@ function attachEventListeners() {
     const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')];
     volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volVoice', e.target.value, volVoiceEls);
+        if (audio.voiceGain && audio.ctx) audio.voiceGain.gain.setValueAtTime(state.volVoice, audio.ctx.currentTime);
     }));
 
     // Drone
@@ -2713,4 +3063,10 @@ function attachEventListeners() {
     updateSessionEstimate();
 } // Closes attachEventListeners
 
-init();
+init().catch(error => {
+    console.error('Application initialization failed:', error);
+    setupVoices();
+    loadPreferences();
+    attachEventListeners();
+    checkFirstTime();
+});
