@@ -1,0 +1,155 @@
+{
+  "intro": {
+    "gratitude_en": "Take one slow breath. You are safe. Begin now.",
+    "gratitude_ml": "ഒരു സാവധാന ശ്വാസം എടുക്കൂ. നിങ്ങൾ സുരക്ഷിതരാണ്. ഇപ്പോൾ ആരംഭിക്കാം.",
+    "moon": {
+      "new_en": "New moon. Begin gently.",
+      "new_ml": "പുതിയ ചന്ദ്രൻ. സാവധാനമായി ആരംഭിക്കാം.",
+      "waxing_en": "Waxing moon. Keep moving.",
+      "waxing_ml": "വളരുന്ന ചന്ദ്രൻ. മുന്നോട്ട് പോകാം.",
+      "full_en": "Full moon. Receive this moment.",
+      "full_ml": "പൂർണ്ണ ചന്ദ്രൻ. ഈ നിമിഷം സ്വീകരിക്കൂ.",
+      "waning_en": "Waning moon. Release gently.",
+      "waning_ml": "ക്ഷയിക്കുന്ന ചന്ദ്രൻ. സാവധാനമായി വിട്ടയക്കൂ."
+    }
+  },
+  "root": {
+    "name": "Root",
+    "mantra": "LAM",
+    "frequency": 396,
+    "color": "#FF0000",
+    "symbol": "symbols/root.png",
+    "en": "Root chakra. Feel grounded.",
+    "ml": "മൂലാധാരം. ഭൂമിയോട് ചേർന്ന് നിൽക്കൂ.",
+    "affirmation_en": "You are safe.",
+    "affirmation_ml": "നിങ്ങൾ സുരക്ഷിതരാണ്."
+  },
+  "sacral": {
+    "name": "Sacral",
+    "mantra": "VAM",
+    "frequency": 417,
+    "color": "#FF7F00",
+    "symbol": "symbols/sacral.png",
+    "en": "Sacral chakra. Let energy flow.",
+    "ml": "സ്വാധിഷ്ഠാനം. ഊർജ്ജം ഒഴുകട്ടെ.",
+    "affirmation_en": "Joy is welcome.",
+    "affirmation_ml": "ആനന്ദത്തെ സ്വീകരിക്കൂ."
+  },
+  "solar": {
+    "name": "Solar",
+    "mantra": "RAM",
+    "frequency": 528,
+    "color": "#FFFF00",
+    "symbol": "symbols/solar.png",
+    "en": "Solar chakra. Feel your strength.",
+    "ml": "മണിപൂരകം. നിങ്ങളുടെ ശക്തി അനുഭവിക്കൂ.",
+    "affirmation_en": "You are powerful.",
+    "affirmation_ml": "നിങ്ങൾ ശക്തരാണ്."
+  },
+  "heart": {
+    "name": "Heart",
+    "mantra": "YAM",
+    "frequency": 639,
+    "color": "#00FF00",
+    "symbol": "symbols/heart.png",
+    "en": "Heart chakra. Breathe into love.",
+    "ml": "ഹൃദയചക്രം. സ്നേഹത്തിലേക്ക് ശ്വസിക്കൂ.",
+    "affirmation_en": "Your heart is open.",
+    "affirmation_ml": "നിങ്ങളുടെ ഹൃദയം തുറന്നിരിക്കുന്നു."
+  },
+  "throat": {
+    "name": "Throat",
+    "mantra": "HAM",
+    "frequency": 741,
+    "color": "#00BFFF",
+    "symbol": "symbols/throat.png",
+    "en": "Throat chakra. Speak your truth.",
+    "ml": "തൊണ്ടചക്രം. നിങ്ങളുടെ സത്യം പറയൂ.",
+    "affirmation_en": "Your voice is clear.",
+    "affirmation_ml": "നിങ്ങളുടെ ശബ്ദം വ്യക്തമാണ്."
+  },
+  "thirdeye": {
+    "name": "Third Eye",
+    "mantra": "OM",
+    "frequency": 852,
+    "color": "#4B0082",
+    "symbol": "symbols/thirdeye.png",
+    "en": "Third eye. See clearly.",
+    "ml": "മൂന്നാം കണ്ണ്. വ്യക്തമായി കാണൂ.",
+    "affirmation_en": "Your mind is clear.",
+    "affirmation_ml": "നിങ്ങളുടെ മനസ്സ് വ്യക്തമാണ്."
+  },
+  "crown": {
+    "name": "Crown",
+    "mantra": "AUM",
+    "frequency": 963,
+    "color": "#9400D3",
+    "symbol": "symbols/crown.png",
+    "en": "Crown chakra. Rest in stillness.",
+    "ml": "സഹസ്രാരം. നിശ്ചലതയിൽ വിശ്രമിക്കൂ.",
+    "affirmation_en": "You are connected.",
+    "affirmation_ml": "നിങ്ങൾ ബന്ധിക്കപ്പെട്ടിരിക്കുന്നു."
+  },
+  "closing": {
+    "en": "The journey is complete. Return slowly.",
+    "ml": "യാത്ര പൂർത്തിയായി. സാവധാനമായി മടങ്ങിവരൂ.",
+    "affirmation_en": "Your whole body is at peace.",
+    "affirmation_ml": "നിങ്ങളുടെ ശരീരം സമാധാനത്തിലാണ്."
+  },
+  "high_energy": {
+    "name": "High Energy Test",
+    "mantra": "HRIM",
+    "frequency": 528,
+    "color": "#FFD700",
+    "symbol": "symbols/hreem.png",
+    "en": "High energy. Feel the light rise.",
+    "ml": "ഉയർന്ന ഊർജ്ജം. പ്രകാശം ഉയരുന്നത് അനുഭവിക്കൂ.",
+    "affirmation_en": "You are fully alive.",
+    "affirmation_ml": "നിങ്ങൾ പൂർണ്ണമായി സജീവരാണ്."
+  },
+  "corpse_pose": {
+    "intro": {
+      "en": "Lie down and release your weight.",
+      "ml": "കിടന്ന് നിങ്ങളുടെ ഭാരം വിട്ടുകൊടുക്കൂ."
+    },
+    "transition": {
+      "en": "One minute remains. Prepare to continue.",
+      "ml": "ഒരു മിനിറ്റ് ബാക്കി. തുടരാൻ തയ്യാറാകൂ."
+    }
+  },
+  "bath_session": {
+    "title": { "en": "Test Bath", "ml": "പരീക്ഷണ സ്നാനം" },
+    "intro": { "en": "Begin the short bath stage.", "ml": "ചെറിയ സ്നാനഘട്ടം ആരംഭിക്കാം." },
+    "instructions": { "en": "Let the water refresh you.", "ml": "ജലം നിങ്ങളെ ഉന്മേഷിപ്പിക്കട്ടെ." },
+    "reminder": { "en": "One minute remains.", "ml": "ഒരു മിനിറ്റ് ബാക്കി." }
+  },
+  "yoga": {
+    "intro": { "en": "Begin the short Yoga Bridge.", "ml": "ചെറിയ യോഗ പാലം ആരംഭിക്കാം." },
+    "preparation": { "en": "Find a comfortable space.", "ml": "സൗകര്യപ്രദമായ സ്ഥലം കണ്ടെത്തൂ." },
+    "poses": [
+      { "id": "vrikshasana", "name_en": "Tree Pose", "name_ml": "വൃക്ഷാസനം", "desc_en": "Stand and balance.", "desc_ml": "നിന്ന് സന്തുലനം കണ്ടെത്തൂ." },
+      { "id": "adho_mukha_svanasana", "name_en": "Downward Dog", "name_ml": "അധോമുഖ ശ്വാനാസനം", "desc_en": "Stretch and breathe.", "desc_ml": "നീട്ടി ശ്വസിക്കൂ." },
+      { "id": "marjaryasana", "name_en": "Cat Cow", "name_ml": "മാർജാര്യാസനം", "desc_en": "Move with the breath.", "desc_ml": "ശ്വാസത്തോടൊപ്പം നീങ്ങൂ." },
+      { "id": "balasana", "name_en": "Child's Pose", "name_ml": "ബാലാസനം", "desc_en": "Rest and soften.", "desc_ml": "വിശ്രമിക്കൂ." },
+      { "id": "ananda_balasana", "name_en": "Happy Baby", "name_ml": "ആനന്ദ ബാലാസനം", "desc_en": "Relax your hips.", "desc_ml": "ഇടുപ്പ് അയച്ചുവിടൂ." }
+    ],
+    "next_pose_prompt": { "en": "Prepare for the next pose.", "ml": "അടുത്ത ഭാവത്തിന് തയ്യാറാകൂ." },
+    "session_complete": { "en": "Yoga is complete. Be still.", "ml": "യോഗ പൂർത്തിയായി. നിശ്ചലമായിരിക്കൂ." }
+  },
+  "hooponopono": {
+    "intro": { "en": "Repeat these four short phrases.", "ml": "ഈ നാല് ചെറിയ വാക്യങ്ങൾ ആവർത്തിക്കൂ." },
+    "phrases": {
+      "en": ["I am sorry", "Please forgive me", "Thank you", "I love you"],
+      "ml": ["ക്ഷമിക്കൂ", "എന്നോട് ക്ഷമിക്കൂ", "നന്ദി", "ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു"]
+    },
+    "closing": { "en": "Rest in peace.", "ml": "സമാധാനത്തിൽ വിശ്രമിക്കൂ." }
+  },
+  "deities": {
+    "shakthi": {
+      "root": "presiding-deities/shakthi/root.png", "sacral": "presiding-deities/shakthi/sacral.png", "solar": "presiding-deities/shakthi/solar.png", "heart": "presiding-deities/shakthi/heart.png", "throat": "presiding-deities/shakthi/throat.png", "thirdeye": "presiding-deities/shakthi/thirdeye.png", "crown": "presiding-deities/shakthi/crown.png"
+    },
+    "shiva": {
+      "root": "presiding-deities/shiva/root.png", "sacral": "presiding-deities/shiva/sacral.png", "solar": "presiding-deities/shiva/solar.png", "heart": "presiding-deities/shiva/heart.png", "throat": "presiding-deities/shiva/throat.png", "thirdeye": "presiding-deities/shiva/thirdeye.png", "crown": "presiding-deities/shiva/crown.png"
+    }
+  }
+}
