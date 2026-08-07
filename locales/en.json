@@ -8,6 +8,7 @@
     "saveSettings": "Save Settings",
     "meditationRoom": "Meditation Room",
     "returning": "Returning",
+    "returningJourney": "Returning Journey",
     "moon": "Moon",
     "gratitude": "Gratitude",
     "intention": "Intention",
@@ -31,6 +32,58 @@
     "piperFallback": "Piper unavailable — using browser voice.",
     "piperLoadFailed": "Piper could not load — using browser voice.",
     "piperPreviewFailed": "Piper preview failed — choose a browser fallback voice."
+    ,"journeys": "Journeys"
+    ,"totalTime": "Total Time"
+    ,"minutes": "mins"
+    ,"narrationVoice": "Narration Voice"
+    ,"customJourney": "Custom Journey"
+    ,"options": "Options"
+    ,"presidingDeities": "Presiding Deities"
+    ,"audioFilters": "Enable Audio Filters (Warmth)"
+    ,"reverseJourney": "Reverse Journey (Crown ➔ Root)"
+    ,"boxMeditation": "Box Meditation"
+    ,"hooponopono": "Ho'oponopono"
+    ,"chakraFrequencies": "Chakra Frequencies (Solfeggio)"
+    ,"eyesCloseMode": "Eyes Close Mode (Warmth/Comfort)"
+    ,"backgroundMusicMode": "Background Music Mode"
+    ,"corpsePoseOption": "Enable Corpse Pose (Savasana)"
+    ,"yogaBridge": "Enable Yoga Bridge (Physical Union)"
+    ,"bathSession": "Enable Bath Session"
+    ,"highEnergy": "High Energy (HRIM)"
+    ,"sleepMode": "🌙 Sleep Mode"
+    ,"timePerSession": "Time per Session (minutes)"
+    ,"intentionPrompt": "What are you calling in today?"
+    ,"yogaFlowNote": "Bath runs first, followed by Yoga, then the journey continues to Crown."
+    ,"yogaTiming": "Yoga Timing"
+    ,"preparation": "Preparation"
+    ,"perPose": "Per Pose"
+    ,"bathDuration": "Bath Duration"
+    ,"screenBrightness": "Screen Brightness"
+    ,"audioLevels": "Audio Levels"
+    ,"voice": "Voice"
+    ,"drone": "Drone"
+    ,"bell": "Bell"
+    ,"mantra": "Mantra"
+    ,"music": "Music"
+    ,"journeyTimings": "Journey Timings"
+    ,"arriving": "Arriving"
+    ,"breathing": "Breathing"
+    ,"corpsePose": "Corpse Pose"
+    ,"interval": "Interval"
+    ,"scriptSelection": "Script Selection"
+    ,"startMeditation": "Start Meditation"
+    ,"beginJourney": "Begin Journey"
+    ,"close": "Close"
+    ,"sessionTime": "Session Time"
+    ,"totalJourneys": "Total Journeys"
+    ,"writeFreely": "Write freely..."
+    ,"root": "Root"
+    ,"sacral": "Sacral"
+    ,"solar": "Solar"
+    ,"heart": "Heart"
+    ,"throat": "Throat"
+    ,"thirdEye": "3rd Eye"
+    ,"crown": "Crown"
   },
   "system": {
     "arriving": "Arriving",
@@ -47,6 +100,10 @@
       { "text": "Exhale", "scale": 1 },
       { "text": "Hold", "scale": 1 }
     ],
-    "musicOnly": "MUSIC ONLY"
+    "musicOnly": "MUSIC ONLY",
+    "breathe": "BREATHE",
+    "silence": "SILENCE",
+    "body": "BODY",
+    "hold": "HOLD"
   }
 }

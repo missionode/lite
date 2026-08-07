@@ -8,6 +8,7 @@
     "saveSettings": "ക്രമീകരണങ്ങൾ സൂക്ഷിക്കുക",
     "meditationRoom": "ധ്യാന മുറി",
     "returning": "വീണ്ടും വരവ്",
+    "returningJourney": "വീണ്ടും വരവിന്റെ യാത്ര",
     "moon": "ചന്ദ്രൻ",
     "gratitude": "കൃതജ്ഞത",
     "intention": "ഉദ്ദേശ്യം",
@@ -31,6 +32,58 @@
     "piperFallback": "Piper ലഭ്യമല്ല — ബ്രൗസർ ശബ്ദം ഉപയോഗിക്കുന്നു.",
     "piperLoadFailed": "Piper ലോഡ് ചെയ്യാനായില്ല — ബ്രൗസർ ശബ്ദം ഉപയോഗിക്കുന്നു.",
     "piperPreviewFailed": "Piper പ്രിവ്യൂ പരാജയപ്പെട്ടു — ബ്രൗസർ ശബ്ദം തിരഞ്ഞെടുക്കുക."
+    ,"journeys": "യാത്രകൾ"
+    ,"totalTime": "ആകെ സമയം"
+    ,"minutes": "മിനിറ്റ്"
+    ,"narrationVoice": "വിവരണ ശബ്ദം"
+    ,"customJourney": "ഇഷ്ടാനുസൃത യാത്ര"
+    ,"options": "ഓപ്ഷനുകൾ"
+    ,"presidingDeities": "ആരാധനാ ദേവതകൾ"
+    ,"audioFilters": "ഓഡിയോ ഫിൽട്ടറുകൾ പ്രവർത്തനക്ഷമമാക്കുക (ഊഷ്മളത)"
+    ,"reverseJourney": "വിപരീത യാത്ര (കിരീടം ➔ മൂലാധാരം)"
+    ,"boxMeditation": "ബോക്സ് ധ്യാനം"
+    ,"hooponopono": "ഹോ'ഒപോനോപോനോ"
+    ,"chakraFrequencies": "ചക്ര ആവൃത്തികൾ (സോൾഫെജിയോ)"
+    ,"eyesCloseMode": "കണ്ണടച്ചുള്ള മോഡ് (ഊഷ്മളത/സുഖം)"
+    ,"backgroundMusicMode": "പശ്ചാത്തല സംഗീത മോഡ്"
+    ,"corpsePoseOption": "ശവാസനം പ്രവർത്തനക്ഷമമാക്കുക"
+    ,"yogaBridge": "യോഗ പാലം പ്രവർത്തനക്ഷമമാക്കുക (ശാരീരിക ഐക്യം)"
+    ,"bathSession": "സ്നാന സെഷൻ പ്രവർത്തനക്ഷമമാക്കുക"
+    ,"highEnergy": "ഉയർന്ന ഊർജ്ജം (HRIM)"
+    ,"sleepMode": "🌙 ഉറക്ക മോഡ്"
+    ,"timePerSession": "ഓരോ സെഷന്റെയും സമയം (മിനിറ്റ്)"
+    ,"intentionPrompt": "ഇന്ന് നിങ്ങൾ എന്താണ് ക്ഷണിക്കുന്നത്?"
+    ,"yogaFlowNote": "ആദ്യം സ്നാനം, തുടർന്ന് യോഗ, പിന്നെ യാത്ര കിരീട ചക്രത്തിലേക്ക് തുടരും."
+    ,"yogaTiming": "യോഗ സമയം"
+    ,"preparation": "തയ്യാറെടുപ്പ്"
+    ,"perPose": "ഓരോ ആസനത്തിനും"
+    ,"bathDuration": "സ്നാന ദൈർഘ്യം"
+    ,"screenBrightness": "സ്ക്രീൻ തെളിച്ചം"
+    ,"audioLevels": "ഓഡിയോ നിലകൾ"
+    ,"voice": "ശബ്ദം"
+    ,"drone": "ഡ്രോൺ"
+    ,"bell": "മണി"
+    ,"mantra": "മന്ത്രം"
+    ,"music": "സംഗീതം"
+    ,"journeyTimings": "യാത്രാ സമയക്രമം"
+    ,"arriving": "എത്തിച്ചേരൽ"
+    ,"breathing": "ശ്വസനം"
+    ,"corpsePose": "ശവാസനം"
+    ,"interval": "ഇടവേള"
+    ,"scriptSelection": "സ്ക്രിപ്റ്റ് തിരഞ്ഞെടുക്കൽ"
+    ,"startMeditation": "ധ്യാനം ആരംഭിക്കുക"
+    ,"beginJourney": "യാത്ര ആരംഭിക്കുക"
+    ,"close": "അടയ്ക്കുക"
+    ,"sessionTime": "സെഷൻ സമയം"
+    ,"totalJourneys": "ആകെ യാത്രകൾ"
+    ,"writeFreely": "സ്വതന്ത്രമായി എഴുതുക..."
+    ,"root": "മൂലാധാരം"
+    ,"sacral": "സ്വാധിഷ്ഠാനം"
+    ,"solar": "മണിപൂരം"
+    ,"heart": "അനാഹതം"
+    ,"throat": "വിശുദ്ധി"
+    ,"thirdEye": "ആജ്ഞ"
+    ,"crown": "സഹസ്രാരം"
   },
   "system": {
     "arriving": "ശാന്തമാകുക",
@@ -47,6 +100,10 @@
       { "text": "ശ്വാസം പുറത്തേക്ക് വിടുക", "scale": 1 },
       { "text": "", "scale": 1 }
     ],
-    "musicOnly": "സംഗീതം മാത്രം"
+    "musicOnly": "സംഗീതം മാത്രം",
+    "breathe": "ശ്വസിക്കൂ",
+    "silence": "നിശ്ശബ്ദത",
+    "body": "ശരീരം",
+    "hold": "നിർത്തുക"
   }
 }
