@@ -1,5 +1,6 @@
 const CACHE_NAME = 'chakra-v5.5';
 const PIPER_CACHE_NAME = 'chakra-piper-v2';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -48,7 +49,7 @@ self.addEventListener('activate', (event) => {
             self.clients.claim(), // Take control of page immediately
             caches.keys().then((keys) => {
                 return Promise.all(keys
-                    .filter(key => key !== CACHE_NAME && key !== PIPER_CACHE_NAME)
+                    .filter(key => ![CACHE_NAME, PIPER_CACHE_NAME, LANGUAGE_CACHE_NAME].includes(key))
                     .map(key => caches.delete(key)));
             })
         ])
@@ -69,6 +70,11 @@ function isPiperRequest(request) {
         (url.hostname === 'huggingface.co' && url.pathname.includes('/piper-voices/'));
 }
 
+function isLanguageRequest(request) {
+    const url = new URL(request.url);
+    return url.pathname.endsWith('/language-manifest.json') || url.pathname.includes('/locales/');
+}
+
 self.addEventListener('fetch', (event) => {
     if (isPiperRequest(event.request)) {
         event.respondWith(caches.open(PIPER_CACHE_NAME).then(async (cache) => {
@@ -78,6 +84,21 @@ self.addEventListener('fetch', (event) => {
             if (response.ok || response.type === 'opaque') {
                 try { await cache.put(event.request, response.clone()); } catch (error) {
                     console.warn('Piper cache write skipped:', error);
+                }
+            }
+            return response;
+        }));
+        return;
+    }
+
+    if (isLanguageRequest(event.request)) {
+        event.respondWith(caches.open(LANGUAGE_CACHE_NAME).then(async (cache) => {
+            const cached = await cache.match(event.request);
+            if (cached) return cached;
+            const response = await fetch(event.request);
+            if (response.ok) {
+                try { await cache.put(event.request, response.clone()); } catch (error) {
+                    console.warn('Language cache write skipped:', error);
                 }
             }
             return response;

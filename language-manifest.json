@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "defaultLanguage": "ml",
+  "fallbackLanguage": "en",
+  "languages": [
+    {
+      "id": "ml",
+      "locale": "ml-IN",
+      "label": "Malayalam",
+      "contentSource": "scripts.json",
+      "localeSource": "locales/ml.json",
+      "browserPrefixes": ["ml"],
+      "defaultPiperVoice": "ml_IN-arjun-medium",
+      "preview": "ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്."
+    },
+    {
+      "id": "en",
+      "locale": "en-US",
+      "label": "English",
+      "contentSource": "scripts.json",
+      "localeSource": "locales/en.json",
+      "browserPrefixes": ["en"],
+      "defaultPiperVoice": "en_US-lessac-medium",
+      "preview": "Breathe gently. You are safe in this moment."
+    }
+  ]
+}

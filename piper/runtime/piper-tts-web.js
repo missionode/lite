@@ -8,7 +8,7 @@ var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot
 var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var _createPiperPhonemize, _modelConfig, _ort, _ortSession, _progressCallback, _wasmPaths, _logger;
+var _createPiperPhonemize, _modelConfig, _ort, _ortSession, _progressCallback, _wasmPaths, _logger, _modelPath, _configPath, _phonemizerVoice;
 const HF_BASE = "https://huggingface.co/rhasspy/piper-voices/resolve/main";
 // Resolve binary assets from this module rather than from the document or
 // worker script. This prevents SPA/dev-server fallbacks from returning HTML
@@ -250,7 +250,10 @@ const _TtsSession = class _TtsSession {
     voiceId,
     progress,
     logger,
-    wasmPaths
+    wasmPaths,
+    modelPath,
+    configPath,
+    phonemizerVoice
   }) {
     __publicField(this, "ready", false);
     __publicField(this, "voiceId", "en_US-hfc_female-medium");
@@ -263,6 +266,9 @@ const _TtsSession = class _TtsSession {
     __privateAdd(this, _wasmPaths, DEFAULT_WASM_PATHS);
     // @ts-ignore-next-line
     __privateAdd(this, _logger);
+    __privateAdd(this, _modelPath);
+    __privateAdd(this, _configPath);
+    __privateAdd(this, _phonemizerVoice);
     var _a;
     if (_TtsSession._instance) {
       logger == null ? void 0 : logger("Reusing session for TTS!");
@@ -273,6 +279,9 @@ const _TtsSession = class _TtsSession {
     logger == null ? void 0 : logger("New session");
     __privateSet(this, _logger, logger);
     this.voiceId = voiceId;
+    __privateSet(this, _modelPath, modelPath || PATH_MAP[voiceId]);
+    __privateSet(this, _configPath, configPath || `${__privateGet(this, _modelPath)}.json`);
+    __privateSet(this, _phonemizerVoice, phonemizerVoice || '');
     __privateSet(this, _progressCallback, progress);
     this.waitReady = this.init();
     __privateSet(this, _wasmPaths, wasmPaths ?? DEFAULT_WASM_PATHS);
@@ -296,8 +305,10 @@ const _TtsSession = class _TtsSession {
       ? Math.min(2, navigator.hardwareConcurrency || 2)
       : 1;
     __privateGet(this, _ort).env.wasm.wasmPaths = __privateGet(this, _wasmPaths).onnxWasm;
-    const path = PATH_MAP[this.voiceId];
-    const modelConfigBlob = await getBlob(`${HF_BASE}/${path}.json`);
+    const path = __privateGet(this, _modelPath);
+    if (!path) throw new Error(`No Piper model path registered for voice ${this.voiceId}`);
+    const configPath = __privateGet(this, _configPath) || `${path}.json`;
+    const modelConfigBlob = await getBlob(`${HF_BASE}/${configPath}`);
     __privateSet(this, _modelConfig, JSON.parse(await modelConfigBlob.text()));
     const modelBlob = await getBlob(
       `${HF_BASE}/${path}`,
@@ -326,7 +337,7 @@ const _TtsSession = class _TtsSession {
       });
       module.callMain([
         "-l",
-        __privateGet(this, _modelConfig).espeak.voice,
+        __privateGet(this, _phonemizerVoice) || __privateGet(this, _modelConfig).espeak.voice,
         "--input",
         input,
         "--espeak_data",
@@ -371,6 +382,9 @@ _ortSession = new WeakMap();
 _progressCallback = new WeakMap();
 _wasmPaths = new WeakMap();
 _logger = new WeakMap();
+_modelPath = new WeakMap();
+_configPath = new WeakMap();
+_phonemizerVoice = new WeakMap();
 __publicField(_TtsSession, "WASM_LOCATIONS", DEFAULT_WASM_PATHS);
 __publicField(_TtsSession, "_instance", null);
 let TtsSession = _TtsSession;

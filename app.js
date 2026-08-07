@@ -73,28 +73,135 @@ function hasScriptPath(source, path) {
     return path.split('.').reduce((value, key) => value == null ? undefined : value[key], source) != null;
 }
 
+function hasLocalizedScriptPath(scripts, path) {
+    if (hasScriptPath(scripts, path)) return true;
+    const parts = path.split('.');
+    const final = parts.pop() || '';
+    const suffixMatch = final.match(/^(.+)_([a-zA-Z-]+)$/);
+    if (!suffixMatch) return false;
+    const basePath = parts.concat(suffixMatch[1]).join('.');
+    if (hasScriptPath(scripts, `${basePath}.${suffixMatch[2]}`)) return true;
+    const parentPath = parts.join('.');
+    return ['text', 'content', 'value'].some(field =>
+        hasScriptPath(scripts, `${parentPath}.${field}.${suffixMatch[2]}`)
+    );
+}
+
 function validateScriptBundle(scripts, options = {}) {
+    const languageIds = (options.languages || languageRegistry.map(language => language.id)).length
+        ? (options.languages || languageRegistry.map(language => language.id))
+        : ['ml', 'en'];
+    const localized = (base) => languageIds.map(language => `${base}_${language}`);
     const required = [
-        'intro.gratitude_en', 'intro.gratitude_ml',
-        'intro.returning_en', 'intro.returning_ml',
-        'intro.moon.new_en', 'intro.moon.new_ml', 'intro.moon.waxing_en', 'intro.moon.waxing_ml',
-        'intro.moon.full_en', 'intro.moon.full_ml', 'intro.moon.waning_en', 'intro.moon.waning_ml',
-        'closing.en', 'closing.ml', 'closing.affirmation_en', 'closing.affirmation_ml',
+        ...localized('intro.gratitude'), ...localized('intro.returning'),
+        ...['new', 'waxing', 'full', 'waning'].flatMap(phase => localized(`intro.moon.${phase}`)),
+        ...languageIds.map(language => `closing.${language}`),
+        ...languageIds.map(language => `closing.affirmation_${language}`),
         ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].flatMap(key => [
-            `${key}.en`, `${key}.ml`, `${key}.affirmation_en`, `${key}.affirmation_ml`,
+            ...languageIds.map(language => `${key}.${language}`),
+            ...languageIds.map(language => `${key}.affirmation_${language}`),
             `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
         ])
     ];
-    if (options.highEnergy) required.push('high_energy.en', 'high_energy.ml', 'high_energy.affirmation_en', 'high_energy.affirmation_ml');
-    if (options.corpse) required.push('corpse_pose.intro.en', 'corpse_pose.intro.ml', 'corpse_pose.transition.en', 'corpse_pose.transition.ml');
-    if (options.bath) required.push('bath_session.title.en', 'bath_session.title.ml', 'bath_session.intro.en', 'bath_session.intro.ml', 'bath_session.instructions.en', 'bath_session.instructions.ml', 'bath_session.reminder.en', 'bath_session.reminder.ml');
-    if (options.yoga) required.push('yoga.intro.en', 'yoga.intro.ml', 'yoga.preparation.en', 'yoga.preparation.ml', 'yoga.next_pose_prompt.en', 'yoga.next_pose_prompt.ml', 'yoga.session_complete.en', 'yoga.session_complete.ml', 'yoga.poses');
-    if (options.hooponopono) required.push('hooponopono.intro.en', 'hooponopono.intro.ml', 'hooponopono.phrases.en', 'hooponopono.phrases.ml', 'hooponopono.closing.en', 'hooponopono.closing.ml');
-    const missing = required.filter(path => !hasScriptPath(scripts, path));
+    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.affirmation_${language}`]));
+    if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
+    if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
+    if (options.yoga) required.push(...languageIds.flatMap(language => [`yoga.intro.${language}`, `yoga.preparation.${language}`, `yoga.next_pose_prompt.${language}`, `yoga.session_complete.${language}`]), 'yoga.poses');
+    if (options.hooponopono) required.push(...languageIds.flatMap(language => [`hooponopono.intro.${language}`, `hooponopono.phrases.${language}`, `hooponopono.closing.${language}`]));
+    const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path));
     return { valid: missing.length === 0, missing };
 }
 
 let piperVoiceRegistry = [];
+let languageRegistry = [];
+let localeBundles = {};
+let fallbackLanguageId = 'en';
+
+function getLanguageConfig(language = state.language) {
+    return languageRegistry.find(item => item.id === language) ||
+        languageRegistry.find(item => item.id === 'en') || { id: language, locale: language, browserPrefixes: [language] };
+}
+
+function getLocalizedValue(bundle, path) {
+    return path.split('.').reduce((value, key) => value == null ? undefined : value[key], bundle);
+}
+
+function localized(source, field = null, language = state.language) {
+    if (source == null) return undefined;
+    const value = field == null ? source : source[field];
+    if (value != null && typeof value === 'object' && value[language] != null) return value[language];
+    if (field == null) {
+        for (const contentField of ['text', 'content', 'value']) {
+            if (source[contentField] != null) return localized(source[contentField], null, language);
+        }
+    }
+    if (field && source[`${field}_${language}`] != null) return source[`${field}_${language}`];
+    if (field && source[`${field}_en`] != null) return source[`${field}_en`];
+    if (field == null && source[language] != null) return source[language];
+    if (field == null && source.en != null) return source.en;
+    return typeof value === 'string' || Array.isArray(value) ? value : undefined;
+}
+
+function t(path, language = state.language) {
+    const value = getLocalizedValue(localeBundles[language], path);
+    if (value != null) return value;
+    const fallback = getLocalizedValue(localeBundles[fallbackLanguageId], path);
+    return fallback == null ? path : fallback;
+}
+
+function applyLocaleUI() {
+    document.documentElement.lang = getLanguageConfig().locale || state.language;
+    const configSubtitle = document.querySelector('#config-screen > .subtitle');
+    if (configSubtitle) configSubtitle.textContent = t('ui.settingsSubtitle');
+    const languageLabel = document.querySelector('label[for="language-select"]');
+    if (languageLabel) languageLabel.textContent = t('ui.language');
+    if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
+    if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
+    setText('lobby-title', t('ui.meditationRoom'));
+    setText('completion-title', t('ui.journeyComplete'));
+    setText('completion-message', t('ui.meditationCompleted'));
+    setText('close-completion', t('ui.returnToRoom'));
+    setText('journal-prompt', t('ui.journalPrompt'));
+    setText('save-journal', t('ui.saveEntry'));
+}
+
+async function loadLanguageManifest() {
+    try {
+        const response = await fetch('language-manifest.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const manifest = await response.json();
+        languageRegistry = Array.isArray(manifest.languages) ? manifest.languages : [];
+        fallbackLanguageId = manifest.fallbackLanguage || 'en';
+        const requested = localStorage.getItem('chakra_lang');
+        const defaultLanguage = manifest.defaultLanguage || languageRegistry[0]?.id || 'en';
+        state.language = languageRegistry.some(item => item.id === requested) ? requested : defaultLanguage;
+        await Promise.all(languageRegistry.map(async language => {
+            const localeResponse = await fetch(language.localeSource);
+            if (!localeResponse.ok) throw new Error(`Locale ${language.id} HTTP ${localeResponse.status}`);
+            localeBundles[language.id] = await localeResponse.json();
+        }));
+        populateLanguageSelect();
+        applyLocaleUI();
+    } catch (error) {
+        console.warn('Language manifest unavailable; using built-in language options.', error);
+        languageRegistry = [
+            { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
+            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' }
+        ];
+    }
+}
+
+function populateLanguageSelect() {
+    if (!languageSelect || languageRegistry.length === 0) return;
+    languageSelect.innerHTML = '';
+    languageRegistry.forEach(language => {
+        const option = document.createElement('option');
+        option.value = language.id;
+        option.textContent = language.label;
+        languageSelect.appendChild(option);
+    });
+    languageSelect.value = state.language;
+}
 
 function isPiperVoice(value) {
     return typeof value === 'string' && value.startsWith('piper:');
@@ -114,8 +221,9 @@ function setVoiceStatus(message, tone = 'muted') {
 
 function voiceMatchesLanguage(voice, language = state.language) {
     if (!voice || !voice.lang) return false;
-    const prefix = language === 'ml' ? 'ml' : 'en';
-    return voice.lang.toLowerCase().startsWith(prefix);
+    const prefixes = getLanguageConfig(language).browserPrefixes || [language];
+    const voiceLanguage = voice.lang.toLowerCase();
+    return prefixes.some(prefix => voiceLanguage.startsWith(String(prefix).toLowerCase()));
 }
 
 function getBrowserVoiceForContent() {
@@ -129,6 +237,7 @@ class PiperTTS {
         this.audio = audioEngine;
         this.worker = null;
         this.voiceId = null;
+        this.voiceDefinition = null;
         this.nextRequestId = 1;
         this.queue = [];
         this.activeJob = null;
@@ -150,6 +259,7 @@ class PiperTTS {
             this.cancel('voice changed');
         }
         this.voiceId = nextVoiceId;
+        this.voiceDefinition = piperVoiceRegistry.find(voice => voice.id === nextVoiceId) || null;
         return true;
     }
 
@@ -159,7 +269,7 @@ class PiperTTS {
             this.worker.onmessage = (event) => this.handleWorkerMessage(event.data || {});
             this.worker.onerror = (event) => {
                 const message = event.message || 'Piper worker failed.';
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
                 if (this.activeJob) this.finishActive(new Error(message));
             };
         }
@@ -183,6 +293,7 @@ class PiperTTS {
             type: job.type,
             requestId: job.requestId,
             voiceId: this.voiceId,
+            voiceDefinition: this.voiceDefinition,
             ...job.payload
         });
     }
@@ -201,12 +312,12 @@ class PiperTTS {
             const total = Number(message.total) || 0;
             const loaded = Number(message.loaded) || 0;
             const percent = total > 0 ? ` ${Math.round((loaded / total) * 100)}%` : '';
-            setVoiceStatus(`Preparing Piper voice…${percent}`);
+            setVoiceStatus(`${t('ui.piperPreparing')}${percent}`);
             return;
         }
         if (!this.activeJob || message.requestId !== this.activeJob.requestId) return;
         if (message.type === 'ready') {
-            setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+            setVoiceStatus(t('ui.piperReady'), 'ready');
             this.finishActive(null, true);
         } else if (message.type === 'audio') {
             this.finishActive(null, message.audio);
@@ -217,7 +328,7 @@ class PiperTTS {
     }
 
     warmup() {
-        setVoiceStatus('Preparing Piper voice…');
+        setVoiceStatus(t('ui.piperPreparing'));
         return this.request('warmup');
     }
 
@@ -255,7 +366,7 @@ class PiperTTS {
         await this.warmup();
         const blob = await this.synthesize(text);
         await this.play(blob);
-        setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+        setVoiceStatus(t('ui.piperReady'), 'ready');
     }
 
     setPaused(paused) {
@@ -1075,6 +1186,7 @@ class MeditationController {
         this.audio = audio;
         this.visual = visual;
         this.scripts = null;
+        this.scriptsLanguage = null;
         this.isMeditationActive = false;
         this.isStarting = false;
         this.isPaused = false;
@@ -1126,15 +1238,18 @@ class MeditationController {
             document.getElementById('completion-modal').classList.add('hidden');
             
             // Script Loading Strategy
-            if (!this.scripts) {
+            if (!this.scripts || this.scriptsLanguage !== state.language) {
                 if (state.scriptSource === 'custom' && state.customScript) {
                     console.log("Loading Custom Script from local storage...");
                     this.scripts = state.customScript;
                 } else {
-                    console.log("Loading Default Script (scripts.json)...");
-                    const response = await fetch('scripts.json?v=' + Date.now());
+                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
+                    console.log(`Loading Language Content (${state.language}): ${contentSource}...`);
+                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
+                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
                     this.scripts = await response.json();
                 }
+                this.scriptsLanguage = state.language;
             }
 
             const scriptCheck = validateScriptBundle(this.scripts, {
@@ -1156,7 +1271,7 @@ class MeditationController {
             if (isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName)) {
                 // Use the existing icebreaker as the first model-loading window.
                 piperWarmup = piperTTS.warmup().catch((error) => {
-                    setVoiceStatus('Piper could not load — using browser voice.', 'error');
+                    setVoiceStatus(t('ui.piperLoadFailed'), 'error');
                     return false;
                 });
             }
@@ -1174,8 +1289,8 @@ class MeditationController {
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
-            setText('icebreaker-title', state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving");
-            setText('icebreaker-subtitle', state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space");
+            setText('icebreaker-title', t('system.arriving'));
+            setText('icebreaker-subtitle', t('system.breatheAndSettle'));
 
             this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
             for (let i = state.timeIcebreaker; i > 0; i--) {
@@ -1246,14 +1361,13 @@ class MeditationController {
         // an evergreen image that welcomes discovery without repeating a lesson.
         const isReturningVisitor = state.stats.journeys > 0;
         const phase = getMoonPhase();
-        const moonText = this.scripts.intro.moon[`${phase}_${state.language}`];
+        const moonText = localized(this.scripts.intro.moon[phase]) ||
+            this.scripts.intro.moon[`${phase}_${state.language}`];
         const openingText = isReturningVisitor
-            ? this.scripts.intro[`returning_${state.language}`]
+            ? localized(this.scripts.intro, 'returning')
             : moonText;
         if (openingText && this.isMeditationActive) {
-            tutTitle.textContent = isReturningVisitor
-                ? (state.language === 'ml' ? "വീണ്ടും വരവ്" : "Returning")
-                : (state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon");
+            tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
             tutText.textContent = openingText;
             await this.narrate(openingText, false); // Keep music playing
             await this.pauseAwareSleep(1000);
@@ -1261,17 +1375,15 @@ class MeditationController {
 
         // Main gratitude + body scan
         if (!this.isMeditationActive) return;
-        tutTitle.textContent = state.language === 'ml' ? "കൃതജ്ഞത" : "Gratitude";
-        const text = this.scripts.intro[`gratitude_${state.language}`];
+        tutTitle.textContent = t('ui.gratitude');
+        const text = localized(this.scripts.intro, 'gratitude');
         tutText.textContent = text;
 
         if (state.intention && state.intention.trim()) {
             await this.narrate(text, false); // Still keep music playing for next part
             
-            const intentionText = state.language === 'ml'
-                ? `ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: ${state.intention.trim()}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്ര മുഴുവൻ അത് ഉള്ളിൽ ജ്വലിക്കട്ടെ.`
-                : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
-            tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
+            const intentionText = t('system.intention').replace('{{intention}}', state.intention.trim());
+            tutTitle.textContent = t('ui.intention');
             tutText.textContent = intentionText;
             await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
@@ -1294,8 +1406,8 @@ class MeditationController {
 
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
-        tutTitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കാം" : "Preparation";
-        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
+        tutTitle.textContent = t('ui.preparation');
+        const text = t('system.centeringBreath');
         tutText.textContent = text;
 
         // Fade out music before box meditation
@@ -1313,14 +1425,7 @@ class MeditationController {
         await this.pauseAwareSleep(1000);
         tutorial.classList.add('hidden');
 
-        const steps = state.language === 'ml' ? [
-            { text: "ശ്വാസം ഉള്ളിലേക്ക് എടുക്കുക", scale: 8 },
-            { text: "", scale: 8 },
-            { text: "ശ്വാസം പുറത്തേക്ക് വിടുക", scale: 1 },
-            { text: "", scale: 1 }
-        ] : [
-            { text: "Inhale", scale: 8 }, { text: "Hold", scale: 8 }, { text: "Exhale", scale: 1 }, { text: "Hold", scale: 1 }
-        ];
+        const steps = t('system.breathingSteps');
 
         for (let cycle = 0; cycle < 4; cycle++) {
             for (const step of steps) {
@@ -1352,15 +1457,15 @@ class MeditationController {
 
         // Intimate Completion
         if (this.isMeditationActive) {
-            instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ. ശ്വാസോശ്വാസം സാധാരണ രീതിയിൽ കൊണ്ട് വരൂ " : "Breathing exercise is complete. Stay still for a moment.";
+            instruction.textContent = t('ui.breathingComplete');
+            const completeText = t('system.breathingComplete');
             await this.narrate(completeText, false, true);
             
             // Fade music back in after box meditation
             this.audio.fadeInBackgroundMusic(4, false);
 
             // 5 second interval before Chakra Journey starts
-            instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            instruction.textContent = t('ui.prepare');
             await this.pauseAwareSleep(5000);
         }
     }
@@ -1375,8 +1480,8 @@ class MeditationController {
             const subtitle = document.getElementById('icebreaker-subtitle');
             const timer = document.getElementById('icebreaker-timer');
 
-            title.textContent = state.language === 'ml' ? "ശവാസനം" : "Corpse Pose";
-            subtitle.textContent = state.language === 'ml' ? "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക" : "Surrender your body completely to the earth";
+            title.textContent = t('ui.corpsePose');
+            subtitle.textContent = t('ui.corpsePoseSubtitle');
 
             // Narration: Intro to the pose
             if (!this.scripts.corpse_pose) {
@@ -1384,7 +1489,7 @@ class MeditationController {
                 throw new Error("Missing corpse_pose scripts");
             }
 
-            await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
+            await this.narrate(localized(this.scripts.corpse_pose.intro), false);
             
             // Debug: Log volume change
             console.log("DEBUG: Transitions to Corpse Pose stillness. Reducing volume factor to 0.30");
@@ -1412,7 +1517,7 @@ class MeditationController {
 
                 // At 1 minute remaining, narrate the transition to hypnagogic state
                 if (i === transitionSecond) {
-                    await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
+                    await this.narrate(localized(this.scripts.corpse_pose.transition), false);
                     console.log("DEBUG: Restoring Corpse Pose stillness volume factor (0.30)");
                     this.audio.fadeInBackgroundMusic(12, 0.30);
                 }
@@ -1421,7 +1526,7 @@ class MeditationController {
             }
 
             // Final settle before Chakra Journey
-            subtitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
+            subtitle.textContent = t('ui.prepare');
             await this.pauseAwareSleep(3000);
         } catch (e) {
             console.error("Error in runCorpsePose:", e);
@@ -1437,11 +1542,11 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = state.language === 'ml' ? this.scripts.bath_session.title.ml : this.scripts.bath_session.title.en;
-        subtitle.textContent = state.language === 'ml' ? "ശുദ്ധീകരണം" : "Purification";
+        title.textContent = localized(this.scripts.bath_session.title);
+        subtitle.textContent = t('ui.purification');
 
-        await this.narrate(this.scripts.bath_session.intro[state.language], false);
-        await this.narrate(this.scripts.bath_session.instructions[state.language], false);
+        await this.narrate(localized(this.scripts.bath_session.intro), false);
+        await this.narrate(localized(this.scripts.bath_session.instructions), false);
 
         let remaining = state.timeBath;
         const reminderSecond = 60;
@@ -1452,7 +1557,7 @@ class MeditationController {
                 if (timer) timer.textContent = Math.floor(remaining / 60) + ":" + (remaining % 60).toString().padStart(2, '0');
                 
                 if (remaining === reminderSecond) {
-                    this.narrateSoft(this.scripts.bath_session.reminder[state.language]);
+                    this.narrateSoft(localized(this.scripts.bath_session.reminder));
                 }
                 remaining--;
             }
@@ -1512,8 +1617,8 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = state.language === 'ml' ? "യോഗ" : "Yoga Bridge";
-        subtitle.textContent = state.language === 'ml' ? "ശരീരവും മനസ്സും തമ്മിലുള്ള യോജിപ്പ്" : "Union of body and spirit";
+        title.textContent = t('ui.yoga');
+        subtitle.textContent = t('ui.yogaSubtitle');
         
         // Grounding Drone for Yoga (136.1 Hz - OM frequency)
         this.audio.startDrone(136.1, 3); // Using heart-level elemental layer for warmth
@@ -1521,8 +1626,8 @@ class MeditationController {
         this.audio.fadeInBackgroundMusic(8, 0.30);
 
         // Intro & Preparation
-        await this.narrate(this.scripts.yoga.intro[state.language], false);
-        await this.narrate(this.scripts.yoga.preparation[state.language], false);
+        await this.narrate(localized(this.scripts.yoga.intro), false);
+        await this.narrate(localized(this.scripts.yoga.preparation), false);
 
         // Prep Countdown
         for (let i = state.timeYogaPrep; i > 0; i--) {
@@ -1549,7 +1654,7 @@ class MeditationController {
             if (!this.isMeditationActive) break;
 
             // Display Pose Name
-            mantraEl.textContent = state.language === 'ml' ? pose.name_ml : pose.name_en;
+            mantraEl.textContent = localized(pose, 'name');
             mantraEl.style.color = "#FFD700"; // Golden Yoga Color
             
             // Set pose-specific image
@@ -1564,7 +1669,7 @@ class MeditationController {
             symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
 
             // Explain Pose
-            const desc = state.language === 'ml' ? pose.desc_ml : pose.desc_en;
+            const desc = localized(pose, 'desc');
             await this.narrate(desc, false);
 
             // Hold Timer
@@ -1579,14 +1684,14 @@ class MeditationController {
             }
             
             if (this.isMeditationActive) {
-                this.narrateSoft(this.scripts.yoga.next_pose_prompt[state.language]);
+                this.narrateSoft(localized(this.scripts.yoga.next_pose_prompt));
                 await this.pauseAwareSleep(5000); // 5s transition gap
             }
         }
 
         // Final Settle
         if (this.isMeditationActive) {
-            await this.narrate(this.scripts.yoga.session_complete[state.language], false);
+            await this.narrate(localized(this.scripts.yoga.session_complete), false);
             await this.pauseAwareSleep(5000);
         }
     }
@@ -1630,7 +1735,7 @@ class MeditationController {
                 piperFailed = true;
                 pending.forEach(job => job.catch(() => {}));
                 piperTTS.cancel('sentence failed');
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
                 await this.narrateBrowser(sentences[i], false, true);
             }
 
@@ -1653,7 +1758,7 @@ class MeditationController {
             catch (error) {
                 console.error('[Piper] soft narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
         return this.narrateSoftBrowser(text);
@@ -1735,11 +1840,11 @@ class MeditationController {
         if (symbolEl) symbolEl.style.opacity = "0.4";
         const aura = document.getElementById('aura-bg');
         if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
-        const closingText = this.scripts.closing[state.language];
+        const closingText = localized(this.scripts.closing);
         await this.narrate(closingText);
         await this.pauseAwareSleep(2000);
         // Full-body health affirmation — head to toe
-        const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
+        const healthAffirmation = localized(this.scripts.closing, 'affirmation');
         if (healthAffirmation && this.isMeditationActive) {
             setText('mantra-display', "✦ BODY ✦");
             await this.narrate(healthAffirmation);
@@ -1760,11 +1865,11 @@ class MeditationController {
         setText('narration-text', '');
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
-        await this.narrate(this.scripts.hooponopono.intro[state.language], false);
+        await this.narrate(localized(this.scripts.hooponopono.intro), false);
         await this.pauseAwareSleep(2000);
 
         // 3 cycles of the 4 phrases
-        const phrases = this.scripts.hooponopono.phrases[state.language];
+        const phrases = localized(this.scripts.hooponopono.phrases);
         for (let cycle = 0; cycle < 3; cycle++) {
             if (!this.isMeditationActive) return;
             for (let i = 0; i < phrases.length; i++) {
@@ -1781,7 +1886,7 @@ class MeditationController {
 
         // Closing breath - Final fade out
         setText('narration-text', '');
-        await this.narrate(this.scripts.hooponopono.closing[state.language], true);
+        await this.narrate(localized(this.scripts.hooponopono.closing), true);
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
@@ -1796,7 +1901,7 @@ class MeditationController {
         if (symbolEl) symbolEl.style.opacity = "0.3";
         this.visual.stop();
         await this.pauseAwareSleep(2000);
-        const breatheText = state.language === 'ml' ? "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ" : "Take a break... breathe and prepare... for the next chakra";
+        const breatheText = t('system.breatheInterval');
         this.narrateFeeble(breatheText);
         const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
@@ -1849,7 +1954,7 @@ class MeditationController {
         this.audio.startDrone(chakra.frequency, absoluteIndex);
 
         if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
-        await this.narrate(chakra[state.language]);
+        await this.narrate(localized(chakra));
         if (!this.isMeditationActive) return;
 
         // Start looping mantra audio track (fades in, drone fades down)
@@ -1880,7 +1985,7 @@ class MeditationController {
         this.audio.stopMantraTrack();
         await this.pauseAwareSleep(4000);
 
-        if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
+        if (this.isMeditationActive) await this.narrate(localized(chakra, 'affirmation'));
     }
 
     async narrateFeeble(text) {
@@ -1889,7 +1994,7 @@ class MeditationController {
             catch (error) {
                 console.error('[Piper] feeble narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
         return this.narrateFeebleBrowser(text);
@@ -1924,7 +2029,7 @@ class MeditationController {
             catch (error) {
                 console.error('[Piper] narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
         return this.narrateBrowser(text, fadeOut, keepSilence);
@@ -1966,7 +2071,7 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 
                 // Fallback language identification
-                utterance.lang = state.language === 'ml' ? 'ml-IN' : 'en-US';
+                utterance.lang = getLanguageConfig().locale || state.language;
 
                 const selectedVoice = getBrowserVoiceForContent();
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
@@ -2104,20 +2209,18 @@ class MeditationController {
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
         const btn = document.getElementById('close-completion');
-        if (title) title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
-        if (msg) msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
-        if (btn) btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+        if (title) title.textContent = t('ui.journeyComplete');
+        if (msg) msg.textContent = t('ui.meditationCompleted');
+        if (btn) btn.textContent = t('ui.returnToRoom');
 
         // Journal: reset textarea, show last entry date, localise prompt
         syncValue('journal-entry', '');
-        setText('journal-prompt', state.language === 'ml'
-            ? 'എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?'
-            : 'What shifted? What are you calling in?');
-        setText('save-journal', state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry');
+        setText('journal-prompt', t('ui.journalPrompt'));
+        setText('save-journal', t('ui.saveEntry'));
         const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
         const lastInfo = document.getElementById('last-journal-info');
         lastInfo.textContent = journalEntries.length > 0
-            ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + journalEntries[0].date
+            ? t('ui.lastEntry') + journalEntries[0].date
             : '';
 
         modal.classList.remove('hidden');
@@ -2240,6 +2343,7 @@ async function loadPiperVoiceRegistry() {
 }
 
 async function init() {
+    await loadLanguageManifest();
     await loadPiperVoiceRegistry();
     setupVoices();
     loadPreferences();
@@ -2313,7 +2417,10 @@ function autoSelectVoice() {
         voiceSelect.value = state.voiceName;
         return;
     }
-    const defaultPiper = piperVoiceRegistry.find(voice => voice.language === state.language);
+    const preferredVoiceId = getLanguageConfig().defaultPiperVoice;
+    const defaultPiper = piperVoiceRegistry.find(voice =>
+        voice.language === state.language && voice.id === preferredVoiceId
+    ) || piperVoiceRegistry.find(voice => voice.language === state.language);
     if (defaultPiper) {
         state.voiceName = `piper:${defaultPiper.id}`;
         voiceSelect.value = state.voiceName;
@@ -2336,19 +2443,7 @@ function autoSelectVoice() {
         return list[0];
     };
 
-    if (state.language === 'ml') {
-        const mlVoices = state.voices.filter(v => v.lang.startsWith('ml'));
-        if (mlVoices.length > 0) {
-            bestVoice = findBestInList(mlVoices);
-        } else {
-            bestVoice = state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
-        }
-    } else {
-        const enVoices = state.voices.filter(v => v.lang.startsWith('en'));
-        if (enVoices.length > 0) {
-            bestVoice = findBestInList(enVoices);
-        }
-    }
+    bestVoice = findBestInList(state.voices.filter(voice => voiceMatchesLanguage(voice)));
     
     if (bestVoice) {
         state.voiceName = `browser:${bestVoice.name}`;
@@ -2363,19 +2458,15 @@ async function testVoice() {
         try {
             if (!audio.isInitialized) await audio.init();
             piperTTS.configure(selectedValue);
-            const sample = state.language === 'ml'
-                ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
-                : 'Breathe gently. You are safe in this moment.';
+            const sample = getLanguageConfig().preview || t('system.centeringBreath');
             await piperTTS.preview(sample);
         } catch (error) {
             console.error('[Piper] preview failed:', error);
-            setVoiceStatus('Piper preview failed — choose a browser fallback voice.', 'error');
+            setVoiceStatus(t('ui.piperPreviewFailed'), 'error');
         }
         return;
     }
-    const utterance = new SpeechSynthesisUtterance(state.language === 'ml'
-        ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
-        : 'Breathe gently. You are safe in this moment.');
+    const utterance = new SpeechSynthesisUtterance(getLanguageConfig().preview || t('system.centeringBreath'));
     const selectedVoice = getBrowserVoiceForContent();
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
     
@@ -2520,6 +2611,7 @@ function attachEventListeners() {
         state.language = e.target.value;
         setupVoices();
         autoSelectVoice();
+        applyLocaleUI();
     });
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
@@ -2973,11 +3065,11 @@ function attachEventListeners() {
         syncValue('journal-entry', '');
         const info = document.getElementById('last-journal-info');
         if (info) {
-            info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
+            info.textContent = t('ui.saved');
             setTimeout(() => {
                 const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
                 info.textContent = saved.length > 0
-                    ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
+                    ? t('ui.lastEntry') + saved[0].date
                     : '';
             }, 2000);
         }

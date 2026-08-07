@@ -10,7 +10,7 @@ This document describes the stack that is actually implemented in this repositor
 | Markup | HTML5 | Five primary screens and completion modal in `index.html` |
 | Client logic | Plain modern JavaScript (ES classes, async/await) | `AudioEngine`, `VisualEngine`, `MeditationController`, and `WakeLockManager` in `app.js` |
 | Styling | Hand-authored CSS with CSS custom properties | `style.css`; no CSS framework or preprocessor |
-| Content/configuration | JSON | `scripts.json` contains bilingual narration and feature scripts |
+| Content/configuration | Manifest-driven JSON language packs with backward-compatible localized lookup | `language-manifest.json`, `locales/*.json`, and `scripts.json` |
 | Audio | Web Audio API, HTML audio buffers, MP3 assets | Procedural drones/effects plus `audio/*.mp3` in `app.js` |
 | Narration | Piper neural TTS in a Web Worker + Web Speech API fallback | Local ONNX/WASM Piper runtime, Malayalam/English voice registry, rolling sentence buffer, and browser voice fallback in `app.js`/`piper-worker.js` |
 | Visuals | DOM/CSS animation and Canvas 2D star/particle effects | `VisualEngine` and `#particle-canvas` |
@@ -32,7 +32,9 @@ Browser
   │   ├─ AudioEngine: Web Audio graph and asset playback
   │   ├─ VisualEngine: symbols, aura, particles, progress
   │   └─ WakeLockManager / Media Session integration
-  ├─ scripts.json: bilingual narration content
+  ├─ language-manifest.json: language, locale, content, preview, and browser-voice metadata
+  ├─ locales/: localized UI/system strings with fallback resolution
+  ├─ scripts.json: current bilingual narration/content pack
   ├─ piper-models.json: versioned local voice registry and model metadata
   ├─ piper-worker.js: isolated Piper model loading and synthesis queue
   ├─ piper/: vendored Piper phonemizer, ONNX Runtime Web, and WASM assets
@@ -45,6 +47,23 @@ The application is designed to be served from a static HTTP(S) origin. Opening `
 ## Narration architecture
 
 Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.
+
+## Multilingual architecture
+
+`language-manifest.json` is the source of truth for supported languages. Each entry defines its language ID, locale, display label, content source, locale dictionary, browser voice prefixes, preview sentence, and preferred Piper voice. `app.js` loads the manifest before settings initialization, populates the language selector from it, resolves UI/system copy through `t(path)`, and resolves content through `localized(...)`. Existing Malayalam/English suffix fields remain supported during migration, while new content should use language-keyed values such as `{ "text": { "hi": "...", "en": "..." } }` or `{ "name": { "hi": "..." } }`. The validator accepts both the current compatibility shape and this language-keyed shape.
+
+Piper model entries now include model and config paths plus phonemizer metadata. The Worker passes the complete registry definition to the runtime, which prefers those paths and retains its built-in voice map only as a compatibility fallback. Adding a new Piper voice should therefore be a registry/content/locale change rather than a runtime source edit. The service worker keeps language bundles in a separate on-demand cache from the app shell and Piper model cache.
+
+Remaining migration work: move all remaining user-visible controller strings into locale dictionaries, convert the full content pack to the language-neutral shape, and validate each language with native speakers and target-device audio tests.
+
+### Migration tracking
+
+- Active checklist: [`TEMP-MULTILINGUAL-ARCHITECTURE.md`](./TEMP-MULTILINGUAL-ARCHITECTURE.md)
+- Language source of truth: [`language-manifest.json`](./language-manifest.json)
+- Locale dictionaries: [`locales/`](./locales/)
+- Narration/model registry: [`piper-models.json`](./piper-models.json)
+- Implementation: [`app.js`](./app.js), [`piper-worker.js`](./piper-worker.js), and [`piper/runtime/piper-tts-web.js`](./piper/runtime/piper-tts-web.js)
+- Current status: architecture implementation and static validation complete; native-speaker, browser, device, model-license, and full content-pack validation remain release gates.
 
 ### Piper language-integration lessons
 
