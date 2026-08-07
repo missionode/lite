@@ -1,4 +1,5 @@
-const CACHE_NAME = 'chakra-v5.4';
+const CACHE_NAME = 'chakra-v5.5';
+const PIPER_CACHE_NAME = 'chakra-piper-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -42,22 +43,51 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    Promise.all([
-      self.clients.claim(), // Take control of page immediately
-      caches.keys().then((keys) => {
-        return Promise.all(
-          keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-        );
-      })
-    ])
-  );
+    event.waitUntil(
+        Promise.all([
+            self.clients.claim(), // Take control of page immediately
+            caches.keys().then((keys) => {
+                return Promise.all(keys
+                    .filter(key => key !== CACHE_NAME && key !== PIPER_CACHE_NAME)
+                    .map(key => caches.delete(key)));
+            })
+        ])
+    );
 });
 
+self.addEventListener('message', (event) => {
+    if (event.data?.type === 'piper-clear-cache') {
+        event.waitUntil(caches.delete(PIPER_CACHE_NAME));
+    }
+});
+
+function isPiperRequest(request) {
+    const url = new URL(request.url);
+    return url.pathname.includes('/piper/') ||
+        url.pathname.endsWith('/piper-worker.js') ||
+        url.pathname.endsWith('/piper-models.json') ||
+        (url.hostname === 'huggingface.co' && url.pathname.includes('/piper-voices/'));
+}
+
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    if (isPiperRequest(event.request)) {
+        event.respondWith(caches.open(PIPER_CACHE_NAME).then(async (cache) => {
+            const cached = await cache.match(event.request);
+            if (cached) return cached;
+            const response = await fetch(event.request);
+            if (response.ok || response.type === 'opaque') {
+                try { await cache.put(event.request, response.clone()); } catch (error) {
+                    console.warn('Piper cache write skipped:', error);
+                }
+            }
+            return response;
+        }));
+        return;
+    }
+
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
     })
   );
 });
