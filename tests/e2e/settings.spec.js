@@ -47,7 +47,8 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
   await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
   await expect(page.locator('#reverse-journey-toggle').locator('..')).toContainText('Reverse Journey');
   await expect(page.locator('.config-group').filter({ hasText: 'Guided Practices' })).toContainText('Box Meditation');
-  await expect(page.locator('.config-group').filter({ hasText: 'Comfort & Visuals' })).toContainText('Eyes Close Mode');
+  await expect(page.locator('#volume-mixer')).toContainText('Comfort & Visuals');
+  await expect(page.locator('#audio-filters-toggle')).toHaveCount(1);
   await expect(page.locator('#settings-help-button')).toBeVisible();
   await page.locator('#settings-help-button').click();
   await expect(page.locator('#settings-help-modal')).toBeVisible();
@@ -73,6 +74,52 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#journey-roadmap')).toHaveText('Intention » HRIM » Closing');
   await page.locator('#music-only-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
+});
+
+test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
+  page.on('dialog', async dialog => {
+    if (dialog.type() === 'confirm') await dialog.accept();
+    else await dialog.dismiss();
+  });
+
+  await page.locator('#save-config').click();
+  await page.locator('#start-meditation').click();
+  const sleepPrompt = page.locator('#sleep-mode-prompt');
+  if (await sleepPrompt.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await page.locator('#sleep-mode-disable').click();
+  }
+  await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+
+  await page.locator('#btn-mixer').click();
+  const mixer = page.locator('#volume-mixer');
+  await expect(mixer).toBeVisible();
+  await expect(mixer).toHaveCSS('position', 'fixed');
+  await expect(page.locator('#audio-filters-toggle')).toBeVisible();
+  await expect(page.locator('#eyes-close-mode-toggle')).toBeVisible();
+  await expect(page.locator('#mixer-frequencies-toggle')).toBeVisible();
+
+  await page.locator('#audio-filters-toggle').check();
+  await page.locator('#eyes-close-mode-toggle').check();
+  await page.locator('#mixer-frequencies-toggle').check();
+  await expect(page.locator('#frequencies-toggle')).toBeChecked();
+  await page.locator('#vol-voice').fill('0.6');
+  await page.locator('#vol-voice').dispatchEvent('input');
+  await expect(page.locator('#vol-voice')).toHaveValue('0.6');
+
+  await page.locator('#close-mixer-bottom').click();
+  await expect(mixer).toBeHidden();
+  await page.locator('#btn-mixer').click();
+  await page.locator('#restart-meditation').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible({ timeout: 10000 });
+  const restartSleepPrompt = page.locator('#sleep-mode-prompt');
+  try {
+    await expect(restartSleepPrompt).toBeVisible({ timeout: 3000 });
+    await page.locator('#sleep-mode-disable').click();
+  } catch {
+    // Daytime journeys do not show the evening Sleep Mode choice.
+  }
+  await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#lobby-screen')).toBeHidden();
 });
 
 test('keeps the Corpse Pose timing slider synchronized', async ({ page }) => {

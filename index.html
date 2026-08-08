@@ -86,12 +86,6 @@
             </div>
 
             <div class="config-group settings-panel">
-                <label data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
-                <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> Enable Audio Filters (Warmth)</label>
-                <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> Eyes Close Mode (Warmth/Comfort)</label>
-            </div>
-
-            <div class="config-group settings-panel">
                 <label data-i18n="ui.yogaSection">Yoga Bridge</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
@@ -151,10 +145,6 @@
                     </div>
                 </div>
                 
-                <div style="margin-top: 10px; width: 100%;">
-                    <label style="font-size: 0.75rem; opacity: 0.6; display: block; margin-bottom: 5px;" data-i18n="ui.screenBrightness">Screen Brightness</label>
-                    <input type="range" id="brightness-slider" min="0.1" max="1" step="0.05" value="1" style="width: 100%;">
-                </div>
             </div>
 
             <div class="config-group" style="margin-top: 1rem;">
@@ -169,32 +159,6 @@
             <p style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 1rem;">
                 💡 For best results, enable <b>Do Not Disturb</b> on your device to block notifications.
             </p>
-
-            <div class="config-group settings-panel">
-                <label data-i18n="ui.audioLevels">Audio Levels</label>
-                <div class="settings-mixer">
-                    <div class="mixer-row">
-                    <label style="font-size: 0.8rem; width: 60px; text-align: left;" data-i18n="ui.voice">Voice</label>
-                        <input type="range" id="settings-vol-voice" min="0" max="2" step="0.1" value="1.1">
-                    </div>
-                    <div class="mixer-row">
-                    <label style="font-size: 0.8rem; width: 60px; text-align: left;" data-i18n="ui.drone">Drone</label>
-                        <input type="range" id="settings-vol-drone" min="0" max="0.2" step="0.01" value="0.01">
-                    </div>
-                    <div class="mixer-row">
-                    <label style="font-size: 0.8rem; width: 60px; text-align: left;" data-i18n="ui.bell">Bell</label>
-                        <input type="range" id="settings-vol-bell" min="0" max="1" step="0.1" value="0.05">
-                    </div>
-                    <div class="mixer-row">
-                    <label style="font-size: 0.8rem; width: 60px; text-align: left;" data-i18n="ui.mantra">Mantra</label>
-                        <input type="range" id="settings-vol-mantra" min="0" max="1" step="0.05" value="0.45">
-                    </div>
-                    <div class="mixer-row">
-                    <label style="font-size: 0.8rem; width: 60px; text-align: left;" data-i18n="ui.music">Music</label>
-                        <input type="range" id="settings-vol-music" min="0" max="0.5" step="0.01" value="0.20">
-                    </div>
-                </div>
-            </div>
 
             <!-- New Timings Settings -->
             <div class="config-group settings-panel">
@@ -355,29 +319,42 @@
             </div>
         </section>
 
-        <!-- Global In-Session Volume Mixer -->
-        <div id="volume-mixer" class="hidden" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 2000;">
-            <div class="mixer-row">
-                <label>Voice</label>
-                <input type="range" id="vol-voice" min="0" max="1" step="0.1" value="1.0">
+        <!-- Full-screen in-session tuning panel -->
+        <div id="volume-mixer" class="hidden" role="dialog" aria-modal="true" aria-labelledby="mixer-title">
+            <div class="mixer-dialog">
+                <div class="mixer-header">
+                    <h2 id="mixer-title" data-i18n="ui.mixerTitle">Journey Tuning</h2>
+                    <button id="close-mixer" class="mixer-close" type="button" data-i18n-aria-label="ui.close">×</button>
+                </div>
+                <p class="mixer-subtitle" data-i18n="ui.mixerSubtitle">Tune the sound and comfort for this journey.</p>
+
+                <div class="mixer-section">
+                    <label class="mixer-section-title" data-i18n="ui.audioLevels">Audio Levels</label>
+                    <div class="mixer-row"><label data-i18n="ui.voice">Voice</label><input type="range" id="vol-voice" min="0" max="2" step="0.1" value="1.0"></div>
+                    <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.01"></div>
+                    <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5"></div>
+                    <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8"></div>
+                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15"></div>
+                </div>
+
+                <div class="mixer-section">
+                    <label class="mixer-section-title" data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
+                    <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> <span data-i18n="ui.audioFilters">Enable Audio Filters (Warmth)</span></label>
+                    <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> <span data-i18n="ui.eyesCloseMode">Eyes Close Mode (Warmth/Comfort)</span></label>
+                    <label class="mixer-brightness-label" for="brightness-slider" data-i18n="ui.screenBrightness">Screen Brightness</label>
+                    <input type="range" id="brightness-slider" min="0.1" max="1" step="0.05" value="1">
+                </div>
+
+                <div class="mixer-section">
+                    <label class="checkbox-label"><input type="checkbox" id="mixer-frequencies-toggle"> <span data-i18n="ui.mixerFrequencies">Use Chakra Frequencies (Solfeggio)</span></label>
+                    <p class="mixer-note" data-i18n="ui.mixerFrequencyNote">Changes apply from the next sound stage.</p>
+                </div>
+
+                <div class="mixer-actions">
+                    <button id="restart-meditation" class="secondary-btn" type="button" data-i18n="ui.restartJourney">Restart Journey</button>
+                    <button id="close-mixer-bottom" class="secondary-btn" type="button" data-i18n="ui.close">Close</button>
+                </div>
             </div>
-            <div class="mixer-row">
-                <label>Drone</label>
-                <input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.01">
-            </div>
-            <div class="mixer-row">
-                <label>Bell</label>
-                <input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="mixer-row">
-                <label>Mantra</label>
-                <input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8">
-            </div>
-            <div class="mixer-row">
-                <label>Music</label>
-                <input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15">
-            </div>
-            <button id="close-mixer" class="secondary-btn" style="margin-top:1rem; width: 100%;">Close</button>
         </div>
 
         <!-- Global In-Session Controls (visible across all meditation screens) -->

@@ -67,7 +67,8 @@ for (const combination of modeCombinations) {
     await openSettings(page);
     await setChecked(page, 'reverse-journey-toggle', combination.reverse);
     await setChecked(page, 'box-meditation-toggle', combination.box);
-    await setChecked(page, 'audio-filters-toggle', combination.filters);
+    // Audio Filters now live in the active full-screen mixer. Their live
+    // behavior is covered by the dedicated mixer journey test.
     await setChecked(page, 'hooponopono-toggle', combination.hooponopono);
     await setChecked(page, 'frequencies-toggle', combination.frequencies);
     await page.locator('#save-config').click();

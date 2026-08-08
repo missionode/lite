@@ -431,7 +431,6 @@ function applyLocaleUI() {
     setText('returning-journey-label', t('ui.returningJourney'));
     setText('save-config', t('ui.startMeditation'));
     setText('start-meditation', t('ui.beginJourney'));
-    setText('close-mixer', t('ui.close'));
     document.querySelectorAll('.stat-lbl').forEach((element, index) => {
         element.textContent = t(index === 0 ? 'ui.sessionTime' : 'ui.totalJourneys');
     });
@@ -856,19 +855,18 @@ class AudioEngine {
             this.exciter.curve = new Float32Array([-1, 1]);
         }
         
-        // Upgrade 4: Frequency Carving Filter
-        if (state.audioFilters) {
-            this.voiceCarveFilter = this.ctx.createBiquadFilter();
-            this.voiceCarveFilter.type = 'peaking';
-            this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
-            this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
-            this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+        // Upgrade 4: Frequency Carving Filter. Keep the nodes in the graph
+        // even when disabled so the mixer can safely change the setting live.
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
-            this.presenceFilter = this.ctx.createBiquadFilter();
-            this.presenceFilter.type = 'highshelf';
-            this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-            this.presenceFilter.gain.setValueAtTime(state.eyesCloseMode ? -6 : -3, this.ctx.currentTime);
-        }
+        this.presenceFilter = this.ctx.createBiquadFilter();
+        this.presenceFilter.type = 'highshelf';
+        this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(state.audioFilters ? (state.eyesCloseMode ? -6 : -3) : 0, this.ctx.currentTime);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -1056,6 +1054,16 @@ class AudioEngine {
             const presenceGain = enabled ? -12 : -3; // More aggressive high-shelf cut
             this.presenceFilter.gain.linearRampToValueAtTime(presenceGain, now + 2.0);
         }
+    }
+
+    toggleAudioFilters(enabled) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const presenceGain = state.eyesCloseMode ? -6 : -3;
+        if (this.presenceFilter) this.presenceFilter.gain.linearRampToValueAtTime(enabled ? presenceGain : 0, now + 1.5);
+        if (this.bgMusicLPF) this.bgMusicLPF.frequency.linearRampToValueAtTime(enabled ? 1200 : 20000, now + 1.5);
+        if (this.reverbFilter) this.reverbFilter.frequency.linearRampToValueAtTime(enabled ? 1500 : 20000, now + 1.5);
+        if (this.mantraFilter) this.mantraFilter.frequency.linearRampToValueAtTime(enabled ? 2200 : 20000, now + 1.5);
     }
 
     makeDistortionCurve(amount) {
@@ -2605,6 +2613,11 @@ class MeditationController {
     stop() {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         this.sessionStartedAt = null;
+        const startBtn = document.getElementById('start-meditation');
+        if (startBtn) {
+            startBtn.disabled = false;
+            startBtn.style.opacity = "1";
+        }
         window.speechSynthesis.cancel();
         piperTTS.cancel('journey stopped');
         document.body.classList.remove('sleep-mode-active');
@@ -2922,6 +2935,7 @@ function loadPreferences() {
     
     syncChecked('returning-journey-toggle', state.returningJourney);
     syncChecked('audio-filters-toggle', state.audioFilters);
+    syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
     syncChecked('reverse-journey-toggle', state.reverseJourney);
     syncChecked('box-meditation-toggle', state.boxMeditation);
     syncChecked('hooponopono-toggle', state.hooponopono);
@@ -3518,7 +3532,10 @@ function attachEventListeners() {
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
-    document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('frequencies-toggle').addEventListener('change', (e) => {
+        syncChecked('mixer-frequencies-toggle', e.target.checked);
+        updateSessionEstimate();
+    });
     document.getElementById('yoga-bridge-toggle').addEventListener('change', updateSessionEstimate);
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
@@ -3672,11 +3689,18 @@ function attachEventListeners() {
         e.stopImmediatePropagation();
         meditation.stop();
     });
-    document.getElementById('eyes-close-mode-toggle').addEventListener('change', (e) => {
+    const eyesCloseToggle = document.getElementById('eyes-close-mode-toggle');
+    if (eyesCloseToggle) eyesCloseToggle.addEventListener('change', (e) => {
         state.eyesCloseMode = e.target.checked;
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
+    });
+    const audioFiltersToggle = document.getElementById('audio-filters-toggle');
+    if (audioFiltersToggle) audioFiltersToggle.addEventListener('change', (e) => {
+        state.audioFilters = e.target.checked;
+        localStorage.setItem('chakra_audio_filters', state.audioFilters);
+        if (audio.toggleAudioFilters) audio.toggleAudioFilters(state.audioFilters);
     });
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
@@ -3735,15 +3759,36 @@ function attachEventListeners() {
         }
     });
     const mixer = document.getElementById('volume-mixer');
+    const mixerCloseButtons = [document.getElementById('close-mixer'), document.getElementById('close-mixer-bottom')].filter(Boolean);
     document.getElementById('btn-mixer').addEventListener('click', (e) => {
-        console.log("Mixer button clicked. Current hidden state:", mixer.classList.contains('hidden'));
         e.stopPropagation();
-        const isHidden = mixer.classList.toggle('hidden');
-        console.log("Mixer toggled. New hidden state:", isHidden);
+        if (!mixer) return;
+        mixer.classList.remove('hidden');
+        syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
+        const closeButton = document.getElementById('close-mixer');
+        if (closeButton) closeButton.focus();
     });
-    document.getElementById('close-mixer').addEventListener('click', (e) => {
+    mixerCloseButtons.forEach(button => button.addEventListener('click', (e) => {
         e.stopPropagation();
-        mixer.classList.add('hidden');
+        if (mixer) mixer.classList.add('hidden');
+        document.getElementById('btn-mixer')?.focus();
+    }));
+    document.getElementById('restart-meditation')?.addEventListener('click', async () => {
+        if (!window.confirm(t('ui.restartConfirm'))) return;
+        if (mixer) mixer.classList.add('hidden');
+        meditation.stop();
+        // A journey may still be unwinding its async start sequence. Wait for
+        // the cancellation to release the start guard before launching again.
+        const deadline = Date.now() + 5000;
+        while (meditation.isStarting && Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        startMeditationBtn.click();
+    });
+    document.getElementById('mixer-frequencies-toggle')?.addEventListener('change', (e) => {
+        state.chakraFrequencies = e.target.checked;
+        localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
+        syncChecked('frequencies-toggle', state.chakraFrequencies);
     });
     // Unified Volume Handlers
     const syncVolume = (key, value, elements) => {
@@ -3753,28 +3798,28 @@ function attachEventListeners() {
     };
 
     // Voice
-    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')];
+    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')].filter(Boolean);
     volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volVoice', e.target.value, volVoiceEls);
         if (audio.voiceGain && audio.ctx) audio.voiceGain.gain.setValueAtTime(state.volVoice, audio.ctx.currentTime);
     }));
 
     // Drone
-    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')];
+    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')].filter(Boolean);
     volDroneEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volDrone', e.target.value, volDroneEls);
         if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
     }));
 
     // Bell
-    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')];
+    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')].filter(Boolean);
     volBellEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volBell', e.target.value, volBellEls);
         if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
     }));
 
     // Mantra
-    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')];
+    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')].filter(Boolean);
     volMantraEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volMantra', e.target.value, volMantraEls);
         if (audio.mantraGain && audio.mantraLoop) {
@@ -3783,7 +3828,7 @@ function attachEventListeners() {
     }));
 
     // Music
-    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')];
+    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')].filter(Boolean);
     volMusicEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volMusic', e.target.value, volMusicEls);
         if (audio.bgMusicGain && audio.bgMusicLoop) {
