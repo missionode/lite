@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.50">
+    <link rel="stylesheet" href="style.css?v=1.52">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -29,7 +29,10 @@
 
         <!-- Configuration Screen -->
         <section id="config-screen" class="screen settings-screen-container">
-            <h1 id="app-title">Chakra Meditation</h1>
+            <div class="settings-title-row">
+                <h1 id="app-title">Chakra Meditation</h1>
+                <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
+            </div>
             <p class="subtitle">Set your preferences for a guided experience</p>
             
             <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
@@ -62,7 +65,7 @@
             </div>
 
             <div class="config-group" style="margin-top: 1rem;">
-                <label data-i18n="ui.customJourney">Custom Journey</label>
+                <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <div id="chakra-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
                     <label class="checkbox-label"><input type="checkbox" value="root" checked> <span data-i18n="ui.root">Root</span></label>
                     <label class="checkbox-label"><input type="checkbox" value="sacral" checked> <span data-i18n="ui.sacral">Sacral</span></label>
@@ -72,23 +75,29 @@
                     <label class="checkbox-label"><input type="checkbox" value="thirdeye" checked disabled> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
                     <label class="checkbox-label"><input type="checkbox" value="crown" checked disabled> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
+                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
+                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
             </div>
 
-            <div class="config-group" style="margin-top: 1rem;">
-                <label data-i18n="ui.options">Options</label>
-                <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> Enable Audio Filters (Warmth)</label>
-                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.guidedPractices">Guided Practices</label>
                 <label class="checkbox-label"><input type="checkbox" id="box-meditation-toggle"> Box Meditation</label>
                 <label class="checkbox-label"><input type="checkbox" id="hooponopono-toggle"> Ho'oponopono</label>
-                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
+            </div>
+
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
+                <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> Enable Audio Filters (Warmth)</label>
                 <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> Eyes Close Mode (Warmth/Comfort)</label>
-                <label class="checkbox-label"><input type="checkbox" id="bg-music-mode-toggle"> Background Music Mode</label>
-                <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle" checked> Enable Corpse Pose (Savasana)</label>
-                
+            </div>
+
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.yogaSection">Yoga Bridge</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
                     
                     <div id="yoga-sub-options" style="display:none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                        <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle"> Enable Corpse Pose (Savasana)</label>
                         <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Bath runs first, followed by Yoga, then the journey continues to Crown.</p>
                         <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
@@ -108,6 +117,11 @@
                                 <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perPose">Per Pose</label>
                                 <input type="range" id="time-yoga-pose" min="30" max="300" step="10" value="60">
                                 <span id="display-yoga-pose" style="font-size: 0.7rem; width: 40px;">60s</span>
+                            </div>
+                            <div class="mixer-row" id="row-corpse">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.corpsePose">Corpse Pose</label>
+                                <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
+                                <span id="display-corpse" style="font-size: 0.7rem; width: 40px;">300s</span>
                             </div>
                             <label class="checkbox-label"><input type="checkbox" id="bath-session-toggle"> Enable Bath Session</label>
                             <div class="mixer-row" id="row-bath">
@@ -196,11 +210,6 @@
                         <input type="range" id="time-breathing" min="4" max="16" step="1" value="8">
                         <span id="display-breathing" style="font-size: 0.7rem; width: 30px;">8s</span>
                     </div>
-                    <div class="mixer-row" id="row-corpse">
-                        <label style="font-size: 0.8rem; width: 80px; text-align: left;" data-i18n="ui.corpsePose">Corpse Pose</label>
-                        <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
-                        <span id="display-corpse" style="font-size: 0.7rem; width: 30px;">300s</span>
-                    </div>
                     <div class="mixer-row">
                         <label style="font-size: 0.8rem; width: 80px; text-align: left;" data-i18n="ui.interval">Interval</label>
                         <input type="range" id="time-interval" min="10" max="20" step="1" value="10">
@@ -235,36 +244,65 @@
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
         </section>
 
+        <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
+            <div class="modal-content settings-help-content">
+                <button id="settings-help-close" class="sleep-mode-prompt-close" type="button" aria-label="Close help" data-i18n-aria-label="ui.close">×</button>
+                <h2 id="settings-help-title" data-i18n="ui.settingsHelpTitle">How this journey works</h2>
+                <div class="settings-help-list">
+                    <p data-i18n="ui.settingsHelpLanguages">Meditation Language controls the narration. Display Language controls the visible interface.</p>
+                    <p data-i18n="ui.settingsHelpChakras">Chakra Journey chooses the centers included. Reverse Journey changes the direction; Third Eye and Crown remain the closing centers.</p>
+                    <p data-i18n="ui.settingsHelpYoga">Yoga Bridge adds the physical sequence. Corpse Pose, massage, perineal care, assisted bathing, and standard bathing are optional stages managed there.</p>
+                    <p data-i18n="ui.settingsHelpModes">Music Only and High Energy are selected in the Lobby. High Energy is available from 3:30 AM to 12:00 PM; after 6 PM, Sleep Mode is offered at journey start.</p>
+                    <p data-i18n="ui.settingsHelpSave">Save the settings to enter the Lobby. You can review the final mode and timing there before beginning.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Lobby Screen -->
         <section id="lobby-screen" class="screen hidden">
             <h1 id="lobby-title">Meditation Room</h1>
             <div class="time-selector">
-                <label for="time-per-chakra" data-i18n="ui.timePerSession">Time per Session (minutes)</label>
+                <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
                 <span id="time-display">5.0 mins</span>
+            </div>
+
+            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control">
+                <label for="time-high-energy" data-i18n="ui.hrimActivationDuration">HRIM Activation Duration (minutes)</label>
+                <input type="range" id="time-high-energy" min="1" max="30" value="5" step="1">
+                <span id="high-energy-time-display">5 mins</span>
             </div>
 
             <!-- Intention Seed -->
             <div class="config-group" style="margin-top: 1rem;">
                 <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
-                <input type="text" id="intention-input" value="സമാധാനം" placeholder="e.g. abundance, clarity, love..." autocomplete="off">
+                <input type="text" id="intention-input" value="" placeholder="e.g. peace, clarity, gentle strength..." autocomplete="off">
             </div>
 
-            <!-- High Energy Mode Toggle -->
+            <!-- Session preferences -->
             <div class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
-                <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
-                    <input type="checkbox" id="high-energy-toggle"> High Energy (HRIM)
-                </label>
-                <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
-                    <input type="checkbox" id="sleep-mode-toggle"> 🌙 Sleep Mode
-                </label>
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
                     <input type="checkbox" id="returning-journey-toggle">
                     <span id="returning-journey-label">Returning Journey</span>
                 </label>
             </div>
 
+            <div class="config-group lobby-experience-mode">
+                <label data-i18n="ui.experienceMode">Experience Mode</label>
+                <div class="experience-mode-options">
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="high-energy-toggle">
+                        <span data-i18n="ui.highEnergy">High Energy (HRIM)</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="music-only-toggle">
+                        <span data-i18n="ui.musicOnlyMode">Music Only</span>
+                    </label>
+                </div>
+            </div>
+
             <div id="session-estimate">~ 36 mins</div>
+            <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
             <div class="lobby-actions">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
@@ -349,6 +387,30 @@
             <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
         </div>
 
+        <div id="sleep-mode-prompt" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sleep-mode-prompt-title">
+            <div class="modal-content sleep-mode-prompt-content">
+                <button id="sleep-mode-prompt-close" class="sleep-mode-prompt-close" type="button" aria-label="Close and skip this journey" data-i18n-aria-label="ui.sleepModeClose">×</button>
+                <h2 id="sleep-mode-prompt-title" data-i18n="ui.sleepModePromptTitle">Evening journey</h2>
+                <p id="sleep-mode-prompt-text" data-i18n="ui.sleepModePrompt">It is evening. Would you like to use Sleep Mode for this journey?</p>
+                <div class="modal-actions sleep-mode-prompt-actions">
+                    <button id="sleep-mode-enable" class="primary-btn" data-i18n="ui.sleepModeEnable">Continue with Sleep Mode</button>
+                    <button id="sleep-mode-disable" class="secondary-btn" data-i18n="ui.sleepModeDisable">Continue without Sleep Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="hrim-time-block-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="hrim-time-block-title">
+            <div class="modal-content hrim-time-block-content">
+                <button id="hrim-time-block-close" class="sleep-mode-prompt-close" type="button" aria-label="Return to Lobby" data-i18n-aria-label="ui.hrimTimeBlockLobby">×</button>
+                <h2 id="hrim-time-block-title" data-i18n="ui.hrimTimeBlockTitle">HRIM daytime guidance</h2>
+                <p id="hrim-time-block-message" data-i18n="ui.hrimTimeBlockMessage">HRIM is available from 3:30 AM to 12:00 PM for daytime energy and healthy rest.</p>
+                <div class="hrim-time-block-actions">
+                    <button id="hrim-time-block-lobby" class="secondary-btn" type="button" data-i18n="ui.hrimTimeBlockLobby">Return to Lobby</button>
+                    <button id="hrim-time-block-regular" class="primary-btn" type="button" data-i18n="ui.hrimTimeBlockRegular">Continue with regular meditation</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Completion Modal -->
         <div id="completion-modal" class="modal hidden">
             <div class="gold-burst"></div>
@@ -379,6 +441,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.53"></script>
+    <script src="app.js?v=1.54"></script>
 </body>
 </html>

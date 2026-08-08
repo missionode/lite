@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.7';
+const CACHE_NAME = 'chakra-v5.8';
 const PIPER_CACHE_NAME = 'chakra-piper-v2';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v2';
 const ASSETS = [
@@ -24,6 +24,7 @@ const ASSETS = [
   './symbols/thirdeye.png',
   './symbols/crown.png',
   './symbols/hreem.png',
+  './symbols/background-only.png',
   './audio/LAM.mp3',
   './audio/VAM.mp3',
   './audio/RAM.mp3',

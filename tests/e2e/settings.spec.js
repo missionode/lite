@@ -37,8 +37,161 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
   await expect(page.locator('#time-bath')).toHaveAttribute('max', '5');
   await expect(page.locator('#time-massage')).toHaveAttribute('min', '1');
   await expect(page.locator('#time-per-chakra')).toHaveAttribute('min', '0.1');
+  await expect(page.locator('#time-high-energy')).toHaveAttribute('min', '0.1');
+  await expect(page.locator('#time-high-energy')).toHaveAttribute('max', '1');
   await expect(page.locator('#time-interval')).toHaveAttribute('min', '2');
   await expect(page.locator('#time-interval')).toHaveValue('2');
+});
+
+test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
+  await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
+  await expect(page.locator('#reverse-journey-toggle').locator('..')).toContainText('Reverse Journey');
+  await expect(page.locator('.config-group').filter({ hasText: 'Guided Practices' })).toContainText('Box Meditation');
+  await expect(page.locator('.config-group').filter({ hasText: 'Comfort & Visuals' })).toContainText('Eyes Close Mode');
+  await expect(page.locator('#settings-help-button')).toBeVisible();
+  await page.locator('#settings-help-button').click();
+  await expect(page.locator('#settings-help-modal')).toBeVisible();
+  await page.locator('#settings-help-close').click();
+  await expect(page.locator('#settings-help-modal')).toBeHidden();
+});
+
+test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
+  await page.locator('#box-meditation-toggle').check();
+  await page.locator('#yoga-bridge-toggle').check();
+  await page.locator('#bath-session-toggle').check();
+  await page.locator('#massage-toggle').check();
+  await page.locator('#perineal-care-toggle').check();
+  await page.locator('#assisted-bathing-toggle').check();
+  await page.locator('#hooponopono-toggle').check();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#journey-roadmap')).toHaveText(
+    'Arrival » Intention » Breathing » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing » Ho\'oponopono'
+  );
+
+  await page.locator('#high-energy-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Intention » HRIM » Closing');
+  await page.locator('#music-only-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
+});
+
+test('keeps the Corpse Pose timing slider synchronized', async ({ page }) => {
+  const corpse = page.locator('#time-corpse');
+  await expect(corpse).toHaveAttribute('min', '1');
+  await expect(corpse).toHaveAttribute('max', '5');
+  await expect(page.locator('.yoga-timing-controls #row-corpse')).toHaveCount(1);
+  await page.locator('#yoga-bridge-toggle').check();
+  await page.locator('#corpse-pose-toggle').check();
+  await expect(page.locator('#row-corpse')).toHaveCSS('display', 'grid');
+  await corpse.fill('4');
+  await corpse.dispatchEvent('input');
+  await expect(corpse).toHaveValue('4');
+  await expect(page.locator('#display-corpse')).toHaveText('4s');
+  await expect(page.locator('#row-corpse .range-current')).toHaveText('4s');
+
+  await page.reload();
+  await expect(page.locator('#time-corpse')).toHaveValue('4');
+  await expect(page.locator('#display-corpse')).toHaveText('4s');
+});
+
+test('loads the production Corpse Pose timing range', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#config-screen')).toBeVisible();
+  const corpse = page.locator('#time-corpse');
+  await expect(corpse).toHaveAttribute('min', '60');
+  await expect(corpse).toHaveAttribute('max', '600');
+  await expect(corpse).toHaveAttribute('step', '30');
+});
+
+test('uses experiential benefit language for chakra narration', async ({ page }) => {
+  const content = await page.evaluate(async () => (await fetch('/scripts.json')).json());
+  for (const key of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy', 'closing']) {
+    expect(content[key].meditation_en).toBeTruthy();
+    expect(content[key].meditation_ml).toBeTruthy();
+  }
+  expect(content.root.meditation_en).not.toMatch(/adrenal|immune|organ|gland/i);
+  expect(content.solar.meditation_en).not.toMatch(/stomach|liver|pancreas|digest/i);
+  expect(content.high_energy.meditation_en).not.toMatch(/adrenal|pineal|digest|gland/i);
+  expect(content.closing.meditation_en).not.toMatch(/organ|cell|lymph|blood|gland/i);
+});
+
+test('persists the independent HRIM duration from the Lobby', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+
+  await page.locator('#high-energy-toggle').check();
+  await expect(page.locator('#high-energy-duration-control')).toBeVisible();
+  await expect(page.locator('#time-per-chakra').locator('..')).toBeHidden();
+
+  const duration = page.locator('#time-high-energy');
+  await duration.fill('0.8');
+  await duration.dispatchEvent('input');
+  await expect(duration).toHaveValue('0.8');
+
+  await page.reload();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#high-energy-toggle')).toBeChecked();
+  await expect(page.locator('#time-high-energy')).toHaveValue('0.8');
+});
+
+test('switches the generated intention for HRIM and preserves custom text', async ({ page }) => {
+  const intention = page.locator('#intention-input');
+  await page.selectOption('#language-select', 'en');
+  await expect(intention).toHaveValue('Peace, clarity, and gentle strength');
+
+  await page.locator('#save-config').click();
+  await page.locator('#high-energy-toggle').check();
+  await expect(intention).toHaveValue('Focused energy, courage, and clear action');
+
+  await page.locator('#high-energy-toggle').uncheck();
+  await expect(intention).toHaveValue('Peace, clarity, and gentle strength');
+
+  await intention.fill('A short custom intention.');
+  await page.locator('#high-energy-toggle').check();
+  await expect(intention).toHaveValue('A short custom intention.');
+  await page.locator('#high-energy-toggle').uncheck();
+  await expect(intention).toHaveValue('A short custom intention.');
+});
+
+test('offers the Sleep Mode decision before an evening journey', async ({ page }) => {
+  await page.evaluate(() => {
+    const NativeDate = Date;
+    const evening = new NativeDate(2026, 7, 8, 19, 0, 0).getTime();
+    window.Date = class extends NativeDate {
+      constructor(...args) { if (args.length) super(...args); else super(evening); }
+      static now() { return evening; }
+    };
+  });
+  page.on('dialog', dialog => dialog.dismiss());
+
+  await page.locator('#save-config').click();
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#sleep-mode-prompt')).toBeVisible();
+  await expect(page.locator('#sleep-mode-enable')).toBeVisible();
+  await expect(page.locator('#sleep-mode-disable')).toBeVisible();
+  await expect(page.locator('#sleep-mode-prompt-close')).toBeVisible();
+  await page.locator('#sleep-mode-prompt-close').click();
+  await expect(page.locator('#sleep-mode-prompt')).toBeHidden();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+});
+
+test('blocks HRIM outside the daytime window before starting audio', async ({ page }) => {
+  await page.evaluate(() => {
+    const NativeDate = Date;
+    const blockedTime = new NativeDate(2026, 7, 8, 13, 0, 0).getTime();
+    window.Date = class extends NativeDate {
+      constructor(...args) { if (args.length) super(...args); else super(blockedTime); }
+      static now() { return blockedTime; }
+    };
+  });
+  await page.locator('#save-config').click();
+  await page.locator('#high-energy-toggle').check();
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#hrim-time-block-modal')).toBeVisible();
+  await expect(page.locator('#hrim-time-block-message')).toContainText('3:30 AM');
+  await page.locator('#hrim-time-block-lobby').click();
+  await expect(page.locator('#hrim-time-block-modal')).toBeHidden();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
 });
 
 test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {

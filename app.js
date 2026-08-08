@@ -103,7 +103,7 @@ function validateScriptBundle(scripts, options = {}) {
             `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
         ])
     ];
-    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.affirmation_${language}`]));
+    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.intention_${language}`, `high_energy.affirmation_${language}`]));
     if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
     if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
     if (options.perinealCare) required.push(...languageIds.flatMap(language => [`perineal_care.title.${language}`, `perineal_care.intro.${language}`, `perineal_care.instructions.${language}`, `perineal_care.reminder.${language}`]));
@@ -175,9 +175,86 @@ function mergeTimingProfile(base, profile) {
     }, { schemaVersion: base.schemaVersion });
 }
 
+function formatRangeControlValue(input) {
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return input.value;
+    if (input.id === 'time-per-chakra') return `${value.toFixed(1)} mins`;
+    if (input.id === 'time-high-energy') return `${value} mins`;
+    if (['time-bath', 'time-perineal-care', 'time-assisted-bathing', 'time-massage'].includes(input.id)) {
+        return `${Math.floor(value / 60)}m`;
+    }
+    if (input.id.startsWith('time-')) return `${value}s`;
+    return input.step && Number(input.step) < 1 ? value.toFixed(2) : String(value);
+}
+
+function enhanceRangeControls() {
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+        const container = input.closest('.mixer-row, .time-selector') || input.parentElement;
+        if (!container || container.dataset.rangeEnhanced === 'true') return;
+
+        container.dataset.rangeEnhanced = 'true';
+        container.classList.add('range-control');
+
+        let current = container.querySelector(':scope > span');
+        if (!current) {
+            current = document.createElement('span');
+            container.appendChild(current);
+        }
+        current.classList.add('range-current');
+
+        const meta = document.createElement('div');
+        meta.className = 'range-meta';
+        const decrement = document.createElement('button');
+        decrement.type = 'button';
+        decrement.className = 'range-step range-decrement';
+        decrement.setAttribute('aria-label', 'Decrease value');
+        decrement.textContent = '−';
+        const minimum = document.createElement('span');
+        minimum.className = 'range-min';
+        const maximum = document.createElement('span');
+        maximum.className = 'range-max';
+        const increment = document.createElement('button');
+        increment.type = 'button';
+        increment.className = 'range-step range-increment';
+        increment.setAttribute('aria-label', 'Increase value');
+        increment.textContent = '+';
+        meta.append(decrement, minimum, current, maximum, increment);
+        container.appendChild(meta);
+
+        const adjust = direction => {
+            const step = Number(input.step) || 1;
+            const precision = (String(step).split('.')[1] || '').length;
+            const next = Math.min(Number(input.max), Math.max(Number(input.min), Number(input.value) + (direction * step)));
+            input.value = precision ? next.toFixed(precision) : String(next);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        decrement.addEventListener('click', () => adjust(-1));
+        increment.addEventListener('click', () => adjust(1));
+
+        const update = () => {
+            minimum.textContent = input.min;
+            maximum.textContent = input.max;
+            current.textContent = formatRangeControlValue(input);
+            decrement.disabled = Number(input.value) <= Number(input.min);
+            increment.disabled = Number(input.value) >= Number(input.max);
+        };
+        input.addEventListener('input', update);
+        update();
+    });
+}
+
+function refreshRangeControlDisplays() {
+    document.querySelectorAll('.range-control').forEach(container => {
+        const input = container.querySelector('input[type="range"]');
+        const current = container.querySelector('.range-current');
+        if (input && current) current.textContent = formatRangeControlValue(input);
+    });
+}
+
 function applyTimingControls() {
     const controls = {
         'time-per-chakra': 'timePerChakra',
+        'time-high-energy': 'timeHighEnergy',
         'time-icebreaker': 'icebreaker',
         'time-breathing': 'breathingStep',
         'time-corpse': 'corpsePose',
@@ -197,6 +274,7 @@ function applyTimingControls() {
             if (definition[attribute] != null) input.setAttribute(attribute, definition[attribute]);
         });
     });
+    enhanceRangeControls();
 }
 
 async function loadTimingConfig() {
@@ -217,6 +295,7 @@ async function loadTimingConfig() {
         const persisted = (key) => localStorage.getItem(key) !== null;
         const defaults = {
             timePerChakra: ['chakra_time', 'timePerChakra', 5],
+            timeHighEnergy: ['chakra_time_high_energy', 'timeHighEnergy', 5],
             timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
             timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
             timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
@@ -282,6 +361,55 @@ function contentT(path) {
     return t(path, state.language);
 }
 
+function defaultIntention(language = state.language) {
+    return t('ui.defaultIntention', language);
+}
+
+function hrimDefaultIntention(language = state.language) {
+    return t('ui.hrimDefaultIntention', language);
+}
+
+function isGeneratedIntention(value, language = state.language) {
+    const current = (value || '').trim();
+    return !current || current === defaultIntention(language) || current === hrimDefaultIntention(language);
+}
+
+function getJourneyRoadmapLabels() {
+    if (getChecked('music-only-toggle')) return [t('ui.roadmapMusicOnly')];
+
+    if (getChecked('high-energy-toggle')) {
+        return [t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')];
+    }
+
+    const labels = [
+        t(state.returningJourney ? 'ui.roadmapReturning' : 'ui.roadmapArrival'),
+        t('ui.roadmapIntention')
+    ];
+    if (getChecked('box-meditation-toggle')) labels.push(t('ui.roadmapBreathing'));
+    if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
+    labels.push(t('ui.roadmapChakras'));
+
+    if (getChecked('yoga-bridge-toggle')) {
+        labels.push(t('ui.roadmapYoga'));
+        if (getChecked('bath-session-toggle')) {
+            if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassage'));
+            if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
+            if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
+            else labels.push(t('ui.roadmapBath'));
+        }
+    }
+
+    labels.push(t('ui.roadmapClosing'));
+    if (getChecked('hooponopono-toggle')) labels.push(t('ui.roadmapHooponopono'));
+    return labels;
+}
+
+function updateJourneyRoadmap() {
+    const roadmap = document.getElementById('journey-roadmap');
+    if (!roadmap) return;
+    roadmap.textContent = getJourneyRoadmapLabels().join(' » ');
+}
+
 function applyLocaleUI() {
     document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
     document.title = t('ui.chakraMeditation');
@@ -309,9 +437,15 @@ function applyLocaleUI() {
     });
     const journalEntry = document.getElementById('journal-entry');
     if (journalEntry) journalEntry.placeholder = t('ui.writeFreely');
+    const intentionInput = document.getElementById('intention-input');
+    if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const path = element.dataset.i18n;
         if (path) element.textContent = t(path);
+    });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
+        const path = element.dataset.i18nAriaLabel;
+        if (path) element.setAttribute('aria-label', t(path));
     });
 
     const controlLabels = {
@@ -321,7 +455,7 @@ function applyLocaleUI() {
         'hooponopono-toggle': 'ui.hooponopono',
         'frequencies-toggle': 'ui.chakraFrequencies',
         'eyes-close-mode-toggle': 'ui.eyesCloseMode',
-        'bg-music-mode-toggle': 'ui.backgroundMusicMode',
+        'music-only-toggle': 'ui.musicOnlyMode',
         'corpse-pose-toggle': 'ui.corpsePoseOption',
         'yoga-bridge-toggle': 'ui.yogaBridge',
         'bath-session-toggle': 'ui.bathSession',
@@ -329,7 +463,6 @@ function applyLocaleUI() {
         'assisted-bathing-toggle': 'ui.assistedBathing',
         'massage-toggle': 'ui.massage',
         'high-energy-toggle': 'ui.highEnergy',
-        'sleep-mode-toggle': 'ui.sleepMode',
         'returning-journey-toggle': 'ui.returningJourney'
     };
     Object.entries(controlLabels).forEach(([inputId, path]) => {
@@ -339,6 +472,7 @@ function applyLocaleUI() {
         const textNode = Array.from(label.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
         if (textNode) textNode.textContent = ` ${t(path)}`;
     });
+    updateJourneyRoadmap();
 }
 
 async function loadLanguageManifest() {
@@ -1493,9 +1627,9 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
 
-            if (this.isMeditationActive) await this.runGratitude();
-            if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
-            if (this.isMeditationActive && state.corpsePoseEnabled) await this.runCorpsePose();
+            if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
+            if (this.isMeditationActive && !this.isHighEnergy && state.boxMeditation) await this.runBoxBreathing();
+            if (this.isMeditationActive && !this.isHighEnergy && state.corpsePoseEnabled) await this.runCorpsePose();
 
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
@@ -1507,7 +1641,8 @@ class MeditationController {
                     if (this.isMeditationActive) {
                         await this.handleSilence();
                         if (this.isMeditationActive) await this.runClosing();
-                        if (this.isMeditationActive && state.hooponopono) await this.runHooponopono();
+                        // HRIM is a focused activation path; it does not add
+                        // Box Breathing, Corpse Pose, or Ho'oponopono.
                         this.finish();
                     }
                 } else {
@@ -1528,7 +1663,7 @@ class MeditationController {
         }
     }
 
-    async runGratitude() {
+    async runGratitude(isHighEnergy = false) {
         const screen = document.getElementById('breathing-screen');
         const tutorial = document.getElementById('breathing-tutorial');
         const tutTitle = document.getElementById('tutorial-title');
@@ -1542,37 +1677,45 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
 
-        // The Lobby preference selects the opening: the default first-visit
-        // path uses the moon, while returning journeys use an evergreen image
-        // that welcomes discovery without repeating a lesson.
-        const isReturningVisitor = state.returningJourney;
-        const phase = getMoonPhase();
-        const moonText = localized(this.scripts.intro.moon[phase]) ||
-            this.scripts.intro.moon[`${phase}_${state.language}`];
-        const openingText = isReturningVisitor
-            ? localized(this.scripts.intro, 'returning')
-            : moonText;
-        if (openingText && this.isMeditationActive) {
-            tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
-            tutText.textContent = openingText;
-            await this.narrate(openingText, false); // Keep music playing
-            await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
+        // Moon-phase and returning sea openings belong to the reflective
+        // journey. HRIM begins directly with its activation intention.
+        if (!isHighEnergy) {
+            const isReturningVisitor = state.returningJourney;
+            const phase = getMoonPhase();
+            const moonText = localized(this.scripts.intro.moon[phase]) ||
+                this.scripts.intro.moon[`${phase}_${state.language}`];
+            const openingText = isReturningVisitor
+                ? localized(this.scripts.intro, 'returning')
+                : moonText;
+            if (openingText && this.isMeditationActive) {
+                tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
+                tutText.textContent = openingText;
+                await this.narrate(openingText, false); // Keep music playing
+                await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
+            }
         }
 
-        // Main gratitude + body scan
+        // Main gratitude + body scan. HRIM uses its own activation-oriented
+        // intention framing while the normal journey keeps the existing text.
         if (!this.isMeditationActive) return;
-        tutTitle.textContent = t('ui.gratitude');
-        const text = localized(this.scripts.intro, 'gratitude');
-        tutText.textContent = text;
-
-        if (state.intention && state.intention.trim()) {
+        tutTitle.textContent = isHighEnergy ? t('ui.intention') : t('ui.gratitude');
+        const text = isHighEnergy
+            ? localized(this.scripts.high_energy, 'intention')
+            : localized(this.scripts.intro, 'gratitude');
+        const personalIntention = state.intention && state.intention.trim();
+        if (isHighEnergy) {
+            const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
+            tutText.textContent = intentionText;
+            await this.narrate(intentionText, false, false, 'hrim');
+        } else if (personalIntention) {
+            tutText.textContent = text;
             await this.narrate(text, false); // Still keep music playing for next part
-            
             const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
             tutTitle.textContent = t('ui.intention');
             tutText.textContent = intentionText;
             await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
+            tutText.textContent = text;
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
 
@@ -1778,7 +1921,7 @@ class MeditationController {
         // Setup simple UI
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) {
-            setSymbolImage("symbols/root.png", symbolEl); // Using a safe default
+            setSymbolImage("symbols/background-only.png", symbolEl);
             symbolEl.style.opacity = "0.7";
         }
         
@@ -1786,7 +1929,9 @@ class MeditationController {
         const narrationEl = document.getElementById('narration-text');
         const timerEl = document.getElementById('timer-display');
 
-        if (mantraEl) mantraEl.textContent = contentT('system.musicOnly');
+        // This is visible interface copy, so follow Display Language rather
+        // than the selected meditation/narration language.
+        if (mantraEl) mantraEl.textContent = t('system.musicOnly');
         if (narrationEl) narrationEl.textContent = "";
         if (timerEl) timerEl.textContent = "";
         
@@ -1909,7 +2054,7 @@ class MeditationController {
         return isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName);
     }
 
-    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1) {
+    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal') {
         if (!text || !this.isMeditationActive && !fadeOut) return;
         if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
         if (this.audio.voiceCarveFilter) {
@@ -1920,7 +2065,13 @@ class MeditationController {
                 this.audio.ctx.currentTime + 1.2
             );
         }
-        await this.pauseAwareSleep(timing('narration', 'piperLeadIn') * 1000);
+        const leadIn = pacing === 'hrim'
+            ? timing('narration', 'hrimLeadIn', timing('narration', 'piperLeadIn'))
+            : timing('narration', 'piperLeadIn');
+        const sentenceGap = pacing === 'hrim'
+            ? timing('narration', 'hrimSentenceGap', timing('narration', 'sentenceGap'))
+            : timing('narration', 'sentenceGap');
+        await this.pauseAwareSleep(leadIn * 1000);
 
         const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
         const pending = sentences.slice(0, 2).map(sentence => piperTTS.synthesize(sentence));
@@ -1932,7 +2083,7 @@ class MeditationController {
 
             setText('narration-text', sentences[i]);
             if (piperFailed) {
-                await this.narrateBrowser(sentences[i], false, true);
+                await this.narrateBrowser(sentences[i], false, true, pacing);
                 continue;
             }
 
@@ -1945,10 +2096,10 @@ class MeditationController {
                 pending.forEach(job => job.catch(() => {}));
                 piperTTS.cancel('sentence failed');
                 setVoiceStatus(t('ui.piperFallback'), 'error');
-                await this.narrateBrowser(sentences[i], false, true);
+                await this.narrateBrowser(sentences[i], false, true, pacing);
             }
 
-            if (i < sentences.length - 1) await this.pauseAwareSleep(timing('narration', 'sentenceGap') * 1000);
+            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         if (fadeOut) {
@@ -2166,13 +2317,14 @@ class MeditationController {
         this.audio.startDrone(chakra.frequency, absoluteIndex);
 
         if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
-        await this.narrate(localized(chakra));
+        await this.narrate(localized(chakra, 'meditation') || localized(chakra));
         if (!this.isMeditationActive) return;
 
         // Start looping mantra audio track (fades in, drone fades down)
         await this.audio.playMantraTrack(key);
 
-        const chantDurationMs = Math.max(0, (state.timePerChakra * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
+        const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+        const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
 
@@ -2235,19 +2387,19 @@ class MeditationController {
         });
     }
 
-    async narrate(text, fadeOut = false, keepSilence = false) {
+    async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
         if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1); }
+            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing); }
             catch (error) {
                 console.error('[Piper] narration failed:', error);
                 if (!this.isMeditationActive) return;
                 setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
-        return this.narrateBrowser(text, fadeOut, keepSilence);
+        return this.narrateBrowser(text, fadeOut, keepSilence, pacing);
     }
 
-    async narrateBrowser(text, fadeOut = false, keepSilence = false) {
+    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
@@ -2259,7 +2411,13 @@ class MeditationController {
         }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
-        await this.pauseAwareSleep(timing('narration', 'piperLeadIn') * 1000);
+        const leadIn = pacing === 'hrim'
+            ? timing('narration', 'hrimLeadIn', timing('narration', 'piperLeadIn'))
+            : timing('narration', 'piperLeadIn');
+        const sentenceGap = pacing === 'hrim'
+            ? timing('narration', 'hrimSentenceGap', timing('narration', 'sentenceGap'))
+            : timing('narration', 'sentenceGap');
+        await this.pauseAwareSleep(leadIn * 1000);
 
         // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
         if (this.audio.voiceCarveFilter) {
@@ -2289,9 +2447,11 @@ class MeditationController {
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity: Breath-aligned pacing
-                const baseRate = state.sleepMode ? 0.60 : 0.70;
+                const baseRate = pacing === 'hrim'
+                    ? (state.sleepMode ? 0.78 : 0.90)
+                    : (state.sleepMode ? 0.60 : 0.70);
                 utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
-                utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02; // Deeper 0.88 for warmth
+                utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : 1.02);
                 utterance.volume = state.volVoice; 
                 
                 let isResolved = false;
@@ -2345,7 +2505,7 @@ class MeditationController {
                 continue;
             }
 
-            await this.pauseAwareSleep(timing('narration', 'sentenceGap') * 1000);
+            await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         // Release Frequency Carving after narration ends
@@ -2495,6 +2655,7 @@ const state = {
     displayLanguage: localStorage.getItem('chakra_display_language') || 'en',
     voiceName: localStorage.getItem('chakra_voice') || 'piper:ml_IN-arjun-medium',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
+    timeHighEnergy: parseFloat(localStorage.getItem('chakra_time_high_energy')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
@@ -2522,8 +2683,9 @@ const state = {
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     bgMusicMode: localStorage.getItem('chakra_bg_music_mode') === 'true',
+    highEnergyEnabled: localStorage.getItem('chakra_high_energy') === 'true',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
-    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') !== 'false', // Default true
+    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
     // Bath is a child stage of Yoga Bridge and cannot be active by itself.
@@ -2727,6 +2889,14 @@ function loadPreferences() {
     }
     
     setText('time-display', `${state.timePerChakra.toFixed(1)} mins`);
+
+    const highEnergyTimeSlider = document.getElementById('time-high-energy');
+    if (highEnergyTimeSlider) {
+        highEnergyTimeSlider.value = state.timeHighEnergy;
+        const pctHigh = ((highEnergyTimeSlider.value - highEnergyTimeSlider.min) / (highEnergyTimeSlider.max - highEnergyTimeSlider.min) * 100).toFixed(1) + '%';
+        highEnergyTimeSlider.style.setProperty('--range-fill', pctHigh);
+    }
+    setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
     
     // Sync Mixer Sliders
     syncValue('vol-voice', state.volVoice);
@@ -2747,9 +2917,9 @@ function loadPreferences() {
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
         cb.checked = state.selectedChakras.includes(cb.value);
     });
+    if (!state.intention.trim()) state.intention = defaultIntention();
     syncValue('intention-input', state.intention);
     
-    syncChecked('sleep-mode-toggle', state.sleepMode);
     syncChecked('returning-journey-toggle', state.returningJourney);
     syncChecked('audio-filters-toggle', state.audioFilters);
     syncChecked('reverse-journey-toggle', state.reverseJourney);
@@ -2757,7 +2927,8 @@ function loadPreferences() {
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    syncChecked('bg-music-mode-toggle', state.bgMusicMode);
+    syncChecked('music-only-toggle', state.bgMusicMode);
+    syncChecked('high-energy-toggle', state.highEnergyEnabled);
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
@@ -2824,6 +2995,8 @@ function loadPreferences() {
             statusEl.style.color = '#4ade80';
         }
     }
+
+    refreshRangeControlDisplays();
     
     // Ensure voice matches the loaded language
     autoSelectVoice();
@@ -2856,7 +3029,15 @@ function showScreen(screen) {
 
 function attachEventListeners() {
     languageSelect.addEventListener('change', (e) => {
+        const previousDefault = defaultIntention(state.language);
+        const previousHrimDefault = hrimDefaultIntention(state.language);
         state.language = e.target.value;
+        if (!state.intention.trim() || state.intention === previousDefault || state.intention === previousHrimDefault) {
+            state.intention = state.highEnergyEnabled
+                ? hrimDefaultIntention(state.language)
+                : defaultIntention(state.language);
+            syncValue('intention-input', state.intention);
+        }
         setupVoices();
         autoSelectVoice();
         applyLocaleUI();
@@ -2885,7 +3066,6 @@ function attachEventListeners() {
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
-        state.bgMusicMode = getChecked('bg-music-mode-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
@@ -2907,7 +3087,6 @@ function attachEventListeners() {
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
-        localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
@@ -2930,22 +3109,21 @@ function attachEventListeners() {
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
         const boxEnabled = getChecked('box-meditation-toggle');
-        const corpseEnabled = getChecked('corpse-pose-toggle');
         const yogaEnabled = getChecked('yoga-bridge-toggle');
+        const corpseToggle = document.getElementById('corpse-pose-toggle');
+        if (!yogaEnabled && corpseToggle) corpseToggle.checked = false;
+        const corpseEnabled = getChecked('corpse-pose-toggle');
         const bathEnabled = getChecked('bath-session-toggle');
         const perinealEnabled = getChecked('perineal-care-toggle');
         const assistedEnabled = getChecked('assisted-bathing-toggle');
         const massageEnabled = getChecked('massage-toggle');
-        const bgMusicMode = getChecked('bg-music-mode-toggle');
-
-        // Hide journey configurations if in music-only mode
-        const journeyConfig = document.getElementById('chakra-selection').parentElement;
-        if (journeyConfig) journeyConfig.style.display = bgMusicMode ? 'none' : 'block';
 
         const toggleDisplay = (id, show) => {
             const el = document.getElementById(id);
             if (!el) return;
-            el.style.display = show ? 'flex' : 'none';
+            // Let the component's CSS choose its layout when visible. This is
+            // important for enhanced range rows, which use grid rather than flex.
+            el.style.display = show ? '' : 'none';
         };
 
         // Bath Session only exists inside the Yoga Bridge. Clear stale state
@@ -2965,23 +3143,23 @@ function attachEventListeners() {
             toggle.setAttribute('aria-disabled', String(toggle.disabled));
         });
 
-        toggleDisplay('row-breathing', boxEnabled && !bgMusicMode);
-        toggleDisplay('row-corpse', corpseEnabled && !bgMusicMode);
-        toggleDisplay('row-yoga-prep', yogaEnabled && !bgMusicMode);
-        toggleDisplay('row-yoga-pose', yogaEnabled && !bgMusicMode);
-        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !assistedEnabled && !bgMusicMode);
-        toggleDisplay('row-perineal-care', yogaEnabled && bathEnabled && perinealEnabled && !bgMusicMode);
-        toggleDisplay('row-assisted-bathing', yogaEnabled && bathEnabled && assistedEnabled && !bgMusicMode);
-        toggleDisplay('row-massage', yogaEnabled && bathEnabled && massageEnabled && !bgMusicMode);
+        toggleDisplay('row-breathing', boxEnabled);
+        toggleDisplay('row-corpse', corpseEnabled);
+        toggleDisplay('row-yoga-prep', yogaEnabled);
+        toggleDisplay('row-yoga-pose', yogaEnabled);
+        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !assistedEnabled);
+        toggleDisplay('row-perineal-care', yogaEnabled && bathEnabled && perinealEnabled);
+        toggleDisplay('row-assisted-bathing', yogaEnabled && bathEnabled && assistedEnabled);
+        toggleDisplay('row-massage', yogaEnabled && bathEnabled && massageEnabled);
         
         const yogaSubOptions = document.getElementById('yoga-sub-options');
         if (yogaSubOptions) {
-            yogaSubOptions.style.display = (yogaEnabled && !bgMusicMode) ? 'flex' : 'none';
+            yogaSubOptions.style.display = yogaEnabled ? 'flex' : 'none';
         }
     }
 
     // Master Toggle Logic
-    const bgMusicToggle = document.getElementById('bg-music-mode-toggle');
+    const musicOnlyToggle = document.getElementById('music-only-toggle');
     const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
     const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
     const boxMeditationToggle = document.getElementById('box-meditation-toggle');
@@ -2989,34 +3167,56 @@ function attachEventListeners() {
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
 
+    function clearHighEnergyMode() {
+        if (!highEnergyToggle) return;
+        highEnergyToggle.checked = false;
+        state.highEnergyEnabled = false;
+        localStorage.setItem('chakra_high_energy', 'false');
+    }
+
+    function clearMusicOnlyMode() {
+        if (!musicOnlyToggle) return;
+        musicOnlyToggle.checked = false;
+        state.bgMusicMode = false;
+        localStorage.setItem('chakra_bg_music_mode', 'false');
+    }
+
     function enforceMasterToggle(target) {
-        if (target === bgMusicToggle && bgMusicToggle.checked) {
+        if (target === musicOnlyToggle && musicOnlyToggle.checked) {
             // Disable other journey features
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
             if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
             if (boxMeditationToggle) boxMeditationToggle.checked = false;
             if (hooponoponoToggle) hooponoponoToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
-            if (highEnergyToggle) highEnergyToggle.checked = false;
-        } else if (target !== bgMusicToggle && target.checked) {
-            // Disable BG Music Mode if any other journey feature is enabled
-            if (bgMusicToggle) bgMusicToggle.checked = false;
+            clearHighEnergyMode();
+        } else if (target !== musicOnlyToggle && target.checked) {
+            // Disable Music Only if any other journey feature is enabled.
+            clearMusicOnlyMode();
         }
 
         // Mutual Exclusivity: Yoga Bridge & Reverse Journey
         if (target === yogaBridgeToggle && yogaBridgeToggle.checked) {
             if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
-            if (highEnergyToggle) highEnergyToggle.checked = false;
+            clearHighEnergyMode();
         } else if (target === reverseJourneyToggle && reverseJourneyToggle.checked) {
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
         }
 
         if (target === highEnergyToggle && highEnergyToggle.checked) {
-            if (bgMusicToggle) bgMusicToggle.checked = false;
+            clearMusicOnlyMode();
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
         }
 
         updateTimingRowVisibility();
+        updateExperienceModeVisibility();
+        if (isGeneratedIntention(state.intention)) {
+            state.intention = state.highEnergyEnabled
+                ? hrimDefaultIntention(state.language)
+                : defaultIntention(state.language);
+            syncValue('intention-input', state.intention);
+            localStorage.setItem('chakra_intention', state.intention);
+        }
         updateSessionEstimate();
     }
 
@@ -3032,11 +3232,13 @@ function attachEventListeners() {
     document.getElementById('assisted-bathing-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('massage-toggle').addEventListener('change', updateTimingRowVisibility);
     document.getElementById('massage-toggle').addEventListener('change', updateSessionEstimate);
-    document.getElementById('bg-music-mode-toggle').addEventListener('change', updateTimingRowVisibility);
-
-    if (bgMusicToggle) {
-        bgMusicToggle.addEventListener('change', (e) => {
+    if (musicOnlyToggle) {
+        musicOnlyToggle.addEventListener('change', (e) => {
+            state.bgMusicMode = e.target.checked;
+            localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
             enforceMasterToggle(e.target);
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
         });
     }
 
@@ -3049,19 +3251,41 @@ function attachEventListeners() {
     }
 
     if (highEnergyToggle) {
-        highEnergyToggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
+        highEnergyToggle.addEventListener('change', (e) => {
+            state.highEnergyEnabled = e.target.checked;
+            localStorage.setItem('chakra_high_energy', state.highEnergyEnabled);
+            enforceMasterToggle(e.target);
+            updateExperienceModeVisibility();
+        });
     }
 
     [reverseJourneyToggle, boxMeditationToggle, hooponoponoToggle, corpsePoseToggle].forEach(toggle => {
         if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
     });
     
+    function updateExperienceModeVisibility() {
+        const highEnergy = getChecked('high-energy-toggle');
+        const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
+        const highEnergyDuration = document.getElementById('high-energy-duration-control');
+        if (normalDuration) normalDuration.style.display = highEnergy ? 'none' : 'flex';
+        if (highEnergyDuration) highEnergyDuration.style.display = highEnergy ? 'flex' : 'none';
+    }
+
     // Initial call
     updateTimingRowVisibility();
+    updateExperienceModeVisibility();
+    if (isGeneratedIntention(state.intention)) {
+        state.intention = state.highEnergyEnabled
+            ? hrimDefaultIntention(state.language)
+            : defaultIntention(state.language);
+        syncValue('intention-input', state.intention);
+        localStorage.setItem('chakra_intention', state.intention);
+    }
 
     function updateSessionEstimate() {
-        if (getChecked('bg-music-mode-toggle')) {
+        if (getChecked('music-only-toggle')) {
             setText('session-estimate', 'Music only — stop anytime');
+            updateJourneyRoadmap();
             return;
         }
         const isHigh = getChecked('high-energy-toggle');
@@ -3092,9 +3316,10 @@ function attachEventListeners() {
         }
 
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'highEnergyExtra'))
+            ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
             : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'normalExtra'));
         setText('session-estimate', `~ ${estimate} min session`);
+        updateJourneyRoadmap();
     }
 
     // Timing Sliders Listeners
@@ -3277,6 +3502,18 @@ function attachEventListeners() {
         updateSessionEstimate();
     });
 
+    const highEnergyTimeSlider = document.getElementById('time-high-energy');
+    if (highEnergyTimeSlider) {
+        highEnergyTimeSlider.addEventListener('input', (e) => {
+            state.timeHighEnergy = parseFloat(e.target.value);
+            setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
+            localStorage.setItem('chakra_time_high_energy', state.timeHighEnergy);
+            const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
+            e.target.style.setProperty('--range-fill', pct);
+            updateSessionEstimate();
+        });
+    }
+
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
@@ -3288,6 +3525,17 @@ function attachEventListeners() {
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
 
+    const settingsHelpModal = document.getElementById('settings-help-modal');
+    const settingsHelpButton = document.getElementById('settings-help-button');
+    const settingsHelpClose = document.getElementById('settings-help-close');
+    if (settingsHelpModal && settingsHelpButton && settingsHelpClose) {
+        settingsHelpButton.addEventListener('click', () => {
+            settingsHelpModal.classList.remove('hidden');
+            settingsHelpClose.focus();
+        });
+        settingsHelpClose.addEventListener('click', () => settingsHelpModal.classList.add('hidden'));
+    }
+
     // Brightness slider
     const brightnessSlider = document.getElementById('brightness-slider');
     if (brightnessSlider) {
@@ -3298,7 +3546,85 @@ function attachEventListeners() {
         });
     }
 
+    function chooseSleepModeForJourney() {
+        const isEvening = new Date().getHours() >= 18;
+        const prompt = document.getElementById('sleep-mode-prompt');
+        const enable = document.getElementById('sleep-mode-enable');
+        const disable = document.getElementById('sleep-mode-disable');
+        const close = document.getElementById('sleep-mode-prompt-close');
+
+        if (!isEvening || !prompt || !enable || !disable || !close) {
+            state.sleepMode = false;
+            return Promise.resolve(!isEvening ? false : null);
+        }
+
+        prompt.classList.remove('hidden');
+        enable.focus();
+        return new Promise(resolve => {
+            const finish = enabled => {
+                enable.removeEventListener('click', enableSleep);
+                disable.removeEventListener('click', disableSleep);
+                close.removeEventListener('click', closePrompt);
+                prompt.classList.add('hidden');
+                state.sleepMode = enabled === true;
+                resolve(enabled);
+            };
+            const enableSleep = () => finish(true);
+            const disableSleep = () => finish(false);
+            const closePrompt = () => finish(null);
+            enable.addEventListener('click', enableSleep);
+            disable.addEventListener('click', disableSleep);
+            close.addEventListener('click', closePrompt);
+        });
+    }
+
+    function isHighEnergyTimeAllowed() {
+        const now = new Date();
+        const minutes = (now.getHours() * 60) + now.getMinutes();
+        return minutes >= (3 * 60 + 30) && minutes < (12 * 60);
+    }
+
+    function confirmHighEnergyTime() {
+        if (!getChecked('high-energy-toggle') || isHighEnergyTimeAllowed()) return Promise.resolve(true);
+
+        const modal = document.getElementById('hrim-time-block-modal');
+        const close = document.getElementById('hrim-time-block-close');
+        const lobby = document.getElementById('hrim-time-block-lobby');
+        const regular = document.getElementById('hrim-time-block-regular');
+        if (!modal || !close || !lobby || !regular) return Promise.resolve(false);
+
+        modal.classList.remove('hidden');
+        lobby.focus();
+        return new Promise(resolve => {
+            const finish = continueJourney => {
+                close.removeEventListener('click', returnToLobby);
+                lobby.removeEventListener('click', returnToLobby);
+                regular.removeEventListener('click', continueRegular);
+                modal.classList.add('hidden');
+                if (continueJourney) {
+                    const highEnergyToggle = document.getElementById('high-energy-toggle');
+                    if (highEnergyToggle) highEnergyToggle.checked = false;
+                    state.highEnergyEnabled = false;
+                    localStorage.setItem('chakra_high_energy', 'false');
+                }
+                resolve(continueJourney);
+            };
+            const returnToLobby = () => finish(false);
+            const continueRegular = () => finish(true);
+            close.addEventListener('click', returnToLobby);
+            lobby.addEventListener('click', returnToLobby);
+            regular.addEventListener('click', continueRegular);
+        });
+    }
+
     startMeditationBtn.addEventListener('click', async () => {
+        // HRIM is a daytime-only energy practice. Gate it before audio setup.
+        if (!await confirmHighEnergyTime()) return;
+
+        // Sleep Mode is a local evening decision for this journey only.
+        const sleepChoice = await chooseSleepModeForJourney();
+        if (sleepChoice === null) return;
+
         // Initialize Audio Engine early for music-only mode
         if (!audio.isInitialized) await audio.init();
 
@@ -3314,7 +3640,8 @@ function attachEventListeners() {
         } else {
             let order = [...state.selectedChakras];
             if (state.reverseJourney) order.reverse();
-            if (order.length === 0) {
+            const isHighEnergy = getChecked('high-energy-toggle');
+            if (!isHighEnergy && order.length === 0) {
                 alert("Please select at least one chakra before beginning the journey.");
                 return;
             }
@@ -3376,12 +3703,6 @@ function attachEventListeners() {
         localStorage.setItem('chakra_intention', state.intention);
     });
 
-    // Sleep mode toggle
-    document.getElementById('sleep-mode-toggle').addEventListener('change', (e) => {
-        state.sleepMode = e.target.checked;
-        localStorage.setItem('chakra_sleep_mode', state.sleepMode);
-    });
-
     // Keep this user-controlled opening preference separate from the completed
     // journey counter in state.stats.journeys.
     const returningJourneyToggle = document.getElementById('returning-journey-toggle');
@@ -3389,6 +3710,7 @@ function attachEventListeners() {
         returningJourneyToggle.addEventListener('change', (e) => {
             state.returningJourney = e.target.checked;
             localStorage.setItem('chakra_returning_journey', String(state.returningJourney));
+            updateJourneyRoadmap();
         });
     }
 

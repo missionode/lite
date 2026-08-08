@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "journey": {
     "timePerChakra": { "default": 5, "min": 1, "max": 7, "step": 0.5, "unit": "minutes" },
+    "timeHighEnergy": { "default": 5, "min": 1, "max": 30, "step": 1, "unit": "minutes" },
     "icebreaker": { "default": 60, "min": 10, "max": 120, "step": 5, "unit": "seconds" },
     "breathingStep": { "default": 8, "min": 4, "max": 16, "step": 1, "unit": "seconds" },
     "corpsePose": { "default": 300, "min": 60, "max": 600, "step": 30, "unit": "seconds" },
@@ -37,6 +38,8 @@
   "narration": {
     "piperLeadIn": 1.2,
     "sentenceGap": 1.5,
+    "hrimLeadIn": 0.4,
+    "hrimSentenceGap": 0.5,
     "fadeOutPause": 2.5,
     "browserSafetyPerCharacter": 200,
     "browserSafetyBuffer": 3000
@@ -54,6 +57,7 @@
     "fast-test": {
       "journey": {
         "timePerChakra": { "default": 0.1, "min": 0.1, "max": 1, "step": 0.1, "unit": "minutes" },
+        "timeHighEnergy": { "default": 0.1, "min": 0.1, "max": 1, "step": 0.1, "unit": "minutes" },
         "icebreaker": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
         "breathingStep": { "default": 1, "min": 1, "max": 2, "step": 1, "unit": "seconds" },
         "corpsePose": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
@@ -89,6 +93,8 @@
       "narration": {
         "piperLeadIn": 0,
         "sentenceGap": 0,
+        "hrimLeadIn": 0,
+        "hrimSentenceGap": 0,
         "fadeOutPause": 0,
         "browserSafetyPerCharacter": 1,
         "browserSafetyBuffer": 100

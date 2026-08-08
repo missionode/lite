@@ -53,13 +53,13 @@ for (const combination of bathCombinations) {
 }
 
 const modeCombinations = [
-  { name: 'standard', high: false, reverse: false, box: false, sleep: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'high energy', high: true, reverse: false, box: false, sleep: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'reverse journey', high: false, reverse: true, box: false, sleep: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'box breathing', high: false, reverse: false, box: true, sleep: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'sleep and audio filters', high: false, reverse: false, box: false, sleep: true, filters: true, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'hooponopono and frequencies', high: false, reverse: false, box: false, sleep: false, filters: false, hooponopono: true, frequencies: true, musicOnly: false },
-  { name: 'music only', high: false, reverse: false, box: false, sleep: false, filters: false, hooponopono: false, frequencies: false, musicOnly: true }
+  { name: 'standard', high: false, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
+  { name: 'high energy', high: true, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
+  { name: 'reverse journey', high: false, reverse: true, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
+  { name: 'box breathing', high: false, reverse: false, box: true, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
+  { name: 'audio filters', high: false, reverse: false, box: false, filters: true, hooponopono: false, frequencies: false, musicOnly: false },
+  { name: 'hooponopono and frequencies', high: false, reverse: false, box: false, filters: false, hooponopono: true, frequencies: true, musicOnly: false },
+  { name: 'music only', high: false, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: true }
 ];
 
 for (const combination of modeCombinations) {
@@ -70,20 +70,23 @@ for (const combination of modeCombinations) {
     await setChecked(page, 'audio-filters-toggle', combination.filters);
     await setChecked(page, 'hooponopono-toggle', combination.hooponopono);
     await setChecked(page, 'frequencies-toggle', combination.frequencies);
-    await setChecked(page, 'bg-music-mode-toggle', combination.musicOnly);
     await page.locator('#save-config').click();
     await expect(page.locator('#lobby-screen')).toBeVisible();
     await setChecked(page, 'high-energy-toggle', combination.high);
-    await setChecked(page, 'sleep-mode-toggle', combination.sleep);
+    await setChecked(page, 'music-only-toggle', combination.musicOnly);
 
     if (combination.musicOnly) {
       await expect(page.locator('#session-estimate')).toContainText('Music only');
       await expect(page.locator('#high-energy-toggle')).not.toBeChecked();
       await expect(page.locator('#box-meditation-toggle')).not.toBeChecked();
       await expect(page.locator('#hooponopono-toggle')).not.toBeChecked();
+    } else if (combination.high) {
+      await expect(page.locator('#high-energy-duration-control')).toBeVisible();
+      await expect(page.locator('#time-per-chakra').locator('..')).toBeHidden();
+      await expect(page.locator('#music-only-toggle')).not.toBeChecked();
     } else {
       await expect(page.locator('#session-estimate')).toContainText('session');
-      await expect(page.locator('#bg-music-mode-toggle')).not.toBeChecked();
+      await expect(page.locator('#music-only-toggle')).not.toBeChecked();
     }
   });
 }
