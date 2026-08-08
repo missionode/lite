@@ -73,28 +73,452 @@ function hasScriptPath(source, path) {
     return path.split('.').reduce((value, key) => value == null ? undefined : value[key], source) != null;
 }
 
+function hasLocalizedScriptPath(scripts, path) {
+    if (hasScriptPath(scripts, path)) return true;
+    const parts = path.split('.');
+    const final = parts.pop() || '';
+    const suffixMatch = final.match(/^(.+)_([a-zA-Z-]+)$/);
+    if (!suffixMatch) return false;
+    const basePath = parts.concat(suffixMatch[1]).join('.');
+    if (hasScriptPath(scripts, `${basePath}.${suffixMatch[2]}`)) return true;
+    const parentPath = parts.join('.');
+    return ['text', 'content', 'value'].some(field =>
+        hasScriptPath(scripts, `${parentPath}.${field}.${suffixMatch[2]}`)
+    );
+}
+
 function validateScriptBundle(scripts, options = {}) {
+    const languageIds = (options.languages || languageRegistry.map(language => language.id)).length
+        ? (options.languages || languageRegistry.map(language => language.id))
+        : ['ml', 'en'];
+    const localized = (base) => languageIds.map(language => `${base}_${language}`);
     const required = [
-        'intro.gratitude_en', 'intro.gratitude_ml',
-        'intro.returning_en', 'intro.returning_ml',
-        'intro.moon.new_en', 'intro.moon.new_ml', 'intro.moon.waxing_en', 'intro.moon.waxing_ml',
-        'intro.moon.full_en', 'intro.moon.full_ml', 'intro.moon.waning_en', 'intro.moon.waning_ml',
-        'closing.en', 'closing.ml', 'closing.affirmation_en', 'closing.affirmation_ml',
+        ...localized('intro.gratitude'), ...localized('intro.returning'),
+        ...['new', 'waxing', 'full', 'waning'].flatMap(phase => localized(`intro.moon.${phase}`)),
+        ...languageIds.map(language => `closing.${language}`),
+        ...languageIds.map(language => `closing.affirmation_${language}`),
         ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].flatMap(key => [
-            `${key}.en`, `${key}.ml`, `${key}.affirmation_en`, `${key}.affirmation_ml`,
+            ...languageIds.map(language => `${key}.${language}`),
+            ...languageIds.map(language => `${key}.affirmation_${language}`),
             `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
         ])
     ];
-    if (options.highEnergy) required.push('high_energy.en', 'high_energy.ml', 'high_energy.affirmation_en', 'high_energy.affirmation_ml');
-    if (options.corpse) required.push('corpse_pose.intro.en', 'corpse_pose.intro.ml', 'corpse_pose.transition.en', 'corpse_pose.transition.ml');
-    if (options.bath) required.push('bath_session.title.en', 'bath_session.title.ml', 'bath_session.intro.en', 'bath_session.intro.ml', 'bath_session.instructions.en', 'bath_session.instructions.ml', 'bath_session.reminder.en', 'bath_session.reminder.ml');
-    if (options.yoga) required.push('yoga.intro.en', 'yoga.intro.ml', 'yoga.preparation.en', 'yoga.preparation.ml', 'yoga.next_pose_prompt.en', 'yoga.next_pose_prompt.ml', 'yoga.session_complete.en', 'yoga.session_complete.ml', 'yoga.poses');
-    if (options.hooponopono) required.push('hooponopono.intro.en', 'hooponopono.intro.ml', 'hooponopono.phrases.en', 'hooponopono.phrases.ml', 'hooponopono.closing.en', 'hooponopono.closing.ml');
-    const missing = required.filter(path => !hasScriptPath(scripts, path));
+    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.intention_${language}`, `high_energy.affirmation_${language}`]));
+    if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
+    if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
+    if (options.perinealCare) required.push(...languageIds.flatMap(language => [`perineal_care.title.${language}`, `perineal_care.intro.${language}`, `perineal_care.instructions.${language}`, `perineal_care.reminder.${language}`]));
+    if (options.assistedBathing) required.push(...languageIds.flatMap(language => [`assisted_bathing.title.${language}`, `assisted_bathing.intro.${language}`, `assisted_bathing.instructions.${language}`, `assisted_bathing.reminder.${language}`]));
+    if (options.massage) required.push(...languageIds.flatMap(language => [`massage.title.${language}`, `massage.intro.${language}`, `massage.instructions.${language}`, `massage.reminder.${language}`]));
+    if (options.yoga) required.push(...languageIds.flatMap(language => [`yoga.intro.${language}`, `yoga.preparation.${language}`, `yoga.next_pose_prompt.${language}`, `yoga.session_complete.${language}`]), 'yoga.poses');
+    if (options.hooponopono) required.push(...languageIds.flatMap(language => [`hooponopono.intro.${language}`, `hooponopono.phrases.${language}`, `hooponopono.closing.${language}`]));
+    const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path));
     return { valid: missing.length === 0, missing };
 }
 
 let piperVoiceRegistry = [];
+let languageRegistry = [];
+let localeBundles = {};
+let fallbackLanguageId = 'en';
+let timingConfig = {
+    journey: {},
+    transitions: {},
+    narration: {},
+    estimate: {}
+};
+const timingFallbacks = {
+    'transitions.initialSettle': 2,
+    'transitions.openingPause': 1,
+    'transitions.postBreathing': 3,
+    'transitions.breathingPreparation': 5,
+    'transitions.breathingTutorialFade': 1,
+    'transitions.breathingCompletion': 5,
+    'transitions.corpseTransitionAt': 60,
+    'transitions.corpseFinalSettle': 3,
+    'transitions.yogaPoseGap': 5,
+    'transitions.yogaFinalSettle': 5,
+    'transitions.chakraPostMantra': 4,
+    'transitions.chakraLeadOut': 15,
+    'transitions.intervalPreparation': 2,
+    'transitions.closingFirstPause': 2,
+    'transitions.closingSecondPause': 3,
+    'transitions.hooponoponoIntroPause': 2,
+    'transitions.hooponoponoPhrasePause': 2,
+    'transitions.hooponoponoFinalRest': 15,
+    'transitions.finalSilence': 60,
+    'narration.piperLeadIn': 1.2,
+    'narration.sentenceGap': 1.5,
+    'narration.fadeOutPause': 2.5,
+    'narration.browserSafetyPerCharacter': 200,
+    'narration.browserSafetyBuffer': 3000,
+    'estimate.baseOverhead': 5,
+    'estimate.normalExtra': 7,
+    'estimate.highEnergyExtra': 3,
+    'estimate.boxBreathingOverhead': 4,
+    'estimate.hooponoponoOverhead': 3,
+    'estimate.chakraStageOverhead': 2,
+    'estimate.yogaPoseTransitionEstimate': 15
+};
+
+function timing(section, key, fallback = 0) {
+    const value = timingConfig[section]?.[key];
+    return value == null ? (timingFallbacks[`${section}.${key}`] ?? fallback) : value;
+}
+
+function timingDefault(key, fallback) {
+    return timingConfig.journey?.[key]?.default ?? fallback;
+}
+
+function mergeTimingProfile(base, profile) {
+    return ['journey', 'transitions', 'narration', 'estimate'].reduce((merged, section) => {
+        merged[section] = { ...(base[section] || {}), ...(profile[section] || {}) };
+        return merged;
+    }, { schemaVersion: base.schemaVersion });
+}
+
+function formatRangeControlValue(input) {
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return input.value;
+    if (input.id === 'time-per-chakra') return `${value.toFixed(1)} mins`;
+    if (input.id === 'time-high-energy') return `${value} mins`;
+    if (['time-bath', 'time-perineal-care', 'time-assisted-bathing', 'time-massage'].includes(input.id)) {
+        return `${Math.floor(value / 60)}m`;
+    }
+    if (input.id.startsWith('time-')) return `${value}s`;
+    return input.step && Number(input.step) < 1 ? value.toFixed(2) : String(value);
+}
+
+function enhanceRangeControls() {
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+        const container = input.closest('.mixer-row, .time-selector') || input.parentElement;
+        if (!container || container.dataset.rangeEnhanced === 'true') return;
+
+        container.dataset.rangeEnhanced = 'true';
+        container.classList.add('range-control');
+
+        let current = container.querySelector(':scope > span');
+        if (!current) {
+            current = document.createElement('span');
+            container.appendChild(current);
+        }
+        current.classList.add('range-current');
+
+        const meta = document.createElement('div');
+        meta.className = 'range-meta';
+        const decrement = document.createElement('button');
+        decrement.type = 'button';
+        decrement.className = 'range-step range-decrement';
+        decrement.setAttribute('aria-label', 'Decrease value');
+        decrement.textContent = '−';
+        const minimum = document.createElement('span');
+        minimum.className = 'range-min';
+        const maximum = document.createElement('span');
+        maximum.className = 'range-max';
+        const increment = document.createElement('button');
+        increment.type = 'button';
+        increment.className = 'range-step range-increment';
+        increment.setAttribute('aria-label', 'Increase value');
+        increment.textContent = '+';
+        meta.append(decrement, minimum, current, maximum, increment);
+        container.appendChild(meta);
+
+        const adjust = direction => {
+            const step = Number(input.step) || 1;
+            const precision = (String(step).split('.')[1] || '').length;
+            const next = Math.min(Number(input.max), Math.max(Number(input.min), Number(input.value) + (direction * step)));
+            input.value = precision ? next.toFixed(precision) : String(next);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        decrement.addEventListener('click', () => adjust(-1));
+        increment.addEventListener('click', () => adjust(1));
+
+        const update = () => {
+            minimum.textContent = input.min;
+            maximum.textContent = input.max;
+            current.textContent = formatRangeControlValue(input);
+            decrement.disabled = Number(input.value) <= Number(input.min);
+            increment.disabled = Number(input.value) >= Number(input.max);
+        };
+        input.addEventListener('input', update);
+        update();
+    });
+}
+
+function refreshRangeControlDisplays() {
+    document.querySelectorAll('.range-control').forEach(container => {
+        const input = container.querySelector('input[type="range"]');
+        const current = container.querySelector('.range-current');
+        if (input && current) current.textContent = formatRangeControlValue(input);
+    });
+}
+
+function applyTimingControls() {
+    const controls = {
+        'time-per-chakra': 'timePerChakra',
+        'time-high-energy': 'timeHighEnergy',
+        'time-icebreaker': 'icebreaker',
+        'time-breathing': 'breathingStep',
+        'time-corpse': 'corpsePose',
+        'time-interval': 'interval',
+        'time-yoga-prep': 'yogaPreparation',
+        'time-yoga-pose': 'yogaPose',
+        'time-bath': 'bath',
+        'time-perineal-care': 'perinealCare',
+        'time-assisted-bathing': 'assistedBathing',
+        'time-massage': 'massage'
+    };
+    Object.entries(controls).forEach(([id, key]) => {
+        const input = document.getElementById(id);
+        const definition = timingConfig.journey?.[key];
+        if (!input || !definition) return;
+        ['min', 'max', 'step'].forEach(attribute => {
+            if (definition[attribute] != null) input.setAttribute(attribute, definition[attribute]);
+        });
+    });
+    enhanceRangeControls();
+}
+
+async function loadTimingConfig() {
+    try {
+        const response = await fetch('timing-config.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        timingConfig = await response.json();
+        const profileName = new URLSearchParams(window.location.search).get('timingProfile');
+        if (profileName && timingConfig.profiles?.[profileName]) {
+            timingConfig = mergeTimingProfile(timingConfig, timingConfig.profiles[profileName]);
+            console.info(`[Timing] Using profile: ${profileName}`);
+        }
+    } catch (error) {
+        console.warn('Timing configuration unavailable; using built-in timing defaults.', error);
+    }
+    applyTimingControls();
+    if (typeof state !== 'undefined') {
+        const persisted = (key) => localStorage.getItem(key) !== null;
+        const defaults = {
+            timePerChakra: ['chakra_time', 'timePerChakra', 5],
+            timeHighEnergy: ['chakra_time_high_energy', 'timeHighEnergy', 5],
+            timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
+            timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
+            timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
+            timeInterval: ['chakra_time_interval', 'interval', 10],
+            timeYogaPrep: ['chakra_time_yoga_prep', 'yogaPreparation', 60],
+            timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
+            timeBath: ['chakra_time_bath', 'bath', 600],
+            timePerinealCare: ['chakra_time_perineal_care', 'perinealCare', 300],
+            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600],
+            timeMassage: ['chakra_time_massage', 'massage', 600]
+        };
+        Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
+            if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
+            const definition = timingConfig.journey?.[configKey];
+            if (definition) {
+                const minimum = Number(definition.min);
+                const maximum = Number(definition.max);
+                const bounded = Math.min(maximum, Math.max(minimum, Number(state[stateKey])));
+                if (Number.isFinite(bounded) && bounded !== state[stateKey]) {
+                    state[stateKey] = bounded;
+                    localStorage.setItem(storageKey, String(bounded));
+                }
+            }
+        });
+    }
+}
+
+function getLanguageConfig(language = state.language) {
+    return languageRegistry.find(item => item.id === language) ||
+        languageRegistry.find(item => item.id === 'en') || { id: language, locale: language, browserPrefixes: [language] };
+}
+
+function getLocalizedValue(bundle, path) {
+    return path.split('.').reduce((value, key) => value == null ? undefined : value[key], bundle);
+}
+
+function localized(source, field = null, language = state.language) {
+    if (source == null) return undefined;
+    const value = field == null ? source : source[field];
+    if (value != null && typeof value === 'object' && value[language] != null) return value[language];
+    if (field == null) {
+        for (const contentField of ['text', 'content', 'value']) {
+            if (source[contentField] != null) return localized(source[contentField], null, language);
+        }
+    }
+    if (field && source[`${field}_${language}`] != null) return source[`${field}_${language}`];
+    if (field && source[`${field}_en`] != null) return source[`${field}_en`];
+    if (field == null && source[language] != null) return source[language];
+    if (field == null && source.en != null) return source.en;
+    return typeof value === 'string' || Array.isArray(value) ? value : undefined;
+}
+
+function t(path, language = state.displayLanguage) {
+    const value = getLocalizedValue(localeBundles[language], path);
+    if (value != null) return value;
+    const fallback = getLocalizedValue(localeBundles[fallbackLanguageId], path);
+    return fallback == null ? path : fallback;
+}
+
+// Narration/system copy follows the selected meditation language, while t()
+// is reserved for the language used by the visible interface.
+function contentT(path) {
+    return t(path, state.language);
+}
+
+function defaultIntention(language = state.language) {
+    return t('ui.defaultIntention', language);
+}
+
+function hrimDefaultIntention(language = state.language) {
+    return t('ui.hrimDefaultIntention', language);
+}
+
+function isGeneratedIntention(value, language = state.language) {
+    const current = (value || '').trim();
+    return !current || current === defaultIntention(language) || current === hrimDefaultIntention(language);
+}
+
+function getJourneyRoadmapLabels() {
+    if (getChecked('music-only-toggle')) return [t('ui.roadmapMusicOnly')];
+
+    if (getChecked('high-energy-toggle')) {
+        return [t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')];
+    }
+
+    const labels = [
+        t(state.returningJourney ? 'ui.roadmapReturning' : 'ui.roadmapArrival'),
+        t('ui.roadmapIntention')
+    ];
+    if (getChecked('box-meditation-toggle')) labels.push(t('ui.roadmapBreathing'));
+    if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
+    labels.push(t('ui.roadmapChakras'));
+
+    if (getChecked('yoga-bridge-toggle')) {
+        labels.push(t('ui.roadmapYoga'));
+        if (getChecked('bath-session-toggle')) {
+            if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassage'));
+            if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
+            if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
+            else labels.push(t('ui.roadmapBath'));
+        }
+    }
+
+    labels.push(t('ui.roadmapClosing'));
+    if (getChecked('hooponopono-toggle')) labels.push(t('ui.roadmapHooponopono'));
+    return labels;
+}
+
+function updateJourneyRoadmap() {
+    const roadmap = document.getElementById('journey-roadmap');
+    if (!roadmap) return;
+    roadmap.textContent = getJourneyRoadmapLabels().join(' » ');
+}
+
+function applyLocaleUI() {
+    document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
+    document.title = t('ui.chakraMeditation');
+    setText('app-title', t('ui.chakraMeditation'));
+    const configSubtitle = document.querySelector('#config-screen > .subtitle');
+    if (configSubtitle) configSubtitle.textContent = t('ui.settingsSubtitle');
+    const languageLabel = document.querySelector('label[for="language-select"]');
+    if (languageLabel) languageLabel.textContent = t('ui.meditationLanguage');
+    const displayLanguageLabel = document.querySelector('label[for="display-language-select"]');
+    if (displayLanguageLabel) displayLanguageLabel.textContent = t('ui.displayLanguage');
+    if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
+    if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
+    setText('lobby-title', t('ui.meditationRoom'));
+    setText('completion-title', t('ui.journeyComplete'));
+    setText('completion-message', t('ui.meditationCompleted'));
+    setText('close-completion', t('ui.returnToRoom'));
+    setText('journal-prompt', t('ui.journalPrompt'));
+    setText('save-journal', t('ui.saveEntry'));
+    setText('returning-journey-label', t('ui.returningJourney'));
+    setText('save-config', t('ui.startMeditation'));
+    setText('start-meditation', t('ui.beginJourney'));
+    document.querySelectorAll('.stat-lbl').forEach((element, index) => {
+        element.textContent = t(index === 0 ? 'ui.sessionTime' : 'ui.totalJourneys');
+    });
+    const journalEntry = document.getElementById('journal-entry');
+    if (journalEntry) journalEntry.placeholder = t('ui.writeFreely');
+    const intentionInput = document.getElementById('intention-input');
+    if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const path = element.dataset.i18n;
+        if (path) element.textContent = t(path);
+    });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
+        const path = element.dataset.i18nAriaLabel;
+        if (path) element.setAttribute('aria-label', t(path));
+    });
+
+    const controlLabels = {
+        'audio-filters-toggle': 'ui.audioFilters',
+        'reverse-journey-toggle': 'ui.reverseJourney',
+        'box-meditation-toggle': 'ui.boxMeditation',
+        'hooponopono-toggle': 'ui.hooponopono',
+        'frequencies-toggle': 'ui.chakraFrequencies',
+        'eyes-close-mode-toggle': 'ui.eyesCloseMode',
+        'music-only-toggle': 'ui.musicOnlyMode',
+        'corpse-pose-toggle': 'ui.corpsePoseOption',
+        'yoga-bridge-toggle': 'ui.yogaBridge',
+        'bath-session-toggle': 'ui.bathSession',
+        'perineal-care-toggle': 'ui.perinealCare',
+        'assisted-bathing-toggle': 'ui.assistedBathing',
+        'massage-toggle': 'ui.massage',
+        'high-energy-toggle': 'ui.highEnergy',
+        'returning-journey-toggle': 'ui.returningJourney'
+    };
+    Object.entries(controlLabels).forEach(([inputId, path]) => {
+        const input = document.getElementById(inputId);
+        const label = input && input.closest('label');
+        if (!label) return;
+        const textNode = Array.from(label.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+        if (textNode) textNode.textContent = ` ${t(path)}`;
+    });
+    updateJourneyRoadmap();
+}
+
+async function loadLanguageManifest() {
+    try {
+        const response = await fetch('language-manifest.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const manifest = await response.json();
+        languageRegistry = Array.isArray(manifest.languages) ? manifest.languages : [];
+        fallbackLanguageId = manifest.fallbackLanguage || 'en';
+        const requested = localStorage.getItem('chakra_lang');
+        const defaultLanguage = manifest.defaultLanguage || languageRegistry[0]?.id || 'en';
+        state.language = languageRegistry.some(item => item.id === requested) ? requested : defaultLanguage;
+        const requestedDisplayLanguage = localStorage.getItem('chakra_display_language');
+        state.displayLanguage = languageRegistry.some(item => item.id === requestedDisplayLanguage)
+            ? requestedDisplayLanguage : fallbackLanguageId;
+        await Promise.all(languageRegistry.map(async language => {
+            const localeResponse = await fetch(language.localeSource);
+            if (!localeResponse.ok) throw new Error(`Locale ${language.id} HTTP ${localeResponse.status}`);
+            localeBundles[language.id] = await localeResponse.json();
+        }));
+        populateLanguageSelect();
+        applyLocaleUI();
+    } catch (error) {
+        console.warn('Language manifest unavailable; using built-in language options.', error);
+        languageRegistry = [
+            { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
+            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' }
+        ];
+    }
+}
+
+function populateLanguageSelect() {
+    if (!languageSelect || languageRegistry.length === 0) return;
+    [languageSelect, document.getElementById('display-language-select')].forEach(select => {
+        if (!select) return;
+        select.innerHTML = '';
+        languageRegistry.forEach(language => {
+            const option = document.createElement('option');
+            option.value = language.id;
+            option.textContent = language.label;
+            select.appendChild(option);
+        });
+    });
+    languageSelect.value = state.language;
+    const displayLanguageSelect = document.getElementById('display-language-select');
+    if (displayLanguageSelect) displayLanguageSelect.value = state.displayLanguage;
+}
 
 function isPiperVoice(value) {
     return typeof value === 'string' && value.startsWith('piper:');
@@ -114,8 +538,9 @@ function setVoiceStatus(message, tone = 'muted') {
 
 function voiceMatchesLanguage(voice, language = state.language) {
     if (!voice || !voice.lang) return false;
-    const prefix = language === 'ml' ? 'ml' : 'en';
-    return voice.lang.toLowerCase().startsWith(prefix);
+    const prefixes = getLanguageConfig(language).browserPrefixes || [language];
+    const voiceLanguage = voice.lang.toLowerCase();
+    return prefixes.some(prefix => voiceLanguage.startsWith(String(prefix).toLowerCase()));
 }
 
 function getBrowserVoiceForContent() {
@@ -129,6 +554,7 @@ class PiperTTS {
         this.audio = audioEngine;
         this.worker = null;
         this.voiceId = null;
+        this.voiceDefinition = null;
         this.nextRequestId = 1;
         this.queue = [];
         this.activeJob = null;
@@ -150,6 +576,7 @@ class PiperTTS {
             this.cancel('voice changed');
         }
         this.voiceId = nextVoiceId;
+        this.voiceDefinition = piperVoiceRegistry.find(voice => voice.id === nextVoiceId) || null;
         return true;
     }
 
@@ -159,7 +586,7 @@ class PiperTTS {
             this.worker.onmessage = (event) => this.handleWorkerMessage(event.data || {});
             this.worker.onerror = (event) => {
                 const message = event.message || 'Piper worker failed.';
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
                 if (this.activeJob) this.finishActive(new Error(message));
             };
         }
@@ -183,6 +610,7 @@ class PiperTTS {
             type: job.type,
             requestId: job.requestId,
             voiceId: this.voiceId,
+            voiceDefinition: this.voiceDefinition,
             ...job.payload
         });
     }
@@ -201,12 +629,12 @@ class PiperTTS {
             const total = Number(message.total) || 0;
             const loaded = Number(message.loaded) || 0;
             const percent = total > 0 ? ` ${Math.round((loaded / total) * 100)}%` : '';
-            setVoiceStatus(`Preparing Piper voice…${percent}`);
+            setVoiceStatus(`${t('ui.piperPreparing')}${percent}`);
             return;
         }
         if (!this.activeJob || message.requestId !== this.activeJob.requestId) return;
         if (message.type === 'ready') {
-            setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+            setVoiceStatus(t('ui.piperReady'), 'ready');
             this.finishActive(null, true);
         } else if (message.type === 'audio') {
             this.finishActive(null, message.audio);
@@ -217,7 +645,7 @@ class PiperTTS {
     }
 
     warmup() {
-        setVoiceStatus('Preparing Piper voice…');
+        setVoiceStatus(t('ui.piperPreparing'));
         return this.request('warmup');
     }
 
@@ -255,7 +683,7 @@ class PiperTTS {
         await this.warmup();
         const blob = await this.synthesize(text);
         await this.play(blob);
-        setVoiceStatus('Piper voice ready for offline narration.', 'ready');
+        setVoiceStatus(t('ui.piperReady'), 'ready');
     }
 
     setPaused(paused) {
@@ -427,19 +855,18 @@ class AudioEngine {
             this.exciter.curve = new Float32Array([-1, 1]);
         }
         
-        // Upgrade 4: Frequency Carving Filter
-        if (state.audioFilters) {
-            this.voiceCarveFilter = this.ctx.createBiquadFilter();
-            this.voiceCarveFilter.type = 'peaking';
-            this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
-            this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
-            this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+        // Upgrade 4: Frequency Carving Filter. Keep the nodes in the graph
+        // even when disabled so the mixer can safely change the setting live.
+        this.voiceCarveFilter = this.ctx.createBiquadFilter();
+        this.voiceCarveFilter.type = 'peaking';
+        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
-            this.presenceFilter = this.ctx.createBiquadFilter();
-            this.presenceFilter.type = 'highshelf';
-            this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-            this.presenceFilter.gain.setValueAtTime(state.eyesCloseMode ? -6 : -3, this.ctx.currentTime);
-        }
+        this.presenceFilter = this.ctx.createBiquadFilter();
+        this.presenceFilter.type = 'highshelf';
+        this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
+        this.presenceFilter.gain.setValueAtTime(state.audioFilters ? (state.eyesCloseMode ? -6 : -3) : 0, this.ctx.currentTime);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -627,6 +1054,16 @@ class AudioEngine {
             const presenceGain = enabled ? -12 : -3; // More aggressive high-shelf cut
             this.presenceFilter.gain.linearRampToValueAtTime(presenceGain, now + 2.0);
         }
+    }
+
+    toggleAudioFilters(enabled) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const presenceGain = state.eyesCloseMode ? -6 : -3;
+        if (this.presenceFilter) this.presenceFilter.gain.linearRampToValueAtTime(enabled ? presenceGain : 0, now + 1.5);
+        if (this.bgMusicLPF) this.bgMusicLPF.frequency.linearRampToValueAtTime(enabled ? 1200 : 20000, now + 1.5);
+        if (this.reverbFilter) this.reverbFilter.frequency.linearRampToValueAtTime(enabled ? 1500 : 20000, now + 1.5);
+        if (this.mantraFilter) this.mantraFilter.frequency.linearRampToValueAtTime(enabled ? 2200 : 20000, now + 1.5);
     }
 
     makeDistortionCurve(amount) {
@@ -1075,6 +1512,7 @@ class MeditationController {
         this.audio = audio;
         this.visual = visual;
         this.scripts = null;
+        this.scriptsLanguage = null;
         this.isMeditationActive = false;
         this.isStarting = false;
         this.isPaused = false;
@@ -1126,21 +1564,27 @@ class MeditationController {
             document.getElementById('completion-modal').classList.add('hidden');
             
             // Script Loading Strategy
-            if (!this.scripts) {
+            if (!this.scripts || this.scriptsLanguage !== state.language) {
                 if (state.scriptSource === 'custom' && state.customScript) {
                     console.log("Loading Custom Script from local storage...");
                     this.scripts = state.customScript;
                 } else {
-                    console.log("Loading Default Script (scripts.json)...");
-                    const response = await fetch('scripts.json?v=' + Date.now());
+                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
+                    console.log(`Loading Language Content (${state.language}): ${contentSource}...`);
+                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
+                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
                     this.scripts = await response.json();
                 }
+                this.scriptsLanguage = state.language;
             }
 
             const scriptCheck = validateScriptBundle(this.scripts, {
                 highEnergy: getChecked('high-energy-toggle'),
                 corpse: state.corpsePoseEnabled,
-                bath: state.yogaBridgeEnabled && state.bathSessionEnabled,
+                bath: state.yogaBridgeEnabled && state.bathSessionEnabled && !state.assistedBathingEnabled,
+                perinealCare: state.yogaBridgeEnabled && state.bathSessionEnabled && state.perinealCareEnabled,
+                assistedBathing: state.yogaBridgeEnabled && state.bathSessionEnabled && state.assistedBathingEnabled,
+                massage: state.yogaBridgeEnabled && state.bathSessionEnabled && state.massageEnabled,
                 yoga: state.yogaBridgeEnabled,
                 hooponopono: state.hooponopono
             });
@@ -1156,7 +1600,7 @@ class MeditationController {
             if (isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName)) {
                 // Use the existing icebreaker as the first model-loading window.
                 piperWarmup = piperTTS.warmup().catch((error) => {
-                    setVoiceStatus('Piper could not load — using browser voice.', 'error');
+                    setVoiceStatus(t('ui.piperLoadFailed'), 'error');
                     return false;
                 });
             }
@@ -1174,8 +1618,8 @@ class MeditationController {
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
-            setText('icebreaker-title', state.language === 'ml' ? "ശാന്തമാകുക" : "Arriving");
-            setText('icebreaker-subtitle', state.language === 'ml' ? "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ" : "Breathe and settle into the space");
+            setText('icebreaker-title', contentT('system.arriving'));
+            setText('icebreaker-subtitle', contentT('system.breatheAndSettle'));
 
             this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
             for (let i = state.timeIcebreaker; i > 0; i--) {
@@ -1189,17 +1633,15 @@ class MeditationController {
             // Transition to Preparation
             showScreen(breathingScreen);
 
-            // Initial Settle (2 seconds)
-            if (this.isMeditationActive) await this.pauseAwareSleep(2000);
+            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
 
-            if (this.isMeditationActive) await this.runGratitude();
-            if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
-            if (this.isMeditationActive && state.corpsePoseEnabled) await this.runCorpsePose();
+            if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
+            if (this.isMeditationActive && !this.isHighEnergy && state.boxMeditation) await this.runBoxBreathing();
+            if (this.isMeditationActive && !this.isHighEnergy && state.corpsePoseEnabled) await this.runCorpsePose();
 
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
-            // Settle after breathing (3 seconds)
-            if (this.isMeditationActive) await this.pauseAwareSleep(3000);
+            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
 
             if (this.isMeditationActive) {
                 if (this.isHighEnergy) {
@@ -1207,7 +1649,8 @@ class MeditationController {
                     if (this.isMeditationActive) {
                         await this.handleSilence();
                         if (this.isMeditationActive) await this.runClosing();
-                        if (this.isMeditationActive && state.hooponopono) await this.runHooponopono();
+                        // HRIM is a focused activation path; it does not add
+                        // Box Breathing, Corpse Pose, or Ho'oponopono.
                         this.finish();
                     }
                 } else {
@@ -1228,7 +1671,7 @@ class MeditationController {
         }
     }
 
-    async runGratitude() {
+    async runGratitude(isHighEnergy = false) {
         const screen = document.getElementById('breathing-screen');
         const tutorial = document.getElementById('breathing-tutorial');
         const tutTitle = document.getElementById('tutorial-title');
@@ -1242,39 +1685,45 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
 
-        // First journeys use the existing moon opening. Returning visitors get
-        // an evergreen image that welcomes discovery without repeating a lesson.
-        const isReturningVisitor = state.stats.journeys > 0;
-        const phase = getMoonPhase();
-        const moonText = this.scripts.intro.moon[`${phase}_${state.language}`];
-        const openingText = isReturningVisitor
-            ? this.scripts.intro[`returning_${state.language}`]
-            : moonText;
-        if (openingText && this.isMeditationActive) {
-            tutTitle.textContent = isReturningVisitor
-                ? (state.language === 'ml' ? "വീണ്ടും വരവ്" : "Returning")
-                : (state.language === 'ml' ? "ചന്ദ്രൻ" : "Moon");
-            tutText.textContent = openingText;
-            await this.narrate(openingText, false); // Keep music playing
-            await this.pauseAwareSleep(1000);
+        // Moon-phase and returning sea openings belong to the reflective
+        // journey. HRIM begins directly with its activation intention.
+        if (!isHighEnergy) {
+            const isReturningVisitor = state.returningJourney;
+            const phase = getMoonPhase();
+            const moonText = localized(this.scripts.intro.moon[phase]) ||
+                this.scripts.intro.moon[`${phase}_${state.language}`];
+            const openingText = isReturningVisitor
+                ? localized(this.scripts.intro, 'returning')
+                : moonText;
+            if (openingText && this.isMeditationActive) {
+                tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
+                tutText.textContent = openingText;
+                await this.narrate(openingText, false); // Keep music playing
+                await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
+            }
         }
 
-        // Main gratitude + body scan
+        // Main gratitude + body scan. HRIM uses its own activation-oriented
+        // intention framing while the normal journey keeps the existing text.
         if (!this.isMeditationActive) return;
-        tutTitle.textContent = state.language === 'ml' ? "കൃതജ്ഞത" : "Gratitude";
-        const text = this.scripts.intro[`gratitude_${state.language}`];
-        tutText.textContent = text;
-
-        if (state.intention && state.intention.trim()) {
+        tutTitle.textContent = isHighEnergy ? t('ui.intention') : t('ui.gratitude');
+        const text = isHighEnergy
+            ? localized(this.scripts.high_energy, 'intention')
+            : localized(this.scripts.intro, 'gratitude');
+        const personalIntention = state.intention && state.intention.trim();
+        if (isHighEnergy) {
+            const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
+            tutText.textContent = intentionText;
+            await this.narrate(intentionText, false, false, 'hrim');
+        } else if (personalIntention) {
+            tutText.textContent = text;
             await this.narrate(text, false); // Still keep music playing for next part
-            
-            const intentionText = state.language === 'ml'
-                ? `ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: ${state.intention.trim()}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്ര മുഴുവൻ അത് ഉള്ളിൽ ജ്വലിക്കട്ടെ.`
-                : `You are calling in: ${state.intention.trim()}. Hold this in your heart — let it burn quietly through every moment of this journey.`;
-            tutTitle.textContent = state.language === 'ml' ? "ഉദ്ദേശ്യം" : "Intention";
+            const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
+            tutTitle.textContent = t('ui.intention');
             tutText.textContent = intentionText;
             await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
+            tutText.textContent = text;
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
 
@@ -1294,8 +1743,8 @@ class MeditationController {
 
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
-        tutTitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കാം" : "Preparation";
-        const text = state.language === 'ml' ? "സൗകര്യപ്രദമായി വിശ്രമിക്കു. ശാന്തമായി ശ്വസിച്ചു തുടങ്ങാം." : "Sit comfortably. We will start with a centering breath.";
+        tutTitle.textContent = t('ui.preparation');
+        const text = contentT('system.centeringBreath');
         tutText.textContent = text;
 
         // Fade out music before box meditation
@@ -1304,23 +1753,16 @@ class MeditationController {
         // Narrate the preparation instruction with keepSilence = true
         await this.narrate(text, false, true);
 
-        for (let s = 5; s > 0; s--) {
+        for (let s = timing('transitions', 'breathingPreparation'); s > 0; s--) {
             if (!this.isMeditationActive) return;
             await this.pauseAwareSleep(1000);
         }
         
         tutorial.style.opacity = "0";
-        await this.pauseAwareSleep(1000);
+        await this.pauseAwareSleep(timing('transitions', 'breathingTutorialFade') * 1000);
         tutorial.classList.add('hidden');
 
-        const steps = state.language === 'ml' ? [
-            { text: "ശ്വാസം ഉള്ളിലേക്ക് എടുക്കുക", scale: 8 },
-            { text: "", scale: 8 },
-            { text: "ശ്വാസം പുറത്തേക്ക് വിടുക", scale: 1 },
-            { text: "", scale: 1 }
-        ] : [
-            { text: "Inhale", scale: 8 }, { text: "Hold", scale: 8 }, { text: "Exhale", scale: 1 }, { text: "Hold", scale: 1 }
-        ];
+        const steps = contentT('system.breathingSteps');
 
         for (let cycle = 0; cycle < 4; cycle++) {
             for (const step of steps) {
@@ -1352,16 +1794,15 @@ class MeditationController {
 
         // Intimate Completion
         if (this.isMeditationActive) {
-            instruction.textContent = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായി" : "Breathing Complete";
-            const completeText = state.language === 'ml' ? "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ. ശ്വാസോശ്വാസം സാധാരണ രീതിയിൽ കൊണ്ട് വരൂ " : "Breathing exercise is complete. Stay still for a moment.";
+            instruction.textContent = t('ui.breathingComplete');
+            const completeText = contentT('system.breathingComplete');
             await this.narrate(completeText, false, true);
             
             // Fade music back in after box meditation
             this.audio.fadeInBackgroundMusic(4, false);
 
-            // 5 second interval before Chakra Journey starts
-            instruction.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
-            await this.pauseAwareSleep(5000);
+            instruction.textContent = t('ui.prepare');
+            await this.pauseAwareSleep(timing('transitions', 'breathingCompletion') * 1000);
         }
     }
 
@@ -1375,8 +1816,8 @@ class MeditationController {
             const subtitle = document.getElementById('icebreaker-subtitle');
             const timer = document.getElementById('icebreaker-timer');
 
-            title.textContent = state.language === 'ml' ? "ശവാസനം" : "Corpse Pose";
-            subtitle.textContent = state.language === 'ml' ? "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക" : "Surrender your body completely to the earth";
+            title.textContent = t('ui.corpsePose');
+            subtitle.textContent = t('ui.corpsePoseSubtitle');
 
             // Narration: Intro to the pose
             if (!this.scripts.corpse_pose) {
@@ -1384,7 +1825,7 @@ class MeditationController {
                 throw new Error("Missing corpse_pose scripts");
             }
 
-            await this.narrate(this.scripts.corpse_pose.intro[state.language], false);
+            await this.narrate(localized(this.scripts.corpse_pose.intro), false);
             
             // Debug: Log volume change
             console.log("DEBUG: Transitions to Corpse Pose stillness. Reducing volume factor to 0.30");
@@ -1394,7 +1835,7 @@ class MeditationController {
 
             // Configurable Duration Countdown
             const totalSeconds = state.timeCorpse;
-            const transitionSecond = 60; // 1 minute remaining mark
+            const transitionSecond = timing('transitions', 'corpseTransitionAt');
             for (let i = totalSeconds; i > 0; i--) {
                 if (!this.isMeditationActive) return;
                 
@@ -1412,7 +1853,7 @@ class MeditationController {
 
                 // At 1 minute remaining, narrate the transition to hypnagogic state
                 if (i === transitionSecond) {
-                    await this.narrate(this.scripts.corpse_pose.transition[state.language], false);
+                    await this.narrate(localized(this.scripts.corpse_pose.transition), false);
                     console.log("DEBUG: Restoring Corpse Pose stillness volume factor (0.30)");
                     this.audio.fadeInBackgroundMusic(12, 0.30);
                 }
@@ -1421,15 +1862,15 @@ class MeditationController {
             }
 
             // Final settle before Chakra Journey
-            subtitle.textContent = state.language === 'ml' ? "തയ്യാറെടുക്കുക" : "Prepare";
-            await this.pauseAwareSleep(3000);
+            subtitle.textContent = t('ui.prepare');
+            await this.pauseAwareSleep(timing('transitions', 'corpseFinalSettle') * 1000);
         } catch (e) {
             console.error("Error in runCorpsePose:", e);
             throw e; // Rethrow to trigger the main alert in start()
         }
     }
 
-    async runBathSession() {
+    async runBathStage(scriptKey, durationSeconds) {
         if (!this.isMeditationActive) return;
 
         showScreen(icebreakerScreen);
@@ -1437,13 +1878,14 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = state.language === 'ml' ? this.scripts.bath_session.title.ml : this.scripts.bath_session.title.en;
-        subtitle.textContent = state.language === 'ml' ? "ശുദ്ധീകരണം" : "Purification";
+        const script = this.scripts[scriptKey];
+        title.textContent = localized(script.title);
+        subtitle.textContent = t('ui.purification');
 
-        await this.narrate(this.scripts.bath_session.intro[state.language], false);
-        await this.narrate(this.scripts.bath_session.instructions[state.language], false);
+        await this.narrate(localized(script.intro), false);
+        await this.narrate(localized(script.instructions), false);
 
-        let remaining = state.timeBath;
+        let remaining = durationSeconds;
         const reminderSecond = 60;
 
         while (remaining > 0) {
@@ -1452,12 +1894,28 @@ class MeditationController {
                 if (timer) timer.textContent = Math.floor(remaining / 60) + ":" + (remaining % 60).toString().padStart(2, '0');
                 
                 if (remaining === reminderSecond) {
-                    this.narrateSoft(this.scripts.bath_session.reminder[state.language]);
+                    this.narrateSoft(localized(script.reminder));
                 }
                 remaining--;
             }
             await this.pauseAwareSleep(1000);
         }
+    }
+
+    async runBathSession() {
+        return this.runBathStage('bath_session', state.timeBath);
+    }
+
+    async runPerinealCare() {
+        return this.runBathStage('perineal_care', state.timePerinealCare);
+    }
+
+    async runAssistedBathing() {
+        return this.runBathStage('assisted_bathing', state.timeAssistedBathing);
+    }
+
+    async runMassage() {
+        return this.runBathStage('massage', state.timeMassage);
     }
 
     async runBackgroundMusicOnly() {
@@ -1471,7 +1929,7 @@ class MeditationController {
         // Setup simple UI
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) {
-            setSymbolImage("symbols/root.png", symbolEl); // Using a safe default
+            setSymbolImage("symbols/background-only.png", symbolEl);
             symbolEl.style.opacity = "0.7";
         }
         
@@ -1479,7 +1937,9 @@ class MeditationController {
         const narrationEl = document.getElementById('narration-text');
         const timerEl = document.getElementById('timer-display');
 
-        if (mantraEl) mantraEl.textContent = "MUSIC ONLY";
+        // This is visible interface copy, so follow Display Language rather
+        // than the selected meditation/narration language.
+        if (mantraEl) mantraEl.textContent = t('system.musicOnly');
         if (narrationEl) narrationEl.textContent = "";
         if (timerEl) timerEl.textContent = "";
         
@@ -1503,8 +1963,15 @@ class MeditationController {
     async runYogaSession() {
         if (!this.isMeditationActive) return;
 
-        // Bath is an optional Yoga Bridge stage.
-        if (state.bathSessionEnabled) await this.runBathSession();
+        // Bath is an optional Yoga Bridge stage. Add-ons run in a fixed,
+        // respectful order. Massage comes first, Assisted Bathing replaces
+        // the standard Bath Session, and Perineal Care precedes either path.
+        if (state.bathSessionEnabled) {
+            if (state.massageEnabled) await this.runMassage();
+            if (state.perinealCareEnabled) await this.runPerinealCare();
+            if (state.assistedBathingEnabled) await this.runAssistedBathing();
+            else await this.runBathSession();
+        }
 
         // Transition Screen
         showScreen(icebreakerScreen);
@@ -1512,8 +1979,8 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = state.language === 'ml' ? "യോഗ" : "Yoga Bridge";
-        subtitle.textContent = state.language === 'ml' ? "ശരീരവും മനസ്സും തമ്മിലുള്ള യോജിപ്പ്" : "Union of body and spirit";
+        title.textContent = t('ui.yoga');
+        subtitle.textContent = t('ui.yogaSubtitle');
         
         // Grounding Drone for Yoga (136.1 Hz - OM frequency)
         this.audio.startDrone(136.1, 3); // Using heart-level elemental layer for warmth
@@ -1521,8 +1988,8 @@ class MeditationController {
         this.audio.fadeInBackgroundMusic(8, 0.30);
 
         // Intro & Preparation
-        await this.narrate(this.scripts.yoga.intro[state.language], false);
-        await this.narrate(this.scripts.yoga.preparation[state.language], false);
+        await this.narrate(localized(this.scripts.yoga.intro), false);
+        await this.narrate(localized(this.scripts.yoga.preparation), false);
 
         // Prep Countdown
         for (let i = state.timeYogaPrep; i > 0; i--) {
@@ -1549,7 +2016,7 @@ class MeditationController {
             if (!this.isMeditationActive) break;
 
             // Display Pose Name
-            mantraEl.textContent = state.language === 'ml' ? pose.name_ml : pose.name_en;
+            mantraEl.textContent = localized(pose, 'name');
             mantraEl.style.color = "#FFD700"; // Golden Yoga Color
             
             // Set pose-specific image
@@ -1564,7 +2031,7 @@ class MeditationController {
             symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
 
             // Explain Pose
-            const desc = state.language === 'ml' ? pose.desc_ml : pose.desc_en;
+            const desc = localized(pose, 'desc');
             await this.narrate(desc, false);
 
             // Hold Timer
@@ -1572,22 +2039,22 @@ class MeditationController {
             while (remaining > 0) {
                 if (!this.isMeditationActive) break;
                 if (!this.isPaused) {
-                    timerEl.textContent = `HOLD: ${remaining}s`;
+                    timerEl.textContent = `${contentT('system.hold')}: ${remaining}s`;
                     remaining--;
                 }
                 await this.pauseAwareSleep(1000);
             }
             
             if (this.isMeditationActive) {
-                this.narrateSoft(this.scripts.yoga.next_pose_prompt[state.language]);
-                await this.pauseAwareSleep(5000); // 5s transition gap
+                this.narrateSoft(localized(this.scripts.yoga.next_pose_prompt));
+                await this.pauseAwareSleep(timing('transitions', 'yogaPoseGap') * 1000);
             }
         }
 
         // Final Settle
         if (this.isMeditationActive) {
-            await this.narrate(this.scripts.yoga.session_complete[state.language], false);
-            await this.pauseAwareSleep(5000);
+            await this.narrate(localized(this.scripts.yoga.session_complete), false);
+            await this.pauseAwareSleep(timing('transitions', 'yogaFinalSettle') * 1000);
         }
     }
 
@@ -1595,7 +2062,7 @@ class MeditationController {
         return isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName);
     }
 
-    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1) {
+    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal') {
         if (!text || !this.isMeditationActive && !fadeOut) return;
         if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
         if (this.audio.voiceCarveFilter) {
@@ -1606,7 +2073,13 @@ class MeditationController {
                 this.audio.ctx.currentTime + 1.2
             );
         }
-        await this.pauseAwareSleep(1200);
+        const leadIn = pacing === 'hrim'
+            ? timing('narration', 'hrimLeadIn', timing('narration', 'piperLeadIn'))
+            : timing('narration', 'piperLeadIn');
+        const sentenceGap = pacing === 'hrim'
+            ? timing('narration', 'hrimSentenceGap', timing('narration', 'sentenceGap'))
+            : timing('narration', 'sentenceGap');
+        await this.pauseAwareSleep(leadIn * 1000);
 
         const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
         const pending = sentences.slice(0, 2).map(sentence => piperTTS.synthesize(sentence));
@@ -1618,7 +2091,7 @@ class MeditationController {
 
             setText('narration-text', sentences[i]);
             if (piperFailed) {
-                await this.narrateBrowser(sentences[i], false, true);
+                await this.narrateBrowser(sentences[i], false, true, pacing);
                 continue;
             }
 
@@ -1630,20 +2103,20 @@ class MeditationController {
                 piperFailed = true;
                 pending.forEach(job => job.catch(() => {}));
                 piperTTS.cancel('sentence failed');
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
-                await this.narrateBrowser(sentences[i], false, true);
+                setVoiceStatus(t('ui.piperFallback'), 'error');
+                await this.narrateBrowser(sentences[i], false, true, pacing);
             }
 
-            if (i < sentences.length - 1) await this.pauseAwareSleep(1500);
+            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         if (fadeOut) {
-            await this.pauseAwareSleep(2500);
+            await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         }
         if (this.audio.voiceCarveFilter) {
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 2.5);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + timing('narration', 'fadeOutPause'));
         }
     }
 
@@ -1653,7 +2126,7 @@ class MeditationController {
             catch (error) {
                 console.error('[Piper] soft narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
         return this.narrateSoftBrowser(text);
@@ -1674,7 +2147,7 @@ class MeditationController {
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
                 if (!isResolved) { isResolved = true; resolve(); }
-            }, (text.length * 200) + 3000);
+            }, (text.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
             utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
@@ -1735,16 +2208,16 @@ class MeditationController {
         if (symbolEl) symbolEl.style.opacity = "0.4";
         const aura = document.getElementById('aura-bg');
         if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
-        const closingText = this.scripts.closing[state.language];
+        const closingText = localized(this.scripts.closing);
         await this.narrate(closingText);
-        await this.pauseAwareSleep(2000);
+        await this.pauseAwareSleep(timing('transitions', 'closingFirstPause') * 1000);
         // Full-body health affirmation — head to toe
-        const healthAffirmation = this.scripts.closing[`affirmation_${state.language}`];
+        const healthAffirmation = localized(this.scripts.closing, 'affirmation');
         if (healthAffirmation && this.isMeditationActive) {
             setText('mantra-display', "✦ BODY ✦");
             await this.narrate(healthAffirmation);
         }
-        await this.pauseAwareSleep(3000);
+        await this.pauseAwareSleep(timing('transitions', 'closingSecondPause') * 1000);
     }
 
     async runHooponopono() {
@@ -1760,11 +2233,11 @@ class MeditationController {
         setText('narration-text', '');
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
-        await this.narrate(this.scripts.hooponopono.intro[state.language], false);
-        await this.pauseAwareSleep(2000);
+        await this.narrate(localized(this.scripts.hooponopono.intro), false);
+        await this.pauseAwareSleep(timing('transitions', 'hooponoponoIntroPause') * 1000);
 
         // 3 cycles of the 4 phrases
-        const phrases = this.scripts.hooponopono.phrases[state.language];
+        const phrases = localized(this.scripts.hooponopono.phrases);
         for (let cycle = 0; cycle < 3; cycle++) {
             if (!this.isMeditationActive) return;
             for (let i = 0; i < phrases.length; i++) {
@@ -1775,29 +2248,31 @@ class MeditationController {
                 // Keep music for all phrases, fade out only on the very last phrase of the last cycle
                 const isLast = (cycle === 2 && i === phrases.length - 1);
                 await this.narrate(phrase, false); // Keep music for phrases
-                await this.pauseAwareSleep(2000);
+                await this.pauseAwareSleep(timing('transitions', 'hooponoponoPhrasePause') * 1000);
             }
         }
 
         // Closing breath - Final fade out
         setText('narration-text', '');
-        await this.narrate(this.scripts.hooponopono.closing[state.language], true);
+        await this.narrate(localized(this.scripts.hooponopono.closing), true);
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
-        await this.pauseAwareSleep(15000);
+        await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
     }
 
     async handleInterval() {
         this.audio.stopDrone();
         const timerEl = document.getElementById('timer-display');
-        setText('mantra-display', "BREATHE");
+        setText('mantra-display', contentT('system.breathe'));
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.3";
         this.visual.stop();
-        await this.pauseAwareSleep(2000);
-        const breatheText = state.language === 'ml' ? "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ" : "Take a break... breathe and prepare... for the next chakra";
-        this.narrateFeeble(breatheText);
+        await this.pauseAwareSleep(timing('transitions', 'intervalPreparation') * 1000);
+        const breatheText = contentT('system.breatheInterval');
+        // Keep the minimum interval short for testing, but never advance to the
+        // next chakra while the break narration is still speaking.
+        const narrationPromise = this.narrateFeeble(breatheText);
         const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
         while (elapsed < intervalMs) {
@@ -1810,6 +2285,7 @@ class MeditationController {
             }
             await new Promise(r => setTimeout(r, 100));
         }
+        await narrationPromise;
     }
 
     async meditateOnChakra(chakra, key) {
@@ -1849,13 +2325,14 @@ class MeditationController {
         this.audio.startDrone(chakra.frequency, absoluteIndex);
 
         if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
-        await this.narrate(chakra[state.language]);
+        await this.narrate(localized(chakra, 'meditation') || localized(chakra));
         if (!this.isMeditationActive) return;
 
         // Start looping mantra audio track (fades in, drone fades down)
         await this.audio.playMantraTrack(key);
 
-        const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
+        const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+        const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
 
@@ -1878,9 +2355,9 @@ class MeditationController {
 
         // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
-        await this.pauseAwareSleep(4000);
+        await this.pauseAwareSleep(timing('transitions', 'chakraPostMantra') * 1000);
 
-        if (this.isMeditationActive) await this.narrate(chakra[`affirmation_${state.language}`]);
+        if (this.isMeditationActive) await this.narrate(localized(chakra, 'affirmation'));
     }
 
     async narrateFeeble(text) {
@@ -1889,7 +2366,7 @@ class MeditationController {
             catch (error) {
                 console.error('[Piper] feeble narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
         return this.narrateFeebleBrowser(text);
@@ -1910,7 +2387,7 @@ class MeditationController {
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
                 if (!isResolved) { isResolved = true; resolve(); }
-            }, (text.length * 200) + 3000);
+            }, (text.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
             utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
@@ -1918,19 +2395,19 @@ class MeditationController {
         });
     }
 
-    async narrate(text, fadeOut = false, keepSilence = false) {
+    async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
         if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1); }
+            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing); }
             catch (error) {
                 console.error('[Piper] narration failed:', error);
                 if (!this.isMeditationActive) return;
-                setVoiceStatus('Piper unavailable — using browser voice.', 'error');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
         }
-        return this.narrateBrowser(text, fadeOut, keepSilence);
+        return this.narrateBrowser(text, fadeOut, keepSilence, pacing);
     }
 
-    async narrateBrowser(text, fadeOut = false, keepSilence = false) {
+    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
@@ -1942,7 +2419,13 @@ class MeditationController {
         }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
-        await this.pauseAwareSleep(1200);
+        const leadIn = pacing === 'hrim'
+            ? timing('narration', 'hrimLeadIn', timing('narration', 'piperLeadIn'))
+            : timing('narration', 'piperLeadIn');
+        const sentenceGap = pacing === 'hrim'
+            ? timing('narration', 'hrimSentenceGap', timing('narration', 'sentenceGap'))
+            : timing('narration', 'sentenceGap');
+        await this.pauseAwareSleep(leadIn * 1000);
 
         // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
         if (this.audio.voiceCarveFilter) {
@@ -1966,15 +2449,17 @@ class MeditationController {
                 const utterance = new SpeechSynthesisUtterance(sentence);
                 
                 // Fallback language identification
-                utterance.lang = state.language === 'ml' ? 'ml-IN' : 'en-US';
+                utterance.lang = getLanguageConfig().locale || state.language;
 
                 const selectedVoice = getBrowserVoiceForContent();
                 if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
 
                 // Studio Clarity: Breath-aligned pacing
-                const baseRate = state.sleepMode ? 0.60 : 0.70;
+                const baseRate = pacing === 'hrim'
+                    ? (state.sleepMode ? 0.78 : 0.90)
+                    : (state.sleepMode ? 0.60 : 0.70);
                 utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
-                utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02; // Deeper 0.88 for warmth
+                utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : 1.02);
                 utterance.volume = state.volVoice; 
                 
                 let isResolved = false;
@@ -1999,7 +2484,7 @@ class MeditationController {
                         clearInterval(pauseCheck);
                         resolve();
                     }
-                }, (sentence.length * 200) + 3000); // More generous buffer
+                }, (sentence.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
                 utterance.onend = () => {
                     if (!isResolved) {
@@ -2028,8 +2513,7 @@ class MeditationController {
                 continue;
             }
 
-            // Breath-aligned space (1.5s) between sentences for comfort
-            await this.pauseAwareSleep(1500);
+            await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         // Release Frequency Carving after narration ends
@@ -2038,7 +2522,7 @@ class MeditationController {
         }
 
         if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
-            await this.pauseAwareSleep(2500);
+            await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         }
@@ -2057,13 +2541,13 @@ class MeditationController {
 
     async handleSilence() {
         this.visual.stop();
-        setText('mantra-display', "SILENCE");
+        setText('mantra-display', contentT('system.silence'));
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.2";
         this.audio.stopDrone();
-        const silenceTime = 60000;
+        const silenceTime = timing('transitions', 'finalSilence') * 1000;
         const timerEl = document.getElementById('timer-display');
-        for (let i = 60; i > 0; i--) {
+        for (let i = Math.ceil(silenceTime / 1000); i > 0; i--) {
             if (!this.isMeditationActive) break;
             if (timerEl) timerEl.textContent = `00:${i.toString().padStart(2, '0')}`;
             await this.pauseAwareSleep(1000);
@@ -2104,20 +2588,18 @@ class MeditationController {
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
         const btn = document.getElementById('close-completion');
-        if (title) title.textContent = state.language === 'ml' ? "യാത്ര പൂർത്തിയായി" : "Journey Complete";
-        if (msg) msg.textContent = state.language === 'ml' ? "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ." : "Meditation Completed. Stay Blessed.";
-        if (btn) btn.textContent = state.language === 'ml' ? "തിരികെ പോവുക" : "Return to Room";
+        if (title) title.textContent = t('ui.journeyComplete');
+        if (msg) msg.textContent = t('ui.meditationCompleted');
+        if (btn) btn.textContent = t('ui.returnToRoom');
 
         // Journal: reset textarea, show last entry date, localise prompt
         syncValue('journal-entry', '');
-        setText('journal-prompt', state.language === 'ml'
-            ? 'എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?'
-            : 'What shifted? What are you calling in?');
-        setText('save-journal', state.language === 'ml' ? 'സൂക്ഷിക്കൂ' : 'Save Entry');
+        setText('journal-prompt', t('ui.journalPrompt'));
+        setText('save-journal', t('ui.saveEntry'));
         const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
         const lastInfo = document.getElementById('last-journal-info');
         lastInfo.textContent = journalEntries.length > 0
-            ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + journalEntries[0].date
+            ? t('ui.lastEntry') + journalEntries[0].date
             : '';
 
         modal.classList.remove('hidden');
@@ -2131,6 +2613,11 @@ class MeditationController {
     stop() {
         this.isMeditationActive = false; this.audio.stopDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         this.sessionStartedAt = null;
+        const startBtn = document.getElementById('start-meditation');
+        if (startBtn) {
+            startBtn.disabled = false;
+            startBtn.style.opacity = "1";
+        }
         window.speechSynthesis.cancel();
         piperTTS.cancel('journey stopped');
         document.body.classList.remove('sleep-mode-active');
@@ -2175,8 +2662,13 @@ document.addEventListener('visibilitychange', async () => {
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
+    // Content/narration language and visible interface language are separate
+    // so a facilitator can guide in one language while reading the UI in
+    // another. English is the safe default for the visible interface.
+    displayLanguage: localStorage.getItem('chakra_display_language') || 'en',
     voiceName: localStorage.getItem('chakra_voice') || 'piper:ml_IN-arjun-medium',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
+    timeHighEnergy: parseFloat(localStorage.getItem('chakra_time_high_energy')) || 5.0,
     voices: [],
     volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
     volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
@@ -2190,6 +2682,13 @@ const state = {
     selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
     intention: localStorage.getItem('chakra_intention') || '',
     sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
+    // This preference controls the opening style; stats.journeys remains the
+    // historical count of completed journeys.
+    returningJourney: (() => {
+        const saved = localStorage.getItem('chakra_returning_journey');
+        if (saved !== null) return saved === 'true';
+        return (parseInt(localStorage.getItem('chakra_stats_journeys')) || 0) > 0;
+    })(),
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
     reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
@@ -2197,20 +2696,35 @@ const state = {
     chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     bgMusicMode: localStorage.getItem('chakra_bg_music_mode') === 'true',
+    highEnergyEnabled: localStorage.getItem('chakra_high_energy') === 'true',
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
-    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') !== 'false', // Default true
+    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     yogaBridgeEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true',
-    bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
+    // Bath is a child stage of Yoga Bridge and cannot be active by itself.
+    bathSessionEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true',
+    perinealCareEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_perineal_care') === 'true',
+    assistedBathingEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_assisted_bathing') === 'true',
+    massageEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_massage') === 'true',
     selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
-    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9,
+    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 10,
     timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
     timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
     timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
+    timePerinealCare: parseInt(localStorage.getItem('chakra_time_perineal_care')) || 300,
+    timeAssistedBathing: parseInt(localStorage.getItem('chakra_time_assisted_bathing')) || 600,
+    timeMassage: parseInt(localStorage.getItem('chakra_time_massage')) || 600,
     scriptSource: localStorage.getItem('chakra_script_source') || 'default',
     customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
@@ -2240,6 +2754,8 @@ async function loadPiperVoiceRegistry() {
 }
 
 async function init() {
+    await loadTimingConfig();
+    await loadLanguageManifest();
     await loadPiperVoiceRegistry();
     setupVoices();
     loadPreferences();
@@ -2313,7 +2829,10 @@ function autoSelectVoice() {
         voiceSelect.value = state.voiceName;
         return;
     }
-    const defaultPiper = piperVoiceRegistry.find(voice => voice.language === state.language);
+    const preferredVoiceId = getLanguageConfig().defaultPiperVoice;
+    const defaultPiper = piperVoiceRegistry.find(voice =>
+        voice.language === state.language && voice.id === preferredVoiceId
+    ) || piperVoiceRegistry.find(voice => voice.language === state.language);
     if (defaultPiper) {
         state.voiceName = `piper:${defaultPiper.id}`;
         voiceSelect.value = state.voiceName;
@@ -2336,19 +2855,7 @@ function autoSelectVoice() {
         return list[0];
     };
 
-    if (state.language === 'ml') {
-        const mlVoices = state.voices.filter(v => v.lang.startsWith('ml'));
-        if (mlVoices.length > 0) {
-            bestVoice = findBestInList(mlVoices);
-        } else {
-            bestVoice = state.voices.find(v => v.name.toLowerCase().includes('malayalam'));
-        }
-    } else {
-        const enVoices = state.voices.filter(v => v.lang.startsWith('en'));
-        if (enVoices.length > 0) {
-            bestVoice = findBestInList(enVoices);
-        }
-    }
+    bestVoice = findBestInList(state.voices.filter(voice => voiceMatchesLanguage(voice)));
     
     if (bestVoice) {
         state.voiceName = `browser:${bestVoice.name}`;
@@ -2363,19 +2870,15 @@ async function testVoice() {
         try {
             if (!audio.isInitialized) await audio.init();
             piperTTS.configure(selectedValue);
-            const sample = state.language === 'ml'
-                ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
-                : 'Breathe gently. You are safe in this moment.';
+            const sample = getLanguageConfig().preview || contentT('system.centeringBreath');
             await piperTTS.preview(sample);
         } catch (error) {
             console.error('[Piper] preview failed:', error);
-            setVoiceStatus('Piper preview failed — choose a browser fallback voice.', 'error');
+            setVoiceStatus(t('ui.piperPreviewFailed'), 'error');
         }
         return;
     }
-    const utterance = new SpeechSynthesisUtterance(state.language === 'ml'
-        ? 'ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.'
-        : 'Breathe gently. You are safe in this moment.');
+    const utterance = new SpeechSynthesisUtterance(getLanguageConfig().preview || contentT('system.centeringBreath'));
     const selectedVoice = getBrowserVoiceForContent();
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
     
@@ -2389,6 +2892,7 @@ async function testVoice() {
 
 function loadPreferences() {
     syncValue('language-select', state.language);
+    syncValue('display-language-select', state.displayLanguage);
     
     const timeSlider = document.getElementById('time-per-chakra');
     if (timeSlider) {
@@ -2398,6 +2902,14 @@ function loadPreferences() {
     }
     
     setText('time-display', `${state.timePerChakra.toFixed(1)} mins`);
+
+    const highEnergyTimeSlider = document.getElementById('time-high-energy');
+    if (highEnergyTimeSlider) {
+        highEnergyTimeSlider.value = state.timeHighEnergy;
+        const pctHigh = ((highEnergyTimeSlider.value - highEnergyTimeSlider.min) / (highEnergyTimeSlider.max - highEnergyTimeSlider.min) * 100).toFixed(1) + '%';
+        highEnergyTimeSlider.style.setProperty('--range-fill', pctHigh);
+    }
+    setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
     
     // Sync Mixer Sliders
     syncValue('vol-voice', state.volVoice);
@@ -2418,22 +2930,28 @@ function loadPreferences() {
     document.querySelectorAll('#chakra-selection input').forEach(cb => {
         cb.checked = state.selectedChakras.includes(cb.value);
     });
+    if (!state.intention.trim()) state.intention = defaultIntention();
     syncValue('intention-input', state.intention);
     
-    syncChecked('sleep-mode-toggle', state.sleepMode);
+    syncChecked('returning-journey-toggle', state.returningJourney);
     syncChecked('audio-filters-toggle', state.audioFilters);
+    syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
     syncChecked('reverse-journey-toggle', state.reverseJourney);
     syncChecked('box-meditation-toggle', state.boxMeditation);
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    syncChecked('bg-music-mode-toggle', state.bgMusicMode);
+    syncChecked('music-only-toggle', state.bgMusicMode);
+    syncChecked('high-energy-toggle', state.highEnergyEnabled);
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
     // Sync Yoga Settings
     syncChecked('yoga-bridge-toggle', state.yogaBridgeEnabled);
     syncChecked('bath-session-toggle', state.bathSessionEnabled);
+    syncChecked('perineal-care-toggle', state.perinealCareEnabled);
+    syncChecked('assisted-bathing-toggle', state.assistedBathingEnabled);
+    syncChecked('massage-toggle', state.massageEnabled);
     const yogaSubOptions = document.getElementById('yoga-sub-options');
     if (yogaSubOptions) {
         yogaSubOptions.style.display = state.yogaBridgeEnabled ? 'flex' : 'none';
@@ -2467,6 +2985,12 @@ function loadPreferences() {
 
     syncValue('time-bath', state.timeBath);
     setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
+    syncValue('time-perineal-care', state.timePerinealCare);
+    setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
+    syncValue('time-assisted-bathing', state.timeAssistedBathing);
+    setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
+    syncValue('time-massage', state.timeMassage);
+    setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
@@ -2485,6 +3009,8 @@ function loadPreferences() {
             statusEl.style.color = '#4ade80';
         }
     }
+
+    refreshRangeControlDisplays();
     
     // Ensure voice matches the loaded language
     autoSelectVoice();
@@ -2517,10 +3043,27 @@ function showScreen(screen) {
 
 function attachEventListeners() {
     languageSelect.addEventListener('change', (e) => {
+        const previousDefault = defaultIntention(state.language);
+        const previousHrimDefault = hrimDefaultIntention(state.language);
         state.language = e.target.value;
+        if (!state.intention.trim() || state.intention === previousDefault || state.intention === previousHrimDefault) {
+            state.intention = state.highEnergyEnabled
+                ? hrimDefaultIntention(state.language)
+                : defaultIntention(state.language);
+            syncValue('intention-input', state.intention);
+        }
         setupVoices();
         autoSelectVoice();
+        applyLocaleUI();
     });
+    const displayLanguageSelect = document.getElementById('display-language-select');
+    if (displayLanguageSelect) {
+        displayLanguageSelect.addEventListener('change', (e) => {
+            state.displayLanguage = e.target.value;
+            localStorage.setItem('chakra_display_language', state.displayLanguage);
+            applyLocaleUI();
+        });
+    }
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
@@ -2529,6 +3072,7 @@ function attachEventListeners() {
         state.selectedChakras = checked;
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
+        localStorage.setItem('chakra_display_language', state.displayLanguage);
         state.voiceName = voiceSelect.value;
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
@@ -2536,11 +3080,13 @@ function attachEventListeners() {
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
         state.chakraFrequencies = getChecked('frequencies-toggle');
-        state.bgMusicMode = getChecked('bg-music-mode-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
+        state.perinealCareEnabled = getChecked('perineal-care-toggle');
+        state.assistedBathingEnabled = getChecked('assisted-bathing-toggle');
+        state.massageEnabled = getChecked('massage-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         if (state.yogaBridgeEnabled && state.selectedYogaPoses.length === 0) {
             alert("Please select at least one yoga pose or disable Yoga Bridge.");
@@ -2555,11 +3101,13 @@ function attachEventListeners() {
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
         localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
         localStorage.setItem('chakra_deity_path', state.deityPath);
-        localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
+        localStorage.setItem('chakra_perineal_care', state.perinealCareEnabled);
+        localStorage.setItem('chakra_assisted_bathing', state.assistedBathingEnabled);
+        localStorage.setItem('chakra_massage', state.massageEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         localStorage.setItem('chakra_script_source', state.scriptSource);
 
@@ -2575,35 +3123,57 @@ function attachEventListeners() {
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
         const boxEnabled = getChecked('box-meditation-toggle');
-        const corpseEnabled = getChecked('corpse-pose-toggle');
         const yogaEnabled = getChecked('yoga-bridge-toggle');
+        const corpseToggle = document.getElementById('corpse-pose-toggle');
+        if (!yogaEnabled && corpseToggle) corpseToggle.checked = false;
+        const corpseEnabled = getChecked('corpse-pose-toggle');
         const bathEnabled = getChecked('bath-session-toggle');
-        const bgMusicMode = getChecked('bg-music-mode-toggle');
-
-        // Hide journey configurations if in music-only mode
-        const journeyConfig = document.getElementById('chakra-selection').parentElement;
-        if (journeyConfig) journeyConfig.style.display = bgMusicMode ? 'none' : 'block';
+        const perinealEnabled = getChecked('perineal-care-toggle');
+        const assistedEnabled = getChecked('assisted-bathing-toggle');
+        const massageEnabled = getChecked('massage-toggle');
 
         const toggleDisplay = (id, show) => {
             const el = document.getElementById(id);
             if (!el) return;
-            el.style.display = show ? 'flex' : 'none';
+            // Let the component's CSS choose its layout when visible. This is
+            // important for enhanced range rows, which use grid rather than flex.
+            el.style.display = show ? '' : 'none';
         };
 
-        toggleDisplay('row-breathing', boxEnabled && !bgMusicMode);
-        toggleDisplay('row-corpse', corpseEnabled && !bgMusicMode);
-        toggleDisplay('row-yoga-prep', yogaEnabled && !bgMusicMode);
-        toggleDisplay('row-yoga-pose', yogaEnabled && !bgMusicMode);
-        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !bgMusicMode);
+        // Bath Session only exists inside the Yoga Bridge. Clear stale state
+        // when Yoga Bridge is switched off and make the dependency explicit.
+        const bathToggle = document.getElementById('bath-session-toggle');
+        if (bathToggle) {
+            if (!yogaEnabled) bathToggle.checked = false;
+            bathToggle.disabled = !yogaEnabled;
+            bathToggle.setAttribute('aria-disabled', String(!yogaEnabled));
+        }
+        const addonToggles = ['perineal-care-toggle', 'assisted-bathing-toggle', 'massage-toggle'];
+        addonToggles.forEach(id => {
+            const toggle = document.getElementById(id);
+            if (!toggle) return;
+            if (!yogaEnabled || !bathEnabled) toggle.checked = false;
+            toggle.disabled = !yogaEnabled || !bathEnabled;
+            toggle.setAttribute('aria-disabled', String(toggle.disabled));
+        });
+
+        toggleDisplay('row-breathing', boxEnabled);
+        toggleDisplay('row-corpse', corpseEnabled);
+        toggleDisplay('row-yoga-prep', yogaEnabled);
+        toggleDisplay('row-yoga-pose', yogaEnabled);
+        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !assistedEnabled);
+        toggleDisplay('row-perineal-care', yogaEnabled && bathEnabled && perinealEnabled);
+        toggleDisplay('row-assisted-bathing', yogaEnabled && bathEnabled && assistedEnabled);
+        toggleDisplay('row-massage', yogaEnabled && bathEnabled && massageEnabled);
         
         const yogaSubOptions = document.getElementById('yoga-sub-options');
         if (yogaSubOptions) {
-            yogaSubOptions.style.display = (yogaEnabled && !bgMusicMode) ? 'flex' : 'none';
+            yogaSubOptions.style.display = yogaEnabled ? 'flex' : 'none';
         }
     }
 
     // Master Toggle Logic
-    const bgMusicToggle = document.getElementById('bg-music-mode-toggle');
+    const musicOnlyToggle = document.getElementById('music-only-toggle');
     const yogaBridgeToggle = document.getElementById('yoga-bridge-toggle');
     const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
     const boxMeditationToggle = document.getElementById('box-meditation-toggle');
@@ -2611,34 +3181,56 @@ function attachEventListeners() {
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
 
+    function clearHighEnergyMode() {
+        if (!highEnergyToggle) return;
+        highEnergyToggle.checked = false;
+        state.highEnergyEnabled = false;
+        localStorage.setItem('chakra_high_energy', 'false');
+    }
+
+    function clearMusicOnlyMode() {
+        if (!musicOnlyToggle) return;
+        musicOnlyToggle.checked = false;
+        state.bgMusicMode = false;
+        localStorage.setItem('chakra_bg_music_mode', 'false');
+    }
+
     function enforceMasterToggle(target) {
-        if (target === bgMusicToggle && bgMusicToggle.checked) {
+        if (target === musicOnlyToggle && musicOnlyToggle.checked) {
             // Disable other journey features
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
             if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
             if (boxMeditationToggle) boxMeditationToggle.checked = false;
             if (hooponoponoToggle) hooponoponoToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
-            if (highEnergyToggle) highEnergyToggle.checked = false;
-        } else if (target !== bgMusicToggle && target.checked) {
-            // Disable BG Music Mode if any other journey feature is enabled
-            if (bgMusicToggle) bgMusicToggle.checked = false;
+            clearHighEnergyMode();
+        } else if (target !== musicOnlyToggle && target.checked) {
+            // Disable Music Only if any other journey feature is enabled.
+            clearMusicOnlyMode();
         }
 
         // Mutual Exclusivity: Yoga Bridge & Reverse Journey
         if (target === yogaBridgeToggle && yogaBridgeToggle.checked) {
             if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
-            if (highEnergyToggle) highEnergyToggle.checked = false;
+            clearHighEnergyMode();
         } else if (target === reverseJourneyToggle && reverseJourneyToggle.checked) {
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
         }
 
         if (target === highEnergyToggle && highEnergyToggle.checked) {
-            if (bgMusicToggle) bgMusicToggle.checked = false;
+            clearMusicOnlyMode();
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
         }
 
         updateTimingRowVisibility();
+        updateExperienceModeVisibility();
+        if (isGeneratedIntention(state.intention)) {
+            state.intention = state.highEnergyEnabled
+                ? hrimDefaultIntention(state.language)
+                : defaultIntention(state.language);
+            syncValue('intention-input', state.intention);
+            localStorage.setItem('chakra_intention', state.intention);
+        }
         updateSessionEstimate();
     }
 
@@ -2647,11 +3239,20 @@ function attachEventListeners() {
     document.getElementById('corpse-pose-toggle').addEventListener('change', updateTimingRowVisibility);
     document.getElementById('yoga-bridge-toggle').addEventListener('change', updateTimingRowVisibility);
     document.getElementById('bath-session-toggle').addEventListener('change', updateTimingRowVisibility);
-    document.getElementById('bg-music-mode-toggle').addEventListener('change', updateTimingRowVisibility);
-
-    if (bgMusicToggle) {
-        bgMusicToggle.addEventListener('change', (e) => {
+    document.getElementById('bath-session-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('perineal-care-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('perineal-care-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('assisted-bathing-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('assisted-bathing-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('massage-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('massage-toggle').addEventListener('change', updateSessionEstimate);
+    if (musicOnlyToggle) {
+        musicOnlyToggle.addEventListener('change', (e) => {
+            state.bgMusicMode = e.target.checked;
+            localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
             enforceMasterToggle(e.target);
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
         });
     }
 
@@ -2664,44 +3265,75 @@ function attachEventListeners() {
     }
 
     if (highEnergyToggle) {
-        highEnergyToggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
+        highEnergyToggle.addEventListener('change', (e) => {
+            state.highEnergyEnabled = e.target.checked;
+            localStorage.setItem('chakra_high_energy', state.highEnergyEnabled);
+            enforceMasterToggle(e.target);
+            updateExperienceModeVisibility();
+        });
     }
 
     [reverseJourneyToggle, boxMeditationToggle, hooponoponoToggle, corpsePoseToggle].forEach(toggle => {
         if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
     });
     
+    function updateExperienceModeVisibility() {
+        const highEnergy = getChecked('high-energy-toggle');
+        const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
+        const highEnergyDuration = document.getElementById('high-energy-duration-control');
+        if (normalDuration) normalDuration.style.display = highEnergy ? 'none' : 'flex';
+        if (highEnergyDuration) highEnergyDuration.style.display = highEnergy ? 'flex' : 'none';
+    }
+
     // Initial call
     updateTimingRowVisibility();
+    updateExperienceModeVisibility();
+    if (isGeneratedIntention(state.intention)) {
+        state.intention = state.highEnergyEnabled
+            ? hrimDefaultIntention(state.language)
+            : defaultIntention(state.language);
+        syncValue('intention-input', state.intention);
+        localStorage.setItem('chakra_intention', state.intention);
+    }
 
     function updateSessionEstimate() {
-        if (getChecked('bg-music-mode-toggle')) {
+        if (getChecked('music-only-toggle')) {
             setText('session-estimate', 'Music only — stop anytime');
+            updateJourneyRoadmap();
             return;
         }
         const isHigh = getChecked('high-energy-toggle');
         const hasBox = getChecked('box-meditation-toggle');
         const hasHooponopono = getChecked('hooponopono-toggle');
         const hasYoga = getChecked('yoga-bridge-toggle');
-        const hasBath = getChecked('bath-session-toggle');
+        const hasBath = hasYoga && getChecked('bath-session-toggle');
+        const hasPerineal = hasBath && getChecked('perineal-care-toggle');
+        const hasAssisted = hasBath && getChecked('assisted-bathing-toggle');
+        const hasMassage = hasBath && getChecked('massage-toggle');
         const hasCorpse = getChecked('corpse-pose-toggle');
         
-        let overhead = 5; // base overhead (gratitude, silence, etc)
-        if (hasBox) overhead += 4; // box breathing cycles + narration
-        if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
+        let overhead = timing('estimate', 'baseOverhead');
+        if (hasBox) overhead += timing('estimate', 'boxBreathingOverhead');
+        if (hasHooponopono) overhead += timing('estimate', 'hooponoponoOverhead');
         
         const corpseTime = hasCorpse ? (state.timeCorpse / 60) : 0;
         
         if (hasYoga) {
             const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
-            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60); // prep + poses + transition gaps
-            if (hasBath) overhead += state.timeBath / 60;
+            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate')) / 60);
+            if (hasBath) {
+                if (hasMassage) overhead += state.timeMassage / 60;
+                if (hasPerineal) overhead += state.timePerinealCare / 60;
+                if (hasAssisted) overhead += state.timeAssistedBathing / 60;
+                else overhead += state.timeBath / 60;
+            }
         }
 
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + 3) 
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + corpseTime + overhead + 7);
+            ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'normalExtra'));
         setText('session-estimate', `~ ${estimate} min session`);
+        updateJourneyRoadmap();
     }
 
     // Timing Sliders Listeners
@@ -2772,7 +3404,10 @@ function attachEventListeners() {
                     const check = validateScriptBundle(json, {
                         highEnergy: getChecked('high-energy-toggle'),
                         corpse: getChecked('corpse-pose-toggle'),
-                        bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                        bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && !getChecked('assisted-bathing-toggle'),
+                        perinealCare: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('perineal-care-toggle'),
+                        assistedBathing: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('assisted-bathing-toggle'),
+                        massage: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('massage-toggle'),
                         yoga: getChecked('yoga-bridge-toggle'),
                         hooponopono: getChecked('hooponopono-toggle')
                     });
@@ -2818,7 +3453,10 @@ function attachEventListeners() {
                 const check = validateScriptBundle(json, {
                     highEnergy: getChecked('high-energy-toggle'),
                     corpse: getChecked('corpse-pose-toggle'),
-                    bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                    bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && !getChecked('assisted-bathing-toggle'),
+                    perinealCare: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('perineal-care-toggle'),
+                    assistedBathing: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('assisted-bathing-toggle'),
+                    massage: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('massage-toggle'),
                     yoga: getChecked('yoga-bridge-toggle'),
                     hooponopono: getChecked('hooponopono-toggle')
                 });
@@ -2848,6 +3486,27 @@ function attachEventListeners() {
         updateSessionEstimate();
     });
 
+    document.getElementById('time-perineal-care').addEventListener('input', (e) => {
+        state.timePerinealCare = parseInt(e.target.value);
+        setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
+        localStorage.setItem('chakra_time_perineal_care', state.timePerinealCare);
+        updateSessionEstimate();
+    });
+
+    document.getElementById('time-assisted-bathing').addEventListener('input', (e) => {
+        state.timeAssistedBathing = parseInt(e.target.value);
+        setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
+        localStorage.setItem('chakra_time_assisted_bathing', state.timeAssistedBathing);
+        updateSessionEstimate();
+    });
+
+    document.getElementById('time-massage').addEventListener('input', (e) => {
+        state.timeMassage = parseInt(e.target.value);
+        setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
+        localStorage.setItem('chakra_time_massage', state.timeMassage);
+        updateSessionEstimate();
+    });
+
     timeSlider.addEventListener('input', (e) => {
         state.timePerChakra = parseFloat(e.target.value);
         timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
@@ -2857,16 +3516,42 @@ function attachEventListeners() {
         updateSessionEstimate();
     });
 
+    const highEnergyTimeSlider = document.getElementById('time-high-energy');
+    if (highEnergyTimeSlider) {
+        highEnergyTimeSlider.addEventListener('input', (e) => {
+            state.timeHighEnergy = parseFloat(e.target.value);
+            setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
+            localStorage.setItem('chakra_time_high_energy', state.timeHighEnergy);
+            const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
+            e.target.style.setProperty('--range-fill', pct);
+            updateSessionEstimate();
+        });
+    }
+
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
-    document.getElementById('frequencies-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('frequencies-toggle').addEventListener('change', (e) => {
+        syncChecked('mixer-frequencies-toggle', e.target.checked);
+        updateSessionEstimate();
+    });
     document.getElementById('yoga-bridge-toggle').addEventListener('change', updateSessionEstimate);
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
+
+    const settingsHelpModal = document.getElementById('settings-help-modal');
+    const settingsHelpButton = document.getElementById('settings-help-button');
+    const settingsHelpClose = document.getElementById('settings-help-close');
+    if (settingsHelpModal && settingsHelpButton && settingsHelpClose) {
+        settingsHelpButton.addEventListener('click', () => {
+            settingsHelpModal.classList.remove('hidden');
+            settingsHelpClose.focus();
+        });
+        settingsHelpClose.addEventListener('click', () => settingsHelpModal.classList.add('hidden'));
+    }
 
     // Brightness slider
     const brightnessSlider = document.getElementById('brightness-slider');
@@ -2878,7 +3563,85 @@ function attachEventListeners() {
         });
     }
 
+    function chooseSleepModeForJourney() {
+        const isEvening = new Date().getHours() >= 18;
+        const prompt = document.getElementById('sleep-mode-prompt');
+        const enable = document.getElementById('sleep-mode-enable');
+        const disable = document.getElementById('sleep-mode-disable');
+        const close = document.getElementById('sleep-mode-prompt-close');
+
+        if (!isEvening || !prompt || !enable || !disable || !close) {
+            state.sleepMode = false;
+            return Promise.resolve(!isEvening ? false : null);
+        }
+
+        prompt.classList.remove('hidden');
+        enable.focus();
+        return new Promise(resolve => {
+            const finish = enabled => {
+                enable.removeEventListener('click', enableSleep);
+                disable.removeEventListener('click', disableSleep);
+                close.removeEventListener('click', closePrompt);
+                prompt.classList.add('hidden');
+                state.sleepMode = enabled === true;
+                resolve(enabled);
+            };
+            const enableSleep = () => finish(true);
+            const disableSleep = () => finish(false);
+            const closePrompt = () => finish(null);
+            enable.addEventListener('click', enableSleep);
+            disable.addEventListener('click', disableSleep);
+            close.addEventListener('click', closePrompt);
+        });
+    }
+
+    function isHighEnergyTimeAllowed() {
+        const now = new Date();
+        const minutes = (now.getHours() * 60) + now.getMinutes();
+        return minutes >= (3 * 60 + 30) && minutes < (12 * 60);
+    }
+
+    function confirmHighEnergyTime() {
+        if (!getChecked('high-energy-toggle') || isHighEnergyTimeAllowed()) return Promise.resolve(true);
+
+        const modal = document.getElementById('hrim-time-block-modal');
+        const close = document.getElementById('hrim-time-block-close');
+        const lobby = document.getElementById('hrim-time-block-lobby');
+        const regular = document.getElementById('hrim-time-block-regular');
+        if (!modal || !close || !lobby || !regular) return Promise.resolve(false);
+
+        modal.classList.remove('hidden');
+        lobby.focus();
+        return new Promise(resolve => {
+            const finish = continueJourney => {
+                close.removeEventListener('click', returnToLobby);
+                lobby.removeEventListener('click', returnToLobby);
+                regular.removeEventListener('click', continueRegular);
+                modal.classList.add('hidden');
+                if (continueJourney) {
+                    const highEnergyToggle = document.getElementById('high-energy-toggle');
+                    if (highEnergyToggle) highEnergyToggle.checked = false;
+                    state.highEnergyEnabled = false;
+                    localStorage.setItem('chakra_high_energy', 'false');
+                }
+                resolve(continueJourney);
+            };
+            const returnToLobby = () => finish(false);
+            const continueRegular = () => finish(true);
+            close.addEventListener('click', returnToLobby);
+            lobby.addEventListener('click', returnToLobby);
+            regular.addEventListener('click', continueRegular);
+        });
+    }
+
     startMeditationBtn.addEventListener('click', async () => {
+        // HRIM is a daytime-only energy practice. Gate it before audio setup.
+        if (!await confirmHighEnergyTime()) return;
+
+        // Sleep Mode is a local evening decision for this journey only.
+        const sleepChoice = await chooseSleepModeForJourney();
+        if (sleepChoice === null) return;
+
         // Initialize Audio Engine early for music-only mode
         if (!audio.isInitialized) await audio.init();
 
@@ -2894,7 +3657,8 @@ function attachEventListeners() {
         } else {
             let order = [...state.selectedChakras];
             if (state.reverseJourney) order.reverse();
-            if (order.length === 0) {
+            const isHighEnergy = getChecked('high-energy-toggle');
+            if (!isHighEnergy && order.length === 0) {
                 alert("Please select at least one chakra before beginning the journey.");
                 return;
             }
@@ -2925,11 +3689,18 @@ function attachEventListeners() {
         e.stopImmediatePropagation();
         meditation.stop();
     });
-    document.getElementById('eyes-close-mode-toggle').addEventListener('change', (e) => {
+    const eyesCloseToggle = document.getElementById('eyes-close-mode-toggle');
+    if (eyesCloseToggle) eyesCloseToggle.addEventListener('change', (e) => {
         state.eyesCloseMode = e.target.checked;
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
+    });
+    const audioFiltersToggle = document.getElementById('audio-filters-toggle');
+    if (audioFiltersToggle) audioFiltersToggle.addEventListener('change', (e) => {
+        state.audioFilters = e.target.checked;
+        localStorage.setItem('chakra_audio_filters', state.audioFilters);
+        if (audio.toggleAudioFilters) audio.toggleAudioFilters(state.audioFilters);
     });
     document.getElementById('close-completion').addEventListener('click', () => {
         document.getElementById('completion-modal').classList.add('hidden');
@@ -2956,11 +3727,16 @@ function attachEventListeners() {
         localStorage.setItem('chakra_intention', state.intention);
     });
 
-    // Sleep mode toggle
-    document.getElementById('sleep-mode-toggle').addEventListener('change', (e) => {
-        state.sleepMode = e.target.checked;
-        localStorage.setItem('chakra_sleep_mode', state.sleepMode);
-    });
+    // Keep this user-controlled opening preference separate from the completed
+    // journey counter in state.stats.journeys.
+    const returningJourneyToggle = document.getElementById('returning-journey-toggle');
+    if (returningJourneyToggle) {
+        returningJourneyToggle.addEventListener('change', (e) => {
+            state.returningJourney = e.target.checked;
+            localStorage.setItem('chakra_returning_journey', String(state.returningJourney));
+            updateJourneyRoadmap();
+        });
+    }
 
     // Journal save
     document.getElementById('save-journal').addEventListener('click', () => {
@@ -2973,25 +3749,46 @@ function attachEventListeners() {
         syncValue('journal-entry', '');
         const info = document.getElementById('last-journal-info');
         if (info) {
-            info.textContent = state.language === 'ml' ? '✓ സൂക്ഷിച്ചു' : '✓ Saved';
+            info.textContent = t('ui.saved');
             setTimeout(() => {
                 const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
                 info.textContent = saved.length > 0
-                    ? (state.language === 'ml' ? 'അവസാന നമ്പർ: ' : 'Last entry: ') + saved[0].date
+                    ? t('ui.lastEntry') + saved[0].date
                     : '';
             }, 2000);
         }
     });
     const mixer = document.getElementById('volume-mixer');
+    const mixerCloseButtons = [document.getElementById('close-mixer'), document.getElementById('close-mixer-bottom')].filter(Boolean);
     document.getElementById('btn-mixer').addEventListener('click', (e) => {
-        console.log("Mixer button clicked. Current hidden state:", mixer.classList.contains('hidden'));
         e.stopPropagation();
-        const isHidden = mixer.classList.toggle('hidden');
-        console.log("Mixer toggled. New hidden state:", isHidden);
+        if (!mixer) return;
+        mixer.classList.remove('hidden');
+        syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
+        const closeButton = document.getElementById('close-mixer');
+        if (closeButton) closeButton.focus();
     });
-    document.getElementById('close-mixer').addEventListener('click', (e) => {
+    mixerCloseButtons.forEach(button => button.addEventListener('click', (e) => {
         e.stopPropagation();
-        mixer.classList.add('hidden');
+        if (mixer) mixer.classList.add('hidden');
+        document.getElementById('btn-mixer')?.focus();
+    }));
+    document.getElementById('restart-meditation')?.addEventListener('click', async () => {
+        if (!window.confirm(t('ui.restartConfirm'))) return;
+        if (mixer) mixer.classList.add('hidden');
+        meditation.stop();
+        // A journey may still be unwinding its async start sequence. Wait for
+        // the cancellation to release the start guard before launching again.
+        const deadline = Date.now() + 5000;
+        while (meditation.isStarting && Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        startMeditationBtn.click();
+    });
+    document.getElementById('mixer-frequencies-toggle')?.addEventListener('change', (e) => {
+        state.chakraFrequencies = e.target.checked;
+        localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
+        syncChecked('frequencies-toggle', state.chakraFrequencies);
     });
     // Unified Volume Handlers
     const syncVolume = (key, value, elements) => {
@@ -3001,28 +3798,28 @@ function attachEventListeners() {
     };
 
     // Voice
-    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')];
+    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')].filter(Boolean);
     volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volVoice', e.target.value, volVoiceEls);
         if (audio.voiceGain && audio.ctx) audio.voiceGain.gain.setValueAtTime(state.volVoice, audio.ctx.currentTime);
     }));
 
     // Drone
-    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')];
+    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')].filter(Boolean);
     volDroneEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volDrone', e.target.value, volDroneEls);
         if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
     }));
 
     // Bell
-    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')];
+    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')].filter(Boolean);
     volBellEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volBell', e.target.value, volBellEls);
         if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
     }));
 
     // Mantra
-    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')];
+    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')].filter(Boolean);
     volMantraEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volMantra', e.target.value, volMantraEls);
         if (audio.mantraGain && audio.mantraLoop) {
@@ -3031,7 +3828,7 @@ function attachEventListeners() {
     }));
 
     // Music
-    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')];
+    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')].filter(Boolean);
     volMusicEls.forEach(el => el.addEventListener('input', (e) => {
         syncVolume('volMusic', e.target.value, volMusicEls);
         if (audio.bgMusicGain && audio.bgMusicLoop) {

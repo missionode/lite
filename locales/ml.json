@@ -1,0 +1,167 @@
+{
+  "language": "മലയാളം",
+  "ui": {
+    "settingsSubtitle": "നയിക്കപ്പെടുന്ന അനുഭവത്തിനായി നിങ്ങളുടെ മുൻഗണനകൾ ക്രമീകരിക്കുക",
+    "language": "ഭാഷ",
+    "meditationLanguage": "ധ്യാന ഭാഷ",
+    "displayLanguage": "പ്രദർശന ഭാഷ",
+    "chakraMeditation": "ചക്ര ധ്യാനം",
+    "settings": "ക്രമീകരണങ്ങൾ",
+    "previewVoice": "ശബ്ദം കേൾക്കുക",
+    "saveSettings": "ക്രമീകരണങ്ങൾ സൂക്ഷിക്കുക",
+    "meditationRoom": "ധ്യാന മുറി",
+    "returning": "വീണ്ടും വരവ്",
+    "returningJourney": "വീണ്ടും വരവിന്റെ യാത്ര",
+    "moon": "ചന്ദ്രൻ",
+    "gratitude": "കൃതജ്ഞത",
+    "intention": "ഉദ്ദേശ്യം",
+    "preparation": "തയ്യാറെടുപ്പ്",
+    "breathingComplete": "ശ്വാസക്രിയ പൂർത്തിയായി",
+    "prepare": "തയ്യാറെടുക്കുക",
+    "journeyComplete": "യാത്ര പൂർത്തിയായി",
+    "returnToRoom": "മുറിയിലേക്ക് മടങ്ങുക",
+    "meditationCompleted": "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ.",
+    "journalPrompt": "എന്ത് മാറി? ഇന്ന് നിങ്ങൾ എന്ത് ക്ഷണിക്കുന്നു?",
+    "saveEntry": "കുറിപ്പ് സൂക്ഷിക്കുക",
+    "saved": "✓ സൂക്ഷിച്ചു",
+    "lastEntry": "അവസാന കുറിപ്പ്: ",
+    "yoga": "യോഗ പാലം",
+    "yogaSubtitle": "ശ്വാസവും ചലനവും ആത്മാവും തമ്മിലുള്ള ഐക്യം",
+    "purification": "ശുദ്ധീകരണം",
+    "corpsePose": "ശവാസനം",
+    "corpsePoseSubtitle": "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക",
+    "piperPreparing": "Piper ശബ്ദം തയ്യാറാക്കുന്നു…",
+    "piperReady": "Piper ശബ്ദം ഓഫ്‌ലൈൻ വിവരണത്തിനായി തയ്യാറാണ്.",
+    "piperFallback": "Piper ലഭ്യമല്ല — ബ്രൗസർ ശബ്ദം ഉപയോഗിക്കുന്നു.",
+    "piperLoadFailed": "Piper ലോഡ് ചെയ്യാനായില്ല — ബ്രൗസർ ശബ്ദം ഉപയോഗിക്കുന്നു.",
+    "piperPreviewFailed": "Piper പ്രിവ്യൂ പരാജയപ്പെട്ടു — ബ്രൗസർ ശബ്ദം തിരഞ്ഞെടുക്കുക."
+    ,"journeys": "യാത്രകൾ"
+    ,"totalTime": "ആകെ സമയം"
+    ,"minutes": "മിനിറ്റ്"
+    ,"narrationVoice": "വിവരണ ശബ്ദം"
+    ,"customJourney": "ഇഷ്ടാനുസൃത യാത്ര"
+    ,"chakraJourney": "ചക്ര യാത്ര"
+    ,"options": "ഓപ്ഷനുകൾ"
+    ,"guidedPractices": "മാർഗ്ഗനിർദ്ദേശമുള്ള അഭ്യാസങ്ങൾ"
+    ,"comfortVisuals": "സുഖവും ദൃശ്യ ക്രമീകരണങ്ങളും"
+    ,"yogaSection": "യോഗ പാലം"
+    ,"settingsHelp": "ക്രമീകരണ സഹായം"
+    ,"settingsHelpTitle": "ഈ യാത്ര എങ്ങനെ പ്രവർത്തിക്കുന്നു"
+    ,"settingsHelpLanguages": "Meditation Language ശബ്ദ മാർഗ്ഗനിർദ്ദേശം നിയന്ത്രിക്കുന്നു. Display Language സ്ക്രീനിലെ എഴുത്തുകൾ നിയന്ത്രിക്കുന്നു."
+    ,"settingsHelpChakras": "Chakra Journey ഉൾപ്പെടുന്ന കേന്ദ്രങ്ങൾ തിരഞ്ഞെടുക്കുന്നു. Reverse Journey ദിശ മാറ്റുന്നു; Third Eye, Crown എന്നിവ അവസാന കേന്ദ്രങ്ങളായി തുടരും."
+    ,"settingsHelpYoga": "Yoga Bridge ശാരീരിക ഘട്ടം ചേർക്കുന്നു. Corpse Pose, മസാജ്, പെരിനിയൽ പരിചരണം, സഹായത്തോടെയുള്ള കുളി, സാധാരണ കുളി എന്നിവ അവിടെ നിയന്ത്രിക്കാം."
+    ,"settingsHelpModes": "Music Only, High Energy എന്നിവ Lobby-ൽ തിരഞ്ഞെടുക്കാം. High Energy രാവിലെ 3:30 മുതൽ ഉച്ചയ്ക്ക് 12:00 വരെ ലഭ്യമാണ്; വൈകുന്നേരം 6 മണിക്ക് ശേഷം യാത്ര തുടങ്ങുമ്പോൾ Sleep Mode തിരഞ്ഞെടുക്കാം."
+    ,"settingsHelpSave": "ക്രമീകരണങ്ങൾ സൂക്ഷിച്ചാൽ Lobby തുറക്കും. ആരംഭിക്കുന്നതിന് മുമ്പ് അവിടെ മോഡും സമയവും പരിശോധിക്കാം."
+    ,"presidingDeities": "ആരാധനാ ദേവതകൾ"
+    ,"audioFilters": "ഓഡിയോ ഫിൽട്ടറുകൾ പ്രവർത്തനക്ഷമമാക്കുക (ഊഷ്മളത)"
+    ,"reverseJourney": "വിപരീത യാത്ര (കിരീടം ➔ മൂലാധാരം)"
+    ,"boxMeditation": "ബോക്സ് ധ്യാനം"
+    ,"hooponopono": "ഹോ'ഒപോനോപോനോ"
+    ,"chakraFrequencies": "ചക്ര ആവൃത്തികൾ (സോൾഫെജിയോ)"
+    ,"eyesCloseMode": "കണ്ണടച്ചുള്ള മോഡ് (ഊഷ്മളത/സുഖം)"
+    ,"backgroundMusicMode": "പശ്ചാത്തല സംഗീത മോഡ്"
+    ,"experienceMode": "അനുഭവ രീതി"
+    ,"musicOnlyMode": "സംഗീതം മാത്രം"
+    ,"corpsePoseOption": "ശവാസനം പ്രവർത്തനക്ഷമമാക്കുക"
+    ,"yogaBridge": "യോഗ പാലം പ്രവർത്തനക്ഷമമാക്കുക (ശാരീരിക ഐക്യം)"
+    ,"bathSession": "സ്നാന സെഷൻ പ്രവർത്തനക്ഷമമാക്കുക"
+    ,"perinealCare": "പെരിനിയൽ പരിചരണം"
+    ,"assistedBathing": "സഹായത്തോടെയുള്ള കുളി"
+    ,"perinealCareDuration": "പെരിനിയൽ സമയം"
+    ,"assistedBathingDuration": "സഹായത്തോടെയുള്ള കുളി സമയം"
+    ,"massage": "മസാജ്"
+    ,"massageDuration": "മസാജ് ദൈർഘ്യം"
+    ,"highEnergy": "ഉയർന്ന ഊർജ്ജം (HRIM)"
+    ,"sleepMode": "🌙 ഉറക്ക മോഡ്"
+    ,"sleepModePromptTitle": "വൈകുന്നേര യാത്ര"
+    ,"sleepModePrompt": "ഇപ്പോൾ വൈകുന്നേരമാണ്. ഈ യാത്രയ്ക്ക് ഉറക്ക മോഡ് ഉപയോഗിക്കണോ?"
+    ,"sleepModeEnable": "ഉറക്ക മോഡ് ഓണാക്കി തുടരുക"
+    ,"sleepModeDisable": "ഉറക്ക മോഡ് ഓഫ് ചെയ്ത് തുടരുക"
+    ,"sleepModeClose": "അടച്ച് ഈ യാത്ര ഒഴിവാക്കുക"
+    ,"hrimTimeBlockTitle": "ഹ്രീം പകൽ സമയ മാർഗ്ഗനിർദ്ദേശം"
+    ,"hrimTimeBlockMessage": "പകൽ സമയത്തെ ഊർജ്ജത്തിനും ആരോഗ്യകരമായ വിശ്രമത്തിനുമായി ഹ്രീം രാവിലെ 3:30 മുതൽ ഉച്ചയ്ക്ക് 12:00 വരെ ലഭ്യമാണ്."
+    ,"hrimTimeBlockLobby": "ലോബിയിലേക്ക് മടങ്ങുക"
+    ,"hrimTimeBlockRegular": "സാധാരണ ധ്യാനവുമായി തുടരുക"
+    ,"timePerSession": "ഓരോ സെഷന്റെയും സമയം (മിനിറ്റ്)"
+    ,"corePracticeDuration": "പ്രധാന ധ്യാന ദൈർഘ്യം (മിനിറ്റ്)"
+    ,"hrimActivationDuration": "ഹ്രീം ഊർജ്ജ ഉണർവ്വിന്റെ ദൈർഘ്യം (മിനിറ്റ്)"
+    ,"intentionPrompt": "ഇന്ന് നിങ്ങൾ എന്താണ് ക്ഷണിക്കുന്നത്?"
+    ,"intentionPlaceholder": "ഉദാ. സമാധാനം, വ്യക്തത, മൃദുവായ ശക്തി..."
+    ,"defaultIntention": "സമാധാനവും വ്യക്തതയും മൃദുവായ ശക്തിയും"
+    ,"hrimDefaultIntention": "ഏകാഗ്രമായ ഊർജ്ജം, ധൈര്യം, വ്യക്തമായ പ്രവർത്തനശക്തി"
+    ,"journeyRoadmap": "യാത്രാ രൂപരേഖ"
+    ,"roadmapArrival": "വരവ്"
+    ,"roadmapReturning": "വീണ്ടും വരവ്"
+    ,"roadmapIntention": "ഉദ്ദേശ്യം"
+    ,"roadmapBreathing": "ശ്വാസക്രിയ"
+    ,"roadmapCorpse": "ശവാസനം"
+    ,"roadmapChakras": "ചക്രങ്ങൾ"
+    ,"roadmapYoga": "യോഗ"
+    ,"roadmapMassage": "മസാജ്"
+    ,"roadmapPerineal": "പെരിനിയൽ പരിചരണം"
+    ,"roadmapAssistedBathing": "സഹായത്തോടെയുള്ള കുളി"
+    ,"roadmapBath": "കുളി"
+    ,"roadmapHrim": "ഹ്രീം"
+    ,"roadmapMusicOnly": "സംഗീതം മാത്രം"
+    ,"roadmapHooponopono": "ഹോ'ഒപോനോപോനോ"
+    ,"roadmapClosing": "സമാപനം"
+    ,"yogaFlowNote": "ആദ്യം സ്നാനം, തുടർന്ന് യോഗ, പിന്നെ യാത്ര കിരീട ചക്രത്തിലേക്ക് തുടരും."
+    ,"yogaTiming": "യോഗ സമയം"
+    ,"preparation": "തയ്യാറെടുപ്പ്"
+    ,"perPose": "ഓരോ ആസനത്തിനും"
+    ,"bathDuration": "സ്നാന ദൈർഘ്യം"
+    ,"screenBrightness": "സ്ക്രീൻ തെളിച്ചം"
+    ,"audioLevels": "ഓഡിയോ നിലകൾ"
+    ,"mixerTitle": "യാത്രാ ക്രമീകരണം"
+    ,"mixerSubtitle": "ഈ യാത്രയ്ക്കുള്ള ശബ്ദവും സുഖവും ക്രമീകരിക്കുക."
+    ,"mixerFrequencies": "ചക്ര ആവൃത്തികൾ ഉപയോഗിക്കുക (സോൾഫെജിയോ)"
+    ,"mixerFrequencyNote": "മാറ്റങ്ങൾ അടുത്ത ശബ്ദ ഘട്ടം മുതൽ പ്രാബല്യത്തിൽ വരും."
+    ,"restartJourney": "യാത്ര പുനരാരംഭിക്കുക"
+    ,"restartConfirm": "ഈ യാത്ര തുടക്കം മുതൽ പുനരാരംഭിക്കണോ? നിങ്ങളുടെ ക്രമീകരണങ്ങൾ സൂക്ഷിക്കും."
+    ,"voice": "ശബ്ദം"
+    ,"drone": "ഡ്രോൺ"
+    ,"bell": "മണി"
+    ,"mantra": "മന്ത്രം"
+    ,"music": "സംഗീതം"
+    ,"journeyTimings": "യാത്രാ സമയക്രമം"
+    ,"arriving": "എത്തിച്ചേരൽ"
+    ,"breathing": "ശ്വസനം"
+    ,"corpsePose": "ശവാസനം"
+    ,"interval": "ഇടവേള"
+    ,"scriptSelection": "സ്ക്രിപ്റ്റ് തിരഞ്ഞെടുക്കൽ"
+    ,"startMeditation": "ധ്യാനം ആരംഭിക്കുക"
+    ,"beginJourney": "യാത്ര ആരംഭിക്കുക"
+    ,"close": "അടയ്ക്കുക"
+    ,"sessionTime": "സെഷൻ സമയം"
+    ,"totalJourneys": "ആകെ യാത്രകൾ"
+    ,"writeFreely": "സ്വതന്ത്രമായി എഴുതുക..."
+    ,"root": "മൂലാധാരം"
+    ,"sacral": "സ്വാധിഷ്ഠാനം"
+    ,"solar": "മണിപൂരം"
+    ,"heart": "അനാഹതം"
+    ,"throat": "വിശുദ്ധി"
+    ,"thirdEye": "ആജ്ഞ"
+    ,"crown": "സഹസ്രാരം"
+  },
+  "system": {
+    "arriving": "ശാന്തമാകുക",
+    "breatheAndSettle": "പതിയെ ശ്വസിക്കൂ... മനസ്സിനെ ഈ ഇടത്തേക്ക് കൊണ്ടുവരൂ",
+    "intention": "ഇന്ന് നിങ്ങൾ ക്ഷണിക്കുന്നത്: {{intention}}. ഈ ഉദ്ദേശ്യം ഹൃദയത്തിൽ സൂക്ഷിക്കൂ — ഈ യാത്രയിലുടനീളം അത് ശാന്തമായി നിങ്ങളോടൊപ്പം നിലനിൽക്കട്ടെ.",
+    "centeringBreath": "സൗകര്യപ്രദമായി ഇരിക്കുക. നമുക്ക് ഒരു ശാന്തമായ ശ്വാസത്തോടെ ആരംഭിക്കാം.",
+    "breathingComplete": "ശ്വാസക്രിയ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം ശാന്തമായിരിക്കൂ.",
+    "corpsePoseSubtitle": "ശരീരം പൂർണ്ണമായി ഭൂമിക്ക് വിട്ടു നൽകുക",
+    "yogaSubtitle": "ശ്വാസവും ചലനവും ആത്മാവും തമ്മിലുള്ള ഐക്യം",
+    "breatheInterval": "അല്പം വിശ്രമിക്കൂ... ശ്വസിക്കൂ... അടുത്ത ചക്രത്തിനായി തയ്യാറെടുക്കൂ",
+    "breathingSteps": [
+      { "text": "ശ്വാസം ഉള്ളിലേക്ക് എടുക്കുക", "scale": 8 },
+      { "text": "", "scale": 8 },
+      { "text": "ശ്വാസം പുറത്തേക്ക് വിടുക", "scale": 1 },
+      { "text": "", "scale": 1 }
+    ],
+    "musicOnly": "സംഗീതം മാത്രം",
+    "breathe": "ശ്വസിക്കൂ",
+    "silence": "നിശ്ശബ്ദത",
+    "body": "ശരീരം",
+    "hold": "നിർത്തുക"
+  }
+}

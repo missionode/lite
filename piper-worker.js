@@ -20,7 +20,7 @@ function reportProgress(requestId, progress) {
     });
 }
 
-async function getSession(voiceId, requestId) {
+async function getSession(voiceId, requestId, voiceDefinition = {}) {
     if (!voiceId) throw new Error('Piper voice is required.');
     if (activeVoiceId && activeVoiceId !== voiceId) {
         throw new Error('Piper worker voice changed; restart the worker.');
@@ -30,6 +30,9 @@ async function getSession(voiceId, requestId) {
         const piper = await loadPiper();
         sessionPromise = piper.TtsSession.create({
             voiceId,
+            modelPath: voiceDefinition.modelPath,
+            configPath: voiceDefinition.configPath,
+            phonemizerVoice: voiceDefinition.phonemizerVoice,
             progress: (progress) => reportProgress(requestId, progress)
         });
     }
@@ -39,7 +42,7 @@ async function getSession(voiceId, requestId) {
 
 self.onmessage = async (event) => {
     const message = event.data || {};
-    const { type, requestId, voiceId } = message;
+    const { type, requestId, voiceId, voiceDefinition } = message;
 
     if (type === 'cancel') {
         if (requestId) cancelledRequests.add(requestId);
@@ -48,7 +51,7 @@ self.onmessage = async (event) => {
 
     try {
         if (type === 'warmup') {
-            await getSession(voiceId, requestId);
+            await getSession(voiceId, requestId, voiceDefinition);
             self.postMessage({ type: 'ready', requestId, voiceId });
             return;
         }
@@ -58,7 +61,7 @@ self.onmessage = async (event) => {
                 self.postMessage({ type: 'audio', requestId, audio: null });
                 return;
             }
-            const { session } = await getSession(voiceId, requestId);
+            const { session } = await getSession(voiceId, requestId, voiceDefinition);
             if (cancelledRequests.has(requestId)) {
                 cancelledRequests.delete(requestId);
                 return;

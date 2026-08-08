@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.50">
+    <link rel="stylesheet" href="style.css?v=1.52">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -29,15 +29,18 @@
 
         <!-- Configuration Screen -->
         <section id="config-screen" class="screen settings-screen-container">
-            <h1>Chakra Meditation</h1>
+            <div class="settings-title-row">
+                <h1 id="app-title">Chakra Meditation</h1>
+                <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
+            </div>
             <p class="subtitle">Set your preferences for a guided experience</p>
             
             <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
-                Journeys: <span id="stat-journeys">0</span> | Total Time: <span id="stat-time">0</span> mins
+                <span data-i18n="ui.journeys">Journeys</span>: <span id="stat-journeys">0</span> | <span data-i18n="ui.totalTime">Total Time</span>: <span id="stat-time">0</span> <span data-i18n="ui.minutes">mins</span>
             </div>
 
             <div class="config-group">
-                <label for="language-select">Language</label>
+                <label for="language-select">Meditation Language</label>
                 <select id="language-select">
                     <option value="ml">Malayalam</option>
                     <option value="en">English</option>
@@ -45,7 +48,15 @@
             </div>
 
             <div class="config-group">
-                <label for="voice-select">Narration Voice</label>
+                <label for="display-language-select">Display Language</label>
+                <select id="display-language-select">
+                    <option value="en">English</option>
+                    <option value="ml">Malayalam</option>
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label for="voice-select" data-i18n="ui.narrationVoice">Narration Voice</label>
                 <select id="voice-select">
                     <option value="piper:ml_IN-arjun-medium">Piper Malayalam — Arjun (Medium)</option>
                 </select>
@@ -54,34 +65,34 @@
             </div>
 
             <div class="config-group" style="margin-top: 1rem;">
-                <label>Custom Journey</label>
+                <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <div id="chakra-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
-                    <label class="checkbox-label"><input type="checkbox" value="root" checked> Root</label>
-                    <label class="checkbox-label"><input type="checkbox" value="sacral" checked> Sacral</label>
-                    <label class="checkbox-label"><input type="checkbox" value="solar" checked> Solar</label>
-                    <label class="checkbox-label"><input type="checkbox" value="heart" checked> Heart</label>
-                    <label class="checkbox-label"><input type="checkbox" value="throat" checked> Throat</label>
-                    <label class="checkbox-label"><input type="checkbox" value="thirdeye" checked disabled> 3rd Eye</label>
-                    <label class="checkbox-label"><input type="checkbox" value="crown" checked disabled> Crown</label>
+                    <label class="checkbox-label"><input type="checkbox" value="root" checked> <span data-i18n="ui.root">Root</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral" checked> <span data-i18n="ui.sacral">Sacral</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar" checked> <span data-i18n="ui.solar">Solar</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart" checked> <span data-i18n="ui.heart">Heart</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat" checked> <span data-i18n="ui.throat">Throat</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye" checked disabled> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown" checked disabled> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
+                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
+                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
             </div>
 
-            <div class="config-group" style="margin-top: 1rem;">
-                <label>Options</label>
-                <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> Enable Audio Filters (Warmth)</label>
-                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.guidedPractices">Guided Practices</label>
                 <label class="checkbox-label"><input type="checkbox" id="box-meditation-toggle"> Box Meditation</label>
                 <label class="checkbox-label"><input type="checkbox" id="hooponopono-toggle"> Ho'oponopono</label>
-                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
-                <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> Eyes Close Mode (Warmth/Comfort)</label>
-                <label class="checkbox-label"><input type="checkbox" id="bg-music-mode-toggle"> Background Music Mode</label>
-                <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle" checked> Enable Corpse Pose (Savasana)</label>
-                
+            </div>
+
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.yogaSection">Yoga Bridge</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
                     
                     <div id="yoga-sub-options" style="display:none; flex-direction: column; gap: 10px; margin-top: 10px;">
-                        <p class="yoga-flow-note">Bath runs first, followed by Yoga, then the journey continues to Crown.</p>
+                        <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle"> Enable Corpse Pose (Savasana)</label>
+                        <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Bath runs first, followed by Yoga, then the journey continues to Crown.</p>
                         <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
@@ -90,35 +101,54 @@
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="ananda_balasana" checked> Ananda Balasana</label>
                         </div>
                         <div class="yoga-timing-controls settings-panel">
-                            <label>Yoga Timing</label>
+                            <label data-i18n="ui.yogaTiming">Yoga Timing</label>
                             <div class="mixer-row" id="row-yoga-prep">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;">Preparation</label>
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.preparation">Preparation</label>
                                 <input type="range" id="time-yoga-prep" min="10" max="120" step="5" value="60">
                                 <span id="display-yoga-prep" style="font-size: 0.7rem; width: 40px;">60s</span>
                             </div>
                             <div class="mixer-row" id="row-yoga-pose">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;">Per Pose</label>
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perPose">Per Pose</label>
                                 <input type="range" id="time-yoga-pose" min="30" max="300" step="10" value="60">
                                 <span id="display-yoga-pose" style="font-size: 0.7rem; width: 40px;">60s</span>
                             </div>
+                            <div class="mixer-row" id="row-corpse">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.corpsePose">Corpse Pose</label>
+                                <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
+                                <span id="display-corpse" style="font-size: 0.7rem; width: 40px;">300s</span>
+                            </div>
                             <label class="checkbox-label"><input type="checkbox" id="bath-session-toggle"> Enable Bath Session</label>
                             <div class="mixer-row" id="row-bath">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;">Bath Duration</label>
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.bathDuration">Bath Duration</label>
                                 <input type="range" id="time-bath" min="60" max="1800" step="60" value="600">
                                 <span id="display-bath" style="font-size: 0.7rem; width: 40px;">10m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="perineal-care-toggle"> Perineal Care</label>
+                            <div class="mixer-row" id="row-perineal-care">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perinealCareDuration">Perineal Duration</label>
+                                <input type="range" id="time-perineal-care" min="30" max="900" step="30" value="300">
+                                <span id="display-perineal-care" style="font-size: 0.7rem; width: 40px;">5m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="assisted-bathing-toggle"> Assisted Bathing</label>
+                            <div class="mixer-row" id="row-assisted-bathing">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.assistedBathingDuration">Assisted Duration</label>
+                                <input type="range" id="time-assisted-bathing" min="60" max="1800" step="60" value="600">
+                                <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="massage-toggle"> Massage</label>
+                            <div class="mixer-row" id="row-massage">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.massageDuration">Massage Duration</label>
+                                <input type="range" id="time-massage" min="60" max="1800" step="60" value="600">
+                                <span id="display-massage" style="font-size: 0.7rem; width: 40px;">10m</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div style="margin-top: 10px; width: 100%;">
-                    <label style="font-size: 0.75rem; opacity: 0.6; display: block; margin-bottom: 5px;">Screen Brightness</label>
-                    <input type="range" id="brightness-slider" min="0.1" max="1" step="0.05" value="1" style="width: 100%;">
-                </div>
             </div>
 
             <div class="config-group" style="margin-top: 1rem;">
-                <label>Presiding Deities</label>
+                <label data-i18n="ui.presidingDeities">Presiding Deities</label>
                 <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
                     <label class="radio-label"><input type="radio" name="deity-path" value="none" checked> None</label>
                     <label class="radio-label"><input type="radio" name="deity-path" value="shakthi"> Shakti (Feminine)</label>
@@ -130,62 +160,31 @@
                 💡 For best results, enable <b>Do Not Disturb</b> on your device to block notifications.
             </p>
 
-            <div class="config-group settings-panel">
-                <label>Audio Levels</label>
-                <div class="settings-mixer">
-                    <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Voice</label>
-                        <input type="range" id="settings-vol-voice" min="0" max="2" step="0.1" value="1.1">
-                    </div>
-                    <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Drone</label>
-                        <input type="range" id="settings-vol-drone" min="0" max="0.2" step="0.01" value="0.01">
-                    </div>
-                    <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Bell</label>
-                        <input type="range" id="settings-vol-bell" min="0" max="1" step="0.1" value="0.05">
-                    </div>
-                    <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Mantra</label>
-                        <input type="range" id="settings-vol-mantra" min="0" max="1" step="0.05" value="0.45">
-                    </div>
-                    <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 60px; text-align: left;">Music</label>
-                        <input type="range" id="settings-vol-music" min="0" max="0.5" step="0.01" value="0.20">
-                    </div>
-                </div>
-            </div>
-
             <!-- New Timings Settings -->
             <div class="config-group settings-panel">
-                <label>Journey Timings</label>
+                <label data-i18n="ui.journeyTimings">Journey Timings</label>
                 <div class="settings-mixer">
                     <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Arriving</label>
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;" data-i18n="ui.arriving">Arriving</label>
                         <input type="range" id="time-icebreaker" min="10" max="120" step="5" value="60">
                         <span id="display-icebreaker" style="font-size: 0.7rem; width: 30px;">60s</span>
                     </div>
                     <div class="mixer-row" id="row-breathing" style="display:none;">
-                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Breathing</label>
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;" data-i18n="ui.breathing">Breathing</label>
                         <input type="range" id="time-breathing" min="4" max="16" step="1" value="8">
                         <span id="display-breathing" style="font-size: 0.7rem; width: 30px;">8s</span>
                     </div>
-                    <div class="mixer-row" id="row-corpse">
-                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Corpse Pose</label>
-                        <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
-                        <span id="display-corpse" style="font-size: 0.7rem; width: 30px;">300s</span>
-                    </div>
                     <div class="mixer-row">
-                        <label style="font-size: 0.8rem; width: 80px; text-align: left;">Interval</label>
-                        <input type="range" id="time-interval" min="2" max="20" step="1" value="9">
-                        <span id="display-interval" style="font-size: 0.7rem; width: 30px;">9s</span>
+                        <label style="font-size: 0.8rem; width: 80px; text-align: left;" data-i18n="ui.interval">Interval</label>
+                        <input type="range" id="time-interval" min="10" max="20" step="1" value="10">
+                        <span id="display-interval" style="font-size: 0.7rem; width: 30px;">10s</span>
                     </div>
                 </div>
             </div>
 
             <!-- New Script Selection -->
             <div class="config-group settings-panel">
-                <label>Script Selection</label>
+                <label data-i18n="ui.scriptSelection">Script Selection</label>
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                     <select id="script-source-select" style="width: 100%; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 5px; outline: none;">
                         <option value="default">Default (scripts.json)</option>
@@ -209,32 +208,65 @@
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
         </section>
 
+        <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
+            <div class="modal-content settings-help-content">
+                <button id="settings-help-close" class="sleep-mode-prompt-close" type="button" aria-label="Close help" data-i18n-aria-label="ui.close">×</button>
+                <h2 id="settings-help-title" data-i18n="ui.settingsHelpTitle">How this journey works</h2>
+                <div class="settings-help-list">
+                    <p data-i18n="ui.settingsHelpLanguages">Meditation Language controls the narration. Display Language controls the visible interface.</p>
+                    <p data-i18n="ui.settingsHelpChakras">Chakra Journey chooses the centers included. Reverse Journey changes the direction; Third Eye and Crown remain the closing centers.</p>
+                    <p data-i18n="ui.settingsHelpYoga">Yoga Bridge adds the physical sequence. Corpse Pose, massage, perineal care, assisted bathing, and standard bathing are optional stages managed there.</p>
+                    <p data-i18n="ui.settingsHelpModes">Music Only and High Energy are selected in the Lobby. High Energy is available from 3:30 AM to 12:00 PM; after 6 PM, Sleep Mode is offered at journey start.</p>
+                    <p data-i18n="ui.settingsHelpSave">Save the settings to enter the Lobby. You can review the final mode and timing there before beginning.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Lobby Screen -->
         <section id="lobby-screen" class="screen hidden">
             <h1 id="lobby-title">Meditation Room</h1>
             <div class="time-selector">
-                <label for="time-per-chakra">Time per Session (minutes)</label>
+                <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
                 <span id="time-display">5.0 mins</span>
             </div>
 
-            <!-- Intention Seed -->
-            <div class="config-group" style="margin-top: 1rem;">
-                <label for="intention-input" id="intention-label">What are you calling in today?</label>
-                <input type="text" id="intention-input" value="സമാധാനം" placeholder="e.g. abundance, clarity, love..." autocomplete="off">
+            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control">
+                <label for="time-high-energy" data-i18n="ui.hrimActivationDuration">HRIM Activation Duration (minutes)</label>
+                <input type="range" id="time-high-energy" min="1" max="30" value="5" step="1">
+                <span id="high-energy-time-display">5 mins</span>
             </div>
 
-            <!-- High Energy Mode Toggle -->
-            <div class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; gap: 1.5rem; justify-content: center;">
+            <!-- Intention Seed -->
+            <div class="config-group" style="margin-top: 1rem;">
+                <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
+                <input type="text" id="intention-input" value="" placeholder="e.g. peace, clarity, gentle strength..." autocomplete="off">
+            </div>
+
+            <!-- Session preferences -->
+            <div class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
-                    <input type="checkbox" id="high-energy-toggle"> High Energy (HRIM)
+                    <input type="checkbox" id="returning-journey-toggle">
+                    <span id="returning-journey-label">Returning Journey</span>
                 </label>
-                <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
-                    <input type="checkbox" id="sleep-mode-toggle"> 🌙 Sleep Mode
-                </label>
+            </div>
+
+            <div class="config-group lobby-experience-mode">
+                <label data-i18n="ui.experienceMode">Experience Mode</label>
+                <div class="experience-mode-options">
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="high-energy-toggle">
+                        <span data-i18n="ui.highEnergy">High Energy (HRIM)</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="music-only-toggle">
+                        <span data-i18n="ui.musicOnlyMode">Music Only</span>
+                    </label>
+                </div>
             </div>
 
             <div id="session-estimate">~ 36 mins</div>
+            <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
             <div class="lobby-actions">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
@@ -287,29 +319,42 @@
             </div>
         </section>
 
-        <!-- Global In-Session Volume Mixer -->
-        <div id="volume-mixer" class="hidden" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 2000;">
-            <div class="mixer-row">
-                <label>Voice</label>
-                <input type="range" id="vol-voice" min="0" max="1" step="0.1" value="1.0">
+        <!-- Full-screen in-session tuning panel -->
+        <div id="volume-mixer" class="hidden" role="dialog" aria-modal="true" aria-labelledby="mixer-title">
+            <div class="mixer-dialog">
+                <div class="mixer-header">
+                    <h2 id="mixer-title" data-i18n="ui.mixerTitle">Journey Tuning</h2>
+                    <button id="close-mixer" class="mixer-close" type="button" data-i18n-aria-label="ui.close">×</button>
+                </div>
+                <p class="mixer-subtitle" data-i18n="ui.mixerSubtitle">Tune the sound and comfort for this journey.</p>
+
+                <div class="mixer-section">
+                    <label class="mixer-section-title" data-i18n="ui.audioLevels">Audio Levels</label>
+                    <div class="mixer-row"><label data-i18n="ui.voice">Voice</label><input type="range" id="vol-voice" min="0" max="2" step="0.1" value="1.0"></div>
+                    <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.01"></div>
+                    <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5"></div>
+                    <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8"></div>
+                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15"></div>
+                </div>
+
+                <div class="mixer-section">
+                    <label class="mixer-section-title" data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
+                    <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> <span data-i18n="ui.audioFilters">Enable Audio Filters (Warmth)</span></label>
+                    <label class="checkbox-label"><input type="checkbox" id="eyes-close-mode-toggle"> <span data-i18n="ui.eyesCloseMode">Eyes Close Mode (Warmth/Comfort)</span></label>
+                    <label class="mixer-brightness-label" for="brightness-slider" data-i18n="ui.screenBrightness">Screen Brightness</label>
+                    <input type="range" id="brightness-slider" min="0.1" max="1" step="0.05" value="1">
+                </div>
+
+                <div class="mixer-section">
+                    <label class="checkbox-label"><input type="checkbox" id="mixer-frequencies-toggle"> <span data-i18n="ui.mixerFrequencies">Use Chakra Frequencies (Solfeggio)</span></label>
+                    <p class="mixer-note" data-i18n="ui.mixerFrequencyNote">Changes apply from the next sound stage.</p>
+                </div>
+
+                <div class="mixer-actions">
+                    <button id="restart-meditation" class="secondary-btn" type="button" data-i18n="ui.restartJourney">Restart Journey</button>
+                    <button id="close-mixer-bottom" class="secondary-btn" type="button" data-i18n="ui.close">Close</button>
+                </div>
             </div>
-            <div class="mixer-row">
-                <label>Drone</label>
-                <input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.01">
-            </div>
-            <div class="mixer-row">
-                <label>Bell</label>
-                <input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5">
-            </div>
-            <div class="mixer-row">
-                <label>Mantra</label>
-                <input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8">
-            </div>
-            <div class="mixer-row">
-                <label>Music</label>
-                <input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15">
-            </div>
-            <button id="close-mixer" class="secondary-btn" style="margin-top:1rem; width: 100%;">Close</button>
         </div>
 
         <!-- Global In-Session Controls (visible across all meditation screens) -->
@@ -317,6 +362,30 @@
             <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
             <button id="pause-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">II</button>
             <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
+        </div>
+
+        <div id="sleep-mode-prompt" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sleep-mode-prompt-title">
+            <div class="modal-content sleep-mode-prompt-content">
+                <button id="sleep-mode-prompt-close" class="sleep-mode-prompt-close" type="button" aria-label="Close and skip this journey" data-i18n-aria-label="ui.sleepModeClose">×</button>
+                <h2 id="sleep-mode-prompt-title" data-i18n="ui.sleepModePromptTitle">Evening journey</h2>
+                <p id="sleep-mode-prompt-text" data-i18n="ui.sleepModePrompt">It is evening. Would you like to use Sleep Mode for this journey?</p>
+                <div class="modal-actions sleep-mode-prompt-actions">
+                    <button id="sleep-mode-enable" class="primary-btn" data-i18n="ui.sleepModeEnable">Continue with Sleep Mode</button>
+                    <button id="sleep-mode-disable" class="secondary-btn" data-i18n="ui.sleepModeDisable">Continue without Sleep Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="hrim-time-block-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="hrim-time-block-title">
+            <div class="modal-content hrim-time-block-content">
+                <button id="hrim-time-block-close" class="sleep-mode-prompt-close" type="button" aria-label="Return to Lobby" data-i18n-aria-label="ui.hrimTimeBlockLobby">×</button>
+                <h2 id="hrim-time-block-title" data-i18n="ui.hrimTimeBlockTitle">HRIM daytime guidance</h2>
+                <p id="hrim-time-block-message" data-i18n="ui.hrimTimeBlockMessage">HRIM is available from 3:30 AM to 12:00 PM for daytime energy and healthy rest.</p>
+                <div class="hrim-time-block-actions">
+                    <button id="hrim-time-block-lobby" class="secondary-btn" type="button" data-i18n="ui.hrimTimeBlockLobby">Return to Lobby</button>
+                    <button id="hrim-time-block-regular" class="primary-btn" type="button" data-i18n="ui.hrimTimeBlockRegular">Continue with regular meditation</button>
+                </div>
+            </div>
         </div>
 
         <!-- Completion Modal -->
@@ -349,6 +418,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.51"></script>
+    <script src="app.js?v=1.54"></script>
 </body>
 </html>

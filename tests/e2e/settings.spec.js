@@ -1,0 +1,286 @@
+const { test, expect } = require('@playwright/test');
+
+const fastProfile = '/?timingProfile=fast-test';
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("e2e-initialized")) {
+      localStorage.clear();
+      sessionStorage.setItem("e2e-initialized", "true");
+    }
+  });
+  await page.goto(fastProfile);
+  await expect(page.locator('#config-screen')).toBeVisible();
+  await expect(page.locator('#splash-screen')).toBeHidden();
+});
+
+test('keeps meditation language and display language independent', async ({ page }) => {
+  await expect(page.locator('#app-title')).toHaveText('Chakra Meditation');
+
+  await page.selectOption('#language-select', 'ml');
+  await expect(page.locator('#app-title')).toHaveText('Chakra Meditation');
+  await expect(page.locator('label[for="display-language-select"]')).toHaveText('Display Language');
+
+  await page.selectOption('#display-language-select', 'ml');
+  await expect(page.locator('#app-title')).toHaveText('ചക്ര ധ്യാനം');
+
+  await page.selectOption('#language-select', 'en');
+  await expect(page.locator('#app-title')).toHaveText('ചക്ര ധ്യാനം');
+
+  await page.selectOption('#display-language-select', 'en');
+  await expect(page.locator('#app-title')).toHaveText('Chakra Meditation');
+});
+
+test('loads fast-test timing profile into controls', async ({ page }) => {
+  await expect(page.locator('#time-icebreaker')).toHaveAttribute('min', '1');
+  await expect(page.locator('#time-yoga-pose')).toHaveAttribute('max', '5');
+  await expect(page.locator('#time-bath')).toHaveAttribute('max', '5');
+  await expect(page.locator('#time-massage')).toHaveAttribute('min', '1');
+  await expect(page.locator('#time-per-chakra')).toHaveAttribute('min', '0.1');
+  await expect(page.locator('#time-high-energy')).toHaveAttribute('min', '0.1');
+  await expect(page.locator('#time-high-energy')).toHaveAttribute('max', '1');
+  await expect(page.locator('#time-interval')).toHaveAttribute('min', '2');
+  await expect(page.locator('#time-interval')).toHaveValue('2');
+});
+
+test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
+  await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
+  await expect(page.locator('#reverse-journey-toggle').locator('..')).toContainText('Reverse Journey');
+  await expect(page.locator('.config-group').filter({ hasText: 'Guided Practices' })).toContainText('Box Meditation');
+  await expect(page.locator('#volume-mixer')).toContainText('Comfort & Visuals');
+  await expect(page.locator('#audio-filters-toggle')).toHaveCount(1);
+  await expect(page.locator('#settings-help-button')).toBeVisible();
+  await page.locator('#settings-help-button').click();
+  await expect(page.locator('#settings-help-modal')).toBeVisible();
+  await page.locator('#settings-help-close').click();
+  await expect(page.locator('#settings-help-modal')).toBeHidden();
+});
+
+test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
+  await page.locator('#box-meditation-toggle').check();
+  await page.locator('#yoga-bridge-toggle').check();
+  await page.locator('#bath-session-toggle').check();
+  await page.locator('#massage-toggle').check();
+  await page.locator('#perineal-care-toggle').check();
+  await page.locator('#assisted-bathing-toggle').check();
+  await page.locator('#hooponopono-toggle').check();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#journey-roadmap')).toHaveText(
+    'Arrival » Intention » Breathing » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing » Ho\'oponopono'
+  );
+
+  await page.locator('#high-energy-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Intention » HRIM » Closing');
+  await page.locator('#music-only-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
+});
+
+test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
+  page.on('dialog', async dialog => {
+    if (dialog.type() === 'confirm') await dialog.accept();
+    else await dialog.dismiss();
+  });
+
+  await page.locator('#save-config').click();
+  await page.locator('#start-meditation').click();
+  const sleepPrompt = page.locator('#sleep-mode-prompt');
+  if (await sleepPrompt.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await page.locator('#sleep-mode-disable').click();
+  }
+  await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+
+  await page.locator('#btn-mixer').click();
+  const mixer = page.locator('#volume-mixer');
+  await expect(mixer).toBeVisible();
+  await expect(mixer).toHaveCSS('position', 'fixed');
+  await expect(page.locator('#audio-filters-toggle')).toBeVisible();
+  await expect(page.locator('#eyes-close-mode-toggle')).toBeVisible();
+  await expect(page.locator('#mixer-frequencies-toggle')).toBeVisible();
+
+  await page.locator('#audio-filters-toggle').check();
+  await page.locator('#eyes-close-mode-toggle').check();
+  await page.locator('#mixer-frequencies-toggle').check();
+  await expect(page.locator('#frequencies-toggle')).toBeChecked();
+  await page.locator('#vol-voice').fill('0.6');
+  await page.locator('#vol-voice').dispatchEvent('input');
+  await expect(page.locator('#vol-voice')).toHaveValue('0.6');
+
+  await page.locator('#close-mixer-bottom').click();
+  await expect(mixer).toBeHidden();
+  await page.locator('#btn-mixer').click();
+  await page.locator('#restart-meditation').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible({ timeout: 10000 });
+  const restartSleepPrompt = page.locator('#sleep-mode-prompt');
+  try {
+    await expect(restartSleepPrompt).toBeVisible({ timeout: 3000 });
+    await page.locator('#sleep-mode-disable').click();
+  } catch {
+    // Daytime journeys do not show the evening Sleep Mode choice.
+  }
+  await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#lobby-screen')).toBeHidden();
+});
+
+test('keeps the Corpse Pose timing slider synchronized', async ({ page }) => {
+  const corpse = page.locator('#time-corpse');
+  await expect(corpse).toHaveAttribute('min', '1');
+  await expect(corpse).toHaveAttribute('max', '5');
+  await expect(page.locator('.yoga-timing-controls #row-corpse')).toHaveCount(1);
+  await page.locator('#yoga-bridge-toggle').check();
+  await page.locator('#corpse-pose-toggle').check();
+  await expect(page.locator('#row-corpse')).toHaveCSS('display', 'grid');
+  await corpse.fill('4');
+  await corpse.dispatchEvent('input');
+  await expect(corpse).toHaveValue('4');
+  await expect(page.locator('#display-corpse')).toHaveText('4s');
+  await expect(page.locator('#row-corpse .range-current')).toHaveText('4s');
+
+  await page.reload();
+  await expect(page.locator('#time-corpse')).toHaveValue('4');
+  await expect(page.locator('#display-corpse')).toHaveText('4s');
+});
+
+test('loads the production Corpse Pose timing range', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#config-screen')).toBeVisible();
+  const corpse = page.locator('#time-corpse');
+  await expect(corpse).toHaveAttribute('min', '60');
+  await expect(corpse).toHaveAttribute('max', '600');
+  await expect(corpse).toHaveAttribute('step', '30');
+});
+
+test('uses experiential benefit language for chakra narration', async ({ page }) => {
+  const content = await page.evaluate(async () => (await fetch('/scripts.json')).json());
+  for (const key of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy', 'closing']) {
+    expect(content[key].meditation_en).toBeTruthy();
+    expect(content[key].meditation_ml).toBeTruthy();
+  }
+  expect(content.root.meditation_en).not.toMatch(/adrenal|immune|organ|gland/i);
+  expect(content.solar.meditation_en).not.toMatch(/stomach|liver|pancreas|digest/i);
+  expect(content.high_energy.meditation_en).not.toMatch(/adrenal|pineal|digest|gland/i);
+  expect(content.closing.meditation_en).not.toMatch(/organ|cell|lymph|blood|gland/i);
+});
+
+test('persists the independent HRIM duration from the Lobby', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+
+  await page.locator('#high-energy-toggle').check();
+  await expect(page.locator('#high-energy-duration-control')).toBeVisible();
+  await expect(page.locator('#time-per-chakra').locator('..')).toBeHidden();
+
+  const duration = page.locator('#time-high-energy');
+  await duration.fill('0.8');
+  await duration.dispatchEvent('input');
+  await expect(duration).toHaveValue('0.8');
+
+  await page.reload();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#high-energy-toggle')).toBeChecked();
+  await expect(page.locator('#time-high-energy')).toHaveValue('0.8');
+});
+
+test('switches the generated intention for HRIM and preserves custom text', async ({ page }) => {
+  const intention = page.locator('#intention-input');
+  await page.selectOption('#language-select', 'en');
+  await expect(intention).toHaveValue('Peace, clarity, and gentle strength');
+
+  await page.locator('#save-config').click();
+  await page.locator('#high-energy-toggle').check();
+  await expect(intention).toHaveValue('Focused energy, courage, and clear action');
+
+  await page.locator('#high-energy-toggle').uncheck();
+  await expect(intention).toHaveValue('Peace, clarity, and gentle strength');
+
+  await intention.fill('A short custom intention.');
+  await page.locator('#high-energy-toggle').check();
+  await expect(intention).toHaveValue('A short custom intention.');
+  await page.locator('#high-energy-toggle').uncheck();
+  await expect(intention).toHaveValue('A short custom intention.');
+});
+
+test('offers the Sleep Mode decision before an evening journey', async ({ page }) => {
+  await page.evaluate(() => {
+    const NativeDate = Date;
+    const evening = new NativeDate(2026, 7, 8, 19, 0, 0).getTime();
+    window.Date = class extends NativeDate {
+      constructor(...args) { if (args.length) super(...args); else super(evening); }
+      static now() { return evening; }
+    };
+  });
+  page.on('dialog', dialog => dialog.dismiss());
+
+  await page.locator('#save-config').click();
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#sleep-mode-prompt')).toBeVisible();
+  await expect(page.locator('#sleep-mode-enable')).toBeVisible();
+  await expect(page.locator('#sleep-mode-disable')).toBeVisible();
+  await expect(page.locator('#sleep-mode-prompt-close')).toBeVisible();
+  await page.locator('#sleep-mode-prompt-close').click();
+  await expect(page.locator('#sleep-mode-prompt')).toBeHidden();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+});
+
+test('blocks HRIM outside the daytime window before starting audio', async ({ page }) => {
+  await page.evaluate(() => {
+    const NativeDate = Date;
+    const blockedTime = new NativeDate(2026, 7, 8, 13, 0, 0).getTime();
+    window.Date = class extends NativeDate {
+      constructor(...args) { if (args.length) super(...args); else super(blockedTime); }
+      static now() { return blockedTime; }
+    };
+  });
+  await page.locator('#save-config').click();
+  await page.locator('#high-energy-toggle').check();
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#hrim-time-block-modal')).toBeVisible();
+  await expect(page.locator('#hrim-time-block-message')).toContainText('3:30 AM');
+  await page.locator('#hrim-time-block-lobby').click();
+  await expect(page.locator('#hrim-time-block-modal')).toBeHidden();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+});
+
+test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {
+  const yoga = page.locator('#yoga-bridge-toggle');
+  const bath = page.locator('#bath-session-toggle');
+  const massage = page.locator('#massage-toggle');
+  const perineal = page.locator('#perineal-care-toggle');
+  const assisted = page.locator('#assisted-bathing-toggle');
+
+  await expect(bath).toBeDisabled();
+  await expect(massage).toBeDisabled();
+
+  await yoga.check();
+  await bath.check();
+  await expect(massage).toBeEnabled();
+  await expect(perineal).toBeEnabled();
+  await expect(assisted).toBeEnabled();
+
+  await massage.check();
+  await perineal.check();
+  await assisted.check();
+  await expect(page.locator('#row-massage')).toBeVisible();
+  await expect(page.locator('#row-perineal-care')).toBeVisible();
+  await expect(page.locator('#row-assisted-bathing')).toBeVisible();
+  await expect(page.locator('#row-bath')).toBeHidden();
+
+  await yoga.uncheck();
+  await expect(bath).not.toBeChecked();
+  await expect(massage).not.toBeChecked();
+  await expect(perineal).not.toBeChecked();
+  await expect(assisted).not.toBeChecked();
+  await expect(massage).toBeDisabled();
+});
+
+test('persists timing changes through settings reload', async ({ page }) => {
+  await page.locator("#yoga-bridge-toggle").check();
+  await page.locator("#bath-session-toggle").check();
+  const bath = page.locator('#time-bath');
+  await bath.fill('3');
+  await bath.dispatchEvent('input');
+  await expect(bath).toHaveValue('3');
+
+  await page.reload();
+  await expect(page.locator('#time-bath')).toHaveValue('3');
+});
