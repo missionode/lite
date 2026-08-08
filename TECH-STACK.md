@@ -58,6 +58,20 @@ Remaining migration work: move all remaining user-visible controller strings int
 
 The Lobby exposes a `Returning Journey` preference for selecting the timeless sea/ocean opening. It is persisted independently from `state.stats.journeys`, which remains the completed-journey statistic; when no preference has been saved, the toggle defaults on for users with prior completed journeys.
 
+Display localization is intentionally independent from meditation content: `language-select` controls narration and content, while `display-language-select` controls the visible interface and defaults to English. `t()` resolves UI copy through the display language; `contentT()` resolves system narration/in-session content through the meditation language.
+
+Bath/Yoga extension behavior: `Enable Bath Session` remains the master switch. Optional Perineal Care and Assisted Bathing have independent persisted durations and localized scripts. Perineal Care may precede the standard bath; selecting Assisted Bathing replaces the standard bath, so both add-ons execute as `Perineal Care → Assisted Bathing → Yoga`.
+
+Massage is an additional optional Bath Session add-on with an independent persisted duration. It always runs before Perineal Care and the bathing stage; the full add-on order is `Massage → Perineal Care → Assisted Bathing → Yoga`, with Assisted Bathing replacing the standard Bath Session.
+
+Journey timing configuration is centralized in [`timing-config.json`](./timing-config.json). It owns stage defaults/ranges, fixed journey transitions, narration pacing/safety buffers, and session-estimate constants. Audio-engine fades, filter ramps, and visual animation timers remain in their playback/visual layers rather than being treated as user journey durations.
+
+## End-to-end testing
+
+Playwright is the browser test runner for the static PWA. The suite lives in [`tests/e2e/settings.spec.js`](./tests/e2e/settings.spec.js) and [`tests/e2e/option-matrix.spec.js`](./tests/e2e/option-matrix.spec.js), and runs through the local static server configured in [`playwright.config.js`](./playwright.config.js). It covers display/content language separation, timing-profile loading, Yoga/Bath/add-on dependencies, timing persistence, all seven valid bath/add-on combinations, and seven representative global journey-mode combinations. The latest complete run passed 18/18 tests.
+
+Tests use `?timingProfile=fast-test`, defined in `timing-config.json`, so journey controls use short values without changing production defaults. The profile is selected at runtime by the app and is not enabled unless the query parameter is present. Functional tests block service workers for deterministic behavior; a separate PWA pass should run with service workers allowed to verify caching/offline behavior.
+
 ### Migration tracking
 
 - Active checklist: [`TEMP-MULTILINGUAL-ARCHITECTURE.md`](./TEMP-MULTILINGUAL-ARCHITECTURE.md)

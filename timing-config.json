@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "journey": {
+    "timePerChakra": { "default": 5, "min": 1, "max": 7, "step": 0.5, "unit": "minutes" },
+    "icebreaker": { "default": 60, "min": 10, "max": 120, "step": 5, "unit": "seconds" },
+    "breathingStep": { "default": 8, "min": 4, "max": 16, "step": 1, "unit": "seconds" },
+    "corpsePose": { "default": 300, "min": 60, "max": 600, "step": 30, "unit": "seconds" },
+    "interval": { "default": 9, "min": 2, "max": 20, "step": 1, "unit": "seconds" },
+    "yogaPreparation": { "default": 60, "min": 10, "max": 120, "step": 5, "unit": "seconds" },
+    "yogaPose": { "default": 60, "min": 30, "max": 300, "step": 10, "unit": "seconds" },
+    "bath": { "default": 600, "min": 60, "max": 1800, "step": 60, "unit": "seconds" },
+    "perinealCare": { "default": 300, "min": 30, "max": 900, "step": 30, "unit": "seconds" },
+    "assistedBathing": { "default": 600, "min": 60, "max": 1800, "step": 60, "unit": "seconds" },
+    "massage": { "default": 600, "min": 60, "max": 1800, "step": 60, "unit": "seconds" }
+  },
+  "transitions": {
+    "initialSettle": 2,
+    "openingPause": 1,
+    "postBreathing": 3,
+    "breathingPreparation": 5,
+    "breathingTutorialFade": 1,
+    "breathingCompletion": 5,
+    "corpseTransitionAt": 60,
+    "corpseFinalSettle": 3,
+    "yogaPoseGap": 5,
+    "yogaFinalSettle": 5,
+    "chakraPostMantra": 4,
+    "chakraLeadOut": 15,
+    "intervalPreparation": 2,
+    "closingFirstPause": 2,
+    "closingSecondPause": 3,
+    "hooponoponoIntroPause": 2,
+    "hooponoponoPhrasePause": 2,
+    "hooponoponoFinalRest": 15,
+    "finalSilence": 60
+  },
+  "narration": {
+    "piperLeadIn": 1.2,
+    "sentenceGap": 1.5,
+    "fadeOutPause": 2.5,
+    "browserSafetyPerCharacter": 200,
+    "browserSafetyBuffer": 3000
+  },
+  "estimate": {
+    "baseOverhead": 5,
+    "normalExtra": 7,
+    "highEnergyExtra": 3,
+    "chakraStageOverhead": 2,
+    "boxBreathingOverhead": 4,
+    "hooponoponoOverhead": 3,
+    "yogaPoseTransitionEstimate": 15
+  },
+  "profiles": {
+    "fast-test": {
+      "journey": {
+        "timePerChakra": { "default": 0.1, "min": 0.1, "max": 1, "step": 0.1, "unit": "minutes" },
+        "icebreaker": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "breathingStep": { "default": 1, "min": 1, "max": 2, "step": 1, "unit": "seconds" },
+        "corpsePose": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "interval": { "default": 1, "min": 1, "max": 2, "step": 1, "unit": "seconds" },
+        "yogaPreparation": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "yogaPose": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "bath": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "perinealCare": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "assistedBathing": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "massage": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" }
+      },
+      "transitions": {
+        "initialSettle": 0,
+        "openingPause": 0,
+        "postBreathing": 0,
+        "breathingPreparation": 1,
+        "breathingTutorialFade": 0,
+        "breathingCompletion": 0,
+        "corpseTransitionAt": 1,
+        "corpseFinalSettle": 0,
+        "yogaPoseGap": 0,
+        "yogaFinalSettle": 0,
+        "chakraPostMantra": 0,
+        "chakraLeadOut": 0,
+        "intervalPreparation": 0,
+        "closingFirstPause": 0,
+        "closingSecondPause": 0,
+        "hooponoponoIntroPause": 0,
+        "hooponoponoPhrasePause": 0,
+        "hooponoponoFinalRest": 0,
+        "finalSilence": 1
+      },
+      "narration": {
+        "piperLeadIn": 0,
+        "sentenceGap": 0,
+        "fadeOutPause": 0,
+        "browserSafetyPerCharacter": 1,
+        "browserSafetyBuffer": 100
+      },
+      "estimate": {
+        "baseOverhead": 0,
+        "normalExtra": 0,
+        "highEnergyExtra": 0,
+        "chakraStageOverhead": 0,
+        "boxBreathingOverhead": 0,
+        "hooponoponoOverhead": 0,
+        "yogaPoseTransitionEstimate": 0
+      }
+    }
+  }
+}

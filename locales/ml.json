@@ -3,6 +3,9 @@
   "ui": {
     "settingsSubtitle": "നയിക്കപ്പെടുന്ന അനുഭവത്തിനായി നിങ്ങളുടെ മുൻഗണനകൾ ക്രമീകരിക്കുക",
     "language": "ഭാഷ",
+    "meditationLanguage": "ധ്യാന ഭാഷ",
+    "displayLanguage": "പ്രദർശന ഭാഷ",
+    "chakraMeditation": "ചക്ര ധ്യാനം",
     "settings": "ക്രമീകരണങ്ങൾ",
     "previewVoice": "ശബ്ദം കേൾക്കുക",
     "saveSettings": "ക്രമീകരണങ്ങൾ സൂക്ഷിക്കുക",
@@ -49,6 +52,12 @@
     ,"corpsePoseOption": "ശവാസനം പ്രവർത്തനക്ഷമമാക്കുക"
     ,"yogaBridge": "യോഗ പാലം പ്രവർത്തനക്ഷമമാക്കുക (ശാരീരിക ഐക്യം)"
     ,"bathSession": "സ്നാന സെഷൻ പ്രവർത്തനക്ഷമമാക്കുക"
+    ,"perinealCare": "പെരിനിയൽ പരിചരണം"
+    ,"assistedBathing": "സഹായത്തോടെയുള്ള കുളി"
+    ,"perinealCareDuration": "പെരിനിയൽ സമയം"
+    ,"assistedBathingDuration": "സഹായത്തോടെയുള്ള കുളി സമയം"
+    ,"massage": "മസാജ്"
+    ,"massageDuration": "മസാജ് ദൈർഘ്യം"
     ,"highEnergy": "ഉയർന്ന ഊർജ്ജം (HRIM)"
     ,"sleepMode": "🌙 ഉറക്ക മോഡ്"
     ,"timePerSession": "ഓരോ സെഷന്റെയും സമയം (മിനിറ്റ്)"

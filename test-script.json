@@ -2,6 +2,8 @@
   "intro": {
     "gratitude_en": "Take one slow breath. You are safe. Begin now.",
     "gratitude_ml": "ഒരു സാവധാന ശ്വാസം എടുക്കൂ. നിങ്ങൾ സുരക്ഷിതരാണ്. ഇപ്പോൾ ആരംഭിക്കാം.",
+    "returning_en": "Welcome back. Let the sea guide your breath.",
+    "returning_ml": "വീണ്ടും സ്വാഗതം. കടലിന്റെ താളത്തിൽ ശ്വസിക്കൂ.",
     "moon": {
       "new_en": "New moon. Begin gently.",
       "new_ml": "പുതിയ ചന്ദ്രൻ. സാവധാനമായി ആരംഭിക്കാം.",
@@ -122,6 +124,24 @@
     "intro": { "en": "Begin the short bath stage.", "ml": "ചെറിയ സ്നാനഘട്ടം ആരംഭിക്കാം." },
     "instructions": { "en": "Let the water refresh you.", "ml": "ജലം നിങ്ങളെ ഉന്മേഷിപ്പിക്കട്ടെ." },
     "reminder": { "en": "One minute remains.", "ml": "ഒരു മിനിറ്റ് ബാക്കി." }
+  },
+  "perineal_care": {
+    "title": { "en": "Test Perineal Care", "ml": "പരീക്ഷണ പെരിനിയൽ പരിചരണം" },
+    "intro": { "en": "Begin private care gently.", "ml": "സ്വകാര്യ പരിചരണം സാവധാനമായി ആരംഭിക്കാം." },
+    "instructions": { "en": "Use warm water and pause when needed.", "ml": "ഇളം ചൂടുവെള്ളം ഉപയോഗിച്ച് ആവശ്യമെങ്കിൽ ഇടവേള എടുക്കൂ." },
+    "reminder": { "en": "One minute remains in private care.", "ml": "സ്വകാര്യ പരിചരണത്തിന് ഒരു മിനിറ്റ് ബാക്കി." }
+  },
+  "assisted_bathing": {
+    "title": { "en": "Test Assisted Bathing", "ml": "പരീക്ഷണ സഹായത്തോടെയുള്ള കുളി" },
+    "intro": { "en": "Begin assisted bathing with consent.", "ml": "സമ്മതത്തോടെ സഹായത്തോടെയുള്ള കുളി ആരംഭിക്കാം." },
+    "instructions": { "en": "Check comfort and water temperature.", "ml": "സുഖവും വെള്ളത്തിന്റെ ചൂടും പരിശോധിക്കൂ." },
+    "reminder": { "en": "One minute remains. Prepare for Yoga.", "ml": "ഒരു മിനിറ്റ് ബാക്കി. യോഗയ്ക്കായി തയ്യാറാകൂ." }
+  },
+  "massage": {
+    "title": { "en": "Test Gentle Massage", "ml": "പരീക്ഷണ സൌമ്യമായ മസാജ്" },
+    "intro": { "en": "Begin a gentle massage with consent.", "ml": "സമ്മതത്തോടെ സൌമ്യമായ മസാജ് ആരംഭിക്കാം." },
+    "instructions": { "en": "Use slow, comfortable movements.", "ml": "പതുക്കെയും സുഖകരമായും ചലിക്കൂ." },
+    "reminder": { "en": "One minute remains. Prepare for bathing.", "ml": "ഒരു മിനിറ്റ് ബാക്കി. കുളിക്കായി തയ്യാറാകൂ." }
   },
   "yoga": {
     "intro": { "en": "Begin the short Yoga Bridge.", "ml": "ചെറിയ യോഗ പാലം ആരംഭിക്കാം." },

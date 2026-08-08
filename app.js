@@ -106,6 +106,9 @@ function validateScriptBundle(scripts, options = {}) {
     if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.affirmation_${language}`]));
     if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
     if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
+    if (options.perinealCare) required.push(...languageIds.flatMap(language => [`perineal_care.title.${language}`, `perineal_care.intro.${language}`, `perineal_care.instructions.${language}`, `perineal_care.reminder.${language}`]));
+    if (options.assistedBathing) required.push(...languageIds.flatMap(language => [`assisted_bathing.title.${language}`, `assisted_bathing.intro.${language}`, `assisted_bathing.instructions.${language}`, `assisted_bathing.reminder.${language}`]));
+    if (options.massage) required.push(...languageIds.flatMap(language => [`massage.title.${language}`, `massage.intro.${language}`, `massage.instructions.${language}`, `massage.reminder.${language}`]));
     if (options.yoga) required.push(...languageIds.flatMap(language => [`yoga.intro.${language}`, `yoga.preparation.${language}`, `yoga.next_pose_prompt.${language}`, `yoga.session_complete.${language}`]), 'yoga.poses');
     if (options.hooponopono) required.push(...languageIds.flatMap(language => [`hooponopono.intro.${language}`, `hooponopono.phrases.${language}`, `hooponopono.closing.${language}`]));
     const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path));
@@ -116,6 +119,120 @@ let piperVoiceRegistry = [];
 let languageRegistry = [];
 let localeBundles = {};
 let fallbackLanguageId = 'en';
+let timingConfig = {
+    journey: {},
+    transitions: {},
+    narration: {},
+    estimate: {}
+};
+const timingFallbacks = {
+    'transitions.initialSettle': 2,
+    'transitions.openingPause': 1,
+    'transitions.postBreathing': 3,
+    'transitions.breathingPreparation': 5,
+    'transitions.breathingTutorialFade': 1,
+    'transitions.breathingCompletion': 5,
+    'transitions.corpseTransitionAt': 60,
+    'transitions.corpseFinalSettle': 3,
+    'transitions.yogaPoseGap': 5,
+    'transitions.yogaFinalSettle': 5,
+    'transitions.chakraPostMantra': 4,
+    'transitions.chakraLeadOut': 15,
+    'transitions.intervalPreparation': 2,
+    'transitions.closingFirstPause': 2,
+    'transitions.closingSecondPause': 3,
+    'transitions.hooponoponoIntroPause': 2,
+    'transitions.hooponoponoPhrasePause': 2,
+    'transitions.hooponoponoFinalRest': 15,
+    'transitions.finalSilence': 60,
+    'narration.piperLeadIn': 1.2,
+    'narration.sentenceGap': 1.5,
+    'narration.fadeOutPause': 2.5,
+    'narration.browserSafetyPerCharacter': 200,
+    'narration.browserSafetyBuffer': 3000,
+    'estimate.baseOverhead': 5,
+    'estimate.normalExtra': 7,
+    'estimate.highEnergyExtra': 3,
+    'estimate.boxBreathingOverhead': 4,
+    'estimate.hooponoponoOverhead': 3,
+    'estimate.chakraStageOverhead': 2,
+    'estimate.yogaPoseTransitionEstimate': 15
+};
+
+function timing(section, key, fallback = 0) {
+    const value = timingConfig[section]?.[key];
+    return value == null ? (timingFallbacks[`${section}.${key}`] ?? fallback) : value;
+}
+
+function timingDefault(key, fallback) {
+    return timingConfig.journey?.[key]?.default ?? fallback;
+}
+
+function mergeTimingProfile(base, profile) {
+    return ['journey', 'transitions', 'narration', 'estimate'].reduce((merged, section) => {
+        merged[section] = { ...(base[section] || {}), ...(profile[section] || {}) };
+        return merged;
+    }, { schemaVersion: base.schemaVersion });
+}
+
+function applyTimingControls() {
+    const controls = {
+        'time-per-chakra': 'timePerChakra',
+        'time-icebreaker': 'icebreaker',
+        'time-breathing': 'breathingStep',
+        'time-corpse': 'corpsePose',
+        'time-interval': 'interval',
+        'time-yoga-prep': 'yogaPreparation',
+        'time-yoga-pose': 'yogaPose',
+        'time-bath': 'bath',
+        'time-perineal-care': 'perinealCare',
+        'time-assisted-bathing': 'assistedBathing',
+        'time-massage': 'massage'
+    };
+    Object.entries(controls).forEach(([id, key]) => {
+        const input = document.getElementById(id);
+        const definition = timingConfig.journey?.[key];
+        if (!input || !definition) return;
+        ['min', 'max', 'step'].forEach(attribute => {
+            if (definition[attribute] != null) input.setAttribute(attribute, definition[attribute]);
+        });
+    });
+}
+
+async function loadTimingConfig() {
+    try {
+        const response = await fetch('timing-config.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        timingConfig = await response.json();
+        const profileName = new URLSearchParams(window.location.search).get('timingProfile');
+        if (profileName && timingConfig.profiles?.[profileName]) {
+            timingConfig = mergeTimingProfile(timingConfig, timingConfig.profiles[profileName]);
+            console.info(`[Timing] Using profile: ${profileName}`);
+        }
+    } catch (error) {
+        console.warn('Timing configuration unavailable; using built-in timing defaults.', error);
+    }
+    applyTimingControls();
+    if (typeof state !== 'undefined') {
+        const persisted = (key) => localStorage.getItem(key) !== null;
+        const defaults = {
+            timePerChakra: ['chakra_time', 'timePerChakra', 5],
+            timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
+            timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
+            timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
+            timeInterval: ['chakra_time_interval', 'interval', 9],
+            timeYogaPrep: ['chakra_time_yoga_prep', 'yogaPreparation', 60],
+            timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
+            timeBath: ['chakra_time_bath', 'bath', 600],
+            timePerinealCare: ['chakra_time_perineal_care', 'perinealCare', 300],
+            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600],
+            timeMassage: ['chakra_time_massage', 'massage', 600]
+        };
+        Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
+            if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
+        });
+    }
+}
 
 function getLanguageConfig(language = state.language) {
     return languageRegistry.find(item => item.id === language) ||
@@ -142,19 +259,29 @@ function localized(source, field = null, language = state.language) {
     return typeof value === 'string' || Array.isArray(value) ? value : undefined;
 }
 
-function t(path, language = state.language) {
+function t(path, language = state.displayLanguage) {
     const value = getLocalizedValue(localeBundles[language], path);
     if (value != null) return value;
     const fallback = getLocalizedValue(localeBundles[fallbackLanguageId], path);
     return fallback == null ? path : fallback;
 }
 
+// Narration/system copy follows the selected meditation language, while t()
+// is reserved for the language used by the visible interface.
+function contentT(path) {
+    return t(path, state.language);
+}
+
 function applyLocaleUI() {
-    document.documentElement.lang = getLanguageConfig().locale || state.language;
+    document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
+    document.title = t('ui.chakraMeditation');
+    setText('app-title', t('ui.chakraMeditation'));
     const configSubtitle = document.querySelector('#config-screen > .subtitle');
     if (configSubtitle) configSubtitle.textContent = t('ui.settingsSubtitle');
     const languageLabel = document.querySelector('label[for="language-select"]');
-    if (languageLabel) languageLabel.textContent = t('ui.language');
+    if (languageLabel) languageLabel.textContent = t('ui.meditationLanguage');
+    const displayLanguageLabel = document.querySelector('label[for="display-language-select"]');
+    if (displayLanguageLabel) displayLanguageLabel.textContent = t('ui.displayLanguage');
     if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
     if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
     setText('lobby-title', t('ui.meditationRoom'));
@@ -188,6 +315,9 @@ function applyLocaleUI() {
         'corpse-pose-toggle': 'ui.corpsePoseOption',
         'yoga-bridge-toggle': 'ui.yogaBridge',
         'bath-session-toggle': 'ui.bathSession',
+        'perineal-care-toggle': 'ui.perinealCare',
+        'assisted-bathing-toggle': 'ui.assistedBathing',
+        'massage-toggle': 'ui.massage',
         'high-energy-toggle': 'ui.highEnergy',
         'sleep-mode-toggle': 'ui.sleepMode',
         'returning-journey-toggle': 'ui.returningJourney'
@@ -211,6 +341,9 @@ async function loadLanguageManifest() {
         const requested = localStorage.getItem('chakra_lang');
         const defaultLanguage = manifest.defaultLanguage || languageRegistry[0]?.id || 'en';
         state.language = languageRegistry.some(item => item.id === requested) ? requested : defaultLanguage;
+        const requestedDisplayLanguage = localStorage.getItem('chakra_display_language');
+        state.displayLanguage = languageRegistry.some(item => item.id === requestedDisplayLanguage)
+            ? requestedDisplayLanguage : fallbackLanguageId;
         await Promise.all(languageRegistry.map(async language => {
             const localeResponse = await fetch(language.localeSource);
             if (!localeResponse.ok) throw new Error(`Locale ${language.id} HTTP ${localeResponse.status}`);
@@ -229,14 +362,19 @@ async function loadLanguageManifest() {
 
 function populateLanguageSelect() {
     if (!languageSelect || languageRegistry.length === 0) return;
-    languageSelect.innerHTML = '';
-    languageRegistry.forEach(language => {
-        const option = document.createElement('option');
-        option.value = language.id;
-        option.textContent = language.label;
-        languageSelect.appendChild(option);
+    [languageSelect, document.getElementById('display-language-select')].forEach(select => {
+        if (!select) return;
+        select.innerHTML = '';
+        languageRegistry.forEach(language => {
+            const option = document.createElement('option');
+            option.value = language.id;
+            option.textContent = language.label;
+            select.appendChild(option);
+        });
     });
     languageSelect.value = state.language;
+    const displayLanguageSelect = document.getElementById('display-language-select');
+    if (displayLanguageSelect) displayLanguageSelect.value = state.displayLanguage;
 }
 
 function isPiperVoice(value) {
@@ -1291,7 +1429,10 @@ class MeditationController {
             const scriptCheck = validateScriptBundle(this.scripts, {
                 highEnergy: getChecked('high-energy-toggle'),
                 corpse: state.corpsePoseEnabled,
-                bath: state.yogaBridgeEnabled && state.bathSessionEnabled,
+                bath: state.yogaBridgeEnabled && state.bathSessionEnabled && !state.assistedBathingEnabled,
+                perinealCare: state.yogaBridgeEnabled && state.bathSessionEnabled && state.perinealCareEnabled,
+                assistedBathing: state.yogaBridgeEnabled && state.bathSessionEnabled && state.assistedBathingEnabled,
+                massage: state.yogaBridgeEnabled && state.bathSessionEnabled && state.massageEnabled,
                 yoga: state.yogaBridgeEnabled,
                 hooponopono: state.hooponopono
             });
@@ -1325,8 +1466,8 @@ class MeditationController {
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
-            setText('icebreaker-title', t('system.arriving'));
-            setText('icebreaker-subtitle', t('system.breatheAndSettle'));
+            setText('icebreaker-title', contentT('system.arriving'));
+            setText('icebreaker-subtitle', contentT('system.breatheAndSettle'));
 
             this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
             for (let i = state.timeIcebreaker; i > 0; i--) {
@@ -1340,8 +1481,7 @@ class MeditationController {
             // Transition to Preparation
             showScreen(breathingScreen);
 
-            // Initial Settle (2 seconds)
-            if (this.isMeditationActive) await this.pauseAwareSleep(2000);
+            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
 
             if (this.isMeditationActive) await this.runGratitude();
             if (this.isMeditationActive && state.boxMeditation) await this.runBoxBreathing();
@@ -1349,8 +1489,7 @@ class MeditationController {
 
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
-            // Settle after breathing (3 seconds)
-            if (this.isMeditationActive) await this.pauseAwareSleep(3000);
+            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
 
             if (this.isMeditationActive) {
                 if (this.isHighEnergy) {
@@ -1407,7 +1546,7 @@ class MeditationController {
             tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
             tutText.textContent = openingText;
             await this.narrate(openingText, false); // Keep music playing
-            await this.pauseAwareSleep(1000);
+            await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
         }
 
         // Main gratitude + body scan
@@ -1419,7 +1558,7 @@ class MeditationController {
         if (state.intention && state.intention.trim()) {
             await this.narrate(text, false); // Still keep music playing for next part
             
-            const intentionText = t('system.intention').replace('{{intention}}', state.intention.trim());
+            const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
             tutTitle.textContent = t('ui.intention');
             tutText.textContent = intentionText;
             await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
@@ -1444,7 +1583,7 @@ class MeditationController {
         const tutTitle = document.getElementById('tutorial-title');
         const tutText = document.getElementById('tutorial-text');
         tutTitle.textContent = t('ui.preparation');
-        const text = t('system.centeringBreath');
+        const text = contentT('system.centeringBreath');
         tutText.textContent = text;
 
         // Fade out music before box meditation
@@ -1453,16 +1592,16 @@ class MeditationController {
         // Narrate the preparation instruction with keepSilence = true
         await this.narrate(text, false, true);
 
-        for (let s = 5; s > 0; s--) {
+        for (let s = timing('transitions', 'breathingPreparation'); s > 0; s--) {
             if (!this.isMeditationActive) return;
             await this.pauseAwareSleep(1000);
         }
         
         tutorial.style.opacity = "0";
-        await this.pauseAwareSleep(1000);
+        await this.pauseAwareSleep(timing('transitions', 'breathingTutorialFade') * 1000);
         tutorial.classList.add('hidden');
 
-        const steps = t('system.breathingSteps');
+        const steps = contentT('system.breathingSteps');
 
         for (let cycle = 0; cycle < 4; cycle++) {
             for (const step of steps) {
@@ -1495,15 +1634,14 @@ class MeditationController {
         // Intimate Completion
         if (this.isMeditationActive) {
             instruction.textContent = t('ui.breathingComplete');
-            const completeText = t('system.breathingComplete');
+            const completeText = contentT('system.breathingComplete');
             await this.narrate(completeText, false, true);
             
             // Fade music back in after box meditation
             this.audio.fadeInBackgroundMusic(4, false);
 
-            // 5 second interval before Chakra Journey starts
             instruction.textContent = t('ui.prepare');
-            await this.pauseAwareSleep(5000);
+            await this.pauseAwareSleep(timing('transitions', 'breathingCompletion') * 1000);
         }
     }
 
@@ -1536,7 +1674,7 @@ class MeditationController {
 
             // Configurable Duration Countdown
             const totalSeconds = state.timeCorpse;
-            const transitionSecond = 60; // 1 minute remaining mark
+            const transitionSecond = timing('transitions', 'corpseTransitionAt');
             for (let i = totalSeconds; i > 0; i--) {
                 if (!this.isMeditationActive) return;
                 
@@ -1564,14 +1702,14 @@ class MeditationController {
 
             // Final settle before Chakra Journey
             subtitle.textContent = t('ui.prepare');
-            await this.pauseAwareSleep(3000);
+            await this.pauseAwareSleep(timing('transitions', 'corpseFinalSettle') * 1000);
         } catch (e) {
             console.error("Error in runCorpsePose:", e);
             throw e; // Rethrow to trigger the main alert in start()
         }
     }
 
-    async runBathSession() {
+    async runBathStage(scriptKey, durationSeconds) {
         if (!this.isMeditationActive) return;
 
         showScreen(icebreakerScreen);
@@ -1579,13 +1717,14 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = localized(this.scripts.bath_session.title);
+        const script = this.scripts[scriptKey];
+        title.textContent = localized(script.title);
         subtitle.textContent = t('ui.purification');
 
-        await this.narrate(localized(this.scripts.bath_session.intro), false);
-        await this.narrate(localized(this.scripts.bath_session.instructions), false);
+        await this.narrate(localized(script.intro), false);
+        await this.narrate(localized(script.instructions), false);
 
-        let remaining = state.timeBath;
+        let remaining = durationSeconds;
         const reminderSecond = 60;
 
         while (remaining > 0) {
@@ -1594,12 +1733,28 @@ class MeditationController {
                 if (timer) timer.textContent = Math.floor(remaining / 60) + ":" + (remaining % 60).toString().padStart(2, '0');
                 
                 if (remaining === reminderSecond) {
-                    this.narrateSoft(localized(this.scripts.bath_session.reminder));
+                    this.narrateSoft(localized(script.reminder));
                 }
                 remaining--;
             }
             await this.pauseAwareSleep(1000);
         }
+    }
+
+    async runBathSession() {
+        return this.runBathStage('bath_session', state.timeBath);
+    }
+
+    async runPerinealCare() {
+        return this.runBathStage('perineal_care', state.timePerinealCare);
+    }
+
+    async runAssistedBathing() {
+        return this.runBathStage('assisted_bathing', state.timeAssistedBathing);
+    }
+
+    async runMassage() {
+        return this.runBathStage('massage', state.timeMassage);
     }
 
     async runBackgroundMusicOnly() {
@@ -1621,7 +1776,7 @@ class MeditationController {
         const narrationEl = document.getElementById('narration-text');
         const timerEl = document.getElementById('timer-display');
 
-        if (mantraEl) mantraEl.textContent = t('system.musicOnly');
+        if (mantraEl) mantraEl.textContent = contentT('system.musicOnly');
         if (narrationEl) narrationEl.textContent = "";
         if (timerEl) timerEl.textContent = "";
         
@@ -1645,8 +1800,15 @@ class MeditationController {
     async runYogaSession() {
         if (!this.isMeditationActive) return;
 
-        // Bath is an optional Yoga Bridge stage.
-        if (state.bathSessionEnabled) await this.runBathSession();
+        // Bath is an optional Yoga Bridge stage. Add-ons run in a fixed,
+        // respectful order. Massage comes first, Assisted Bathing replaces
+        // the standard Bath Session, and Perineal Care precedes either path.
+        if (state.bathSessionEnabled) {
+            if (state.massageEnabled) await this.runMassage();
+            if (state.perinealCareEnabled) await this.runPerinealCare();
+            if (state.assistedBathingEnabled) await this.runAssistedBathing();
+            else await this.runBathSession();
+        }
 
         // Transition Screen
         showScreen(icebreakerScreen);
@@ -1714,7 +1876,7 @@ class MeditationController {
             while (remaining > 0) {
                 if (!this.isMeditationActive) break;
                 if (!this.isPaused) {
-                    timerEl.textContent = `${t('system.hold')}: ${remaining}s`;
+                    timerEl.textContent = `${contentT('system.hold')}: ${remaining}s`;
                     remaining--;
                 }
                 await this.pauseAwareSleep(1000);
@@ -1722,14 +1884,14 @@ class MeditationController {
             
             if (this.isMeditationActive) {
                 this.narrateSoft(localized(this.scripts.yoga.next_pose_prompt));
-                await this.pauseAwareSleep(5000); // 5s transition gap
+                await this.pauseAwareSleep(timing('transitions', 'yogaPoseGap') * 1000);
             }
         }
 
         // Final Settle
         if (this.isMeditationActive) {
             await this.narrate(localized(this.scripts.yoga.session_complete), false);
-            await this.pauseAwareSleep(5000);
+            await this.pauseAwareSleep(timing('transitions', 'yogaFinalSettle') * 1000);
         }
     }
 
@@ -1748,7 +1910,7 @@ class MeditationController {
                 this.audio.ctx.currentTime + 1.2
             );
         }
-        await this.pauseAwareSleep(1200);
+        await this.pauseAwareSleep(timing('narration', 'piperLeadIn') * 1000);
 
         const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
         const pending = sentences.slice(0, 2).map(sentence => piperTTS.synthesize(sentence));
@@ -1776,16 +1938,16 @@ class MeditationController {
                 await this.narrateBrowser(sentences[i], false, true);
             }
 
-            if (i < sentences.length - 1) await this.pauseAwareSleep(1500);
+            if (i < sentences.length - 1) await this.pauseAwareSleep(timing('narration', 'sentenceGap') * 1000);
         }
 
         if (fadeOut) {
-            await this.pauseAwareSleep(2500);
+            await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         }
         if (this.audio.voiceCarveFilter) {
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + 2.5);
+            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + timing('narration', 'fadeOutPause'));
         }
     }
 
@@ -1816,7 +1978,7 @@ class MeditationController {
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
                 if (!isResolved) { isResolved = true; resolve(); }
-            }, (text.length * 200) + 3000);
+            }, (text.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
             utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
@@ -1879,14 +2041,14 @@ class MeditationController {
         if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
         const closingText = localized(this.scripts.closing);
         await this.narrate(closingText);
-        await this.pauseAwareSleep(2000);
+        await this.pauseAwareSleep(timing('transitions', 'closingFirstPause') * 1000);
         // Full-body health affirmation — head to toe
         const healthAffirmation = localized(this.scripts.closing, 'affirmation');
         if (healthAffirmation && this.isMeditationActive) {
             setText('mantra-display', "✦ BODY ✦");
             await this.narrate(healthAffirmation);
         }
-        await this.pauseAwareSleep(3000);
+        await this.pauseAwareSleep(timing('transitions', 'closingSecondPause') * 1000);
     }
 
     async runHooponopono() {
@@ -1903,7 +2065,7 @@ class MeditationController {
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(localized(this.scripts.hooponopono.intro), false);
-        await this.pauseAwareSleep(2000);
+        await this.pauseAwareSleep(timing('transitions', 'hooponoponoIntroPause') * 1000);
 
         // 3 cycles of the 4 phrases
         const phrases = localized(this.scripts.hooponopono.phrases);
@@ -1917,7 +2079,7 @@ class MeditationController {
                 // Keep music for all phrases, fade out only on the very last phrase of the last cycle
                 const isLast = (cycle === 2 && i === phrases.length - 1);
                 await this.narrate(phrase, false); // Keep music for phrases
-                await this.pauseAwareSleep(2000);
+                await this.pauseAwareSleep(timing('transitions', 'hooponoponoPhrasePause') * 1000);
             }
         }
 
@@ -1927,18 +2089,18 @@ class MeditationController {
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
-        await this.pauseAwareSleep(15000);
+        await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
     }
 
     async handleInterval() {
         this.audio.stopDrone();
         const timerEl = document.getElementById('timer-display');
-        setText('mantra-display', t('system.breathe'));
+        setText('mantra-display', contentT('system.breathe'));
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.3";
         this.visual.stop();
-        await this.pauseAwareSleep(2000);
-        const breatheText = t('system.breatheInterval');
+        await this.pauseAwareSleep(timing('transitions', 'intervalPreparation') * 1000);
+        const breatheText = contentT('system.breatheInterval');
         this.narrateFeeble(breatheText);
         const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
@@ -1997,7 +2159,7 @@ class MeditationController {
         // Start looping mantra audio track (fades in, drone fades down)
         await this.audio.playMantraTrack(key);
 
-        const chantDurationMs = (state.timePerChakra * 60 * 1000) - 15000;
+        const chantDurationMs = Math.max(0, (state.timePerChakra * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
 
@@ -2020,7 +2182,7 @@ class MeditationController {
 
         // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
-        await this.pauseAwareSleep(4000);
+        await this.pauseAwareSleep(timing('transitions', 'chakraPostMantra') * 1000);
 
         if (this.isMeditationActive) await this.narrate(localized(chakra, 'affirmation'));
     }
@@ -2052,7 +2214,7 @@ class MeditationController {
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
                 if (!isResolved) { isResolved = true; resolve(); }
-            }, (text.length * 200) + 3000);
+            }, (text.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
             utterance.onend = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
             utterance.onerror = () => { if (!isResolved) { isResolved = true; clearTimeout(safetyTimeout); resolve(); } };
@@ -2084,7 +2246,7 @@ class MeditationController {
         }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
-        await this.pauseAwareSleep(1200);
+        await this.pauseAwareSleep(timing('narration', 'piperLeadIn') * 1000);
 
         // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
         if (this.audio.voiceCarveFilter) {
@@ -2141,7 +2303,7 @@ class MeditationController {
                         clearInterval(pauseCheck);
                         resolve();
                     }
-                }, (sentence.length * 200) + 3000); // More generous buffer
+                }, (sentence.length * timing('narration', 'browserSafetyPerCharacter')) + timing('narration', 'browserSafetyBuffer'));
 
                 utterance.onend = () => {
                     if (!isResolved) {
@@ -2170,8 +2332,7 @@ class MeditationController {
                 continue;
             }
 
-            // Breath-aligned space (1.5s) between sentences for comfort
-            await this.pauseAwareSleep(1500);
+            await this.pauseAwareSleep(timing('narration', 'sentenceGap') * 1000);
         }
 
         // Release Frequency Carving after narration ends
@@ -2180,7 +2341,7 @@ class MeditationController {
         }
 
         if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
-            await this.pauseAwareSleep(2500);
+            await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         }
@@ -2199,13 +2360,13 @@ class MeditationController {
 
     async handleSilence() {
         this.visual.stop();
-        setText('mantra-display', t('system.silence'));
+        setText('mantra-display', contentT('system.silence'));
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.2";
         this.audio.stopDrone();
-        const silenceTime = 60000;
+        const silenceTime = timing('transitions', 'finalSilence') * 1000;
         const timerEl = document.getElementById('timer-display');
-        for (let i = 60; i > 0; i--) {
+        for (let i = Math.ceil(silenceTime / 1000); i > 0; i--) {
             if (!this.isMeditationActive) break;
             if (timerEl) timerEl.textContent = `00:${i.toString().padStart(2, '0')}`;
             await this.pauseAwareSleep(1000);
@@ -2315,6 +2476,10 @@ document.addEventListener('visibilitychange', async () => {
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
+    // Content/narration language and visible interface language are separate
+    // so a facilitator can guide in one language while reading the UI in
+    // another. English is the safe default for the visible interface.
+    displayLanguage: localStorage.getItem('chakra_display_language') || 'en',
     voiceName: localStorage.getItem('chakra_voice') || 'piper:ml_IN-arjun-medium',
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     voices: [],
@@ -2351,6 +2516,15 @@ const state = {
     // Bath is a child stage of Yoga Bridge and cannot be active by itself.
     bathSessionEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
         localStorage.getItem('chakra_bath_enabled') === 'true',
+    perinealCareEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_perineal_care') === 'true',
+    assistedBathingEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_assisted_bathing') === 'true',
+    massageEnabled: localStorage.getItem('chakra_yoga_bridge') === 'true' &&
+        localStorage.getItem('chakra_bath_enabled') === 'true' &&
+        localStorage.getItem('chakra_massage') === 'true',
     selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
     // Journey Timings (in seconds)
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
@@ -2360,6 +2534,9 @@ const state = {
     timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
     timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
     timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
+    timePerinealCare: parseInt(localStorage.getItem('chakra_time_perineal_care')) || 300,
+    timeAssistedBathing: parseInt(localStorage.getItem('chakra_time_assisted_bathing')) || 600,
+    timeMassage: parseInt(localStorage.getItem('chakra_time_massage')) || 600,
     scriptSource: localStorage.getItem('chakra_script_source') || 'default',
     customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
@@ -2389,6 +2566,7 @@ async function loadPiperVoiceRegistry() {
 }
 
 async function init() {
+    await loadTimingConfig();
     await loadLanguageManifest();
     await loadPiperVoiceRegistry();
     setupVoices();
@@ -2504,7 +2682,7 @@ async function testVoice() {
         try {
             if (!audio.isInitialized) await audio.init();
             piperTTS.configure(selectedValue);
-            const sample = getLanguageConfig().preview || t('system.centeringBreath');
+            const sample = getLanguageConfig().preview || contentT('system.centeringBreath');
             await piperTTS.preview(sample);
         } catch (error) {
             console.error('[Piper] preview failed:', error);
@@ -2512,7 +2690,7 @@ async function testVoice() {
         }
         return;
     }
-    const utterance = new SpeechSynthesisUtterance(getLanguageConfig().preview || t('system.centeringBreath'));
+    const utterance = new SpeechSynthesisUtterance(getLanguageConfig().preview || contentT('system.centeringBreath'));
     const selectedVoice = getBrowserVoiceForContent();
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
     
@@ -2526,6 +2704,7 @@ async function testVoice() {
 
 function loadPreferences() {
     syncValue('language-select', state.language);
+    syncValue('display-language-select', state.displayLanguage);
     
     const timeSlider = document.getElementById('time-per-chakra');
     if (timeSlider) {
@@ -2572,6 +2751,9 @@ function loadPreferences() {
     // Sync Yoga Settings
     syncChecked('yoga-bridge-toggle', state.yogaBridgeEnabled);
     syncChecked('bath-session-toggle', state.bathSessionEnabled);
+    syncChecked('perineal-care-toggle', state.perinealCareEnabled);
+    syncChecked('assisted-bathing-toggle', state.assistedBathingEnabled);
+    syncChecked('massage-toggle', state.massageEnabled);
     const yogaSubOptions = document.getElementById('yoga-sub-options');
     if (yogaSubOptions) {
         yogaSubOptions.style.display = state.yogaBridgeEnabled ? 'flex' : 'none';
@@ -2605,6 +2787,12 @@ function loadPreferences() {
 
     syncValue('time-bath', state.timeBath);
     setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
+    syncValue('time-perineal-care', state.timePerinealCare);
+    setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
+    syncValue('time-assisted-bathing', state.timeAssistedBathing);
+    setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
+    syncValue('time-massage', state.timeMassage);
+    setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
@@ -2660,6 +2848,14 @@ function attachEventListeners() {
         autoSelectVoice();
         applyLocaleUI();
     });
+    const displayLanguageSelect = document.getElementById('display-language-select');
+    if (displayLanguageSelect) {
+        displayLanguageSelect.addEventListener('change', (e) => {
+            state.displayLanguage = e.target.value;
+            localStorage.setItem('chakra_display_language', state.displayLanguage);
+            applyLocaleUI();
+        });
+    }
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
@@ -2668,6 +2864,7 @@ function attachEventListeners() {
         state.selectedChakras = checked;
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         localStorage.setItem('chakra_lang', state.language);
+        localStorage.setItem('chakra_display_language', state.displayLanguage);
         state.voiceName = voiceSelect.value;
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
@@ -2680,6 +2877,9 @@ function attachEventListeners() {
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
+        state.perinealCareEnabled = getChecked('perineal-care-toggle');
+        state.assistedBathingEnabled = getChecked('assisted-bathing-toggle');
+        state.massageEnabled = getChecked('massage-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         if (state.yogaBridgeEnabled && state.selectedYogaPoses.length === 0) {
             alert("Please select at least one yoga pose or disable Yoga Bridge.");
@@ -2699,6 +2899,9 @@ function attachEventListeners() {
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_yoga_bridge', state.yogaBridgeEnabled);
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
+        localStorage.setItem('chakra_perineal_care', state.perinealCareEnabled);
+        localStorage.setItem('chakra_assisted_bathing', state.assistedBathingEnabled);
+        localStorage.setItem('chakra_massage', state.massageEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         localStorage.setItem('chakra_script_source', state.scriptSource);
 
@@ -2717,6 +2920,9 @@ function attachEventListeners() {
         const corpseEnabled = getChecked('corpse-pose-toggle');
         const yogaEnabled = getChecked('yoga-bridge-toggle');
         const bathEnabled = getChecked('bath-session-toggle');
+        const perinealEnabled = getChecked('perineal-care-toggle');
+        const assistedEnabled = getChecked('assisted-bathing-toggle');
+        const massageEnabled = getChecked('massage-toggle');
         const bgMusicMode = getChecked('bg-music-mode-toggle');
 
         // Hide journey configurations if in music-only mode
@@ -2737,12 +2943,23 @@ function attachEventListeners() {
             bathToggle.disabled = !yogaEnabled;
             bathToggle.setAttribute('aria-disabled', String(!yogaEnabled));
         }
+        const addonToggles = ['perineal-care-toggle', 'assisted-bathing-toggle', 'massage-toggle'];
+        addonToggles.forEach(id => {
+            const toggle = document.getElementById(id);
+            if (!toggle) return;
+            if (!yogaEnabled || !bathEnabled) toggle.checked = false;
+            toggle.disabled = !yogaEnabled || !bathEnabled;
+            toggle.setAttribute('aria-disabled', String(toggle.disabled));
+        });
 
         toggleDisplay('row-breathing', boxEnabled && !bgMusicMode);
         toggleDisplay('row-corpse', corpseEnabled && !bgMusicMode);
         toggleDisplay('row-yoga-prep', yogaEnabled && !bgMusicMode);
         toggleDisplay('row-yoga-pose', yogaEnabled && !bgMusicMode);
-        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !bgMusicMode);
+        toggleDisplay('row-bath', yogaEnabled && bathEnabled && !assistedEnabled && !bgMusicMode);
+        toggleDisplay('row-perineal-care', yogaEnabled && bathEnabled && perinealEnabled && !bgMusicMode);
+        toggleDisplay('row-assisted-bathing', yogaEnabled && bathEnabled && assistedEnabled && !bgMusicMode);
+        toggleDisplay('row-massage', yogaEnabled && bathEnabled && massageEnabled && !bgMusicMode);
         
         const yogaSubOptions = document.getElementById('yoga-sub-options');
         if (yogaSubOptions) {
@@ -2796,6 +3013,12 @@ function attachEventListeners() {
     document.getElementById('yoga-bridge-toggle').addEventListener('change', updateTimingRowVisibility);
     document.getElementById('bath-session-toggle').addEventListener('change', updateTimingRowVisibility);
     document.getElementById('bath-session-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('perineal-care-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('perineal-care-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('assisted-bathing-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('assisted-bathing-toggle').addEventListener('change', updateSessionEstimate);
+    document.getElementById('massage-toggle').addEventListener('change', updateTimingRowVisibility);
+    document.getElementById('massage-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('bg-music-mode-toggle').addEventListener('change', updateTimingRowVisibility);
 
     if (bgMusicToggle) {
@@ -2833,23 +3056,31 @@ function attachEventListeners() {
         const hasHooponopono = getChecked('hooponopono-toggle');
         const hasYoga = getChecked('yoga-bridge-toggle');
         const hasBath = hasYoga && getChecked('bath-session-toggle');
+        const hasPerineal = hasBath && getChecked('perineal-care-toggle');
+        const hasAssisted = hasBath && getChecked('assisted-bathing-toggle');
+        const hasMassage = hasBath && getChecked('massage-toggle');
         const hasCorpse = getChecked('corpse-pose-toggle');
         
-        let overhead = 5; // base overhead (gratitude, silence, etc)
-        if (hasBox) overhead += 4; // box breathing cycles + narration
-        if (hasHooponopono) overhead += 3; // 3 cycles + intro/outro
+        let overhead = timing('estimate', 'baseOverhead');
+        if (hasBox) overhead += timing('estimate', 'boxBreathingOverhead');
+        if (hasHooponopono) overhead += timing('estimate', 'hooponoponoOverhead');
         
         const corpseTime = hasCorpse ? (state.timeCorpse / 60) : 0;
         
         if (hasYoga) {
             const yogaSelected = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
-            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + 15) / 60); // prep + poses + transition gaps
-            if (hasBath) overhead += state.timeBath / 60;
+            overhead += (state.timeYogaPrep / 60) + (yogaSelected.length * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate')) / 60);
+            if (hasBath) {
+                if (hasMassage) overhead += state.timeMassage / 60;
+                if (hasPerineal) overhead += state.timePerinealCare / 60;
+                if (hasAssisted) overhead += state.timeAssistedBathing / 60;
+                else overhead += state.timeBath / 60;
+            }
         }
 
         const estimate = isHigh
-            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + 3) 
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + 2) + (state.timeIcebreaker / 60) + corpseTime + overhead + 7);
+            ? Math.round(state.timePerChakra + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'highEnergyExtra'))
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'normalExtra'));
         setText('session-estimate', `~ ${estimate} min session`);
     }
 
@@ -2921,7 +3152,10 @@ function attachEventListeners() {
                     const check = validateScriptBundle(json, {
                         highEnergy: getChecked('high-energy-toggle'),
                         corpse: getChecked('corpse-pose-toggle'),
-                        bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                        bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && !getChecked('assisted-bathing-toggle'),
+                        perinealCare: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('perineal-care-toggle'),
+                        assistedBathing: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('assisted-bathing-toggle'),
+                        massage: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('massage-toggle'),
                         yoga: getChecked('yoga-bridge-toggle'),
                         hooponopono: getChecked('hooponopono-toggle')
                     });
@@ -2967,7 +3201,10 @@ function attachEventListeners() {
                 const check = validateScriptBundle(json, {
                     highEnergy: getChecked('high-energy-toggle'),
                     corpse: getChecked('corpse-pose-toggle'),
-                    bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle'),
+                    bath: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && !getChecked('assisted-bathing-toggle'),
+                    perinealCare: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('perineal-care-toggle'),
+                    assistedBathing: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('assisted-bathing-toggle'),
+                    massage: getChecked('yoga-bridge-toggle') && getChecked('bath-session-toggle') && getChecked('massage-toggle'),
                     yoga: getChecked('yoga-bridge-toggle'),
                     hooponopono: getChecked('hooponopono-toggle')
                 });
@@ -2994,6 +3231,27 @@ function attachEventListeners() {
         state.timeBath = parseInt(e.target.value);
         setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
         localStorage.setItem('chakra_time_bath', state.timeBath);
+        updateSessionEstimate();
+    });
+
+    document.getElementById('time-perineal-care').addEventListener('input', (e) => {
+        state.timePerinealCare = parseInt(e.target.value);
+        setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
+        localStorage.setItem('chakra_time_perineal_care', state.timePerinealCare);
+        updateSessionEstimate();
+    });
+
+    document.getElementById('time-assisted-bathing').addEventListener('input', (e) => {
+        state.timeAssistedBathing = parseInt(e.target.value);
+        setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
+        localStorage.setItem('chakra_time_assisted_bathing', state.timeAssistedBathing);
+        updateSessionEstimate();
+    });
+
+    document.getElementById('time-massage').addEventListener('input', (e) => {
+        state.timeMassage = parseInt(e.target.value);
+        setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
+        localStorage.setItem('chakra_time_massage', state.timeMassage);
         updateSessionEstimate();
     });
 

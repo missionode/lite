@@ -29,7 +29,7 @@
 
         <!-- Configuration Screen -->
         <section id="config-screen" class="screen settings-screen-container">
-            <h1>Chakra Meditation</h1>
+            <h1 id="app-title">Chakra Meditation</h1>
             <p class="subtitle">Set your preferences for a guided experience</p>
             
             <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
@@ -37,10 +37,18 @@
             </div>
 
             <div class="config-group">
-                <label for="language-select">Language</label>
+                <label for="language-select">Meditation Language</label>
                 <select id="language-select">
                     <option value="ml">Malayalam</option>
                     <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="config-group">
+                <label for="display-language-select">Display Language</label>
+                <select id="display-language-select">
+                    <option value="en">English</option>
+                    <option value="ml">Malayalam</option>
                 </select>
             </div>
 
@@ -106,6 +114,24 @@
                                 <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.bathDuration">Bath Duration</label>
                                 <input type="range" id="time-bath" min="60" max="1800" step="60" value="600">
                                 <span id="display-bath" style="font-size: 0.7rem; width: 40px;">10m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="perineal-care-toggle"> Perineal Care</label>
+                            <div class="mixer-row" id="row-perineal-care">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perinealCareDuration">Perineal Duration</label>
+                                <input type="range" id="time-perineal-care" min="30" max="900" step="30" value="300">
+                                <span id="display-perineal-care" style="font-size: 0.7rem; width: 40px;">5m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="assisted-bathing-toggle"> Assisted Bathing</label>
+                            <div class="mixer-row" id="row-assisted-bathing">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.assistedBathingDuration">Assisted Duration</label>
+                                <input type="range" id="time-assisted-bathing" min="60" max="1800" step="60" value="600">
+                                <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
+                            </div>
+                            <label class="checkbox-label"><input type="checkbox" id="massage-toggle"> Massage</label>
+                            <div class="mixer-row" id="row-massage">
+                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.massageDuration">Massage Duration</label>
+                                <input type="range" id="time-massage" min="60" max="1800" step="60" value="600">
+                                <span id="display-massage" style="font-size: 0.7rem; width: 40px;">10m</span>
                             </div>
                         </div>
                     </div>
@@ -353,6 +379,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.51"></script>
+    <script src="app.js?v=1.53"></script>
 </body>
 </html>

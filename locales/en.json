@@ -3,6 +3,9 @@
   "ui": {
     "settingsSubtitle": "Set your preferences for a guided experience",
     "language": "Language",
+    "meditationLanguage": "Meditation Language",
+    "displayLanguage": "Display Language",
+    "chakraMeditation": "Chakra Meditation",
     "settings": "Settings",
     "previewVoice": "Preview Voice",
     "saveSettings": "Save Settings",
@@ -49,6 +52,12 @@
     ,"corpsePoseOption": "Enable Corpse Pose (Savasana)"
     ,"yogaBridge": "Enable Yoga Bridge (Physical Union)"
     ,"bathSession": "Enable Bath Session"
+    ,"perinealCare": "Perineal Care"
+    ,"assistedBathing": "Assisted Bathing"
+    ,"perinealCareDuration": "Perineal Duration"
+    ,"assistedBathingDuration": "Assisted Duration"
+    ,"massage": "Massage"
+    ,"massageDuration": "Massage Duration"
     ,"highEnergy": "High Energy (HRIM)"
     ,"sleepMode": "🌙 Sleep Mode"
     ,"timePerSession": "Time per Session (minutes)"
