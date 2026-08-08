@@ -37,6 +37,8 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
   await expect(page.locator('#time-bath')).toHaveAttribute('max', '5');
   await expect(page.locator('#time-massage')).toHaveAttribute('min', '1');
   await expect(page.locator('#time-per-chakra')).toHaveAttribute('min', '0.1');
+  await expect(page.locator('#time-interval')).toHaveAttribute('min', '2');
+  await expect(page.locator('#time-interval')).toHaveValue('2');
 });
 
 test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {

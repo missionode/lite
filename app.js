@@ -220,7 +220,7 @@ async function loadTimingConfig() {
             timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
             timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
             timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
-            timeInterval: ['chakra_time_interval', 'interval', 9],
+            timeInterval: ['chakra_time_interval', 'interval', 10],
             timeYogaPrep: ['chakra_time_yoga_prep', 'yogaPreparation', 60],
             timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
             timeBath: ['chakra_time_bath', 'bath', 600],
@@ -230,6 +230,16 @@ async function loadTimingConfig() {
         };
         Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
             if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
+            const definition = timingConfig.journey?.[configKey];
+            if (definition) {
+                const minimum = Number(definition.min);
+                const maximum = Number(definition.max);
+                const bounded = Math.min(maximum, Math.max(minimum, Number(state[stateKey])));
+                if (Number.isFinite(bounded) && bounded !== state[stateKey]) {
+                    state[stateKey] = bounded;
+                    localStorage.setItem(storageKey, String(bounded));
+                }
+            }
         });
     }
 }
@@ -2101,7 +2111,9 @@ class MeditationController {
         this.visual.stop();
         await this.pauseAwareSleep(timing('transitions', 'intervalPreparation') * 1000);
         const breatheText = contentT('system.breatheInterval');
-        this.narrateFeeble(breatheText);
+        // Keep the minimum interval short for testing, but never advance to the
+        // next chakra while the break narration is still speaking.
+        const narrationPromise = this.narrateFeeble(breatheText);
         const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
         while (elapsed < intervalMs) {
@@ -2114,6 +2126,7 @@ class MeditationController {
             }
             await new Promise(r => setTimeout(r, 100));
         }
+        await narrationPromise;
     }
 
     async meditateOnChakra(chakra, key) {
@@ -2530,7 +2543,7 @@ const state = {
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
-    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 9,
+    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 10,
     timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
     timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
     timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
