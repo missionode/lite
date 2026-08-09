@@ -102,3 +102,12 @@
 - Audited mantra wording and pronunciation: canonical identifiers remain `LAM`, `VAM`, `RAM`, `YAM`, `HAM`, `OM`, `AUM`, and `HRIM`; English spoken narration now uses contextual forms such as “The Lam mantra” and “Hreem mantra,” while Malayalam uses the native forms such as `ഹ്രീം`. This keeps the HRIM key and `HREEM.mp3` asset stable while giving English Piper a clearer pronunciation input.
 - Confirmed Piper transport behavior: narration is segmented with explicit lead-in/sentence-gap timing; pause suspends the AudioContext and blocks queue advancement; stop/restart cancels the active source, clears queued synthesis, and terminates the Worker. Fixed persisted volume loading so `0` remains a true mute after reload. Focused Playwright validation passed 2/2 for mantra wording and mute persistence; syntax, JSON, and diff checks also passed.
 - Consultation architecture is documented in `TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md` as planning-only. The first implementation is single-participant: HRIM and Music Only stay in the Lobby, Reverse Journey stays in Settings, Sleep Mode is collected as a preference but remains governed by the evening runtime prompt, and Yoga remains compatible with Sleep Mode. No consultation production code, recording backend, or video-sharing infrastructure has started.
+- Added the Lobby entry point CTA `Begin Session Consultation`, localized in English and Malayalam. It is currently a non-mutating placeholder that preserves the existing meditation flow until the consultation screen/state machine is implemented.
+
+## Documentation checkpoint
+
+- Date: 2026-08-09 (Asia/Kolkata)
+- Baseline `HEAD`: `6da554d` — `update`
+- Status: the consultation architecture documentation and Loop procedure are **uncommitted working changes**; `6da554d` is not the commit containing these edits.
+- Validation: `git diff --check` passed; no production consultation implementation has started.
+- Next checkpoint: commit the documentation updates together with the first approved consultation implementation slice, then replace this baseline entry with the actual commit hash and subject.

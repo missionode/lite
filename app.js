@@ -33,6 +33,7 @@ const timeSlider = document.getElementById('time-per-chakra');
 const timeDisplay = document.getElementById('time-display');
 const startMeditationBtn = document.getElementById('start-meditation');
 const openSettingsBtn = document.getElementById('open-settings');
+const beginConsultationBtn = document.getElementById('begin-consultation');
 
 // ── UTILS (Defensive Element Access) ──────────────────────────────────────────
 const getChecked = (id) => {
@@ -422,6 +423,7 @@ function applyLocaleUI() {
     if (displayLanguageLabel) displayLanguageLabel.textContent = t('ui.displayLanguage');
     if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
     if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
+    if (beginConsultationBtn) beginConsultationBtn.textContent = t('ui.beginConsultation');
     setText('lobby-title', t('ui.meditationRoom'));
     setText('completion-title', t('ui.journeyComplete'));
     setText('completion-message', t('ui.meditationCompleted'));
@@ -3707,6 +3709,9 @@ function attachEventListeners() {
         cb.addEventListener('change', updateSessionEstimate);
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
+    beginConsultationBtn?.addEventListener('click', () => {
+        alert(t('ui.consultationComingSoon'));
+    });
 
     const settingsHelpModal = document.getElementById('settings-help-modal');
     const settingsHelpButton = document.getElementById('settings-help-button');

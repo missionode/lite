@@ -145,6 +145,8 @@
     ,"scriptSelection": "Script Selection"
     ,"startMeditation": "Start Meditation"
     ,"beginJourney": "Begin Journey"
+    ,"beginConsultation": "Begin Session Consultation"
+    ,"consultationComingSoon": "Session Consultation will open here in the next release. Your current meditation flow remains unchanged."
     ,"close": "Close"
     ,"sessionTime": "Session Time"
     ,"totalJourneys": "Total Journeys"

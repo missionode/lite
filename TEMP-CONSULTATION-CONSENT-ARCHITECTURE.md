@@ -379,6 +379,7 @@ Do not label a chakra as “weak” or “blocked” based only on a self-report
 
 ## First implementation boundary and readiness
 
+- The Lobby now contains the consultation entry CTA. It is intentionally a non-mutating placeholder until the consultation screen/state machine is implemented; the existing Begin Journey and Settings actions remain unchanged.
 - First implementation is single-participant consultation only.
 - HRIM and Music Only remain Lobby modes; Reverse Journey remains in Settings.
 - Sleep preference is captured in consultation, but the evening runtime prompt remains the final authority.

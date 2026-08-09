@@ -370,7 +370,8 @@ select:focus {
 }
 
 .lobby-actions .primary-btn,
-.lobby-actions .link-btn {
+.lobby-actions .link-btn,
+.lobby-actions .consultation-btn {
     width: 100%;
 }
 
@@ -380,6 +381,18 @@ select:focus {
 
 .lobby-actions .link-btn {
     margin-top: 0.25rem;
+}
+
+.lobby-actions .consultation-btn {
+    margin-top: 0.25rem;
+    border-color: rgba(196, 181, 253, 0.35);
+    background: rgba(124, 58, 237, 0.12);
+}
+
+.lobby-actions .consultation-btn:hover,
+.lobby-actions .consultation-btn:focus-visible {
+    background: rgba(124, 58, 237, 0.22);
+    border-color: rgba(196, 181, 253, 0.6);
 }
 
 #lobby-screen #lobby-title {

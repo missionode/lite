@@ -61,6 +61,19 @@ For each meaningful task:
 8. Update the handoff record.
 9. Report the checkpoint, result, risks, and next decision.
 
+### Commit traceability (required from this point onward)
+
+For every meaningful checkpoint, update the handoff with commit traceability:
+
+- checkpoint date and local timezone;
+- short commit hash and full commit subject when a commit exists;
+- whether the working tree was clean at the checkpoint;
+- files changed or intentionally excluded;
+- validation commands and their evidence level;
+- known follow-up work and whether it is implemented, pending, blocked, or deferred.
+
+If the work is documented but not committed, record the current `HEAD` as the baseline and explicitly label the documentation as **uncommitted working changes**. Never present a baseline hash as the commit containing the new work. Before a checkpoint commit, run `git status --short`, inspect staged paths, and run `git diff --cached --check`.
+
 ## Stack fidelity and proof scope
 
 - Before implementation, state whether the task is a production-shaped implementation, a protocol proof, or a minimal technical spike.
