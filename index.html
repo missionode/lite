@@ -76,7 +76,7 @@
                     <label class="checkbox-label"><input type="checkbox" value="crown" checked disabled> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
-                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle"> Chakra Frequencies (Solfeggio)</label>
+                <label class="checkbox-label"><input type="checkbox" id="frequencies-toggle" checked> Chakra Frequencies (Solfeggio)</label>
             </div>
 
             <div class="config-group settings-panel">
@@ -270,6 +270,7 @@
             <div class="lobby-actions">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
+                <button id="begin-consultation" class="secondary-btn consultation-btn" type="button">Begin Session Consultation</button>
             </div>
         </section>
 
@@ -337,6 +338,26 @@
                     <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15"></div>
                 </div>
 
+                <details id="voice-tuning-panel" class="mixer-section mixer-collapsible">
+                    <summary class="mixer-section-title">
+                        <span data-i18n="ui.voiceTuning">Voice Tuning</span>
+                        <span class="mixer-chevron" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div class="mixer-section-body">
+                        <div class="mixer-row"><label data-i18n="ui.voiceClarity">Clarity</label><input type="range" id="voice-clarity" min="0" max="100" step="1" value="50"></div>
+                        <div class="mixer-row"><label data-i18n="ui.voiceWarmth">Warmth</label><input type="range" id="voice-warmth" min="0" max="100" step="1" value="50"></div>
+                        <div class="mixer-row"><label data-i18n="ui.voicePace">Pace</label><input type="range" id="voice-pace" min="0.85" max="1.15" step="0.05" value="1"></div>
+                        <div class="mixer-row"><label for="voice-echo" data-i18n="ui.voiceEcho">Voice Space</label><select id="voice-echo"><option value="off" data-i18n="ui.voiceEchoOff">Off</option><option value="light" selected data-i18n="ui.voiceEchoLight">Soft Room</option><option value="spacious" data-i18n="ui.voiceEchoSpacious">Temple Air</option></select></div>
+                        <div class="mixer-preset-row" role="group" data-i18n-aria-label="ui.voicePresets">
+                            <button type="button" class="mixer-preset" data-voice-preset="soft" data-i18n="ui.voicePresetSoft">Soft</button>
+                            <button type="button" class="mixer-preset mixer-preset-active" data-voice-preset="balanced" data-i18n="ui.voicePresetBalanced">Balanced</button>
+                            <button type="button" class="mixer-preset" data-voice-preset="clear" data-i18n="ui.voicePresetClear">Clear</button>
+                        </div>
+                        <button id="mixer-voice-preview" class="secondary-btn" type="button" data-i18n="ui.previewTunedVoice">Preview Current Voice</button>
+                        <p class="mixer-note" data-i18n="ui.voicePaceNote">Pace changes apply from the next phrase.</p>
+                    </div>
+                </details>
+
                 <div class="mixer-section">
                     <label class="mixer-section-title" data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
                     <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> <span data-i18n="ui.audioFilters">Enable Audio Filters (Warmth)</span></label>
@@ -346,7 +367,7 @@
                 </div>
 
                 <div class="mixer-section">
-                    <label class="checkbox-label"><input type="checkbox" id="mixer-frequencies-toggle"> <span data-i18n="ui.mixerFrequencies">Use Chakra Frequencies (Solfeggio)</span></label>
+                    <label class="checkbox-label"><input type="checkbox" id="mixer-frequencies-toggle" checked> <span data-i18n="ui.mixerFrequencies">Use Chakra Frequencies (Solfeggio)</span></label>
                     <p class="mixer-note" data-i18n="ui.mixerFrequencyNote">Changes apply from the next sound stage.</p>
                 </div>
 
@@ -418,6 +439,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.54"></script>
+    <script src="app.js?v=1.60"></script>
 </body>
 </html>

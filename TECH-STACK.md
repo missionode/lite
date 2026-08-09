@@ -48,6 +48,14 @@ The application is designed to be served from a static HTTP(S) origin. Opening `
 
 Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.
 
+Audio quality controls: the Web Audio graph now ends in a conservative master safety limiter after the musical compressor, and the bell path is included in that final protection stage. Piper clips receive restrained per-clip RMS/peak matching and short edge fades before entering the shared voice chain. Background and mantra loops retain crossfades, but their next instances are now scheduled ahead on the AudioContext timeline to reduce mobile timer-jitter gaps. Browser speech synthesis remains outside the Web Audio graph and therefore cannot receive the limiter or Piper normalization.
+
+Journey Tuning also includes a compact, collapsed Voice Tuning section. Clarity and Warmth use voice-only Web Audio filters, Pace applies to the next generated Piper phrase through a bounded `lengthScale` override and maps to browser speech rate for fallback voices, and Soft/Balanced/Clear presets provide approachable starting points. Voice Space uses a short pre-delay into a generated stereo room impulse, filtered and mixed quietly; its user-facing presets are Off, Soft Room, and Temple Air, with Soft Room as the default for new users. Soft Room is approximately 14% wet and Temple Air approximately 20% wet so the effect remains perceptible on mobile without masking narration. This replaces the earlier flat single-delay echo. Voice Preview uses the same selected tuning. Voice model selection remains in Settings because changing a Piper model requires worker/session reinitialization.
+
+Journey type applies an initial narration profile at start: regular guided journeys use Soft voice tuning with Temple Air, while HRIM uses Balanced voice tuning with Soft Room. The profile is persisted as the current starting preference and can still be adjusted from Journey Tuning after the journey begins. Chakra Frequencies/Solfeggio is enabled by default for new users; an existing explicit Off preference is preserved.
+
+Asset audit baseline: `audio/background_music.mp3` and the mantra MP3s are stereo, 44.1 kHz, 192 kbps, approximately 30 seconds long. No lossless master is present in the repository; the existing MP3s were not re-encoded because repeated lossy conversion would reduce quality. A future source replacement should start from WAV/FLAC masters, then normalize and export a delivery asset once the source material is available.
+
 ## Multilingual architecture
 
 `language-manifest.json` is the source of truth for supported languages. Each entry defines its language ID, locale, display label, content source, locale dictionary, browser voice prefixes, preview sentence, and preferred Piper voice. `app.js` loads the manifest before settings initialization, populates the language selector from it, resolves UI/system copy through `t(path)`, and resolves content through `localized(...)`. Existing Malayalam/English suffix fields remain supported during migration, while new content should use language-keyed values such as `{ "text": { "hi": "...", "en": "..." } }` or `{ "name": { "hi": "..." } }`. The validator accepts both the current compatibility shape and this language-keyed shape.
@@ -138,7 +146,9 @@ These may become appropriate if the product later needs multi-device sync, prote
 
 ## Quality and security baseline
 
-Current validation is primarily static/manual because no automated test harness is present. Before a release, validate:
+The repository now includes a Playwright suite under `tests/e2e/` with a local static `webServer`; `timing-config.json` supports the explicit `fast-test` profile so long narration and interval flows can be exercised quickly without changing production defaults. Current narration regression coverage checks both English and Malayalam production sections for organ/gland/blood/cell/disease-directed claims.
+
+Before a release, validate:
 
 - JSON parsing for `scripts.json` and custom script uploads
 - Required DOM IDs and media paths
@@ -147,6 +157,14 @@ Current validation is primarily static/manual because no automated test harness 
 - Safe handling of remote custom-script URLs, including CORS failure and untrusted content
 - Journal/privacy expectations, since entries are stored in browser storage without encryption
 - No secrets in the static bundle; the app currently has no server secrets
+
+## Narration content policy
+
+- Production guided meditation copy in `scripts.json` should describe felt experience and practical outcomes—grounding, calm, emotional release, confidence, compassion, clarity, renewal, and purposeful action—without claiming to treat or directly change organs, glands, blood, cells, hormones, disease, or other medical conditions.
+- Keep English and Malayalam fields aligned in meaning and intent. Run the bilingual Playwright narration regression after editing `en`, `ml`, `meditation_en`, or `meditation_ml` fields.
+- Keep canonical mantra keys stable for UI/audio lookup (`LAM`, `VAM`, `RAM`, `YAM`, `HAM`, `OM`, `AUM`, `HRIM`), while using contextual spoken forms in narration. The English HRIM pronunciation is written as `Hreem mantra`; Malayalam uses `ഹ്രീം`. This avoids asking English Piper to infer the short `hrim` spelling while preserving the established `HRIM` journey identifier and `HREEM.mp3` asset.
+- Piper narration is sentence-queued with an explicit lead-in and sentence gap. `piperTTS.setPaused(true)` stops queue advancement while the AudioContext suspension holds the current clip; `piperTTS.cancel()` stops the active source, rejects queued synthesis, and terminates the Worker for journey stop/restart. Voice volume is a live Web Audio gain, and zero is a valid persisted mute value.
+- `docs/dot.json` is a custom facilitator script and is intentionally not synchronized with the production bundle. Review it separately before promoting any of its content into runtime narration.
 
 For this client-only release, the main security boundary is untrusted browser/user content and remote custom script input. If a backend is added, authentication, authorization, storage, rate limiting, and a formal threat model must be designed at that point.
 
@@ -160,3 +178,4 @@ Use any static host that serves the files over HTTPS with correct MIME types and
 - User flow and reverse-engineered architecture: [`INITIAL-HANDOFF.md`](./INITIAL-HANDOFF.md)
 - Runtime implementation: [`index.html`](./index.html), [`app.js`](./app.js), [`style.css`](./style.css), [`sw.js`](./sw.js)
 - Narration content: [`scripts.json`](./scripts.json)
+- Consultation planning (not yet implemented): [`TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`](./TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md). The first release is single-participant and must hydrate a versioned session plan before entering the existing Lobby.
