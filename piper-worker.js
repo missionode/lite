@@ -66,7 +66,7 @@ self.onmessage = async (event) => {
                 cancelledRequests.delete(requestId);
                 return;
             }
-            const audio = await session.predict(message.text);
+            const audio = await session.predict(message.text, message.settings || {});
             if (cancelledRequests.has(requestId)) {
                 cancelledRequests.delete(requestId);
                 return;

@@ -89,16 +89,36 @@ test('opens the full-screen mixer and safely restarts the active journey', async
     await page.locator('#sleep-mode-disable').click();
   }
   await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#voice-clarity')).toHaveValue('35');
+  await expect(page.locator('#voice-warmth')).toHaveValue('65');
+  await expect(page.locator('#voice-pace')).toHaveValue('0.9');
+  await expect(page.locator('#voice-echo')).toHaveValue('spacious');
 
   await page.locator('#btn-mixer').click();
   const mixer = page.locator('#volume-mixer');
   await expect(mixer).toBeVisible();
   await expect(mixer).toHaveCSS('position', 'fixed');
-  await expect(page.locator('#audio-filters-toggle')).toBeVisible();
-  await expect(page.locator('#eyes-close-mode-toggle')).toBeVisible();
-  await expect(page.locator('#mixer-frequencies-toggle')).toBeVisible();
+       await expect(page.locator('#audio-filters-toggle')).toBeVisible();
+       await expect(page.locator('#eyes-close-mode-toggle')).toBeVisible();
+       await expect(page.locator('#mixer-frequencies-toggle')).toBeVisible();
+       await expect(page.locator('#mixer-frequencies-toggle')).toBeChecked();
+       await expect(page.locator('#frequencies-toggle')).toBeChecked();
+       const voiceTuning = page.locator('#voice-tuning-panel');
+       await expect(voiceTuning).not.toHaveAttribute('open', '');
+       await voiceTuning.locator('summary').click();
+       await expect(page.locator('#voice-clarity')).toBeVisible();
+       await expect(page.locator('#voice-warmth')).toBeVisible();
+       await expect(page.locator('#voice-pace')).toBeVisible();
+       await expect(page.locator('label[for="voice-echo"]')).toHaveCSS('white-space', 'nowrap');
+       await expect(page.locator('#voice-echo')).toHaveValue('spacious');
+       await page.selectOption('#voice-echo', 'light');
+       await expect(page.locator('#voice-echo')).toHaveValue('light');
+       await page.locator('[data-voice-preset="soft"]').click();
+       await expect(page.locator('#voice-warmth')).toHaveValue('65');
+       await expect(page.locator('#voice-pace')).toHaveValue('0.9');
+       await page.locator('#mixer-voice-preview').click();
 
-  await page.locator('#audio-filters-toggle').check();
+       await page.locator('#audio-filters-toggle').check();
   await page.locator('#eyes-close-mode-toggle').check();
   await page.locator('#mixer-frequencies-toggle').check();
   await expect(page.locator('#frequencies-toggle')).toBeChecked();
@@ -156,10 +176,30 @@ test('uses experiential benefit language for chakra narration', async ({ page })
     expect(content[key].meditation_en).toBeTruthy();
     expect(content[key].meditation_ml).toBeTruthy();
   }
-  expect(content.root.meditation_en).not.toMatch(/adrenal|immune|organ|gland/i);
-  expect(content.solar.meditation_en).not.toMatch(/stomach|liver|pancreas|digest/i);
-  expect(content.high_energy.meditation_en).not.toMatch(/adrenal|pineal|digest|gland/i);
-  expect(content.closing.meditation_en).not.toMatch(/organ|cell|lymph|blood|gland/i);
+  const anatomyClaims = /adrenal|immune|organ|gland|kidney|bladder|thyroid|pituitary|pineal|digest|liver|pancreas|lymph|blood|spinal cord|hypothalamus|thalamus|അവയവ|ഗ്രന്ഥി|വൃക്ക|തൈറോയ്ഡ്|പിറ്റ്യൂട്ടറി|പൈനൽ|ദഹന|രക്തം|നാഡീവ്യൂഹ/i;
+  for (const key of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy', 'closing']) {
+    expect(content[key].en).not.toMatch(anatomyClaims);
+    expect(content[key].ml).not.toMatch(anatomyClaims);
+  }
+});
+
+test('uses explicit spoken mantra wording and canonical Hreem pronunciation', async ({ page }) => {
+  const content = await page.evaluate(async () => (await fetch('/scripts.json')).json());
+  for (const [key, name] of Object.entries({ root: 'Lam', sacral: 'Vam', solar: 'Ram', heart: 'Yam', throat: 'Ham', thirdeye: 'Om', crown: 'Aum' })) {
+    expect(content[key].meditation_en).toContain(`The ${name} mantra`);
+    expect(content[key].en).toContain(`The ${name} mantra`);
+  }
+  expect(content.high_energy.mantra).toBe('HRIM');
+  expect(content.high_energy.meditation_en).toContain('Hreem mantra');
+  expect(content.high_energy.en).toContain('Hreem mantra');
+  expect(content.high_energy.meditation_ml).toContain('ഹ്രീം');
+  expect(content.high_energy.ml).toContain('ഹ്രീം');
+});
+
+test('persists zero voice volume as an intentional mute setting', async ({ page }) => {
+  await page.evaluate(() => localStorage.setItem('chakra_vol_voice', '0'));
+  await page.reload();
+  await expect(page.locator('#vol-voice')).toHaveValue('0');
 });
 
 test('persists the independent HRIM duration from the Lobby', async ({ page }) => {

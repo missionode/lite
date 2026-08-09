@@ -318,7 +318,7 @@ const _TtsSession = class _TtsSession {
       await modelBlob.arrayBuffer()
     ));
   }
-  async predict(text) {
+  async predict(text, settings = {}) {
     await this.waitReady;
     const input = JSON.stringify([{ text: text.trim() }]);
     const phonemeIds = await new Promise(async (resolve) => {
@@ -346,9 +346,10 @@ const _TtsSession = class _TtsSession {
     });
     const speakerId = 0;
     const sampleRate = __privateGet(this, _modelConfig).audio.sample_rate;
-    const noiseScale = __privateGet(this, _modelConfig).inference.noise_scale;
-    const lengthScale = __privateGet(this, _modelConfig).inference.length_scale;
-    const noiseW = __privateGet(this, _modelConfig).inference.noise_w;
+    const inference = __privateGet(this, _modelConfig).inference;
+    const noiseScale = inference.noise_scale;
+    const lengthScale = Math.max(0.75, Math.min(1.35, Number(settings.lengthScale) || inference.length_scale));
+    const noiseW = inference.noise_w;
     const session = __privateGet(this, _ortSession);
     const feeds = {
       input: new (__privateGet(this, _ort)).Tensor("int64", phonemeIds, [1, phonemeIds.length]),

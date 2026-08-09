@@ -650,7 +650,34 @@ class PiperTTS {
     }
 
     synthesize(text) {
-        return this.request('synthesize', { text });
+        return this.request('synthesize', {
+            text,
+            settings: { lengthScale: 1 / Math.max(0.85, Math.min(1.15, state.voicePace || 1)) }
+        });
+    }
+
+    getNormalizationGain(buffer) {
+        let peak = 0;
+        let sumSquares = 0;
+        let sampleCount = 0;
+        for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+            const samples = buffer.getChannelData(channel);
+            for (let i = 0; i < samples.length; i++) {
+                const sample = samples[i];
+                const magnitude = Math.abs(sample);
+                if (magnitude > peak) peak = magnitude;
+                sumSquares += sample * sample;
+                sampleCount++;
+            }
+        }
+        if (!peak || !sampleCount) return 1;
+
+        // Gentle per-clip matching: bring quiet model outputs toward a
+        // consistent RMS while keeping headroom for the master limiter.
+        const rms = Math.sqrt(sumSquares / sampleCount);
+        let gain = rms > 0 ? 0.16 / rms : 1;
+        gain = Math.min(gain, 0.85 / peak);
+        return Math.max(0.7, Math.min(1.5, gain));
     }
 
     async play(blob, volumeScale = 1) {
@@ -661,8 +688,10 @@ class PiperTTS {
 
         return new Promise((resolve) => {
             const source = this.audio.ctx.createBufferSource();
+            const clipGain = this.audio.ctx.createGain();
             source.buffer = buffer;
-            source.connect(this.audio.voiceGain || this.audio.ctx.destination);
+            source.connect(clipGain);
+            clipGain.connect(this.audio.voiceGain || this.audio.ctx.destination);
             this.currentSource = source;
             this.currentResolve = resolve;
             source.onended = () => {
@@ -672,8 +701,17 @@ class PiperTTS {
                 }
                 resolve();
             };
+            const now = this.audio.ctx.currentTime;
+            const fadeTime = Math.min(0.05, buffer.duration / 4);
+            const normalizedGain = this.getNormalizationGain(buffer);
+            clipGain.gain.setValueAtTime(0, now);
+            clipGain.gain.linearRampToValueAtTime(normalizedGain, now + fadeTime);
+            if (buffer.duration > fadeTime * 2) {
+                clipGain.gain.setValueAtTime(normalizedGain, now + buffer.duration - fadeTime);
+                clipGain.gain.linearRampToValueAtTime(0, now + buffer.duration);
+            }
             if (this.audio.voiceGain) {
-                this.audio.voiceGain.gain.setValueAtTime(state.volVoice * volumeScale, this.audio.ctx.currentTime);
+                this.audio.voiceGain.gain.setValueAtTime(state.volVoice * volumeScale, now);
             }
             source.start();
         });
@@ -726,18 +764,19 @@ class SeamlessLoop {
         this.activeSources = [];
         this.nextStartTimer = null;
         this.isRunning = false;
+        this.scheduleAheadTime = 1.5;
     }
 
     start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        this._playInstance();
+        this._scheduleInstance(this.ctx.currentTime + 0.01);
     }
 
-    _playInstance() {
+    _scheduleInstance(startTime) {
         if (!this.isRunning) return;
 
-        const now = this.ctx.currentTime;
+        const now = Math.max(startTime, this.ctx.currentTime + 0.01);
         const source = this.ctx.createBufferSource();
         const gain = this.ctx.createGain();
 
@@ -766,9 +805,14 @@ class SeamlessLoop {
             this.activeSources = this.activeSources.filter(s => s.source !== source);
         }, (duration + 1) * 1000);
 
-        // Recursively schedule next
-        const delayMs = (duration - this.crossfadeDuration) * 1000;
-        this.nextStartTimer = setTimeout(() => this._playInstance(), delayMs);
+        // Use the JavaScript timer only to enqueue the next source early. The
+        // actual start time is placed on the AudioContext timeline, so normal
+        // mobile timer jitter does not move the crossfade itself.
+        const delayMs = Math.max(25, (nextStartTime - this.ctx.currentTime - this.scheduleAheadTime) * 1000);
+        this.nextStartTimer = setTimeout(() => {
+            this.nextStartTimer = null;
+            this._scheduleInstance(nextStartTime);
+        }, delayMs);
     }
 
     setGain(value) {
@@ -819,7 +863,15 @@ class AudioEngine {
 
         // Studio Mastering Nodes
         this.masterCompressor = null;
+        this.masterLimiter = null;
         this.presenceFilter = null;
+        this.voiceWarmthFilter = null;
+        this.voiceClarityFilter = null;
+        this.voiceEchoSend = null;
+        this.voiceEchoDelay = null;
+        this.voiceEchoConvolver = null;
+        this.voiceEchoFilter = null;
+        this.voiceEchoWetGain = null;
         this.lowCutFilter = null;
         this.mantraPresenceLFO = null; // New: Organic Mantra Motion
     }
@@ -868,6 +920,39 @@ class AudioEngine {
         this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
         this.presenceFilter.gain.setValueAtTime(state.audioFilters ? (state.eyesCloseMode ? -6 : -3) : 0, this.ctx.currentTime);
 
+        // Voice-only tone controls. These sit before the shared comfort chain
+        // so tuning narration does not recolor the background music.
+        this.voiceWarmthFilter = this.ctx.createBiquadFilter();
+        this.voiceWarmthFilter.type = 'lowshelf';
+        this.voiceWarmthFilter.frequency.setValueAtTime(220, this.ctx.currentTime);
+        this.voiceWarmthFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
+        this.voiceClarityFilter = this.ctx.createBiquadFilter();
+        this.voiceClarityFilter.type = 'peaking';
+        this.voiceClarityFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
+        this.voiceClarityFilter.Q.setValueAtTime(0.8, this.ctx.currentTime);
+        this.voiceClarityFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
+        // Controlled voice-only echo. It is intentionally dry by default;
+        // the mixer exposes only safe presets rather than raw feedback knobs.
+        this.voiceEchoSend = this.ctx.createGain();
+        this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.voiceEchoDelay = this.ctx.createDelay(0.5);
+        this.voiceEchoDelay.delayTime.setValueAtTime(0.04, this.ctx.currentTime);
+        this.voiceEchoConvolver = this.ctx.createConvolver();
+        this.voiceEchoConvolver.buffer = this.createImpulseResponse(1.1, 3.2);
+        this.voiceEchoFilter = this.ctx.createBiquadFilter();
+        this.voiceEchoFilter.type = 'lowpass';
+        this.voiceEchoFilter.frequency.setValueAtTime(2600, this.ctx.currentTime);
+        this.voiceEchoWetGain = this.ctx.createGain();
+        this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.voiceEchoSend.connect(this.voiceEchoDelay);
+        this.voiceEchoDelay.connect(this.voiceEchoFilter);
+        this.voiceEchoDelay.disconnect();
+        this.voiceEchoDelay.connect(this.voiceEchoConvolver);
+        this.voiceEchoConvolver.connect(this.voiceEchoFilter);
+        this.voiceEchoFilter.connect(this.voiceEchoWetGain);
+
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
         // Grounding: Allow deeper frequencies in Closed mode (40Hz vs 80Hz)
@@ -892,6 +977,15 @@ class AudioEngine {
         this.masterCompressor.ratio.setValueAtTime(3.0, this.ctx.currentTime); 
         this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime); 
         this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+
+        // Final safety stage: catch short peaks from narration, bells, and
+        // overlapping crossfades without changing the musical compressor.
+        this.masterLimiter = this.ctx.createDynamicsCompressor();
+        this.masterLimiter.threshold.setValueAtTime(-1.0, this.ctx.currentTime);
+        this.masterLimiter.knee.setValueAtTime(0, this.ctx.currentTime);
+        this.masterLimiter.ratio.setValueAtTime(20, this.ctx.currentTime);
+        this.masterLimiter.attack.setValueAtTime(0.001, this.ctx.currentTime);
+        this.masterLimiter.release.setValueAtTime(0.1, this.ctx.currentTime);
 
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
@@ -923,7 +1017,7 @@ class AudioEngine {
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
-        this.bellGain.connect(this.ctx.destination);
+        this.bellGain.connect(this.masterLimiter);
 
         this.pannerNode = this.ctx.createStereoPanner();
         
@@ -960,7 +1054,11 @@ class AudioEngine {
 
         // Local Piper narration enters the same clarity/comfort chain as the
         // existing voice mix without being coupled to the drone gain.
-        this.voiceGain.connect(this.lowCutFilter);
+        this.voiceGain.connect(this.voiceWarmthFilter);
+        this.voiceWarmthFilter.connect(this.voiceClarityFilter);
+        this.voiceClarityFilter.connect(this.lowCutFilter);
+        this.voiceClarityFilter.connect(this.voiceEchoSend);
+        this.voiceEchoWetGain.connect(this.lowCutFilter);
         
         let lastNode = this.lowCutFilter;
         // Inject Eyes Close Filter
@@ -985,7 +1083,8 @@ class AudioEngine {
             this.exciter.connect(this.masterCompressor);
         }
         
-        this.masterCompressor.connect(this.ctx.destination);
+        this.masterCompressor.connect(this.masterLimiter);
+        this.masterLimiter.connect(this.ctx.destination);
 
         // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
         if (state.eyesCloseMode) {
@@ -1015,6 +1114,32 @@ class AudioEngine {
         this.toggleEyesCloseMode(state.eyesCloseMode);
 
         this.isInitialized = true;
+        this.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
+        this.setVoiceEcho(state.voiceEcho);
+    }
+
+    setVoiceTuning(warmth = 50, clarity = 50) {
+        if (!this.ctx || !this.voiceWarmthFilter || !this.voiceClarityFilter) return;
+        const now = this.ctx.currentTime;
+        const warmthGain = ((Number(warmth) - 50) / 50) * 3;
+        const clarityGain = ((Number(clarity) - 50) / 50) * 4;
+        this.voiceWarmthFilter.gain.cancelScheduledValues(now);
+        this.voiceWarmthFilter.gain.linearRampToValueAtTime(warmthGain, now + 0.25);
+        this.voiceClarityFilter.gain.cancelScheduledValues(now);
+        this.voiceClarityFilter.gain.linearRampToValueAtTime(clarityGain, now + 0.25);
+    }
+
+    setVoiceEcho(mode = 'off') {
+        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
+        const settings = {
+            off: { delay: 0.04, wet: 0 },
+            light: { delay: 0.035, wet: 0.14 },
+            spacious: { delay: 0.07, wet: 0.20 }
+        }[mode] || { delay: 0.04, wet: 0 };
+        const now = this.ctx.currentTime;
+        this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
+        this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
+        this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
     }
 
     toggleEyesCloseMode(enabled) {
@@ -2140,7 +2265,7 @@ class MeditationController {
             
             // Warmth & Comfort: Deeper pitch and slower rate for transitions
             const baseRate = state.sleepMode ? 0.60 : 0.70;
-            utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
+            utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
             utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02;
             utterance.volume = state.volVoice; 
             
@@ -2380,7 +2505,7 @@ class MeditationController {
             
             // Feeble prompts: Extra slow and deep for minimal intrusion
             const baseRate = state.sleepMode ? 0.58 : 0.65;
-            utterance.rate   = state.eyesCloseMode ? baseRate * 0.85 : baseRate;
+            utterance.rate   = (state.eyesCloseMode ? baseRate * 0.85 : baseRate) * state.voicePace;
             utterance.pitch  = state.eyesCloseMode ? 0.82 : 0.95; 
             utterance.volume = state.volVoice * 0.9; // Relative to master voice volume
             
@@ -2458,7 +2583,7 @@ class MeditationController {
                 const baseRate = pacing === 'hrim'
                     ? (state.sleepMode ? 0.78 : 0.90)
                     : (state.sleepMode ? 0.60 : 0.70);
-                utterance.rate   = state.eyesCloseMode ? baseRate * 0.88 : baseRate;
+                utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
                 utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : 1.02);
                 utterance.volume = state.volVoice; 
                 
@@ -2656,6 +2781,11 @@ const visual = new VisualEngine();
 const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
+function storedNumber(key, fallback) {
+    const value = Number(localStorage.getItem(key));
+    return Number.isFinite(value) ? value : fallback;
+}
+
 document.addEventListener('visibilitychange', async () => {
     if (wakeLock.wakeLock !== null && document.visibilityState === 'visible') await wakeLock.request();
 });
@@ -2670,11 +2800,15 @@ const state = {
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     timeHighEnergy: parseFloat(localStorage.getItem('chakra_time_high_energy')) || 5.0,
     voices: [],
-    volVoice: parseFloat(localStorage.getItem('chakra_vol_voice')) || 0.9,
-    volDrone: parseFloat(localStorage.getItem('chakra_vol_drone')) || 0.05,
-    volBell: parseFloat(localStorage.getItem('chakra_vol_bell')) || 0.05,
-    volMantra: parseFloat(localStorage.getItem('chakra_vol_mantra')) || 0.35,
-    volMusic: parseFloat(localStorage.getItem('chakra_vol_music')) || 0.20,
+    volVoice: storedNumber('chakra_vol_voice', 0.9),
+    volDrone: storedNumber('chakra_vol_drone', 0.05),
+    volBell: storedNumber('chakra_vol_bell', 0.05),
+    volMantra: storedNumber('chakra_vol_mantra', 0.35),
+    volMusic: storedNumber('chakra_vol_music', 0.20),
+    voiceClarity: parseFloat(localStorage.getItem('chakra_voice_clarity')) || 50,
+    voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
+    voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
+    voiceEcho: localStorage.getItem('chakra_voice_echo') || 'light',
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -2693,7 +2827,10 @@ const state = {
     reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
-    chakraFrequencies: localStorage.getItem('chakra_frequencies') === 'true',
+    chakraFrequencies: (() => {
+        const saved = localStorage.getItem('chakra_frequencies');
+        return saved === null ? true : saved === 'true';
+    })(),
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     bgMusicMode: localStorage.getItem('chakra_bg_music_mode') === 'true',
     highEnergyEnabled: localStorage.getItem('chakra_high_energy') === 'true',
@@ -2863,6 +3000,30 @@ function autoSelectVoice() {
     }
 }
 
+function applyJourneyVoiceProfile(isHighEnergy) {
+    const profile = isHighEnergy
+        ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
+        : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
+
+    state.voiceClarity = profile.clarity;
+    state.voiceWarmth = profile.warmth;
+    state.voicePace = profile.pace;
+    state.voiceEcho = profile.echo;
+    localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
+    localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
+    localStorage.setItem('chakra_voice_pace', state.voicePace);
+    localStorage.setItem('chakra_voice_echo', state.voiceEcho);
+    syncValue('voice-clarity', state.voiceClarity);
+    syncValue('voice-warmth', state.voiceWarmth);
+    syncValue('voice-pace', state.voicePace);
+    syncValue('voice-echo', state.voiceEcho);
+    document.querySelectorAll('[data-voice-preset]').forEach(button => {
+        button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : 'soft'));
+    });
+    if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
+    if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
+}
+
 async function testVoice() {
     const selectedValue = voiceSelect.value || state.voiceName;
     state.voiceName = selectedValue;
@@ -2883,7 +3044,7 @@ async function testVoice() {
     if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
     
     // Test with new warm settings
-    utterance.rate = 0.65;
+    utterance.rate = 0.65 * state.voicePace;
     utterance.pitch = 0.88;
     utterance.volume = state.volVoice;
     
@@ -2917,6 +3078,10 @@ function loadPreferences() {
     syncValue('vol-bell', state.volBell);
     syncValue('vol-mantra', state.volMantra);
     syncValue('vol-music', state.volMusic);
+    syncValue('voice-clarity', state.voiceClarity);
+    syncValue('voice-warmth', state.voiceWarmth);
+    syncValue('voice-pace', state.voicePace);
+    syncValue('voice-echo', state.voiceEcho);
 
     // Sync Settings Sliders
     syncValue('settings-vol-voice', state.volVoice);
@@ -3066,6 +3231,7 @@ function attachEventListeners() {
     }
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
+    document.getElementById('mixer-voice-preview')?.addEventListener('click', testVoice);
     saveConfigBtn.addEventListener('click', () => {
         const checked = Array.from(document.querySelectorAll('#chakra-selection input:checked')).map(cb => cb.value);
         if (checked.length === 0) { alert("Please select at least one chakra."); return; }
@@ -3642,6 +3808,10 @@ function attachEventListeners() {
         const sleepChoice = await chooseSleepModeForJourney();
         if (sleepChoice === null) return;
 
+        // Select the intended narration character for this journey type.
+        // Users can still fine-tune it after the journey begins.
+        applyJourneyVoiceProfile(getChecked('high-energy-toggle'));
+
         // Initialize Audio Engine early for music-only mode
         if (!audio.isInitialized) await audio.init();
 
@@ -3796,6 +3966,56 @@ function attachEventListeners() {
         localStorage.setItem(`chakra_${key.replace('vol', 'vol_').toLowerCase()}`, state[key]);
         elements.forEach(el => { if (el) el.value = value; });
     };
+
+    const voiceClarity = document.getElementById('voice-clarity');
+    const voiceWarmth = document.getElementById('voice-warmth');
+    const voicePace = document.getElementById('voice-pace');
+    const applyVoiceTuning = () => {
+        if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
+    };
+    voiceClarity?.addEventListener('input', (event) => {
+        state.voiceClarity = Number(event.target.value);
+        localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
+        applyVoiceTuning();
+        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
+    });
+    voiceWarmth?.addEventListener('input', (event) => {
+        state.voiceWarmth = Number(event.target.value);
+        localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
+        applyVoiceTuning();
+        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
+    });
+    voicePace?.addEventListener('input', (event) => {
+        state.voicePace = Number(event.target.value);
+        localStorage.setItem('chakra_voice_pace', state.voicePace);
+    });
+    document.getElementById('voice-echo')?.addEventListener('change', (event) => {
+        state.voiceEcho = event.target.value;
+        localStorage.setItem('chakra_voice_echo', state.voiceEcho);
+        if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
+    });
+    const voicePresets = {
+        soft: { clarity: 35, warmth: 65, pace: 0.9 },
+        balanced: { clarity: 50, warmth: 50, pace: 1 },
+        clear: { clarity: 70, warmth: 40, pace: 1.05 }
+    };
+    document.querySelectorAll('[data-voice-preset]').forEach(button => {
+        button.addEventListener('click', () => {
+            const preset = voicePresets[button.dataset.voicePreset];
+            if (!preset) return;
+            state.voiceClarity = preset.clarity;
+            state.voiceWarmth = preset.warmth;
+            state.voicePace = preset.pace;
+            localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
+            localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
+            localStorage.setItem('chakra_voice_pace', state.voicePace);
+            syncValue('voice-clarity', state.voiceClarity);
+            syncValue('voice-warmth', state.voiceWarmth);
+            syncValue('voice-pace', state.voicePace);
+            applyVoiceTuning();
+            document.querySelectorAll('[data-voice-preset]').forEach(item => item.classList.toggle('mixer-preset-active', item === button));
+        });
+    });
 
     // Voice
     const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')].filter(Boolean);
