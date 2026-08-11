@@ -263,3 +263,13 @@
 - Review Recording explicitly unhides Retry and Accept whenever the preview stage opens. Actions are moved directly below the 16:9 player, use a compact two-column mobile layout, and remain visible in the initial 390×844 viewport.
 - Runtime versions: `app.js?v=1.77`, `style.css?v=1.66`, service-worker cache `chakra-v5.37`.
 - Validation: rendered plan/consent/preview frames were inspected at their actual output sizes; the focused mobile-to-landscape flow passed; the complete Playwright regression passed **34/34**; syntax, locale JSON, and diff checks passed.
+
+### Manual consent start and luxury document recording — 2026-08-11
+
+- Consent recording now has two deliberate user actions. The first Record action starts the silent approved-plan pre-roll; after all plan pages finish, the composition holds on a completion document and exposes `Start Consent Recording`. The second action opens microphone audio, initializes consent timing, and begins spoken consent immediately without a countdown.
+- The production teleprompter remains stationary for seven seconds after spoken recording starts, then begins the existing gentle automatic scroll. Pause/resume continues to preserve the remaining lead and scroll position.
+- Consent Confirmation keeps the complete script in one non-scrolling panel. Responsive typography is reduced for this review stage only; the full script remains the source used by the recording teleprompter.
+- Replaced Material/app-like generated frames with a consistent luxury-document treatment at `1280×720`: warm ivory paper, double gold rules, formal serif hierarchy, structured plan fields, an approval seal, and restrained footers. The transition frame uses the same document language so waiting for the second action remains intentional in the exported sequence.
+- The spoken evidence page keeps a synchronized three-line excerpt and circular camera portrait while restoring two explicit live evidence fields: pause-aware elapsed duration and the local wall-clock. The wall-clock is repeated in the footer beside timestamp/location metadata.
+- Composition metadata now records `luxury-document`, `manual-after-plan-pages`, the configured teleprompter lead, and live-wall-clock presence. Runtime versions: `app.js?v=1.78`, `style.css?v=1.67`, service-worker cache `chakra-v5.38`.
+- Focused Playwright validation passed, including mobile confirmation fit, inline actions, plan-first phase, manual second start, lead behavior, pause/resume, landscape metadata, preview, Retry, and Accept. Captured plan, consent, and 390×844 review frames were inspected directly; the complete regression passed **34/34**.

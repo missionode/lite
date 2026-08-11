@@ -208,7 +208,6 @@ test('opens the single-participant consultation entry point and returns a saved 
     window.__chakraConsentTestTimings = {
       planPageMs: 35,
       planTransitionMs: 25,
-      countdownStepMs: 150,
       readingLeadMs: 1000
     };
   });
@@ -248,7 +247,12 @@ test('opens the single-participant consultation entry point and returns a saved 
     return Boolean(camera && script && camera.compareDocumentPosition(script) & Node.DOCUMENT_POSITION_FOLLOWING);
   });
   expect(confirmationOrder).toBe(true);
-  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'auto');
+  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'visible');
+  const confirmationScriptFit = await page.locator('#consent-review-stage .consent-prompter').evaluate(element => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight
+  }));
+  expect(confirmationScriptFit.scrollHeight).toBeLessThanOrEqual(confirmationScriptFit.clientHeight + 1);
   const actionAlignment = await page.locator('.consent-review-actions').evaluate(actions => {
     const [continueButton, cancelButton] = Array.from(actions.querySelectorAll('button')).map(button => button.getBoundingClientRect());
     return Math.abs(continueButton.top - cancelButton.top);
@@ -279,14 +283,18 @@ test('opens the single-participant consultation entry point and returns a saved 
   }
   const planPageCount = Number(await page.locator('#consent-composite-canvas').getAttribute('data-plan-pages'));
   expect(planPageCount).toBeGreaterThan(0);
-  await expect(page.locator('#consent-countdown')).toBeVisible({ timeout: 3_000 });
-  await expect(page.locator('#consent-countdown')).toHaveText(/[123]/);
+  await expect(page.locator('#consent-record')).toBeVisible({ timeout: 3_000 });
+  await expect(page.locator('#consent-record')).toHaveAttribute('aria-label', 'Start Consent Recording');
+  await expect(page.locator('#consent-countdown')).toBeHidden();
+  await expect(page.locator('#consent-pause')).toBeHidden();
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'transition');
+  await page.locator('#consent-record').click();
   await expect(page.locator('#consent-pause')).toBeVisible({ timeout: 6_000 });
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('width', '1280');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('height', '720');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-video-format', 'landscape-16:9');
-  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-plan-design', 'material-cards');
-  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-consent-design', 'minimal-evidence');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-plan-design', 'luxury-document');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-consent-design', 'luxury-document-evidence');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'consent');
   if (process.env.CONSENT_VISUAL_CAPTURE) {
     const consentFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);

@@ -3246,6 +3246,7 @@ let consentPromptLeadStartedAt = 0;
 let consentPromptLeadRemaining = 0;
 let consentScrollSpeed = 14;
 let consultationRecordingAttempt = 0;
+let consultationAwaitingConsentStart = false;
 
 function consentTiming(name, fallback) {
     const testValue = globalThis.__chakraConsentTestTimings?.[name];
@@ -3324,7 +3325,7 @@ function stopConsentPromptLead(preserveRemaining = false) {
 }
 
 function startConsentPromptWithLead(reset = false) {
-    if (reset) consentPromptLeadRemaining = consentTiming('readingLeadMs', 3000);
+    if (reset) consentPromptLeadRemaining = consentTiming('readingLeadMs', 7000);
     stopConsentPromptLead();
     if (consentPromptLeadRemaining <= 0) {
         startConsentPromptAutoScroll(reset);
@@ -3599,41 +3600,46 @@ function drawConsentPlanRows(context, lines, width, padding, startY, contentBott
     });
 }
 
-function drawConsentMaterialCard(context, x, y, width, height, index, label, value, fontFamily) {
+function drawConsentDocumentPaper(context, width, height) {
+    context.fillStyle = '#d8d0c2';
+    context.fillRect(0, 0, width, height);
     context.save();
-    context.shadowColor = 'rgba(31, 41, 55, 0.14)';
-    context.shadowBlur = 20;
-    context.shadowOffsetY = 8;
-    drawConsentRoundedRect(context, x, y, width, height, 22);
-    context.fillStyle = '#ffffff';
-    context.fill();
+    context.shadowColor = 'rgba(56, 43, 27, 0.24)';
+    context.shadowBlur = 28;
+    context.shadowOffsetY = 10;
+    context.fillStyle = '#fffaf0';
+    context.fillRect(28, 22, width - 56, height - 44);
     context.restore();
+    context.strokeStyle = '#a9823d';
+    context.lineWidth = 2;
+    context.strokeRect(40, 34, width - 80, height - 68);
+    context.strokeStyle = '#d7c49c';
+    context.lineWidth = 1;
+    context.strokeRect(48, 42, width - 96, height - 84);
+}
 
-    context.fillStyle = index % 2 ? '#efe7ff' : '#fff3dc';
-    context.beginPath();
-    context.arc(x + 42, y + 44, 22, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = index % 2 ? '#6d28d9' : '#9a6700';
-    context.font = `700 17px ${fontFamily}`;
-    context.textAlign = 'center';
-    context.fillText(String(index + 1), x + 42, y + 50);
-    context.textAlign = 'start';
-
-    context.fillStyle = '#6b7280';
-    context.font = `700 15px ${fontFamily}`;
-    context.fillText(label.toUpperCase(), x + 76, y + 49);
-    context.fillStyle = '#1f2937';
-    context.font = `700 25px ${fontFamily}`;
-    const valueLines = wrapConsentCanvasText(context, value, width - 56);
-    const maxLines = Math.max(3, Math.floor((height - 112) / 37));
+function drawConsentDocumentField(context, x, y, width, height, index, label, value, fontFamily) {
+    context.fillStyle = index % 2 ? '#fffdf8' : '#fbf5e8';
+    context.fillRect(x, y, width, height);
+    context.strokeStyle = '#d8c59d';
+    context.lineWidth = 1.5;
+    context.strokeRect(x, y, width, height);
+    context.fillStyle = '#a9823d';
+    context.fillRect(x, y, width, 5);
+    context.font = `700 13px ${fontFamily}`;
+    context.fillText(`${String(index + 1).padStart(2, '0')}  ${label.toUpperCase()}`, x + 24, y + 40);
+    context.fillStyle = '#2d2923';
+    context.font = `600 23px ${fontFamily}`;
+    const valueLines = wrapConsentCanvasText(context, value, width - 48);
+    const maxLines = Math.max(3, Math.floor((height - 88) / 34));
     const visibleLines = valueLines.slice(0, maxLines);
     if (valueLines.length > maxLines) visibleLines[maxLines - 1] = `${visibleLines[maxLines - 1].replace(/[.,;:]?$/, '')}…`;
-    visibleLines.forEach((line, lineIndex) => context.fillText(line, x + 28, y + 112 + lineIndex * 37));
+    visibleLines.forEach((line, lineIndex) => context.fillText(line, x + 24, y + 86 + lineIndex * 34));
 }
 
 function drawConsentPlanFrame(context, width, height) {
-    const padding = 52;
-    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
+    const padding = 68;
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Georgia, serif';
     const pageIndex = Math.min(consultationPlanPageIndex, Math.max(0, consultationPlanPages.length - 1));
     const page = consultationPlanPages[pageIndex] || [];
     const heading = page[0] || t('ui.consentPlanOverview');
@@ -3643,87 +3649,87 @@ function drawConsentPlanFrame(context, width, height) {
             ? { label: line.slice(0, separator), value: line.slice(separator + 2) }
             : { label: t('ui.consentPlanDetails'), value: line };
     });
-    context.fillStyle = '#f6f7fb';
-    context.fillRect(0, 0, width, height);
-    const appBar = context.createLinearGradient(0, 0, width, 0);
-    appBar.addColorStop(0, '#3b1768');
-    appBar.addColorStop(0.72, '#5b21b6');
-    appBar.addColorStop(1, '#7c3aed');
-    context.fillStyle = appBar;
-    context.fillRect(0, 0, width, 112);
+    drawConsentDocumentPaper(context, width, height);
 
-    const logoSize = 64;
+    const logoSize = 54;
     if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
-        context.drawImage(consultationConsentLogo, padding, 24, logoSize, logoSize);
+        context.drawImage(consultationConsentLogo, padding, 55, logoSize, logoSize);
     }
-    context.fillStyle = '#ffffff';
-    context.font = `700 30px ${fontFamily}`;
-    context.fillText(t('ui.consentPlanVideoTitle'), padding + 84, 55);
-    context.fillStyle = 'rgba(255, 255, 255, 0.76)';
-    context.font = `500 16px ${fontFamily}`;
+    context.fillStyle = '#2d2923';
+    context.font = `700 29px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanVideoTitle'), padding + 72, 79);
+    context.fillStyle = '#766a58';
+    context.font = `500 15px ${fontFamily}`;
     const clientName = consultationVideoPlan?.profile?.name || t('ui.client');
-    context.fillText(`${clientName} · ${t('ui.consentPlanVideoSubtitle')}`, padding + 84, 82);
-
-    drawConsentRoundedRect(context, width - padding - 126, 32, 126, 46, 23);
-    context.fillStyle = 'rgba(255, 255, 255, 0.16)';
-    context.fill();
-    context.fillStyle = '#ffffff';
-    context.font = `700 15px ${fontFamily}`;
-    context.textAlign = 'center';
-    context.fillText(`${pageIndex + 1} / ${consultationPlanPages.length}`, width - padding - 63, 61);
+    context.fillText(`${clientName} · ${t('ui.consentPlanVideoSubtitle')}`, padding + 72, 103);
+    context.fillStyle = '#a9823d';
+    context.font = `700 14px ${fontFamily}`;
+    context.textAlign = 'right';
+    context.fillText(`${pageIndex + 1} / ${consultationPlanPages.length}`, width - padding, 83);
     context.textAlign = 'start';
+    context.fillRect(padding, 129, width - padding * 2, 2);
 
-    context.fillStyle = '#5b21b6';
-    drawConsentRoundedRect(context, padding, 144, 8, 54, 4);
-    context.fill();
-    context.fillStyle = '#1f2937';
-    context.font = `700 34px ${fontFamily}`;
-    context.fillText(heading, padding + 28, 183);
+    context.fillStyle = '#a9823d';
+    context.font = `700 13px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanDetails').toUpperCase(), padding, 166);
+    context.fillStyle = '#2d2923';
+    context.font = `700 33px ${fontFamily}`;
+    context.fillText(heading, padding, 204);
 
-    const cardGap = 24;
+    const cardGap = 18;
     const cardCount = Math.max(1, rows.length);
     const cardWidth = (width - padding * 2 - cardGap * (cardCount - 1)) / cardCount;
-    rows.forEach((row, index) => drawConsentMaterialCard(context, padding + index * (cardWidth + cardGap), 226, cardWidth, 292, index, row.label, row.value, fontFamily));
+    rows.forEach((row, index) => drawConsentDocumentField(context, padding + index * (cardWidth + cardGap), 232, cardWidth, 270, index, row.label, row.value, fontFamily));
 
-    drawConsentRoundedRect(context, padding, 548, width - padding * 2, 72, 18);
-    context.fillStyle = '#ede9fe';
-    context.fill();
-    context.fillStyle = '#6d28d9';
+    context.strokeStyle = '#a9823d';
+    context.lineWidth = 2;
     context.beginPath();
-    context.arc(padding + 38, 584, 19, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = '#ffffff';
+    context.arc(width / 2, 557, 39, 0, Math.PI * 2);
+    context.stroke();
+    context.fillStyle = '#a9823d';
     context.font = `700 20px Arial, sans-serif`;
     context.textAlign = 'center';
-    context.fillText('✓', padding + 38, 591);
+    context.fillText('✓', width / 2, 565);
+    context.fillStyle = '#4d4438';
+    context.font = `600 16px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanApprovedBanner'), width / 2, 623);
     context.textAlign = 'start';
-    context.fillStyle = '#4c1d95';
-    context.font = `700 18px ${fontFamily}`;
-    context.fillText(t('ui.consentPlanApprovedBanner'), padding + 72, 591);
 
-    const progressWidth = width - padding * 2;
-    context.fillStyle = '#e1e3ea';
-    drawConsentRoundedRect(context, padding, 665, progressWidth, 8, 4);
-    context.fill();
-    context.fillStyle = '#7c3aed';
-    drawConsentRoundedRect(context, padding, 665, progressWidth * ((pageIndex + 1) / consultationPlanPages.length), 8, 4);
-    context.fill();
-    context.fillStyle = '#6b7280';
+    context.fillStyle = '#877968';
     context.font = `600 14px ${fontFamily}`;
-    context.fillText(t('ui.consentPlanPage').replace('{current}', String(pageIndex + 1)).replace('{total}', String(consultationPlanPages.length)), padding, 699);
+    context.fillText(t('ui.consentPlanPage').replace('{current}', String(pageIndex + 1)).replace('{total}', String(consultationPlanPages.length)), padding, 670);
+    context.textAlign = 'right';
+    context.fillText(t('ui.consentEvidenceLabel'), width - padding, 670);
+    context.textAlign = 'start';
 }
 
 function drawConsentTransitionFrame(context, width, height) {
-    context.fillStyle = '#171025';
-    context.fillRect(0, 0, width, height);
-    const titleSize = Math.max(30, Math.round(width * 0.045));
-    context.fillStyle = '#ffffff';
-    context.font = `700 ${titleSize}px Arial, sans-serif`;
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Georgia, serif';
+    drawConsentDocumentPaper(context, width, height);
+    if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
+        context.drawImage(consultationConsentLogo, width / 2 - 42, 104, 84, 84);
+    }
+    context.fillStyle = '#a9823d';
+    context.fillRect(width / 2 - 80, 224, 160, 2);
+    context.fillStyle = '#2d2923';
+    context.font = `700 47px ${fontFamily}`;
     context.textAlign = 'center';
-    context.fillText(t('ui.consentPlanComplete'), width / 2, height / 2 - titleSize * 0.35);
-    context.fillStyle = 'rgba(255, 255, 255, 0.76)';
-    context.font = `500 ${Math.max(18, Math.round(titleSize * 0.48))}px Arial, sans-serif`;
-    context.fillText(t('ui.consentPlanTransition'), width / 2, height / 2 + titleSize * 0.65);
+    context.fillText(t('ui.consentPlanComplete'), width / 2, 310);
+    context.fillStyle = '#6f6454';
+    context.font = `500 22px ${fontFamily}`;
+    const lines = wrapConsentCanvasText(context, t('ui.consentPlanTransition'), 760);
+    lines.slice(0, 3).forEach((line, index) => context.fillText(line, width / 2, 370 + index * 34));
+    context.strokeStyle = '#a9823d';
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(width / 2, 514, 42, 0, Math.PI * 2);
+    context.stroke();
+    context.fillStyle = '#a9823d';
+    context.font = `700 20px Arial, sans-serif`;
+    context.fillText('✓', width / 2, 522);
+    context.fillStyle = '#877968';
+    context.font = `600 14px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceLabel'), width / 2, 650);
     context.textAlign = 'start';
 }
 
@@ -3755,132 +3761,122 @@ function drawConsentCameraThumbnail(context, centerX, centerY, radius) {
 }
 
 function drawConsentSpokenFrame(context, width, height) {
-    const padding = 52;
-    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
+    const padding = 68;
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Georgia, serif';
     const elapsed = getConsentRecordingElapsed();
+    const liveClock = formatConsentClock(getConsentLiveDate());
     const recordingClock = document.getElementById('consent-recording-clock');
     if (recordingClock) recordingClock.textContent = formatConsentElapsed(elapsed);
     updateConsentMetadataDisplay();
 
-    context.fillStyle = '#f6f7fb';
-    context.fillRect(0, 0, width, height);
-    const appBar = context.createLinearGradient(0, 0, width, 0);
-    appBar.addColorStop(0, '#3b1768');
-    appBar.addColorStop(1, '#6d28d9');
-    context.fillStyle = appBar;
-    context.fillRect(0, 0, width, 96);
-    const logoSize = 58;
+    drawConsentDocumentPaper(context, width, height);
+    const logoSize = 52;
     if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
-        context.drawImage(consultationConsentLogo, padding, 19, logoSize, logoSize);
+        context.drawImage(consultationConsentLogo, padding, 54, logoSize, logoSize);
     }
-    context.fillStyle = '#ffffff';
+    context.fillStyle = '#2d2923';
     context.font = `700 27px ${fontFamily}`;
-    context.fillText(t('ui.consentEvidenceLabel'), padding + 78, 58);
-    drawConsentRoundedRect(context, width - padding - 170, 23, 170, 50, 25);
-    context.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    context.fill();
-    context.fillStyle = '#ff5252';
-    context.beginPath();
-    context.arc(width - padding - 142, 48, 7, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = '#ffffff';
-    context.font = `700 21px Arial, sans-serif`;
-    context.fillText(formatConsentElapsed(elapsed), width - padding - 122, 56);
+    context.fillText(t('ui.consentEvidenceLabel'), padding + 70, 78);
+    context.fillStyle = '#8a795f';
+    context.font = `600 13px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceOverline').toUpperCase(), padding + 70, 101);
 
-    context.save();
-    context.shadowColor = 'rgba(31, 41, 55, 0.13)';
-    context.shadowBlur = 22;
-    context.shadowOffsetY = 8;
-    drawConsentRoundedRect(context, padding, 132, 748, 512, 24);
-    context.fillStyle = '#ffffff';
-    context.fill();
-    context.restore();
-    context.fillStyle = '#6d28d9';
-    context.font = `700 15px ${fontFamily}`;
-    context.fillText(t('ui.consentEvidenceOverline').toUpperCase(), 84, 180);
-    context.fillStyle = '#1f2937';
-    context.font = `700 38px ${fontFamily}`;
-    context.fillText(t('ui.consentTitle'), 84, 228);
-    context.fillStyle = '#606776';
-    context.font = `500 20px ${fontFamily}`;
-    context.fillText(t('ui.consentEvidenceSummary'), 84, 265);
+    const tickerWidth = 174;
+    const tickerGap = 12;
+    const tickerStart = width - padding - tickerWidth * 2 - tickerGap;
+    [[t('ui.consentElapsedLabel'), formatConsentElapsed(elapsed)], [t('ui.consentLiveTimeLabel'), liveClock]].forEach((entry, index) => {
+        const x = tickerStart + index * (tickerWidth + tickerGap);
+        context.strokeStyle = '#c8ae78';
+        context.lineWidth = 1.5;
+        context.strokeRect(x, 55, tickerWidth, 54);
+        context.fillStyle = '#8b7347';
+        context.font = `700 11px ${fontFamily}`;
+        context.fillText(entry[0].toUpperCase(), x + 14, 74);
+        context.fillStyle = '#2d2923';
+        context.font = `700 20px Arial, sans-serif`;
+        context.fillText(entry[1], x + 14, 99);
+    });
+    context.fillStyle = '#a9823d';
+    context.fillRect(padding, 129, width - padding * 2, 2);
+
+    context.fillStyle = '#a9823d';
+    context.font = `700 13px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceOverline').toUpperCase(), padding, 166);
+    context.fillStyle = '#2d2923';
+    context.font = `700 35px ${fontFamily}`;
+    context.fillText(t('ui.consentTitle'), padding, 205);
+    context.fillStyle = '#706656';
+    context.font = `500 17px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceSummary'), padding, 232);
 
     const clientName = consultationVideoPlan?.profile?.name || t('ui.client');
     const clientGoal = consultationVideoPlan?.goal || t('ui.sessionGoal');
-    drawConsentRoundedRect(context, 84, 294, 250, 44, 22);
-    context.fillStyle = '#efe7ff';
-    context.fill();
-    context.fillStyle = '#5b21b6';
-    context.font = `700 16px ${fontFamily}`;
-    context.fillText(clientName, 105, 322);
-    drawConsentRoundedRect(context, 348, 294, 414, 44, 22);
-    context.fillStyle = '#fff3dc';
-    context.fill();
-    context.fillStyle = '#815700';
-    context.font = `600 15px ${fontFamily}`;
-    const goalLabel = wrapConsentCanvasText(context, `${t('ui.consultationSummaryGoal')}: ${clientGoal}`, 374)[0];
-    context.fillText(goalLabel, 369, 322);
+    const leftWidth = 730;
+    context.strokeStyle = '#d8c59d';
+    context.lineWidth = 1.5;
+    context.strokeRect(padding, 260, leftWidth, 70);
+    context.fillStyle = '#8b7347';
+    context.font = `700 11px ${fontFamily}`;
+    context.fillText(t('ui.client').toUpperCase(), padding + 20, 282);
+    context.fillText(t('ui.consultationSummaryGoal').toUpperCase(), padding + 280, 282);
+    context.fillStyle = '#2d2923';
+    context.font = `600 18px ${fontFamily}`;
+    context.fillText(clientName, padding + 20, 311);
+    const goalLabel = wrapConsentCanvasText(context, clientGoal, leftWidth - 320)[0];
+    context.fillText(goalLabel, padding + 280, 311);
 
-    drawConsentRoundedRect(context, 84, 366, 678, 206, 18);
-    context.fillStyle = '#f8f7fc';
-    context.fill();
-    context.fillStyle = '#6b7280';
-    context.font = `700 14px ${fontFamily}`;
-    context.fillText(t('ui.consentCurrentExcerpt').toUpperCase(), 112, 405);
-    context.fillStyle = '#252a34';
-    context.font = `600 25px ${fontFamily}`;
-    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), 620);
+    context.fillStyle = '#fbf5e8';
+    context.fillRect(padding, 352, leftWidth, 218);
+    context.strokeStyle = '#d8c59d';
+    context.strokeRect(padding, 352, leftWidth, 218);
+    context.fillStyle = '#8b7347';
+    context.font = `700 12px ${fontFamily}`;
+    context.fillText(t('ui.consentCurrentExcerpt').toUpperCase(), padding + 24, 384);
+    context.fillStyle = '#2d2923';
+    context.font = `600 23px ${fontFamily}`;
+    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), leftWidth - 48);
     const promptScroller = document.querySelector('#consultation-consent-screen .consent-prompter');
     const domMaxScroll = Math.max(0, (promptScroller?.scrollHeight || 0) - (promptScroller?.clientHeight || 0));
     const scrollRatio = domMaxScroll ? Math.min(1, promptScroller.scrollTop / domMaxScroll) : 0;
     const excerptStart = Math.min(Math.max(0, lines.length - 3), Math.floor(scrollRatio * Math.max(0, lines.length - 3)));
-    lines.slice(excerptStart, excerptStart + 3).forEach((line, index) => context.fillText(line, 112, 447 + index * 37));
-    context.fillStyle = '#dedbe8';
-    drawConsentRoundedRect(context, 112, 545, 622, 7, 3.5);
+    lines.slice(excerptStart, excerptStart + 3).forEach((line, index) => context.fillText(line, padding + 24, 428 + index * 36));
+    context.fillStyle = '#dfd4bf';
+    drawConsentRoundedRect(context, padding + 24, 540, leftWidth - 48, 5, 2.5);
     context.fill();
-    context.fillStyle = '#7c3aed';
-    drawConsentRoundedRect(context, 112, 545, Math.max(10, 622 * scrollRatio), 7, 3.5);
+    context.fillStyle = '#a9823d';
+    drawConsentRoundedRect(context, padding + 24, 540, Math.max(10, (leftWidth - 48) * scrollRatio), 5, 2.5);
     context.fill();
-    context.fillStyle = '#6b7280';
-    context.font = `500 14px ${fontFamily}`;
-    context.fillText(t('ui.consentPlanReference'), 84, 612);
+    context.fillStyle = '#766a58';
+    context.font = `500 13px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanReference'), padding, 601);
 
-    context.save();
-    context.shadowColor = 'rgba(31, 41, 55, 0.13)';
-    context.shadowBlur = 22;
-    context.shadowOffsetY = 8;
-    drawConsentRoundedRect(context, 832, 132, 396, 512, 24);
-    context.fillStyle = '#ffffff';
-    context.fill();
-    context.restore();
-    drawConsentRoundedRect(context, 978, 164, 104, 38, 19);
-    context.fillStyle = '#ffebee';
-    context.fill();
-    context.fillStyle = '#d32f2f';
+    const portraitCenterX = 1035;
+    context.strokeStyle = '#d8c59d';
+    context.lineWidth = 1.5;
+    context.strokeRect(844, 154, 368, 448);
+    context.fillStyle = '#8b7347';
+    context.font = `700 12px ${fontFamily}`;
+    context.textAlign = 'center';
+    context.fillText(t('ui.consentSpokenSection').toUpperCase(), portraitCenterX, 184);
+    context.fillStyle = '#a33a34';
     context.font = `700 14px Arial, sans-serif`;
-    context.textAlign = 'center';
-    context.fillText('●  REC', 1030, 189);
-    context.textAlign = 'start';
-    drawConsentCameraThumbnail(context, 1030, 350, 136);
-    context.fillStyle = '#1f2937';
-    context.font = `700 25px ${fontFamily}`;
-    context.textAlign = 'center';
-    context.fillText(clientName, 1030, 528);
-    context.fillStyle = '#6b7280';
-    context.font = `500 16px ${fontFamily}`;
-    context.fillText(t('ui.consentSpokenSection'), 1030, 558);
-    context.fillStyle = '#ecfdf3';
-    drawConsentRoundedRect(context, 906, 585, 248, 38, 19);
-    context.fill();
-    context.fillStyle = '#067647';
-    context.font = `700 14px ${fontFamily}`;
-    context.fillText(t('ui.consentRecordingVerified'), 1030, 610);
+    context.fillText('●  REC', portraitCenterX, 214);
+    drawConsentCameraThumbnail(context, portraitCenterX, 354, 125);
+    context.fillStyle = '#2d2923';
+    context.font = `700 24px ${fontFamily}`;
+    context.fillText(clientName, portraitCenterX, 515);
+    context.fillStyle = '#4d735f';
+    context.font = `700 13px ${fontFamily}`;
+    context.fillText(`✓  ${t('ui.consentRecordingVerified')}`, portraitCenterX, 552);
     context.textAlign = 'start';
 
     const locationText = consultationLocation ? `${consultationLocation.latitude}, ${consultationLocation.longitude}` : t('ui.consentLocationUnavailable');
-    context.fillStyle = '#6b7280';
-    context.font = `500 14px ${fontFamily}`;
-    context.fillText(`${formatConsentDateTime(consultationRecordingStartedAt)} · ${locationText}`, padding, 696);
+    context.fillStyle = '#877968';
+    context.font = `500 13px ${fontFamily}`;
+    context.fillText(`${formatConsentDateTime(consultationRecordingStartedAt)} · ${locationText}`, padding, 670);
+    context.textAlign = 'right';
+    context.fillText(`${t('ui.consentLiveTimeLabel')}: ${liveClock}`, width - padding, 670);
+    context.textAlign = 'start';
 }
 
 function requestConsentLocation() {
@@ -3909,8 +3905,8 @@ function drawConsentComposite() {
     canvas.dataset.compositionPhase = consultationCompositePhase;
     canvas.dataset.planPage = String(consultationPlanPageIndex + 1);
     canvas.dataset.planPages = String(consultationPlanPages.length);
-    canvas.dataset.planDesign = 'material-cards';
-    canvas.dataset.consentDesign = 'minimal-evidence';
+    canvas.dataset.planDesign = 'luxury-document';
+    canvas.dataset.consentDesign = 'luxury-document-evidence';
     if (consultationCompositePhase === 'plan') {
         drawConsentPlanFrame(context, width, height);
         consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
@@ -4238,17 +4234,22 @@ function setConsentRecordingState(stateName) {
     const recordingClock = document.getElementById('consent-recording-clock');
     consultationConsentScreen?.classList.toggle('consent-recording-active', stateName === 'lead' || stateName === 'recording' || stateName === 'paused');
     const messages = {
-        ready: 'ui.consentReady', composing: 'ui.consentPlanPreparing', lead: 'ui.consentReadingLead', recording: 'ui.consentRecording', paused: 'ui.consentPaused',
+        ready: 'ui.consentReady', composing: 'ui.consentPlanPreparing', awaitingConsent: 'ui.consentAwaitingManualStart', lead: 'ui.consentReadingLead', recording: 'ui.consentRecording', paused: 'ui.consentPaused',
         recorded: 'ui.consentRecorded', error: 'ui.consentError'
     };
     if (status && messages[stateName]) status.textContent = t(messages[stateName]);
-    record?.classList.toggle('hidden', stateName !== 'ready');
+    record?.classList.toggle('hidden', stateName !== 'ready' && stateName !== 'awaitingConsent');
     pause?.classList.toggle('hidden', stateName !== 'lead' && stateName !== 'recording' && stateName !== 'paused');
     stop?.classList.toggle('hidden', stateName !== 'lead' && stateName !== 'recording' && stateName !== 'paused');
     retry?.classList.toggle('hidden', stateName !== 'recorded' && stateName !== 'error');
     submit?.classList.toggle('hidden', stateName !== 'recorded');
     if (pause) pause.setAttribute('aria-label', t(stateName === 'paused' ? 'ui.resumeRecording' : 'ui.pauseRecording'));
     if (pauseIcon) pauseIcon.textContent = stateName === 'paused' ? '▶' : 'Ⅱ';
+    if (record) {
+        const recordLabel = t(stateName === 'awaitingConsent' ? 'ui.startConsentRecording' : 'ui.startRecording');
+        record.setAttribute('aria-label', recordLabel);
+        record.title = recordLabel;
+    }
     if (recordingClock && stateName === 'ready') recordingClock.textContent = '00:00';
     if (stateName === 'paused' || stateName === 'recorded' || stateName === 'error' || stateName === 'ready') {
         stopConsentPromptAutoScroll(stateName === 'ready');
@@ -4367,20 +4368,8 @@ async function startConsultationRecording() {
         const shouldTransition = await waitForConsentAttempt(consentTiming('planTransitionMs', 1000), attemptId);
         if (!shouldTransition || attemptId !== consultationRecordingAttempt) return;
 
-        const countdown = document.getElementById('consent-countdown');
-        countdown?.classList.remove('hidden');
-        for (let remaining = 3; remaining >= 1; remaining -= 1) {
-            if (countdown) countdown.textContent = String(remaining);
-            if (status) status.textContent = `${t('ui.consentPreparing')} ${remaining}`;
-            const shouldContinue = await waitForConsentAttempt(consentTiming('countdownStepMs', 1000), attemptId);
-            if (!shouldContinue || attemptId !== consultationRecordingAttempt) return;
-        }
-        countdown?.classList.add('hidden');
-        consultationCompositePhase = 'consent';
-        consultationRecordingStartedAt = new Date();
-        consultationRecordingStartTick = performance.now();
-        setConsentAudioEnabled(true);
-        startConsentPromptWithLead(true);
+        consultationAwaitingConsentStart = true;
+        setConsentRecordingState('awaitingConsent');
     } catch (error) {
         acquiredAudioStream?.getTracks().forEach(track => track.stop());
         stopConsultationStream();
@@ -4390,6 +4379,21 @@ async function startConsultationRecording() {
         const recordButton = document.getElementById('consent-record');
         if (recordButton && attemptId === consultationRecordingAttempt) recordButton.disabled = false;
     }
+}
+
+function startSpokenConsentRecording() {
+    if (!consultationAwaitingConsentStart || consultationRecorder?.state !== 'recording') return;
+    consultationAwaitingConsentStart = false;
+    consultationCompositePhase = 'consent';
+    consultationRecordingStartedAt = new Date();
+    consultationRecordingStartTick = performance.now();
+    setConsentAudioEnabled(true);
+    startConsentPromptWithLead(true);
+}
+
+function handleConsentRecordAction() {
+    if (consultationAwaitingConsentStart) startSpokenConsentRecording();
+    else startConsultationRecording();
 }
 
 function resetConsultationRecording() {
@@ -4422,6 +4426,7 @@ function resetConsultationRecording() {
     consultationVideoPlan = null;
     consultationCompositePhase = 'idle';
     consultationPlanPageIndex = 0;
+    consultationAwaitingConsentStart = false;
     consentPromptLeadRemaining = 0;
     consentPromptLeadStartedAt = 0;
     if (consultationStopTimer) {
@@ -5456,7 +5461,7 @@ function attachEventListeners() {
         }
         showScreen(lobbyScreen);
     });
-    document.getElementById('consent-record')?.addEventListener('click', startConsultationRecording);
+    document.getElementById('consent-record')?.addEventListener('click', handleConsentRecordAction);
     document.getElementById('consent-pause')?.addEventListener('click', () => {
         if (!consultationRecorder) return;
         if (consultationRecorder.state === 'recording') {
@@ -5523,8 +5528,11 @@ function attachEventListeners() {
             planPageDurationMs: consentTiming('planPageMs', 5000),
             planAudio: 'silent',
             videoFormat: '1280x720-landscape-16:9',
-            planDesign: 'material-cards',
-            consentCameraLayout: 'minimal-material-evidence-with-circular-camera',
+            planDesign: 'luxury-document',
+            consentCameraLayout: 'luxury-document-evidence-with-circular-camera',
+            consentStartMode: 'manual-after-plan-pages',
+            teleprompterLeadMs: consentTiming('readingLeadMs', 7000),
+            liveWallClock: true,
             storage: 'memory-only-prototype'
         };
         applyApprovedConsultationPlan(sessionPlan);
