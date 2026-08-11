@@ -301,3 +301,13 @@
 - Consent Confirmation again uses a bounded vertically scrollable script so the complete declaration is accessible. Continue to Recording is centered, with Cancel on the row below.
 - Saved metadata advances to consent version 3 and composition `session-plan-then-spoken-consent-v4`, with `recording-date-only` verbal evidence and native-file-share capability recorded.
 - Runtime versions: `app.js?v=1.81`, `style.css?v=1.68`, service-worker cache `chakra-v5.41`. Focused functional Playwright validation passed 1/1 and the complete regression passed **34/34**, both with screenshot capture disabled.
+
+### Consultation timing authority and session reset — 2026-08-11
+
+- Replaced shared-budget chakra redistribution with independent timing. The Core duration is the baseline; Some additional support adds one minute and More attention adds two minutes to that chakra only, with every result capped at seven minutes.
+- Added `activeChakras` to the session plan so consultation focus remains a customization layer and no longer replaces the journey's active chakra selection. Existing consented plans without this field recover their active selection from stored chakra-duration keys.
+- A consent-recorded plan now locks Core Practice Duration in the Meditation Room and presents a localized Consultation Plan Active panel with client name, every active chakra timing, and the exact chakra-practice total.
+- The session estimate now sums the active consultation timings before applying the existing stage and service overheads, matching the durations the runtime will consume. Missing individual values continue to use the Core duration.
+- Added a confirmed `End Consultation and Reset Session` action. It clears the local client plan, consent metadata, and in-memory recording; restores all seven chakras, the production five-minute Core default, standard meditation language/voice, normal frequency state, and consultation-controlled guidance/care defaults; then re-enables Core timing. Statistics, journal entries, display language, and audio levels are retained.
+- The approved product boundary is preserved: the complete timing table appears in the Meditation Room only and was not added to Guide Review or the recorded plan pages.
+- Runtime versions: `app.js?v=1.82`, `style.css?v=1.69`, service-worker cache `chakra-v5.42`. Focused timing/consultation validation passed 2/2 and the complete regression passed **35/35**, with screenshot capture disabled.

@@ -4,6 +4,8 @@
 
 The implemented single-participant consultation slice was compared with this plan after the full Playwright run. The completed items have been removed from this temporary checklist. The current app supports the local consultation flow:
 
+- Consent-recorded consultations own chakra timing until the guide explicitly ends and resets the client session. Chakra focus customizes independent 1–7 minute timings without replacing the active journey list; the Meditation Room shows the active schedule and uses its sum for the session estimate.
+
 ```text
 Settings → Consultation intake → Guide Review → Consent prompter → Lobby → Meditation
 ```

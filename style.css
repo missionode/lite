@@ -794,6 +794,135 @@ select:focus {
     text-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
 }
 
+.timing-source-note {
+    margin: 0.15rem 0 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+#core-practice-duration-control.consultation-timing-locked {
+    border-color: rgba(251, 191, 36, 0.34);
+}
+
+#core-practice-duration-control.consultation-timing-locked input[type="range"] {
+    cursor: not-allowed;
+    opacity: 0.42;
+}
+
+#core-practice-duration-control.consultation-timing-locked .range-step {
+    cursor: not-allowed;
+    opacity: 0.38;
+}
+
+.consultation-timing-panel {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    padding: 1.25rem;
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(72, 53, 20, 0.3), rgba(20, 14, 35, 0.68));
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.consultation-timing-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.consultation-timing-header h2 {
+    margin: 0.45rem 0 0;
+    color: #fff9e8;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+.consultation-timing-badge {
+    display: inline-flex;
+    padding: 0.34rem 0.65rem;
+    border: 1px solid rgba(251, 191, 36, 0.38);
+    border-radius: 999px;
+    color: #f8d47c;
+    background: rgba(251, 191, 36, 0.1);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.consultation-timing-client {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.72rem;
+    text-align: right;
+}
+
+.consultation-timing-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.consultation-timing-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.consultation-timing-name {
+    min-width: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+}
+
+.consultation-timing-duration {
+    flex: 0 0 auto;
+    color: #f8d47c;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.consultation-timing-total {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.consultation-reset-btn {
+    width: min(100%, 420px);
+    margin: 0 auto;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 600px) {
+    .consultation-timing-header {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .consultation-timing-client {
+        text-align: left;
+    }
+
+    .consultation-timing-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .journey-roadmap {
     width: 100%;
     max-width: 620px;

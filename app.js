@@ -17,6 +17,9 @@ const MANTRA_AUDIO_MAP = {
     high_energy: 'audio/HREEM.mp3'
 };
 
+const STANDARD_CHAKRA_KEYS = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+const MAX_CHAKRA_MINUTES = 7;
+
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -4200,37 +4203,158 @@ function updateConsultationChakraQuestions() {
 }
 
 function buildAdaptiveChakraDurations(selectedChakras, focusChakras, chakraResponses = {}) {
-    const selected = selectedChakras.length ? selectedChakras : state.selectedChakras;
+    const selected = selectedChakras.length ? selectedChakras : STANDARD_CHAKRA_KEYS;
     const focus = new Set(focusChakras);
-    const totalSeconds = Math.max(60, Math.round(state.timePerChakra * 60 * selected.length));
-    const answerWeights = { often: 1.15, sometimes: 1, rarely: 0.9, 'prefer-not': 1 };
-    const weights = selected.map(key => {
-        const response = chakraResponses[key]?.attention;
-        const answers = chakraResponses[key]?.answers || [];
-        const answerWeight = answers.length
-            ? answers.reduce((sum, answer) => sum + (answerWeights[answer] || 1), 0) / answers.length
-            : 1;
-        if (response === 'more') return Math.max(1.3, answerWeight);
-        if (response === 'support') return Math.max(1.15, answerWeight);
-        if (response === 'skip') return 1;
-        return focus.has(key) ? Math.max(1.15, answerWeight) : answerWeight;
-    });
-    const weightTotal = weights.reduce((sum, value) => sum + value, 0) || 1;
+    const baseMinutes = Math.max(1, Math.min(MAX_CHAKRA_MINUTES, Number(state.timePerChakra) || 5));
     const durations = {};
-    selected.forEach((key, index) => {
-        durations[key] = Math.max(60, Math.min(600, Math.round(totalSeconds * weights[index] / weightTotal)));
+    selected.forEach(key => {
+        const attention = focus.has(key) ? chakraResponses[key]?.attention : 'standard';
+        const additionalMinutes = attention === 'more' ? 2 : attention === 'support' ? 1 : 0;
+        durations[key] = Math.round(Math.min(MAX_CHAKRA_MINUTES, baseMinutes + additionalMinutes) * 60);
     });
     return durations;
 }
 
-function approvedChakraDurationMinutes(key) {
+function getActiveConsultationPlan() {
     try {
         const plan = JSON.parse(localStorage.getItem('chakra_consultation_plan') || 'null');
-        const seconds = plan?.status === 'consent-recorded' ? plan.chakraDurations?.[key] : null;
-        return Number.isFinite(Number(seconds)) ? Number(seconds) / 60 : state.timePerChakra;
+        return plan?.status === 'consent-recorded' ? plan : null;
     } catch {
-        return state.timePerChakra;
+        return null;
     }
+}
+
+function getConsultationPlanChakras(plan) {
+    if (!plan) return [...state.selectedChakras];
+    const planned = Array.isArray(plan.activeChakras) && plan.activeChakras.length
+        ? plan.activeChakras
+        : Object.keys(plan.chakraDurations || {});
+    return planned.filter(key => STANDARD_CHAKRA_KEYS.includes(key));
+}
+
+function approvedChakraDurationMinutes(key) {
+    const plan = getActiveConsultationPlan();
+    const seconds = plan?.chakraDurations?.[key];
+    return Number.isFinite(Number(seconds)) && Number(seconds) > 0
+        ? Math.min(MAX_CHAKRA_MINUTES, Number(seconds) / 60)
+        : state.timePerChakra;
+}
+
+function getActiveChakraPracticeMinutes() {
+    const plan = getActiveConsultationPlan();
+    if (!plan) return state.selectedChakras.length * state.timePerChakra;
+    return state.selectedChakras.reduce((total, key) => total + approvedChakraDurationMinutes(key), 0);
+}
+
+function formatChakraMinutes(minutes) {
+    return `${new Intl.NumberFormat([], { maximumFractionDigits: 1 }).format(minutes)} ${t('ui.minutes')}`;
+}
+
+function renderMeditationRoomTiming() {
+    const plan = getActiveConsultationPlan();
+    const coreControl = document.getElementById('core-practice-duration-control');
+    const coreNote = document.getElementById('core-practice-timing-note');
+    const panel = document.getElementById('consultation-timing-panel');
+    const list = document.getElementById('consultation-timing-list');
+    const client = document.getElementById('consultation-timing-client');
+    const total = document.getElementById('consultation-timing-total');
+    if (timeSlider) timeSlider.disabled = Boolean(plan);
+    const rangeControl = timeSlider?.closest('.range-control');
+    const rangeButtons = rangeControl?.querySelectorAll('.range-step') || [];
+    rangeButtons.forEach(button => {
+        const isDecrease = button.classList.contains('range-decrement');
+        const atLimit = isDecrease
+            ? Number(timeSlider.value) <= Number(timeSlider.min)
+            : Number(timeSlider.value) >= Number(timeSlider.max);
+        button.disabled = Boolean(plan) || atLimit;
+    });
+    coreControl?.classList.toggle('consultation-timing-locked', Boolean(plan));
+    if (coreNote) coreNote.textContent = t(plan ? 'ui.coreTimingManagedByConsultation' : 'ui.coreTimingActive');
+    panel?.classList.toggle('hidden', !plan);
+    if (!plan || !list) return;
+    const labelKeys = { root: 'root', sacral: 'sacral', solar: 'solar', heart: 'heart', throat: 'throat', thirdeye: 'thirdEye', crown: 'crown' };
+    const plannedChakras = getConsultationPlanChakras(plan);
+    if (plannedChakras.length && plannedChakras.join('|') !== state.selectedChakras.join('|')) {
+        state.selectedChakras = [...plannedChakras];
+        localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
+        document.querySelectorAll('#chakra-selection input').forEach(input => {
+            input.checked = state.selectedChakras.includes(input.value);
+        });
+    }
+    list.innerHTML = plannedChakras.map(key => `
+        <div class="consultation-timing-row">
+            <span class="consultation-timing-name">${t(`ui.${labelKeys[key]}`)}</span>
+            <strong class="consultation-timing-duration">${formatChakraMinutes(approvedChakraDurationMinutes(key))}</strong>
+        </div>
+    `).join('');
+    if (client) client.textContent = t('ui.consultationTimingForClient').replace('{name}', plan.profile?.name || t('ui.client'));
+    const totalMinutes = plannedChakras.reduce((sum, key) => sum + approvedChakraDurationMinutes(key), 0);
+    if (total) total.textContent = t('ui.consultationTimingTotal').replace('{duration}', formatChakraMinutes(totalMinutes));
+}
+
+function resetConsultationSession() {
+    if (!getActiveConsultationPlan()) return;
+    if (!window.confirm(t('ui.resetConsultationConfirm'))) return;
+    resetConsultationRecording();
+    localStorage.removeItem('chakra_consultation_plan');
+    const defaultLanguage = languageRegistry.find(language => language.id === 'ml') || languageRegistry[0];
+    state.language = defaultLanguage?.id || 'ml';
+    state.voiceName = defaultLanguage?.defaultPiperVoice
+        ? `piper:${defaultLanguage.defaultPiperVoice}`
+        : 'browser:Default';
+    state.timePerChakra = timingDefault('timePerChakra', 5);
+    state.selectedChakras = [...STANDARD_CHAKRA_KEYS];
+    state.audioFilters = false;
+    state.hooponopono = false;
+    state.reverseJourney = false;
+    state.chakraFrequencies = true;
+    state.yogaBridgeEnabled = false;
+    state.corpsePoseEnabled = false;
+    state.bathSessionEnabled = false;
+    state.massageEnabled = false;
+    state.perinealCareEnabled = false;
+    state.assistedBathingEnabled = false;
+    state.selectedYogaPoses = ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'];
+    state.timeYogaPrep = timingDefault('yogaPreparation', 60);
+    state.timeYogaPose = timingDefault('yogaPose', 60);
+    state.timeCorpse = timingDefault('corpsePose', 300);
+    state.timeBath = timingDefault('bath', 600);
+    state.timeMassage = timingDefault('massage', 600);
+    state.timePerinealCare = timingDefault('perinealCare', 300);
+    state.timeAssistedBathing = timingDefault('assistedBathing', 600);
+    const resetValues = {
+        chakra_lang: state.language,
+        chakra_voice: state.voiceName,
+        chakra_time: state.timePerChakra,
+        chakra_selected: JSON.stringify(state.selectedChakras),
+        chakra_audio_filters: false,
+        chakra_hooponopono: false,
+        chakra_reverse_journey: false,
+        chakra_frequencies: true,
+        chakra_yoga_bridge: false,
+        chakra_corpse_enabled: false,
+        chakra_bath_enabled: false,
+        chakra_massage: false,
+        chakra_perineal_care: false,
+        chakra_assisted_bathing: false,
+        chakra_yoga_selected: JSON.stringify(state.selectedYogaPoses),
+        chakra_time_yoga_prep: state.timeYogaPrep,
+        chakra_time_yoga_pose: state.timeYogaPose,
+        chakra_time_corpse: state.timeCorpse,
+        chakra_time_bath: state.timeBath,
+        chakra_time_massage: state.timeMassage,
+        chakra_time_perineal_care: state.timePerinealCare,
+        chakra_time_assisted_bathing: state.timeAssistedBathing
+    };
+    Object.entries(resetValues).forEach(([key, value]) => localStorage.setItem(key, String(value)));
+    document.getElementById('consultation-form')?.reset();
+    setupVoices();
+    loadPreferences();
+    refreshRangeControlDisplays();
+    document.getElementById('yoga-bridge-toggle')?.dispatchEvent(new Event('change'));
+    document.getElementById('bath-session-toggle')?.dispatchEvent(new Event('change'));
+    renderMeditationRoomTiming();
+    globalThis.updateSessionEstimate?.();
 }
 
 function updateConsultationCareVisibility() {
@@ -4602,8 +4726,9 @@ function applyApprovedConsultationPlan(sessionPlan) {
     state.assistedBathingEnabled = state.bathSessionEnabled && Boolean(preferences.assistedBathingEnabled);
     state.selectedYogaPoses = state.yogaBridgeEnabled && Array.isArray(preferences.selectedYogaPoses)
         ? preferences.selectedYogaPoses : [];
-    if (Array.isArray(sessionPlan.chakraFocus) && sessionPlan.chakraFocus.length) {
-        state.selectedChakras = [...sessionPlan.chakraFocus];
+    const plannedChakras = getConsultationPlanChakras(sessionPlan);
+    if (plannedChakras.length) {
+        state.selectedChakras = [...plannedChakras];
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
         document.querySelectorAll('#chakra-selection input').forEach(input => {
             input.checked = state.selectedChakras.includes(input.value);
@@ -5144,6 +5269,7 @@ function attachEventListeners() {
     }
 
     function updateSessionEstimate() {
+        renderMeditationRoomTiming();
         if (getChecked('music-only-toggle')) {
             setText('session-estimate', 'Music only — stop anytime');
             updateJourneyRoadmap();
@@ -5176,9 +5302,10 @@ function attachEventListeners() {
             }
         }
 
+        const chakraPracticeMinutes = getActiveChakraPracticeMinutes();
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'normalExtra'));
+            : Math.round(chakraPracticeMinutes + (state.selectedChakras.length * timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + corpseTime + overhead + timing('estimate', 'normalExtra'));
         setText('session-estimate', `~ ${estimate} min session`);
         updateJourneyRoadmap();
     }
@@ -5359,6 +5486,7 @@ function attachEventListeners() {
     });
 
     timeSlider.addEventListener('input', (e) => {
+        if (getActiveConsultationPlan()) return renderMeditationRoomTiming();
         state.timePerChakra = parseFloat(e.target.value);
         timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
         localStorage.setItem('chakra_time', state.timePerChakra);
@@ -5395,6 +5523,7 @@ function attachEventListeners() {
         cb.addEventListener('change', updateConsultationChakraQuestions);
     });
     updateConsultationChakraQuestions();
+    document.getElementById('reset-consultation-session')?.addEventListener('click', resetConsultationSession);
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     beginConsultationBtn?.addEventListener('click', () => {
         showScreen(consultationScreen);
@@ -5438,6 +5567,7 @@ function attachEventListeners() {
         const countryOption = document.getElementById('consultation-citizenship')?.selectedOptions[0];
         const citizenshipName = countryOption?.textContent?.trim() || data.citizenship;
         const focusChakras = formData.getAll('chakraFocus');
+        const activeChakras = state.selectedChakras.length ? [...state.selectedChakras] : [...STANDARD_CHAKRA_KEYS];
         const chakraResponses = Object.fromEntries(focusChakras.map(key => [key, {
             answers: [1, 2, 3].map(index => String(formData.get(`chakraAnswer_${key}_${index}`) || 'prefer-not')),
             attention: String(formData.get(`chakraNeed_${key}`) || 'standard'),
@@ -5497,9 +5627,10 @@ function attachEventListeners() {
                 flags: safetyFlags
             },
             goal: data.goal,
+            activeChakras,
             chakraFocus: focusChakras,
             chakraResponses,
-            chakraDurations: buildAdaptiveChakraDurations(state.selectedChakras, focusChakras, chakraResponses)
+            chakraDurations: buildAdaptiveChakraDurations(activeChakras, focusChakras, chakraResponses)
         };
         localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
         renderConsultationReview(sessionPlan);
@@ -5657,6 +5788,8 @@ function attachEventListeners() {
         };
         applyApprovedConsultationPlan(sessionPlan);
         localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
+        renderMeditationRoomTiming();
+        globalThis.updateSessionEstimate?.();
         stopConsentCameraPreview();
         showScreen(lobbyScreen);
     });

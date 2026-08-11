@@ -251,11 +251,14 @@ test('opens the single-participant consultation entry point and returns a saved 
   expect(plan.profile.name).toBe('Test Client');
   expect(plan.goal).toBe('Feel grounded and clear.');
   expect(plan.language).toBe('en');
+  expect(plan.activeChakras).toEqual(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
   expect(plan.chakraFocus).toEqual(['heart']);
   expect(plan.chakraResponses.heart.attention).toBe('more');
   expect(plan.chakraResponses.heart.answers).toEqual(['sometimes', 'often', 'rarely']);
   expect(plan.chakraResponses.heart.note).toBe('Support compassion and connection.');
-  expect(plan.chakraDurations.heart).toBeGreaterThan(plan.chakraDurations.root);
+  expect(plan.chakraDurations.root).toBe(60);
+  expect(plan.chakraDurations.heart).toBe(180);
+  expect(Math.max(...Object.values(plan.chakraDurations))).toBeLessThanOrEqual(7 * 60);
   expect(plan.preferences.yogaBridgeEnabled).toBe(true);
   expect(plan.preferences.voiceGender).toBe('female');
   expect(plan.preferences.selectedYogaPoses).toEqual(['balasana']);
@@ -411,6 +414,66 @@ test('opens the single-participant consultation entry point and returns a saved 
   await page.locator('#consent-retry').click();
   await expect(page.locator('#consent-record-stage')).toBeVisible();
   await expect(page.locator('#consent-recording-clock')).toHaveText('00:00');
+});
+
+test('locks Core timing for an active consultation and resets the client session', async ({ page }) => {
+  await page.evaluate(() => {
+    const activeChakras = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+    localStorage.setItem('chakra_lang', 'en');
+    localStorage.setItem('chakra_voice', 'piper:en_US-lessac-medium');
+    localStorage.setItem('chakra_time', '1');
+    localStorage.setItem('chakra_selected', JSON.stringify(activeChakras));
+    localStorage.setItem('chakra_consultation_plan', JSON.stringify({
+      schemaVersion: 1,
+      status: 'consent-recorded',
+      profile: { name: 'Timing Client' },
+      activeChakras,
+      chakraFocus: activeChakras,
+      chakraDurations: {
+        root: 240,
+        sacral: 300,
+        solar: 240,
+        heart: 420,
+        throat: 300,
+        thirdeye: 360,
+        crown: 300
+      },
+      preferences: {},
+      durations: {},
+      consent: { recordedAt: new Date().toISOString() }
+    }));
+  });
+  await page.reload();
+  await expect(page.locator('#config-screen')).toBeVisible();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+
+  await expect(page.locator('#time-per-chakra')).toBeDisabled();
+  await expect(page.locator('#core-practice-timing-note')).toContainText('Locked while');
+  await expect(page.locator('#consultation-timing-panel')).toBeVisible();
+  await expect(page.locator('#consultation-timing-client')).toContainText('Timing Client');
+  await expect(page.locator('.consultation-timing-row')).toHaveCount(7);
+  await expect(page.locator('.consultation-timing-row').filter({ hasText: 'Heart' })).toContainText('7 mins');
+  await expect(page.locator('#consultation-timing-total')).toContainText('36 mins');
+  await expect(page.locator('#session-estimate')).toContainText('~ 36 min session');
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#reset-consultation-session').click();
+  await expect(page.locator('#consultation-timing-panel')).toBeHidden();
+  await expect(page.locator('#time-per-chakra')).toBeEnabled();
+  await expect(page.locator('#core-practice-timing-note')).toContainText('Core timing is active');
+  const resetState = await page.evaluate(() => ({
+    plan: localStorage.getItem('chakra_consultation_plan'),
+    selected: JSON.parse(localStorage.getItem('chakra_selected')),
+    core: localStorage.getItem('chakra_time'),
+    language: localStorage.getItem('chakra_lang'),
+    voice: localStorage.getItem('chakra_voice')
+  }));
+  expect(resetState.plan).toBeNull();
+  expect(resetState.selected).toEqual(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
+  expect(resetState.core).toBe('0.1');
+  expect(resetState.language).toBe('ml');
+  expect(resetState.voice).toContain('piper:ml_IN-');
 });
 
 test('Guide Review routes sensitive plans to manual delivery and removes movement stages', async ({ page }) => {
