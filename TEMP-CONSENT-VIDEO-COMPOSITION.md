@@ -49,4 +49,6 @@ Remove this file only after all local browser-side items are implemented, tested
 - Restored the historical saved-video layout for the spoken section: consent script as the primary surface, circular face thumbnail at the side, synchronized voice/timer, and no microphone audio during plan pages.
 - Plan video data now comes from an explicit approved-plan allowlist rather than copying the complete Guide Review DOM. Client contact data, emergency-contact data, medication details, private reflection notes, and guide notes are excluded.
 - Review Recording identifies and plays the complete sequence: silent approved-plan pages followed by spoken consent. Retry clears the complete composition state.
+- Export format is fixed at `1280×720` landscape even when recording from a portrait phone. Plan pages use Material-inspired summary cards; the spoken section shows a minimal synchronized excerpt and evidence details rather than copying the full teleprompter.
+- Retry and Accept are explicitly restored when Review Recording opens and remain together below the player on narrow screens.
 - No committed historical implementation can be checked out: these consent iterations exist in the uncommitted working tree and documentation rather than a Git commit after baseline `969ff2e`.

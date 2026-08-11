@@ -3230,6 +3230,7 @@ let consultationRecordingPausedDuration = 0;
 let consultationLocation = null;
 let consultationConsentOpenedAt = null;
 let consultationPlanPages = [];
+let consultationVideoPlan = null;
 let consultationCompositePhase = 'idle';
 let consultationPlanPageIndex = 0;
 let consultationAudioContext = null;
@@ -3384,6 +3385,8 @@ function showConsentPreviewStage() {
     document.getElementById('consent-video-preview')?.classList.remove('hidden');
     consultationConsentScreen?.classList.remove('consent-recording-active', 'consent-teleprompter-mode');
     consultationConsentScreen?.classList.add('consent-preview-mode');
+    document.getElementById('consent-retry')?.classList.remove('hidden');
+    document.getElementById('consent-submit')?.classList.remove('hidden');
     const planCount = document.getElementById('consent-preview-plan-count');
     if (planCount) planCount.textContent = t('ui.consentPlanPageCount').replace('{count}', String(consultationPlanPages.length));
 }
@@ -3596,36 +3599,118 @@ function drawConsentPlanRows(context, lines, width, padding, startY, contentBott
     });
 }
 
+function drawConsentMaterialCard(context, x, y, width, height, index, label, value, fontFamily) {
+    context.save();
+    context.shadowColor = 'rgba(31, 41, 55, 0.14)';
+    context.shadowBlur = 20;
+    context.shadowOffsetY = 8;
+    drawConsentRoundedRect(context, x, y, width, height, 22);
+    context.fillStyle = '#ffffff';
+    context.fill();
+    context.restore();
+
+    context.fillStyle = index % 2 ? '#efe7ff' : '#fff3dc';
+    context.beginPath();
+    context.arc(x + 42, y + 44, 22, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = index % 2 ? '#6d28d9' : '#9a6700';
+    context.font = `700 17px ${fontFamily}`;
+    context.textAlign = 'center';
+    context.fillText(String(index + 1), x + 42, y + 50);
+    context.textAlign = 'start';
+
+    context.fillStyle = '#6b7280';
+    context.font = `700 15px ${fontFamily}`;
+    context.fillText(label.toUpperCase(), x + 76, y + 49);
+    context.fillStyle = '#1f2937';
+    context.font = `700 25px ${fontFamily}`;
+    const valueLines = wrapConsentCanvasText(context, value, width - 56);
+    const maxLines = Math.max(3, Math.floor((height - 112) / 37));
+    const visibleLines = valueLines.slice(0, maxLines);
+    if (valueLines.length > maxLines) visibleLines[maxLines - 1] = `${visibleLines[maxLines - 1].replace(/[.,;:]?$/, '')}…`;
+    visibleLines.forEach((line, lineIndex) => context.fillText(line, x + 28, y + 112 + lineIndex * 37));
+}
+
 function drawConsentPlanFrame(context, width, height) {
-    const portrait = height > width;
-    const padding = Math.round(width * (portrait ? 0.065 : 0.055));
+    const padding = 52;
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
     const pageIndex = Math.min(consultationPlanPageIndex, Math.max(0, consultationPlanPages.length - 1));
     const page = consultationPlanPages[pageIndex] || [];
-    context.fillStyle = '#f1f0ec';
+    const heading = page[0] || t('ui.consentPlanOverview');
+    const rows = page.slice(1).map(line => {
+        const separator = line.indexOf(': ');
+        return separator > 0
+            ? { label: line.slice(0, separator), value: line.slice(separator + 2) }
+            : { label: t('ui.consentPlanDetails'), value: line };
+    });
+    context.fillStyle = '#f6f7fb';
     context.fillRect(0, 0, width, height);
-    const accent = context.createLinearGradient(0, 0, width, 0);
-    accent.addColorStop(0, '#6d28d9');
-    accent.addColorStop(1, '#b88732');
-    context.fillStyle = accent;
-    context.fillRect(0, 0, width, Math.max(10, Math.round(height * 0.016)));
+    const appBar = context.createLinearGradient(0, 0, width, 0);
+    appBar.addColorStop(0, '#3b1768');
+    appBar.addColorStop(0.72, '#5b21b6');
+    appBar.addColorStop(1, '#7c3aed');
+    context.fillStyle = appBar;
+    context.fillRect(0, 0, width, 112);
 
-    const logoSize = Math.round(width * (portrait ? 0.13 : 0.075));
+    const logoSize = 64;
     if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
-        context.drawImage(consultationConsentLogo, width - padding - logoSize, padding, logoSize, logoSize);
+        context.drawImage(consultationConsentLogo, padding, 24, logoSize, logoSize);
     }
-    context.fillStyle = '#1f2937';
-    context.font = `700 ${Math.max(28, Math.round(width * (portrait ? 0.055 : 0.035)))}px Arial, sans-serif`;
-    context.fillText(t('ui.consentPlanVideoTitle'), padding, padding + Math.max(34, Math.round(width * 0.04)));
-    context.fillStyle = '#667085';
-    context.font = `500 ${Math.max(15, Math.round(width * 0.016))}px Arial, sans-serif`;
-    context.fillText(t('ui.consentPlanVideoSubtitle'), padding, padding + Math.max(64, Math.round(width * 0.072)));
+    context.fillStyle = '#ffffff';
+    context.font = `700 30px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanVideoTitle'), padding + 84, 55);
+    context.fillStyle = 'rgba(255, 255, 255, 0.76)';
+    context.font = `500 16px ${fontFamily}`;
+    const clientName = consultationVideoPlan?.profile?.name || t('ui.client');
+    context.fillText(`${clientName} · ${t('ui.consentPlanVideoSubtitle')}`, padding + 84, 82);
 
-    const startY = padding + logoSize + Math.max(30, Math.round(height * 0.035));
-    const footerY = height - padding;
-    drawConsentPlanRows(context, page, width, padding, startY, footerY - Math.max(34, Math.round(height * 0.04)));
-    context.fillStyle = '#667085';
-    context.font = `600 ${Math.max(14, Math.round(width * 0.014))}px Arial, sans-serif`;
-    context.fillText(t('ui.consentPlanPage').replace('{current}', String(pageIndex + 1)).replace('{total}', String(consultationPlanPages.length)), padding, footerY);
+    drawConsentRoundedRect(context, width - padding - 126, 32, 126, 46, 23);
+    context.fillStyle = 'rgba(255, 255, 255, 0.16)';
+    context.fill();
+    context.fillStyle = '#ffffff';
+    context.font = `700 15px ${fontFamily}`;
+    context.textAlign = 'center';
+    context.fillText(`${pageIndex + 1} / ${consultationPlanPages.length}`, width - padding - 63, 61);
+    context.textAlign = 'start';
+
+    context.fillStyle = '#5b21b6';
+    drawConsentRoundedRect(context, padding, 144, 8, 54, 4);
+    context.fill();
+    context.fillStyle = '#1f2937';
+    context.font = `700 34px ${fontFamily}`;
+    context.fillText(heading, padding + 28, 183);
+
+    const cardGap = 24;
+    const cardCount = Math.max(1, rows.length);
+    const cardWidth = (width - padding * 2 - cardGap * (cardCount - 1)) / cardCount;
+    rows.forEach((row, index) => drawConsentMaterialCard(context, padding + index * (cardWidth + cardGap), 226, cardWidth, 292, index, row.label, row.value, fontFamily));
+
+    drawConsentRoundedRect(context, padding, 548, width - padding * 2, 72, 18);
+    context.fillStyle = '#ede9fe';
+    context.fill();
+    context.fillStyle = '#6d28d9';
+    context.beginPath();
+    context.arc(padding + 38, 584, 19, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#ffffff';
+    context.font = `700 20px Arial, sans-serif`;
+    context.textAlign = 'center';
+    context.fillText('✓', padding + 38, 591);
+    context.textAlign = 'start';
+    context.fillStyle = '#4c1d95';
+    context.font = `700 18px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanApprovedBanner'), padding + 72, 591);
+
+    const progressWidth = width - padding * 2;
+    context.fillStyle = '#e1e3ea';
+    drawConsentRoundedRect(context, padding, 665, progressWidth, 8, 4);
+    context.fill();
+    context.fillStyle = '#7c3aed';
+    drawConsentRoundedRect(context, padding, 665, progressWidth * ((pageIndex + 1) / consultationPlanPages.length), 8, 4);
+    context.fill();
+    context.fillStyle = '#6b7280';
+    context.font = `600 14px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanPage').replace('{current}', String(pageIndex + 1)).replace('{total}', String(consultationPlanPages.length)), padding, 699);
 }
 
 function drawConsentTransitionFrame(context, width, height) {
@@ -3670,85 +3755,132 @@ function drawConsentCameraThumbnail(context, centerX, centerY, radius) {
 }
 
 function drawConsentSpokenFrame(context, width, height) {
-    const portrait = height > width;
-    const padding = Math.round(width * (portrait ? 0.055 : 0.045));
+    const padding = 52;
     const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
     const elapsed = getConsentRecordingElapsed();
     const recordingClock = document.getElementById('consent-recording-clock');
     if (recordingClock) recordingClock.textContent = formatConsentElapsed(elapsed);
     updateConsentMetadataDisplay();
 
-    context.fillStyle = '#171025';
+    context.fillStyle = '#f6f7fb';
     context.fillRect(0, 0, width, height);
-    const glow = context.createRadialGradient(width * 0.3, height * 0.2, 0, width * 0.3, height * 0.2, width * 0.9);
-    glow.addColorStop(0, 'rgba(124, 58, 237, 0.24)');
-    glow.addColorStop(1, 'rgba(23, 16, 37, 0)');
-    context.fillStyle = glow;
-    context.fillRect(0, 0, width, height);
-
-    const logoSize = Math.round(width * (portrait ? 0.105 : 0.065));
+    const appBar = context.createLinearGradient(0, 0, width, 0);
+    appBar.addColorStop(0, '#3b1768');
+    appBar.addColorStop(1, '#6d28d9');
+    context.fillStyle = appBar;
+    context.fillRect(0, 0, width, 96);
+    const logoSize = 58;
     if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
-        context.drawImage(consultationConsentLogo, width - padding - logoSize, padding, logoSize, logoSize);
+        context.drawImage(consultationConsentLogo, padding, 19, logoSize, logoSize);
     }
     context.fillStyle = '#ffffff';
-    context.font = `700 ${Math.max(24, Math.round(width * (portrait ? 0.045 : 0.028)))}px ${fontFamily}`;
-    context.fillText(t('ui.consentTitle'), padding, padding + Math.max(30, Math.round(width * 0.032)));
-
-    const timerWidth = portrait ? 150 : 180;
-    const timerHeight = portrait ? 50 : 56;
-    drawConsentRoundedRect(context, padding, padding + Math.max(48, Math.round(width * 0.05)), timerWidth, timerHeight, timerHeight / 2);
-    context.fillStyle = 'rgba(8, 5, 18, 0.72)';
+    context.font = `700 27px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceLabel'), padding + 78, 58);
+    drawConsentRoundedRect(context, width - padding - 170, 23, 170, 50, 25);
+    context.fillStyle = 'rgba(255, 255, 255, 0.15)';
     context.fill();
-    context.fillStyle = '#ef4444';
+    context.fillStyle = '#ff5252';
     context.beginPath();
-    context.arc(padding + 23, padding + Math.max(48, Math.round(width * 0.05)) + timerHeight / 2, 7, 0, Math.PI * 2);
+    context.arc(width - padding - 142, 48, 7, 0, Math.PI * 2);
     context.fill();
     context.fillStyle = '#ffffff';
-    context.font = `${portrait ? 21 : 23}px Arial, sans-serif`;
-    context.fillText(formatConsentElapsed(elapsed), padding + 42, padding + Math.max(48, Math.round(width * 0.05)) + timerHeight * 0.67);
+    context.font = `700 21px Arial, sans-serif`;
+    context.fillText(formatConsentElapsed(elapsed), width - padding - 122, 56);
 
-    const panelTop = Math.round(height * (portrait ? 0.16 : 0.18));
-    const panelWidth = portrait ? width - padding * 2 : Math.round(width * 0.7);
-    const panelHeight = Math.round(height * (portrait ? 0.57 : 0.68));
-    drawConsentRoundedRect(context, padding, panelTop, panelWidth, panelHeight, portrait ? 22 : 18);
-    context.fillStyle = '#fbfaf7';
+    context.save();
+    context.shadowColor = 'rgba(31, 41, 55, 0.13)';
+    context.shadowBlur = 22;
+    context.shadowOffsetY = 8;
+    drawConsentRoundedRect(context, padding, 132, 748, 512, 24);
+    context.fillStyle = '#ffffff';
     context.fill();
-    context.strokeStyle = 'rgba(212, 168, 79, 0.7)';
-    context.lineWidth = 2;
-    context.stroke();
+    context.restore();
+    context.fillStyle = '#6d28d9';
+    context.font = `700 15px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceOverline').toUpperCase(), 84, 180);
+    context.fillStyle = '#1f2937';
+    context.font = `700 38px ${fontFamily}`;
+    context.fillText(t('ui.consentTitle'), 84, 228);
+    context.fillStyle = '#606776';
+    context.font = `500 20px ${fontFamily}`;
+    context.fillText(t('ui.consentEvidenceSummary'), 84, 265);
 
-    const textInset = Math.round(panelWidth * 0.055);
-    const textWidth = panelWidth - textInset * 2;
-    const labelHeight = portrait ? 58 : 52;
-    const textTop = panelTop + labelHeight;
-    const availableHeight = panelHeight - labelHeight - textInset;
-    const fontSize = portrait ? 28 : 29;
-    const lineHeight = Math.round(fontSize * 1.52);
-    context.fillStyle = '#8a6424';
-    context.font = `700 ${portrait ? 16 : 15}px ${fontFamily}`;
-    context.fillText(t('ui.consentPromptLabel').toUpperCase(), padding + textInset, panelTop + (portrait ? 37 : 34));
-    context.fillStyle = '#20242b';
-    context.font = `600 ${fontSize}px ${fontFamily}`;
-    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), textWidth);
+    const clientName = consultationVideoPlan?.profile?.name || t('ui.client');
+    const clientGoal = consultationVideoPlan?.goal || t('ui.sessionGoal');
+    drawConsentRoundedRect(context, 84, 294, 250, 44, 22);
+    context.fillStyle = '#efe7ff';
+    context.fill();
+    context.fillStyle = '#5b21b6';
+    context.font = `700 16px ${fontFamily}`;
+    context.fillText(clientName, 105, 322);
+    drawConsentRoundedRect(context, 348, 294, 414, 44, 22);
+    context.fillStyle = '#fff3dc';
+    context.fill();
+    context.fillStyle = '#815700';
+    context.font = `600 15px ${fontFamily}`;
+    const goalLabel = wrapConsentCanvasText(context, `${t('ui.consultationSummaryGoal')}: ${clientGoal}`, 374)[0];
+    context.fillText(goalLabel, 369, 322);
+
+    drawConsentRoundedRect(context, 84, 366, 678, 206, 18);
+    context.fillStyle = '#f8f7fc';
+    context.fill();
+    context.fillStyle = '#6b7280';
+    context.font = `700 14px ${fontFamily}`;
+    context.fillText(t('ui.consentCurrentExcerpt').toUpperCase(), 112, 405);
+    context.fillStyle = '#252a34';
+    context.font = `600 25px ${fontFamily}`;
+    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), 620);
     const promptScroller = document.querySelector('#consultation-consent-screen .consent-prompter');
     const domMaxScroll = Math.max(0, (promptScroller?.scrollHeight || 0) - (promptScroller?.clientHeight || 0));
-    const canvasMaxScroll = Math.max(0, lines.length * lineHeight - availableHeight + lineHeight);
     const scrollRatio = domMaxScroll ? Math.min(1, promptScroller.scrollTop / domMaxScroll) : 0;
-    const canvasOffset = canvasMaxScroll * scrollRatio;
-    context.save();
-    context.beginPath();
-    context.rect(padding + textInset, textTop, textWidth, availableHeight);
-    context.clip();
-    lines.forEach((line, index) => context.fillText(line, padding + textInset, textTop + fontSize + index * lineHeight - canvasOffset));
-    context.restore();
+    const excerptStart = Math.min(Math.max(0, lines.length - 3), Math.floor(scrollRatio * Math.max(0, lines.length - 3)));
+    lines.slice(excerptStart, excerptStart + 3).forEach((line, index) => context.fillText(line, 112, 447 + index * 37));
+    context.fillStyle = '#dedbe8';
+    drawConsentRoundedRect(context, 112, 545, 622, 7, 3.5);
+    context.fill();
+    context.fillStyle = '#7c3aed';
+    drawConsentRoundedRect(context, 112, 545, Math.max(10, 622 * scrollRatio), 7, 3.5);
+    context.fill();
+    context.fillStyle = '#6b7280';
+    context.font = `500 14px ${fontFamily}`;
+    context.fillText(t('ui.consentPlanReference'), 84, 612);
 
-    const cameraRadius = portrait ? Math.round(width * 0.13) : Math.round(Math.min(width, height) * 0.15);
-    const cameraX = width - padding - cameraRadius;
-    const cameraY = portrait ? height - padding - cameraRadius - 34 : Math.round(height * 0.53);
-    drawConsentCameraThumbnail(context, cameraX, cameraY, cameraRadius);
-    context.fillStyle = 'rgba(255, 255, 255, 0.82)';
-    context.font = `${portrait ? 17 : 16}px ${fontFamily}`;
-    context.fillText(`${t('ui.consentScrollSpeed')}: ${document.getElementById('consent-scroll-speed-value')?.textContent || ''}`, padding, height - padding);
+    context.save();
+    context.shadowColor = 'rgba(31, 41, 55, 0.13)';
+    context.shadowBlur = 22;
+    context.shadowOffsetY = 8;
+    drawConsentRoundedRect(context, 832, 132, 396, 512, 24);
+    context.fillStyle = '#ffffff';
+    context.fill();
+    context.restore();
+    drawConsentRoundedRect(context, 978, 164, 104, 38, 19);
+    context.fillStyle = '#ffebee';
+    context.fill();
+    context.fillStyle = '#d32f2f';
+    context.font = `700 14px Arial, sans-serif`;
+    context.textAlign = 'center';
+    context.fillText('●  REC', 1030, 189);
+    context.textAlign = 'start';
+    drawConsentCameraThumbnail(context, 1030, 350, 136);
+    context.fillStyle = '#1f2937';
+    context.font = `700 25px ${fontFamily}`;
+    context.textAlign = 'center';
+    context.fillText(clientName, 1030, 528);
+    context.fillStyle = '#6b7280';
+    context.font = `500 16px ${fontFamily}`;
+    context.fillText(t('ui.consentSpokenSection'), 1030, 558);
+    context.fillStyle = '#ecfdf3';
+    drawConsentRoundedRect(context, 906, 585, 248, 38, 19);
+    context.fill();
+    context.fillStyle = '#067647';
+    context.font = `700 14px ${fontFamily}`;
+    context.fillText(t('ui.consentRecordingVerified'), 1030, 610);
+    context.textAlign = 'start';
+
+    const locationText = consultationLocation ? `${consultationLocation.latitude}, ${consultationLocation.longitude}` : t('ui.consentLocationUnavailable');
+    context.fillStyle = '#6b7280';
+    context.font = `500 14px ${fontFamily}`;
+    context.fillText(`${formatConsentDateTime(consultationRecordingStartedAt)} · ${locationText}`, padding, 696);
 }
 
 function requestConsentLocation() {
@@ -3777,6 +3909,8 @@ function drawConsentComposite() {
     canvas.dataset.compositionPhase = consultationCompositePhase;
     canvas.dataset.planPage = String(consultationPlanPageIndex + 1);
     canvas.dataset.planPages = String(consultationPlanPages.length);
+    canvas.dataset.planDesign = 'material-cards';
+    canvas.dataset.consentDesign = 'minimal-evidence';
     if (consultationCompositePhase === 'plan') {
         drawConsentPlanFrame(context, width, height);
         consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
@@ -4172,9 +4306,9 @@ async function startConsultationRecording() {
         consultationRecordingPausedAt = 0;
         consultationRecordingPausedDuration = 0;
         const canvas = document.getElementById('consent-composite-canvas');
-        const usePortraitVideo = window.innerHeight > window.innerWidth;
-        canvas.width = usePortraitVideo ? 720 : 1280;
-        canvas.height = usePortraitVideo ? 1280 : 720;
+        canvas.width = 1280;
+        canvas.height = 720;
+        canvas.dataset.videoFormat = 'landscape-16:9';
         const compositeStream = canvas.captureStream(30);
         const audioTracks = consultationRecordingStream.getAudioTracks();
         if (audioTracks.length) {
@@ -4212,6 +4346,7 @@ async function startConsultationRecording() {
 
         const storedPlan = localStorage.getItem('chakra_consultation_plan');
         const approvedPlan = storedPlan ? JSON.parse(storedPlan) : null;
+        consultationVideoPlan = approvedPlan;
         consultationPlanPages = getConsentPlanPages(approvedPlan);
         consultationCompositePhase = 'plan';
         consultationPlanPageIndex = 0;
@@ -4284,6 +4419,7 @@ function resetConsultationRecording() {
     consultationLocation = null;
     consultationConsentOpenedAt = null;
     consultationPlanPages = [];
+    consultationVideoPlan = null;
     consultationCompositePhase = 'idle';
     consultationPlanPageIndex = 0;
     consentPromptLeadRemaining = 0;
@@ -5386,7 +5522,9 @@ function attachEventListeners() {
             planPageCount: consultationPlanPages.length,
             planPageDurationMs: consentTiming('planPageMs', 5000),
             planAudio: 'silent',
-            consentCameraLayout: 'circular-thumbnail',
+            videoFormat: '1280x720-landscape-16:9',
+            planDesign: 'material-cards',
+            consentCameraLayout: 'minimal-material-evidence-with-circular-camera',
             storage: 'memory-only-prototype'
         };
         applyApprovedConsultationPlan(sessionPlan);

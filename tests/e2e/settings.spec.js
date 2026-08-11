@@ -91,7 +91,7 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
 });
 
-test('opens the single-participant consultation entry point and returns a saved plan to Lobby', async ({ page }) => {
+test('opens the single-participant consultation entry point and returns a saved plan to Lobby', async ({ page }, testInfo) => {
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await page.locator('#open-settings').click();
@@ -273,14 +273,25 @@ test('opens the single-participant consultation entry point and returns a saved 
 
   await page.locator('#consent-record').click();
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'plan');
+  if (process.env.CONSENT_VISUAL_CAPTURE) {
+    const planFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);
+    await testInfo.attach('consent-plan-frame', { body: Buffer.from(planFrame, 'base64'), contentType: 'image/png' });
+  }
   const planPageCount = Number(await page.locator('#consent-composite-canvas').getAttribute('data-plan-pages'));
   expect(planPageCount).toBeGreaterThan(0);
   await expect(page.locator('#consent-countdown')).toBeVisible({ timeout: 3_000 });
   await expect(page.locator('#consent-countdown')).toHaveText(/[123]/);
   await expect(page.locator('#consent-pause')).toBeVisible({ timeout: 6_000 });
-  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('width', '720');
-  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('height', '1280');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('width', '1280');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('height', '720');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-video-format', 'landscape-16:9');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-plan-design', 'material-cards');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-consent-design', 'minimal-evidence');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'consent');
+  if (process.env.CONSENT_VISUAL_CAPTURE) {
+    const consentFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);
+    await testInfo.attach('consent-evidence-frame', { body: Buffer.from(consentFrame, 'base64'), contentType: 'image/png' });
+  }
 
   const initialScroll = await page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop);
   await page.waitForTimeout(150);
@@ -303,9 +314,22 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-preview-stage')).toBeVisible();
   await expect(page.locator('#consent-record-stage')).toBeHidden();
   await expect(page.locator('#consent-video-preview')).toBeVisible();
+  await expect(page.locator('#consent-video-preview')).toHaveCSS('aspect-ratio', '16 / 9');
   await expect(page.locator('.consent-preview-sequence')).toContainText('Approved Session Plan');
   await expect(page.locator('#consent-preview-plan-count')).toContainText(`${planPageCount} silent plan pages`);
   await expect(page.locator('.consent-preview-sequence')).toContainText('Spoken Consent');
+  await expect(page.locator('#consent-retry')).toBeVisible();
+  await expect(page.locator('#consent-retry')).toContainText('Retry Recording');
+  const retryViewportPosition = await page.locator('#consent-retry').evaluate(button => ({
+    top: button.getBoundingClientRect().top,
+    bottom: button.getBoundingClientRect().bottom,
+    viewport: window.innerHeight
+  }));
+  expect(retryViewportPosition.top).toBeGreaterThanOrEqual(0);
+  expect(retryViewportPosition.bottom).toBeLessThanOrEqual(retryViewportPosition.viewport);
+  if (process.env.CONSENT_VISUAL_CAPTURE) {
+    await testInfo.attach('consent-review-screen', { body: await page.screenshot(), contentType: 'image/png' });
+  }
   await page.locator('#consent-retry').click();
   await expect(page.locator('#consent-record-stage')).toBeVisible();
   await expect(page.locator('#consent-recording-clock')).toHaveText('00:00');

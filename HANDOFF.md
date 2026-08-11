@@ -254,3 +254,12 @@
 - Runtime versions: `app.js?v=1.76`, `style.css?v=1.65`, service-worker cache `chakra-v5.36`.
 - Validation: focused consultation/recording flow passed 1/1; the complete Playwright regression passed **34/34** against a retained local server; JavaScript syntax, runtime JSON parsing, and `git diff --check` passed.
 - Hardware boundary: mocked browser media verifies state and composition routing, but physical camera/microphone codecs, long-recording memory/thermal behavior, rotation during capture, and real Blob playback still require representative-device validation.
+
+### Landscape consent-video design refinement — 2026-08-11
+
+- Generated recordings now use one predictable `1280×720` 16:9 landscape format regardless of the browser/device orientation. The live teleprompter continues to fill the current app viewport.
+- Replaced the sparse plan-slide renderer with a Material-inspired presentation: branded purple app bar, section hierarchy, elevated summary cards, page badge/progress, and a reviewed/approved banner. Plan content and privacy allowlist are unchanged.
+- Simplified the spoken-consent portion into a minimal evidence frame rather than reproducing the full teleprompter: client/goal chips, a three-line synchronized current excerpt, progress, recording timer, larger circular camera card, status, timestamp, and location fallback.
+- Review Recording explicitly unhides Retry and Accept whenever the preview stage opens. Actions are moved directly below the 16:9 player, use a compact two-column mobile layout, and remain visible in the initial 390×844 viewport.
+- Runtime versions: `app.js?v=1.77`, `style.css?v=1.66`, service-worker cache `chakra-v5.37`.
+- Validation: rendered plan/consent/preview frames were inspected at their actual output sizes; the focused mobile-to-landscape flow passed; the complete Playwright regression passed **34/34**; syntax, locale JSON, and diff checks passed.
