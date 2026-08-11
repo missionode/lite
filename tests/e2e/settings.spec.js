@@ -391,6 +391,20 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('.consent-preview-sequence')).toContainText('Approved Session Plan');
   await expect(page.locator('#consent-preview-plan-count')).toContainText(`${planPageCount} silent plan pages`);
   await expect(page.locator('.consent-preview-sequence')).toContainText('Spoken Consent');
+  const previewInsets = await page.evaluate(() => {
+    const inset = selector => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, right: window.innerWidth - rect.right };
+    };
+    return {
+      sequence: inset('.consent-preview-sequence'),
+      video: inset('.consent-preview-stage .consent-video-preview')
+    };
+  });
+  expect(previewInsets.sequence.left).toBeGreaterThanOrEqual(19);
+  expect(previewInsets.sequence.right).toBeGreaterThanOrEqual(19);
+  expect(previewInsets.video.left).toBeGreaterThanOrEqual(19);
+  expect(previewInsets.video.right).toBeGreaterThanOrEqual(19);
   await expect(page.locator('#consent-retry')).toBeVisible();
   await expect(page.locator('#consent-retry')).toContainText('Retry Recording');
   await expect(page.locator('#consent-share')).toBeVisible();
@@ -404,8 +418,18 @@ test('opens the single-participant consultation entry point and returns a saved 
   expect(sharePayload.text).toContain('recorded verbal consent confirmation');
   expect(sharePayload.text).toContain('personal and sensitive information');
   expect(sharePayload.fileName).toMatch(/^consent-recording-test-client-\d{4}-\d{2}-\d{2}\.webm$/);
-  expect(sharePayload.fileType).toContain('video/webm');
+  expect(sharePayload.fileType).toBe('video/webm');
   expect(sharePayload.fileSize).toBeGreaterThan(0);
+  const mp4ShareFormat = await page.evaluate(() => getConsentRecordingFileFormat(new Blob([], { type: 'video/mp4;codecs=avc1,mp4a.40.2' })));
+  expect(mp4ShareFormat).toEqual({ mimeType: 'video/mp4', extension: 'mp4' });
+  const safariRecordingFormat = await page.evaluate(() => {
+    const originalSupportCheck = MediaRecorder.isTypeSupported;
+    MediaRecorder.isTypeSupported = type => type.startsWith('video/mp4');
+    const supportedType = getSupportedConsentRecordingMimeType();
+    MediaRecorder.isTypeSupported = originalSupportCheck;
+    return supportedType;
+  });
+  expect(safariRecordingFormat).toMatch(/^video\/mp4/);
   await expect(page.locator('#consent-share-status')).toContainText('shared from your device');
   const retryViewportPosition = await page.locator('#consent-retry').evaluate(button => ({
     top: button.getBoundingClientRect().top,

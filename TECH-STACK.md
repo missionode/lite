@@ -48,6 +48,8 @@ The consent confirmation script is a bounded, independently scrollable region. I
 
 The client-facing declaration states the consent date without a clock time. Precise recording timestamps remain separate evidence metadata and are not part of the words the client must read aloud.
 
+Consent recording negotiates WebM first and MP4 when required by the browser. Native sharing normalizes the resulting MIME type and uses the matching `.webm`, `.mp4`, or `.mov` filename so macOS/iOS share validation does not receive a mismatched attachment.
+
 ## Narration architecture
 
 Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.

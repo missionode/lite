@@ -486,7 +486,7 @@ body {
 
 .consent-preview-stage .consent-video-preview {
     display: block;
-    width: min(100%, 760px);
+    width: min(calc(100% - 40px), 760px);
     height: auto;
     max-height: min(48dvh, 428px);
     aspect-ratio: 16 / 9;
@@ -503,7 +503,7 @@ body {
     align-items: stretch;
     justify-content: center;
     gap: 0.65rem;
-    width: min(100%, 760px);
+    width: min(calc(100% - 40px), 760px);
 }
 
 .consent-preview-step {

@@ -324,3 +324,11 @@
 - The final spoken declaration now states only the calendar date after `This declaration is made on`; the local clock time is no longer included in the text the client reads.
 - Recording start/end times and the live clock remain available in the generated evidence frame and internal consent metadata.
 - Runtime versions: `app.js?v=1.83`, `style.css?v=1.70`, service-worker cache `chakra-v5.44`. Focused consent validation passed **1/1** with screenshot capture disabled; syntax and diff checks also passed.
+
+### macOS native sharing and preview insets — 2026-08-11
+
+- Corrected native file-share compatibility by matching the attachment extension to the browser's actual recording container (`.webm`, `.mp4`, or `.mov`) and removing codec parameters from the shared file MIME type.
+- Recording format negotiation now considers MP4 after WebM, allowing Safari/macOS to use a format its `MediaRecorder` and native share sheet accept instead of forcing an unsupported WebM constructor.
+- Sharing remains entirely device-native through the Web Share API; no upload, backend email sender, or custom share destination was introduced.
+- Added a consistent 20px horizontal viewport inset to both the Review Recording sequence and the 16:9 video player.
+- Runtime versions: `app.js?v=1.84`, `style.css?v=1.71`, service-worker cache `chakra-v5.45`. Focused recording/share validation passed **1/1**, including MP4 negotiation and 20px preview-inset assertions, with screenshot capture disabled; syntax and diff checks also passed.

@@ -4131,14 +4131,32 @@ function getConsentShareDate(value) {
     return new Intl.DateTimeFormat([], { year: 'numeric', month: 'long', day: 'numeric' }).format(value || new Date());
 }
 
-function getConsentShareFileName(sessionPlan) {
+function getConsentRecordingFileFormat(blob = consultationRecordingBlob) {
+    const sourceType = String(blob?.type || 'video/webm');
+    const mimeType = sourceType.split(';')[0].trim().toLowerCase() || 'video/webm';
+    if (mimeType === 'video/mp4') return { mimeType, extension: 'mp4' };
+    if (mimeType === 'video/quicktime') return { mimeType, extension: 'mov' };
+    return { mimeType: 'video/webm', extension: 'webm' };
+}
+
+function getSupportedConsentRecordingMimeType() {
+    if (typeof MediaRecorder.isTypeSupported !== 'function') return '';
+    return [
+        'video/webm;codecs=vp8,opus',
+        'video/webm',
+        'video/mp4;codecs=avc1,mp4a.40.2',
+        'video/mp4'
+    ].find(type => MediaRecorder.isTypeSupported(type)) || '';
+}
+
+function getConsentShareFileName(sessionPlan, extension = 'webm') {
     const clientName = String(sessionPlan?.profile?.name || 'client')
         .normalize('NFKD')
         .replace(/[^a-zA-Z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
         .toLowerCase() || 'client';
     const date = (consultationRecordingStartedAt || new Date()).toISOString().slice(0, 10);
-    return `consent-recording-${clientName}-${date}.webm`;
+    return `consent-recording-${clientName}-${date}.${extension}`;
 }
 
 async function shareConsentRecording() {
@@ -4151,8 +4169,9 @@ async function shareConsentRecording() {
         if (status) status.textContent = t('ui.consentShareUnavailable');
         return;
     }
-    const file = new File([consultationRecordingBlob], getConsentShareFileName(sessionPlan), {
-        type: consultationRecordingBlob.type || 'video/webm'
+    const fileFormat = getConsentRecordingFileFormat();
+    const file = new File([consultationRecordingBlob], getConsentShareFileName(sessionPlan, fileFormat.extension), {
+        type: fileFormat.mimeType
     });
     const shareData = {
         title: t('ui.consentShareEmailTitle').replace('{date}', shareDate),
@@ -4560,8 +4579,10 @@ async function startConsultationRecording() {
             audioDestination.stream.getAudioTracks().forEach(track => compositeStream.addTrack(track));
             await consultationAudioContext.resume();
         }
-        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus') ? 'video/webm;codecs=vp8,opus' : 'video/webm';
-        const activeRecorder = new MediaRecorder(compositeStream, { mimeType, videoBitsPerSecond: 600000, audioBitsPerSecond: 64000 });
+        const supportedMimeType = getSupportedConsentRecordingMimeType();
+        const recorderOptions = { videoBitsPerSecond: 600000, audioBitsPerSecond: 64000 };
+        if (supportedMimeType) recorderOptions.mimeType = supportedMimeType;
+        const activeRecorder = new MediaRecorder(compositeStream, recorderOptions);
         consultationRecorder = activeRecorder;
         activeRecorder.ondataavailable = event => {
             if (event.data.size > 0) consultationRecordingChunks.push(event.data);
