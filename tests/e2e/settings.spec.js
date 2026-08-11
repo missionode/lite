@@ -241,6 +241,8 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-prompt-text')).not.toContainText(/\d+ min/);
   await expect(page.locator('#consent-prompt-text')).toContainText('touch or assistance');
   await expect(page.locator('#consent-prompt-text')).toContainText('This declaration is made on');
+  const consentDeclaration = await page.locator('#consent-prompt-text').textContent();
+  expect(consentDeclaration).not.toMatch(/This declaration is made on[^.]*\d{1,2}:\d{2}/);
   await expect(page.locator('#consent-prompt-text')).not.toContainText('latitude');
   await expect(page.locator('#consent-prompt-text')).not.toContainText('longitude');
   await expect(page.locator('#consent-prompt-text')).not.toContainText('12.971599');

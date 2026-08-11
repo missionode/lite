@@ -4124,7 +4124,7 @@ function renderConsentPromptText(sessionPlan, evidenceDate = consultationConsent
         .replace('{services}', getConsentVerbalServiceSummary(sessionPlan))
         .replace('{touch}', touchStatement)
         .replace('{medication}', medicationStatement)
-        .replace('{date}', formatConsentDateTime(evidenceDate));
+        .replace('{date}', getConsentShareDate(evidenceDate));
 }
 
 function getConsentShareDate(value) {

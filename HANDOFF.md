@@ -318,3 +318,9 @@
 - Added touch momentum and contained vertical panning, a visible gold scrollbar where the browser supports custom scrollbars, and stable scrollbar spacing.
 - Made the script region keyboard-focusable and connected it to the existing reading instruction for assistive technology.
 - Runtime versions: `app.js?v=1.82`, `style.css?v=1.70`, service-worker cache `chakra-v5.43`. Focused consultation validation passed **1/1** with screenshot capture disabled; syntax and diff checks also passed.
+
+### Date-only final consent statement — 2026-08-11
+
+- The final spoken declaration now states only the calendar date after `This declaration is made on`; the local clock time is no longer included in the text the client reads.
+- Recording start/end times and the live clock remain available in the generated evidence frame and internal consent metadata.
+- Runtime versions: `app.js?v=1.83`, `style.css?v=1.70`, service-worker cache `chakra-v5.44`. Focused consent validation passed **1/1** with screenshot capture disabled; syntax and diff checks also passed.
