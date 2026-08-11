@@ -292,3 +292,12 @@
 - Binary plan decisions use `Approved for this session` or `Not included in this session`; disabled Savasana no longer displays a misleading unused duration. Yoga scheduling explicitly distinguishes preparation from each approved posture.
 - Document-card labels wrap across up to two lines and move the value baseline down when needed, protecting long English and Malayalam headings within the `1280×720` layout.
 - Runtime versions: `app.js?v=1.80`, `style.css?v=1.67`, service-worker cache `chakra-v5.40`. Focused assertions and direct inspection of the identity, guidance-settings, consent-evidence, and mobile review frames passed; the complete regression passed **34/34**.
+
+### Native recording share and confirmation refinement — 2026-08-11
+
+- Review Recording now offers `Share Recording` through the standard Web Share API. On compatible Android and other devices, the native share sheet receives the generated WebM file together with a localized suggested subject and professional covering message; the user chooses Gmail, Mail, or another compatible destination.
+- This is intentionally device-native sharing only. The app does not automatically send email, preselect a recipient, upload the recording, or add backend delivery/storage. Browsers that cannot share files show a clear unsupported message.
+- Latitude and longitude were removed from the declaration the client reads. Permission-derived location remains in internal recording metadata and the generated evidence footer.
+- Consent Confirmation again uses a bounded vertically scrollable script so the complete declaration is accessible. Continue to Recording is centered, with Cancel on the row below.
+- Saved metadata advances to consent version 3 and composition `session-plan-then-spoken-consent-v4`, with `recording-date-only` verbal evidence and native-file-share capability recorded.
+- Runtime versions: `app.js?v=1.81`, `style.css?v=1.68`, service-worker cache `chakra-v5.41`. Focused functional Playwright validation passed 1/1 and the complete regression passed **34/34**, both with screenshot capture disabled.

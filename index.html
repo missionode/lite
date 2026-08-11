@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.67">
+    <link rel="stylesheet" href="style.css?v=1.68">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -695,10 +695,13 @@
                 <video id="consent-video-preview" class="consent-video-preview" controls playsinline></video>
                 <div class="consent-preview-actions">
                     <button id="consent-retry" class="secondary-btn consent-retry-btn" type="button" data-i18n="ui.retryRecording">Retry Recording</button>
+                    <button id="consent-share" class="secondary-btn consent-share-btn" type="button" data-i18n="ui.consentShareRecording">Share Recording</button>
                     <button id="consent-submit" class="primary-btn" type="button" data-i18n="ui.submitConsent">Accept and Continue</button>
                 </div>
+                <p class="consent-share-hint" data-i18n="ui.consentShareHint">Uses your device's share menu. Choose your email app to send the attached recording.</p>
+                <p id="consent-share-status" class="consent-share-status" role="status" aria-live="polite"></p>
                 <p id="consent-recording-metadata" class="consent-recording-metadata" role="status" aria-live="polite"></p>
-                <p class="consultation-note" data-i18n="ui.consentLocalNote">This prototype keeps the recording in memory only. Secure sharing will be added later.</p>
+                <p class="consultation-note" data-i18n="ui.consentLocalNote">The recording stays in memory until you accept, retry, leave, or share it through your device.</p>
             </div>
         </section>
 
@@ -869,6 +872,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.80"></script>
+    <script src="app.js?v=1.81"></script>
 </body>
 </html>

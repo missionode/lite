@@ -207,6 +207,18 @@ test('opens the single-participant consultation entry point and returns a saved 
       }
     }
     window.MediaRecorder = TestMediaRecorder;
+    window.__consentSharePayload = null;
+    navigator.canShare = data => Array.isArray(data?.files) && data.files.length === 1;
+    navigator.share = async data => {
+      const file = data.files[0];
+      window.__consentSharePayload = {
+        title: data.title,
+        text: data.text,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      };
+    };
     navigator.geolocation.getCurrentPosition = success => success({
       coords: { latitude: 12.971599, longitude: 77.594566 }
     });
@@ -229,7 +241,10 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-prompt-text')).not.toContainText(/\d+ min/);
   await expect(page.locator('#consent-prompt-text')).toContainText('touch or assistance');
   await expect(page.locator('#consent-prompt-text')).toContainText('This declaration is made on');
-  await expect(page.locator('#consent-prompt-text')).toContainText('latitude 12.971599, longitude 77.594566');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('latitude');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('longitude');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('12.971599');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('77.594566');
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem('chakra_consultation_plan')));
   expect(plan.schemaVersion).toBe(1);
   expect(plan.participantCount).toBe(1);
@@ -256,17 +271,27 @@ test('opens the single-participant consultation entry point and returns a saved 
     return Boolean(camera && script && camera.compareDocumentPosition(script) & Node.DOCUMENT_POSITION_FOLLOWING);
   });
   expect(confirmationOrder).toBe(true);
-  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'visible');
+  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'auto');
   const confirmationScriptFit = await page.locator('#consent-review-stage .consent-prompter').evaluate(element => ({
     clientHeight: element.clientHeight,
-    scrollHeight: element.scrollHeight
+    scrollHeight: element.scrollHeight,
+    scrollable: (() => {
+      element.scrollTop = element.scrollHeight;
+      return element.scrollTop > 0;
+    })()
   }));
-  expect(confirmationScriptFit.scrollHeight).toBeLessThanOrEqual(confirmationScriptFit.clientHeight + 1);
+  expect(confirmationScriptFit.scrollHeight).toBeGreaterThan(confirmationScriptFit.clientHeight);
+  expect(confirmationScriptFit.scrollable).toBe(true);
   const actionAlignment = await page.locator('.consent-review-actions').evaluate(actions => {
+    const actionsRect = actions.getBoundingClientRect();
     const [continueButton, cancelButton] = Array.from(actions.querySelectorAll('button')).map(button => button.getBoundingClientRect());
-    return Math.abs(continueButton.top - cancelButton.top);
+    return {
+      continueCenterOffset: Math.abs((continueButton.left + continueButton.width / 2) - (actionsRect.left + actionsRect.width / 2)),
+      cancelBelowContinue: cancelButton.top >= continueButton.bottom
+    };
   });
-  expect(actionAlignment).toBeLessThan(2);
+  expect(actionAlignment.continueCenterOffset).toBeLessThan(2);
+  expect(actionAlignment.cancelBelowContinue).toBe(true);
 
   const videoPlanText = await page.evaluate(() => getConsentPlanPages(JSON.parse(localStorage.getItem('chakra_consultation_plan'))).flat().join(' '));
   expect(videoPlanText).toContain('Feel grounded and clear.');
@@ -359,6 +384,20 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('.consent-preview-sequence')).toContainText('Spoken Consent');
   await expect(page.locator('#consent-retry')).toBeVisible();
   await expect(page.locator('#consent-retry')).toContainText('Retry Recording');
+  await expect(page.locator('#consent-share')).toBeVisible();
+  await expect(page.locator('.consent-share-hint')).toContainText("device's share menu");
+  await page.locator('#consent-share').click();
+  await expect.poll(() => page.evaluate(() => window.__consentSharePayload)).not.toBeNull();
+  const sharePayload = await page.evaluate(() => window.__consentSharePayload);
+  expect(sharePayload.title).toContain('Guided wellness session consent recording');
+  expect(sharePayload.text).toContain('Dear Test Client');
+  expect(sharePayload.text).toContain('summary of the approved session plan');
+  expect(sharePayload.text).toContain('recorded verbal consent confirmation');
+  expect(sharePayload.text).toContain('personal and sensitive information');
+  expect(sharePayload.fileName).toMatch(/^consent-recording-test-client-\d{4}-\d{2}-\d{2}\.webm$/);
+  expect(sharePayload.fileType).toContain('video/webm');
+  expect(sharePayload.fileSize).toBeGreaterThan(0);
+  await expect(page.locator('#consent-share-status')).toContainText('shared from your device');
   const retryViewportPosition = await page.locator('#consent-retry').evaluate(button => ({
     top: button.getBoundingClientRect().top,
     bottom: button.getBoundingClientRect().bottom,

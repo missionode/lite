@@ -585,6 +585,24 @@ body {
     font-weight: 700;
 }
 
+.consent-preview-actions .consent-share-btn {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    color: #4b3718;
+    border-color: #b88732;
+    background: #fffaf0;
+}
+
+.consent-share-hint,
+.consent-share-status {
+    max-width: 620px;
+    margin: 0;
+    color: #686a6e;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
 @media (max-width: 600px) {
     #consultation-consent-screen.consent-teleprompter-mode {
         padding: 0;
@@ -1117,10 +1135,11 @@ select:focus {
 }
 
 #consultation-consent-screen #consent-review-stage .consent-prompter {
-    max-height: none;
+    max-height: min(42vh, 360px);
     padding: 0.9rem 1rem;
-    overflow: visible;
-    scrollbar-gutter: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
 #consultation-consent-screen #consent-review-stage .consent-prompt-text {
@@ -1177,7 +1196,8 @@ select:focus {
 
 .consent-review-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     gap: 0.65rem;
     width: 100%;
     margin-top: 0.25rem;
@@ -1186,6 +1206,14 @@ select:focus {
 .consent-review-actions button {
     min-height: 44px;
     margin: 0;
+}
+
+#consent-continue-to-recording {
+    width: min(100%, 360px);
+}
+
+#consent-review-cancel {
+    width: auto;
 }
 
 .teleprompter-shell {

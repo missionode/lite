@@ -3388,6 +3388,8 @@ function showConsentPreviewStage() {
     consultationConsentScreen?.classList.add('consent-preview-mode');
     document.getElementById('consent-retry')?.classList.remove('hidden');
     document.getElementById('consent-submit')?.classList.remove('hidden');
+    const shareStatus = document.getElementById('consent-share-status');
+    if (shareStatus) shareStatus.textContent = '';
     const planCount = document.getElementById('consent-preview-plan-count');
     if (planCount) planCount.textContent = t('ui.consentPlanPageCount').replace('{count}', String(consultationPlanPages.length));
 }
@@ -4102,13 +4104,6 @@ function getConsentVerbalServiceSummary(sessionPlan) {
     return services.join(', ');
 }
 
-function getConsentVerbalLocation() {
-    if (!consultationLocation) return t('ui.consentLocationUnavailable');
-    return t('ui.consentCoordinates')
-        .replace('{latitude}', String(consultationLocation.latitude))
-        .replace('{longitude}', String(consultationLocation.longitude));
-}
-
 function renderConsentPromptText(sessionPlan, evidenceDate = consultationConsentOpenedAt || new Date()) {
     const prompt = document.getElementById('consent-prompt-text');
     if (!prompt) return;
@@ -4126,8 +4121,61 @@ function renderConsentPromptText(sessionPlan, evidenceDate = consultationConsent
         .replace('{services}', getConsentVerbalServiceSummary(sessionPlan))
         .replace('{touch}', touchStatement)
         .replace('{medication}', medicationStatement)
-        .replace('{date}', formatConsentDateTime(evidenceDate))
-        .replace('{location}', getConsentVerbalLocation());
+        .replace('{date}', formatConsentDateTime(evidenceDate));
+}
+
+function getConsentShareDate(value) {
+    return new Intl.DateTimeFormat([], { year: 'numeric', month: 'long', day: 'numeric' }).format(value || new Date());
+}
+
+function getConsentShareFileName(sessionPlan) {
+    const clientName = String(sessionPlan?.profile?.name || 'client')
+        .normalize('NFKD')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase() || 'client';
+    const date = (consultationRecordingStartedAt || new Date()).toISOString().slice(0, 10);
+    return `consent-recording-${clientName}-${date}.webm`;
+}
+
+async function shareConsentRecording() {
+    const status = document.getElementById('consent-share-status');
+    if (!consultationRecordingBlob) return;
+    const storedPlan = localStorage.getItem('chakra_consultation_plan');
+    const sessionPlan = storedPlan ? JSON.parse(storedPlan) : consultationVideoPlan;
+    const shareDate = getConsentShareDate(consultationRecordingStartedAt || new Date());
+    if (!navigator.share || typeof File === 'undefined') {
+        if (status) status.textContent = t('ui.consentShareUnavailable');
+        return;
+    }
+    const file = new File([consultationRecordingBlob], getConsentShareFileName(sessionPlan), {
+        type: consultationRecordingBlob.type || 'video/webm'
+    });
+    const shareData = {
+        title: t('ui.consentShareEmailTitle').replace('{date}', shareDate),
+        text: t('ui.consentShareEmailBody')
+            .replace('{name}', sessionPlan?.profile?.name || t('ui.client'))
+            .replaceAll('{date}', shareDate),
+        files: [file]
+    };
+    let fileSharingSupported = true;
+    if (navigator.canShare) {
+        try {
+            fileSharingSupported = navigator.canShare({ files: shareData.files });
+        } catch {
+            fileSharingSupported = false;
+        }
+    }
+    if (!fileSharingSupported) {
+        if (status) status.textContent = t('ui.consentShareUnavailable');
+        return;
+    }
+    try {
+        await navigator.share(shareData);
+        if (status) status.textContent = t('ui.consentShareOpened');
+    } catch (error) {
+        if (error?.name !== 'AbortError' && status) status.textContent = t('ui.consentShareFailed');
+    }
 }
 
 function renderConsentPrompt(sessionPlan) {
@@ -5567,6 +5615,7 @@ function attachEventListeners() {
         resetConsultationRecording();
         enterConsentTeleprompter();
     });
+    document.getElementById('consent-share')?.addEventListener('click', shareConsentRecording);
     document.getElementById('consent-cancel')?.addEventListener('click', () => {
         resetConsultationRecording();
         stopConsentCameraPreview();
@@ -5587,10 +5636,10 @@ function attachEventListeners() {
             recordingStartedAt: consultationRecordingStartedAt?.toISOString() || null,
             recordingEndedAt: consultationRecordingEndedAt?.toISOString() || null,
             location: consultationLocation,
-            consentVersion: 2,
+            consentVersion: 3,
             recordingType: consultationRecordingBlob.type,
             recordingBytes: consultationRecordingBlob.size,
-            composition: 'session-plan-then-spoken-consent-v3',
+            composition: 'session-plan-then-spoken-consent-v4',
             planPageCount: consultationPlanPages.length,
             planPageDurationMs: consentTiming('planPageMs', 5000),
             planAudio: 'silent',
@@ -5602,7 +5651,8 @@ function attachEventListeners() {
             liveWallClock: true,
             clientVerificationFields: ['name', 'contactNumber', 'email', 'citizenship', 'emergencyContact', 'meditationLanguage'],
             verbalServiceDetail: 'professional-categories-only',
-            verbalEvidence: 'recording-date-and-coordinate-location',
+            verbalEvidence: 'recording-date-only',
+            nativeFileShare: true,
             storage: 'memory-only-prototype'
         };
         applyApprovedConsultationPlan(sessionPlan);

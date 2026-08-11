@@ -16,7 +16,7 @@ module.exports = defineConfig({
     headless: true,
     serviceWorkers: 'block',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: process.env.PLAYWRIGHT_SCREENSHOTS === '1' ? 'only-on-failure' : 'off',
     video: 'retain-on-failure'
   },
   webServer: {
