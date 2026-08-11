@@ -3477,53 +3477,72 @@ function getConsentPlanPages(sessionPlan) {
     const durations = sessionPlan?.durations || {};
     const chakraLabelKeys = { root: 'root', sacral: 'sacral', solar: 'solar', heart: 'heart', throat: 'throat', thirdeye: 'thirdEye', crown: 'crown' };
     const focus = (sessionPlan?.chakraFocus || []).map(key => t(`ui.${chakraLabelKeys[key] || key}`)).join(', ') || t('ui.consultationEvenJourney');
-    const yesNo = value => t(value ? 'ui.consultationYes' : 'ui.consultationNo');
-    const minutes = value => `${Math.round((Number(value) || 0) / 60)} min`;
+    const minutes = value => `${Math.round((Number(value) || 0) / 60)} ${t('ui.minutes')}`;
+    const localizedChoice = (value, choices, fallback = 'ui.consultationNone') => t(choices[value] || fallback);
+    const voice = localizedChoice(preferences.voiceGender || 'guide', {
+        guide: 'ui.consultationVoiceGuide', female: 'ui.consultationVoiceFemale', male: 'ui.consultationVoiceMale'
+    });
+    const tone = localizedChoice(preferences.tone, {
+        soft: 'ui.consultationToneSoft', deep: 'ui.consultationToneDeep', adaptive: 'ui.consultationToneAdaptive'
+    });
+    const touch = localizedChoice(preferences.touch || sessionPlan?.safety?.touch, {
+        no: 'ui.consultationTouchNo', ask: 'ui.consultationTouchAsk', yes: 'ui.consultationTouchYes'
+    });
+    const sleep = localizedChoice(preferences.sleepMode, {
+        guide: 'ui.consultationSleepGuide', needed: 'ui.consultationSleepNeeded', 'not-needed': 'ui.consultationSleepNotNeeded'
+    });
+    const yogaPoseNames = {
+        vrikshasana: 'Vrikshasana', adho_mukha_svanasana: 'Downward Dog', marjaryasana: 'Marjaryasana',
+        balasana: 'Balasana', ananda_balasana: 'Ananda Balasana'
+    };
+    const selectedYogaPoses = (preferences.selectedYogaPoses || []).map(pose => yogaPoseNames[pose] || pose).join(', ') || t('ui.consultationNone');
     const emergencyContact = sessionPlan?.safetyReview?.emergencyContact || {};
     const emergencyLabel = [emergencyContact.name, emergencyContact.phone].filter(Boolean).join(' · ') || t('ui.consultationNone');
     const groups = [
         {
             heading: t('ui.consentPlanClientVerification'),
             rows: [
-                [t('ui.consultationSummaryName'), sessionPlan?.profile?.name || t('ui.client')],
-                [t('ui.consultationSummaryContact'), sessionPlan?.profile?.contactNumber || t('ui.consultationNone')],
-                [t('ui.consultationSummaryEmail'), sessionPlan?.profile?.email || t('ui.consultationNone')],
-                [t('ui.consultationSummaryCitizenship'), sessionPlan?.profile?.citizenship || t('ui.consultationNone')],
-                [t('ui.consultationSummaryEmergency'), emergencyLabel],
-                [t('ui.consultationSummaryLanguage'), getMeditationLanguageLabel(sessionPlan?.language || state.language)]
+                [t('ui.consentPlanClientFullName'), sessionPlan?.profile?.name || t('ui.client')],
+                [t('ui.consentPlanPrimaryContact'), sessionPlan?.profile?.contactNumber || t('ui.consultationNone')],
+                [t('ui.consentPlanClientEmail'), sessionPlan?.profile?.email || t('ui.consultationNone')],
+                [t('ui.consentPlanCitizenship'), sessionPlan?.profile?.citizenship || t('ui.consultationNone')],
+                [t('ui.consentPlanEmergencyContact'), emergencyLabel],
+                [t('ui.consentPlanMeditationLanguage'), getMeditationLanguageLabel(sessionPlan?.language || state.language)]
             ]
         },
         {
-            heading: t('ui.consentPlanOverview'),
+            heading: t('ui.consentPlanSessionIntentions'),
             rows: [
-                [t('ui.consultationSummaryGoal'), sessionPlan?.goal || t('ui.sessionGoal')],
-                [t('ui.consultationSummaryFocus'), focus]
+                [t('ui.consentPlanSessionGoal'), sessionPlan?.goal || t('ui.sessionGoal')],
+                [t('ui.consentPlanMeditationFocus'), focus]
             ]
         },
         {
-            heading: t('ui.consultationSummaryPlanDetails'),
+            heading: t('ui.consentPlanGuidanceSettings'),
             rows: [
-                [t('ui.consentPlanServices'), getConsentServiceSummary(sessionPlan)],
-                [t('ui.consultationSummaryVoice'), preferences.voiceGender || 'guide'],
-                [t('ui.consultationSummaryTone'), preferences.tone || t('ui.consultationNone')],
-                [t('ui.consultationSummaryTouch'), preferences.touch || sessionPlan?.safety?.touch || t('ui.consultationNone')],
-                [t('ui.consultationSummarySleep'), preferences.sleepMode || t('ui.consultationNone')],
-                [t('ui.consultationSummaryReverseJourney'), yesNo(Boolean(sessionPlan?.approvedSettings?.reverseJourney))]
+                [t('ui.consentPlanApprovedServices'), getConsentServiceSummary(sessionPlan)],
+                [t('ui.consentPlanGuidanceVoice'), voice],
+                [t('ui.consentPlanGuidanceTone'), tone],
+                [t('ui.consentPlanTouchAssistance'), touch],
+                [t('ui.consentPlanRestPreference'), sleep],
+                [t('ui.consentPlanReverseJourney'), t(sessionPlan?.approvedSettings?.reverseJourney ? 'ui.consentPlanApproved' : 'ui.consentPlanNotIncluded')]
             ]
         },
         {
-            heading: t('ui.consentPlanTiming'),
+            heading: t('ui.consentPlanServiceSchedule'),
             rows: [
                 ...(preferences.yogaBridgeEnabled ? [
-                    [t('ui.consultationSummaryYogaPoses'), preferences.selectedYogaPoses?.join(', ') || t('ui.consultationNone')],
-                    [t('ui.consultationSummaryYogaTiming'), `${minutes(durations.yogaPrep)} prep · ${minutes(durations.yogaPose)} per pose`]
+                    [t('ui.consentPlanYogaPostures'), selectedYogaPoses],
+                    [t('ui.consentPlanYogaSchedule'), t('ui.consentPlanYogaScheduleValue').replace('{preparation}', minutes(durations.yogaPrep)).replace('{posture}', minutes(durations.yogaPose))]
                 ] : []),
-                ...(preferences.bathSessionEnabled ? [[t('ui.consultationSummaryCareTiming'), [
+                ...(preferences.bathSessionEnabled ? [[t('ui.consentPlanCareSchedule'), [
                     preferences.assistedBathingEnabled ? `${t('ui.consentServiceAssisted')} ${minutes(durations.assistedBathing)}` : `${t('ui.consentServiceBath')} ${minutes(durations.bath)}`,
                     preferences.massageEnabled ? `${t('ui.consentServiceMassage')} ${minutes(durations.massage)}` : '',
                     preferences.perinealCareEnabled ? `${t('ui.consentServicePerineal')} ${minutes(durations.perinealCare)}` : ''
                 ].filter(Boolean).join(' · ')]] : []),
-                [t('ui.consultationSummarySavasana'), `${yesNo(Boolean(preferences.corpsePoseEnabled))} · ${minutes(durations.corpse)}`]
+                [t('ui.consentPlanFinalRelaxation'), preferences.corpsePoseEnabled
+                    ? t('ui.consentPlanIncludedDuration').replace('{duration}', minutes(durations.corpse))
+                    : t('ui.consentPlanNotIncluded')]
             ]
         }
     ];
@@ -3534,7 +3553,7 @@ function getConsentPlanPages(sessionPlan) {
             pages.push([group.heading, ...rows.slice(index, index + 3).map(([label, value]) => `${label}: ${value}`)]);
         }
     });
-    return pages.length ? pages : [[t('ui.consentPlanOverview'), `${t('ui.consultationSummaryGoal')}: ${t('ui.sessionGoal')}`]];
+    return pages.length ? pages : [[t('ui.consentPlanSessionIntentions'), `${t('ui.consentPlanSessionGoal')}: ${t('ui.sessionGoal')}`]];
 }
 
 function drawConsentRoundedRect(context, x, y, width, height, radius) {
@@ -3638,14 +3657,16 @@ function drawConsentDocumentField(context, x, y, width, height, index, label, va
     context.fillStyle = '#a9823d';
     context.fillRect(x, y, width, 5);
     context.font = `700 13px ${fontFamily}`;
-    context.fillText(`${String(index + 1).padStart(2, '0')}  ${label.toUpperCase()}`, x + 24, y + 40);
+    const labelLines = wrapConsentCanvasText(context, `${String(index + 1).padStart(2, '0')}  ${label.toUpperCase()}`, width - 48).slice(0, 2);
+    labelLines.forEach((line, lineIndex) => context.fillText(line, x + 24, y + 36 + lineIndex * 17));
     context.fillStyle = '#2d2923';
     context.font = `600 23px ${fontFamily}`;
     const valueLines = wrapConsentCanvasText(context, value, width - 48);
-    const maxLines = Math.max(3, Math.floor((height - 88) / 34));
+    const valueStart = labelLines.length > 1 ? 104 : 86;
+    const maxLines = Math.max(3, Math.floor((height - valueStart) / 34));
     const visibleLines = valueLines.slice(0, maxLines);
     if (valueLines.length > maxLines) visibleLines[maxLines - 1] = `${visibleLines[maxLines - 1].replace(/[.,;:]?$/, '')}…`;
-    visibleLines.forEach((line, lineIndex) => context.fillText(line, x + 24, y + 86 + lineIndex * 34));
+    visibleLines.forEach((line, lineIndex) => context.fillText(line, x + 24, y + valueStart + lineIndex * 34));
 }
 
 function drawConsentPlanFrame(context, width, height) {

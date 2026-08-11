@@ -283,3 +283,12 @@
 - The declaration now states the exact recording date/time and permission-derived latitude/longitude. The document evidence footer continues to show the same timestamp and coordinates; location denial remains explicit as unavailable.
 - Saved consent metadata advances to consent version 2 and composition `session-plan-then-spoken-consent-v3`, recording verification fields, category-only verbal detail, and dated coordinate evidence. Runtime versions: `app.js?v=1.79`, `style.css?v=1.67`, service-worker cache `chakra-v5.39`.
 - Focused Playwright validation passed with mocked coordinates, expanded plan allowlist assertions, category-only narration checks, non-scrolling confirmation fit, and visual inspection of the generated plan, spoken evidence, and mobile review frames; the complete regression passed **34/34**.
+
+### Contextual recorded-plan headings — 2026-08-11
+
+- Replaced every generic recorded-plan field label with a document-specific heading that explains the decision in context. Examples include `Meditation guidance voice selected`, `Meditation guidance tone selected`, `Permitted touch and physical assistance`, `Post-session rest and sleep preference`, and `Reverse meditation journey authorization`.
+- Applied the same wording standard to client verification, intentions/focus, services, yoga, personal-care timing, and final relaxation fields. Page sections now read `Client intentions and meditation focus`, `Approved guidance and participation settings`, and `Approved service schedule` instead of generic internal review headings.
+- Raw stored values are no longer exposed in the generated plan. `female`, `soft`, `yes`, `guide`, and pose identifiers are converted into localized client-readable phrases such as `Female voice`, `Soft, whisper-like, and gentle`, `Yes, with clear guidance and a stop signal`, `Guide to decide`, and `Downward Dog`.
+- Binary plan decisions use `Approved for this session` or `Not included in this session`; disabled Savasana no longer displays a misleading unused duration. Yoga scheduling explicitly distinguishes preparation from each approved posture.
+- Document-card labels wrap across up to two lines and move the value baseline down when needed, protecting long English and Malayalam headings within the `1280×720` layout.
+- Runtime versions: `app.js?v=1.80`, `style.css?v=1.67`, service-worker cache `chakra-v5.40`. Focused assertions and direct inspection of the identity, guidance-settings, consent-evidence, and mobile review frames passed; the complete regression passed **34/34**.

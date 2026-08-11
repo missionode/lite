@@ -59,3 +59,4 @@ Remove this file only after all local browser-side items are implemented, tested
 - Client-verification plan pages now intentionally include name, contact number, email, citizenship, emergency-contact name/phone, and the full meditation-language name. Medication details, private reflection notes, and guide notes remain excluded.
 - Detailed service names, pose names, and durations remain on the visual approved-plan pages only. The spoken declaration uses professional service categories so yoga and care details are not duplicated while the client reads.
 - Spoken consent version 2 explicitly declares the recording date/time and latitude/longitude (or location unavailable), alongside the same evidence in the generated document footer.
+- Generated plan cards use contextual headings and localized display values rather than terse review labels or stored codes. Long labels wrap to two lines; values remain visually separate and readable.

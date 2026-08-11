@@ -170,7 +170,7 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consultation-review-advice')).toContainText('grounding-focused Reverse Journey');
   await page.locator('#review-safety-confirm').check();
   await page.locator('#review-reverse-journey').check();
-  await page.evaluate(() => {
+  await page.evaluate((visualCapture) => {
     const cameraCanvas = document.createElement('canvas');
     cameraCanvas.width = 640;
     cameraCanvas.height = 480;
@@ -211,11 +211,11 @@ test('opens the single-participant consultation entry point and returns a saved 
       coords: { latitude: 12.971599, longitude: 77.594566 }
     });
     window.__chakraConsentTestTimings = {
-      planPageMs: 35,
+      planPageMs: visualCapture ? 600 : 35,
       planTransitionMs: 25,
       readingLeadMs: 1000
     };
-  });
+  }, Boolean(process.env.CONSENT_VISUAL_CAPTURE));
   await page.locator('#approve-consultation').click();
 
   await expect(page.locator('#consultation-consent-screen')).toBeVisible();
@@ -275,15 +275,23 @@ test('opens the single-participant consultation entry point and returns a saved 
   expect(videoPlanText).toContain('test@example.com');
   expect(videoPlanText).toContain('+919876543210');
   expect(videoPlanText).toContain('Emergency Person · +919812345678');
-  expect(videoPlanText).toContain('Meditation language: English');
-  expect(videoPlanText).not.toContain('Meditation language: en');
+  expect(videoPlanText).toContain('Meditation guidance language: English');
+  expect(videoPlanText).not.toContain('Meditation guidance language: en');
+  expect(videoPlanText).toContain('Meditation guidance voice selected: Female voice');
+  expect(videoPlanText).toContain('Meditation guidance tone selected: Soft, whisper-like, and gentle');
+  expect(videoPlanText).toContain('Permitted touch and physical assistance: Yes, with clear guidance and a stop signal');
+  expect(videoPlanText).toContain('Post-session rest and sleep preference: Guide to decide');
+  expect(videoPlanText).toContain('Reverse meditation journey authorization: Approved for this session');
+  expect(videoPlanText).not.toContain('Voice: female');
+  expect(videoPlanText).not.toContain('Voice tone: soft');
+  expect(videoPlanText).not.toContain('Touch preference: yes');
   expect(videoPlanText).not.toContain('Discussed privately with the guide.');
   const malayalamPlanText = await page.evaluate(() => {
     const storedPlan = JSON.parse(localStorage.getItem('chakra_consultation_plan'));
     return getConsentPlanPages({ ...storedPlan, language: 'ml' }).flat().join(' ');
   });
-  expect(malayalamPlanText).toContain('Meditation language: Malayalam');
-  expect(malayalamPlanText).not.toContain('Meditation language: ml');
+  expect(malayalamPlanText).toContain('Meditation guidance language: Malayalam');
+  expect(malayalamPlanText).not.toContain('Meditation guidance language: ml');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#consent-continue-to-recording').click();
@@ -299,10 +307,13 @@ test('opens the single-participant consultation entry point and returns a saved 
   if (process.env.CONSENT_VISUAL_CAPTURE) {
     const planFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);
     await testInfo.attach('consent-plan-frame', { body: Buffer.from(planFrame, 'base64'), contentType: 'image/png' });
+    await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-plan-page', '4');
+    const guidanceFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);
+    await testInfo.attach('consent-guidance-settings-frame', { body: Buffer.from(guidanceFrame, 'base64'), contentType: 'image/png' });
   }
   const planPageCount = Number(await page.locator('#consent-composite-canvas').getAttribute('data-plan-pages'));
   expect(planPageCount).toBeGreaterThan(0);
-  await expect(page.locator('#consent-record')).toBeVisible({ timeout: 3_000 });
+  await expect(page.locator('#consent-record')).toBeVisible({ timeout: 8_000 });
   await expect(page.locator('#consent-record')).toHaveAttribute('aria-label', 'Start Consent Recording');
   await expect(page.locator('#consent-countdown')).toBeHidden();
   await expect(page.locator('#consent-pause')).toBeHidden();
