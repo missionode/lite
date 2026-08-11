@@ -340,3 +340,11 @@
 - Already-saved plans created by the previous implementation are corrected at read time: a non-empty `chakraFocus` selection takes priority over the stale seven-item `activeChakras` copy.
 - Updated the consultation heading and guidance in English and Malayalam to explain the selection behavior.
 - Runtime versions: `app.js?v=1.85`, `style.css?v=1.71`, service-worker shell cache `chakra-v5.46`, language cache `chakra-language-v3`. Focused creation, migration, timing-panel, estimate, and reset validation passed **2/2** with screenshot capture disabled; syntax, locale JSON, and diff checks also passed.
+
+### Consent countdown and slower reading pace — 2026-08-11
+
+- The manual `Start Consent Recording` action now opens a visible `5–4–3–2–1` countdown. Spoken-consent audio, elapsed recording time, consent evidence rendering, and the reading lead begin only after the full five seconds.
+- Default teleprompter speed changed from Comfortable at 14 px/sec to Slow at 10 px/sec; the client can still adjust the existing 8–24 px/sec control.
+- Increased the production stationary reading lead from seven to ten seconds after recording starts, giving the client more time to read the initially visible text before automatic scrolling.
+- Saved consent composition metadata now records the five-second countdown and ten-second lead.
+- Runtime versions: `app.js?v=1.86`, `style.css?v=1.71`, service-worker shell cache `chakra-v5.47`, language cache `chakra-language-v4`. Focused countdown, default-speed, delayed-scroll, pause/resume, and preview validation passed **1/1** with screenshot capture disabled; syntax, locale JSON, and diff checks also passed.

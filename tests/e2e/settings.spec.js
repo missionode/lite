@@ -227,6 +227,7 @@ test('opens the single-participant consultation entry point and returns a saved 
     window.__chakraConsentTestTimings = {
       planPageMs: visualCapture ? 600 : 35,
       planTransitionMs: 25,
+      countdownStepMs: 150,
       readingLeadMs: 1000
     };
   }, Boolean(process.env.CONSENT_VISUAL_CAPTURE));
@@ -335,7 +336,8 @@ test('opens the single-participant consultation entry point and returns a saved 
   await page.locator('#consent-continue-to-recording').click();
   await expect(page.locator('#consent-record-stage')).toBeVisible();
   await expect(page.locator('#consent-preview-stage')).toBeHidden();
-  await expect(page.locator('#consent-scroll-speed-value')).toHaveText('Comfortable');
+  await expect(page.locator('#consent-scroll-speed')).toHaveValue('10');
+  await expect(page.locator('#consent-scroll-speed-value')).toHaveText('Slow');
   const cameraBounds = await page.locator('.teleprompter-shell').boundingBox();
   expect(cameraBounds.width).toBeGreaterThanOrEqual(389);
   expect(cameraBounds.height).toBeGreaterThanOrEqual(843);
@@ -357,7 +359,11 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-pause')).toBeHidden();
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'transition');
   await page.locator('#consent-record').click();
+  await expect(page.locator('#consent-countdown')).toBeVisible();
+  await expect(page.locator('#consent-countdown')).toHaveText(/[1-5]/);
+  await expect(page.locator('#consent-pause')).toBeHidden();
   await expect(page.locator('#consent-pause')).toBeVisible({ timeout: 6_000 });
+  await expect(page.locator('#consent-countdown')).toBeHidden();
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('width', '1280');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('height', '720');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-video-format', 'landscape-16:9');

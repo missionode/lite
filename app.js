@@ -3247,7 +3247,7 @@ let consentPromptScrollLastTime = null;
 let consentPromptLeadTimer = null;
 let consentPromptLeadStartedAt = 0;
 let consentPromptLeadRemaining = 0;
-let consentScrollSpeed = 14;
+let consentScrollSpeed = 10;
 let consultationRecordingAttempt = 0;
 let consultationAwaitingConsentStart = false;
 
@@ -3328,7 +3328,7 @@ function stopConsentPromptLead(preserveRemaining = false) {
 }
 
 function startConsentPromptWithLead(reset = false) {
-    if (reset) consentPromptLeadRemaining = consentTiming('readingLeadMs', 7000);
+    if (reset) consentPromptLeadRemaining = consentTiming('readingLeadMs', 10000);
     stopConsentPromptLead();
     if (consentPromptLeadRemaining <= 0) {
         startConsentPromptAutoScroll(reset);
@@ -3400,7 +3400,7 @@ function showConsentPreviewStage() {
 function updateConsentScrollSpeed() {
     const input = document.getElementById('consent-scroll-speed');
     const output = document.getElementById('consent-scroll-speed-value');
-    consentScrollSpeed = Number(input?.value) || 14;
+    consentScrollSpeed = Number(input?.value) || 10;
     if (output) {
         output.textContent = consentScrollSpeed <= 11
             ? t('ui.consentSpeedSlow')
@@ -4496,7 +4496,7 @@ function setConsentRecordingState(stateName) {
     const recordingClock = document.getElementById('consent-recording-clock');
     consultationConsentScreen?.classList.toggle('consent-recording-active', stateName === 'lead' || stateName === 'recording' || stateName === 'paused');
     const messages = {
-        ready: 'ui.consentReady', composing: 'ui.consentPlanPreparing', awaitingConsent: 'ui.consentAwaitingManualStart', lead: 'ui.consentReadingLead', recording: 'ui.consentRecording', paused: 'ui.consentPaused',
+        ready: 'ui.consentReady', composing: 'ui.consentPlanPreparing', awaitingConsent: 'ui.consentAwaitingManualStart', countdown: 'ui.consentCountdownStatus', lead: 'ui.consentReadingLead', recording: 'ui.consentRecording', paused: 'ui.consentPaused',
         recorded: 'ui.consentRecorded', error: 'ui.consentError'
     };
     if (status && messages[stateName]) status.textContent = t(messages[stateName]);
@@ -4645,9 +4645,31 @@ async function startConsultationRecording() {
     }
 }
 
-function startSpokenConsentRecording() {
+async function runSpokenConsentCountdown(attemptId) {
+    const countdown = document.getElementById('consent-countdown');
+    if (!countdown) return true;
+    countdown.classList.remove('hidden');
+    for (let remaining = 5; remaining >= 1; remaining -= 1) {
+        countdown.textContent = String(remaining);
+        const shouldContinue = await waitForConsentAttempt(consentTiming('countdownStepMs', 1000), attemptId);
+        if (!shouldContinue || attemptId !== consultationRecordingAttempt) {
+            countdown.classList.add('hidden');
+            countdown.textContent = '';
+            return false;
+        }
+    }
+    countdown.classList.add('hidden');
+    countdown.textContent = '';
+    return true;
+}
+
+async function startSpokenConsentRecording() {
     if (!consultationAwaitingConsentStart || consultationRecorder?.state !== 'recording') return;
     consultationAwaitingConsentStart = false;
+    const attemptId = consultationRecordingAttempt;
+    setConsentRecordingState('countdown');
+    if (!await runSpokenConsentCountdown(attemptId)) return;
+    if (attemptId !== consultationRecordingAttempt || consultationRecorder?.state !== 'recording') return;
     consultationCompositePhase = 'consent';
     consultationRecordingStartedAt = new Date();
     consultationRecordingStartTick = performance.now();
@@ -5806,7 +5828,8 @@ function attachEventListeners() {
             planDesign: 'luxury-document',
             consentCameraLayout: 'luxury-document-evidence-with-circular-camera',
             consentStartMode: 'manual-after-plan-pages',
-            teleprompterLeadMs: consentTiming('readingLeadMs', 7000),
+            consentCountdownSeconds: 5,
+            teleprompterLeadMs: consentTiming('readingLeadMs', 10000),
             liveWallClock: true,
             clientVerificationFields: ['name', 'contactNumber', 'email', 'citizenship', 'emergencyContact', 'meditationLanguage'],
             verbalServiceDetail: 'professional-categories-only',
