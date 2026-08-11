@@ -117,7 +117,9 @@ test('opens the single-participant consultation entry point and returns a saved 
     input.value = '1';
     input.dispatchEvent(new Event('input', { bubbles: true }));
   });
+  await page.locator('input[name="chakraFocus"][value="root"]').check();
   await page.locator('input[name="chakraFocus"][value="heart"]').check();
+  await page.locator('input[name="chakraFocus"][value="crown"]').check();
   await expect(page.locator('[data-chakra-question="heart"]')).toBeVisible();
   await page.locator('select[name="chakraAnswer_heart_1"]').selectOption('sometimes');
   await page.locator('select[name="chakraAnswer_heart_2"]').selectOption('often');
@@ -253,13 +255,15 @@ test('opens the single-participant consultation entry point and returns a saved 
   expect(plan.profile.name).toBe('Test Client');
   expect(plan.goal).toBe('Feel grounded and clear.');
   expect(plan.language).toBe('en');
-  expect(plan.activeChakras).toEqual(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
-  expect(plan.chakraFocus).toEqual(['heart']);
+  expect(plan.activeChakras).toEqual(['root', 'heart', 'crown']);
+  expect(plan.chakraFocus).toEqual(['root', 'heart', 'crown']);
   expect(plan.chakraResponses.heart.attention).toBe('more');
   expect(plan.chakraResponses.heart.answers).toEqual(['sometimes', 'often', 'rarely']);
   expect(plan.chakraResponses.heart.note).toBe('Support compassion and connection.');
   expect(plan.chakraDurations.root).toBe(60);
   expect(plan.chakraDurations.heart).toBe(180);
+  expect(plan.chakraDurations.crown).toBe(60);
+  expect(Object.keys(plan.chakraDurations)).toEqual(['root', 'heart', 'crown']);
   expect(Math.max(...Object.values(plan.chakraDurations))).toBeLessThanOrEqual(7 * 60);
   expect(plan.preferences.yogaBridgeEnabled).toBe(true);
   expect(plan.preferences.voiceGender).toBe('female');
@@ -449,6 +453,7 @@ test('opens the single-participant consultation entry point and returns a saved 
 test('locks Core timing for an active consultation and resets the client session', async ({ page }) => {
   await page.evaluate(() => {
     const activeChakras = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+    const consultationChakras = ['root', 'heart', 'crown'];
     localStorage.setItem('chakra_lang', 'en');
     localStorage.setItem('chakra_voice', 'piper:en_US-lessac-medium');
     localStorage.setItem('chakra_time', '1');
@@ -458,7 +463,7 @@ test('locks Core timing for an active consultation and resets the client session
       status: 'consent-recorded',
       profile: { name: 'Timing Client' },
       activeChakras,
-      chakraFocus: activeChakras,
+      chakraFocus: consultationChakras,
       chakraDurations: {
         root: 240,
         sacral: 300,
@@ -482,10 +487,13 @@ test('locks Core timing for an active consultation and resets the client session
   await expect(page.locator('#core-practice-timing-note')).toContainText('Locked while');
   await expect(page.locator('#consultation-timing-panel')).toBeVisible();
   await expect(page.locator('#consultation-timing-client')).toContainText('Timing Client');
-  await expect(page.locator('.consultation-timing-row')).toHaveCount(7);
+  await expect(page.locator('.consultation-timing-row')).toHaveCount(3);
+  await expect(page.locator('.consultation-timing-row')).toHaveText([/Root\s+4 mins/, /Heart\s+7 mins/, /Crown\s+5 mins/]);
+  await expect(page.locator('.consultation-timing-row').filter({ hasText: 'Sacral' })).toHaveCount(0);
   await expect(page.locator('.consultation-timing-row').filter({ hasText: 'Heart' })).toContainText('7 mins');
-  await expect(page.locator('#consultation-timing-total')).toContainText('36 mins');
-  await expect(page.locator('#session-estimate')).toContainText('~ 36 min session');
+  await expect(page.locator('#consultation-timing-total')).toContainText('16 mins');
+  await expect(page.locator('#session-estimate')).toContainText('~ 16 min session');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('chakra_selected')))).toEqual(['root', 'heart', 'crown']);
 
   page.once('dialog', dialog => dialog.accept());
   await page.locator('#reset-consultation-session').click();

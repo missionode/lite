@@ -4245,9 +4245,14 @@ function getActiveConsultationPlan() {
 
 function getConsultationPlanChakras(plan) {
     if (!plan) return [...state.selectedChakras];
-    const planned = Array.isArray(plan.activeChakras) && plan.activeChakras.length
-        ? plan.activeChakras
-        : Object.keys(plan.chakraDurations || {});
+    const consultationSelection = Array.isArray(plan.chakraFocus)
+        ? plan.chakraFocus.filter(key => STANDARD_CHAKRA_KEYS.includes(key))
+        : [];
+    const planned = consultationSelection.length
+        ? consultationSelection
+        : Array.isArray(plan.activeChakras) && plan.activeChakras.length
+            ? plan.activeChakras
+            : Object.keys(plan.chakraDurations || {});
     return planned.filter(key => STANDARD_CHAKRA_KEYS.includes(key));
 }
 
@@ -5588,7 +5593,9 @@ function attachEventListeners() {
         const countryOption = document.getElementById('consultation-citizenship')?.selectedOptions[0];
         const citizenshipName = countryOption?.textContent?.trim() || data.citizenship;
         const focusChakras = formData.getAll('chakraFocus');
-        const activeChakras = state.selectedChakras.length ? [...state.selectedChakras] : [...STANDARD_CHAKRA_KEYS];
+        const activeChakras = focusChakras.length
+            ? [...focusChakras]
+            : state.selectedChakras.length ? [...state.selectedChakras] : [...STANDARD_CHAKRA_KEYS];
         const chakraResponses = Object.fromEntries(focusChakras.map(key => [key, {
             answers: [1, 2, 3].map(index => String(formData.get(`chakraAnswer_${key}_${index}`) || 'prefer-not')),
             attention: String(formData.get(`chakraNeed_${key}`) || 'standard'),

@@ -332,3 +332,11 @@
 - Sharing remains entirely device-native through the Web Share API; no upload, backend email sender, or custom share destination was introduced.
 - Added a consistent 20px horizontal viewport inset to both the Review Recording sequence and the 16:9 video player.
 - Runtime versions: `app.js?v=1.84`, `style.css?v=1.71`, service-worker cache `chakra-v5.45`. Focused recording/share validation passed **1/1**, including MP4 negotiation and 20px preview-inset assertions, with screenshot capture disabled; syntax and diff checks also passed.
+
+### Consultation-selected chakra schedule — 2026-08-11
+
+- Consultation chakra selection is now authoritative for that client session. Selecting Root, Heart, and Crown creates timings, a Meditation Room timing list, an estimate, and a runtime chakra sequence for only those three chakras.
+- Leaving every consultation chakra unchecked deliberately falls back to the existing Meditation Room chakra selection.
+- Already-saved plans created by the previous implementation are corrected at read time: a non-empty `chakraFocus` selection takes priority over the stale seven-item `activeChakras` copy.
+- Updated the consultation heading and guidance in English and Malayalam to explain the selection behavior.
+- Runtime versions: `app.js?v=1.85`, `style.css?v=1.71`, service-worker shell cache `chakra-v5.46`, language cache `chakra-language-v3`. Focused creation, migration, timing-panel, estimate, and reset validation passed **2/2** with screenshot capture disabled; syntax, locale JSON, and diff checks also passed.

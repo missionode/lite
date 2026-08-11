@@ -50,6 +50,8 @@ The client-facing declaration states the consent date without a clock time. Prec
 
 Consent recording negotiates WebM first and MP4 when required by the browser. Native sharing normalizes the resulting MIME type and uses the matching `.webm`, `.mp4`, or `.mov` filename so macOS/iOS share validation does not receive a mismatched attachment.
 
+For an approved consultation, a non-empty consultation chakra selection defines the active session sequence and its individual timings. If the consultation leaves all chakras unchecked, the persisted Meditation Room selection is the fallback; this same resolved list drives the timing panel, estimate, and journey runtime.
+
 ## Narration architecture
 
 Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.
