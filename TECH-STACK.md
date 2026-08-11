@@ -86,7 +86,7 @@ Journey timing configuration is centralized in [`timing-config.json`](./timing-c
 
 ## End-to-end testing
 
-Playwright is the browser test runner for the static PWA. The suite lives in [`tests/e2e/settings.spec.js`](./tests/e2e/settings.spec.js) and [`tests/e2e/option-matrix.spec.js`](./tests/e2e/option-matrix.spec.js), and runs through the local static server configured in [`playwright.config.js`](./playwright.config.js). It covers display/content language separation, Settings organization and help, the compact selection-driven Lobby roadmap, the full-screen Journey Tuning mixer and safe restart, Corpse Pose timing synchronization and production bounds, Yoga/Bath/add-on dependencies, production narration-field quality, evening Sleep Mode choice, daytime HRIM gating, normal and HRIM timing persistence, generated-versus-custom HRIM intention behavior, all seven valid bath/add-on combinations, and seven representative global journey-mode combinations, including High Energy and Music Only selected from the Lobby. The suite now contains 28 tests; the mixer test passes in isolation, while the final full-suite rerun was affected by the local static-server process being interrupted after the stale Settings assertion was corrected.
+Playwright is the browser test runner for the static PWA. The suite lives in [`tests/e2e/settings.spec.js`](./tests/e2e/settings.spec.js) and [`tests/e2e/option-matrix.spec.js`](./tests/e2e/option-matrix.spec.js), and runs through the local static server configured in [`playwright.config.js`](./playwright.config.js). It covers display/content language separation, Settings organization and help, the compact selection-driven Lobby roadmap, the full-screen Journey Tuning mixer and safe restart, Corpse Pose timing synchronization and production bounds, Yoga/Bath/add-on dependencies, production narration-field quality, evening Sleep Mode choice, daytime HRIM gating, normal and HRIM timing persistence, generated-versus-custom HRIM intention behavior, all seven valid bath/add-on combinations, and seven representative global journey-mode combinations, including High Energy and Music Only selected from the Lobby. The suite currently contains 33 tests; the complete run on 2026-08-09 passed 33/33 with `?timingProfile=fast-test`.
 
 `scripts.json` remains the production narration source. `test-script.json` is a short, fast validation fixture and receives matching additions when a newly introduced script field is needed; it is not a production-content replacement. `docs/dot.json` is a facilitator-custom script, so new schema fields are added there additively only—its existing custom copy is never synchronized with `scripts.json`.
 
@@ -158,6 +158,44 @@ Before a release, validate:
 - Journal/privacy expectations, since entries are stored in browser storage without encryption
 - No secrets in the static bundle; the app currently has no server secrets
 
+## Consultation safety routing
+
+The single-participant consultation is implemented as a local, versioned plan flowing through `intake → Guide Review → consent/manual route → Lobby`. Guide Review is the safety decision point:
+
+- Movement/body-position sensitivity removes Yoga, Savasana, Bath, Massage, Perineal Care, and Assisted Bathing before a guided plan proceeds.
+- Imagery sensitivity advises neutral, present-focused guidance.
+- Audio/voice or wording sensitivity requires `Manual Guide Only`; the plan is stored as `manual-guide-required` and the guided app-audio CTA is blocked.
+- Safety Review acknowledgment and Manual Guide Only acknowledgment are separate gates and are both required when applicable.
+- Injury/back limitation immediately forces Yoga Bridge to `No`, disables the Yoga selector, and hides/clears Yoga poses. Medication/private medication remains selectable but is highlighted in Guide Review. Pregnancy/possible pregnancy keeps Yoga Bridge and remaining care/timing options available while hiding/clearing Yoga poses; Recent childbirth is a separate answer and keeps Yoga poses available, subject to Guide Review. The guide-review requirement remains enforced.
+- When medication is disclosed, the consent prompter states that the client is taking prescribed medication and will not stop, start, or change it because of the session without consulting the prescribing clinician. The statement is localized for English and Malayalam and does not include private medication details.
+- Consultation approval refreshes the Lobby estimate through the published runtime estimator, avoiding a scope error when returning from consent recording.
+- Consultation plans now capture Meditation Language and approval deterministically hydrates language, selected chakras, Yoga poses (including an intentional empty list), and Savasana without stale Settings fallback.
+- Consultation now reveals long-term, non-medical chakra reflection questions for selected focus areas. Each answer stores an attention preference and optional private guide note; bounded weights (`balanced`, `support`, `more`, `skip`) generate per-chakra durations within the approved total practice budget. No diagnosis or “blocked/weak chakra” inference is made.
+- Consultation entry is intentionally located in Settings rather than Lobby; Lobby remains dedicated to experience selection and starting the journey.
+- Each selected chakra now presents three separately answered reflective questions plus an explicit attention preference and optional guide note. Stored `answers` support rapport and context; bounded timing combines their response signal with the client’s direct time preference and never treats answers as diagnosis.
+- Guide Review now renders the complete collected plan in sections: profile/goal/language/voice, experience/readiness, chakra answers and notes with calculated minutes, Yoga/Care selections and durations, Savasana, emergency contact, safety answers/details, sensitivities, and guide advice. The review is the source used for final approval.
+- Consultation profile now includes required Citizenship, Contact Number, and Email Address fields. They are stored and shown to the guide in Review but are intentionally excluded from the spoken consent prompt. Consent recording controls have explicit high-contrast light-theme button styling.
+- Guide Review now highlights every flagged safety row, including private responses, and provides persistent guide notes for decisions, adaptations, and follow-up. Notes are stored on `sessionPlan.guideReview` and remain outside the spoken consent prompt. Focused Playwright validation passed 1/1.
+- Manual Guide Only reviews expose separate `Print / Save as PDF`, `Save Manual Plan`, and `Return to Lobby` actions. The A4 document uses print CSS, standard margins, a sans-serif font stack, restrained printer-safe colors, clear header/status styling, and guide prompts/notes. The browser’s print dialog provides the standard PDF output path.
+- The manual plan is reusable through the local versioned session plan: the guide can print it repeatedly before leaving the review, and saving no longer implicitly redirects or downloads a separate image.
+- The print window is opened without `noopener,noreferrer` so the app can populate it before invoking the native print dialog; manual CTA colors are explicit for visibility on the light review surface.
+- Printing now uses a hidden same-page iframe, eliminating the temporary popup/`about:blank` artifact. Chakra reflection summaries are question-by-question with explicit answer and guide-note labels in both review and print output.
+- Print invocation is idempotent through a one-shot guard; the detailed review summary has an explicit mobile inset so same-level contents do not touch the card edge.
+- Review action buttons use an isolated local stacking context and explicit pointer/touch interaction so decorative layers cannot intercept clicks.
+- The app shell, consultation screen, and cards use `min-width: 0`, bounded widths, and horizontal overflow containment; the consultation review test asserts document/app width does not exceed the viewport.
+
+This is a product safety control, not medical clearance. The guide retains final responsibility for suitability, adaptation, and whether to conduct a session in person. The behavior is covered by the focused Playwright Guide Review test.
+
+## Consultation audit status — 2026-08-09
+
+The single-participant consultation implementation is complete for the current local-PWA scope. It includes the Settings entry point, required identity/contact fields, bilingual intake, detailed Guide Review, consent prompter states, safety routing, adaptive chakra reflections/timing, Yoga and care dependencies, voice preference, Sleep/Savasana behavior, and Lobby hydration. The reconciliation file [`TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`](./TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md) now contains only open production and test gaps.
+
+Open boundaries are authenticated/server-side video sharing, retention/deletion/audit infrastructure, real-device MediaRecorder validation, full Cartesian combination reporting, native-speaker/device validation, and future couple support. The current repository Playwright suite validates UI/state behavior but cannot establish production security or real hardware recording quality.
+
+## Full-width action spacing
+
+Full-width action buttons use a consistent 10px inline margin and calculated width reduction for mobile edge spacing across Lobby, consultation, consent, Sleep Mode, and HRIM action groups.
+
 ## Narration content policy
 
 - Production guided meditation copy in `scripts.json` should describe felt experience and practical outcomes—grounding, calm, emotional release, confidence, compassion, clarity, renewal, and purposeful action—without claiming to treat or directly change organs, glands, blood, cells, hormones, disease, or other medical conditions.
@@ -178,4 +216,48 @@ Use any static host that serves the files over HTTPS with correct MIME types and
 - User flow and reverse-engineered architecture: [`INITIAL-HANDOFF.md`](./INITIAL-HANDOFF.md)
 - Runtime implementation: [`index.html`](./index.html), [`app.js`](./app.js), [`style.css`](./style.css), [`sw.js`](./sw.js)
 - Narration content: [`scripts.json`](./scripts.json)
-- Consultation planning (not yet implemented): [`TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`](./TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md). The first release is single-participant and must hydrate a versioned session plan before entering the existing Lobby.
+- Consultation architecture and implementation notes: [`TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`](./TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md). The current release is single-participant and hydrates a versioned session plan before entering the existing Lobby.
+## Consultation contact validation
+
+- The consultation uses a required country select with dial-code metadata instead of free-text citizenship.
+- The selected prefix is editable and user-edited phone values are not overwritten.
+- Email and client phone are required; emergency phone is optional and validated when entered.
+- The consultation form/card has a 10px mobile-safe horizontal inset.
+
+## Reverse Journey consultation routing
+
+- Consultation collects a non-diagnostic grounding/reconnection preference as preferences.reverseJourneyNeed.
+- reconnect and private answers create a Guide Review recommendation; only the explicit review-reverse-journey approval checkbox writes approvedSettings.reverseJourney.
+- Approval hydrates the existing state.reverseJourney and chakra_reverse_journey setting. The feature does not infer a diagnosis or auto-enable the journey.
+
+## Consent video composition
+
+- The browser records a canvas composition rather than the raw camera stream. The canvas presents a session-plan pre-roll, then the consent prompt, live start/timecode/location metadata, and a circular lower-right camera thumbnail.
+- MediaRecorder uses WebM VP8/Opus at a bounded video/audio bitrate and emits periodic chunks. A final client-side guard rejects files at or above Gmail's 25 MB attachment limit.
+- Start/end timestamps and permission-based location are persisted on the local consultation plan. Location denial is represented as unavailable.
+- The source microphone is routed through a Web Audio gain gate: plan pages remain silent, then audio opens at the consent-prompt transition where the circular face thumbnail also appears.
+- Consent start time and live wall-clock time are initialized at that same prompt/audio/thumbnail transition; the silent plan pre-roll displays no active consent timer.
+- The composed overlay shows Start date/time, live local wall-clock time, and location; the stop action holds an end-time frame for 500 ms before finalizing the MediaRecorder blob.
+- Plan pages are built from the same detailed review summary used by the printable plan, normalized into readable label/value rows, pixel-wrapped, paginated, and rendered inside a clipped safe-area rectangle. Prompt text reserves space for the face thumbnail.
+- Consent narration derives a localized service summary from the approved plan, including only selected Yoga, Bath, Massage, Perineal Care, Assisted Bathing, and Savasana stages with durations where applicable.
+- Guide Review always exposes the A4 Print / Save as PDF action. The generated document uses a branded logo header and distinguishes normal Guide Review copies from Manual Guide Only copies; manual save/return actions remain conditional.
+- Both print variants omit the visible Session Plan title, generated date, and app-generated footer/URL text. Browser-native print headers and footers remain controlled by the browser print dialog.
+- The uploaded logo is used in Settings, Lobby, Consultation, Guide Review, Consent Confirmation, completion modal, printable plan header, favicon, and PWA manifest icons. It is intentionally not used on the Splash screen or overlaid on top of the chakra symbol.
+- The active Chakra Meditation screen now includes a dedicated 100×100px logo with 20px bottom spacing; the Settings header uses a 72×72px logo with 12px title spacing.
+- Lobby branding uses a dedicated 64×64px logo treatment with 8px spacing before the room heading.
+- Visual QA checkpoint (2026-08-10): temporary Playwright screenshots covered desktop 1440×900, tablet 1024×768, and mobile 390×844 for Settings, Lobby, Consultation, and Guide Review; all 3 scenarios passed and no horizontal overflow was detected. Findings are non-blocking: desktop Lobby CTA sits near the viewport edge, Guide Review is intentionally narrow on desktop, long mobile values are dense, and the dark hero art is visually dense on narrow Settings screens.
+- Visual QA follow-ups are implemented in `style.css`: the Lobby action stack has additional bottom breathing room, desktop Guide Review uses an 820px app measure/760px content measure, mobile review rows stack label and value for scanning, and Settings reduces nebula contrast on narrow screens. Stylesheet query is `style.css?v=1.58`.
+- Print plans continue to generate the branded logo header for both standard and Manual Guide Only A4 documents. Fixed the Settings consultation-entry button’s nested mobile overflow by accounting for its 10px side margins; the 390px Playwright inspection reports no overflow offenders. Stylesheet query is now `style.css?v=1.59`.
+- Print invocation clears the document and iframe titles before printing to avoid an app-supplied title in browser print headers. Date/time and other browser-native headers are outside page content and require disabling “Headers and footers” in the print dialog. Stylesheet query is now `style.css?v=1.60`.
+- Both `GUIDE REVIEW COPY` and `MANUAL GUIDE ONLY` variants share this title-clearing renderer and are covered by explicit empty-title print assertions.
+- Consent video composition now preloads and draws the shared branded logo at 96×96px in the upper-right header-safe area across plan pre-roll and live consent-prompt frames. It does not overlap the lower-right circular face thumbnail. App script is `app.js?v=1.71`; shell cache is `chakra-v5.31`.
+- Consent content now covers the touch/assistance decision as well as every selected service and medication statement. The live prompt is a bounded scroll layer on the page, while the recorded canvas wraps text and reduces prompt typography from 27px to 18px when needed to avoid clipping. English/Malayalam touch consent keys and a Playwright assertion are included. App script is `app.js?v=1.72`; stylesheet is `style.css?v=1.61`; shell cache is `chakra-v5.32`.
+- Consent plan slides and A4 print plans now distinguish information hierarchy with diamond section markers, labeled value cards/rows, stronger values, restrained alternating surfaces, and extra spacing. Canvas pages are limited to four source lines per slide; prompt text still fits down to 18px. App script is `app.js?v=1.73`; stylesheet is `style.css?v=1.62`; shell cache is `chakra-v5.33`.
+- Consent recording UX now has two modes: pre-recording shows the complete script and a live camera preview; recording hides manual scrollbars and auto-scrolls the prompt at a gentle pace, with the same scroll ratio rendered into the canvas video. Compact icon-led controls support record, pause/resume, stop, retry, submit, and cancel. App script is `app.js?v=1.74`; stylesheet is `style.css?v=1.63`; shell cache is `chakra-v5.34`.
+- Consent presentation is now explicitly staged: review first, then selfie teleprompter recording. The prompt DOM is moved into the recording overlay rather than duplicated, preserving one source of truth for text and scroll position. The user can adjust 8–24 px/sec before recording; 14 px/sec is the default.
+- The live teleprompter uses a full app-viewport camera surface with a translucent scrolling script panel and icon-only camera controls. The confirmation stage places its circular camera thumbnail above a bounded, manually scrollable script while preserving inline Continue/Cancel actions.
+- The generated video contract is plan-first and consent-last. MediaRecorder starts with five-second silent session-plan canvas pages, then a transition/countdown, then the spoken consent. Microphone gain and the consent timer begin only at the consent transition; teleprompter motion waits another three seconds so the client can read the initially visible lines.
+- Video plan pages use an explicit client-facing allowlist sourced from the approved plan. They include the client name, goal, focus, language, approved services/settings, and relevant durations while excluding contact/email, emergency contact, medication details, private reflection notes, and guide notes.
+- The saved spoken-consent section uses the script as the primary canvas surface with a circular face thumbnail, voice, consent timer, logo, and reading-speed label. The live recording screen remains full camera; the exported evidence layout is intentionally document-led.
+- Stop transitions to Review Recording, which labels and plays the complete sequence (silent plan pages → spoken consent) before Retry or Accept. Canvas orientation remains `720×1280` portrait or `1280×720` landscape. App script is `app.js?v=1.76`; stylesheet is `style.css?v=1.65`; shell cache is `chakra-v5.36`.
+- This remains a local prototype: authenticated storage, email delivery, retention/deletion, and real-device codec/media validation are not implemented.

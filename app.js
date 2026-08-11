@@ -20,6 +20,9 @@ const MANTRA_AUDIO_MAP = {
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
+const consultationScreen = document.getElementById('consultation-screen');
+const consultationReviewScreen = document.getElementById('consultation-review-screen');
+const consultationConsentScreen = document.getElementById('consultation-consent-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
 const icebreakerScreen = document.getElementById('icebreaker-screen');
@@ -387,7 +390,6 @@ function getJourneyRoadmapLabels() {
         t('ui.roadmapIntention')
     ];
     if (getChecked('box-meditation-toggle')) labels.push(t('ui.roadmapBreathing'));
-    if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
     labels.push(t('ui.roadmapChakras'));
 
     if (getChecked('yoga-bridge-toggle')) {
@@ -402,6 +404,7 @@ function getJourneyRoadmapLabels() {
 
     labels.push(t('ui.roadmapClosing'));
     if (getChecked('hooponopono-toggle')) labels.push(t('ui.roadmapHooponopono'));
+    if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
     return labels;
 }
 
@@ -447,6 +450,10 @@ function applyLocaleUI() {
     document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
         const path = element.dataset.i18nAriaLabel;
         if (path) element.setAttribute('aria-label', t(path));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+        const path = element.dataset.i18nPlaceholder;
+        if (path) element.setAttribute('placeholder', t(path));
     });
 
     const controlLabels = {
@@ -1764,8 +1771,6 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
             if (this.isMeditationActive && !this.isHighEnergy && state.boxMeditation) await this.runBoxBreathing();
-            if (this.isMeditationActive && !this.isHighEnergy && state.corpsePoseEnabled) await this.runCorpsePose();
-
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
@@ -2326,6 +2331,7 @@ class MeditationController {
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
         if (this.isMeditationActive && state.hooponopono) { await this.runHooponopono(); }
+        if (this.isMeditationActive && state.corpsePoseEnabled) { await this.runCorpsePose(); }
         if (this.isMeditationActive) { this.finish(); }
     }
 
@@ -2458,7 +2464,7 @@ class MeditationController {
         // Start looping mantra audio track (fades in, drone fades down)
         await this.audio.playMantraTrack(key);
 
-        const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+        const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : approvedChakraDurationMinutes(key);
         const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
         const timerEl = document.getElementById('timer-display');
@@ -3202,10 +3208,1427 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    [configScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
+    [configScreen, lobbyScreen, consultationScreen, consultationReviewScreen, consultationConsentScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
     if (screen) screen.classList.remove('hidden');
+}
+
+let consultationRecorder = null;
+let consultationRecordingStream = null;
+let consultationRecordingChunks = [];
+let consultationRecordingBlob = null;
+let consultationCountdownTimer = null;
+let consultationCountdownResolve = null;
+let consultationCompositeFrame = null;
+let consultationCameraPreview = null;
+let consultationRecordingStartedAt = null;
+let consultationRecordingEndedAt = null;
+let consultationRecordingStartTick = 0;
+let consultationRecordingPausedAt = 0;
+let consultationRecordingPausedDuration = 0;
+let consultationLocation = null;
+let consultationConsentOpenedAt = null;
+let consultationPlanPages = [];
+let consultationCompositePhase = 'idle';
+let consultationPlanPageIndex = 0;
+let consultationAudioContext = null;
+let consultationAudioGain = null;
+let consultationStopTimer = null;
+let consultationConsentLogo = null;
+let consultationConsentLogoPromise = null;
+let consultationPreviewStream = null;
+let consentPromptScrollFrame = null;
+let consentPromptScrollLastTime = null;
+let consentPromptLeadTimer = null;
+let consentPromptLeadStartedAt = 0;
+let consentPromptLeadRemaining = 0;
+let consentScrollSpeed = 14;
+let consultationRecordingAttempt = 0;
+
+function consentTiming(name, fallback) {
+    const testValue = globalThis.__chakraConsentTestTimings?.[name];
+    return Number.isFinite(Number(testValue)) ? Math.max(0, Number(testValue)) : fallback;
+}
+
+function waitForConsentAttempt(milliseconds, attemptId) {
+    return new Promise(resolve => {
+        consultationCountdownResolve = resolve;
+        consultationCountdownTimer = setTimeout(() => {
+            consultationCountdownTimer = null;
+            consultationCountdownResolve = null;
+            resolve(attemptId === consultationRecordingAttempt);
+        }, milliseconds);
+    });
+}
+
+function loadConsentLogo() {
+    if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
+        return Promise.resolve(consultationConsentLogo);
+    }
+    if (consultationConsentLogoPromise) return consultationConsentLogoPromise;
+    consultationConsentLogoPromise = new Promise(resolve => {
+        const image = new Image();
+        image.onload = () => {
+            consultationConsentLogo = image;
+            resolve(image);
+        };
+        image.onerror = () => resolve(null);
+        image.src = new URL('symbols/logo_453x453.png', document.baseURI).href;
+    });
+    return consultationConsentLogoPromise;
+}
+
+async function prepareConsentCameraPreview() {
+    const video = document.getElementById('consent-live-preview');
+    if (!video || !navigator.mediaDevices?.getUserMedia || consultationPreviewStream) return;
+    try {
+        consultationPreviewStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        video.srcObject = consultationPreviewStream;
+        await video.play();
+        video.classList.add('is-ready');
+    } catch (error) {
+        video.classList.remove('is-ready');
+        console.info('[Consultation] live camera preview unavailable:', error?.name || error);
+    }
+}
+
+function stopConsentCameraPreview() {
+    consultationPreviewStream?.getTracks().forEach(track => track.stop());
+    consultationPreviewStream = null;
+    const video = document.getElementById('consent-live-preview');
+    if (video) {
+        video.pause();
+        video.srcObject = null;
+        video.classList.remove('is-ready');
+    }
+}
+
+function stopConsentPromptAutoScroll(reset = false) {
+    if (consentPromptScrollFrame) clearInterval(consentPromptScrollFrame);
+    consentPromptScrollFrame = null;
+    consentPromptScrollLastTime = null;
+    const prompter = document.querySelector('#consultation-consent-screen .consent-prompter');
+    if (reset && prompter) prompter.scrollTop = 0;
+}
+
+function stopConsentPromptLead(preserveRemaining = false) {
+    if (!consentPromptLeadTimer) return;
+    clearTimeout(consentPromptLeadTimer);
+    consentPromptLeadTimer = null;
+    if (preserveRemaining && consentPromptLeadStartedAt) {
+        consentPromptLeadRemaining = Math.max(0, consentPromptLeadRemaining - (performance.now() - consentPromptLeadStartedAt));
+    }
+    consentPromptLeadStartedAt = 0;
+}
+
+function startConsentPromptWithLead(reset = false) {
+    if (reset) consentPromptLeadRemaining = consentTiming('readingLeadMs', 3000);
+    stopConsentPromptLead();
+    if (consentPromptLeadRemaining <= 0) {
+        startConsentPromptAutoScroll(reset);
+        setConsentRecordingState('recording');
+        return;
+    }
+    if (reset) stopConsentPromptAutoScroll(true);
+    consentPromptLeadStartedAt = performance.now();
+    consentPromptLeadTimer = setTimeout(() => {
+        consentPromptLeadTimer = null;
+        consentPromptLeadStartedAt = 0;
+        consentPromptLeadRemaining = 0;
+        if (consultationRecorder?.state === 'recording') {
+            startConsentPromptAutoScroll();
+            setConsentRecordingState('recording');
+        }
+    }, consentPromptLeadRemaining);
+    setConsentRecordingState('lead');
+}
+
+function showConsentReviewStage() {
+    const reviewStage = document.getElementById('consent-review-stage');
+    const recordStage = document.getElementById('consent-record-stage');
+    const previewStage = document.getElementById('consent-preview-stage');
+    const prompter = document.querySelector('#consultation-consent-screen .consent-prompter');
+    const reviewLiveStage = document.querySelector('#consent-review-stage .consent-live-stage');
+    if (prompter && reviewLiveStage && !reviewStage.contains(prompter)) reviewLiveStage.after(prompter);
+    reviewStage?.classList.remove('hidden');
+    recordStage?.classList.add('hidden');
+    previewStage?.classList.add('hidden');
+    consultationConsentScreen?.classList.remove('consent-recording-active', 'consent-teleprompter-mode', 'consent-preview-mode');
+    stopConsentPromptAutoScroll(true);
+}
+
+function enterConsentTeleprompter() {
+    const reviewStage = document.getElementById('consent-review-stage');
+    const recordStage = document.getElementById('consent-record-stage');
+    const previewStage = document.getElementById('consent-preview-stage');
+    const prompter = document.querySelector('#consultation-consent-screen .consent-prompter');
+    const copySlot = document.getElementById('teleprompter-copy-slot');
+    const camera = document.getElementById('consent-live-preview');
+    const cameraLayer = document.querySelector('.teleprompter-camera-layer');
+    if (prompter && copySlot) copySlot.append(prompter);
+    if (camera && cameraLayer) cameraLayer.append(camera);
+    reviewStage?.classList.add('hidden');
+    recordStage?.classList.remove('hidden');
+    previewStage?.classList.add('hidden');
+    consultationConsentScreen?.classList.remove('consent-preview-mode');
+    consultationConsentScreen?.classList.add('consent-teleprompter-mode');
+    setConsentRecordingState('ready');
+    prepareConsentCameraPreview();
+}
+
+function showConsentPreviewStage() {
+    document.getElementById('consent-review-stage')?.classList.add('hidden');
+    document.getElementById('consent-record-stage')?.classList.add('hidden');
+    document.getElementById('consent-preview-stage')?.classList.remove('hidden');
+    document.getElementById('consent-video-preview')?.classList.remove('hidden');
+    consultationConsentScreen?.classList.remove('consent-recording-active', 'consent-teleprompter-mode');
+    consultationConsentScreen?.classList.add('consent-preview-mode');
+    const planCount = document.getElementById('consent-preview-plan-count');
+    if (planCount) planCount.textContent = t('ui.consentPlanPageCount').replace('{count}', String(consultationPlanPages.length));
+}
+
+function updateConsentScrollSpeed() {
+    const input = document.getElementById('consent-scroll-speed');
+    const output = document.getElementById('consent-scroll-speed-value');
+    consentScrollSpeed = Number(input?.value) || 14;
+    if (output) {
+        output.textContent = consentScrollSpeed <= 11
+            ? t('ui.consentSpeedSlow')
+            : consentScrollSpeed >= 20
+                ? t('ui.consentSpeedFast')
+                : t('ui.consentSpeedComfortable');
+    }
+}
+
+function startConsentPromptAutoScroll(reset = false) {
+    const prompter = document.querySelector('#consultation-consent-screen .consent-prompter');
+    if (!prompter) return;
+    if (reset) prompter.scrollTop = 0;
+    stopConsentPromptAutoScroll();
+    consentPromptScrollLastTime = performance.now();
+    const step = () => {
+        const maxScroll = Math.max(0, prompter.scrollHeight - prompter.clientHeight);
+        if (prompter.scrollTop >= maxScroll - 1) {
+            clearInterval(consentPromptScrollFrame);
+            consentPromptScrollFrame = null;
+            consentPromptScrollLastTime = null;
+            const status = document.getElementById('consent-recording-status');
+            if (status && consultationRecorder?.state === 'recording') status.textContent = t('ui.consentScriptComplete');
+            return;
+        }
+        const now = performance.now();
+        const elapsedSeconds = Math.min(0.15, Math.max(0, now - consentPromptScrollLastTime) / 1000);
+        prompter.scrollTop = Math.min(maxScroll, prompter.scrollTop + consentScrollSpeed * elapsedSeconds);
+        consentPromptScrollLastTime = now;
+    };
+    consentPromptScrollFrame = setInterval(step, 50);
+}
+
+function formatConsentDateTime(value) {
+    if (!value) return '—';
+    return new Intl.DateTimeFormat([], {
+        year: 'numeric', month: 'short', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).format(value);
+}
+
+function formatConsentElapsed(milliseconds) {
+    const seconds = Math.max(0, Math.floor(milliseconds / 1000));
+    return String(Math.floor(seconds / 60)).padStart(2, '0') + ':' + String(seconds % 60).padStart(2, '0');
+}
+
+function getConsentRecordingElapsed() {
+    if (!consultationRecordingStartTick) return 0;
+    const endTick = consultationRecordingPausedAt || performance.now();
+    return Math.max(0, endTick - consultationRecordingStartTick - consultationRecordingPausedDuration);
+}
+
+function formatConsentClock(value) {
+    if (!value) return '—';
+    return new Intl.DateTimeFormat([], {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(value);
+}
+
+function getConsentLiveDate() {
+    if (consultationRecordingEndedAt) return consultationRecordingEndedAt;
+    if (!consultationRecordingStartedAt || !consultationRecordingStartTick) return null;
+    return new Date(consultationRecordingStartedAt.getTime() + (performance.now() - consultationRecordingStartTick));
+}
+
+function updateConsentMetadataDisplay() {
+    const metadata = document.getElementById('consent-recording-metadata');
+    if (!metadata) return;
+    const locationText = consultationLocation
+        ? consultationLocation.latitude + ', ' + consultationLocation.longitude
+        : 'unavailable';
+    metadata.textContent = 'Start: ' + formatConsentDateTime(consultationRecordingStartedAt)
+        + ' · Live time: ' + formatConsentClock(getConsentLiveDate())
+        + ' · Location: ' + locationText;
+}
+
+function getConsentPlanPages(sessionPlan) {
+    const preferences = sessionPlan?.preferences || {};
+    const durations = sessionPlan?.durations || {};
+    const chakraLabelKeys = { root: 'root', sacral: 'sacral', solar: 'solar', heart: 'heart', throat: 'throat', thirdeye: 'thirdEye', crown: 'crown' };
+    const focus = (sessionPlan?.chakraFocus || []).map(key => t(`ui.${chakraLabelKeys[key] || key}`)).join(', ') || t('ui.consultationEvenJourney');
+    const yesNo = value => t(value ? 'ui.consultationYes' : 'ui.consultationNo');
+    const minutes = value => `${Math.round((Number(value) || 0) / 60)} min`;
+    const groups = [
+        {
+            heading: t('ui.consentPlanOverview'),
+            rows: [
+                [t('ui.consultationSummaryName'), sessionPlan?.profile?.name || t('ui.client')],
+                [t('ui.consultationSummaryGoal'), sessionPlan?.goal || t('ui.sessionGoal')],
+                [t('ui.consultationSummaryFocus'), focus],
+                [t('ui.consultationSummaryLanguage'), sessionPlan?.language || state.language]
+            ]
+        },
+        {
+            heading: t('ui.consultationSummaryPlanDetails'),
+            rows: [
+                [t('ui.consentPlanServices'), getConsentServiceSummary(sessionPlan)],
+                [t('ui.consultationSummaryVoice'), preferences.voiceGender || 'guide'],
+                [t('ui.consultationSummaryTone'), preferences.tone || t('ui.consultationNone')],
+                [t('ui.consultationSummaryTouch'), preferences.touch || sessionPlan?.safety?.touch || t('ui.consultationNone')],
+                [t('ui.consultationSummarySleep'), preferences.sleepMode || t('ui.consultationNone')],
+                [t('ui.consultationSummaryReverseJourney'), yesNo(Boolean(sessionPlan?.approvedSettings?.reverseJourney))]
+            ]
+        },
+        {
+            heading: t('ui.consentPlanTiming'),
+            rows: [
+                ...(preferences.yogaBridgeEnabled ? [
+                    [t('ui.consultationSummaryYogaPoses'), preferences.selectedYogaPoses?.join(', ') || t('ui.consultationNone')],
+                    [t('ui.consultationSummaryYogaTiming'), `${minutes(durations.yogaPrep)} prep · ${minutes(durations.yogaPose)} per pose`]
+                ] : []),
+                ...(preferences.bathSessionEnabled ? [[t('ui.consultationSummaryCareTiming'), [
+                    preferences.assistedBathingEnabled ? `${t('ui.consentServiceAssisted')} ${minutes(durations.assistedBathing)}` : `${t('ui.consentServiceBath')} ${minutes(durations.bath)}`,
+                    preferences.massageEnabled ? `${t('ui.consentServiceMassage')} ${minutes(durations.massage)}` : '',
+                    preferences.perinealCareEnabled ? `${t('ui.consentServicePerineal')} ${minutes(durations.perinealCare)}` : ''
+                ].filter(Boolean).join(' · ')]] : []),
+                [t('ui.consultationSummarySavasana'), `${yesNo(Boolean(preferences.corpsePoseEnabled))} · ${minutes(durations.corpse)}`]
+            ]
+        }
+    ];
+    const pages = [];
+    groups.forEach(group => {
+        const rows = group.rows.filter(([, value]) => String(value || '').trim());
+        for (let index = 0; index < rows.length; index += 3) {
+            pages.push([group.heading, ...rows.slice(index, index + 3).map(([label, value]) => `${label}: ${value}`)]);
+        }
+    });
+    return pages.length ? pages : [[t('ui.consentPlanOverview'), `${t('ui.consultationSummaryGoal')}: ${t('ui.sessionGoal')}`]];
+}
+
+function drawConsentRoundedRect(context, x, y, width, height, radius) {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.arcTo(x + width, y, x + width, y + height, radius);
+    context.arcTo(x + width, y + height, x, y + height, radius);
+    context.arcTo(x, y + height, x, y, radius);
+    context.arcTo(x, y, x + width, y, radius);
+    context.closePath();
+}
+
+function wrapConsentCanvasText(context, text, maxWidth) {
+    const lines = [];
+    const words = String(text || '').split(/\s+/).filter(Boolean);
+    let current = '';
+    words.forEach(word => {
+        const candidate = current ? current + ' ' + word : word;
+        if (context.measureText(candidate).width > maxWidth && current) {
+            lines.push(current);
+            current = word;
+        } else current = candidate;
+    });
+    if (current) lines.push(current);
+    return lines.length ? lines : ['—'];
+}
+
+function drawConsentPlanRows(context, lines, width, padding, startY, contentBottom) {
+    const rowWidth = width - padding * 2;
+    const scale = width / 1280;
+    const labelFont = Math.max(12, Math.round(14 * scale));
+    const valueFont = Math.max(16, Math.round(19 * scale));
+    const headingFont = Math.max(18, Math.round(22 * scale));
+    const lineHeight = Math.round(valueFont * 1.35);
+    let y = startY;
+    lines.forEach(line => {
+        const separator = line.indexOf(': ');
+        if (separator <= 0) {
+            context.fillStyle = '#a16207';
+            context.font = `700 ${Math.max(13, Math.round(16 * scale))}px Arial, sans-serif`;
+            context.fillText('◆', padding, y + headingFont);
+            context.fillStyle = '#243247';
+            context.font = `700 ${headingFont}px Arial, sans-serif`;
+            context.fillText(line, padding + Math.max(22, Math.round(28 * scale)), y + headingFont);
+            y += headingFont + Math.max(20, Math.round(24 * scale));
+            return;
+        }
+
+        const label = line.slice(0, separator).trim();
+        const value = line.slice(separator + 2).trim();
+        context.font = `700 ${valueFont}px Arial, sans-serif`;
+        const horizontalInset = Math.max(32, Math.round(44 * scale));
+        const valueLines = wrapConsentCanvasText(context, value, rowWidth - horizontalInset * 1.5);
+        const rowHeight = Math.max(Math.round(66 * scale), Math.round(40 * scale) + valueLines.length * lineHeight);
+        if (y + rowHeight > contentBottom) return;
+
+        drawConsentRoundedRect(context, padding, y, rowWidth, rowHeight, Math.max(8, Math.round(10 * scale)));
+        context.fillStyle = '#ffffff';
+        context.fill();
+        context.strokeStyle = '#d8dde4';
+        context.lineWidth = Math.max(1, Math.round(2 * scale));
+        context.stroke();
+        context.fillStyle = '#a16207';
+        context.beginPath();
+        context.arc(padding + horizontalInset * 0.42, y + Math.max(16, Math.round(20 * scale)), Math.max(4, Math.round(5 * scale)), 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = '#667085';
+        context.font = `700 ${labelFont}px Arial, sans-serif`;
+        context.fillText(label.toUpperCase(), padding + horizontalInset, y + Math.max(21, Math.round(25 * scale)));
+        context.fillStyle = '#20242b';
+        context.font = `700 ${valueFont}px Arial, sans-serif`;
+        valueLines.forEach((valueLine, index) => context.fillText(valueLine, padding + horizontalInset, y + Math.max(43, Math.round(51 * scale)) + index * lineHeight));
+        y += rowHeight + Math.max(9, Math.round(12 * scale));
+    });
+}
+
+function drawConsentPlanFrame(context, width, height) {
+    const portrait = height > width;
+    const padding = Math.round(width * (portrait ? 0.065 : 0.055));
+    const pageIndex = Math.min(consultationPlanPageIndex, Math.max(0, consultationPlanPages.length - 1));
+    const page = consultationPlanPages[pageIndex] || [];
+    context.fillStyle = '#f1f0ec';
+    context.fillRect(0, 0, width, height);
+    const accent = context.createLinearGradient(0, 0, width, 0);
+    accent.addColorStop(0, '#6d28d9');
+    accent.addColorStop(1, '#b88732');
+    context.fillStyle = accent;
+    context.fillRect(0, 0, width, Math.max(10, Math.round(height * 0.016)));
+
+    const logoSize = Math.round(width * (portrait ? 0.13 : 0.075));
+    if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
+        context.drawImage(consultationConsentLogo, width - padding - logoSize, padding, logoSize, logoSize);
+    }
+    context.fillStyle = '#1f2937';
+    context.font = `700 ${Math.max(28, Math.round(width * (portrait ? 0.055 : 0.035)))}px Arial, sans-serif`;
+    context.fillText(t('ui.consentPlanVideoTitle'), padding, padding + Math.max(34, Math.round(width * 0.04)));
+    context.fillStyle = '#667085';
+    context.font = `500 ${Math.max(15, Math.round(width * 0.016))}px Arial, sans-serif`;
+    context.fillText(t('ui.consentPlanVideoSubtitle'), padding, padding + Math.max(64, Math.round(width * 0.072)));
+
+    const startY = padding + logoSize + Math.max(30, Math.round(height * 0.035));
+    const footerY = height - padding;
+    drawConsentPlanRows(context, page, width, padding, startY, footerY - Math.max(34, Math.round(height * 0.04)));
+    context.fillStyle = '#667085';
+    context.font = `600 ${Math.max(14, Math.round(width * 0.014))}px Arial, sans-serif`;
+    context.fillText(t('ui.consentPlanPage').replace('{current}', String(pageIndex + 1)).replace('{total}', String(consultationPlanPages.length)), padding, footerY);
+}
+
+function drawConsentTransitionFrame(context, width, height) {
+    context.fillStyle = '#171025';
+    context.fillRect(0, 0, width, height);
+    const titleSize = Math.max(30, Math.round(width * 0.045));
+    context.fillStyle = '#ffffff';
+    context.font = `700 ${titleSize}px Arial, sans-serif`;
+    context.textAlign = 'center';
+    context.fillText(t('ui.consentPlanComplete'), width / 2, height / 2 - titleSize * 0.35);
+    context.fillStyle = 'rgba(255, 255, 255, 0.76)';
+    context.font = `500 ${Math.max(18, Math.round(titleSize * 0.48))}px Arial, sans-serif`;
+    context.fillText(t('ui.consentPlanTransition'), width / 2, height / 2 + titleSize * 0.65);
+    context.textAlign = 'start';
+}
+
+function drawConsentCameraThumbnail(context, centerX, centerY, radius) {
+    context.save();
+    context.beginPath();
+    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    context.clip();
+    context.fillStyle = '#2b2733';
+    context.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+    if (consultationCameraPreview?.readyState >= 2 && consultationCameraPreview.videoWidth && consultationCameraPreview.videoHeight) {
+        const videoWidth = consultationCameraPreview.videoWidth;
+        const videoHeight = consultationCameraPreview.videoHeight;
+        const sourceSize = Math.min(videoWidth, videoHeight);
+        const sourceX = (videoWidth - sourceSize) / 2;
+        const sourceY = (videoHeight - sourceSize) / 2;
+        context.translate(centerX * 2, 0);
+        context.scale(-1, 1);
+        context.drawImage(consultationCameraPreview, sourceX, sourceY, sourceSize, sourceSize, centerX - radius, centerY - radius, radius * 2, radius * 2);
+    }
+    context.restore();
+    context.save();
+    context.strokeStyle = '#d4a84f';
+    context.lineWidth = Math.max(4, Math.round(radius * 0.055));
+    context.beginPath();
+    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    context.stroke();
+    context.restore();
+}
+
+function drawConsentSpokenFrame(context, width, height) {
+    const portrait = height > width;
+    const padding = Math.round(width * (portrait ? 0.055 : 0.045));
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
+    const elapsed = getConsentRecordingElapsed();
+    const recordingClock = document.getElementById('consent-recording-clock');
+    if (recordingClock) recordingClock.textContent = formatConsentElapsed(elapsed);
+    updateConsentMetadataDisplay();
+
+    context.fillStyle = '#171025';
+    context.fillRect(0, 0, width, height);
+    const glow = context.createRadialGradient(width * 0.3, height * 0.2, 0, width * 0.3, height * 0.2, width * 0.9);
+    glow.addColorStop(0, 'rgba(124, 58, 237, 0.24)');
+    glow.addColorStop(1, 'rgba(23, 16, 37, 0)');
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+
+    const logoSize = Math.round(width * (portrait ? 0.105 : 0.065));
+    if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
+        context.drawImage(consultationConsentLogo, width - padding - logoSize, padding, logoSize, logoSize);
+    }
+    context.fillStyle = '#ffffff';
+    context.font = `700 ${Math.max(24, Math.round(width * (portrait ? 0.045 : 0.028)))}px ${fontFamily}`;
+    context.fillText(t('ui.consentTitle'), padding, padding + Math.max(30, Math.round(width * 0.032)));
+
+    const timerWidth = portrait ? 150 : 180;
+    const timerHeight = portrait ? 50 : 56;
+    drawConsentRoundedRect(context, padding, padding + Math.max(48, Math.round(width * 0.05)), timerWidth, timerHeight, timerHeight / 2);
+    context.fillStyle = 'rgba(8, 5, 18, 0.72)';
+    context.fill();
+    context.fillStyle = '#ef4444';
+    context.beginPath();
+    context.arc(padding + 23, padding + Math.max(48, Math.round(width * 0.05)) + timerHeight / 2, 7, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#ffffff';
+    context.font = `${portrait ? 21 : 23}px Arial, sans-serif`;
+    context.fillText(formatConsentElapsed(elapsed), padding + 42, padding + Math.max(48, Math.round(width * 0.05)) + timerHeight * 0.67);
+
+    const panelTop = Math.round(height * (portrait ? 0.16 : 0.18));
+    const panelWidth = portrait ? width - padding * 2 : Math.round(width * 0.7);
+    const panelHeight = Math.round(height * (portrait ? 0.57 : 0.68));
+    drawConsentRoundedRect(context, padding, panelTop, panelWidth, panelHeight, portrait ? 22 : 18);
+    context.fillStyle = '#fbfaf7';
+    context.fill();
+    context.strokeStyle = 'rgba(212, 168, 79, 0.7)';
+    context.lineWidth = 2;
+    context.stroke();
+
+    const textInset = Math.round(panelWidth * 0.055);
+    const textWidth = panelWidth - textInset * 2;
+    const labelHeight = portrait ? 58 : 52;
+    const textTop = panelTop + labelHeight;
+    const availableHeight = panelHeight - labelHeight - textInset;
+    const fontSize = portrait ? 28 : 29;
+    const lineHeight = Math.round(fontSize * 1.52);
+    context.fillStyle = '#8a6424';
+    context.font = `700 ${portrait ? 16 : 15}px ${fontFamily}`;
+    context.fillText(t('ui.consentPromptLabel').toUpperCase(), padding + textInset, panelTop + (portrait ? 37 : 34));
+    context.fillStyle = '#20242b';
+    context.font = `600 ${fontSize}px ${fontFamily}`;
+    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), textWidth);
+    const promptScroller = document.querySelector('#consultation-consent-screen .consent-prompter');
+    const domMaxScroll = Math.max(0, (promptScroller?.scrollHeight || 0) - (promptScroller?.clientHeight || 0));
+    const canvasMaxScroll = Math.max(0, lines.length * lineHeight - availableHeight + lineHeight);
+    const scrollRatio = domMaxScroll ? Math.min(1, promptScroller.scrollTop / domMaxScroll) : 0;
+    const canvasOffset = canvasMaxScroll * scrollRatio;
+    context.save();
+    context.beginPath();
+    context.rect(padding + textInset, textTop, textWidth, availableHeight);
+    context.clip();
+    lines.forEach((line, index) => context.fillText(line, padding + textInset, textTop + fontSize + index * lineHeight - canvasOffset));
+    context.restore();
+
+    const cameraRadius = portrait ? Math.round(width * 0.13) : Math.round(Math.min(width, height) * 0.15);
+    const cameraX = width - padding - cameraRadius;
+    const cameraY = portrait ? height - padding - cameraRadius - 34 : Math.round(height * 0.53);
+    drawConsentCameraThumbnail(context, cameraX, cameraY, cameraRadius);
+    context.fillStyle = 'rgba(255, 255, 255, 0.82)';
+    context.font = `${portrait ? 17 : 16}px ${fontFamily}`;
+    context.fillText(`${t('ui.consentScrollSpeed')}: ${document.getElementById('consent-scroll-speed-value')?.textContent || ''}`, padding, height - padding);
+}
+
+function requestConsentLocation() {
+    return new Promise(resolve => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+            position => resolve({
+                latitude: Number(position.coords.latitude.toFixed(6)),
+                longitude: Number(position.coords.longitude.toFixed(6))
+            }),
+            () => resolve(null),
+            { enableHighAccuracy: false, timeout: 2500, maximumAge: 300000 }
+        );
+    });
+}
+
+function drawConsentComposite() {
+    const canvas = document.getElementById('consent-composite-canvas');
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const portrait = height > width;
+    const padding = Math.round(width * (portrait ? 0.055 : 0.045));
+
+    canvas.dataset.compositionPhase = consultationCompositePhase;
+    canvas.dataset.planPage = String(consultationPlanPageIndex + 1);
+    canvas.dataset.planPages = String(consultationPlanPages.length);
+    if (consultationCompositePhase === 'plan') {
+        drawConsentPlanFrame(context, width, height);
+        consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
+        return;
+    }
+    if (consultationCompositePhase === 'transition') {
+        drawConsentTransitionFrame(context, width, height);
+        consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
+        return;
+    }
+    if (consultationCompositePhase === 'consent') {
+        drawConsentSpokenFrame(context, width, height);
+        consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
+        return;
+    }
+
+    context.fillStyle = '#050308';
+    context.fillRect(0, 0, width, height);
+    if (consultationCameraPreview?.readyState >= 2 && consultationCameraPreview.videoWidth && consultationCameraPreview.videoHeight) {
+        const videoWidth = consultationCameraPreview.videoWidth;
+        const videoHeight = consultationCameraPreview.videoHeight;
+        const sourceRatio = videoWidth / videoHeight;
+        const targetRatio = width / height;
+        let sourceX = 0;
+        let sourceY = 0;
+        let sourceWidth = videoWidth;
+        let sourceHeight = videoHeight;
+        if (sourceRatio > targetRatio) {
+            sourceWidth = videoHeight * targetRatio;
+            sourceX = (videoWidth - sourceWidth) / 2;
+        } else {
+            sourceHeight = videoWidth / targetRatio;
+            sourceY = (videoHeight - sourceHeight) / 2;
+        }
+        context.drawImage(consultationCameraPreview, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+    }
+
+    const shade = context.createLinearGradient(0, 0, 0, height);
+    shade.addColorStop(0, 'rgba(3, 2, 8, 0.72)');
+    shade.addColorStop(0.28, 'rgba(3, 2, 8, 0.12)');
+    shade.addColorStop(0.62, 'rgba(3, 2, 8, 0.2)');
+    shade.addColorStop(1, 'rgba(3, 2, 8, 0.88)');
+    context.fillStyle = shade;
+    context.fillRect(0, 0, width, height);
+
+    const logoSize = Math.round(width * (portrait ? 0.1 : 0.065));
+    if (consultationConsentLogo?.complete && consultationConsentLogo.naturalWidth > 0) {
+        context.save();
+        context.globalAlpha = 0.9;
+        context.drawImage(consultationConsentLogo, width - padding - logoSize, padding, logoSize, logoSize);
+        context.restore();
+    }
+
+    const elapsed = getConsentRecordingElapsed();
+    const recordingClock = document.getElementById('consent-recording-clock');
+    if (recordingClock) recordingClock.textContent = formatConsentElapsed(elapsed);
+    updateConsentMetadataDisplay();
+
+    context.save();
+    context.fillStyle = 'rgba(8, 5, 18, 0.62)';
+    drawConsentRoundedRect(context, padding, padding, portrait ? 150 : 180, portrait ? 54 : 58, 28);
+    context.fill();
+    context.fillStyle = '#ef4444';
+    context.beginPath();
+    context.arc(padding + 24, padding + (portrait ? 27 : 29), 7, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#ffffff';
+    context.font = `${portrait ? 22 : 24}px Arial, sans-serif`;
+    context.fillText(formatConsentElapsed(elapsed), padding + 42, padding + (portrait ? 35 : 38));
+    context.restore();
+
+    const panelTop = Math.round(height * (portrait ? 0.16 : 0.19));
+    const panelHeight = Math.round(height * (portrait ? 0.48 : 0.56));
+    const panelWidth = width - padding * 2;
+    context.save();
+    context.fillStyle = 'rgba(8, 5, 18, 0.58)';
+    context.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+    context.lineWidth = 2;
+    drawConsentRoundedRect(context, padding, panelTop, panelWidth, panelHeight, portrait ? 24 : 20);
+    context.fill();
+    context.stroke();
+
+    const textInset = Math.round(panelWidth * 0.045);
+    const textWidth = panelWidth - textInset * 2;
+    const labelHeight = portrait ? 54 : 46;
+    const textTop = panelTop + labelHeight;
+    const availableHeight = panelHeight - labelHeight - textInset;
+    const fontFamily = state.language === 'ml' ? 'Manjari, Arial, sans-serif' : 'Arial, sans-serif';
+    const fontSize = portrait ? 28 : 30;
+    const lineHeight = Math.round(fontSize * 1.52);
+    context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    context.font = `700 ${portrait ? 16 : 15}px ${fontFamily}`;
+    context.fillText(t('ui.consentPromptLabel').toUpperCase(), padding + textInset, panelTop + (portrait ? 35 : 31));
+    context.fillStyle = '#ffffff';
+    context.font = `600 ${fontSize}px ${fontFamily}`;
+    const lines = wrapConsentCanvasText(context, String(document.getElementById('consent-prompt-text')?.innerText || '').trim(), textWidth);
+    const promptScroller = document.querySelector('#consultation-consent-screen .consent-prompter');
+    const domMaxScroll = Math.max(0, (promptScroller?.scrollHeight || 0) - (promptScroller?.clientHeight || 0));
+    const canvasMaxScroll = Math.max(0, lines.length * lineHeight - availableHeight + lineHeight);
+    const scrollRatio = domMaxScroll ? Math.min(1, promptScroller.scrollTop / domMaxScroll) : 0;
+    const canvasOffset = canvasMaxScroll * scrollRatio;
+    context.beginPath();
+    context.rect(padding + textInset, textTop, textWidth, availableHeight);
+    context.clip();
+    lines.forEach((line, index) => context.fillText(line, padding + textInset, textTop + fontSize + index * lineHeight - canvasOffset));
+    context.restore();
+
+    context.fillStyle = 'rgba(255, 255, 255, 0.86)';
+    context.font = `${portrait ? 18 : 17}px ${fontFamily}`;
+    const speedLabel = `${t('ui.consentScrollSpeed')}: ${document.getElementById('consent-scroll-speed-value')?.textContent || ''}`;
+    context.fillText(speedLabel, padding, height - padding);
+    consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
+}
+
+function stopConsentCompositeFrame() {
+    if (consultationCompositeFrame) cancelAnimationFrame(consultationCompositeFrame);
+    consultationCompositeFrame = null;
+}
+
+function setConsentAudioEnabled(enabled) {
+    if (!consultationAudioGain || !consultationAudioContext) return;
+    const target = enabled ? 1 : 0;
+    consultationAudioGain.gain.cancelScheduledValues(consultationAudioContext.currentTime);
+    consultationAudioGain.gain.setTargetAtTime(target, consultationAudioContext.currentTime, enabled ? 0.04 : 0.01);
+}
+
+function getConsentServiceSummary(sessionPlan) {
+    const preferences = sessionPlan?.preferences || {};
+    const durations = sessionPlan?.durations || {};
+    const services = [];
+    if (preferences.yogaBridgeEnabled) {
+        const poses = Array.isArray(preferences.selectedYogaPoses) && preferences.selectedYogaPoses.length
+            ? ' (' + preferences.selectedYogaPoses.join(', ') + ')' : '';
+        services.push(t('ui.consentServiceYoga') + poses);
+    }
+    if (preferences.massageEnabled) services.push(t('ui.consentServiceMassage') + ' (' + Math.round((durations.massage || 0) / 60) + ' min)');
+    if (preferences.perinealCareEnabled) services.push(t('ui.consentServicePerineal') + ' (' + Math.round((durations.perinealCare || 0) / 60) + ' min)');
+    if (preferences.assistedBathingEnabled) services.push(t('ui.consentServiceAssisted') + ' (' + Math.round((durations.assistedBathing || 0) / 60) + ' min)');
+    else if (preferences.bathSessionEnabled) services.push(t('ui.consentServiceBath') + ' (' + Math.round((durations.bath || 0) / 60) + ' min)');
+    if (preferences.corpsePoseEnabled) services.push(t('ui.consentServiceSavasana') + ' (' + Math.round((durations.corpse || 0) / 60) + ' min)');
+    return services.length ? services.join(', ') : t('ui.consentServicesNone');
+}
+
+function renderConsentPrompt(sessionPlan) {
+    const prompt = document.getElementById('consent-prompt-text');
+    if (!prompt) return;
+    const clientName = sessionPlan?.profile?.name || t('ui.client');
+    const medicationStatus = sessionPlan?.safetyReview?.medication;
+    const medicationStatement = medicationStatus && medicationStatus !== 'no'
+        ? t('ui.consentMedicationAcknowledgment')
+        : t('ui.consentMedicationNone');
+    const touchStatement = sessionPlan?.safety?.touch === 'yes'
+        ? t('ui.consentTouchYes')
+        : t('ui.consentTouchNo');
+    prompt.textContent = t('ui.consentScript')
+        .replace('{name}', clientName)
+        .replace('{goal}', sessionPlan?.goal || t('ui.sessionGoal'))
+        .replace('{services}', getConsentServiceSummary(sessionPlan))
+        .replace('{touch}', touchStatement)
+        .replace('{medication}', medicationStatement);
+    consultationConsentOpenedAt = new Date();
+    consultationPlanPages = getConsentPlanPages();
+    requestConsentLocation().then(location => {
+        consultationLocation = location;
+        const metadata = document.getElementById('consent-recording-metadata');
+        if (metadata) metadata.textContent = location
+            ? 'Location ready: ' + location.latitude + ', ' + location.longitude
+            : 'Location unavailable';
+    });
+}
+
+function updateConsultationChakraQuestions() {
+    const selected = new Set(Array.from(document.querySelectorAll('input[name="chakraFocus"]:checked')).map(input => input.value));
+    document.querySelectorAll('[data-chakra-question]').forEach(panel => {
+        panel.classList.toggle('hidden', !selected.has(panel.dataset.chakraQuestion));
+    });
+}
+
+function buildAdaptiveChakraDurations(selectedChakras, focusChakras, chakraResponses = {}) {
+    const selected = selectedChakras.length ? selectedChakras : state.selectedChakras;
+    const focus = new Set(focusChakras);
+    const totalSeconds = Math.max(60, Math.round(state.timePerChakra * 60 * selected.length));
+    const answerWeights = { often: 1.15, sometimes: 1, rarely: 0.9, 'prefer-not': 1 };
+    const weights = selected.map(key => {
+        const response = chakraResponses[key]?.attention;
+        const answers = chakraResponses[key]?.answers || [];
+        const answerWeight = answers.length
+            ? answers.reduce((sum, answer) => sum + (answerWeights[answer] || 1), 0) / answers.length
+            : 1;
+        if (response === 'more') return Math.max(1.3, answerWeight);
+        if (response === 'support') return Math.max(1.15, answerWeight);
+        if (response === 'skip') return 1;
+        return focus.has(key) ? Math.max(1.15, answerWeight) : answerWeight;
+    });
+    const weightTotal = weights.reduce((sum, value) => sum + value, 0) || 1;
+    const durations = {};
+    selected.forEach((key, index) => {
+        durations[key] = Math.max(60, Math.min(600, Math.round(totalSeconds * weights[index] / weightTotal)));
+    });
+    return durations;
+}
+
+function approvedChakraDurationMinutes(key) {
+    try {
+        const plan = JSON.parse(localStorage.getItem('chakra_consultation_plan') || 'null');
+        const seconds = plan?.status === 'consent-recorded' ? plan.chakraDurations?.[key] : null;
+        return Number.isFinite(Number(seconds)) ? Number(seconds) / 60 : state.timePerChakra;
+    } catch {
+        return state.timePerChakra;
+    }
+}
+
+function updateConsultationCareVisibility() {
+    const yogaSelect = document.getElementById('consultation-yoga-enabled');
+    const physicalRestricted = document.getElementById('consultation-physical')?.value !== 'no';
+    const pregnancyRestricted = document.getElementById('consultation-pregnancy')?.value === 'yes';
+    if (physicalRestricted && yogaSelect) yogaSelect.value = 'no';
+    const yogaRestricted = physicalRestricted;
+    if (yogaSelect) yogaSelect.disabled = yogaRestricted;
+    const yogaEnabled = !yogaRestricted && yogaSelect?.value === 'yes';
+    const bathEnabled = yogaEnabled && document.getElementById('consultation-bath-enabled')?.value === 'yes';
+    document.getElementById('consultation-yoga-restriction-note')?.classList.toggle('hidden', !yogaRestricted);
+    document.getElementById('consultation-yoga-pose-restriction-note')?.classList.toggle('hidden', !yogaEnabled || !pregnancyRestricted);
+    document.getElementById('consultation-yoga-options')?.classList.toggle('hidden', !yogaEnabled);
+    document.getElementById('consultation-bath-options')?.classList.toggle('hidden', !bathEnabled);
+    document.querySelectorAll('#consultation-yoga-options input[name="yogaPose"]').forEach(input => {
+        input.disabled = yogaRestricted || pregnancyRestricted;
+        if (yogaRestricted || pregnancyRestricted) input.checked = false;
+    });
+    document.querySelectorAll('.consultation-yoga-pose-option').forEach(option => option.classList.toggle('hidden', yogaRestricted || pregnancyRestricted));
+    document.querySelectorAll('.consultation-yoga-pose-timing').forEach(option => option.classList.toggle('hidden', yogaRestricted || pregnancyRestricted));
+    const bathSelect = document.getElementById('consultation-bath-enabled');
+    if (!yogaEnabled && bathSelect) {
+        bathSelect.value = 'no';
+        bathSelect.disabled = yogaRestricted;
+    } else if (bathSelect) {
+        bathSelect.disabled = false;
+    }
+    const touchNo = document.getElementById('consultation-touch')?.value === 'no';
+    document.getElementById('consultation-touch-care-options')?.classList.toggle('hidden', touchNo || !bathEnabled);
+    document.querySelectorAll('#consultation-touch-care-options input[name="massage"], #consultation-touch-care-options input[name="perinealCare"], #consultation-touch-care-options input[name="assistedBathing"]').forEach(input => {
+        input.disabled = touchNo;
+        if (touchNo) input.checked = false;
+    });
+}
+
+function updateConsultationSafetyVisibility() {
+    const pairs = [
+        ['consultation-physical', 'consultation-physical-details'],
+        ['consultation-medication', 'consultation-medication-details'],
+        ['consultation-stimulation', 'consultation-stimulation-details']
+    ];
+    pairs.forEach(([selectId, detailsId]) => {
+        const select = document.getElementById(selectId);
+        const details = document.getElementById(detailsId);
+        const needsDetails = select && select.value !== 'no';
+        details?.classList.toggle('hidden', !needsDetails);
+        if (details) details.required = Boolean(needsDetails);
+    });
+    updateConsultationCareVisibility();
+}
+
+function updateConsultationCountryPrefix() {
+    const country = document.getElementById('consultation-citizenship');
+    if (!country) return;
+    const dialCode = country.selectedOptions[0]?.dataset.dialCode || '';
+    ['consultation-contact', 'consultation-emergency-phone'].forEach(id => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        const current = input.value.trim();
+        const previousPrefix = input.dataset.autoCountryPrefix || '';
+        const canReplace = !current || input.dataset.userEdited !== 'true' || current === previousPrefix;
+        if (canReplace && dialCode) {
+            input.value = `${dialCode} `;
+            input.dataset.autoCountryPrefix = dialCode;
+            input.dataset.userEdited = 'false';
+        }
+    });
+}
+
+function markConsultationPhoneEdited(event) {
+    event.currentTarget.dataset.userEdited = 'true';
+}
+
+function getConsultationPhoneValue(id) {
+    const input = document.getElementById(id);
+    const value = String(input?.value || '').trim();
+    const autoPrefix = String(input?.dataset.autoCountryPrefix || '').trim();
+    return autoPrefix && value === autoPrefix ? '' : value;
+}
+
+function validateConsultationContactFields(form) {
+    if (!form.reportValidity()) return false;
+    const email = String(document.getElementById('consultation-email')?.value || '').trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const phonePattern = /^\+?[0-9][0-9\s().-]{6,}$/;
+    const contact = getConsultationPhoneValue('consultation-contact');
+    const emergency = getConsultationPhoneValue('consultation-emergency-phone');
+    if (!emailValid) {
+        alert(t('ui.consultationEmailInvalid'));
+        document.getElementById('consultation-email')?.focus();
+        return false;
+    }
+    if (!phonePattern.test(contact)) {
+        alert(t('ui.consultationPhoneInvalid'));
+        document.getElementById('consultation-contact')?.focus();
+        return false;
+    }
+    if (emergency && !phonePattern.test(emergency)) {
+        alert(t('ui.consultationPhoneInvalid'));
+        document.getElementById('consultation-emergency-phone')?.focus();
+        return false;
+    }
+    return true;
+}
+
+function setConsentRecordingState(stateName) {
+    const status = document.getElementById('consent-recording-status');
+    const record = document.getElementById('consent-record');
+    const pause = document.getElementById('consent-pause');
+    const stop = document.getElementById('consent-stop');
+    const retry = document.getElementById('consent-retry');
+    const submit = document.getElementById('consent-submit');
+    const pauseIcon = pause?.querySelector('span');
+    const recordingClock = document.getElementById('consent-recording-clock');
+    consultationConsentScreen?.classList.toggle('consent-recording-active', stateName === 'lead' || stateName === 'recording' || stateName === 'paused');
+    const messages = {
+        ready: 'ui.consentReady', composing: 'ui.consentPlanPreparing', lead: 'ui.consentReadingLead', recording: 'ui.consentRecording', paused: 'ui.consentPaused',
+        recorded: 'ui.consentRecorded', error: 'ui.consentError'
+    };
+    if (status && messages[stateName]) status.textContent = t(messages[stateName]);
+    record?.classList.toggle('hidden', stateName !== 'ready');
+    pause?.classList.toggle('hidden', stateName !== 'lead' && stateName !== 'recording' && stateName !== 'paused');
+    stop?.classList.toggle('hidden', stateName !== 'lead' && stateName !== 'recording' && stateName !== 'paused');
+    retry?.classList.toggle('hidden', stateName !== 'recorded' && stateName !== 'error');
+    submit?.classList.toggle('hidden', stateName !== 'recorded');
+    if (pause) pause.setAttribute('aria-label', t(stateName === 'paused' ? 'ui.resumeRecording' : 'ui.pauseRecording'));
+    if (pauseIcon) pauseIcon.textContent = stateName === 'paused' ? '▶' : 'Ⅱ';
+    if (recordingClock && stateName === 'ready') recordingClock.textContent = '00:00';
+    if (stateName === 'paused' || stateName === 'recorded' || stateName === 'error' || stateName === 'ready') {
+        stopConsentPromptAutoScroll(stateName === 'ready');
+    }
+}
+
+function stopConsultationStream() {
+    consultationRecordingStream?.getTracks().forEach(track => {
+        if (track.kind === 'audio' || !consultationPreviewStream?.getTracks().includes(track)) track.stop();
+    });
+    consultationRecordingStream = null;
+    consultationRecorder = null;
+}
+
+async function startConsultationRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        setConsentRecordingState('error');
+        return;
+    }
+    const attemptId = ++consultationRecordingAttempt;
+    let acquiredAudioStream = null;
+    try {
+        const recordButton = document.getElementById('consent-record');
+        if (recordButton) recordButton.disabled = true;
+        const status = document.getElementById('consent-recording-status');
+        if (status) status.textContent = t('ui.consentPreparingCamera');
+        consultationLocation = await requestConsentLocation();
+        if (attemptId !== consultationRecordingAttempt) return;
+        acquiredAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const videoTracks = consultationPreviewStream?.getVideoTracks() || [];
+        if (!videoTracks.length) {
+            const fallbackVideoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+            consultationPreviewStream = fallbackVideoStream;
+            const preview = document.getElementById('consent-live-preview');
+            if (preview) {
+                preview.srcObject = fallbackVideoStream;
+                await preview.play();
+            }
+        }
+        consultationRecordingStream = new MediaStream([
+            ...(consultationPreviewStream?.getVideoTracks() || []),
+            ...acquiredAudioStream.getAudioTracks()
+        ]);
+        consultationCameraPreview = document.createElement('video');
+        consultationCameraPreview.muted = true;
+        consultationCameraPreview.playsInline = true;
+        consultationCameraPreview.srcObject = consultationRecordingStream;
+        await consultationCameraPreview.play();
+        await loadConsentLogo();
+        consultationRecordingChunks = [];
+        consultationRecordingBlob = null;
+        consultationRecordingEndedAt = null;
+        consultationRecordingStartedAt = null;
+        consultationRecordingStartTick = 0;
+        consultationRecordingPausedAt = 0;
+        consultationRecordingPausedDuration = 0;
+        const canvas = document.getElementById('consent-composite-canvas');
+        const usePortraitVideo = window.innerHeight > window.innerWidth;
+        canvas.width = usePortraitVideo ? 720 : 1280;
+        canvas.height = usePortraitVideo ? 1280 : 720;
+        const compositeStream = canvas.captureStream(30);
+        const audioTracks = consultationRecordingStream.getAudioTracks();
+        if (audioTracks.length) {
+            consultationAudioContext = new AudioContext();
+            const audioSource = consultationAudioContext.createMediaStreamSource(new MediaStream(audioTracks));
+            consultationAudioGain = consultationAudioContext.createGain();
+            consultationAudioGain.gain.value = 0;
+            const audioDestination = consultationAudioContext.createMediaStreamDestination();
+            audioSource.connect(consultationAudioGain).connect(audioDestination);
+            audioDestination.stream.getAudioTracks().forEach(track => compositeStream.addTrack(track));
+            await consultationAudioContext.resume();
+        }
+        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus') ? 'video/webm;codecs=vp8,opus' : 'video/webm';
+        const activeRecorder = new MediaRecorder(compositeStream, { mimeType, videoBitsPerSecond: 600000, audioBitsPerSecond: 64000 });
+        consultationRecorder = activeRecorder;
+        activeRecorder.ondataavailable = event => {
+            if (event.data.size > 0) consultationRecordingChunks.push(event.data);
+        };
+        activeRecorder.onstop = () => {
+            stopConsentCompositeFrame();
+            stopConsentPromptAutoScroll();
+            if (attemptId !== consultationRecordingAttempt) return;
+            consultationRecordingEndedAt = consultationRecordingEndedAt || new Date();
+            consultationRecordingBlob = new Blob(consultationRecordingChunks, { type: activeRecorder.mimeType || 'video/webm' });
+            const preview = document.getElementById('consent-video-preview');
+            if (preview) {
+                preview.src = URL.createObjectURL(consultationRecordingBlob);
+            }
+            updateConsentMetadataDisplay();
+            stopConsultationStream();
+            stopConsentCameraPreview();
+            setConsentRecordingState('recorded');
+            showConsentPreviewStage();
+        };
+
+        const storedPlan = localStorage.getItem('chakra_consultation_plan');
+        const approvedPlan = storedPlan ? JSON.parse(storedPlan) : null;
+        consultationPlanPages = getConsentPlanPages(approvedPlan);
+        consultationCompositePhase = 'plan';
+        consultationPlanPageIndex = 0;
+        setConsentAudioEnabled(false);
+        activeRecorder.start();
+        drawConsentComposite();
+        setConsentRecordingState('composing');
+        for (let pageIndex = 0; pageIndex < consultationPlanPages.length; pageIndex += 1) {
+            consultationPlanPageIndex = pageIndex;
+            if (status) status.textContent = t('ui.consentPlanProgress')
+                .replace('{current}', String(pageIndex + 1))
+                .replace('{total}', String(consultationPlanPages.length));
+            const shouldContinue = await waitForConsentAttempt(consentTiming('planPageMs', 5000), attemptId);
+            if (!shouldContinue || attemptId !== consultationRecordingAttempt) return;
+        }
+        consultationCompositePhase = 'transition';
+        if (status) status.textContent = t('ui.consentPlanTransition');
+        const shouldTransition = await waitForConsentAttempt(consentTiming('planTransitionMs', 1000), attemptId);
+        if (!shouldTransition || attemptId !== consultationRecordingAttempt) return;
+
+        const countdown = document.getElementById('consent-countdown');
+        countdown?.classList.remove('hidden');
+        for (let remaining = 3; remaining >= 1; remaining -= 1) {
+            if (countdown) countdown.textContent = String(remaining);
+            if (status) status.textContent = `${t('ui.consentPreparing')} ${remaining}`;
+            const shouldContinue = await waitForConsentAttempt(consentTiming('countdownStepMs', 1000), attemptId);
+            if (!shouldContinue || attemptId !== consultationRecordingAttempt) return;
+        }
+        countdown?.classList.add('hidden');
+        consultationCompositePhase = 'consent';
+        consultationRecordingStartedAt = new Date();
+        consultationRecordingStartTick = performance.now();
+        setConsentAudioEnabled(true);
+        startConsentPromptWithLead(true);
+    } catch (error) {
+        acquiredAudioStream?.getTracks().forEach(track => track.stop());
+        stopConsultationStream();
+        if (attemptId === consultationRecordingAttempt) setConsentRecordingState('error');
+        console.warn('[Consultation] recording permission failed:', error);
+    } finally {
+        const recordButton = document.getElementById('consent-record');
+        if (recordButton && attemptId === consultationRecordingAttempt) recordButton.disabled = false;
+    }
+}
+
+function resetConsultationRecording() {
+    consultationRecordingAttempt += 1;
+    if (consultationCountdownTimer) {
+        clearTimeout(consultationCountdownTimer);
+        consultationCountdownTimer = null;
+    }
+    if (consultationCountdownResolve) {
+        consultationCountdownResolve(false);
+        consultationCountdownResolve = null;
+    }
+    if (consultationRecorder && consultationRecorder.state !== 'inactive') consultationRecorder.stop();
+    stopConsultationStream();
+    stopConsentPromptLead();
+    stopConsentPromptAutoScroll(true);
+    consultationRecordingChunks = [];
+    consultationRecordingBlob = null;
+    stopConsentCompositeFrame();
+    consultationCameraPreview?.pause();
+    consultationCameraPreview = null;
+    consultationRecordingStartedAt = null;
+    consultationRecordingEndedAt = null;
+    consultationRecordingStartTick = 0;
+    consultationRecordingPausedAt = 0;
+    consultationRecordingPausedDuration = 0;
+    consultationLocation = null;
+    consultationConsentOpenedAt = null;
+    consultationPlanPages = [];
+    consultationCompositePhase = 'idle';
+    consultationPlanPageIndex = 0;
+    consentPromptLeadRemaining = 0;
+    consentPromptLeadStartedAt = 0;
+    if (consultationStopTimer) {
+        clearTimeout(consultationStopTimer);
+        consultationStopTimer = null;
+    }
+    consultationAudioGain = null;
+    if (consultationAudioContext) {
+        consultationAudioContext.close().catch(() => {});
+        consultationAudioContext = null;
+    }
+    const preview = document.getElementById('consent-video-preview');
+    if (preview) { preview.pause(); preview.removeAttribute('src'); preview.load(); preview.classList.add('hidden'); }
+    document.getElementById('consent-countdown')?.classList.add('hidden');
+    setConsentRecordingState('ready');
+}
+
+function applyApprovedConsultationPlan(sessionPlan) {
+    const approvedSettings = sessionPlan.approvedSettings || {};
+    state.audioFilters = Boolean(approvedSettings.audioFilters);
+    state.hooponopono = Boolean(approvedSettings.hooponopono);
+    state.reverseJourney = Boolean(approvedSettings.reverseJourney);
+    localStorage.setItem('chakra_audio_filters', String(state.audioFilters));
+    localStorage.setItem('chakra_hooponopono', String(state.hooponopono));
+    localStorage.setItem('chakra_reverse_journey', String(state.reverseJourney));
+    syncChecked('audio-filters-toggle', state.audioFilters);
+    syncChecked('hooponopono-toggle', state.hooponopono);
+    syncChecked('reverse-journey-toggle', state.reverseJourney);
+    const preferences = sessionPlan.preferences || {};
+    const durations = sessionPlan.durations || {};
+    const approvedLanguage = sessionPlan.language || preferences.meditationLanguage;
+    if (approvedLanguage === 'ml' || approvedLanguage === 'en') {
+        state.language = approvedLanguage;
+        localStorage.setItem('chakra_lang', state.language);
+        syncValue('language-select', state.language);
+        setupVoices();
+        autoSelectVoice();
+    }
+    if (preferences.voiceGender && preferences.voiceGender !== 'guide') {
+        const matchingVoice = piperVoiceRegistry.find(voice => voice.language === state.language && voice.gender === preferences.voiceGender);
+        if (matchingVoice) {
+            state.voiceName = `piper:${matchingVoice.id}`;
+            localStorage.setItem('chakra_voice', state.voiceName);
+            if (voiceSelect) {
+                setupVoices();
+                voiceSelect.value = state.voiceName;
+            }
+            sessionPlan.approvedSettings.voiceGender = preferences.voiceGender;
+        } else {
+            sessionPlan.approvedSettings.voiceGender = 'unavailable-fallback';
+        }
+    }
+    state.yogaBridgeEnabled = Boolean(preferences.yogaBridgeEnabled);
+    state.corpsePoseEnabled = Boolean(preferences.corpsePoseEnabled);
+    state.bathSessionEnabled = state.yogaBridgeEnabled && Boolean(preferences.bathSessionEnabled);
+    state.massageEnabled = state.bathSessionEnabled && Boolean(preferences.massageEnabled);
+    state.perinealCareEnabled = state.bathSessionEnabled && Boolean(preferences.perinealCareEnabled);
+    state.assistedBathingEnabled = state.bathSessionEnabled && Boolean(preferences.assistedBathingEnabled);
+    state.selectedYogaPoses = state.yogaBridgeEnabled && Array.isArray(preferences.selectedYogaPoses)
+        ? preferences.selectedYogaPoses : [];
+    if (Array.isArray(sessionPlan.chakraFocus) && sessionPlan.chakraFocus.length) {
+        state.selectedChakras = [...sessionPlan.chakraFocus];
+        localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
+        document.querySelectorAll('#chakra-selection input').forEach(input => {
+            input.checked = state.selectedChakras.includes(input.value);
+        });
+    }
+    if (state.assistedBathingEnabled) state.bathSessionEnabled = true;
+    if (sessionPlan.safety?.touch === 'no') {
+        state.massageEnabled = false;
+        state.perinealCareEnabled = false;
+        state.assistedBathingEnabled = false;
+        localStorage.setItem('chakra_massage', 'false');
+        localStorage.setItem('chakra_perineal_care', 'false');
+        localStorage.setItem('chakra_assisted_bathing', 'false');
+        syncChecked('massage-toggle', false);
+        syncChecked('perineal-care-toggle', false);
+        syncChecked('assisted-bathing-toggle', false);
+        sessionPlan.approvedSettings.touchSensitiveStages = 'disabled-by-client';
+    }
+    if (sessionPlan.safetyReview?.stimulation && sessionPlan.safetyReview.stimulation !== 'no') {
+        state.chakraFrequencies = false;
+        localStorage.setItem('chakra_frequencies', 'false');
+        syncChecked('frequencies-toggle', false);
+        syncChecked('mixer-frequencies-toggle', false);
+        sessionPlan.approvedSettings.frequencySafety = 'disabled-pending-guide-review';
+    }
+    state.timeYogaPrep = Number(durations.yogaPrep) || state.timeYogaPrep;
+    state.timeYogaPose = Number(durations.yogaPose) || state.timeYogaPose;
+    state.timeCorpse = Number(durations.corpse) || state.timeCorpse;
+    state.timeBath = Number(durations.bath) || state.timeBath;
+    state.timePerinealCare = Number(durations.perinealCare) || state.timePerinealCare;
+    state.timeAssistedBathing = Number(durations.assistedBathing) || state.timeAssistedBathing;
+    state.timeMassage = Number(durations.massage) || state.timeMassage;
+    localStorage.setItem('chakra_yoga_bridge', String(state.yogaBridgeEnabled));
+    localStorage.setItem('chakra_corpse_enabled', String(state.corpsePoseEnabled));
+    localStorage.setItem('chakra_bath_enabled', String(state.bathSessionEnabled));
+    localStorage.setItem('chakra_massage', String(state.massageEnabled));
+    localStorage.setItem('chakra_perineal_care', String(state.perinealCareEnabled));
+    localStorage.setItem('chakra_assisted_bathing', String(state.assistedBathingEnabled));
+    localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
+    localStorage.setItem('chakra_time_yoga_prep', String(state.timeYogaPrep));
+    localStorage.setItem('chakra_time_yoga_pose', String(state.timeYogaPose));
+    localStorage.setItem('chakra_time_corpse', String(state.timeCorpse));
+    localStorage.setItem('chakra_time_bath', String(state.timeBath));
+    localStorage.setItem('chakra_time_perineal_care', String(state.timePerinealCare));
+    localStorage.setItem('chakra_time_assisted_bathing', String(state.timeAssistedBathing));
+    localStorage.setItem('chakra_time_massage', String(state.timeMassage));
+    syncChecked('yoga-bridge-toggle', state.yogaBridgeEnabled);
+    syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
+    syncChecked('bath-session-toggle', state.bathSessionEnabled);
+    syncChecked('massage-toggle', state.massageEnabled);
+    syncChecked('perineal-care-toggle', state.perinealCareEnabled);
+    syncChecked('assisted-bathing-toggle', state.assistedBathingEnabled);
+    document.querySelectorAll('#yoga-pose-selection input').forEach(input => { input.checked = state.selectedYogaPoses.includes(input.value); });
+    syncValue('time-yoga-prep', state.timeYogaPrep); syncValue('time-yoga-pose', state.timeYogaPose); syncValue('time-corpse', state.timeCorpse);
+    syncValue('time-bath', state.timeBath); syncValue('time-perineal-care', state.timePerinealCare); syncValue('time-assisted-bathing', state.timeAssistedBathing); syncValue('time-massage', state.timeMassage);
+    document.getElementById('yoga-bridge-toggle')?.dispatchEvent(new Event('change'));
+    document.getElementById('bath-session-toggle')?.dispatchEvent(new Event('change'));
+    globalThis.updateSessionEstimate?.();
+}
+
+function renderConsultationReview(sessionPlan) {
+    const summary = document.getElementById('consultation-review-summary');
+    if (!summary) return;
+    const escape = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[character]));
+    const chakraAnswerLabels = {
+        often: 'chakraAnswerOften',
+        sometimes: 'chakraAnswerSometimes',
+        rarely: 'chakraAnswerRarely',
+        'prefer-not': 'chakraAnswerPreferNot'
+    };
+    const attentionLabels = {
+        standard: 'consultationAttentionStandard',
+        support: 'consultationAttentionSupport',
+        more: 'consultationAttentionMore',
+        skip: 'consultationAttentionSkip'
+    };
+    const chakraLabelKeys = { root: 'root', sacral: 'sacral', solar: 'solar', heart: 'heart', throat: 'throat', thirdeye: 'thirdEye', crown: 'crown' };
+    const chakraQuestionKeys = {
+        root: ['chakraRootQuestion1', 'chakraRootQuestion2', 'chakraRootQuestion3'],
+        sacral: ['chakraSacralQuestion1', 'chakraSacralQuestion2', 'chakraSacralQuestion3'],
+        solar: ['chakraSolarQuestion1', 'chakraSolarQuestion2', 'chakraSolarQuestion3'],
+        heart: ['chakraHeartQuestion1', 'chakraHeartQuestion2', 'chakraHeartQuestion3'],
+        throat: ['chakraThroatQuestion1', 'chakraThroatQuestion2', 'chakraThroatQuestion3'],
+        thirdeye: ['chakraThirdEyeQuestion1', 'chakraThirdEyeQuestion2', 'chakraThirdEyeQuestion3'],
+        crown: ['chakraCrownQuestion1', 'chakraCrownQuestion2', 'chakraCrownQuestion3']
+    };
+    const chakraPlanRows = Object.entries(sessionPlan.chakraResponses || {}).map(([key, response]) => {
+        const duration = sessionPlan.chakraDurations?.[key];
+        const attention = t(`ui.${attentionLabels[response.attention] || 'consultationAttentionStandard'}`);
+        const prompts = (response.answers || []).map((answer, index) => {
+            const questionKey = chakraQuestionKeys[key]?.[index];
+            const question = questionKey ? t(`ui.${questionKey}`) : t('ui.consultationChakraPrompt');
+            const answerLabel = t(`ui.${chakraAnswerLabels[answer] || 'chakraAnswerPreferNot'}`);
+            return `<div class="consultation-reflection-answer"><span>${escape(question)}</span><strong>${escape(answerLabel)}</strong></div>`;
+        }).join('');
+        const note = response.note ? `<div class="consultation-reflection-note"><b>${escape(t('ui.consultationChakraGuideNote'))}</b><span>${escape(response.note)}</span></div>` : '';
+        return `<div class="consultation-summary-detail"><strong class="consultation-chakra-title">${escape(t(`ui.${chakraLabelKeys[key] || key}`))}</strong><em>${escape(t('ui.consultationChakraAttentionSummary'))}: ${escape(attention)}${duration ? ` · ${Math.round(duration / 60)} min` : ''}</em><div class="consultation-reflection-answers">${prompts}</div>${note}</div>`;
+    }).join('');
+    const safetyReview = sessionPlan.safetyReview || {};
+    const safetyRows = [
+        { label: 'consultationSummaryEmergency', value: `${safetyReview.emergencyContact?.name || t('ui.consultationNone')}${safetyReview.emergencyContact?.phone ? ` · ${safetyReview.emergencyContact.phone}` : ''}`, flagged: false },
+        { label: 'consultationSummaryPhysical', value: `${safetyReview.physical || t('ui.consultationNone')}${safetyReview.physicalDetails ? ` — ${safetyReview.physicalDetails}` : ''}`, flagged: Boolean(safetyReview.physical && safetyReview.physical !== 'no') },
+        { label: 'consultationSummaryMedication', value: `${safetyReview.medication || t('ui.consultationNone')}${safetyReview.medicationDetails ? ` — ${safetyReview.medicationDetails}` : ''}`, flagged: Boolean(safetyReview.medication && safetyReview.medication !== 'no') },
+        { label: 'consultationSummaryPregnancy', value: safetyReview.pregnancy || t('ui.consultationNone'), flagged: Boolean(safetyReview.pregnancy && safetyReview.pregnancy !== 'no') },
+        { label: 'consultationSummaryStimulation', value: `${safetyReview.stimulation || t('ui.consultationNone')}${safetyReview.stimulationDetails ? ` — ${safetyReview.stimulationDetails}` : ''}`, flagged: Boolean(safetyReview.stimulation && safetyReview.stimulation !== 'no') },
+        { label: 'consultationSummarySensitivities', value: sessionPlan.safety?.sensitivityTypes?.length ? sessionPlan.safety.sensitivityTypes.join(', ') : t('ui.consultationNone'), flagged: Boolean(sessionPlan.safety?.sensitivityTypes?.length) },
+        { label: 'consultationSummaryPrivateNote', value: sessionPlan.safety?.sensitivities || t('ui.consultationNone'), flagged: Boolean(sessionPlan.safety?.sensitivities) }
+    ].map(({ label, value, flagged }) => `<div class="consultation-summary-row${flagged ? ' consultation-safety-flagged' : ''}"><span>${escape(t(`ui.${label}`))}</span><strong>${escape(value)}</strong></div>`).join('');
+    const planRows = [
+        ['consultationSummaryExperience', sessionPlan.profile?.experience],
+        ['consultationSummaryReadiness', sessionPlan.preferences?.readiness],
+        ['consultationSummaryYogaPoses', sessionPlan.preferences?.selectedYogaPoses?.length ? sessionPlan.preferences.selectedYogaPoses.join(', ') : t('ui.consultationNone')],
+        ['consultationSummaryYogaTiming', `${Math.round((sessionPlan.durations?.yogaPrep || 0) / 60)}m prep · ${Math.round((sessionPlan.durations?.yogaPose || 0) / 60)}m per pose`],
+        ['consultationSummaryCareTiming', `Bath ${Math.round((sessionPlan.durations?.bath || 0) / 60)}m · Massage ${Math.round((sessionPlan.durations?.massage || 0) / 60)}m · Perineal ${Math.round((sessionPlan.durations?.perinealCare || 0) / 60)}m · Assisted ${Math.round((sessionPlan.durations?.assistedBathing || 0) / 60)}m`],
+        ['consultationSummarySavasana', `${sessionPlan.preferences?.corpsePoseEnabled ? t('ui.consultationYes') : t('ui.consultationNo')} · ${Math.round((sessionPlan.durations?.corpse || 0) / 60)}m`]
+    ].map(([label, value]) => `<div class="consultation-summary-row"><span>${escape(t(`ui.${label}`))}</span><strong>${escape(value || t('ui.consultationNone'))}</strong></div>`).join('');
+    summary.innerHTML = `
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryName'))}</span><strong>${escape(sessionPlan.profile.name)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryCitizenship'))}</span><strong>${escape(sessionPlan.profile.citizenship)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryContact'))}</span><strong>${escape(sessionPlan.profile.contactNumber)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryEmail'))}</span><strong>${escape(sessionPlan.profile.email)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryGoal'))}</span><strong>${escape(sessionPlan.goal)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryFocus'))}</span><strong>${escape((sessionPlan.chakraFocus?.length ? sessionPlan.chakraFocus.join(', ') : t('ui.consultationEvenJourney')))}</strong></div>
+        ${chakraPlanRows ? `<div class="consultation-summary-section"><h3>${escape(t('ui.consultationSummaryChakraPlan'))}</h3>${chakraPlanRows}</div>` : ''}
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryLanguage'))}</span><strong>${escape(sessionPlan.language || state.language)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryVoice'))}</span><strong>${escape(sessionPlan.preferences.voiceGender || 'guide')}</strong></div>
+        <div class="consultation-summary-section"><h3>${escape(t('ui.consultationSummaryPlanDetails'))}</h3>${planRows}</div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryYoga'))}</span><strong>${escape(sessionPlan.preferences.yogaBridgeEnabled ? t('ui.consultationYes') : t('ui.consultationNo'))}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryCare'))}</span><strong>${escape(sessionPlan.preferences.careSummary || t('ui.consultationNone'))}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryTone'))}</span><strong>${escape(sessionPlan.preferences.tone)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummaryTouch'))}</span><strong>${escape(sessionPlan.safety.touch)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummarySleep'))}</span><strong>${escape(sessionPlan.preferences.sleepMode)}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummarySensitivities'))}</span><strong>${escape(sessionPlan.safety.sensitivityTypes?.length ? sessionPlan.safety.sensitivityTypes.join(', ') : t('ui.consultationNone'))}</strong></div>
+        <div class="consultation-summary-row"><span>${escape(t('ui.consultationSummarySafety'))}</span><strong>${escape(sessionPlan.safetyReview?.requiresGuideReview ? t('ui.consultationGuideReviewRequired') : t('ui.consultationSafetyClear'))}</strong></div>
+        <div class="consultation-summary-section"><h3>${escape(t('ui.consultationSummarySafetyDetails'))}</h3>${safetyRows}</div>
+    `;
+    const reverseJourneySummary = document.createElement('div');
+    reverseJourneySummary.className = 'consultation-summary-row';
+    reverseJourneySummary.innerHTML = '<span></span><strong></strong>';
+    reverseJourneySummary.querySelector('span').textContent = t('ui.consultationSummaryReverseJourney');
+    reverseJourneySummary.querySelector('strong').textContent = t('ui.consultationReverseJourney' + (sessionPlan.preferences.reverseJourneyNeed === 'reconnect' ? 'Reconnect' : sessionPlan.preferences.reverseJourneyNeed === 'private' ? 'Private' : 'Grounded'));
+    summary.appendChild(reverseJourneySummary);
+    syncChecked('review-audio-filters', sessionPlan.preferences.tone === 'soft' || sessionPlan.preferences.tone === 'deep');
+    syncChecked('review-hooponopono', sessionPlan.preferences.hooponopono);
+    const reverseJourneyRecommended = ['reconnect', 'private'].includes(sessionPlan.preferences.reverseJourneyNeed);
+    document.getElementById('review-reverse-journey-row')?.classList.toggle('hidden', !reverseJourneyRecommended);
+    syncChecked('review-reverse-journey', sessionPlan.preferences.reverseJourneyNeed === 'reconnect');
+    const guideNotes = document.getElementById('review-guide-notes');
+    if (guideNotes) guideNotes.value = sessionPlan.guideReview?.notes || '';
+    document.getElementById('review-safety-row')?.classList.toggle('hidden', !sessionPlan.safetyReview?.requiresGuideReview);
+    syncChecked('review-safety-confirm', false);
+    const sensitivityTypes = new Set(sessionPlan.safety?.sensitivityTypes || []);
+    const manualOnly = sensitivityTypes.has('audio') || sensitivityTypes.has('wording');
+    document.getElementById('review-print')?.classList.remove('hidden');
+    document.getElementById('save-manual-plan')?.classList.toggle('hidden', !manualOnly);
+    document.getElementById('return-manual-lobby')?.classList.toggle('hidden', !manualOnly);
+    const approveButton = document.getElementById('approve-consultation');
+    if (approveButton) {
+        approveButton.textContent = t('ui.approveConsultation');
+        approveButton.classList.toggle('hidden', manualOnly);
+    }
+    const advice = document.getElementById('consultation-review-advice');
+    if (advice) {
+        const messages = [];
+        const safetyReview = sessionPlan.safetyReview || {};
+        if (safetyReview.physical && safetyReview.physical !== 'no') messages.push(t('ui.consultationInjuryReviewAdvice'));
+        if (safetyReview.medication && safetyReview.medication !== 'no') messages.push(t('ui.consultationMedicationReviewAdvice'));
+        if (safetyReview.pregnancy && safetyReview.pregnancy !== 'no') messages.push(t('ui.consultationPregnancyReviewAdvice'));
+        if ([safetyReview.physical, safetyReview.medication, safetyReview.pregnancy, safetyReview.stimulation].includes('private')) messages.push(t('ui.consultationPrivateReviewAdvice'));
+        if (sensitivityTypes.has('movement')) messages.push(t('ui.consultationMovementAdvice'));
+        if (sensitivityTypes.has('imagery')) messages.push(t('ui.consultationImageryAdvice'));
+        if (manualOnly) messages.push(t('ui.consultationManualOnlyAdvice'));
+        if (reverseJourneyRecommended) messages.push(t('ui.consultationReverseJourneyReviewAdvice'));
+        advice.textContent = messages.join(' ');
+        advice.classList.toggle('hidden', messages.length === 0);
+    }
+    document.getElementById('review-manual-only-row')?.classList.toggle('hidden', !manualOnly);
+    syncChecked('review-manual-only', false);
+}
+
+function escapeDocumentText(value) {
+    const element = document.createElement('span');
+    element.textContent = String(value ?? '');
+    return element.innerHTML;
+}
+
+function buildManualPlanDocument() {
+    const summary = document.getElementById('consultation-review-summary');
+    const advice = document.getElementById('consultation-review-advice');
+    const notes = document.getElementById('review-guide-notes')?.value || '';
+    if (!summary) return null;
+    const manualOnly = new Set(JSON.parse(localStorage.getItem('chakra_consultation_plan') || '{}')?.safety?.sensitivityTypes || []).has('audio')
+        || new Set(JSON.parse(localStorage.getItem('chakra_consultation_plan') || '{}')?.safety?.sensitivityTypes || []).has('wording');
+    const printStatus = manualOnly ? 'MANUAL GUIDE ONLY' : 'GUIDE REVIEW COPY';
+    const logoUrl = new URL('symbols/logo_453x453.png', document.baseURI).href;
+    const adviceMarkup = advice && !advice.classList.contains('hidden')
+        ? `<section class="manual-plan-alert"><h2>Guide prompts</h2><p>${escapeDocumentText(advice.textContent)}</p></section>`
+        : '';
+    return `<!doctype html>
+<html><head><meta charset="utf-8"><title></title>
+<style>
+@page { size: A4 portrait; margin: 16mm 15mm 18mm; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #fff; color: #202329; font-family: "Arial", "Helvetica Neue", Helvetica, sans-serif; font-size: 10.5pt; line-height: 1.45; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { padding: 0; }
+.manual-plan { width: 100%; max-width: 180mm; margin: 0 auto; }
+.manual-plan-header { border-bottom: 2px solid #1f3a5f; padding-bottom: 11px; margin-bottom: 17px; text-align: center; }
+.manual-plan-logo { display: block; width: 34mm; height: 34mm; object-fit: contain; margin: 0 auto 8px; }
+.manual-plan-header h1 { margin: 0 0 5px; color: #1f3a5f; font-size: 19pt; font-weight: 700; letter-spacing: .01em; }
+.manual-plan-header p { margin: 0; color: #4d5968; font-size: 9pt; }
+.manual-plan-header .manual-status { display: inline-block; margin-top: 10px; padding: 4px 9px; border: 1px solid #8a3d32; border-radius: 3px; color: #71342c; background: #fbf3f1; font-size: 8.5pt; font-weight: 700; letter-spacing: .04em; }
+.manual-plan-section, .manual-plan-alert, .manual-plan-notes { break-inside: avoid; page-break-inside: avoid; margin: 0 0 14px; padding: 12px 13px; border: 1px solid #bfc6cf; border-radius: 3px; }
+.manual-plan-section h2, .manual-plan-alert h2, .manual-plan-notes h2 { margin: 0 0 9px; color: #1f3a5f; font-size: 12pt; border-bottom: 1px solid #d3d8de; padding-bottom: 6px; }
+.manual-plan-alert { border-color: #b88732; background: #fffaf0; }
+.manual-plan-alert p { margin: 0; }
+.manual-plan .consultation-summary-row { display: grid; grid-template-columns: minmax(42%, 0.9fr) minmax(0, 1.1fr); gap: 14px; align-items: start; padding: 8px 9px; border-bottom: 1px solid #e3e7eb; border-radius: 3px; }
+.manual-plan .consultation-summary-row:nth-of-type(even) { background: #f8fafc; }
+.manual-plan .consultation-summary-row:last-child { border-bottom: 0; }
+.manual-plan .consultation-summary-row span { color: #667085; font-size: 8.5pt; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.manual-plan .consultation-summary-row strong { max-width: none; color: #202b3c; text-align: left; overflow-wrap: anywhere; }
+.manual-plan .consultation-summary-section { margin-top: 16px; padding-top: 11px; border-top: 2px solid #d3d8de; }
+.manual-plan .consultation-summary-section h3 { margin: 0 0 8px; color: #1f3a5f; font-size: 10.5pt; letter-spacing: .04em; }
+.manual-plan .consultation-summary-section h3::before { content: '◆'; margin-right: 7px; color: #b88732; font-size: 8pt; }
+.manual-plan .consultation-summary-detail { margin: 6px 0; padding: 7px 9px; border-left: 3px solid #667f9e; background: #f5f7fa; }
+.manual-plan .consultation-summary-detail strong, .manual-plan .consultation-summary-detail span, .manual-plan .consultation-summary-detail em, .manual-plan .consultation-summary-detail small { display: block; }
+.manual-plan .consultation-summary-detail em { color: #4d5968; font-size: 9pt; }
+.manual-plan .consultation-summary-detail small { margin-top: 3px; white-space: pre-wrap; }
+.manual-plan .consultation-chakra-title { color: #1f3a5f; font-size: 11pt; }
+.manual-plan .consultation-reflection-answers { display: grid; gap: 5px; margin-top: 7px; }
+.manual-plan .consultation-reflection-answer, .manual-plan .consultation-reflection-note { display: grid; gap: 2px; padding: 6px 8px; border-left: 3px solid #8c9db1; background: #ffffff; }
+.manual-plan .consultation-reflection-answer span, .manual-plan .consultation-reflection-note b { color: #4d5968; font-size: 8.5pt; font-weight: 400; }
+.manual-plan .consultation-reflection-answer strong, .manual-plan .consultation-reflection-note span { max-width: none; color: #202329; font-size: 9.5pt; text-align: left; }
+.manual-plan .consultation-reflection-note { margin-top: 6px; border-left-color: #b88732; background: #fffaf0; }
+.manual-plan-notes { min-height: 35mm; }
+.manual-plan-notes .notes-content { min-height: 20mm; white-space: pre-wrap; }
+.manual-plan-footer { margin-top: 18px; padding-top: 7px; border-top: 1px solid #bfc6cf; color: #596575; font-size: 8pt; }
+@media print { .manual-plan-section, .manual-plan-alert, .manual-plan-notes { box-shadow: none; } }
+</style></head><body><main class="manual-plan">
+<header class="manual-plan-header"><img class="manual-plan-logo" src="${escapeDocumentText(logoUrl)}" alt="Chakra Meditation logo"><span class="manual-status">${printStatus}</span></header>
+${adviceMarkup}
+<section class="manual-plan-section"><h2>Session review</h2>${summary.innerHTML}</section>
+<section class="manual-plan-notes"><h2>Guide notes</h2><div class="notes-content">${escapeDocumentText(notes) || 'No additional guide notes recorded.'}</div></section>
+</main></body></html>`;
+}
+
+function printManualPlan() {
+    const documentMarkup = buildManualPlanDocument();
+    if (!documentMarkup) return;
+    const printFrame = document.createElement('iframe');
+    printFrame.className = 'manual-plan-print-frame';
+    // Keep the browser from deriving a visible print header title from the
+    // iframe. Native date/time headers are still controlled by print-dialog
+    // settings and cannot be removed by page JavaScript.
+    printFrame.title = '';
+    printFrame.style.position = 'fixed';
+    printFrame.style.width = '1px';
+    printFrame.style.height = '1px';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.opacity = '0';
+    printFrame.style.pointerEvents = 'none';
+    let hasPrinted = false;
+    const print = () => {
+        if (hasPrinted) return;
+        hasPrinted = true;
+        if (printFrame.contentDocument) printFrame.contentDocument.title = '';
+        const previousTitle = document.title;
+        document.title = '';
+        printFrame.contentWindow?.focus();
+        printFrame.contentWindow?.print();
+        setTimeout(() => {
+            document.title = previousTitle;
+            printFrame.remove();
+        }, 5000);
+    };
+    printFrame.onload = print;
+    document.body.appendChild(printFrame);
+    printFrame.srcdoc = documentMarkup;
+    setTimeout(print, 400);
 }
 
 function attachEventListeners() {
@@ -3504,6 +4927,10 @@ function attachEventListeners() {
         updateJourneyRoadmap();
     }
 
+    // Consultation approval runs outside attachEventListeners after consent.
+    // Publish the estimator so that transition can refresh the Lobby safely.
+    globalThis.updateSessionEstimate = updateSessionEstimate;
+
     // Timing Sliders Listeners
     document.getElementById('time-icebreaker').addEventListener('input', (e) => {
         state.timeIcebreaker = parseInt(e.target.value);
@@ -3708,9 +5135,264 @@ function attachEventListeners() {
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
     });
+    document.querySelectorAll('input[name="chakraFocus"]').forEach(cb => {
+        cb.addEventListener('change', updateConsultationChakraQuestions);
+    });
+    updateConsultationChakraQuestions();
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     beginConsultationBtn?.addEventListener('click', () => {
-        alert(t('ui.consultationComingSoon'));
+        showScreen(consultationScreen);
+        syncValue('consultation-language', state.language);
+        document.getElementById('consultation-name')?.focus();
+    });
+    document.getElementById('cancel-consultation')?.addEventListener('click', () => showScreen(lobbyScreen));
+    document.getElementById('edit-consultation')?.addEventListener('click', () => showScreen(consultationScreen));
+    document.getElementById('consultation-yoga-enabled')?.addEventListener('change', updateConsultationCareVisibility);
+    document.getElementById('consultation-bath-enabled')?.addEventListener('change', updateConsultationCareVisibility);
+    document.getElementById('consultation-touch')?.addEventListener('change', updateConsultationCareVisibility);
+    document.getElementById('consultation-citizenship')?.addEventListener('change', updateConsultationCountryPrefix);
+    document.getElementById('consultation-contact')?.addEventListener('input', markConsultationPhoneEdited);
+    document.getElementById('consultation-emergency-phone')?.addEventListener('input', markConsultationPhoneEdited);
+    ['consultation-physical', 'consultation-medication', 'consultation-pregnancy', 'consultation-stimulation'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', updateConsultationSafetyVisibility);
+    });
+    document.getElementById('consultation-sleep')?.addEventListener('change', (event) => {
+        const savasana = document.getElementById('consultation-corpse');
+        const duration = document.getElementById('consultation-corpse-time');
+        const note = document.getElementById('consultation-savasana-sleep-note');
+        if (!savasana || !duration) return;
+        if (event.target.value === 'needed') {
+            savasana.checked = true;
+            duration.value = '3600';
+            savasana.dataset.sleepDerived = 'true';
+            note?.classList.remove('hidden');
+        } else if (savasana.dataset.sleepDerived === 'true') {
+            savasana.checked = false;
+            duration.value = '300';
+            delete savasana.dataset.sleepDerived;
+            note?.classList.add('hidden');
+        }
+    });
+    document.getElementById('consultation-form')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (!validateConsultationContactFields(form)) return;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        const countryOption = document.getElementById('consultation-citizenship')?.selectedOptions[0];
+        const citizenshipName = countryOption?.textContent?.trim() || data.citizenship;
+        const focusChakras = formData.getAll('chakraFocus');
+        const chakraResponses = Object.fromEntries(focusChakras.map(key => [key, {
+            answers: [1, 2, 3].map(index => String(formData.get(`chakraAnswer_${key}_${index}`) || 'prefer-not')),
+            attention: String(formData.get(`chakraNeed_${key}`) || 'standard'),
+            note: String(formData.get(`chakraNote_${key}`) || '').trim()
+        }]));
+        const sensitivityTypes = formData.getAll('sensitivityType');
+        const pregnancyRestricted = data.pregnancy === 'yes';
+        const yogaBridgeEnabled = data.yogaBridge === 'yes';
+        const bathSessionEnabled = yogaBridgeEnabled && data.bathSession === 'yes';
+        const touchAllowsCare = data.touch !== 'no';
+        const assistedBathingEnabled = bathSessionEnabled && touchAllowsCare && data.assistedBathing === 'yes';
+        const perinealCareEnabled = bathSessionEnabled && touchAllowsCare && data.perinealCare === 'yes';
+        const massageEnabled = bathSessionEnabled && touchAllowsCare && data.massage === 'yes';
+        const selectedYogaPoses = yogaBridgeEnabled ? formData.getAll('yogaPose') : [];
+        if (yogaBridgeEnabled && selectedYogaPoses.length === 0 && !pregnancyRestricted) {
+            alert(t('ui.consultationYogaPoseRequired'));
+            document.querySelector('#consultation-yoga-options input[name="yogaPose"]')?.focus();
+            return;
+        }
+        const careSummary = [
+            massageEnabled ? t('ui.massage') : '',
+            perinealCareEnabled ? t('ui.perinealCare') : '',
+            assistedBathingEnabled ? t('ui.assistedBathing') : (bathSessionEnabled ? t('ui.bathSession') : '')
+        ].filter(Boolean).join(', ');
+        const safetyFlags = ['physical', 'medication', 'pregnancy', 'stimulation']
+            .filter(key => data[key] && data[key] !== 'no');
+        const sensitivityNote = String(data.sensitivities || '').trim();
+        if (sensitivityTypes.length || (sensitivityNote && sensitivityNote.toLowerCase() !== 'none')) safetyFlags.push('sensitivities');
+        const sessionPlan = {
+            schemaVersion: 1,
+            status: 'draft',
+            participantCount: 1,
+            createdAt: new Date().toISOString(),
+            source: 'lobby-consultation',
+            profile: { name: data.name, citizenship: citizenshipName, citizenshipCode: data.citizenship, contactNumber: String(data.contactNumber || '').trim(), email: String(data.email || '').trim(), experience: data.experience },
+            preferences: {
+                tone: data.tone, voiceGender: data.voiceGender || 'guide', readiness: data.readiness, sleepMode: data.sleepMode, hooponopono: data.hooponopono === 'yes',
+                reverseJourneyNeed: data.reverseJourneyNeed || 'grounded',
+                yogaBridgeEnabled, corpsePoseEnabled: yogaBridgeEnabled && data.corpsePose === 'yes', bathSessionEnabled,
+                perinealCareEnabled, assistedBathingEnabled, massageEnabled, selectedYogaPoses, careSummary
+            },
+            language: data.meditationLanguage || state.language,
+            durations: {
+                yogaPrep: Number(data.yogaPrep) || state.timeYogaPrep, yogaPose: Number(data.yogaPoseTime) || state.timeYogaPose,
+                corpse: Number(data.corpseTime) || state.timeCorpse, bath: Number(data.bathTime) || state.timeBath,
+                perinealCare: Number(data.perinealTime) || state.timePerinealCare, assistedBathing: Number(data.assistedTime) || state.timeAssistedBathing,
+                massage: Number(data.massageTime) || state.timeMassage
+            },
+            safety: { sensitivities: data.sensitivities, sensitivityTypes, touch: data.touch },
+            safetyReview: {
+                emergencyContact: { name: data.emergencyName || '', phone: getConsultationPhoneValue('consultation-emergency-phone') },
+                physical: data.physical, physicalDetails: data.physicalDetails || '',
+                medication: data.medication, medicationDetails: data.medicationDetails || '',
+                pregnancy: data.pregnancy,
+                stimulation: data.stimulation, stimulationDetails: data.stimulationDetails || '',
+                requiresGuideReview: safetyFlags.length > 0,
+                flags: safetyFlags
+            },
+            goal: data.goal,
+            chakraFocus: focusChakras,
+            chakraResponses,
+            chakraDurations: buildAdaptiveChakraDurations(state.selectedChakras, focusChakras, chakraResponses)
+        };
+        localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
+        renderConsultationReview(sessionPlan);
+        showScreen(consultationReviewScreen);
+    });
+    document.getElementById('approve-consultation')?.addEventListener('click', async () => {
+        const stored = localStorage.getItem('chakra_consultation_plan');
+        if (!stored) return showScreen(consultationScreen);
+        const sessionPlan = JSON.parse(stored);
+        if (sessionPlan.safetyReview?.requiresGuideReview && !getChecked('review-safety-confirm')) {
+            alert(t('ui.consultationSafetyConfirmRequired'));
+            return;
+        }
+        const sensitivityTypes = new Set(sessionPlan.safety?.sensitivityTypes || []);
+        const manualOnly = sensitivityTypes.has('audio') || sensitivityTypes.has('wording');
+        if (manualOnly && !getChecked('review-manual-only')) {
+            alert(t('ui.consultationManualOnlyRequired'));
+            return;
+        }
+        sessionPlan.guideReview = {
+            ...(sessionPlan.guideReview || {}),
+            notes: String(document.getElementById('review-guide-notes')?.value || '').trim(),
+            reviewedAt: new Date().toISOString()
+        };
+        sessionPlan.approvedSettings = {
+            ...(sessionPlan.approvedSettings || {}),
+            audioFilters: getChecked('review-audio-filters'),
+            hooponopono: getChecked('review-hooponopono'),
+            reverseJourney: getChecked('review-reverse-journey')
+        };
+        if (sensitivityTypes.has('movement')) {
+            sessionPlan.preferences.yogaBridgeEnabled = false;
+            sessionPlan.preferences.corpsePoseEnabled = false;
+            sessionPlan.preferences.bathSessionEnabled = false;
+            sessionPlan.preferences.massageEnabled = false;
+            sessionPlan.preferences.perinealCareEnabled = false;
+            sessionPlan.preferences.assistedBathingEnabled = false;
+            sessionPlan.preferences.selectedYogaPoses = [];
+            sessionPlan.approvedSettings.movementStages = 'removed-by-guide-review';
+        }
+        if (manualOnly) {
+            sessionPlan.status = 'manual-guide-required';
+            sessionPlan.sessionRoute = 'manual-guide';
+            sessionPlan.approvedAt = new Date().toISOString();
+            localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
+            alert(t('ui.consultationManualOnlySaved'));
+            return;
+        }
+        sessionPlan.status = 'guide-approved';
+        sessionPlan.approvedAt = new Date().toISOString();
+        localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
+        renderConsentPrompt(sessionPlan);
+        resetConsultationRecording();
+        showScreen(consultationConsentScreen);
+        showConsentReviewStage();
+        updateConsentScrollSpeed();
+        prepareConsentCameraPreview();
+    });
+    document.getElementById('consent-continue-to-recording')?.addEventListener('click', enterConsentTeleprompter);
+    document.getElementById('consent-review-cancel')?.addEventListener('click', () => {
+        resetConsultationRecording();
+        stopConsentCameraPreview();
+        showScreen(lobbyScreen);
+    });
+    document.getElementById('consent-scroll-speed')?.addEventListener('input', updateConsentScrollSpeed);
+    document.getElementById('review-print')?.addEventListener('click', printManualPlan);
+    document.getElementById('save-manual-plan')?.addEventListener('click', () => document.getElementById('approve-consultation')?.click());
+    document.getElementById('return-manual-lobby')?.addEventListener('click', () => {
+        const stored = localStorage.getItem('chakra_consultation_plan');
+        const plan = stored ? JSON.parse(stored) : null;
+        if (plan?.status !== 'manual-guide-required') {
+            alert(t('ui.consultationSaveManualFirst'));
+            return;
+        }
+        showScreen(lobbyScreen);
+    });
+    document.getElementById('consent-record')?.addEventListener('click', startConsultationRecording);
+    document.getElementById('consent-pause')?.addEventListener('click', () => {
+        if (!consultationRecorder) return;
+        if (consultationRecorder.state === 'recording') {
+            consultationRecorder.pause();
+            consultationRecordingPausedAt = performance.now();
+            stopConsentPromptLead(true);
+            stopConsentPromptAutoScroll();
+            setConsentRecordingState('paused');
+        } else if (consultationRecorder.state === 'paused') {
+            consultationRecorder.resume();
+            if (consultationRecordingPausedAt) {
+                consultationRecordingPausedDuration += performance.now() - consultationRecordingPausedAt;
+                consultationRecordingPausedAt = 0;
+            }
+            if (consentPromptLeadRemaining > 0) startConsentPromptWithLead();
+            else {
+                startConsentPromptAutoScroll();
+                setConsentRecordingState('recording');
+            }
+        }
+    });
+    document.getElementById('consent-stop')?.addEventListener('click', () => {
+        if (consultationRecorder && consultationRecorder.state !== 'inactive') {
+            consultationRecordingEndedAt = new Date();
+            stopConsentCompositeFrame();
+            stopConsentPromptLead();
+            stopConsentPromptAutoScroll();
+            drawConsentComposite();
+            consultationStopTimer = setTimeout(() => {
+                consultationStopTimer = null;
+                if (consultationRecorder && consultationRecorder.state !== 'inactive') consultationRecorder.stop();
+            }, 500);
+        }
+    });
+    document.getElementById('consent-retry')?.addEventListener('click', () => {
+        resetConsultationRecording();
+        enterConsentTeleprompter();
+    });
+    document.getElementById('consent-cancel')?.addEventListener('click', () => {
+        resetConsultationRecording();
+        stopConsentCameraPreview();
+        showScreen(lobbyScreen);
+    });
+    document.getElementById('consent-submit')?.addEventListener('click', () => {
+        if (!consultationRecordingBlob) return;
+        if (consultationRecordingBlob.size > 25 * 1024 * 1024) {
+            alert('This recording is larger than Gmail’s 25 MB attachment limit. Please retry with a shorter recording.');
+            return;
+        }
+        const stored = localStorage.getItem('chakra_consultation_plan');
+        if (!stored) return showScreen(consultationScreen);
+        const sessionPlan = JSON.parse(stored);
+        sessionPlan.status = 'consent-recorded';
+        sessionPlan.consent = {
+            recordedAt: new Date().toISOString(),
+            recordingStartedAt: consultationRecordingStartedAt?.toISOString() || null,
+            recordingEndedAt: consultationRecordingEndedAt?.toISOString() || null,
+            location: consultationLocation,
+            consentVersion: 1,
+            recordingType: consultationRecordingBlob.type,
+            recordingBytes: consultationRecordingBlob.size,
+            composition: 'session-plan-then-spoken-consent-v2',
+            planPageCount: consultationPlanPages.length,
+            planPageDurationMs: consentTiming('planPageMs', 5000),
+            planAudio: 'silent',
+            consentCameraLayout: 'circular-thumbnail',
+            storage: 'memory-only-prototype'
+        };
+        applyApprovedConsultationPlan(sessionPlan);
+        localStorage.setItem('chakra_consultation_plan', JSON.stringify(sessionPlan));
+        stopConsentCameraPreview();
+        showScreen(lobbyScreen);
     });
 
     const settingsHelpModal = document.getElementById('settings-help-modal');
@@ -3806,6 +5488,11 @@ function attachEventListeners() {
     }
 
     startMeditationBtn.addEventListener('click', async () => {
+        const consultationPlan = JSON.parse(localStorage.getItem('chakra_consultation_plan') || 'null');
+        if (consultationPlan?.status === 'manual-guide-required') {
+            alert(t('ui.consultationManualOnlyStartBlocked'));
+            return;
+        }
         // HRIM is a daytime-only energy practice. Gate it before audio setup.
         if (!await confirmHighEnergyTime()) return;
 

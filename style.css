@@ -29,6 +29,7 @@ body {
     min-height: 100vh;
     margin: 0;
     user-select: none;
+    overflow-x: hidden;
 }
 
 #splash-screen {
@@ -66,6 +67,8 @@ body {
 #app {
     width: 100%;
     max-width: 500px;
+    min-width: 0;
+    overflow-x: hidden;
     padding: 2rem 1.5rem;
     text-align: center;
     position: relative;
@@ -234,6 +237,390 @@ body {
     .mixer-actions { grid-template-columns: 1fr; }
 }
 
+/* Full-viewport camera teleprompter. The complete consent remains on the
+ * preceding review stage; this surface is reserved for recording. */
+#consultation-consent-screen.consent-teleprompter-mode {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    min-height: 100dvh;
+    padding: 0;
+    margin: 0;
+    gap: 0;
+    overflow: hidden;
+    background: #050308;
+    animation: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode #consent-record-stage {
+    width: 100%;
+    height: 100%;
+    gap: 0;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-shell {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-camera-layer .consent-live-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    object-fit: cover;
+    box-shadow: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-gradient {
+    z-index: 1;
+    background:
+        linear-gradient(180deg, rgba(3, 2, 8, 0.76) 0%, rgba(3, 2, 8, 0.08) 28%, rgba(3, 2, 8, 0.14) 58%, rgba(3, 2, 8, 0.88) 100%);
+}
+
+.teleprompter-topbar {
+    position: absolute;
+    z-index: 5;
+    top: max(16px, env(safe-area-inset-top, 0px));
+    left: 18px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.teleprompter-recording-indicator,
+.teleprompter-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(8, 5, 18, 0.54);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(12px);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.teleprompter-badge {
+    position: static;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.teleprompter-recording-dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16);
+}
+
+#consultation-consent-screen.consent-teleprompter-mode:not(.consent-recording-active) .teleprompter-recording-dot {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-copy-slot {
+    z-index: 2;
+    inset: 11% 0 188px;
+    padding: 0 18px;
+    pointer-events: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-copy-slot .consent-prompter {
+    width: min(760px, 92vw);
+    max-height: min(46dvh, 390px);
+    padding: clamp(1rem, 2.4vw, 1.5rem);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 18px;
+    color: #fff;
+    background: rgba(10, 7, 20, 0.56);
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(10px);
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .consent-prompt-text {
+    color: #fff;
+    font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+    line-height: 1.65;
+    text-wrap: pretty;
+}
+
+.teleprompter-countdown {
+    position: absolute;
+    z-index: 8;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: rgba(3, 2, 8, 0.38);
+    backdrop-filter: blur(4px);
+    font-size: clamp(6rem, 22vw, 12rem);
+    font-weight: 200;
+    text-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+}
+
+.teleprompter-countdown.hidden {
+    display: none;
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-speed-control {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    grid-template-columns: auto minmax(120px, 280px) auto;
+    width: min(620px, calc(100vw - 32px));
+    padding: 9px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    color: #fff;
+    background: rgba(8, 5, 18, 0.58);
+    backdrop-filter: blur(12px);
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-speed-control label,
+#consultation-consent-screen.consent-teleprompter-mode .teleprompter-speed-control output {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .consent-recording-status {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    width: min(680px, calc(100vw - 36px));
+    margin: 0;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.75rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+#consultation-consent-screen.consent-teleprompter-mode .consent-actions {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    width: auto;
+    margin: 0;
+    transform: translateX(-50%);
+}
+
+#consultation-consent-screen .camera-control {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    min-width: 54px;
+    height: 54px;
+    min-height: 54px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(8, 5, 18, 0.62);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+    font-size: 1.15rem;
+    cursor: pointer;
+}
+
+#consultation-consent-screen .camera-control.hidden {
+    display: none;
+}
+
+#consultation-consent-screen .camera-control::before {
+    content: none !important;
+}
+
+#consultation-consent-screen .camera-control:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+#consultation-consent-screen .camera-record {
+    width: 62px;
+    min-width: 62px;
+    height: 62px;
+    min-height: 62px;
+    border: 3px solid #fff;
+    background: rgba(8, 5, 18, 0.36);
+}
+
+#consultation-consent-screen .camera-record span {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #ef4444;
+}
+
+.consent-preview-stage {
+    justify-content: flex-start;
+    min-height: 100dvh;
+    height: auto;
+    padding: calc(1rem + env(safe-area-inset-top, 0px)) 0 calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.consent-preview-stage .consent-video-preview {
+    display: block;
+    width: min(100%, 760px);
+    max-height: 58dvh;
+    margin: 0;
+    border: 1px solid #d5d4cf;
+    border-radius: 18px;
+    background: #050308;
+    box-shadow: 0 14px 36px rgba(39, 39, 42, 0.14);
+}
+
+.consent-preview-sequence {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.65rem;
+    width: min(100%, 760px);
+}
+
+.consent-preview-step {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem;
+    border: 1px solid #d5d4cf;
+    border-radius: 14px;
+    background: #fbfaf7;
+    text-align: left;
+}
+
+.consent-preview-step > span {
+    display: grid;
+    place-items: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #fff;
+    background: #6d28d9;
+    font-weight: 700;
+}
+
+.consent-preview-step div {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.consent-preview-step strong {
+    color: #292b30;
+    font-size: 0.78rem;
+}
+
+.consent-preview-step small {
+    color: #686a6e;
+    font-size: 0.68rem;
+    line-height: 1.35;
+}
+
+.consent-preview-separator {
+    align-self: center;
+    color: #8a6424;
+    font-size: 1.2rem;
+}
+
+.consent-preview-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    width: min(100%, 620px);
+}
+
+.consent-preview-actions button {
+    width: 100%;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    #consultation-consent-screen.consent-teleprompter-mode {
+        padding: 0;
+    }
+
+    #consultation-consent-screen.consent-teleprompter-mode .teleprompter-shell {
+        min-height: 100%;
+        aspect-ratio: auto;
+        border-radius: 0;
+    }
+
+    #consultation-consent-screen.consent-teleprompter-mode .teleprompter-copy-slot {
+        inset: 10% 0 194px;
+        padding: 0 10px;
+    }
+
+    #consultation-consent-screen.consent-teleprompter-mode .teleprompter-copy-slot .consent-prompter {
+        max-height: 50dvh;
+        padding: 0.9rem;
+    }
+
+    #consultation-consent-screen.consent-teleprompter-mode .teleprompter-speed-control {
+        bottom: calc(114px + env(safe-area-inset-bottom, 0px));
+        grid-template-columns: 1fr auto;
+        gap: 5px 10px;
+        padding: 7px 10px;
+    }
+
+    #consultation-consent-screen.consent-teleprompter-mode .teleprompter-speed-control input[type="range"] {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .teleprompter-topbar {
+        left: 10px;
+        right: 10px;
+    }
+
+    .teleprompter-badge {
+        max-width: 48vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .consent-preview-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .consent-preview-sequence {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .consent-preview-separator {
+        transform: rotate(90deg);
+        justify-self: center;
+    }
+}
+
 .hidden {
     display: none !important;
 }
@@ -367,6 +754,7 @@ select:focus {
     gap: 1rem;
     width: 100%;
     margin-top: 0.25rem;
+    margin-bottom: 1.25rem;
 }
 
 .lobby-actions .primary-btn,
@@ -393,6 +781,534 @@ select:focus {
 .lobby-actions .consultation-btn:focus-visible {
     background: rgba(124, 58, 237, 0.22);
     border-color: rgba(196, 181, 253, 0.6);
+}
+
+.consultation-entry-actions {
+    width: 100%;
+    margin-top: -1rem;
+}
+
+.consultation-entry-actions .consultation-btn {
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+    border-color: rgba(196, 181, 253, 0.35);
+    background: rgba(124, 58, 237, 0.12);
+}
+
+.consultation-entry-actions .consultation-btn:hover,
+.consultation-entry-actions .consultation-btn:focus-visible {
+    background: rgba(124, 58, 237, 0.22);
+    border-color: rgba(196, 181, 253, 0.6);
+}
+
+.consultation-screen {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+
+.consultation-form,
+.consultation-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Keep the consultation card and its full-width actions comfortably inset on phones. */
+.consultation-screen .consultation-form {
+    width: calc(100% - 20px);
+    max-width: none;
+    margin-inline: 10px;
+}
+
+.consultation-screen .consultation-form > .consultation-card {
+    width: 100%;
+}
+
+.consultation-review-summary {
+    gap: 0.7rem;
+}
+
+.consultation-review-advice {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 12px;
+    color: #fde68a;
+    background: rgba(120, 53, 15, 0.24);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+
+.consultation-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.consultation-summary-row span {
+    opacity: 0.62;
+}
+
+.consultation-summary-row strong {
+    max-width: 62%;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.consultation-summary-detail .consultation-chakra-title {
+    display: block;
+    color: #1f3a5f;
+    font-size: 0.95rem;
+}
+
+.consultation-summary-detail > em {
+    display: block;
+    margin-top: 0.2rem;
+    color: #596575;
+    font-size: 0.78rem;
+    font-style: normal;
+}
+
+.consultation-reflection-answers {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 0.65rem;
+}
+
+.consultation-reflection-answer,
+.consultation-reflection-note {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.55rem 0.65rem;
+    border-left: 3px solid #8c9db1;
+    background: rgba(255, 255, 255, 0.58);
+}
+
+.consultation-reflection-answer span,
+.consultation-reflection-note b {
+    color: #596575;
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+.consultation-reflection-answer strong,
+.consultation-reflection-note span {
+    max-width: none;
+    color: #292b30;
+    font-size: 0.84rem;
+    text-align: left;
+}
+
+.consultation-reflection-note {
+    margin-top: 0.55rem;
+    border-left-color: #b88732;
+    background: #fffaf0;
+}
+
+.consultation-summary-row.consultation-safety-flagged {
+    padding: 0.55rem 0.65rem;
+    border: 1px solid #e3bd68;
+    border-left: 4px solid #c47b18;
+    border-radius: 8px;
+    background: #fff8e7;
+}
+
+.consultation-approval-card .checkbox-label {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem;
+}
+
+.consultation-focus-fieldset {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.7rem 0 0;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.consultation-focus-fieldset legend {
+    padding: 0 0.25rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.consultation-field-hint {
+    margin: 0 0 0.25rem;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    opacity: 0.58;
+}
+
+.consultation-care-options {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+    padding: 0.7rem;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.14);
+}
+
+/* Keep Sleep Mode visibly before physical care planning in the intake. */
+.consultation-care-fieldset {
+    order: 2;
+}
+
+#consultation-savasana-fieldset {
+    order: 3;
+}
+
+.consultation-card > label[for="consultation-reflection"],
+.consultation-card > #consultation-reflection {
+    order: 4;
+}
+
+.consultation-card > label[for="consultation-sleep"],
+.consultation-card > #consultation-sleep {
+    order: 1;
+}
+
+.consultation-sensitivity-fieldset {
+    order: 0;
+}
+
+.consultation-touch-care-options {
+    display: grid;
+    gap: 0.45rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.consultation-field-label {
+    font-size: 0.78rem;
+    opacity: 0.72;
+}
+
+.consultation-card {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem;
+    border: 1px solid rgba(196, 181, 253, 0.16);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.16);
+    text-align: left;
+}
+
+.consultation-card label {
+    margin-top: 0.45rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.consultation-card input,
+.consultation-card select,
+.consultation-card textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    padding: 0.7rem;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.06);
+    font: inherit;
+}
+
+.consultation-card select option {
+    color: #1f1535;
+}
+
+.consultation-note {
+    margin: 0.85rem 0 0;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    opacity: 0.65;
+    text-align: center;
+}
+
+.consultation-actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.consultation-actions button {
+    width: 100%;
+}
+
+.consent-prompter {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.1rem;
+    max-height: min(42vh, 360px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    border: 1px solid rgba(196, 181, 253, 0.24);
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(124, 58, 237, 0.16), rgba(0, 0, 0, 0.24));
+    text-align: left;
+}
+
+.consent-recording-active .consent-prompter {
+    max-height: min(36vh, 300px);
+    overflow-y: hidden;
+}
+
+.consent-live-stage {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
+}
+
+.consent-live-preview {
+    display: block;
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+    border: 3px solid #b88732;
+    border-radius: 50%;
+    background: #e7e4dc;
+    transform: scaleX(-1);
+    box-shadow: 0 5px 18px rgba(39, 39, 42, 0.12);
+}
+
+.consent-live-caption,
+.consent-scroll-hint {
+    color: #686a6e;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.consent-scroll-hint {
+    max-width: 440px;
+    margin: 0;
+}
+
+.consent-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.85rem;
+}
+
+.consent-review-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem;
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+.consent-review-actions button {
+    min-height: 44px;
+    margin: 0;
+}
+
+.teleprompter-shell {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 360px;
+    overflow: hidden;
+    border: 1px solid rgba(196, 181, 253, 0.32);
+    border-radius: 20px;
+    background: #181225;
+    box-shadow: 0 12px 34px rgba(39, 39, 42, 0.18);
+}
+
+.teleprompter-camera-layer,
+.teleprompter-camera-layer .consent-live-preview,
+.teleprompter-gradient,
+.teleprompter-copy-slot {
+    position: absolute;
+    inset: 0;
+}
+
+.teleprompter-camera-layer .consent-live-preview {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    transform: scaleX(-1);
+    object-fit: cover;
+    box-shadow: none;
+}
+
+.teleprompter-gradient {
+    background: linear-gradient(180deg, rgba(11, 7, 24, 0.78) 0%, rgba(30, 16, 53, 0.58) 35%, rgba(10, 6, 20, 0.88) 100%);
+    pointer-events: none;
+}
+
+.teleprompter-copy-slot {
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.15rem 1.5rem;
+}
+
+.teleprompter-copy-slot .consent-prompter {
+    width: min(100%, 650px);
+    max-height: min(46vh, 330px);
+    overflow: hidden;
+    border-color: rgba(255, 255, 255, 0.26);
+    background: rgba(10, 6, 20, 0.52);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.teleprompter-copy-slot .consent-prompt-label {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.teleprompter-copy-slot .consent-prompt-text {
+    color: #fff;
+    font-size: clamp(1.1rem, 3vw, 1.45rem);
+    line-height: 1.7;
+}
+
+.teleprompter-badge {
+    position: absolute;
+    z-index: 3;
+    top: 0.8rem;
+    left: 1rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.82);
+    background: rgba(10, 6, 20, 0.35);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.teleprompter-speed-control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    max-width: 650px;
+}
+
+.teleprompter-speed-control label {
+    color: #686a6e;
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.teleprompter-speed-control input[type="range"] {
+    width: 100%;
+    min-width: 0;
+}
+
+.teleprompter-speed-control output {
+    min-width: 76px;
+    color: #4d5663;
+    font-size: 0.7rem;
+    text-align: right;
+}
+
+.consent-prompt-label {
+    margin-bottom: 0.8rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.62;
+}
+
+.consent-prompt-text {
+    margin: 0;
+    font-size: clamp(1.05rem, 4vw, 1.35rem);
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.consent-video-preview {
+    width: 100%;
+    max-height: 260px;
+    margin-top: 1rem;
+    border-radius: 12px;
+    background: #050308;
+}
+
+.consent-recording-metadata {
+    min-height: 1.2rem;
+    margin: 0.45rem 0 0;
+    color: #5f6368;
+    font-size: 0.75rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.consent-recording-status {
+    min-height: 1.4rem;
+    margin: 0.85rem 0 0;
+    font-size: 0.82rem;
+    text-align: center;
+    opacity: 0.75;
+}
+
+.consent-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.9rem;
+}
+
+.consent-actions button {
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    padding: 8px 6px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+}
+
+.consent-actions button::before {
+    display: inline-block;
+    margin-right: 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1;
+    vertical-align: -0.05em;
+}
+
+#consent-record::before { content: '●'; color: #ef4444; }
+#consent-pause::before { content: 'Ⅱ'; }
+#consent-stop::before { content: '■'; }
+#consent-retry::before { content: '↻'; }
+#consent-submit::before { content: '✓'; }
+#consent-cancel::before { content: '×'; }
+
+#consultation-consent-screen .consent-actions > button {
+    width: 100%;
+    margin-inline: 0;
 }
 
 #lobby-screen #lobby-title {
@@ -952,14 +1868,63 @@ input[type="range"]::-moz-range-progress {
 }
 
 .settings-title-row {
+    position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.65rem;
+    gap: 0.35rem;
+    width: 100%;
+}
+
+.screen-brand-logo {
+    display: block;
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    margin: 0 auto 0.35rem;
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
+}
+
+.settings-title-row .screen-brand-logo {
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 12px;
+}
+
+.completion-brand-logo {
+    display: block;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    margin: 0 auto 0.5rem;
+}
+
+.lobby-brand-logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+}
+
+.meditation-brand-logo {
+    display: block;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin: 0 auto 20px;
+    flex: 0 0 100px;
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
 }
 
 .settings-title-row h1 {
     margin: 0;
+}
+
+.settings-title-row .help-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .help-icon {
@@ -1291,6 +2256,88 @@ input[type="range"]::-moz-range-progress {
     .screen { gap: 1.5rem; }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
+
+    #consultation-consent-screen {
+        gap: 0.85rem;
+        padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    #consultation-consent-screen .consent-prompter {
+        max-height: min(39dvh, 330px);
+        padding: 0.85rem;
+        overflow-y: auto;
+    }
+
+    #consultation-consent-screen .teleprompter-shell {
+        min-height: 330px;
+        aspect-ratio: 3 / 4;
+        border-radius: 16px;
+    }
+
+    #consultation-consent-screen .teleprompter-copy-slot {
+        padding: 2.5rem 0.7rem 1rem;
+    }
+
+    #consultation-consent-screen .teleprompter-copy-slot .consent-prompter {
+        max-height: 58%;
+    }
+
+    #consultation-consent-screen .teleprompter-speed-control {
+        grid-template-columns: 1fr auto;
+    }
+
+    #consultation-consent-screen .teleprompter-speed-control input[type="range"] {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    #consultation-consent-screen.consent-recording-active .consent-prompter {
+        max-height: min(35dvh, 280px);
+        overflow-y: hidden;
+    }
+
+    #consultation-consent-screen .consent-prompt-text {
+        font-size: clamp(0.95rem, 3.8vw, 1.2rem);
+        line-height: 1.55;
+    }
+
+    #consultation-consent-screen .consent-recording-metadata,
+    #consultation-consent-screen .consultation-note {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    #consultation-consent-screen .consent-live-preview {
+        width: 92px;
+        height: 92px;
+    }
+
+    #consultation-consent-screen .consent-actions {
+        gap: 0.35rem;
+    }
+
+    #consultation-consent-screen .consent-actions button {
+        min-height: 38px;
+        padding-inline: 3px;
+        font-size: 0.62rem;
+    }
+
+    #consultation-consent-screen .consent-actions button::before {
+        margin-right: 0.15rem;
+    }
+
+    /* Reduce decorative contrast on the long Settings form so controls remain
+     * the visual focus on narrow screens. */
+    body:has(#config-screen:not(.hidden)) #nebula-bg {
+        opacity: 0.52;
+    }
+}
+
+@media (min-width: 601px) {
+    body:has(#config-screen:not(.hidden)) #nebula-bg {
+        opacity: 0.72;
+    }
 }
 
 /* ── Eyes Close Mode ────────────────────────────────────────────────────────── */
@@ -1355,4 +2402,295 @@ body.sleep-mode-active #glow-effect {
 #intention-input::placeholder {
     color: rgba(255,255,255,0.25);
     font-style: italic;
+}
+
+/* Consultation forms use a neutral paper surface for real-world completion. */
+.consultation-screen {
+    background: #f1f0ec;
+    color: #2f3033;
+}
+
+.consultation-screen h1 {
+    color: #2f3033;
+}
+
+.consultation-screen .subtitle {
+    color: #62656a;
+    opacity: 1;
+}
+
+.consultation-screen .consultation-card {
+    border-color: #d5d4cf;
+    background: #fbfaf7;
+    box-shadow: 0 8px 24px rgba(39, 39, 42, 0.06);
+}
+
+.consultation-screen .consultation-card label,
+.consultation-screen .consultation-focus-fieldset legend {
+    color: #44464b;
+}
+
+.consultation-screen .consultation-focus-fieldset {
+    border-color: #d8d7d2;
+}
+
+.consultation-screen .consultation-card input,
+.consultation-screen .consultation-card select,
+.consultation-screen .consultation-card textarea {
+    border-color: #c9c8c3;
+    color: #282a2e;
+    background: #ffffff;
+    box-shadow: inset 0 1px 2px rgba(39, 39, 42, 0.04);
+}
+
+.consultation-screen .consultation-card input::placeholder,
+.consultation-screen .consultation-card textarea::placeholder {
+    color: #85868a;
+}
+
+.consultation-screen .consultation-card select option {
+    color: #282a2e;
+    background: #ffffff;
+}
+
+.consultation-screen .checkbox-label {
+    color: #44464b;
+    background: #f4f3ef;
+    border-color: #d1d0ca;
+}
+
+.consultation-screen .consultation-care-options {
+    background: #f2f1ed;
+}
+
+.consultation-screen .consultation-touch-care-options {
+    border-top-color: #d8d7d2;
+}
+
+.consultation-screen .consultation-field-hint,
+.consultation-screen .consultation-note,
+.consultation-screen .consultation-summary-row span,
+.consultation-screen .consent-prompt-label {
+    color: #686a6e;
+    opacity: 1;
+}
+
+.consultation-screen .consultation-summary-row strong,
+.consultation-screen .consent-prompt-text {
+    color: #292b30;
+}
+
+.consultation-screen .consultation-review-advice {
+    color: #713f12;
+    background: #fff4d6;
+    border-color: #e3bd68;
+}
+
+.consultation-screen .consent-prompter {
+    border-color: #d5d4cf;
+    background: #fbfaf7;
+    box-shadow: 0 8px 24px rgba(39, 39, 42, 0.06);
+}
+
+.consultation-screen .consent-prompter:focus-within {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14), 0 8px 24px rgba(39, 39, 42, 0.06);
+}
+
+.consultation-screen .link-btn {
+    color: #4b4d52;
+    opacity: 0.85;
+}
+
+.consultation-screen .consent-actions button {
+    border: 1px solid #b8b7b2;
+    color: #292b30;
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(39, 39, 42, 0.08);
+}
+
+.consultation-screen .consent-actions .primary-btn {
+    border-color: #5b21b6;
+    color: #ffffff;
+    background: #6d28d9;
+}
+
+.consultation-screen .consent-actions .secondary-btn {
+    border-color: #6b7280;
+    color: #292b30;
+    background: #e7e6e1;
+}
+
+/* Manual Guide Review actions use explicit print-safe contrast and a stable visual order. */
+#consultation-review-screen .consultation-actions {
+    position: relative;
+    z-index: 5;
+    flex-direction: column;
+    isolation: isolate;
+}
+
+#consultation-review-screen .consultation-actions > button {
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+#consultation-review-screen #review-print {
+    color: #ffffff;
+    background: #1f3a5f;
+    border-color: #1f3a5f;
+}
+
+#consultation-review-screen #save-manual-plan {
+    color: #ffffff;
+    background: #2f6b4f;
+    border-color: #2f6b4f;
+}
+
+#consultation-review-screen #return-manual-lobby {
+    color: #273444;
+    background: #eef1f4;
+    border-color: #9aa6b2;
+}
+
+/* Keep review-summary content visibly inset from the card edge on small screens. */
+#consultation-review-screen .consultation-review-summary {
+    width: calc(100% - 20px);
+    margin-inline: 10px;
+    padding: 1.15rem;
+    gap: 0.8rem;
+}
+
+#consultation-review-screen .consultation-review-summary > .consultation-summary-row,
+#consultation-review-screen .consultation-review-summary > .consultation-summary-section {
+    margin-inline: 0.2rem;
+}
+
+#consultation-review-screen .consultation-review-advice,
+#consultation-review-screen .consultation-approval-card {
+    width: calc(100% - 20px);
+    margin-inline: 10px;
+    box-sizing: border-box;
+}
+
+/* Give the guide a more useful reading measure on desktop without widening the
+ * compact meditation and Lobby experiences. */
+@media (min-width: 801px) {
+    #app:has(#consultation-review-screen:not(.hidden)) {
+        max-width: 820px;
+    }
+
+    #consultation-review-screen .consultation-review-summary,
+    #consultation-review-screen .consultation-review-advice,
+    #consultation-review-screen .consultation-approval-card,
+    #consultation-review-screen .consultation-actions {
+        max-width: 760px;
+    }
+}
+
+/* Keep the review scannable when a value is longer than its label on phones. */
+@media (max-width: 600px) {
+    #consultation-review-screen .consultation-summary-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    #consultation-review-screen .consultation-summary-row span,
+    #consultation-review-screen .consultation-summary-row strong {
+        max-width: none;
+        text-align: left;
+    }
+
+    #consultation-review-screen .consultation-summary-row strong {
+        padding-left: 0.35rem;
+        color: #292b30;
+    }
+}
+
+.consultation-screen .consent-actions button:hover,
+.consultation-screen .consent-actions button:focus-visible {
+    filter: brightness(0.96);
+}
+
+/* Full-width actions keep a comfortable 10px breathing edge on both sides. */
+.lobby-actions > button,
+.consultation-entry-actions > button,
+.consultation-actions > button,
+.consent-actions > button,
+.sleep-mode-prompt-actions > button,
+.hrim-time-block-actions > button {
+    width: calc(100% - 20px);
+    margin-inline: 10px;
+    box-sizing: border-box;
+}
+
+.consultation-chakra-question {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.8rem;
+    border: 1px solid #deddd8;
+    border-radius: 10px;
+    background: #f7f6f2;
+}
+
+.consultation-chakra-question h3 {
+    margin: 0;
+    color: #35373c;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.consultation-chakra-question p {
+    margin: 0.15rem 0;
+    color: #55575c;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.consultation-summary-section {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.35rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #deddd8;
+}
+
+.consultation-summary-section h3 {
+    margin: 0;
+    color: #3d3f44;
+    font-size: 0.82rem;
+}
+
+.consultation-summary-detail {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.65rem 0.7rem;
+    border-radius: 8px;
+    background: #f4f3ef;
+    color: #55575c;
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
+.consultation-summary-detail strong {
+    color: #303238;
+}
+
+.consultation-summary-detail em {
+    color: #6b5a35;
+    font-style: normal;
+}
+
+.consultation-summary-detail small {
+    color: #63656a;
+}
+
+/* Keep the badge inside the camera top bar; the base teleprompter badge rule
+ * above is also used by the older compact layout. */
+.teleprompter-topbar .teleprompter-badge {
+    position: static;
+    inset: auto;
 }

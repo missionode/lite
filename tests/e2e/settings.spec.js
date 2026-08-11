@@ -56,6 +56,20 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
   await expect(page.locator('#settings-help-modal')).toBeHidden();
 });
 
+test('keeps Settings free of nested horizontal overflow on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const dimensions = await page.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: document.documentElement.clientWidth,
+    settingsWidth: document.querySelector('#config-screen')?.scrollWidth || 0,
+    consultationEntryWidth: document.querySelector('.consultation-entry-actions')?.scrollWidth || 0,
+    consultationEntryClientWidth: document.querySelector('.consultation-entry-actions')?.clientWidth || 0
+  }));
+  expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth + 1);
+  expect(dimensions.settingsWidth).toBeLessThanOrEqual(dimensions.viewportWidth + 1);
+  expect(dimensions.consultationEntryWidth).toBeLessThanOrEqual(dimensions.consultationEntryClientWidth + 1);
+});
+
 test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
   await page.locator('#box-meditation-toggle').check();
   await page.locator('#yoga-bridge-toggle').check();
@@ -64,16 +78,361 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await page.locator('#perineal-care-toggle').check();
   await page.locator('#assisted-bathing-toggle').check();
   await page.locator('#hooponopono-toggle').check();
+  await page.locator('#corpse-pose-toggle').check();
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await expect(page.locator('#journey-roadmap')).toHaveText(
-    'Arrival » Intention » Breathing » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing » Ho\'oponopono'
+    'Arrival » Intention » Breathing » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing » Ho\'oponopono » Savasana'
   );
 
   await page.locator('#high-energy-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Intention » HRIM » Closing');
   await page.locator('#music-only-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
+});
+
+test('opens the single-participant consultation entry point and returns a saved plan to Lobby', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await page.locator('#open-settings').click();
+  await expect(page.locator('#config-screen')).toBeVisible();
+  await page.locator('#begin-consultation').click();
+  await expect(page.locator('#consultation-screen')).toBeVisible();
+
+  await page.locator('#consultation-name').fill('Test Client');
+  await page.locator('#consultation-citizenship').selectOption('IN');
+  await expect(page.locator('#consultation-contact')).toHaveValue('+91 ');
+  await expect(page.locator('#consultation-emergency-phone')).toHaveValue('+91 ');
+  await page.locator('#consultation-contact').fill('+919876543210');
+  await page.locator('#consultation-email').fill('test@example.com');
+  await page.locator('#consultation-goal').fill('Feel grounded and clear.');
+  await page.locator('#consultation-reverse-journey').selectOption('reconnect');
+  await page.locator('#consultation-language').selectOption('en');
+  await page.locator('#consultation-sensitivities').fill('None');
+  await page.locator('#consultation-medication').selectOption('private');
+  await page.locator('#consultation-medication-details').fill('Discussed privately with the guide.');
+  await page.locator('#time-per-chakra').evaluate((input) => {
+    input.value = '1';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await page.locator('input[name="chakraFocus"][value="heart"]').check();
+  await expect(page.locator('[data-chakra-question="heart"]')).toBeVisible();
+  await page.locator('select[name="chakraAnswer_heart_1"]').selectOption('sometimes');
+  await page.locator('select[name="chakraAnswer_heart_2"]').selectOption('often');
+  await page.locator('select[name="chakraAnswer_heart_3"]').selectOption('rarely');
+  await page.locator('#chakra-need-heart').selectOption('more');
+  await page.locator('textarea[name="chakraNote_heart"]').fill('Support compassion and connection.');
+  await page.locator('#consultation-tone').selectOption('soft');
+  await page.locator('#consultation-voice-gender').selectOption('female');
+  await page.locator('#consultation-sleep').selectOption('guide');
+  await page.locator('#consultation-sleep').selectOption('needed');
+  await expect(page.locator('#consultation-corpse')).toBeChecked();
+  await expect(page.locator('#consultation-corpse-time')).toHaveValue('3600');
+  await expect(page.locator('#consultation-savasana-sleep-note')).toBeVisible();
+  await page.locator('#consultation-sleep').selectOption('guide');
+  await expect(page.locator('#consultation-corpse')).not.toBeChecked();
+  await page.locator('#consultation-touch').selectOption('yes');
+  await page.locator('#consultation-yoga-enabled').selectOption('yes');
+  await expect(page.locator('#consultation-yoga-options')).toBeVisible();
+  await page.locator('input[name="yogaPose"][value="balasana"]').check();
+  await page.locator('#consultation-bath-enabled').selectOption('yes');
+  await expect(page.locator('#consultation-bath-options')).toBeVisible();
+  await expect(page.locator('#consultation-touch-care-options')).toBeVisible();
+  await page.locator('input[name="massage"]').check();
+  await page.locator('input[name="perinealCare"]').check();
+  await page.locator('#consultation-touch').selectOption('no');
+  await expect(page.locator('#consultation-touch-care-options')).toBeHidden();
+  await expect(page.locator('input[name="massage"]')).toBeDisabled();
+  await page.locator('#consultation-touch').selectOption('yes');
+  await expect(page.locator('#consultation-touch-care-options')).toBeVisible();
+  await page.locator('input[name="massage"]').check();
+  await page.locator('input[name="perinealCare"]').check();
+  await page.locator('#save-consultation').click();
+
+  await expect(page.locator('#consultation-review-screen')).toBeVisible();
+  await expect(page.locator('#review-print')).toBeVisible();
+  await page.locator('#review-print').click();
+  const standardPrintFrame = page.locator('iframe.manual-plan-print-frame');
+  await expect(standardPrintFrame.contentFrame().locator('.manual-plan-logo')).toBeVisible();
+  await expect(standardPrintFrame.contentFrame().locator('title')).toHaveText('');
+  await expect(standardPrintFrame.contentFrame().locator('body')).not.toContainText('Session Plan');
+  await expect(standardPrintFrame.contentFrame().locator('body')).not.toContainText('Generated');
+  await expect(standardPrintFrame.contentFrame().locator('body')).not.toContainText('http');
+  await expect(page.locator('#consultation-review-summary')).toContainText('Test Client');
+  await expect(page.locator('#consultation-review-summary')).toContainText('+919876543210');
+  await expect(page.locator('#consultation-review-summary')).toContainText('Complete plan details');
+  await expect(page.locator('#consultation-review-summary')).toContainText('Support compassion and connection.');
+  await expect(page.locator('#review-audio-filters')).toBeChecked();
+  await expect(page.locator('#review-safety-row')).toBeVisible();
+  await expect(page.locator('#review-reverse-journey-row')).toBeVisible();
+  await expect(page.locator('#consultation-review-advice')).toContainText('grounding-focused Reverse Journey');
+  await page.locator('#review-safety-confirm').check();
+  await page.locator('#review-reverse-journey').check();
+  await page.evaluate(() => {
+    const cameraCanvas = document.createElement('canvas');
+    cameraCanvas.width = 640;
+    cameraCanvas.height = 480;
+    const cameraContext = cameraCanvas.getContext('2d');
+    cameraContext.fillStyle = '#454545';
+    cameraContext.fillRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+    const cameraStream = cameraCanvas.captureStream(5);
+    setInterval(() => {
+      cameraContext.fillStyle = '#454545';
+      cameraContext.fillRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+    }, 100);
+    const testAudioContext = new AudioContext();
+    const audioDestination = testAudioContext.createMediaStreamDestination();
+    const oscillator = testAudioContext.createOscillator();
+    oscillator.connect(audioDestination);
+    oscillator.start();
+    navigator.mediaDevices.getUserMedia = async constraints => constraints?.audio
+      ? audioDestination.stream
+      : cameraStream;
+    class TestMediaRecorder {
+      static isTypeSupported() { return true; }
+      constructor(stream, options = {}) {
+        this.stream = stream;
+        this.mimeType = options.mimeType || 'video/webm';
+        this.state = 'inactive';
+      }
+      start() { this.state = 'recording'; }
+      pause() { this.state = 'paused'; }
+      resume() { this.state = 'recording'; }
+      stop() {
+        this.state = 'inactive';
+        this.ondataavailable?.({ data: new Blob(['test-recording'], { type: this.mimeType }) });
+        this.onstop?.();
+      }
+    }
+    window.MediaRecorder = TestMediaRecorder;
+    window.__chakraConsentTestTimings = {
+      planPageMs: 35,
+      planTransitionMs: 25,
+      countdownStepMs: 150,
+      readingLeadMs: 1000
+    };
+  });
+  await page.locator('#approve-consultation').click();
+
+  await expect(page.locator('#consultation-consent-screen')).toBeVisible();
+  await expect(page.locator('#consent-prompt-text')).toContainText('Test Client');
+  await expect(page.locator('#consent-prompt-text')).toContainText('prescribed medication');
+  await expect(page.locator('#consent-prompt-text')).toContainText('will not stop, start, or change');
+  await expect(page.locator('#consent-prompt-text')).toContainText('Yoga Bridge');
+  await expect(page.locator('#consent-prompt-text')).toContainText('Massage');
+  await expect(page.locator('#consent-prompt-text')).toContainText('Perineal Care');
+  await expect(page.locator('#consent-prompt-text')).toContainText('touch or assistance');
+  const plan = await page.evaluate(() => JSON.parse(localStorage.getItem('chakra_consultation_plan')));
+  expect(plan.schemaVersion).toBe(1);
+  expect(plan.participantCount).toBe(1);
+  expect(plan.profile.name).toBe('Test Client');
+  expect(plan.goal).toBe('Feel grounded and clear.');
+  expect(plan.language).toBe('en');
+  expect(plan.chakraFocus).toEqual(['heart']);
+  expect(plan.chakraResponses.heart.attention).toBe('more');
+  expect(plan.chakraResponses.heart.answers).toEqual(['sometimes', 'often', 'rarely']);
+  expect(plan.chakraResponses.heart.note).toBe('Support compassion and connection.');
+  expect(plan.chakraDurations.heart).toBeGreaterThan(plan.chakraDurations.root);
+  expect(plan.preferences.yogaBridgeEnabled).toBe(true);
+  expect(plan.preferences.voiceGender).toBe('female');
+  expect(plan.preferences.selectedYogaPoses).toEqual(['balasana']);
+  expect(plan.preferences.massageEnabled).toBe(true);
+  expect(plan.preferences.perinealCareEnabled).toBe(true);
+  expect(plan.status).toBe('guide-approved');
+  expect(plan.approvedSettings.audioFilters).toBe(true);
+  expect(plan.approvedSettings.reverseJourney).toBe(true);
+
+  const confirmationOrder = await page.locator('#consent-review-stage').evaluate(stage => {
+    const camera = stage.querySelector('.consent-live-stage');
+    const script = stage.querySelector('.consent-prompter');
+    return Boolean(camera && script && camera.compareDocumentPosition(script) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(confirmationOrder).toBe(true);
+  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'auto');
+  const actionAlignment = await page.locator('.consent-review-actions').evaluate(actions => {
+    const [continueButton, cancelButton] = Array.from(actions.querySelectorAll('button')).map(button => button.getBoundingClientRect());
+    return Math.abs(continueButton.top - cancelButton.top);
+  });
+  expect(actionAlignment).toBeLessThan(2);
+
+  const videoPlanText = await page.evaluate(() => getConsentPlanPages(JSON.parse(localStorage.getItem('chakra_consultation_plan'))).flat().join(' '));
+  expect(videoPlanText).toContain('Feel grounded and clear.');
+  expect(videoPlanText).toContain('Yoga Bridge');
+  expect(videoPlanText).not.toContain('test@example.com');
+  expect(videoPlanText).not.toContain('+919876543210');
+  expect(videoPlanText).not.toContain('Discussed privately with the guide.');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('#consent-continue-to-recording').click();
+  await expect(page.locator('#consent-record-stage')).toBeVisible();
+  await expect(page.locator('#consent-preview-stage')).toBeHidden();
+  await expect(page.locator('#consent-scroll-speed-value')).toHaveText('Comfortable');
+  const cameraBounds = await page.locator('.teleprompter-shell').boundingBox();
+  expect(cameraBounds.width).toBeGreaterThanOrEqual(389);
+  expect(cameraBounds.height).toBeGreaterThanOrEqual(843);
+
+  await page.locator('#consent-record').click();
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'plan');
+  const planPageCount = Number(await page.locator('#consent-composite-canvas').getAttribute('data-plan-pages'));
+  expect(planPageCount).toBeGreaterThan(0);
+  await expect(page.locator('#consent-countdown')).toBeVisible({ timeout: 3_000 });
+  await expect(page.locator('#consent-countdown')).toHaveText(/[123]/);
+  await expect(page.locator('#consent-pause')).toBeVisible({ timeout: 6_000 });
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('width', '720');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('height', '1280');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'consent');
+
+  const initialScroll = await page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop);
+  await page.waitForTimeout(150);
+  const heldScroll = await page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop);
+  expect(heldScroll).toBe(initialScroll);
+  await page.waitForTimeout(950);
+  const movedScroll = await page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop);
+  expect(movedScroll).toBeGreaterThan(heldScroll);
+
+  await page.locator('#consent-pause').click();
+  await expect(page.locator('#consent-pause')).toBeVisible();
+  await expect(page.locator('#consent-pause')).toHaveAttribute('aria-label', 'Resume Recording');
+  const pausedScroll = await page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop);
+  await page.waitForTimeout(350);
+  await expect.poll(() => page.locator('.teleprompter-copy-slot .consent-prompter').evaluate(element => element.scrollTop)).toBe(pausedScroll);
+  await page.locator('#consent-pause').click();
+  await expect(page.locator('#consent-pause')).toHaveAttribute('aria-label', 'Pause / Resume');
+
+  await page.locator('#consent-stop').click();
+  await expect(page.locator('#consent-preview-stage')).toBeVisible();
+  await expect(page.locator('#consent-record-stage')).toBeHidden();
+  await expect(page.locator('#consent-video-preview')).toBeVisible();
+  await expect(page.locator('.consent-preview-sequence')).toContainText('Approved Session Plan');
+  await expect(page.locator('#consent-preview-plan-count')).toContainText(`${planPageCount} silent plan pages`);
+  await expect(page.locator('.consent-preview-sequence')).toContainText('Spoken Consent');
+  await page.locator('#consent-retry').click();
+  await expect(page.locator('#consent-record-stage')).toBeVisible();
+  await expect(page.locator('#consent-recording-clock')).toHaveText('00:00');
+});
+
+test('Guide Review routes sensitive plans to manual delivery and removes movement stages', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await page.locator('#open-settings').click();
+  await page.locator('#begin-consultation').click();
+  await page.locator('#consultation-name').fill('Sensitive Client');
+  await page.locator('#consultation-citizenship').selectOption('IN');
+  await page.locator('#consultation-contact').fill('+919876543211');
+  await page.locator('#consultation-email').fill('sensitive@example.com');
+  await page.locator('#consultation-goal').fill('Feel safe and supported.');
+  await page.locator('#consultation-yoga-enabled').selectOption('yes');
+  await page.locator('input[name="yogaPose"][value="balasana"]').check();
+  await page.locator('input[name="sensitivityType"][value="audio"]').check();
+  await page.locator('input[name="sensitivityType"][value="movement"]').check();
+  await page.locator('#save-consultation').click();
+
+  await expect(page.locator('#consultation-review-screen')).toBeVisible();
+  await expect(page.locator('#consultation-review-advice')).toContainText('manual session');
+  await expect(page.locator('#review-safety-row')).toBeVisible();
+  await expect(page.locator('#review-manual-only-row')).toBeVisible();
+  await expect(page.locator('.consultation-safety-flagged')).toHaveCount(1);
+  await expect(page.locator('#review-print')).toBeVisible();
+  const mobileOverflow = await page.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: document.documentElement.clientWidth,
+    appWidth: document.getElementById('app')?.scrollWidth || 0
+  }));
+  expect(mobileOverflow.documentWidth).toBeLessThanOrEqual(mobileOverflow.viewportWidth + 1);
+  expect(mobileOverflow.appWidth).toBeLessThanOrEqual(mobileOverflow.viewportWidth + 1);
+  await expect(page.locator('#save-manual-plan')).toBeVisible();
+  await expect(page.locator('#return-manual-lobby')).toBeVisible();
+  await expect(page.locator('#approve-consultation')).toBeHidden();
+  await page.locator('#review-guide-notes').fill('Discuss private comfort preferences before approving movement.');
+  await expect(page.locator('#review-print')).toBeVisible();
+  await page.locator('#review-print').click();
+  const printFrame = page.locator('iframe.manual-plan-print-frame');
+  await expect(printFrame).toHaveCount(1);
+  await expect(printFrame.contentFrame().locator('.manual-plan-logo')).toHaveAttribute('src', /logo_453x453\.png/);
+  await expect(printFrame.contentFrame().locator('title')).toHaveText('');
+  await expect(printFrame.contentFrame().locator('body')).not.toContainText('Generated');
+  await expect(printFrame.contentFrame().locator('body')).not.toContainText('Manual Session Plan');
+  await expect(printFrame.contentFrame().locator('body')).not.toContainText('http');
+
+  let firstDialogMessage = '';
+  page.once('dialog', async dialog => {
+    firstDialogMessage = dialog.message();
+    await dialog.dismiss();
+  });
+  await page.locator('#save-manual-plan').click();
+  expect(firstDialogMessage).toContain('flagged safety information');
+  await page.locator('#review-safety-confirm').check();
+  await page.locator('#review-manual-only').check();
+
+  let savedDialogMessage = '';
+  page.once('dialog', async dialog => {
+    savedDialogMessage = dialog.message();
+    await dialog.accept();
+  });
+  await page.locator('#save-manual-plan').click();
+  expect(savedDialogMessage).toContain('Manual Guide Only');
+  await page.locator('#return-manual-lobby').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+
+  const plan = await page.evaluate(() => JSON.parse(localStorage.getItem('chakra_consultation_plan')));
+  expect(plan.status).toBe('manual-guide-required');
+  expect(plan.sessionRoute).toBe('manual-guide');
+  expect(plan.preferences.yogaBridgeEnabled).toBe(false);
+  expect(plan.preferences.corpsePoseEnabled).toBe(false);
+  expect(plan.preferences.selectedYogaPoses).toEqual([]);
+  expect(plan.approvedSettings.movementStages).toBe('removed-by-guide-review');
+  expect(plan.guideReview.notes).toContain('private comfort preferences');
+
+  let blockedDialogMessage = '';
+  page.once('dialog', async dialog => {
+    blockedDialogMessage = dialog.message();
+    await dialog.accept();
+  });
+  await page.locator('#start-meditation').click();
+  expect(blockedDialogMessage).toContain('manual guide-led');
+});
+
+test('applies the correct Yoga dependency for injury, medication, and pregnancy answers', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await page.locator('#open-settings').click();
+  await page.locator('#begin-consultation').click();
+  await page.locator('#consultation-touch').selectOption('yes');
+  const restrictedAnswers = [
+    ['#consultation-physical', 'yes'],
+    ['#consultation-medication', 'private'],
+    ['#consultation-pregnancy', 'yes']
+  ];
+
+  for (const [index, [selector, value]] of restrictedAnswers.entries()) {
+    await page.locator('#consultation-yoga-enabled').selectOption('yes');
+    await expect(page.locator('#consultation-yoga-options')).toBeVisible();
+    await page.locator(selector).selectOption(value);
+    if (index === 0) {
+      await expect(page.locator('#consultation-yoga-enabled')).toHaveValue('no');
+      await expect(page.locator('#consultation-yoga-enabled')).toBeDisabled();
+      await expect(page.locator('#consultation-yoga-options')).toBeHidden();
+      await expect(page.locator('#consultation-yoga-restriction-note')).toBeVisible();
+    } else if (index === 1) {
+      await expect(page.locator('#consultation-yoga-enabled')).toHaveValue('yes');
+      await expect(page.locator('#consultation-yoga-enabled')).toBeEnabled();
+      await expect(page.locator('#consultation-yoga-options')).toBeVisible();
+    } else {
+      await expect(page.locator('#consultation-yoga-enabled')).toHaveValue('yes');
+      await expect(page.locator('.consultation-yoga-pose-option').first()).toBeHidden();
+      await expect(page.locator('#consultation-yoga-options')).toBeVisible();
+      await expect(page.locator('#consultation-yoga-pose-restriction-note')).toBeVisible();
+      await page.locator('#consultation-bath-enabled').selectOption('yes');
+      await expect(page.locator('#consultation-bath-options')).toBeVisible();
+      await expect(page.locator('#consultation-touch-care-options')).toBeVisible();
+    }
+    await page.locator(selector).selectOption('no');
+    await expect(page.locator('#consultation-yoga-enabled')).toBeEnabled();
+  }
+
+  await page.locator('#consultation-yoga-enabled').selectOption('yes');
+  await page.locator('#consultation-pregnancy').selectOption('postpartum');
+  await expect(page.locator('.consultation-yoga-pose-option').first()).toBeVisible();
+  await expect(page.locator('.consultation-yoga-pose-timing').first()).toBeVisible();
+  await expect(page.locator('#consultation-yoga-pose-restriction-note')).toBeHidden();
 });
 
 test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
@@ -166,8 +525,8 @@ test('loads the production Corpse Pose timing range', async ({ page }) => {
   await expect(page.locator('#config-screen')).toBeVisible();
   const corpse = page.locator('#time-corpse');
   await expect(corpse).toHaveAttribute('min', '60');
-  await expect(corpse).toHaveAttribute('max', '600');
-  await expect(corpse).toHaveAttribute('step', '30');
+  await expect(corpse).toHaveAttribute('max', '3600');
+  await expect(corpse).toHaveAttribute('step', '60');
 });
 
 test('uses experiential benefit language for chakra narration', async ({ page }) => {

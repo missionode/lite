@@ -9,14 +9,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.52">
+    <link rel="stylesheet" href="style.css?v=1.65">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="apple-touch-startup-image" href="Splash.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="symbols/logo_453x453.png">
+    <link rel="shortcut icon" type="image/png" href="symbols/logo_453x453.png">
 </head>
 <body>
     <div id="splash-screen">
@@ -30,6 +29,7 @@
         <!-- Configuration Screen -->
         <section id="config-screen" class="screen settings-screen-container">
             <div class="settings-title-row">
+                <img class="screen-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
                 <h1 id="app-title">Chakra Meditation</h1>
                 <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
             </div>
@@ -114,7 +114,7 @@
                             </div>
                             <div class="mixer-row" id="row-corpse">
                                 <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.corpsePose">Corpse Pose</label>
-                                <input type="range" id="time-corpse" min="60" max="600" step="30" value="300">
+                                <input type="range" id="time-corpse" min="60" max="3600" step="60" value="300">
                                 <span id="display-corpse" style="font-size: 0.7rem; width: 40px;">300s</span>
                             </div>
                             <label class="checkbox-label"><input type="checkbox" id="bath-session-toggle"> Enable Bath Session</label>
@@ -206,6 +206,9 @@
             </div>
 
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
+            <div class="consultation-entry-actions">
+                <button id="begin-consultation" class="secondary-btn consultation-btn" type="button" data-i18n="ui.beginConsultation">Begin Session Consultation</button>
+            </div>
         </section>
 
         <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
@@ -224,6 +227,7 @@
 
         <!-- Lobby Screen -->
         <section id="lobby-screen" class="screen hidden">
+            <img class="screen-brand-logo lobby-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
             <h1 id="lobby-title">Meditation Room</h1>
             <div class="time-selector">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
@@ -270,7 +274,431 @@
             <div class="lobby-actions">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
-                <button id="begin-consultation" class="secondary-btn consultation-btn" type="button">Begin Session Consultation</button>
+            </div>
+        </section>
+
+        <!-- Consultation Entry Screen (first implementation slice) -->
+        <section id="consultation-screen" class="screen hidden consultation-screen">
+            <img class="screen-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
+            <h1 data-i18n="ui.consultationTitle">Session Consultation</h1>
+            <p class="subtitle" data-i18n="ui.consultationSubtitle">Prepare a personal session plan with your guide.</p>
+            <form id="consultation-form" class="consultation-form">
+                <div class="consultation-card">
+                    <label for="consultation-name" data-i18n="ui.consultationName">Client name</label>
+                    <input id="consultation-name" name="name" type="text" autocomplete="name" required>
+
+                    <label for="consultation-citizenship" data-i18n="ui.consultationCitizenship">Citizenship</label>
+                    <select id="consultation-citizenship" name="citizenship" autocomplete="country-name" required>
+                        <option value="" data-i18n="ui.consultationSelectCountry">Select country</option>
+                        <option value="IN" data-dial-code="+91">India</option>
+                        <option value="US" data-dial-code="+1">United States</option>
+                        <option value="GB" data-dial-code="+44">United Kingdom</option>
+                        <option value="CA" data-dial-code="+1">Canada</option>
+                        <option value="AU" data-dial-code="+61">Australia</option>
+                        <option value="NZ" data-dial-code="+64">New Zealand</option>
+                        <option value="AE" data-dial-code="+971">United Arab Emirates</option>
+                        <option value="SA" data-dial-code="+966">Saudi Arabia</option>
+                        <option value="SG" data-dial-code="+65">Singapore</option>
+                        <option value="MY" data-dial-code="+60">Malaysia</option>
+                        <option value="LK" data-dial-code="+94">Sri Lanka</option>
+                        <option value="DE" data-dial-code="+49">Germany</option>
+                        <option value="FR" data-dial-code="+33">France</option>
+                        <option value="IT" data-dial-code="+39">Italy</option>
+                        <option value="ES" data-dial-code="+34">Spain</option>
+                        <option value="NL" data-dial-code="+31">Netherlands</option>
+                        <option value="CH" data-dial-code="+41">Switzerland</option>
+                        <option value="JP" data-dial-code="+81">Japan</option>
+                        <option value="KR" data-dial-code="+82">South Korea</option>
+                        <option value="CN" data-dial-code="+86">China</option>
+                        <option value="BR" data-dial-code="+55">Brazil</option>
+                        <option value="ZA" data-dial-code="+27">South Africa</option>
+                        <option value="OTHER" data-dial-code="">Other / enter code manually</option>
+                    </select>
+                    <label for="consultation-contact" data-i18n="ui.consultationContact">Contact number</label>
+                    <input id="consultation-contact" name="contactNumber" type="tel" autocomplete="tel" inputmode="tel" required>
+                    <label for="consultation-email" data-i18n="ui.consultationEmail">Email address</label>
+                    <input id="consultation-email" name="email" type="email" autocomplete="email" required>
+
+                    <fieldset class="consultation-focus-fieldset">
+                        <legend data-i18n="ui.consultationSafetySection">Safety Review</legend>
+                        <label for="consultation-emergency-name" data-i18n="ui.consultationEmergencyName">Emergency contact name</label>
+                        <input id="consultation-emergency-name" name="emergencyName" type="text" autocomplete="off">
+                        <label for="consultation-emergency-phone" data-i18n="ui.consultationEmergencyPhone">Emergency contact phone</label>
+                        <input id="consultation-emergency-phone" name="emergencyPhone" type="tel" autocomplete="off" inputmode="tel">
+                        <label for="consultation-physical" data-i18n="ui.consultationPhysical">Any injury, back pain, or difficulty sitting or lying down for a long time?</label>
+                        <select id="consultation-physical" name="physical" required>
+                            <option value="no" data-i18n="ui.consultationNo">No</option>
+                            <option value="yes" data-i18n="ui.consultationYes">Yes</option>
+                        </select>
+                        <textarea id="consultation-physical-details" name="physicalDetails" rows="2" class="hidden" placeholder="Share only what the guide needs to adapt the session."></textarea>
+                        <label for="consultation-medication" data-i18n="ui.consultationMedication">Are you taking prescribed medication that may affect alertness, movement, breathing, balance, or participation?</label>
+                        <select id="consultation-medication" name="medication" required>
+                            <option value="no" data-i18n="ui.consultationNo">No</option>
+                            <option value="yes" data-i18n="ui.consultationYes">Yes</option>
+                            <option value="private" data-i18n="ui.consultationPrivate">Prefer to discuss privately with the guide</option>
+                        </select>
+                        <textarea id="consultation-medication-details" name="medicationDetails" rows="2" class="hidden" placeholder="Do not include medication details in the consent video."></textarea>
+                        <label for="consultation-pregnancy" data-i18n="ui.consultationPregnancy">Pregnancy, possible pregnancy, or recent childbirth?</label>
+                        <select id="consultation-pregnancy" name="pregnancy" required>
+                            <option value="no" data-i18n="ui.consultationNo">No</option>
+                            <option value="yes" data-i18n="ui.consultationYes">Yes</option>
+                            <option value="postpartum" data-i18n="ui.consultationRecentChildbirth">Recent childbirth</option>
+                            <option value="private" data-i18n="ui.consultationPrivate">Prefer to discuss privately with the guide</option>
+                        </select>
+                        <label for="consultation-stimulation" data-i18n="ui.consultationStimulation">Any history of seizures, photosensitivity, or sensitivity to rhythmic audio/visual stimulation?</label>
+                        <select id="consultation-stimulation" name="stimulation" required>
+                            <option value="no" data-i18n="ui.consultationNo">No</option>
+                            <option value="yes" data-i18n="ui.consultationYes">Yes</option>
+                            <option value="private" data-i18n="ui.consultationPrivate">Prefer to discuss privately with the guide</option>
+                        </select>
+                        <textarea id="consultation-stimulation-details" name="stimulationDetails" rows="2" class="hidden" placeholder="The guide will review frequency, brightness, and eyes-closed settings."></textarea>
+                    </fieldset>
+
+                    <label for="consultation-experience" data-i18n="ui.consultationExperience">Have you practiced meditation before?</label>
+                    <select id="consultation-experience" name="experience" required>
+                        <option value="new" data-i18n="ui.consultationNew">No, this is new to me</option>
+                        <option value="some" data-i18n="ui.consultationSome">Yes, a little</option>
+                        <option value="regular" data-i18n="ui.consultationRegular">Yes, regularly</option>
+                    </select>
+
+                    <label for="consultation-language" data-i18n="ui.consultationMeditationLanguage">Meditation Language</label>
+                    <select id="consultation-language" name="meditationLanguage" required>
+                        <option value="ml" data-i18n="ui.malayalam">Malayalam</option>
+                        <option value="en" data-i18n="ui.english">English</option>
+                    </select>
+
+                    <label for="consultation-tone" data-i18n="ui.consultationTone">What kind of voice tone helps you anchor?</label>
+                    <select id="consultation-tone" name="tone" required>
+                        <option value="soft" data-i18n="ui.consultationToneSoft">Soft, whisper-like, and gentle</option>
+                        <option value="deep" data-i18n="ui.consultationToneDeep">Deep, resonant, and steady</option>
+                        <option value="adaptive" data-i18n="ui.consultationToneAdaptive">I have no preference</option>
+                    </select>
+
+                    <label for="consultation-voice-gender" data-i18n="ui.consultationVoiceGender">Voice preference</label>
+                    <select id="consultation-voice-gender" name="voiceGender" required>
+                        <option value="guide" data-i18n="ui.consultationVoiceGuide">Guide choice / no preference</option>
+                        <option value="female" data-i18n="ui.consultationVoiceFemale">Female voice</option>
+                        <option value="male" data-i18n="ui.consultationVoiceMale">Male voice</option>
+                    </select>
+
+                    <label for="consultation-goal" data-i18n="ui.consultationGoal">What is your primary goal today?</label>
+                    <textarea id="consultation-goal" name="goal" rows="2" required></textarea>
+
+                    <label for="consultation-reverse-journey" data-i18n="ui.consultationReverseJourney">How connected and grounded do you generally feel in everyday life?</label>
+                    <select id="consultation-reverse-journey" name="reverseJourneyNeed" required>
+                        <option value="grounded" data-i18n="ui.consultationReverseJourneyGrounded">I usually feel present and connected</option>
+                        <option value="reconnect" data-i18n="ui.consultationReverseJourneyReconnect">I sometimes feel distant or ungrounded and would like support reconnecting with everyday life</option>
+                        <option value="private" data-i18n="ui.consultationReverseJourneyPrivate">I would prefer to discuss this privately with the guide</option>
+                    </select>
+
+                    <label for="consultation-touch" data-i18n="ui.consultationTouch">Are you comfortable with touch or assistance if offered?</label>
+                    <select id="consultation-touch" name="touch" required>
+                        <option value="no" data-i18n="ui.consultationTouchNo">No</option>
+                        <option value="ask" data-i18n="ui.consultationTouchAsk">Ask me before any assistance</option>
+                        <option value="yes" data-i18n="ui.consultationTouchYes">Yes, with clear guidance and a stop signal</option>
+                    </select>
+
+                    <fieldset class="consultation-focus-fieldset">
+                        <legend data-i18n="ui.consultationFocus">Which areas would you like to receive more attention?</legend>
+                        <p class="consultation-field-hint" data-i18n="ui.consultationFocusHint">This is a personal preference, not a diagnosis. Leave all unchecked for an even journey.</p>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="root"><span data-i18n="ui.root">Root</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="sacral"><span data-i18n="ui.sacral">Sacral</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="solar"><span data-i18n="ui.solar">Solar</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="heart"><span data-i18n="ui.heart">Heart</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="throat"><span data-i18n="ui.throat">Throat</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="thirdeye"><span data-i18n="ui.thirdEye">Third Eye</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="chakraFocus" value="crown"><span data-i18n="ui.crown">Crown</span></label>
+                    </fieldset>
+
+                    <fieldset id="consultation-chakra-questions" class="consultation-focus-fieldset consultation-chakra-questions">
+                        <legend data-i18n="ui.consultationChakraQuestionsTitle">Chakra Reflection</legend>
+                        <p class="consultation-field-hint" data-i18n="ui.consultationChakraQuestionsHint">Select an area above to see reflective questions. These answers guide attention timing; they are not a diagnosis.</p>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="root">
+                            <h3 data-i18n="ui.root">Root</h3>
+                            <p data-i18n="ui.chakraRootQuestion1">How supported and grounded do you generally feel in your life?</p>
+                            <select name="chakraAnswer_root_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraRootQuestion2">Do responsibilities or uncertainty often affect your sense of stability?</p>
+                            <select name="chakraAnswer_root_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraRootQuestion3">What helps you feel settled, supported, and present over time?</p>
+                            <select name="chakraAnswer_root_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-root" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-root" name="chakraNeed_root"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_root" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="sacral">
+                            <h3 data-i18n="ui.sacral">Sacral</h3>
+                            <p data-i18n="ui.chakraSacralQuestion1">How freely do your emotions move through your daily life?</p>
+                            <select name="chakraAnswer_sacral_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraSacralQuestion2">Do you feel connected to creativity, enjoyment, and healthy expression?</p>
+                            <select name="chakraAnswer_sacral_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraSacralQuestion3">What helps you reconnect with enjoyment, creativity, or emotional ease?</p>
+                            <select name="chakraAnswer_sacral_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-sacral" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-sacral" name="chakraNeed_sacral"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_sacral" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="solar">
+                            <h3 data-i18n="ui.solar">Solar</h3>
+                            <p data-i18n="ui.chakraSolarQuestion1">How confident do you generally feel when making decisions?</p>
+                            <select name="chakraAnswer_solar_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraSolarQuestion2">Do hesitation, self-doubt, pressure, or overextension frequently affect you?</p>
+                            <select name="chakraAnswer_solar_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraSolarQuestion3">What kind of support helps you move from reflection into purposeful action?</p>
+                            <select name="chakraAnswer_solar_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-solar" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-solar" name="chakraNeed_solar"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_solar" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="heart">
+                            <h3 data-i18n="ui.heart">Heart</h3>
+                            <p data-i18n="ui.chakraHeartQuestion1">How connected do you feel to yourself and the people around you?</p>
+                            <select name="chakraAnswer_heart_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraHeartQuestion2">Is self-kindness easy for you, or do you often place others first?</p>
+                            <select name="chakraAnswer_heart_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraHeartQuestion3">What helps you feel connected, understood, and able to receive care?</p>
+                            <select name="chakraAnswer_heart_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-heart" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-heart" name="chakraNeed_heart"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_heart" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="throat">
+                            <h3 data-i18n="ui.throat">Throat</h3>
+                            <p data-i18n="ui.chakraThroatQuestion1">How freely do you communicate your needs, feelings, and boundaries?</p>
+                            <select name="chakraAnswer_throat_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraThroatQuestion2">Do you generally feel heard and understood?</p>
+                            <select name="chakraAnswer_throat_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraThroatQuestion3">What would help you express what matters to you with more ease?</p>
+                            <select name="chakraAnswer_throat_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-throat" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-throat" name="chakraNeed_throat"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_throat" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="thirdeye">
+                            <h3 data-i18n="ui.thirdEye">Third Eye</h3>
+                            <p data-i18n="ui.chakraThirdEyeQuestion1">How clear and focused does your mind generally feel?</p>
+                            <select name="chakraAnswer_thirdeye_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraThirdEyeQuestion2">Do you often experience overthinking, distraction, or uncertainty?</p>
+                            <select name="chakraAnswer_thirdeye_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraThirdEyeQuestion3">What kind of support helps you find perspective and return to one clear focus?</p>
+                            <select name="chakraAnswer_thirdeye_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-thirdeye" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-thirdeye" name="chakraNeed_thirdeye"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_thirdeye" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                        <div class="consultation-chakra-question hidden" data-chakra-question="crown">
+                            <h3 data-i18n="ui.crown">Crown</h3>
+                            <p data-i18n="ui.chakraCrownQuestion1">How connected do you feel to meaning, purpose, or inner stillness?</p>
+                            <select name="chakraAnswer_crown_1" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraCrownQuestion2">Would silence, spaciousness, or gentle contemplation support your ongoing journey?</p>
+                            <select name="chakraAnswer_crown_2" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <p data-i18n="ui.chakraCrownQuestion3">What gives your life a sense of meaning, perspective, or quiet renewal?</p>
+                            <select name="chakraAnswer_crown_3" class="chakra-reflection-answer"><option value="often" data-i18n="ui.chakraAnswerOften">Often true for me</option><option value="sometimes" data-i18n="ui.chakraAnswerSometimes">Sometimes true</option><option value="rarely" data-i18n="ui.chakraAnswerRarely">Rarely true</option><option value="prefer-not" data-i18n="ui.chakraAnswerPreferNot">Prefer not to answer</option></select>
+                            <label for="chakra-need-crown" data-i18n="ui.consultationChakraAttention">How much attention would support your ongoing practice?</label>
+                            <select id="chakra-need-crown" name="chakraNeed_crown"><option value="standard" data-i18n="ui.consultationAttentionStandard">Balanced attention</option><option value="support" data-i18n="ui.consultationAttentionSupport">Some additional support</option><option value="more" data-i18n="ui.consultationAttentionMore">More attention</option><option value="skip" data-i18n="ui.consultationAttentionSkip">Prefer not to answer</option></select>
+                            <textarea name="chakraNote_crown" rows="2" data-i18n-placeholder="ui.consultationChakraNotePlaceholder" placeholder="Optional private note for the guide"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="consultation-focus-fieldset consultation-care-fieldset">
+                        <legend data-i18n="ui.consultationMovementCare">Movement and Care Preferences</legend>
+                        <label for="consultation-yoga-enabled" data-i18n="ui.consultationYoga">Include Yoga Bridge?</label>
+                        <select id="consultation-yoga-enabled" name="yogaBridge">
+                            <option value="no" data-i18n="ui.consultationNo">No</option>
+                            <option value="yes" data-i18n="ui.consultationYes">Yes</option>
+                        </select>
+                        <p id="consultation-yoga-restriction-note" class="consultation-field-hint hidden" role="alert" data-i18n="ui.consultationYogaRestricted">Yoga is unavailable while an injury or back limitation is selected. The guide will review the plan.</p>
+                        <p id="consultation-yoga-pose-restriction-note" class="consultation-field-hint hidden" role="alert" data-i18n="ui.consultationYogaPoseRestricted">Yoga Bridge may remain in the plan, but poses are unavailable for pregnancy or possible pregnancy. The guide will review the remaining options.</p>
+                        <div id="consultation-yoga-options" class="consultation-care-options hidden">
+                            <span class="consultation-field-label consultation-yoga-pose-option" data-i18n="ui.consultationYogaPoses">Yoga poses</span>
+                            <label class="consultation-yoga-pose-option checkbox-label"><input type="checkbox" name="yogaPose" value="vrikshasana"><span>Vrikshasana</span></label>
+                            <label class="consultation-yoga-pose-option checkbox-label"><input type="checkbox" name="yogaPose" value="adho_mukha_svanasana"><span>Downward Dog</span></label>
+                            <label class="consultation-yoga-pose-option checkbox-label"><input type="checkbox" name="yogaPose" value="marjaryasana"><span>Marjaryasana</span></label>
+                            <label class="consultation-yoga-pose-option checkbox-label"><input type="checkbox" name="yogaPose" value="balasana"><span>Balasana</span></label>
+                            <label class="consultation-yoga-pose-option checkbox-label"><input type="checkbox" name="yogaPose" value="ananda_balasana"><span>Ananda Balasana</span></label>
+                            <div class="consultation-yoga-pose-timing"><label for="consultation-yoga-prep" data-i18n="ui.preparation">Preparation</label>
+                            <select id="consultation-yoga-prep" name="yogaPrep"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">120s</option></select></div>
+                            <div class="consultation-yoga-pose-timing"><label for="consultation-yoga-pose-time" data-i18n="ui.perPose">Per Pose</label>
+                            <select id="consultation-yoga-pose-time" name="yogaPoseTime"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">120s</option></select></div>
+                            <label for="consultation-bath-enabled" data-i18n="ui.bathSession">Include Bath Session?</label>
+                            <select id="consultation-bath-enabled" name="bathSession"><option value="no" data-i18n="ui.consultationNo">No</option><option value="yes" data-i18n="ui.consultationYes">Yes</option></select>
+                            <div id="consultation-bath-options" class="consultation-care-options hidden">
+                                <label for="consultation-bath-time" data-i18n="ui.bathDuration">Bath Duration</label>
+                                <select id="consultation-bath-time" name="bathTime"><option value="300">5m</option><option value="600" selected>10m</option><option value="900">15m</option></select>
+                                <p class="consultation-field-hint" data-i18n="ui.consultationBathSelfDirected">Standard Bath is self-directed. The additional care stages below require touch or assistance approval.</p>
+                                <div id="consultation-touch-care-options" class="consultation-touch-care-options">
+                                <label class="checkbox-label"><input type="checkbox" name="massage" value="yes"><span data-i18n="ui.massage">Massage</span></label>
+                                <label for="consultation-massage-time" data-i18n="ui.massageDuration">Massage Duration</label>
+                                <select id="consultation-massage-time" name="massageTime"><option value="300">5m</option><option value="600" selected>10m</option><option value="900">15m</option></select>
+                                <label class="checkbox-label"><input type="checkbox" name="perinealCare" value="yes"><span data-i18n="ui.perinealCare">Perineal Care</span></label>
+                                <label for="consultation-perineal-time" data-i18n="ui.perinealCareDuration">Perineal Duration</label>
+                                <select id="consultation-perineal-time" name="perinealTime"><option value="180">3m</option><option value="300" selected>5m</option><option value="600">10m</option></select>
+                                <label class="checkbox-label"><input type="checkbox" name="assistedBathing" value="yes"><span data-i18n="ui.assistedBathing">Assisted Bathing</span></label>
+                                <label for="consultation-assisted-time" data-i18n="ui.assistedBathingDuration">Assisted Duration</label>
+                                <select id="consultation-assisted-time" name="assistedTime"><option value="300">5m</option><option value="600" selected>10m</option><option value="900">15m</option></select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="consultation-focus-fieldset consultation-sensitivity-fieldset">
+                        <legend data-i18n="ui.consultationSensitivities">Anything to avoid or adjust?</legend>
+                        <p class="consultation-field-hint" data-i18n="ui.consultationSensitivityOptionsHint">Select any area you would like the guide to review.</p>
+                        <label class="checkbox-label"><input type="checkbox" name="sensitivityType" value="audio"><span data-i18n="ui.consultationSensitivityAudio">Audio or voice</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="sensitivityType" value="imagery"><span data-i18n="ui.consultationSensitivityImagery">Imagery or visualisation</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="sensitivityType" value="movement"><span data-i18n="ui.consultationSensitivityMovement">Movement or body position</span></label>
+                        <label class="checkbox-label"><input type="checkbox" name="sensitivityType" value="wording"><span data-i18n="ui.consultationSensitivityWording">Wording or prompts</span></label>
+                        <textarea id="consultation-sensitivities" name="sensitivities" rows="2" placeholder="Optional private note for the guide."></textarea>
+                        <p class="consultation-field-hint" data-i18n="ui.consultationSensitivitiesGuidePrompt">Optional. If blank, the guide should ask about sensitivities privately before approval.</p>
+                    </fieldset>
+
+                    <label for="consultation-readiness" data-i18n="ui.consultationReadiness">What will you do after the session?</label>
+                    <select id="consultation-readiness" name="readiness" required>
+                        <option value="rest" data-i18n="ui.consultationAfterRest">Rest or continue quietly</option>
+                        <option value="drive" data-i18n="ui.consultationAfterDrive">Drive soon</option>
+                        <option value="exercise" data-i18n="ui.consultationAfterExercise">Physical exercise soon</option>
+                        <option value="work" data-i18n="ui.consultationAfterWork">Return to work or activity</option>
+                    </select>
+
+                    <label for="consultation-sleep" data-i18n="ui.consultationSleep">How should Sleep Mode be considered?</label>
+                    <select id="consultation-sleep" name="sleepMode" required>
+                        <option value="guide" data-i18n="ui.consultationSleepGuide">Guide to decide</option>
+                        <option value="needed" data-i18n="ui.consultationSleepNeeded">I would like sleep-supportive guidance</option>
+                        <option value="not-needed" data-i18n="ui.consultationSleepNotNeeded">I do not need Sleep Mode</option>
+                    </select>
+
+                    <fieldset id="consultation-savasana-fieldset" class="consultation-focus-fieldset">
+                        <legend data-i18n="ui.consultationSavasanaSection">Final Rest / Savasana</legend>
+                        <label class="checkbox-label"><input id="consultation-corpse" type="checkbox" name="corpsePose" value="yes"><span data-i18n="ui.corpsePoseOption">Enable Savasana</span></label>
+                        <label for="consultation-corpse-time" data-i18n="ui.corpsePoseDuration">Savasana duration</label>
+                        <select id="consultation-corpse-time" name="corpseTime"><option value="60">1m</option><option value="300" selected>5m</option><option value="600">10m</option><option value="1800">30m</option><option value="3600">60m</option></select>
+                        <p id="consultation-savasana-sleep-note" class="consultation-field-hint hidden" data-i18n="ui.consultationSavasanaSleepNote">Sleep Mode selected: Savasana is set to 60 minutes for restorative rest.</p>
+                    </fieldset>
+
+                    <label for="consultation-reflection" data-i18n="ui.consultationReflection">Would reflective forgiveness practice help with regret or something unresolved?</label>
+                    <select id="consultation-reflection" name="hooponopono" required>
+                        <option value="no" data-i18n="ui.consultationNo">No</option>
+                        <option value="yes" data-i18n="ui.consultationYes">Yes, gently</option>
+                    </select>
+                </div>
+                <p class="consultation-note" data-i18n="ui.consultationDraftNote">This saves a local session-plan draft. Consent recording and sharing will be added in a later step.</p>
+                <div class="consultation-actions">
+                    <button id="cancel-consultation" class="link-btn" type="button" data-i18n="ui.cancel">Cancel</button>
+                    <button id="save-consultation" class="primary-btn" type="submit" data-i18n="ui.saveConsultation">Save and Continue to Lobby</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="consultation-review-screen" class="screen hidden consultation-screen">
+            <img class="screen-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
+            <h1 data-i18n="ui.consultationReviewTitle">Guide Review</h1>
+            <p class="subtitle" data-i18n="ui.consultationReviewSubtitle">Review the plan before it is applied to the Lobby.</p>
+            <div id="consultation-review-summary" class="consultation-card consultation-review-summary"></div>
+            <div id="consultation-review-advice" class="consultation-review-advice hidden" role="alert"></div>
+            <div class="consultation-card consultation-approval-card">
+                <label class="checkbox-label">
+                    <input id="review-audio-filters" type="checkbox">
+                    <span data-i18n="ui.consultationApplyAudio">Apply gentle audio warmth and filter guidance</span>
+                </label>
+                <label class="checkbox-label">
+                    <input id="review-hooponopono" type="checkbox">
+                    <span data-i18n="ui.consultationApplyReflection">Include reflective forgiveness practice</span>
+                </label>
+                <label id="review-reverse-journey-row" class="checkbox-label hidden">
+                    <input id="review-reverse-journey" type="checkbox">
+                    <span data-i18n="ui.consultationApplyReverseJourney">Apply Reverse Journey as a guide-approved grounding sequence</span>
+                </label>
+                <label id="review-safety-row" class="checkbox-label hidden">
+                    <input id="review-safety-confirm" type="checkbox">
+                    <span data-i18n="ui.consultationSafetyConfirm">I have reviewed the flagged safety information and will adapt or discuss the session before starting.</span>
+                </label>
+                <label id="review-manual-only-row" class="checkbox-label hidden">
+                    <input id="review-manual-only" type="checkbox">
+                    <span data-i18n="ui.consultationManualOnlyConfirm">I understand this plan must be delivered manually by the guide, without the app's guided audio.</span>
+                </label>
+                <label for="review-guide-notes" data-i18n="ui.consultationGuideNotes">Guide review notes</label>
+                <textarea id="review-guide-notes" rows="4" data-i18n-placeholder="ui.consultationGuideNotesPlaceholder" placeholder="Record important decisions, adaptations, or follow-up points for this session."></textarea>
+                <p class="consultation-note" data-i18n="ui.consultationReviewSleep">Sleep Mode remains decided by the existing evening prompt at journey start.</p>
+            </div>
+            <div class="consultation-actions">
+                <button id="edit-consultation" class="link-btn" type="button" data-i18n="ui.editConsultation">Edit Intake</button>
+                <button id="review-print" class="secondary-btn" type="button" data-i18n="ui.consultationPrintA4">Print / Save as PDF</button>
+                <button id="save-manual-plan" class="primary-btn hidden" type="button" data-i18n="ui.consultationSaveManualPlanOnly">Save Manual Plan</button>
+                <button id="return-manual-lobby" class="secondary-btn hidden" type="button" data-i18n="ui.consultationReturnLobby">Return to Lobby</button>
+                <button id="approve-consultation" class="primary-btn" type="button" data-i18n="ui.approveConsultation">Approve Plan and Continue</button>
+            </div>
+        </section>
+
+        <section id="consultation-consent-screen" class="screen hidden consultation-screen">
+            <div id="consent-review-stage" class="consent-stage">
+                <img class="screen-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
+                <h1 data-i18n="ui.consentTitle">Consent Confirmation</h1>
+                <p class="subtitle" data-i18n="ui.consentSubtitle">Read the confirmation aloud while the guide records.</p>
+                <div class="consent-live-stage">
+                    <video id="consent-live-preview" class="consent-live-preview" muted autoplay playsinline></video>
+                    <div class="consent-live-caption" data-i18n="ui.consentLivePreview">Live camera preview</div>
+                </div>
+                <div class="consent-prompter" role="article" aria-labelledby="consent-prompt-label">
+                    <div id="consent-prompt-label" class="consent-prompt-label" data-i18n="ui.consentPromptLabel">Read this confirmation</div>
+                    <p id="consent-prompt-text" class="consent-prompt-text"></p>
+                </div>
+                <p class="consent-scroll-hint" data-i18n="ui.consentReviewHint">Read the complete confirmation before continuing.</p>
+                <div class="consent-review-actions">
+                    <button id="consent-continue-to-recording" class="primary-btn" type="button" data-i18n="ui.consentContinueToRecording">Continue to Recording</button>
+                    <button id="consent-review-cancel" class="link-btn" type="button" data-i18n="ui.cancel">Cancel</button>
+                </div>
+            </div>
+
+            <div id="consent-record-stage" class="consent-stage hidden">
+                <div class="teleprompter-shell">
+                    <div class="teleprompter-camera-layer"></div>
+                    <div class="teleprompter-gradient"></div>
+                    <div class="teleprompter-topbar">
+                        <div class="teleprompter-recording-indicator">
+                            <span class="teleprompter-recording-dot" aria-hidden="true"></span>
+                            <span id="consent-recording-clock">00:00</span>
+                        </div>
+                        <div class="teleprompter-badge" data-i18n="ui.consentTeleprompter">Consent teleprompter</div>
+                    </div>
+                    <div id="teleprompter-copy-slot" class="teleprompter-copy-slot"></div>
+                    <div id="consent-countdown" class="teleprompter-countdown hidden" aria-live="assertive"></div>
+                    <div class="teleprompter-speed-control">
+                        <label for="consent-scroll-speed" data-i18n="ui.consentScrollSpeed">Reading speed</label>
+                        <input id="consent-scroll-speed" type="range" min="8" max="24" step="1" value="14">
+                        <output id="consent-scroll-speed-value" for="consent-scroll-speed">Comfortable</output>
+                    </div>
+                    <p id="consent-recording-status" class="consent-recording-status" role="status" aria-live="polite" data-i18n="ui.consentReady">Ready when you are.</p>
+                    <div class="consent-actions" role="group" data-i18n-aria-label="ui.consentCameraControls">
+                        <button id="consent-record" class="camera-control camera-record" type="button" aria-label="Start Recording" data-i18n-aria-label="ui.startRecording"><span aria-hidden="true"></span></button>
+                        <button id="consent-pause" class="camera-control hidden" type="button" aria-label="Pause or resume recording" data-i18n-aria-label="ui.pauseRecording"><span aria-hidden="true">Ⅱ</span></button>
+                        <button id="consent-stop" class="camera-control hidden" type="button" aria-label="Stop Recording" data-i18n-aria-label="ui.stopRecording"><span aria-hidden="true">■</span></button>
+                        <button id="consent-cancel" class="camera-control" type="button" aria-label="Cancel" data-i18n-aria-label="ui.cancel"><span aria-hidden="true">×</span></button>
+                    </div>
+                </div>
+                <canvas id="consent-composite-canvas" class="hidden" width="1280" height="720" aria-hidden="true"></canvas>
+            </div>
+
+            <div id="consent-preview-stage" class="consent-stage consent-preview-stage hidden">
+                <img class="screen-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
+                <h1 data-i18n="ui.consentPreviewTitle">Review Recording</h1>
+                <p class="subtitle" data-i18n="ui.consentPreviewHint">Play the recording before accepting it.</p>
+                <div class="consent-preview-sequence" aria-label="Recording sequence" data-i18n-aria-label="ui.consentPreviewSequence">
+                    <div class="consent-preview-step">
+                        <span>1</span>
+                        <div><strong data-i18n="ui.consentPlanVideoTitle">Approved Session Plan</strong><small id="consent-preview-plan-count"></small></div>
+                    </div>
+                    <div class="consent-preview-separator" aria-hidden="true">→</div>
+                    <div class="consent-preview-step">
+                        <span>2</span>
+                        <div><strong data-i18n="ui.consentSpokenSection">Spoken Consent</strong><small data-i18n="ui.consentSpokenSectionHint">Script, voice, timer, and camera thumbnail</small></div>
+                    </div>
+                </div>
+                <video id="consent-video-preview" class="consent-video-preview" controls playsinline></video>
+                <p id="consent-recording-metadata" class="consent-recording-metadata" role="status" aria-live="polite"></p>
+                <div class="consent-preview-actions">
+                    <button id="consent-retry" class="secondary-btn" type="button" data-i18n="ui.retryRecording">Retry Recording</button>
+                    <button id="consent-submit" class="primary-btn" type="button" data-i18n="ui.submitConsent">Accept and Continue</button>
+                </div>
+                <p class="consultation-note" data-i18n="ui.consentLocalNote">This prototype keeps the recording in memory only. Secure sharing will be added later.</p>
             </div>
         </section>
 
@@ -299,6 +727,7 @@
 
         <!-- Meditation Screen -->
         <section id="meditation-screen" class="screen hidden">
+            <img class="meditation-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
             <div id="chakra-container" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <img id="chakra-symbol" alt="Meditation symbol" style="width: 100%; height: 100%; object-fit: contain;">
                 <div id="glow-effect"></div>
@@ -413,6 +842,7 @@
         <div id="completion-modal" class="modal hidden">
             <div class="gold-burst"></div>
             <div class="modal-content">
+                <img class="completion-brand-logo" src="symbols/logo_453x453.png" alt="Chakra Meditation">
                 <div class="completion-icon">🕉️</div>
                 <div class="gold-line"></div>
                 <h2 id="completion-title">Journey Complete</h2>
@@ -439,6 +869,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.60"></script>
+    <script src="app.js?v=1.76"></script>
 </body>
 </html>

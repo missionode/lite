@@ -67,7 +67,7 @@
 - Added the HRIM duration slider, mobile range controls, mutual exclusion with Music Only, locale-backed HRIM intention defaults that preserve custom intentions, storage migration/defaulting, service-worker cache entry for the background-only image, and cache/version bumps. Browser validation completed at `browser` evidence level: 22/22 Playwright tests passed. `test-script.json` receives short test content for new script fields, while `docs/dot.json` receives additive fields only because it is a custom facilitator script.
 - Moved Sleep Mode out of the Lobby. At or after 6:00 PM local device time, the journey-start flow asks whether to continue with or without Sleep Mode before the existing Do Not Disturb reminder. The decision applies only to that journey; daytime journeys reset Sleep Mode off.
 - Refined the evening Sleep Mode prompt with compact, consistently spaced mobile actions: “Continue with Sleep Mode On” and a red “Continue with Sleep Mode Off” action for clear visibility. Browser validation now covers 25/25 tests.
-- Verified the Corpse Pose timing control in both fast-test and production profiles; its value changes, display, persistence, and 60–600 second production bounds are working.
+- Verified the Corpse Pose timing control in both fast-test and production profiles; its value changes, display, persistence, and 60–3600 second production bounds are working. The production maximum is now 1 hour.
 - Fixed the Corpse Pose range-control visual styling by giving the current value a responsive minimum width, centered outline, and tabular-number layout; bumped the stylesheet cache version to `1.52`.
 - Corrected the remaining Corpse Pose-only column alignment bug by removing the inline `display:flex` override from the dynamic timing-row visibility helper; enhanced timing rows now retain their grid layout when shown.
 - Reorganized Settings into Chakra Journey, Guided Practices, Comfort & Visuals, and Yoga Bridge sections. Corpse Pose and its timing now live under Yoga Bridge and default off for new setups; Reverse Journey and Chakra Frequencies live under Chakra Journey. Added a localized Settings help modal. Browser validation now covers 27/27 tests.
@@ -102,12 +102,155 @@
 - Audited mantra wording and pronunciation: canonical identifiers remain `LAM`, `VAM`, `RAM`, `YAM`, `HAM`, `OM`, `AUM`, and `HRIM`; English spoken narration now uses contextual forms such as “The Lam mantra” and “Hreem mantra,” while Malayalam uses the native forms such as `ഹ്രീം`. This keeps the HRIM key and `HREEM.mp3` asset stable while giving English Piper a clearer pronunciation input.
 - Confirmed Piper transport behavior: narration is segmented with explicit lead-in/sentence-gap timing; pause suspends the AudioContext and blocks queue advancement; stop/restart cancels the active source, clears queued synthesis, and terminates the Worker. Fixed persisted volume loading so `0` remains a true mute after reload. Focused Playwright validation passed 2/2 for mantra wording and mute persistence; syntax, JSON, and diff checks also passed.
 - Consultation architecture is documented in `TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md` as planning-only. The first implementation is single-participant: HRIM and Music Only stay in the Lobby, Reverse Journey stays in Settings, Sleep Mode is collected as a preference but remains governed by the evening runtime prompt, and Yoga remains compatible with Sleep Mode. No consultation production code, recording backend, or video-sharing infrastructure has started.
-- Added the Lobby entry point CTA `Begin Session Consultation`, localized in English and Malayalam. It is currently a non-mutating placeholder that preserves the existing meditation flow until the consultation screen/state machine is implemented.
+- Added the Lobby entry point CTA `Begin Session Consultation`, localized in English and Malayalam. It opens the first single-participant intake screen, saves a local versioned `sessionPlan` draft, and returns to Lobby without changing the existing meditation flow. Consent recording, secure sharing, guide review, adaptive timing automation, and couple support remain pending.
+- Added a Playwright regression for the consultation entry, required fields, local plan persistence, and Lobby return path.
+- Implemented the first consultation intake slice: a mobile-friendly, localized single-participant form opened from the Lobby CTA. It stores a versioned local draft with profile, goal, safety, tone, readiness, Sleep Mode preference, and reflective-practice preference, then returns to Lobby. Focused Playwright validation passed 1/1; `node --check`, locale JSON parsing, and `git diff --check` also passed.
+- Added the guide-review slice between intake and Lobby. The guide can edit the intake or explicitly approve audio-filter and reflective-practice settings; the approved plan is marked `guide-approved` and stored with an approval timestamp. Sleep Mode remains controlled by the existing evening journey prompt. Focused Playwright validation passed 1/1.
+- Added the local consent-prompter slice after guide approval. It displays a readable consent script, supports MediaRecorder start/pause/resume/stop/retry/preview/submit states, and marks the plan `consent-recorded` only after a completed recording. The recording Blob remains memory-only; no upload or sharing exists yet. Focused Playwright coverage passes the consent-screen entry 1/1, while camera/microphone permission and real-device recording remain manual gates.
+- Added the consent preparation countdown and enforced touch-safety mapping. A `touch = no` consultation answer clears Massage, Perineal Care, and Assisted Bathing at approved-plan application time and records `disabled-by-client` in the plan; incomplete recordings and cancelled countdowns are discarded. A Chromium fake-media attempt could not expose a usable recording stream in this environment, so automated coverage remains at consent-screen entry and real recording is a manual device gate.
+- Added adaptive chakra timing to the consultation plan. The client can request more attention for selected centers; bounded per-chakra durations are calculated inside the existing total practice budget and are consumed only after consent is recorded. The existing `timePerChakra` slider remains the fallback. Focused Playwright validation passed 1/1 after correcting the fast-test fixture to use a one-minute base duration.
+- Added the missing consultation Movement and Care section. It now exposes Yoga Bridge, pose selection, Yoga preparation/per-pose/Corpse Pose timings, Bath Session, Massage, Perineal Care, Assisted Bathing, and corresponding timings. Dependency enforcement matches Settings, including touch refusal clearing sensitive care stages and Assisted Bathing replacing standard Bath. Focused Playwright validation passed 1/1.
+- Refined the UI dependency hierarchy so Yoga Bridge reveals Bath Session first, while Massage, Perineal Care, and Assisted Bathing are grouped under touch/assistance approval. Standard Bath is explicitly labeled self-directed; declining touch hides and disables the add-on area. Focused Playwright validation passed 1/1.
+- Reordered the consultation intake to collect Touch/Assistance Preference before Yoga and Care choices. The resulting order is `Touch preference → Yoga Bridge → Bath Session → Massage/Perineal Care/Assisted Bathing`; focused Playwright validation passed 1/1.
+- Added consultation voice preference (Guide choice, Female, Male) and gender metadata to the Piper registry. The approved plan selects a matching installed Piper voice after consent, or safely retains the current voice when the requested gender is unavailable. Focused Playwright validation passed 1/1.
+- Bumped the app shell, stylesheet, and service-worker cache versions after the consultation UI additions so existing PWA installs refresh instead of serving an older shell that lacks the consultation screens. Headless consultation flow remains passing 1/1.
+- Tightened consultation validation: identity, experience, tone/voice preference, goal, sensitivities, touch preference, post-session readiness, Sleep Mode preference, and reflective-practice choice are required; Chakra focus and Yoga/Care add-ons remain optional, with at least one pose required when Yoga is enabled. Focused Playwright validation passed 1/1.
+- Revised sensitivities/avoidances to optional: the guide is prompted to ask privately in person when the field is blank. Moved Corpse Pose/Savasana permanently to the final restorative position: Sleep Mode decision → preparation/gratitude → chakras → Yoga/Care → silence → closing → optional Ho’oponopono → Corpse Pose → completion. HRIM intentionally skips Corpse Pose.
+- Increased production Savasana duration from 10 minutes to 60 minutes. The consultation offers 1, 5, 10, 30, and 60-minute choices; fast-test bounds remain unchanged.
+- Connected consultation Sleep Mode preference to the separate Final Rest/Savasana section: `Sleep Mode = needed` auto-enables Savasana at 60 minutes with an explanatory note, while changing away from it clears only that sleep-derived choice. Independent Savasana selection remains available.
+- Added the Safety Review section: emergency contact, physical limitations, medication effects relevant to participation, pregnancy/postpartum status, and seizure/photosensitivity or rhythmic audio/visual sensitivity. Conditional details are required when applicable, sensitive answers stay out of the consent script, and flagged stimulation sensitivity conservatively disables frequencies pending guide review. Focused Playwright validation passed 1/1.
+- Added a required Guide Review acknowledgment for any flagged Safety Review answer; flagged plans cannot be approved silently.
+- Replaced the single sensitivity text prompt with selectable Audio/Voice, Imagery, Movement, and Wording options plus an optional private note. Selected sensitivity areas require Guide Review, and Movement/Care now appears below Sleep Mode in the intake order.
+
+### Full-width action spacing checkpoint — 2026-08-09
+
+- All full-width action buttons now use a 10px inline margin and `calc(100% - 20px)` for mobile breathing room across Lobby, consultation, consent, Sleep Mode, and HRIM action groups.
+- Stylesheet query: `style.css?v=1.57`; app cache: `chakra-v5.29`.
+
+### Consultation reconciliation and full Playwright audit — 2026-08-09
+
+- Status: current single-participant consultation scope implemented and validated; working tree changes remain uncommitted.
+- Full test command: `npm run test:e2e`; result: **33 passed (2.0m)** using the explicit `fast-test` timing profile.
+- Static validation: `node --check app.js`, JSON parsing for runtime manifests/configuration, and `git diff --check` passed.
+- Reconciled `TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`: completed intake, review, consent-propter, safety-routing, adaptive-timing, care-dependency, contact-field, localization, and mobile-spacing items were removed from the open list. The file remains intentionally open only for production video infrastructure, real-device recording validation, expanded combination/negative tests, native-language/device validation, and future couple support.
+- Browser limitation: the in-app browser backend was unavailable in this environment, so the verified browser evidence is repository Playwright CLI coverage through the local static server.
+- Production readiness remains separate from implementation completion: secure sharing, authenticated storage, retention/deletion, audit logging, privacy/legal review, and physical-device media tests are not complete.
+- Guide Review now highlights flagged safety rows, including `private` answers, and persists a guide notes field for decisions, adaptations, and follow-up. Focused regression passed 1/1 after this addition.
+- Manual Guide Only review now provides printer-friendly A4 `Print / Save as PDF`, `Save Manual Plan`, and `Return to Lobby` actions. Saving and returning are separate; the print action opens the browser’s standard PDF-capable print dialog and does not upload data.
+- Removed the unreliable SVG download path. The reusable source remains the local versioned session plan, which can be printed again from the review screen before leaving it. Focused Playwright validation passed 1/1.
+- Fixed the A4 print popup by removing restrictive popup features that produced a blank tab. Manual CTAs now use explicit print-safe colors; Playwright verifies the opened print document contains `Manual Session Plan`.
+- Replaced the popup print window with a hidden same-page print frame to avoid `about:blank` print artifacts. Centered the document header and expanded chakra review output so every question, answer, attention level, duration, and guide note is individually labeled. Focused Playwright validation passed 1/1.
+- Guarded the print trigger so the preview opens only once, and added explicit 10px card-edge spacing for the review summary on mobile.
+- Strengthened the review CTA hit areas with a local stacking context, explicit pointer interaction, and mobile touch behavior to prevent intermittent click misses.
+- Added explicit mobile horizontal-overflow containment and a Playwright viewport-width assertion for the consultation review screen and app shell.
 
 ## Documentation checkpoint
 
+### Sensitivity routing checkpoint — 2026-08-09
+
+- Status: implemented and locally validated; changes are uncommitted working tree edits.
+- Guide Review now shows explicit advice for movement, imagery, and audio/wording sensitivity.
+- Movement sensitivity clears all Yoga/Care/Savasana selections and records `approvedSettings.movementStages = removed-by-guide-review`; a non-movement guided format may continue if the guide approves it.
+- Audio/wording sensitivity requires a separate Manual Guide Only acknowledgment. Approval stores `status: manual-guide-required` and `sessionRoute: manual-guide`, returns to Lobby, and blocks the guided app-audio start CTA.
+- Focused validation: `npm run test:e2e -- --grep 'consultation'` passed 1/1; `npm run test:e2e -- --grep 'Guide Review'` passed 1/1; `node --check app.js`, JSON parsing, and `git diff --check` passed.
+- Open boundary: this does not provide medical clearance or replace the guide’s professional judgment; real-device and consent-recording validation remain separate gates.
+- Refined intake safety dependency: injury/back limitation disables Yoga Bridge and hides/clears poses; medication/private medication remains available but is highlighted in Guide Review; pregnancy/possible pregnancy keeps Yoga Bridge and remaining care/timing options while hiding/clearing poses; Recent childbirth is separate and keeps Yoga controls available. Focused Playwright coverage passed for all cases; app cache version is `chakra-v5.18` and script query is `app.js?v=1.64`.
+- Added medication consent language: disclosed medication produces a localized statement that the client will not stop, start, or change medication because of the session without consulting the prescribing clinician. Pregnancy/possible pregnancy hides Yoga poses, preparation, and per-pose timing but preserves Bath and touch-approved add-ons; Recent childbirth keeps these Yoga controls available. Focused Playwright consultation validation passed 2/2.
+- Fixed the post-consent Lobby transition error: `applyApprovedConsultationPlan()` now calls the existing session estimator through an explicit runtime reference instead of reaching into `attachEventListeners()` scope. App cache version is `chakra-v5.19`; script query is `app.js?v=1.65`.
+- Added Meditation Language to consultation intake and Guide Review, persisted it on the session plan, and made consent approval apply the selected language, chakra focus, explicit empty Yoga pose selection, and independent Savasana setting to Lobby/Settings instead of retaining stale values. App cache version is `chakra-v5.21`; script query is `app.js?v=1.67`.
+- Restyled consultation intake, Guide Review, and consent surfaces with a light paper/grey form theme while preserving the dark meditation and Lobby experience. Stylesheet query is `style.css?v=1.54`; app cache version is `chakra-v5.22`.
+- Added conditional long-term chakra reflection questions for each selected focus area, with localized prompts, attention preference, optional private guide note, adaptive bounded timing, and Guide Review summary. Focused Playwright consultation validation passed 1/1; app cache version is `chakra-v5.24` and script query is `app.js?v=1.68`.
+- Moved `Begin Session Consultation` from the Lobby to the Settings screen so consultation remains a configuration/intake entry point and the Lobby stays focused on journey selection/start. Stylesheet query is `style.css?v=1.55`; app cache version is `chakra-v5.25`.
+- Expanded chakra reflection from one shared timing response to three individually answered questions per selected chakra, plus explicit attention preference and guide note. Stored answers feed bounded timing and the Guide Review summary; focused Playwright validation passed 1/1. App cache version is `chakra-v5.26`; script query is `app.js?v=1.69`.
+- Expanded Guide Review into detailed plan, chakra, and safety sections so all collected consultation data is visible before approval. The focused Playwright review assertion passed 1/1; app cache version is `chakra-v5.27` and script query is `app.js?v=1.70`.
+- Added required client Citizenship, Contact Number, and Email Address fields; Review displays them while consent narration excludes them. Fixed consent-page button background/text contrast for the light consultation theme. Focused consultation/Guide Review tests passed 2/2; stylesheet query is `style.css?v=1.56`, app cache version is `chakra-v5.28`.
+- Fixed the consultation Third Eye localization key from `ui.thirdeye` to the registered `ui.thirdEye` locale key; app cache version is now `chakra-v5.23`.
+
+### Visual design QA checkpoint — 2026-08-10
+
+- Ran a temporary Playwright visual matrix at desktop (1440×900), tablet (1024×768), and mobile (390×844) across Settings, Lobby, Consultation, and Guide Review. All 3 viewport scenarios passed, including a horizontal-overflow assertion.
+- Visual review found no critical layout breakage. Touch targets, form fields, responsive stacking, logo placement, light consultation theme, and Guide Review card hierarchy are usable across the tested sizes.
+- Design follow-ups: the Lobby’s long vertical composition places the primary CTA close to the desktop viewport edge; the Guide Review remains narrow on large screens; long review values become dense/right-aligned on mobile; the dark hero artwork is visually strong but high-density on Settings at small widths.
+- Temporary screenshots and the visual-only test harness are removed after review. This was a design audit, not a replacement for real-device camera/audio, print-dialog, or accessibility testing.
+- Applied the visual follow-ups: added Lobby action breathing room, widened Guide Review only at desktop widths, stacked long review values on mobile, and softened Settings background decoration on narrow screens. Stylesheet query is now `style.css?v=1.58`.
+- Confirmed both A4 print-plan variants embed the branded `symbols/logo_453x453.png` header logo. Fixed the Settings consultation CTA’s nested mobile overflow caused by a 100% width plus horizontal margins; the 390px inspection now reports no overflowing descendants. Stylesheet query is now `style.css?v=1.59`.
+- Print invocation now clears the parent document title and print iframe title before opening the dialog. Browser-native date/time headers remain controlled by the user’s print-dialog “Headers and footers” setting and are not part of the generated PDF body. Stylesheet query is now `style.css?v=1.60`.
+- Confirmed this title-clearing behavior applies to both `GUIDE REVIEW COPY` and `MANUAL GUIDE ONLY` print variants; both paths use the same print renderer and now have explicit empty-title assertions.
+- Added the branded logo to the canvas-composed consent video. It is preloaded from `symbols/logo_453x453.png` and rendered at 96×96px in the upper-right safe header area on both session-plan and consent-prompt frames, clear of the face thumbnail and metadata. App script is now `app.js?v=1.71`; service-worker shell cache is `chakra-v5.31`.
+- Hardened the consent page for full plan combinations: the recorded confirmation now explicitly states the touch/assistance decision in English and Malayalam; the on-page prompt has bounded vertical scrolling, safe wrapping, and tighter mobile spacing; the canvas prompt fits typography down from 27px to a minimum 18px before clipping. Touch/service coverage is asserted in the consultation Playwright flow. App script is `app.js?v=1.72`, stylesheet `style.css?v=1.61`, shell cache `chakra-v5.32`.
+- Refined consent readability: plan slides now use section headings, diamond markers, labeled value cards, stronger value typography, and deliberate spacing; A4 prints use an alternating row surface, uppercase labels, left-aligned values, and section markers. Page grouping is reduced to four source lines per slide to protect readability. App script is `app.js?v=1.73`, stylesheet `style.css?v=1.62`, shell cache `chakra-v5.33`.
+- Reworked the recording UX: the full consent script is visible before recording, a live circular camera preview is prepared before capture, and recording mode replaces manual scrolling with gentle automatic scrolling mirrored into the composed video. Recording controls are compact, icon-led, and arranged in a space-efficient grid; pause stops the scroll and resume continues it. App script is `app.js?v=1.74`, stylesheet `style.css?v=1.63`, shell cache `chakra-v5.34`.
+- Simplified consent into two explicit presentation stages: `consent-review-stage` shows the complete script and live preview before recording; `consent-record-stage` moves the same prompt into a selfie-camera background with a gradient teleprompter overlay. Reading speed defaults to Comfortable (14 px/sec) with Slow/Comfortable/Fast control, and the recording controls remain compact. `loop.md` remains procedural and unchanged.
+
 - Date: 2026-08-09 (Asia/Kolkata)
 - Baseline `HEAD`: `6da554d` — `update`
-- Status: the consultation architecture documentation and Loop procedure are **uncommitted working changes**; `6da554d` is not the commit containing these edits.
-- Validation: `git diff --check` passed; no production consultation implementation has started.
-- Next checkpoint: commit the documentation updates together with the first approved consultation implementation slice, then replace this baseline entry with the actual commit hash and subject.
+- Status: the consultation intake slice, architecture documentation, and Loop procedure are **uncommitted working changes**; `6da554d` is not the commit containing these edits.
+- Validation: focused Playwright consultation test passed 1/1; static syntax/JSON/diff checks passed.
+- Next checkpoint: add the real consent recording/device validation pass, map remaining approved plan fields to safe settings, and then commit the approved slice and replace this baseline entry with the actual commit hash and subject.
+### Consultation contact-field checkpoint — 2026-08-10
+
+- Citizenship is now a required country select rather than free text. Supported country selection prefills an editable country code into both phone fields.
+- Email, client phone, and entered emergency phone values are validated before the consultation plan is created. An untouched optional emergency country-code prefix is treated as empty.
+- Consultation card spacing now uses a 10px mobile-safe horizontal inset.
+- Focused Playwright validation passed 2/2; static syntax and diff checks passed.
+
+### Reverse Journey grounding checkpoint — 2026-08-10
+
+- Added a non-diagnostic consultation question about feeling present, connected, and grounded in everyday life.
+- A reconnecting or private response is highlighted for the guide. Reverse Journey is never silently enabled: the guide must explicitly approve it in Guide Review.
+- The approved choice is persisted and applied to the existing Settings/Lobby Reverse Journey state, with English and Malayalam guidance.
+
+### Consent video composition checkpoint — 2026-08-10
+
+- Consent recording now composes a session-plan pre-roll and consent-prompt background on a canvas with a circular face thumbnail, live elapsed time, start/end timestamps, and permission-based location.
+- WebM bitrate is bounded and submission rejects recordings at or above 25 MB for Gmail compatibility.
+- This is browser-local and remains unverified on physical cameras/mobile codecs. Authenticated email sharing, private storage, retention, and deletion are still open.
+
+- The consent composition now displays the actual local recording wall-clock time, preserves start/end timestamps, and holds the final end-time frame before MediaRecorder finalization. Plan pages are sourced from the detailed review sections, advice, and guide notes.
+- Consent plan pages now use structured label/value rows, pixel-aware pagination, readable typography, safe padding, and clipped content bounds so details do not overflow or collide with the face thumbnail.
+- The consent timer now starts at the prompt/audio/thumbnail transition rather than at the silent plan pre-roll, matching the actual client consent recording interval.
+- Consent narration now identifies the goal and the selected service stages, including relevant durations, so the recorded agreement represents the full approved plan rather than meditation intention alone.
+- All Guide Review plans now expose Print / Save as PDF. The A4 document includes the uploaded logo and uses a normal Guide Review Copy status for standard plans while retaining Manual Guide Only labeling where applicable.
+- Both print variants now omit the visible Session Plan heading, generated date, and app-generated footer. Browser-added URL/header/footer text can only be controlled through the browser print-dialog settings.
+- Branded logo coverage now includes Settings, Lobby, Consultation, Guide Review, Consent, completion, favicon, PWA manifest icons, and printable plans. Splash branding was removed, and the active meditation visual remains uncluttered.
+- Added the logo to the active Chakra Meditation screen at exactly 100×100px with a 20px bottom margin. Settings branding is larger at 72×72px with 12px title spacing.
+- Lobby now uses a dedicated 64×64px brand mark with 8px spacing before the Meditation Room heading.
+
+### Full-camera teleprompter checkpoint — 2026-08-11
+
+- Replaced the combined consent recording section with three explicit stages: complete consent review, app-viewport camera recording, and a separate recording preview with Retry or Accept.
+- Removed the recorded session-plan pre-roll. Camera/microphone preparation now happens before a visible `3–2–1` countdown; recording, microphone capture, and Comfortable-speed teleprompter scrolling begin together afterward.
+- The camera fills the recording viewport. The consent script, reading-speed control, recording timer/status, and accessible icon-only record/pause-resume/stop/cancel controls float over it.
+- Fixed default-speed scrolling so it starts without moving the slider, made scrolling elapsed-time based, and fixed Pause/Resume so the control stays available and the timer excludes paused time.
+- Stopping moves to a dedicated preview stage. Retrying returns to a fresh camera stage and reacquires the preview stream.
+- The saved video composition now mirrors the camera-style experience: full-frame camera, translucent scrolling consent panel, timer, logo, and reading-speed label. Portrait browser view produces a portrait `720×1280` video canvas; landscape produces `1280×720`.
+- English and Malayalam labels were added for the new camera controls, speed states, preparation, completion, and preview screen.
+- Validation: static syntax/JSON/DOM ID/diff checks passed; focused camera-flow Playwright test passed; complete regression suite passed **34/34** before the isolated recorded-canvas alignment, and the focused camera-flow test passed again afterward.
+- Evidence level: `browser` for mocked camera/media state flow and responsive viewport behavior; real-device camera, microphone, codec, thermal, orientation-change, and print/share behavior remain open.
+- Changes remain uncommitted working-tree edits on baseline `969ff2e`; no baseline commit is presented as containing this feature.
+
+### Consent flow context refresh — 2026-08-11
+
+- This checkpoint records investigation only; no consent-flow implementation was changed during the refresh.
+- Current Consent Confirmation order is script first, then the circular live-camera preview. The requested order is live-camera thumbnail first, then the complete script.
+- Current confirmation CSS gives the script `max-height: none` and `overflow-y: visible` (including the mobile override), so it expands instead of providing a bounded, manually scrollable reading area. The requested confirmation script must have an obvious touch/mouse/keyboard scroll area.
+- Continue to Recording and Cancel already share one grid row in the base CSS. Their inline layout must be retained and checked at mobile widths when the confirmation layout is adjusted.
+- Current camera flow starts recording, microphone audio, timer, canvas rendering, and teleprompter auto-scroll together immediately after the `3–2–1` countdown. The requested behavior is to begin recording after the countdown but hold the script at its initial position for a short reading lead-in (provisionally about 3 seconds) before automatic scrolling starts.
+- The current Review Recording stage is a simple playback surface for the new full-camera composite, followed by Retry Recording and Accept and Continue.
+- The historical local design, documented in `TEMP-CONSENT-VIDEO-COMPOSITION.md` and the 2026-08-10 handoff checkpoint, generated still session-plan pages with structured label/value rows and pixel-aware pagination, then transitioned to the consent prompt with microphone audio, timer, and a circular lower-right face thumbnail. The plan portion was silent and the consent timer began at the spoken-prompt transition.
+- The 2026-08-11 full-camera design intentionally removed that recorded session-plan pre-roll and changed the saved video to a full-frame camera composition with a translucent scrolling prompt. The latest request refers back to the historical plan-page/thumbnail presentation for Review Recording, so the final saved-video contract needs one explicit product decision: restore the historical plan pages inside the exported recording, or show plan pages only as review context while preserving a consent-only recording.
+- Git history cannot supply a committed snapshot of the historical consent implementation. `HEAD` remains `969ff2e`, while the consultation and consent work is still represented by uncommitted working-tree files and temporary design notes.
+- The phrase “Hindi and confirmation page” was treated as a likely transcription of “in the confirmation page.” The app currently supports English and Malayalam; Hindi support was not inferred or added.
+
+### Plan-first consent recording implementation — 2026-08-11
+
+- Restored the mandatory generated-video sequence: silent approved session-plan pages first, then the spoken consent section with script, voice, timer, logo, and circular camera thumbnail.
+- Kept the live recording experience as a full app-viewport camera teleprompter. Consent begins after the plan pre-roll and `3–2–1`; the script remains still for a three-second reading lead before auto-scroll begins.
+- Consent Confirmation now places the circular live-camera thumbnail above a bounded manual-scroll script. Continue to Recording and Cancel remain inline.
+- Replaced historical Guide Review DOM scraping with an approved-plan allowlist for video pages. Name, goal, focus, language, approved services/settings, and relevant timing are included; contact/email, emergency contact, medication details, private chakra notes, and guide notes are excluded.
+- Review Recording now presents the final sequence explicitly and plays the single combined recording before Retry or Accept.
+- Pause/Resume preserves any remaining reading lead and pauses the consent timer and script movement together. Cancellation/retry clears pre-roll, lead, media, canvas, and preview state.
+- Composition metadata records `session-plan-then-spoken-consent-v2`, plan page count/duration, silent plan audio, and circular-thumbnail consent layout.
+- Runtime versions: `app.js?v=1.76`, `style.css?v=1.65`, service-worker cache `chakra-v5.36`.
+- Validation: focused consultation/recording flow passed 1/1; the complete Playwright regression passed **34/34** against a retained local server; JavaScript syntax, runtime JSON parsing, and `git diff --check` passed.
+- Hardware boundary: mocked browser media verifies state and composition routing, but physical camera/microphone codecs, long-recording memory/thermal behavior, rotation during capture, and real Blob playback still require representative-device validation.

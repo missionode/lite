@@ -1,4 +1,6 @@
 const { defineConfig, devices } = require('@playwright/test');
+const testPort = Number(process.env.PLAYWRIGHT_PORT || 4173);
+const testBaseURL = `http://127.0.0.1:${testPort}`;
 
 module.exports = defineConfig({
   testDir: './tests/e2e',
@@ -8,7 +10,7 @@ module.exports = defineConfig({
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: testBaseURL,
     browserName: 'chromium',
     ...devices['Desktop Chrome'],
     headless: true,
@@ -18,8 +20,8 @@ module.exports = defineConfig({
     video: 'retain-on-failure'
   },
   webServer: {
-    command: 'python3 -m http.server 4173',
-    url: 'http://127.0.0.1:4173',
+    command: `python3 -m http.server ${testPort}`,
+    url: testBaseURL,
     reuseExistingServer: true,
     timeout: 10_000
   }
