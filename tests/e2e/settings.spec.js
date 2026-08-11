@@ -105,6 +105,8 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consultation-emergency-phone')).toHaveValue('+91 ');
   await page.locator('#consultation-contact').fill('+919876543210');
   await page.locator('#consultation-email').fill('test@example.com');
+  await page.locator('#consultation-emergency-name').fill('Emergency Person');
+  await page.locator('#consultation-emergency-phone').fill('+919812345678');
   await page.locator('#consultation-goal').fill('Feel grounded and clear.');
   await page.locator('#consultation-reverse-journey').selectOption('reconnect');
   await page.locator('#consultation-language').selectOption('en');
@@ -205,6 +207,9 @@ test('opens the single-participant consultation entry point and returns a saved 
       }
     }
     window.MediaRecorder = TestMediaRecorder;
+    navigator.geolocation.getCurrentPosition = success => success({
+      coords: { latitude: 12.971599, longitude: 77.594566 }
+    });
     window.__chakraConsentTestTimings = {
       planPageMs: 35,
       planTransitionMs: 25,
@@ -217,10 +222,14 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-prompt-text')).toContainText('Test Client');
   await expect(page.locator('#consent-prompt-text')).toContainText('prescribed medication');
   await expect(page.locator('#consent-prompt-text')).toContainText('will not stop, start, or change');
-  await expect(page.locator('#consent-prompt-text')).toContainText('Yoga Bridge');
-  await expect(page.locator('#consent-prompt-text')).toContainText('Massage');
-  await expect(page.locator('#consent-prompt-text')).toContainText('Perineal Care');
+  await expect(page.locator('#consent-prompt-text')).toContainText('guided yoga services');
+  await expect(page.locator('#consent-prompt-text')).toContainText('personal wellness and assisted-care services');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('balasana');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText('Perineal Care');
+  await expect(page.locator('#consent-prompt-text')).not.toContainText(/\d+ min/);
   await expect(page.locator('#consent-prompt-text')).toContainText('touch or assistance');
+  await expect(page.locator('#consent-prompt-text')).toContainText('This declaration is made on');
+  await expect(page.locator('#consent-prompt-text')).toContainText('latitude 12.971599, longitude 77.594566');
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem('chakra_consultation_plan')));
   expect(plan.schemaVersion).toBe(1);
   expect(plan.participantCount).toBe(1);
@@ -262,9 +271,19 @@ test('opens the single-participant consultation entry point and returns a saved 
   const videoPlanText = await page.evaluate(() => getConsentPlanPages(JSON.parse(localStorage.getItem('chakra_consultation_plan'))).flat().join(' '));
   expect(videoPlanText).toContain('Feel grounded and clear.');
   expect(videoPlanText).toContain('Yoga Bridge');
-  expect(videoPlanText).not.toContain('test@example.com');
-  expect(videoPlanText).not.toContain('+919876543210');
+  expect(videoPlanText).toContain('Test Client');
+  expect(videoPlanText).toContain('test@example.com');
+  expect(videoPlanText).toContain('+919876543210');
+  expect(videoPlanText).toContain('Emergency Person · +919812345678');
+  expect(videoPlanText).toContain('Meditation language: English');
+  expect(videoPlanText).not.toContain('Meditation language: en');
   expect(videoPlanText).not.toContain('Discussed privately with the guide.');
+  const malayalamPlanText = await page.evaluate(() => {
+    const storedPlan = JSON.parse(localStorage.getItem('chakra_consultation_plan'));
+    return getConsentPlanPages({ ...storedPlan, language: 'ml' }).flat().join(' ');
+  });
+  expect(malayalamPlanText).toContain('Meditation language: Malayalam');
+  expect(malayalamPlanText).not.toContain('Meditation language: ml');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#consent-continue-to-recording').click();
@@ -295,6 +314,7 @@ test('opens the single-participant consultation entry point and returns a saved 
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-video-format', 'landscape-16:9');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-plan-design', 'luxury-document');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-consent-design', 'luxury-document-evidence');
+  await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-meditation-language', 'English');
   await expect(page.locator('#consent-composite-canvas')).toHaveAttribute('data-composition-phase', 'consent');
   if (process.env.CONSENT_VISUAL_CAPTURE) {
     const consentFrame = await page.locator('#consent-composite-canvas').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);

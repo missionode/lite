@@ -3479,14 +3479,25 @@ function getConsentPlanPages(sessionPlan) {
     const focus = (sessionPlan?.chakraFocus || []).map(key => t(`ui.${chakraLabelKeys[key] || key}`)).join(', ') || t('ui.consultationEvenJourney');
     const yesNo = value => t(value ? 'ui.consultationYes' : 'ui.consultationNo');
     const minutes = value => `${Math.round((Number(value) || 0) / 60)} min`;
+    const emergencyContact = sessionPlan?.safetyReview?.emergencyContact || {};
+    const emergencyLabel = [emergencyContact.name, emergencyContact.phone].filter(Boolean).join(' · ') || t('ui.consultationNone');
     const groups = [
+        {
+            heading: t('ui.consentPlanClientVerification'),
+            rows: [
+                [t('ui.consultationSummaryName'), sessionPlan?.profile?.name || t('ui.client')],
+                [t('ui.consultationSummaryContact'), sessionPlan?.profile?.contactNumber || t('ui.consultationNone')],
+                [t('ui.consultationSummaryEmail'), sessionPlan?.profile?.email || t('ui.consultationNone')],
+                [t('ui.consultationSummaryCitizenship'), sessionPlan?.profile?.citizenship || t('ui.consultationNone')],
+                [t('ui.consultationSummaryEmergency'), emergencyLabel],
+                [t('ui.consultationSummaryLanguage'), getMeditationLanguageLabel(sessionPlan?.language || state.language)]
+            ]
+        },
         {
             heading: t('ui.consentPlanOverview'),
             rows: [
-                [t('ui.consultationSummaryName'), sessionPlan?.profile?.name || t('ui.client')],
                 [t('ui.consultationSummaryGoal'), sessionPlan?.goal || t('ui.sessionGoal')],
-                [t('ui.consultationSummaryFocus'), focus],
-                [t('ui.consultationSummaryLanguage'), sessionPlan?.language || state.language]
+                [t('ui.consultationSummaryFocus'), focus]
             ]
         },
         {
@@ -3661,7 +3672,8 @@ function drawConsentPlanFrame(context, width, height) {
     context.fillStyle = '#766a58';
     context.font = `500 15px ${fontFamily}`;
     const clientName = consultationVideoPlan?.profile?.name || t('ui.client');
-    context.fillText(`${clientName} · ${t('ui.consentPlanVideoSubtitle')}`, padding + 72, 103);
+    const meditationLanguage = getMeditationLanguageLabel(consultationVideoPlan?.language || state.language);
+    context.fillText(`${clientName} · ${meditationLanguage} · ${t('ui.consentPlanVideoSubtitle')}`, padding + 72, 103);
     context.fillStyle = '#a9823d';
     context.font = `700 14px ${fontFamily}`;
     context.textAlign = 'right';
@@ -3779,7 +3791,7 @@ function drawConsentSpokenFrame(context, width, height) {
     context.fillText(t('ui.consentEvidenceLabel'), padding + 70, 78);
     context.fillStyle = '#8a795f';
     context.font = `600 13px ${fontFamily}`;
-    context.fillText(t('ui.consentEvidenceOverline').toUpperCase(), padding + 70, 101);
+    context.fillText(`${t('ui.consentEvidenceOverline')} · ${getMeditationLanguageLabel(consultationVideoPlan?.language || state.language)}`.toUpperCase(), padding + 70, 101);
 
     const tickerWidth = 174;
     const tickerGap = 12;
@@ -3907,6 +3919,7 @@ function drawConsentComposite() {
     canvas.dataset.planPages = String(consultationPlanPages.length);
     canvas.dataset.planDesign = 'luxury-document';
     canvas.dataset.consentDesign = 'luxury-document-evidence';
+    canvas.dataset.meditationLanguage = getMeditationLanguageLabel(consultationVideoPlan?.language || state.language);
     if (consultationCompositePhase === 'plan') {
         drawConsentPlanFrame(context, width, height);
         consultationCompositeFrame = requestAnimationFrame(drawConsentComposite);
@@ -4050,7 +4063,32 @@ function getConsentServiceSummary(sessionPlan) {
     return services.length ? services.join(', ') : t('ui.consentServicesNone');
 }
 
-function renderConsentPrompt(sessionPlan) {
+function getMeditationLanguageLabel(language) {
+    if (language === 'ml') return t('ui.malayalam');
+    if (language === 'en') return t('ui.english');
+    return String(language || t('ui.english'));
+}
+
+function getConsentVerbalServiceSummary(sessionPlan) {
+    const preferences = sessionPlan?.preferences || {};
+    const services = [t('ui.consentVerbalServiceMeditation')];
+    if (preferences.yogaBridgeEnabled || preferences.corpsePoseEnabled) {
+        services.push(t('ui.consentVerbalServiceYoga'));
+    }
+    if (preferences.bathSessionEnabled || preferences.massageEnabled || preferences.perinealCareEnabled || preferences.assistedBathingEnabled) {
+        services.push(t('ui.consentVerbalServicePersonalCare'));
+    }
+    return services.join(', ');
+}
+
+function getConsentVerbalLocation() {
+    if (!consultationLocation) return t('ui.consentLocationUnavailable');
+    return t('ui.consentCoordinates')
+        .replace('{latitude}', String(consultationLocation.latitude))
+        .replace('{longitude}', String(consultationLocation.longitude));
+}
+
+function renderConsentPromptText(sessionPlan, evidenceDate = consultationConsentOpenedAt || new Date()) {
     const prompt = document.getElementById('consent-prompt-text');
     if (!prompt) return;
     const clientName = sessionPlan?.profile?.name || t('ui.client');
@@ -4064,13 +4102,20 @@ function renderConsentPrompt(sessionPlan) {
     prompt.textContent = t('ui.consentScript')
         .replace('{name}', clientName)
         .replace('{goal}', sessionPlan?.goal || t('ui.sessionGoal'))
-        .replace('{services}', getConsentServiceSummary(sessionPlan))
+        .replace('{services}', getConsentVerbalServiceSummary(sessionPlan))
         .replace('{touch}', touchStatement)
-        .replace('{medication}', medicationStatement);
+        .replace('{medication}', medicationStatement)
+        .replace('{date}', formatConsentDateTime(evidenceDate))
+        .replace('{location}', getConsentVerbalLocation());
+}
+
+function renderConsentPrompt(sessionPlan) {
     consultationConsentOpenedAt = new Date();
-    consultationPlanPages = getConsentPlanPages();
+    renderConsentPromptText(sessionPlan, consultationConsentOpenedAt);
+    consultationPlanPages = getConsentPlanPages(sessionPlan);
     requestConsentLocation().then(location => {
         consultationLocation = location;
+        renderConsentPromptText(sessionPlan, consultationConsentOpenedAt);
         const metadata = document.getElementById('consent-recording-metadata');
         if (metadata) metadata.textContent = location
             ? 'Location ready: ' + location.latitude + ', ' + location.longitude
@@ -4387,6 +4432,7 @@ function startSpokenConsentRecording() {
     consultationCompositePhase = 'consent';
     consultationRecordingStartedAt = new Date();
     consultationRecordingStartTick = performance.now();
+    renderConsentPromptText(consultationVideoPlan, consultationRecordingStartedAt);
     setConsentAudioEnabled(true);
     startConsentPromptWithLead(true);
 }
@@ -5520,10 +5566,10 @@ function attachEventListeners() {
             recordingStartedAt: consultationRecordingStartedAt?.toISOString() || null,
             recordingEndedAt: consultationRecordingEndedAt?.toISOString() || null,
             location: consultationLocation,
-            consentVersion: 1,
+            consentVersion: 2,
             recordingType: consultationRecordingBlob.type,
             recordingBytes: consultationRecordingBlob.size,
-            composition: 'session-plan-then-spoken-consent-v2',
+            composition: 'session-plan-then-spoken-consent-v3',
             planPageCount: consultationPlanPages.length,
             planPageDurationMs: consentTiming('planPageMs', 5000),
             planAudio: 'silent',
@@ -5533,6 +5579,9 @@ function attachEventListeners() {
             consentStartMode: 'manual-after-plan-pages',
             teleprompterLeadMs: consentTiming('readingLeadMs', 7000),
             liveWallClock: true,
+            clientVerificationFields: ['name', 'contactNumber', 'email', 'citizenship', 'emergencyContact', 'meditationLanguage'],
+            verbalServiceDetail: 'professional-categories-only',
+            verbalEvidence: 'recording-date-and-coordinate-location',
             storage: 'memory-only-prototype'
         };
         applyApprovedConsultationPlan(sessionPlan);
