@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.69">
+    <link rel="stylesheet" href="style.css?v=1.70">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -651,11 +651,11 @@
                     <video id="consent-live-preview" class="consent-live-preview" muted autoplay playsinline></video>
                     <div class="consent-live-caption" data-i18n="ui.consentLivePreview">Live camera preview</div>
                 </div>
-                <div class="consent-prompter" role="article" aria-labelledby="consent-prompt-label">
+                <div class="consent-prompter" role="region" aria-labelledby="consent-prompt-label" aria-describedby="consent-scroll-hint" tabindex="0">
                     <div id="consent-prompt-label" class="consent-prompt-label" data-i18n="ui.consentPromptLabel">Read this confirmation</div>
                     <p id="consent-prompt-text" class="consent-prompt-text"></p>
                 </div>
-                <p class="consent-scroll-hint" data-i18n="ui.consentReviewHint">Read the complete confirmation before continuing.</p>
+                <p id="consent-scroll-hint" class="consent-scroll-hint" data-i18n="ui.consentReviewHint">Read the complete confirmation before continuing.</p>
                 <div class="consent-review-actions">
                     <button id="consent-continue-to-recording" class="primary-btn" type="button" data-i18n="ui.consentContinueToRecording">Continue to Recording</button>
                     <button id="consent-review-cancel" class="link-btn" type="button" data-i18n="ui.cancel">Cancel</button>

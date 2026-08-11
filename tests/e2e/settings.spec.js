@@ -274,7 +274,11 @@ test('opens the single-participant consultation entry point and returns a saved 
     return Boolean(camera && script && camera.compareDocumentPosition(script) & Node.DOCUMENT_POSITION_FOLLOWING);
   });
   expect(confirmationOrder).toBe(true);
-  await expect(page.locator('#consent-review-stage .consent-prompter')).toHaveCSS('overflow-y', 'auto');
+  const confirmationPrompter = page.locator('#consent-review-stage .consent-prompter');
+  await expect(confirmationPrompter).toHaveCSS('overflow-y', 'scroll');
+  await expect(confirmationPrompter).toHaveAttribute('role', 'region');
+  await expect(confirmationPrompter).toHaveAttribute('tabindex', '0');
+  await expect(confirmationPrompter).toHaveAttribute('aria-describedby', 'consent-scroll-hint');
   const confirmationScriptFit = await page.locator('#consent-review-stage .consent-prompter').evaluate(element => ({
     clientHeight: element.clientHeight,
     scrollHeight: element.scrollHeight,

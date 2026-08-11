@@ -311,3 +311,10 @@
 - Added a confirmed `End Consultation and Reset Session` action. It clears the local client plan, consent metadata, and in-memory recording; restores all seven chakras, the production five-minute Core default, standard meditation language/voice, normal frequency state, and consultation-controlled guidance/care defaults; then re-enables Core timing. Statistics, journal entries, display language, and audio levels are retained.
 - The approved product boundary is preserved: the complete timing table appears in the Meditation Room only and was not added to Guide Review or the recorded plan pages.
 - Runtime versions: `app.js?v=1.82`, `style.css?v=1.69`, service-worker cache `chakra-v5.42`. Focused timing/consultation validation passed 2/2 and the complete regression passed **35/35**, with screenshot capture disabled.
+
+### Consent confirmation scrolling — 2026-08-11
+
+- Made `Read this confirmation` an explicitly sized vertical scroll region instead of relying only on a maximum height, preventing long consent copy from being clipped by mobile layout sizing.
+- Added touch momentum and contained vertical panning, a visible gold scrollbar where the browser supports custom scrollbars, and stable scrollbar spacing.
+- Made the script region keyboard-focusable and connected it to the existing reading instruction for assistive technology.
+- Runtime versions: `app.js?v=1.82`, `style.css?v=1.70`, service-worker cache `chakra-v5.43`. Focused consultation validation passed **1/1** with screenshot capture disabled; syntax and diff checks also passed.
