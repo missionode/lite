@@ -1,0 +1,55 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const readJson = path => JSON.parse(fs.readFileSync(path, 'utf8'));
+const scripts = readJson('scripts.json');
+const en = readJson('locales/en.json');
+const ml = readJson('locales/ml.json');
+const app = fs.readFileSync('app.js', 'utf8');
+
+for (const [language, bundle] of [['en', en], ['ml', ml]]) {
+  assert.ok(bundle.ui.safetySummary, `${language} lobby safety summary is required`);
+  assert.ok(bundle.system.prePracticeSafety, `${language} pre-practice safety narration is required`);
+  assert.ok(bundle.system.groundingSupport, `${language} grounding response is required`);
+}
+
+assert.match(app, /contentT\('system\.prePracticeSafety'\)/, 'runtime must narrate the safety contract');
+assert.match(app, /contentT\('system\.groundingSupport'\)/, 'runtime must narrate grounding support');
+
+const productionCopy = JSON.stringify({ scripts, en, ml });
+const prohibitedClaims = [
+  /intuition has never been wrong/i,
+  /what you decide, happens/i,
+  /everything is happening for you, in perfect order/i,
+  /money flows to you easily/i,
+  /every need[^.]*is met/i,
+  /most healing words in the universe/i,
+  /ripples of healing through time/i,
+  /your finances are accelerating/i,
+  /what you have been calling in is at the door/i,
+  /every intention you hold right now gains momentum/i,
+  /നിങ്ങളുടെ അന്തർജ്ഞാനം ഒരിക്കലും തെറ്റിയിട്ടില്ല/u,
+  /നിങ്ങൾ തീരുമാനിക്കുന്നത് സംഭവിക്കുന്നു/u,
+  /പണം എളുപ്പത്തിലും സമൃദ്ധമായും/u,
+  /പ്രപഞ്ചത്തിലെ ഏറ്റവും രോഗശാന്തി നൽകുന്ന/u,
+];
+
+for (const claim of prohibitedClaims) {
+  assert.doesNotMatch(productionCopy, claim, `prohibited certainty or healing claim returned: ${claim}`);
+}
+
+for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy']) {
+  assert.ok(scripts[chakra].affirmation_en, `${chakra} English affirmation is required`);
+  assert.ok(scripts[chakra].affirmation_ml, `${chakra} Malayalam affirmation is required`);
+}
+
+assert.match(scripts.hooponopono.intro.en, /optional/i);
+assert.match(scripts.hooponopono.intro.ml, /ഐച്ഛിക/u);
+assert.match(scripts.closing.meditation_en, /qualified health professional/i);
+assert.match(scripts.closing.meditation_ml, /ആരോഗ്യവിദഗ്ധ/u);
+assert.match(scripts.bath_session.intro.en, /keep the device dry/i);
+assert.match(scripts.bath_session.intro.ml, /ഉപകരണം വെള്ളത്തിൽ നിന്ന്/u);
+assert.match(scripts.yoga.intro.en, /stop for pain/i);
+assert.match(scripts.yoga.intro.ml, /വേദന/u);
+
+console.log('Content safety contract passed for English and Malayalam.');
