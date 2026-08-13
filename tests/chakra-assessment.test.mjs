@@ -16,6 +16,7 @@ assert.ok(chakraDataMatch, 'chakra question data should remain extractable');
 const chakras = vm.runInNewContext(chakraDataMatch[1]);
 assert.equal(chakras.length, 7, 'assessment should retain all seven chakra cards');
 assert.equal(new Set(chakras.map((chakra) => chakra.id)).size, 7, 'chakra IDs should be unique');
+assert.equal(new Set(chakras.map((chakra) => chakra.color)).size, 7, 'each chakra should retain a distinct page theme color');
 
 for (const chakra of chakras) {
     assert.equal(chakra.questions.length, 5, `${chakra.id} should retain five questions`);
@@ -36,6 +37,9 @@ assert.match(inlineScripts[0], /value="unsure"/, 'each rendered question should 
 assert.match(inlineScripts[0], /chakraAssessmentNotes/, 'client context notes should be persisted separately');
 assert.match(html, /id="newAssessment"/, 'guides need a deliberate way to clear data for a new client');
 assert.match(inlineScripts[0], /removeItem\("chakraAnswers"\)/, 'new-client reset should clear previous answers');
+assert.match(html, /--page-chakra:/, 'assessment should expose an active chakra theme variable');
+assert.match(inlineScripts[0], /function setPageTheme\(chakra\)/, 'active chakra changes should update the complete page theme');
+assert.match(inlineScripts[0], /themeMeta\.content=chakra\.color/, 'browser theme color should follow the active chakra');
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain its Back to Lobby CTA');
 
 console.log('Chakra assessment contract passed for seven cards and 35 questions.');
