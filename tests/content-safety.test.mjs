@@ -134,6 +134,27 @@ assert.doesNotMatch(
 assert.match(scripts.intro.gratitude_ml, /പൂർണ്ണമായി എന്നിൽ ശ്രദ്ധിക്കൂ/u);
 assert.match(scripts.intro.moon.waning_ml, /പിൻവാങ്ങുന്ന ചന്ദ്രനെ തിരിച്ചുവരവിന്റെ പ്രതീകമായി/u);
 
+const englishChakraNames = {
+  root: 'Root Chakra',
+  sacral: 'Sacral Chakra',
+  solar: 'Solar Plexus Chakra',
+  heart: 'Heart Chakra',
+  throat: 'Throat Chakra',
+  thirdeye: 'Third Eye Chakra',
+  crown: 'Crown Chakra',
+};
+for (const [chakra, canonicalName] of Object.entries(englishChakraNames)) {
+  assert.match(scripts[chakra].meditation_en, new RegExp(canonicalName),
+    `${chakra} should use its canonical English chakra name`);
+}
+assert.doesNotMatch(
+  Object.keys(englishChakraNames).map(chakra => scripts[chakra].meditation_en).join(' '),
+  /Muladhara|Svadhisthana|Manipura|Anahata|Vishuddha|Ajna|Sahasrara/,
+  'English chakra narration must not add a second Sanskrit chakra name',
+);
+assert.match(scripts.intro.gratitude_en, /full attention to my voice/i);
+assert.match(scripts.intro.moon.waning_en, /waning moon can symbolize return/i);
+
 assert.match(scripts.hooponopono.intro.en, /optional/i);
 assert.match(scripts.hooponopono.intro.ml, /വേണമെങ്കിൽ മാത്രം/u);
 assert.match(scripts.closing.en, /awareness you cultivated/i);
