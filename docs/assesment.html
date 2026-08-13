@@ -136,6 +136,8 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
 .answer:not(.expected) .mark::after{content:""}
 .answer.selected:not(.expected) .mark{border-color:var(--chakra);background:var(--chakra)}
 .answer.selected:not(.expected) .mark::after{content:"✓"}
+.answer.uncertain{border-style:dashed;background:#fffaf2}
+.answer.uncertain.selected .mark{border-color:var(--warn);background:var(--warn)}
 .answer-copy{font-size:calc(26px * var(--fs));line-height:1.33;font-weight:700}
 .answer-copy small{
   display:block;margin-top:5px;font-size:calc(15px * var(--fs));line-height:1.35;
@@ -150,6 +152,16 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
 .meter{display:flex;gap:6px}
 .dot{width:15px;height:15px;border-radius:50%;background:#e6ddd9}
 .dot.on{background:var(--chakra)}
+.context-note{padding:22px;background:#fffaf8;border-top:1px solid var(--line)}
+.context-note label{display:block;font-weight:800;margin-bottom:9px}
+.context-note textarea{
+  width:100%;min-height:92px;resize:vertical;border:1.5px solid #ded6d2;
+  border-radius:17px;padding:14px 15px;color:var(--ink);background:#fff;line-height:1.45
+}
+.context-note textarea:focus{outline:3px solid color-mix(in srgb,var(--chakra) 18%,transparent);border-color:var(--chakra)}
+.context-help{display:block;margin-top:7px;color:var(--muted);font-size:calc(14px * var(--fs));line-height:1.4}
+.assessment-actions{display:flex;justify-content:center;margin:26px 0 8px}
+.new-assessment{color:var(--accent);border-color:#dfb8b4}
 .note{
   margin:8px 4px 0;color:var(--muted);font-size:calc(15px * var(--fs));line-height:1.5
 }
@@ -192,13 +204,16 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
     <a class="back-link" href="../index.html" aria-label="Back to meditation lobby">← Back to Lobby</a>
     <div class="eyebrow">COUNSELLOR TOOL · 7 CHAKRAS</div>
     <h1>Chakra Training-Need Assessment</h1>
-    <p>Ask each question conversationally and tick the answer that best fits. The green-marked option is the expected/aligned response. Translation is kept separate from the assessment layout.</p>
+    <p>Ask each question conversationally and answer from how life has generally felt during the past two weeks. Choose the response that fits best, even when it is not the green balanced response. Use “it varies” whenever more context is needed.</p>
   </section>
 
   <nav class="chakra-nav" id="chakraNav" aria-label="Chakra navigation"></nav>
   <div id="cards"></div>
 
-  <p class="note">This is a wellness / meditation reflection tool, not a clinical diagnostic instrument. Google translation requires an internet connection.</p>
+  <p class="note">This is a wellness and meditation reflection tool, not a clinical diagnostic or emergency assessment. Its results describe the client’s current self-report and should guide conversation, not label the person. Google translation requires an internet connection.</p>
+  <div class="assessment-actions">
+    <button class="control new-assessment" id="newAssessment" type="button">Clear for New Client</button>
+  </div>
 </main>
 
 <script>
@@ -228,19 +243,24 @@ const chakras = [
     questions:[
       ["When strong emotions arise, what usually happens?",
        "I can feel and express them without being controlled by them.",
-       "I usually suppress them or become overwhelmed by them."],
+       "I usually suppress or disconnect from them.",
+       "I often become overwhelmed or controlled by them."],
       ["How is your relationship with enjoyment and pleasure?",
        "I can enjoy things without feeling dependent on them.",
-       "I tend to avoid pleasure or constantly seek more stimulation."],
+       "I tend to avoid pleasure or feel uncomfortable receiving it.",
+       "I constantly seek more stimulation to feel satisfied."],
       ["How does creativity show up in your life?",
        "Creativity and playfulness have a natural place in my life.",
-       "I rarely feel creative or I constantly need novelty to feel engaged."],
+       "I rarely feel creative or playful.",
+       "I constantly need novelty to feel engaged."],
       ["In close relationships, what best describes you?",
        "I can feel close while maintaining my individuality.",
-       "I usually become very detached or overly dependent."],
+       "I usually become detached or keep too much distance.",
+       "I often become overly dependent or lose my individuality."],
       ["When life changes unexpectedly, how do you respond emotionally?",
        "I can gradually adapt to the change.",
-       "I strongly resist change or constantly seek something new."]
+       "I strongly resist change and struggle to adapt.",
+       "I constantly seek something new and find steadiness difficult."]
     ]
   },
   {
@@ -248,19 +268,24 @@ const chakras = [
     questions:[
       ["When you make an important decision, what usually happens?",
        "I generally trust myself while remaining open to useful advice.",
-       "I constantly doubt myself or need everything to happen my way."],
+       "I constantly doubt myself or depend on others to decide.",
+       "I need everything to happen my way and struggle with other views."],
       ["When you face a difficult challenge, how do you respond?",
        "I try, while accepting that failure is possible.",
-       "I avoid trying or feel compelled to prove myself at any cost."],
+       "I often avoid trying because failure feels too difficult.",
+       "I feel compelled to prove myself, even at a high personal cost."],
       ["How would you describe your personal boundaries?",
        "I can protect my boundaries while respecting other people.",
-       "My boundaries are very weak or extremely rigid."],
+       "My boundaries are weak and I struggle to protect my needs.",
+       "My boundaries are extremely rigid and leave little room for others."],
       ["During disagreement, what best describes you?",
        "I can express my position without needing to control the other person.",
-       "I usually give in or try to dominate the situation."],
+       "I usually give in even when something matters to me.",
+       "I try to dominate or control the situation."],
       ["How does ambition feel in your life?",
        "It motivates me without controlling my life.",
-       "I lack motivation or feel driven to constantly achieve and prove myself."]
+       "I lack motivation or find purposeful action difficult.",
+       "I feel driven to constantly achieve and prove myself."]
     ]
   },
   {
@@ -268,19 +293,24 @@ const chakras = [
     questions:[
       ["When you care for someone, what best describes you?",
        "I can care for them while also protecting my own needs.",
-       "I avoid emotional involvement or repeatedly sacrifice myself."],
+       "I avoid emotional involvement or keep myself closed.",
+       "I repeatedly sacrifice my own needs while caring for them."],
       ["When someone gives you affection or appreciation, what happens?",
        "I can generally receive it comfortably.",
-       "I tend to reject it, distrust it or become strongly dependent on it."],
+       "I tend to reject or distrust affection and appreciation.",
+       "I become strongly dependent on receiving affection or appreciation."],
       ["After someone emotionally hurts you, what usually happens over time?",
        "I can process what happened and gradually move forward.",
-       "I remain emotionally closed or stay intensely attached to the hurt."],
+       "I become emotionally closed and avoid closeness.",
+       "I stay intensely attached to the hurt and struggle to move forward."],
       ["When you feel compassion for another person, what do you usually do?",
        "I can help while maintaining appropriate boundaries.",
-       "I feel disconnected or become responsible for rescuing them."],
+       "I feel disconnected and find it difficult to respond with compassion.",
+       "I feel responsible for rescuing them, even beyond my limits."],
       ["In a close relationship, what feels most like you?",
        "I can experience closeness while remaining emotionally independent.",
-       "I keep people distant or become highly dependent on their affection."]
+       "I keep people distant even when I want connection.",
+       "I become highly dependent on their affection or reassurance."]
     ]
   },
   {
@@ -288,19 +318,24 @@ const chakras = [
     questions:[
       ["When someone asks what you really want, what happens?",
        "I can usually express it clearly.",
-       "I struggle to say what I want or feel compelled to over-explain."],
+       "I struggle to say what I want or remain silent.",
+       "I feel compelled to over-explain until I feel understood."],
       ["When you need to say no, what best describes you?",
        "I can usually say it respectfully.",
-       "I avoid saying no or become much more forceful than necessary."],
+       "I avoid saying no even when I need to.",
+       "I become much more forceful than the situation requires."],
       ["During disagreement, how do you communicate?",
        "I express myself and allow the other person to speak.",
-       "I become silent or dominate the conversation."],
+       "I become silent or withdraw from the conversation.",
+       "I dominate the conversation and leave little room for the other person."],
       ["When another person is speaking, what usually happens?",
        "I generally listen before responding.",
-       "I withdraw from the conversation or frequently interrupt."],
+       "I withdraw and find it difficult to stay engaged.",
+       "I frequently interrupt or prepare my response instead of listening."],
       ["How does self-expression generally feel to you?",
        "I can express myself naturally without needing to dominate.",
-       "Expression feels extremely difficult or I feel an almost constant need to speak."]
+       "Expression feels extremely difficult or unsafe for me.",
+       "I feel an almost constant need to speak or be heard."]
     ]
   },
   {
@@ -308,19 +343,24 @@ const chakras = [
     questions:[
       ["Before reaching an important conclusion, what do you usually do?",
        "I consider both my perception and the available information.",
-       "I distrust my judgment or become completely convinced by my first interpretation."],
+       "I distrust my judgment and repeatedly depend on reassurance.",
+       "I become completely convinced by my first interpretation."],
       ["How do you approach intuition?",
        "I consider intuition while also checking facts and reality.",
-       "I completely ignore intuition or treat it as unquestionably correct."],
+       "I completely ignore intuition or inner signals.",
+       "I treat intuition as unquestionably correct without checking reality."],
       ["How do you notice recurring patterns in your life?",
        "I can recognize patterns while accepting that not everything is connected.",
-       "I rarely notice patterns or tend to see meaningful patterns everywhere."],
+       "I rarely notice recurring patterns, even when they affect me.",
+       "I tend to see meaningful connections in nearly everything."],
       ["When someone offers a different perspective, what usually happens?",
        "I can consider it while maintaining my own judgment.",
-       "I immediately doubt myself or completely reject other interpretations."],
+       "I immediately doubt myself and lose confidence in my own view.",
+       "I completely reject other interpretations without considering them."],
       ["What role does imagination play in your life?",
        "It helps me while I remain connected to practical reality.",
-       "I rarely use imagination or frequently retreat into it instead of dealing with reality."]
+       "I rarely use imagination or find it difficult to envision possibilities.",
+       "I frequently retreat into imagination instead of dealing with practical reality."]
     ]
   },
   {
@@ -328,19 +368,21 @@ const chakras = [
     questions:[
       ["How do you feel about meaning or purpose in your life?",
        "I have some sense of meaning while accepting that I do not have every answer.",
-       "I feel completely disconnected from purpose or constantly search for meaning behind everything."],
+       "I feel disconnected from purpose or unsure what gives my life meaning.",
+       "I constantly search for hidden meaning behind nearly everything."],
       ["How does spirituality relate to your everyday responsibilities?",
-       "It supports my life while I continue handling practical responsibilities.",
-       "I feel disconnected from it or use it to avoid practical responsibilities."],
+       "Whether or not spirituality is important to me, I continue handling practical responsibilities.",
+       "I sometimes use spirituality to avoid practical responsibilities."],
       ["When something cannot be explained immediately, what happens?",
        "I can accept some uncertainty.",
-       "I become very uncomfortable or immediately require a spiritual explanation."],
+       "I become very uncomfortable and struggle to tolerate uncertainty.",
+       "I immediately require a spiritual explanation instead of remaining open."],
       ["How do you experience connection with something larger than yourself?",
-       "I can feel connected without losing my individuality or practical grounding.",
-       "I feel completely disconnected or let the idea dominate my identity and decisions."],
+       "I may feel connected or find meaning in other ways while keeping my individuality and practical grounding.",
+       "The idea can dominate my identity and practical decisions."],
       ["How do spiritual or contemplative practices affect everyday life?",
-       "They support and enrich my everyday functioning.",
-       "I feel completely disconnected from them or they interfere with ordinary responsibilities."]
+       "They support my everyday functioning, or I am comfortable not using them.",
+       "They sometimes interfere with ordinary responsibilities or functioning."]
     ]
   }
 ];
@@ -348,26 +390,48 @@ const chakras = [
 const cards = document.getElementById("cards");
 const nav = document.getElementById("chakraNav");
 
-const state = JSON.parse(localStorage.getItem("chakraAnswers") || "{}");
+function readStoredObject(key){
+  try{
+    const value=JSON.parse(localStorage.getItem(key)||"{}");
+    return value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+  }catch{
+    return {};
+  }
+}
+function escapeHtml(value){
+  return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[char]);
+}
+
+const state = readStoredObject("chakraAnswers");
+const notes = readStoredObject("chakraAssessmentNotes");
+Object.values(state).forEach(answers=>{
+  Object.keys(answers||{}).forEach(key=>{
+    if(answers[key]==="issue") answers[key]="unsure";
+  });
+});
 
 function trainingNeed(chakra){
   const a = state[chakra.id] || {};
-  const issues = Object.values(a).filter(v=>v==="issue").length;
-  if (issues===0) return 1;
-  if (issues===1) return 2;
-  if (issues===2) return 3;
-  if (issues===3) return 4;
-  return 5;
+  const responses=chakra.questions.map((_,i)=>a[i]).filter(v=>v==="aligned"||v==="unsure"||v?.startsWith("concern-"));
+  const concerns=responses.filter(v=>v.startsWith("concern-")).length;
+  const unsure=responses.filter(v=>v==="unsure").length;
+  return {answered:responses.length,concerns,unsure,score:Math.min(5,concerns+1)};
 }
 function labelFor(n){
-  return ["","Aligned · maintenance only","Mostly aligned · observe","Some training may help","Training recommended","Priority training"][n];
+  return ["","Currently supported","Light support may help","Some support may help","More support requested","Priority for conversation"][n];
 }
 function renderEval(chakra){
-  const n = trainingNeed(chakra);
+  const result = trainingNeed(chakra);
   const el = document.querySelector(`[data-eval="${chakra.id}"]`);
   if(!el) return;
-  el.querySelector(".eval-value").textContent = `${n}/5 · ${labelFor(n)}`;
-  el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<n?'on':''}"></span>`).join("");
+  if(result.answered<chakra.questions.length){
+    el.querySelector(".eval-value").textContent = `${result.answered}/${chakra.questions.length} answered · Continue the conversation`;
+    el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<result.answered?'on':''}"></span>`).join("");
+    return;
+  }
+  const followUp=result.unsure?` · ${result.unsure} to discuss`:"";
+  el.querySelector(".eval-value").textContent = `${result.score}/5 · ${labelFor(result.score)}${followUp}`;
+  el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<result.score?'on':''}"></span>`).join("");
 }
 
 chakras.forEach((c,ci)=>{
@@ -395,18 +459,28 @@ chakras.forEach((c,ci)=>{
           <label class="answer expected ${saved==="aligned"?"selected":""}">
             <input type="radio" name="${c.id}-${qi}" value="aligned" ${saved==="aligned"?"checked":""}>
             <span class="mark" aria-hidden="true"></span>
-            <span class="answer-copy">${q[1]}<small>EXPECTED / ALIGNED</small></span>
+            <span class="answer-copy">${q[1]}<small>BALANCED / SUPPORTED</small></span>
           </label>
-          <label class="answer ${saved==="issue"?"selected":""}">
-            <input type="radio" name="${c.id}-${qi}" value="issue" ${saved==="issue"?"checked":""}>
+          ${q.slice(2).map((copy,oi)=>`<label class="answer ${saved===`concern-${oi}`?"selected":""}">
+            <input type="radio" name="${c.id}-${qi}" value="concern-${oi}" ${saved===`concern-${oi}`?"checked":""}>
             <span class="mark" aria-hidden="true"></span>
-            <span class="answer-copy">${q[2]}<small>NEEDS ATTENTION</small></span>
+            <span class="answer-copy">${copy}<small>MORE SUPPORT MAY HELP</small></span>
+          </label>`).join("")}
+          <label class="answer uncertain ${saved==="unsure"?"selected":""}">
+            <input type="radio" name="${c.id}-${qi}" value="unsure" ${saved==="unsure"?"checked":""}>
+            <span class="mark" aria-hidden="true"></span>
+            <span class="answer-copy">It changes by situation, or I am not sure yet.<small>IT VARIES / DISCUSS</small></span>
           </label>
         </div>
       </div>`;
     }).join("")}
-    <footer class="evaluation" data-eval="${c.id}">
-      <div><div class="eval-label">Training need</div><div class="eval-value"></div></div>
+    <div class="context-note">
+      <label for="note-${c.id}">Client context or counsellor note <small>(optional)</small></label>
+      <textarea id="note-${c.id}" data-note="${c.id}" placeholder="What is happening, how often, and how is it affecting everyday life?">${escapeHtml(notes[c.id]||"")}</textarea>
+      <small class="context-help">Record the client’s own words or relevant circumstances. Avoid diagnosis or assumptions.</small>
+    </div>
+    <footer class="evaluation" data-eval="${c.id}" aria-live="polite">
+      <div><div class="eval-label">Meditation support reflection</div><div class="eval-value"></div></div>
       <div class="meter" aria-hidden="true"></div>
     </footer>`;
   cards.appendChild(section);
@@ -422,6 +496,11 @@ document.addEventListener("change",e=>{
   e.target.closest(".answer").classList.add("selected");
   renderEval(chakras.find(c=>c.id===cid));
 });
+document.addEventListener("input",e=>{
+  if(!e.target.matches("textarea[data-note]")) return;
+  notes[e.target.dataset.note]=e.target.value;
+  localStorage.setItem("chakraAssessmentNotes",JSON.stringify(notes));
+});
 chakras.forEach(renderEval);
 
 const savedScale=parseFloat(localStorage.getItem("chakraFontScale")||"1");
@@ -435,6 +514,12 @@ function setScale(v){
 document.getElementById("fontUp").onclick=()=>setScale(getScale()+.1);
 document.getElementById("fontDown").onclick=()=>setScale(getScale()-.1);
 document.getElementById("fontReset").onclick=()=>setScale(1);
+document.getElementById("newAssessment").onclick=()=>{
+  if(!window.confirm("Clear all answers and notes before beginning with a new client?")) return;
+  localStorage.removeItem("chakraAnswers");
+  localStorage.removeItem("chakraAssessmentNotes");
+  window.location.reload();
+};
 
 const tBtn=document.getElementById("translateBtn");
 const tBox=document.getElementById("google_translate_element");
