@@ -112,12 +112,34 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
   assert.ok(scripts[chakra].affirmation_ml, `${chakra} Malayalam affirmation is required`);
 }
 
+const malayalamChakraNames = {
+  root: 'മൂലാധാര ചക്രത്തിലേക്ക്',
+  sacral: 'സ്വാധിഷ്ഠാന ചക്രത്തിലേക്ക്',
+  solar: 'മണിപൂര ചക്രത്തിലേക്ക്',
+  heart: 'അനാഹത ചക്രത്തിലേക്ക്',
+  throat: 'വിശുദ്ധ ചക്രത്തിലേക്ക്',
+  thirdeye: 'ആജ്ഞാചക്രത്തിലേക്ക്',
+  crown: 'സഹസ്രാര ചക്രത്തിൽ',
+};
+for (const [chakra, canonicalName] of Object.entries(malayalamChakraNames)) {
+  assert.match(scripts[chakra].meditation_ml, new RegExp(canonicalName, 'u'),
+    `${chakra} should use only its canonical Malayalam chakra name`);
+}
+assert.doesNotMatch(
+  Object.values(malayalamChakraNames).map((_, index) =>
+    scripts[['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'][index]].meditation_ml).join(' '),
+  /റൂട്ട്|സാക്രൽ|സോളാർ പ്ലെക്സസ്|തൊണ്ടചക്ര|മൂന്നാം കണ്ണ് ചക്ര|കിരീടചക്ര/u,
+  'Malayalam chakra narration must not mix English or explanatory chakra names',
+);
+assert.match(scripts.intro.gratitude_ml, /പൂർണ്ണമായി എന്നിൽ ശ്രദ്ധിക്കൂ/u);
+assert.match(scripts.intro.moon.waning_ml, /പിൻവാങ്ങുന്ന ചന്ദ്രനെ തിരിച്ചുവരവിന്റെ പ്രതീകമായി/u);
+
 assert.match(scripts.hooponopono.intro.en, /optional/i);
-assert.match(scripts.hooponopono.intro.ml, /ഐച്ഛിക/u);
+assert.match(scripts.hooponopono.intro.ml, /വേണമെങ്കിൽ മാത്രം/u);
 assert.match(scripts.closing.en, /awareness you cultivated/i);
 assert.match(scripts.closing.ml, /വളർത്തിയ അവബോധം/u);
-assert.match(scripts.bath_session.intro.en, /keep the device dry/i);
-assert.match(scripts.bath_session.intro.ml, /ഉപകരണം വെള്ളത്തിൽ നിന്ന്/u);
+assert.match(scripts.bath_session.intro.en, /sadhak guide/i);
+assert.match(scripts.bath_session.intro.ml, /സാധകന്റെ മാർഗ്ഗനിർദ്ദേശം/u);
 assert.match(scripts.yoga.intro.en, /stop for pain/i);
 assert.match(scripts.yoga.intro.ml, /വേദന/u);
 
