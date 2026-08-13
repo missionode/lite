@@ -21,10 +21,6 @@
     "journeyComplete": "Journey Complete",
     "returnToRoom": "Return to Room",
     "meditationCompleted": "Meditation Completed. Stay Blessed.",
-    "journalPrompt": "What shifted? What are you calling in today?",
-    "saveEntry": "Save Entry",
-    "saved": "✓ Saved",
-    "lastEntry": "Last entry: ",
     "yoga": "Yoga Bridge",
     "yogaSubtitle": "Union of breath, movement, and spirit",
     "purification": "Purification",
@@ -150,8 +146,6 @@
     ,"consultationComingSoon": "Session Consultation will open here in the next release. Your current meditation flow remains unchanged."
     ,"close": "Close"
     ,"sessionTime": "Session Time"
-    ,"totalJourneys": "Total Journeys"
-    ,"writeFreely": "Write freely..."
     ,"root": "Root"
     ,"sacral": "Sacral"
     ,"solar": "Solar"

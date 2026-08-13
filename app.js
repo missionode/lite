@@ -17,6 +17,11 @@ const MANTRA_AUDIO_MAP = {
     high_energy: 'audio/HREEM.mp3'
 };
 
+// Journey completion hands off without sharing meditation or financial data.
+const EARN_HANDOFF_URL = 'https://missionode.github.io/earn-app/receive.html?Source=Lite';
+const EARN_HANDOFF_DELAY_MS = 3000;
+let earnHandoffTimer = null;
+
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -52,6 +57,20 @@ const setText = (id, txt) => {
     const el = document.getElementById(id);
     if (el) el.textContent = txt;
 };
+
+function cancelEarnHandoff() {
+    if (earnHandoffTimer === null) return;
+    window.clearTimeout(earnHandoffTimer);
+    earnHandoffTimer = null;
+}
+
+function scheduleEarnHandoff() {
+    cancelEarnHandoff();
+    earnHandoffTimer = window.setTimeout(() => {
+        earnHandoffTimer = null;
+        window.location.assign(EARN_HANDOFF_URL);
+    }, EARN_HANDOFF_DELAY_MS);
+}
 
 function setSymbolImage(src, symbolEl = document.getElementById('chakra-symbol')) {
     if (!symbolEl || !src) return;
@@ -436,16 +455,12 @@ function applyLocaleUI() {
     setText('completion-title', t('ui.journeyComplete'));
     setText('completion-message', t('ui.meditationCompleted'));
     setText('close-completion', t('ui.returnToRoom'));
-    setText('journal-prompt', t('ui.journalPrompt'));
-    setText('save-journal', t('ui.saveEntry'));
     setText('returning-journey-label', t('ui.returningJourney'));
     setText('save-config', t('ui.startMeditation'));
     setText('start-meditation', t('ui.beginJourney'));
-    document.querySelectorAll('.stat-lbl').forEach((element, index) => {
-        element.textContent = t(index === 0 ? 'ui.sessionTime' : 'ui.totalJourneys');
+    document.querySelectorAll('.stat-lbl').forEach((element) => {
+        element.textContent = t('ui.sessionTime');
     });
-    const journalEntry = document.getElementById('journal-entry');
-    if (journalEntry) journalEntry.placeholder = t('ui.writeFreely');
     const intentionInput = document.getElementById('intention-input');
     if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
     document.querySelectorAll('[data-i18n]').forEach((element) => {
@@ -2715,8 +2730,8 @@ class MeditationController {
         this.visual.stop(); 
         this.audio.stopDrone(); 
         this.audio.stopMantraTrack(); 
-        this.audio.fadeOutBackgroundMusic(12); // Long 12s final fade out
-        setTimeout(() => this.audio.stopBackgroundMusic(), 13000);
+        this.audio.fadeOutBackgroundMusic(2.5);
+        setTimeout(() => this.audio.stopBackgroundMusic(), EARN_HANDOFF_DELAY_MS);
         wakeLock.release();
         piperTTS.cancel('journey finished');
         document.getElementById('aura-bg').style.opacity = "0";
@@ -2728,7 +2743,6 @@ class MeditationController {
         setText('stat-journeys', state.stats.journeys);
         setText('stat-time', state.stats.time);
         setText('stat-session-time', sessionMinutes + ' mins');
-        setText('stat-total-journeys', state.stats.journeys);
         // Lift sleep mode dimming once session ends
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
@@ -2746,22 +2760,8 @@ class MeditationController {
         if (msg) msg.textContent = t('ui.meditationCompleted');
         if (btn) btn.textContent = t('ui.returnToRoom');
 
-        // Journal: reset textarea, show last entry date, localise prompt
-        syncValue('journal-entry', '');
-        setText('journal-prompt', t('ui.journalPrompt'));
-        setText('save-journal', t('ui.saveEntry'));
-        const journalEntries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
-        const lastInfo = document.getElementById('last-journal-info');
-        lastInfo.textContent = journalEntries.length > 0
-            ? t('ui.lastEntry') + journalEntries[0].date
-            : '';
-
         modal.classList.remove('hidden');
-
-        // DND Reminder
-        setTimeout(() => {
-            alert("Meditation complete. You can now turn off 'Do Not Disturb' if you wish.");
-        }, 500);
+        scheduleEarnHandoff();
     }
 
     stop() {
@@ -3907,6 +3907,7 @@ function attachEventListeners() {
         if (audio.toggleAudioFilters) audio.toggleAudioFilters(state.audioFilters);
     });
     document.getElementById('close-completion').addEventListener('click', () => {
+        cancelEarnHandoff();
         document.getElementById('completion-modal').classList.add('hidden');
         const aura = document.getElementById('aura-bg');
         if (aura) {
@@ -3942,26 +3943,6 @@ function attachEventListeners() {
         });
     }
 
-    // Journal save
-    document.getElementById('save-journal').addEventListener('click', () => {
-        const entryEl = document.getElementById('journal-entry');
-        const entry = entryEl ? entryEl.value.trim() : "";
-        if (!entry) return;
-        const entries = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
-        entries.unshift({ date: new Date().toLocaleDateString(), text: entry });
-        localStorage.setItem('chakra_journal', JSON.stringify(entries.slice(0, 50)));
-        syncValue('journal-entry', '');
-        const info = document.getElementById('last-journal-info');
-        if (info) {
-            info.textContent = t('ui.saved');
-            setTimeout(() => {
-                const saved = JSON.parse(localStorage.getItem('chakra_journal') || '[]');
-                info.textContent = saved.length > 0
-                    ? t('ui.lastEntry') + saved[0].date
-                    : '';
-            }, 2000);
-        }
-    });
     const mixer = document.getElementById('volume-mixer');
     const mixerCloseButtons = [document.getElementById('close-mixer'), document.getElementById('close-mixer-bottom')].filter(Boolean);
     document.getElementById('btn-mixer').addEventListener('click', (e) => {
