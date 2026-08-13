@@ -3736,7 +3736,7 @@ function attachEventListeners() {
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     beginConsultationBtn?.addEventListener('click', () => {
-        alert(t('ui.consultationComingSoon'));
+        window.location.href = './docs/assesment.html';
     });
 
     const settingsHelpModal = document.getElementById('settings-help-modal');

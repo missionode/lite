@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff8f4">
+<title>Chakra Assessment</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --fs:1;
+  --bg:#fffaf7;
+  --card:#ffffff;
+  --ink:#171513;
+  --muted:#6e625d;
+  --line:#ecdeda;
+  --accent:#b81921;
+  --accent-soft:#fff0ee;
+  --ok:#2f933f;
+  --ok-soft:#f1faf2;
+  --warn:#c97918;
+  --shadow:0 10px 28px rgba(85,41,31,.07);
+  --radius:26px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 90% 3%, rgba(236,115,108,.12), transparent 28rem),
+    radial-gradient(circle at -10% 25%, rgba(255,192,142,.13), transparent 24rem),
+    var(--bg);
+  font-family:"Nunito","Noto Sans Malayalam",system-ui,sans-serif;
+  font-size:calc(18px * var(--fs));
+}
+button,input{font:inherit}
+.shell{max-width:864px;margin:auto;padding:18px 14px 64px}
+.toolbar{
+  position:sticky;top:0;z-index:20;
+  margin:-18px -14px 18px;
+  padding:12px 14px;
+  background:rgba(255,250,247,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(225,205,198,.7);
+}
+.toolbar-inner{max-width:864px;margin:auto;display:flex;gap:10px;align-items:center}
+.brand{font-weight:800;font-size:calc(19px * var(--fs));margin-right:auto}
+.control{
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  min-height:46px;padding:8px 14px;border-radius:14px;font-weight:800;
+}
+.control:active{transform:translateY(1px)}
+.font-group{display:flex;gap:6px}
+.font-group .control{min-width:46px;padding:6px}
+.translate-wrap{position:relative}
+#google_translate_element{
+  position:absolute;right:0;top:52px;background:#fff;padding:10px;border-radius:14px;
+  box-shadow:var(--shadow);border:1px solid var(--line);display:none;min-width:210px
+}
+#google_translate_element.open{display:block}
+.goog-te-gadget{font-size:0!important}
+.goog-te-combo{
+  width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);
+  font-family:inherit!important;font-size:16px!important;background:white
+}
+.goog-logo-link,.goog-te-gadget span{display:none!important}
+.hero{
+  position:relative;overflow:hidden;
+  padding:26px 24px 24px;border-radius:32px;background:
+    linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,244,238,.92));
+  border:1px solid #f0ddd6;box-shadow:var(--shadow);margin-bottom:18px
+}
+.back-link{
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:15px;
+  color:var(--accent);font-weight:800;text-decoration:none
+}
+.back-link:hover{text-decoration:underline}
+.back-link:focus-visible{outline:3px solid rgba(184,25,33,.28);outline-offset:5px;border-radius:6px}
+.hero:after{
+  content:"";position:absolute;inset:auto -12% -36% 20%;height:220px;opacity:.35;
+  background:repeating-radial-gradient(ellipse at center,transparent 0 12px,rgba(184,25,33,.16) 13px 14px,transparent 15px 26px);
+  transform:rotate(-9deg);pointer-events:none
+}
+.eyebrow{color:var(--accent);font-weight:800;font-size:calc(14px * var(--fs));letter-spacing:.08em}
+h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width:700px}
+.hero p{margin:0;color:var(--muted);font-size:calc(19px * var(--fs));line-height:1.45;max-width:720px}
+.chakra-nav{
+  display:flex;gap:9px;overflow-x:auto;padding:4px 2px 14px;
+  scrollbar-width:none;position:sticky;top:71px;z-index:15;background:linear-gradient(var(--bg) 75%,transparent)
+}
+.chakra-nav::-webkit-scrollbar{display:none}
+.chakra-pill{
+  white-space:nowrap;border:1px solid var(--line);background:#fff;
+  border-radius:999px;padding:10px 14px;font-weight:800;color:#504743
+}
+.chakra-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chakra-card{
+  --chakra:#b81921;
+  margin:12px 0 28px;background:var(--card);border:1px solid var(--line);
+  border-radius:30px;box-shadow:var(--shadow);overflow:hidden
+}
+.card-head{
+  padding:24px 22px 20px;background:
+    linear-gradient(120deg,color-mix(in srgb,var(--chakra) 9%,white),#fff 72%);
+  border-bottom:1px solid var(--line)
+}
+.card-kicker{font-weight:800;color:var(--chakra);font-size:calc(14px * var(--fs));letter-spacing:.06em;text-transform:uppercase}
+.card-title{font-size:calc(34px * var(--fs));line-height:1.08;margin:5px 0 4px;font-weight:800}
+.card-theme{font-size:calc(20px * var(--fs));color:#574c47;font-weight:700}
+.question{padding:26px 22px;border-bottom:1px solid var(--line)}
+.question:last-of-type{border-bottom:none}
+.qtext{
+  font-size:calc(31px * var(--fs));line-height:1.24;font-weight:800;
+  letter-spacing:-.018em;margin:0 0 18px
+}
+.answers{display:grid;gap:12px}
+.answer{
+  position:relative;display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;
+  width:100%;text-align:left;border:1.5px solid #ded6d2;background:#fff;
+  border-radius:20px;padding:18px 18px;cursor:pointer;color:var(--ink)
+}
+.answer.expected{border-color:#a8d3ad;background:var(--ok-soft)}
+.answer.selected{box-shadow:0 0 0 3px color-mix(in srgb,var(--chakra) 15%,transparent)}
+.answer input{position:absolute;opacity:0;pointer-events:none}
+.mark{
+  width:32px;height:32px;border:3px solid #807873;border-radius:50%;
+  display:grid;place-items:center;margin-top:2px;color:#fff;font-size:20px;font-weight:900
+}
+.answer.expected .mark{border-color:var(--ok);background:var(--ok)}
+.answer.expected .mark::after{content:"✓"}
+.answer:not(.expected) .mark::after{content:""}
+.answer.selected:not(.expected) .mark{border-color:var(--chakra);background:var(--chakra)}
+.answer.selected:not(.expected) .mark::after{content:"✓"}
+.answer-copy{font-size:calc(26px * var(--fs));line-height:1.33;font-weight:700}
+.answer-copy small{
+  display:block;margin-top:5px;font-size:calc(15px * var(--fs));line-height:1.35;
+  color:var(--muted);font-weight:800;letter-spacing:.02em
+}
+.evaluation{
+  display:flex;gap:16px;align-items:center;justify-content:space-between;
+  padding:20px 22px;background:#fffaf8
+}
+.eval-label{font-size:calc(15px * var(--fs));color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.eval-value{font-size:calc(24px * var(--fs));font-weight:800;margin-top:3px}
+.meter{display:flex;gap:6px}
+.dot{width:15px;height:15px;border-radius:50%;background:#e6ddd9}
+.dot.on{background:var(--chakra)}
+.note{
+  margin:8px 4px 0;color:var(--muted);font-size:calc(15px * var(--fs));line-height:1.5
+}
+@media(max-width:520px){
+  .shell{padding-left:10px;padding-right:10px}
+  .toolbar{margin-left:-10px;margin-right:-10px}
+  .toolbar-inner{gap:7px}
+  .brand{display:none}
+  .control{min-height:44px;padding:7px 11px}
+  h1{font-size:calc(34px * var(--fs))}
+  .card-head{padding:22px 18px 18px}
+  .card-title{font-size:calc(31px * var(--fs))}
+  .question{padding:25px 17px}
+  .qtext{font-size:calc(29px * var(--fs))}
+  .answer{grid-template-columns:34px 1fr;padding:17px 14px;gap:12px}
+  .mark{width:30px;height:30px}
+  .answer-copy{font-size:calc(24px * var(--fs))}
+  .evaluation{padding:18px 17px}
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="brand">Chakra Assessment</div>
+    <div class="font-group" aria-label="Text size controls">
+      <button class="control" id="fontDown" aria-label="Decrease font size">A−</button>
+      <button class="control" id="fontReset" aria-label="Reset font size">A</button>
+      <button class="control" id="fontUp" aria-label="Increase font size">A+</button>
+    </div>
+    <div class="translate-wrap">
+      <button class="control" id="translateBtn" aria-expanded="false">EN / മലയാളം</button>
+      <div id="google_translate_element"></div>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+  <section class="hero">
+    <a class="back-link" href="../index.html" aria-label="Back to meditation lobby">← Back to Lobby</a>
+    <div class="eyebrow">COUNSELLOR TOOL · 7 CHAKRAS</div>
+    <h1>Chakra Training-Need Assessment</h1>
+    <p>Ask each question conversationally and tick the answer that best fits. The green-marked option is the expected/aligned response. Translation is kept separate from the assessment layout.</p>
+  </section>
+
+  <nav class="chakra-nav" id="chakraNav" aria-label="Chakra navigation"></nav>
+  <div id="cards"></div>
+
+  <p class="note">This is a wellness / meditation reflection tool, not a clinical diagnostic instrument. Google translation requires an internet connection.</p>
+</main>
+
+<script>
+const chakras = [
+  {
+    id:"root", name:"Root Chakra", sanskrit:"Muladhara", theme:"Safety · Stability · Grounding", color:"#b81921",
+    questions:[
+      ["When life suddenly feels uncertain, what usually happens to you?",
+       "I usually settle myself and regain stability.",
+       "I often remain worried or insecure."],
+      ["How do you feel about stability in your everyday life?",
+       "I feel reasonably secure while remaining flexible.",
+       "I need things to feel under control before I can relax."],
+      ["When your normal routine changes, what happens?",
+       "I can adapt reasonably well.",
+       "I remain unsettled for a long time."],
+      ["When you think about money, home or basic security, what best describes you?",
+       "I give these areas appropriate attention without constantly worrying.",
+       "They occupy a large part of my thoughts."],
+      ["In everyday life, do you generally feel grounded and present?",
+       "Yes, generally.",
+       "I often feel restless or disconnected."]
+    ]
+  },
+  {
+    id:"sacral", name:"Sacral Chakra", sanskrit:"Svadhisthana", theme:"Emotion · Pleasure · Creativity", color:"#d96b19",
+    questions:[
+      ["When strong emotions arise, what usually happens?",
+       "I can feel and express them without being controlled by them.",
+       "I usually suppress them or become overwhelmed by them."],
+      ["How is your relationship with enjoyment and pleasure?",
+       "I can enjoy things without feeling dependent on them.",
+       "I tend to avoid pleasure or constantly seek more stimulation."],
+      ["How does creativity show up in your life?",
+       "Creativity and playfulness have a natural place in my life.",
+       "I rarely feel creative or I constantly need novelty to feel engaged."],
+      ["In close relationships, what best describes you?",
+       "I can feel close while maintaining my individuality.",
+       "I usually become very detached or overly dependent."],
+      ["When life changes unexpectedly, how do you respond emotionally?",
+       "I can gradually adapt to the change.",
+       "I strongly resist change or constantly seek something new."]
+    ]
+  },
+  {
+    id:"solar", name:"Solar Plexus Chakra", sanskrit:"Manipura", theme:"Confidence · Willpower · Action", color:"#d49b00",
+    questions:[
+      ["When you make an important decision, what usually happens?",
+       "I generally trust myself while remaining open to useful advice.",
+       "I constantly doubt myself or need everything to happen my way."],
+      ["When you face a difficult challenge, how do you respond?",
+       "I try, while accepting that failure is possible.",
+       "I avoid trying or feel compelled to prove myself at any cost."],
+      ["How would you describe your personal boundaries?",
+       "I can protect my boundaries while respecting other people.",
+       "My boundaries are very weak or extremely rigid."],
+      ["During disagreement, what best describes you?",
+       "I can express my position without needing to control the other person.",
+       "I usually give in or try to dominate the situation."],
+      ["How does ambition feel in your life?",
+       "It motivates me without controlling my life.",
+       "I lack motivation or feel driven to constantly achieve and prove myself."]
+    ]
+  },
+  {
+    id:"heart", name:"Heart Chakra", sanskrit:"Anahata", theme:"Love · Compassion · Boundaries", color:"#3b8c55",
+    questions:[
+      ["When you care for someone, what best describes you?",
+       "I can care for them while also protecting my own needs.",
+       "I avoid emotional involvement or repeatedly sacrifice myself."],
+      ["When someone gives you affection or appreciation, what happens?",
+       "I can generally receive it comfortably.",
+       "I tend to reject it, distrust it or become strongly dependent on it."],
+      ["After someone emotionally hurts you, what usually happens over time?",
+       "I can process what happened and gradually move forward.",
+       "I remain emotionally closed or stay intensely attached to the hurt."],
+      ["When you feel compassion for another person, what do you usually do?",
+       "I can help while maintaining appropriate boundaries.",
+       "I feel disconnected or become responsible for rescuing them."],
+      ["In a close relationship, what feels most like you?",
+       "I can experience closeness while remaining emotionally independent.",
+       "I keep people distant or become highly dependent on their affection."]
+    ]
+  },
+  {
+    id:"throat", name:"Throat Chakra", sanskrit:"Vishuddha", theme:"Expression · Truth · Listening", color:"#2d7fa8",
+    questions:[
+      ["When someone asks what you really want, what happens?",
+       "I can usually express it clearly.",
+       "I struggle to say what I want or feel compelled to over-explain."],
+      ["When you need to say no, what best describes you?",
+       "I can usually say it respectfully.",
+       "I avoid saying no or become much more forceful than necessary."],
+      ["During disagreement, how do you communicate?",
+       "I express myself and allow the other person to speak.",
+       "I become silent or dominate the conversation."],
+      ["When another person is speaking, what usually happens?",
+       "I generally listen before responding.",
+       "I withdraw from the conversation or frequently interrupt."],
+      ["How does self-expression generally feel to you?",
+       "I can express myself naturally without needing to dominate.",
+       "Expression feels extremely difficult or I feel an almost constant need to speak."]
+    ]
+  },
+  {
+    id:"third-eye", name:"Third Eye Chakra", sanskrit:"Ajna", theme:"Insight · Intuition · Clarity", color:"#6550a4",
+    questions:[
+      ["Before reaching an important conclusion, what do you usually do?",
+       "I consider both my perception and the available information.",
+       "I distrust my judgment or become completely convinced by my first interpretation."],
+      ["How do you approach intuition?",
+       "I consider intuition while also checking facts and reality.",
+       "I completely ignore intuition or treat it as unquestionably correct."],
+      ["How do you notice recurring patterns in your life?",
+       "I can recognize patterns while accepting that not everything is connected.",
+       "I rarely notice patterns or tend to see meaningful patterns everywhere."],
+      ["When someone offers a different perspective, what usually happens?",
+       "I can consider it while maintaining my own judgment.",
+       "I immediately doubt myself or completely reject other interpretations."],
+      ["What role does imagination play in your life?",
+       "It helps me while I remain connected to practical reality.",
+       "I rarely use imagination or frequently retreat into it instead of dealing with reality."]
+    ]
+  },
+  {
+    id:"crown", name:"Crown Chakra", sanskrit:"Sahasrara", theme:"Meaning · Awareness · Connection", color:"#79598d",
+    questions:[
+      ["How do you feel about meaning or purpose in your life?",
+       "I have some sense of meaning while accepting that I do not have every answer.",
+       "I feel completely disconnected from purpose or constantly search for meaning behind everything."],
+      ["How does spirituality relate to your everyday responsibilities?",
+       "It supports my life while I continue handling practical responsibilities.",
+       "I feel disconnected from it or use it to avoid practical responsibilities."],
+      ["When something cannot be explained immediately, what happens?",
+       "I can accept some uncertainty.",
+       "I become very uncomfortable or immediately require a spiritual explanation."],
+      ["How do you experience connection with something larger than yourself?",
+       "I can feel connected without losing my individuality or practical grounding.",
+       "I feel completely disconnected or let the idea dominate my identity and decisions."],
+      ["How do spiritual or contemplative practices affect everyday life?",
+       "They support and enrich my everyday functioning.",
+       "I feel completely disconnected from them or they interfere with ordinary responsibilities."]
+    ]
+  }
+];
+
+const cards = document.getElementById("cards");
+const nav = document.getElementById("chakraNav");
+
+const state = JSON.parse(localStorage.getItem("chakraAnswers") || "{}");
+
+function trainingNeed(chakra){
+  const a = state[chakra.id] || {};
+  const issues = Object.values(a).filter(v=>v==="issue").length;
+  if (issues===0) return 1;
+  if (issues===1) return 2;
+  if (issues===2) return 3;
+  if (issues===3) return 4;
+  return 5;
+}
+function labelFor(n){
+  return ["","Aligned · maintenance only","Mostly aligned · observe","Some training may help","Training recommended","Priority training"][n];
+}
+function renderEval(chakra){
+  const n = trainingNeed(chakra);
+  const el = document.querySelector(`[data-eval="${chakra.id}"]`);
+  if(!el) return;
+  el.querySelector(".eval-value").textContent = `${n}/5 · ${labelFor(n)}`;
+  el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<n?'on':''}"></span>`).join("");
+}
+
+chakras.forEach((c,ci)=>{
+  const p=document.createElement("button");
+  p.className="chakra-pill"+(ci===0?" active":"");
+  p.textContent=c.name.replace(" Chakra","");
+  p.onclick=()=>document.getElementById(c.id).scrollIntoView({behavior:"smooth",block:"start"});
+  nav.appendChild(p);
+
+  const section=document.createElement("section");
+  section.className="chakra-card";
+  section.id=c.id;
+  section.style.setProperty("--chakra",c.color);
+  section.innerHTML=`
+    <header class="card-head">
+      <div class="card-kicker">Card ${ci+1} of 7</div>
+      <div class="card-title">${c.name}</div>
+      <div class="card-theme">${c.sanskrit} · ${c.theme}</div>
+    </header>
+    ${c.questions.map((q,qi)=>{
+      const saved=(state[c.id]||{})[qi];
+      return `<div class="question">
+        <p class="qtext">${q[0]}</p>
+        <div class="answers">
+          <label class="answer expected ${saved==="aligned"?"selected":""}">
+            <input type="radio" name="${c.id}-${qi}" value="aligned" ${saved==="aligned"?"checked":""}>
+            <span class="mark" aria-hidden="true"></span>
+            <span class="answer-copy">${q[1]}<small>EXPECTED / ALIGNED</small></span>
+          </label>
+          <label class="answer ${saved==="issue"?"selected":""}">
+            <input type="radio" name="${c.id}-${qi}" value="issue" ${saved==="issue"?"checked":""}>
+            <span class="mark" aria-hidden="true"></span>
+            <span class="answer-copy">${q[2]}<small>NEEDS ATTENTION</small></span>
+          </label>
+        </div>
+      </div>`;
+    }).join("")}
+    <footer class="evaluation" data-eval="${c.id}">
+      <div><div class="eval-label">Training need</div><div class="eval-value"></div></div>
+      <div class="meter" aria-hidden="true"></div>
+    </footer>`;
+  cards.appendChild(section);
+});
+
+document.addEventListener("change",e=>{
+  if(!e.target.matches('input[type="radio"]')) return;
+  const [cid,qi]=e.target.name.split(/-(?=\d+$)/);
+  state[cid]=state[cid]||{};
+  state[cid][qi]=e.target.value;
+  localStorage.setItem("chakraAnswers",JSON.stringify(state));
+  e.target.closest(".answers").querySelectorAll(".answer").forEach(x=>x.classList.remove("selected"));
+  e.target.closest(".answer").classList.add("selected");
+  renderEval(chakras.find(c=>c.id===cid));
+});
+chakras.forEach(renderEval);
+
+const savedScale=parseFloat(localStorage.getItem("chakraFontScale")||"1");
+document.documentElement.style.setProperty("--fs",Math.min(1.45,Math.max(.85,savedScale)));
+function getScale(){return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--fs"))||1}
+function setScale(v){
+  v=Math.round(Math.min(1.45,Math.max(.85,v))*100)/100;
+  document.documentElement.style.setProperty("--fs",v);
+  localStorage.setItem("chakraFontScale",v);
+}
+document.getElementById("fontUp").onclick=()=>setScale(getScale()+.1);
+document.getElementById("fontDown").onclick=()=>setScale(getScale()-.1);
+document.getElementById("fontReset").onclick=()=>setScale(1);
+
+const tBtn=document.getElementById("translateBtn");
+const tBox=document.getElementById("google_translate_element");
+tBtn.onclick=()=>{
+  tBox.classList.toggle("open");
+  tBtn.setAttribute("aria-expanded",tBox.classList.contains("open"));
+};
+
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:"en",
+    includedLanguages:"en,ml",
+    autoDisplay:false,
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE
+  },"google_translate_element");
+}
+
+const sections=[...document.querySelectorAll(".chakra-card")];
+const pills=[...document.querySelectorAll(".chakra-pill")];
+const io=new IntersectionObserver(entries=>{
+  const visible=entries.filter(x=>x.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+  if(!visible)return;
+  pills.forEach((p,i)=>p.classList.toggle("active",sections[i].id===visible.target.id));
+},{rootMargin:"-30% 0px -55% 0px",threshold:[0,.1,.25]});
+sections.forEach(s=>io.observe(s));
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
