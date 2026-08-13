@@ -23,8 +23,6 @@
     "symbol": "symbols/root.png",
     "meditation_en": "Feel grounded, steady, and safe enough to begin.",
     "meditation_ml": "ആരംഭിക്കാൻ മതിയായ ശാന്തതയും സ്ഥിരതയും അനുഭവിക്കൂ.",
-    "en": "Root chakra. Feel grounded.",
-    "ml": "മൂലാധാരം. ഭൂമിയോട് ചേർന്ന് നിൽക്കൂ.",
     "affirmation_en": "You are safe.",
     "affirmation_ml": "നിങ്ങൾ സുരക്ഷിതരാണ്."
   },
@@ -36,8 +34,6 @@
     "symbol": "symbols/sacral.png",
     "meditation_en": "Welcome creativity, ease, and honest emotional flow.",
     "meditation_ml": "സർഗ്ഗാത്മകതയും ലാളിത്യവും സത്യസന്ധമായ വികാരപ്രവാഹവും സ്വീകരിക്കൂ.",
-    "en": "Sacral chakra. Let energy flow.",
-    "ml": "സ്വാധിഷ്ഠാനം. ഊർജ്ജം ഒഴുകട്ടെ.",
     "affirmation_en": "Joy is welcome.",
     "affirmation_ml": "ആനന്ദത്തെ സ്വീകരിക്കൂ."
   },
@@ -49,8 +45,6 @@
     "symbol": "symbols/solar.png",
     "meditation_en": "Breathe in courage and clear, purposeful action.",
     "meditation_ml": "ധൈര്യവും വ്യക്തമായ ലക്ഷ്യബോധമുള്ള പ്രവർത്തനവും ശ്വസിച്ചെടുക്കൂ.",
-    "en": "Solar chakra. Feel your strength.",
-    "ml": "മണിപൂരകം. നിങ്ങളുടെ ശക്തി അനുഭവിക്കൂ.",
     "affirmation_en": "You are powerful.",
     "affirmation_ml": "നിങ്ങൾ ശക്തരാണ്."
   },
@@ -62,8 +56,6 @@
     "symbol": "symbols/heart.png",
     "meditation_en": "Make room for compassion, gratitude, and connection.",
     "meditation_ml": "കരുണയ്ക്കും നന്ദിക്കും ബന്ധത്തിനും ഇടം നൽകൂ.",
-    "en": "Heart chakra. Breathe into love.",
-    "ml": "ഹൃദയചക്രം. സ്നേഹത്തിലേക്ക് ശ്വസിക്കൂ.",
     "affirmation_en": "Your heart is open.",
     "affirmation_ml": "നിങ്ങളുടെ ഹൃദയം തുറന്നിരിക്കുന്നു."
   },
@@ -75,8 +67,6 @@
     "symbol": "symbols/throat.png",
     "meditation_en": "Let your words become clear, sincere, and kind.",
     "meditation_ml": "നിങ്ങളുടെ വാക്കുകൾ വ്യക്തവും സത്യസന്ധവും സൗമ്യവുമാകട്ടെ.",
-    "en": "Throat chakra. Speak your truth.",
-    "ml": "തൊണ്ടചക്രം. നിങ്ങളുടെ സത്യം പറയൂ.",
     "affirmation_en": "Your voice is clear.",
     "affirmation_ml": "നിങ്ങളുടെ ശബ്ദം വ്യക്തമാണ്."
   },
@@ -88,8 +78,6 @@
     "symbol": "symbols/thirdeye.png",
     "meditation_en": "Let quiet attention reveal clarity and insight.",
     "meditation_ml": "ശാന്തമായ ശ്രദ്ധ വ്യക്തതയും ഉൾക്കാഴ്ചയും വെളിപ്പെടുത്തട്ടെ.",
-    "en": "Third eye. See clearly.",
-    "ml": "മൂന്നാം കണ്ണ്. വ്യക്തമായി കാണൂ.",
     "affirmation_en": "Your mind is clear.",
     "affirmation_ml": "നിങ്ങളുടെ മനസ്സ് വ്യക്തമാണ്."
   },
@@ -101,14 +89,10 @@
     "symbol": "symbols/crown.png",
     "meditation_en": "Rest in stillness, perspective, and connection.",
     "meditation_ml": "നിശ്ചലതയിലും വിശാലദൃഷ്ടിയിലും ബന്ധബോധത്തിലും വിശ്രമിക്കൂ.",
-    "en": "Crown chakra. Rest in stillness.",
-    "ml": "സഹസ്രാരം. നിശ്ചലതയിൽ വിശ്രമിക്കൂ.",
     "affirmation_en": "You are connected.",
     "affirmation_ml": "നിങ്ങൾ ബന്ധിക്കപ്പെട്ടിരിക്കുന്നു."
   },
   "closing": {
-    "meditation_en": "Carry steadiness, creativity, courage, compassion, clarity, and connection into your day.",
-    "meditation_ml": "സ്ഥിരതയും സർഗ്ഗാത്മകതയും ധൈര്യവും കരുണയും വ്യക്തതയും ബന്ധബോധവും നിങ്ങളുടെ ദിവസത്തിലേക്ക് കൊണ്ടുപോകൂ.",
     "en": "The journey is complete. Return slowly.",
     "ml": "യാത്ര പൂർത്തിയായി. സാവധാനമായി മടങ്ങിവരൂ.",
     "affirmation_en": "Your whole body is at peace.",
@@ -124,8 +108,6 @@
     "meditation_ml": "ഏകാഗ്രമായ ഊർജ്ജവും ധൈര്യവും ലക്ഷ്യബോധമുള്ള പ്രവർത്തനവും ഉണർത്തൂ.",
     "intention_en": "Focus and courage for this short Hreem mantra journey.",
     "intention_ml": "ഈ ചെറിയ ഹ്രീം യാത്രയ്ക്ക് ഏകാഗ്രതയും ധൈര്യവും.",
-    "en": "High energy. Feel the light rise.",
-    "ml": "ഉയർന്ന ഊർജ്ജം. പ്രകാശം ഉയരുന്നത് അനുഭവിക്കൂ.",
     "affirmation_en": "You are fully alive.",
     "affirmation_ml": "നിങ്ങൾ പൂർണ്ണമായി സജീവരാണ്."
   },

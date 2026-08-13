@@ -78,11 +78,19 @@ function hasLocalizedScriptPath(scripts, path) {
     if (hasScriptPath(scripts, path)) return true;
     const parts = path.split('.');
     const final = parts.pop() || '';
+    const parentPath = parts.join('.');
+
+    // Canonical chakra narration uses meditation_<language>, while older
+    // custom bundles used the section-level <language> field. Closing uses
+    // section-level languages, with meditation_<language> accepted as legacy.
+    const meditationMatch = final.match(/^meditation_([a-zA-Z-]+)$/);
+    if (meditationMatch && hasScriptPath(scripts, `${parentPath}.${meditationMatch[1]}`)) return true;
+    if (/^[a-zA-Z-]+$/.test(final) && hasScriptPath(scripts, `${parentPath}.meditation_${final}`)) return true;
+
     const suffixMatch = final.match(/^(.+)_([a-zA-Z-]+)$/);
     if (!suffixMatch) return false;
     const basePath = parts.concat(suffixMatch[1]).join('.');
     if (hasScriptPath(scripts, `${basePath}.${suffixMatch[2]}`)) return true;
-    const parentPath = parts.join('.');
     return ['text', 'content', 'value'].some(field =>
         hasScriptPath(scripts, `${parentPath}.${field}.${suffixMatch[2]}`)
     );
@@ -99,12 +107,12 @@ function validateScriptBundle(scripts, options = {}) {
         ...languageIds.map(language => `closing.${language}`),
         ...languageIds.map(language => `closing.affirmation_${language}`),
         ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].flatMap(key => [
-            ...languageIds.map(language => `${key}.${language}`),
+            ...languageIds.map(language => `${key}.meditation_${language}`),
             ...languageIds.map(language => `${key}.affirmation_${language}`),
             `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
         ])
     ];
-    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.${language}`, `high_energy.intention_${language}`, `high_energy.affirmation_${language}`]));
+    if (options.highEnergy) required.push(...languageIds.flatMap(language => [`high_energy.meditation_${language}`, `high_energy.intention_${language}`, `high_energy.affirmation_${language}`]));
     if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
     if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
     if (options.perinealCare) required.push(...languageIds.flatMap(language => [`perineal_care.title.${language}`, `perineal_care.intro.${language}`, `perineal_care.instructions.${language}`, `perineal_care.reminder.${language}`]));

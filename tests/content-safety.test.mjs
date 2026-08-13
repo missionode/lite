@@ -32,11 +32,23 @@ for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.jso
   assert.deepEqual(missing, [], `${name} is missing production script fields`);
 }
 
-for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'closing', 'high_energy']) {
-  assert.equal(facilitatorScripts[section].meditation_en, facilitatorScripts[section].en,
-    `${section} English custom narration must be preserved`);
-  assert.equal(facilitatorScripts[section].meditation_ml, facilitatorScripts[section].ml,
-    `${section} Malayalam custom narration must be preserved`);
+for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy']) {
+  for (const language of ['en', 'ml']) {
+    assert.ok(scripts[section][`meditation_${language}`], `${section} ${language} meditation is required`);
+    assert.ok(facilitatorScripts[section][`meditation_${language}`], `${section} ${language} fixture meditation is required`);
+    assert.ok(testScripts[section][`meditation_${language}`], `${section} ${language} test meditation is required`);
+    assert.equal(scripts[section][language], undefined, `${section}.${language} duplicates the canonical meditation field`);
+    assert.equal(facilitatorScripts[section][language], undefined, `${section}.${language} fixture duplicate must stay removed`);
+    assert.equal(testScripts[section][language], undefined, `${section}.${language} test duplicate must stay removed`);
+  }
+}
+
+for (const bundle of [scripts, facilitatorScripts, testScripts]) {
+  for (const language of ['en', 'ml']) {
+    assert.ok(bundle.closing[language], `closing.${language} is the canonical closing narration`);
+    assert.equal(bundle.closing[`meditation_${language}`], undefined,
+      `closing.meditation_${language} duplicates the canonical closing field`);
+  }
 }
 
 for (const [language, bundle] of [['en', en], ['ml', ml]]) {
@@ -46,6 +58,10 @@ for (const [language, bundle] of [['en', en], ['ml', ml]]) {
 
 assert.match(app, /contentT\('system\.prePracticeSafety'\)/, 'runtime must narrate the guided preparation');
 assert.doesNotMatch(app, /contentT\('system\.groundingSupport'\)/, 'runtime must not add a global crisis narration');
+assert.match(app, /meditationMatch[\s\S]*?parentPath[\s\S]*?meditationMatch\[1\]/,
+  'legacy section-level language narration must remain import-compatible');
+assert.match(app, /meditation_\$\{final\}/,
+  'legacy closing meditation fields must remain import-compatible');
 
 const globalJourneyCopy = JSON.stringify({
   en: { lobby: en.ui.safetySummary, preparation: en.system.prePracticeSafety },
@@ -98,8 +114,8 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
 
 assert.match(scripts.hooponopono.intro.en, /optional/i);
 assert.match(scripts.hooponopono.intro.ml, /ഐച്ഛിക/u);
-assert.match(scripts.closing.meditation_en, /awareness you cultivated/i);
-assert.match(scripts.closing.meditation_ml, /വളർത്തിയ അവബോധം/u);
+assert.match(scripts.closing.en, /awareness you cultivated/i);
+assert.match(scripts.closing.ml, /വളർത്തിയ അവബോധം/u);
 assert.match(scripts.bath_session.intro.en, /keep the device dry/i);
 assert.match(scripts.bath_session.intro.ml, /ഉപകരണം വെള്ളത്തിൽ നിന്ന്/u);
 assert.match(scripts.yoga.intro.en, /stop for pain/i);
