@@ -1822,18 +1822,13 @@ class MeditationController {
         aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
         aura.style.opacity = "1";
 
-        // This app-owned safety contract is mandatory for every guided path,
-        // including custom scripts and HRIM. It is intentionally sourced from
-        // the language locale so a custom narration bundle cannot remove it.
+        // Keep one short, app-owned preparation for every guided path,
+        // including custom scripts and HRIM. Activity-specific guidance stays
+        // with Yoga, bathing, massage, and assisted-care stages.
         tutTitle.textContent = t('ui.preparation');
         const prePracticeSafety = contentT('system.prePracticeSafety');
         tutText.textContent = prePracticeSafety;
         await this.narrate(prePracticeSafety, false);
-        if (!this.isMeditationActive) return;
-
-        const groundingSupport = contentT('system.groundingSupport');
-        tutText.textContent = groundingSupport;
-        await this.narrate(groundingSupport, false);
         if (!this.isMeditationActive) return;
 
         // Moon-phase and returning sea openings belong to the reflective

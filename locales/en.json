@@ -145,7 +145,7 @@
     ,"scriptSelection": "Script Selection"
     ,"startMeditation": "Start Meditation"
     ,"beginJourney": "Begin Journey"
-    ,"safetySummary": "Wellness practice only — begin from a safe, supported position. Do not use while driving or operating equipment. Keep the device dry and away from water. You may keep your eyes open, skip any instruction, pause, or stop at any time."
+    ,"safetySummary": "Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time."
     ,"beginConsultation": "Begin Session Consultation"
     ,"consultationComingSoon": "Session Consultation will open here in the next release. Your current meditation flow remains unchanged."
     ,"close": "Close"
@@ -161,8 +161,7 @@
     ,"crown": "Crown"
   },
   "system": {
-    "prePracticeSafety": "Before we begin, remember that this is a wellness practice for relaxation and reflection, not a diagnosis or treatment. Begin only when you are in a safe, supported position. Do not use this practice while driving or operating equipment. If movement or bathing is included, keep your eyes open when balance requires it, use support, and keep the device dry and safely away from water. You remain in control. You may breathe naturally, change position, skip any instruction, pause, or end the journey at any time.",
-    "groundingSupport": "Whatever you notice is allowed to be here. You do not need to force calm, positivity, or healing. If you feel anxious, overwhelmed, dizzy, disconnected, or unsafe, open your eyes and look around the room. Feel your feet or another point of support, and return to your natural breathing. Stop the practice if needed. If strong distress continues, contact a qualified health professional or a trusted support person; seek local emergency help for immediate danger.",
+    "prePracticeSafety": "Settle into a comfortable position. Your guide is here with you. Let your breathing remain natural, and allow yourself to arrive gently in this moment.",
     "arriving": "Arriving",
     "breatheAndSettle": "Breathe and settle into the space",
     "intention": "You are calling in: {{intention}}. Hold this in your heart — let it remain quietly with you through every moment of this journey.",

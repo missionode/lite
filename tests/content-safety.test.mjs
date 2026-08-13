@@ -41,12 +41,33 @@ for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye',
 
 for (const [language, bundle] of [['en', en], ['ml', ml]]) {
   assert.ok(bundle.ui.safetySummary, `${language} lobby safety summary is required`);
-  assert.ok(bundle.system.prePracticeSafety, `${language} pre-practice safety narration is required`);
-  assert.ok(bundle.system.groundingSupport, `${language} grounding response is required`);
+  assert.ok(bundle.system.prePracticeSafety, `${language} guided preparation narration is required`);
 }
 
-assert.match(app, /contentT\('system\.prePracticeSafety'\)/, 'runtime must narrate the safety contract');
-assert.match(app, /contentT\('system\.groundingSupport'\)/, 'runtime must narrate grounding support');
+assert.match(app, /contentT\('system\.prePracticeSafety'\)/, 'runtime must narrate the guided preparation');
+assert.doesNotMatch(app, /contentT\('system\.groundingSupport'\)/, 'runtime must not add a global crisis narration');
+
+const globalJourneyCopy = JSON.stringify({
+  en: { lobby: en.ui.safetySummary, preparation: en.system.prePracticeSafety },
+  ml: { lobby: ml.ui.safetySummary, preparation: ml.system.prePracticeSafety },
+  closing: scripts.closing,
+  heart: { en: scripts.heart.affirmation_en, ml: scripts.heart.affirmation_ml },
+});
+for (const alarmingGlobalCopy of [
+  /qualified health professional/i,
+  /trusted (support )?person/i,
+  /emergency/i,
+  /driv/i,
+  /operating equipment/i,
+  /യോഗ്യതയുള്ള ആരോഗ്യവിദഗ്ധ/u,
+  /വിശ്വസിക്കുന്ന ഒരാള/u,
+  /അടിയന്തര/u,
+  /വാഹനമോടി/u,
+  /യന്ത്രങ്ങൾ/u,
+]) {
+  assert.doesNotMatch(globalJourneyCopy, alarmingGlobalCopy,
+    `global guide-led journey copy must remain calm and proportionate: ${alarmingGlobalCopy}`);
+}
 
 const productionCopy = JSON.stringify({ scripts, en, ml });
 const prohibitedClaims = [
@@ -77,8 +98,8 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
 
 assert.match(scripts.hooponopono.intro.en, /optional/i);
 assert.match(scripts.hooponopono.intro.ml, /ഐച്ഛിക/u);
-assert.match(scripts.closing.meditation_en, /qualified health professional/i);
-assert.match(scripts.closing.meditation_ml, /ആരോഗ്യവിദഗ്ധ/u);
+assert.match(scripts.closing.meditation_en, /awareness you cultivated/i);
+assert.match(scripts.closing.meditation_ml, /വളർത്തിയ അവബോധം/u);
 assert.match(scripts.bath_session.intro.en, /keep the device dry/i);
 assert.match(scripts.bath_session.intro.ml, /ഉപകരണം വെള്ളത്തിൽ നിന്ന്/u);
 assert.match(scripts.yoga.intro.en, /stop for pain/i);
