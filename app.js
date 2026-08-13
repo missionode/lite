@@ -1165,7 +1165,11 @@ class AudioEngine {
         
         // Anti-Buzz Notch: Widened and deepened to remove the "edge"
         const bgNotchGain = enabled ? -24 : -12; 
-        this.bgMusicEQ.gain.exponentialRampToValueAtTime(Math.abs(bgNotchGain) * -1, now + 2.5);
+        // Biquad gain is a signed decibel parameter. Exponential ramps cannot
+        // cross zero or target a negative value, so use a linear transition.
+        this.bgMusicEQ.gain.cancelScheduledValues(now);
+        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
+        this.bgMusicEQ.gain.linearRampToValueAtTime(bgNotchGain, now + 2.5);
         this.bgMusicEQ.frequency.exponentialRampToValueAtTime(3000, now + 2.5);
         // Widen the notch (lower Q) to catch a broader range of buzzy harmonics
         this.bgMusicEQ.Q.exponentialRampToValueAtTime(enabled ? 0.4 : 1.5, now + 2.0);
@@ -1559,14 +1563,17 @@ class AudioEngine {
         
         const now = this.ctx.currentTime;
         
-        // Web Audio API Tip: exponentialRampToValueAtTime cannot start from 0.
-        // We anchor the current value, but if it's 0, we jump it to a tiny non-zero value.
-        let startVol = this.bgMusicGain.gain.value;
-        if (startVol <= 0) startVol = 0.0001;
-
         this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(startVol, now);
-        this.bgMusicGain.gain.exponentialRampToValueAtTime(Math.max(0.0001, targetVol), now + duration); 
+        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
+        if (targetVol <= 0) {
+            // Zero is a supported user setting. Linear ramps may end at zero,
+            // keeping playback muted without aborting the journey.
+            this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
+        } else {
+            const startVol = Math.max(0.0001, this.bgMusicGain.gain.value);
+            this.bgMusicGain.gain.setValueAtTime(startVol, now);
+            this.bgMusicGain.gain.exponentialRampToValueAtTime(targetVol, now + duration);
+        }
         
         this.bgMusicEQ.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
@@ -1594,6 +1601,9 @@ class AudioEngine {
     }
 
     playSingingBowl() {
+        // A muted bell is an intentional setting, not an audio error. Avoid
+        // creating oscillators whose exponential envelope would target zero.
+        if (!this.ctx || state.volBell <= 0) return;
         const now = this.ctx.currentTime;
         const baseFreq = 180;
         const partials = [1, 2.8, 5.0, 8.1, 12.5];
@@ -1606,7 +1616,7 @@ class AudioEngine {
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(baseFreq * ratio, now);
             filter.Q.setValueAtTime(50, now);
-            gain.gain.setValueAtTime(0, now);
+            gain.gain.setValueAtTime(0.0001, now);
             gain.gain.exponentialRampToValueAtTime(state.volBell / partials.length, now + 0.1);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 8);
             osc.connect(filter);
@@ -2798,7 +2808,9 @@ const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
 function storedNumber(key, fallback) {
-    const value = Number(localStorage.getItem(key));
+    const storedValue = localStorage.getItem(key);
+    if (storedValue === null || storedValue === '') return fallback;
+    const value = Number(storedValue);
     return Number.isFinite(value) ? value : fallback;
 }
 

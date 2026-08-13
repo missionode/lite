@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "test:content-safety": "node tests/content-safety.test.mjs",
+    "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
