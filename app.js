@@ -17,8 +17,8 @@ const MANTRA_AUDIO_MAP = {
     high_energy: 'audio/HREEM.mp3'
 };
 
-// Journey completion hands off without sharing meditation or financial data.
-const EARN_HANDOFF_URL = 'https://missionode.github.io/earn-app/receive.html?Source=Lite';
+// Journey completion reveals a native Earn link after a quiet closing pause.
+// Navigation remains a real user action so an installed PWA can capture it.
 const EARN_HANDOFF_DELAY_MS = 3000;
 let earnHandoffTimer = null;
 
@@ -59,16 +59,26 @@ const setText = (id, txt) => {
 };
 
 function cancelEarnHandoff() {
-    if (earnHandoffTimer === null) return;
-    window.clearTimeout(earnHandoffTimer);
-    earnHandoffTimer = null;
+    if (earnHandoffTimer !== null) {
+        window.clearTimeout(earnHandoffTimer);
+        earnHandoffTimer = null;
+    }
+    const earnLink = document.getElementById('continue-to-earn');
+    if (earnLink) {
+        earnLink.hidden = true;
+        earnLink.classList.add('hidden');
+    }
 }
 
 function scheduleEarnHandoff() {
     cancelEarnHandoff();
     earnHandoffTimer = window.setTimeout(() => {
         earnHandoffTimer = null;
-        window.location.assign(EARN_HANDOFF_URL);
+        const earnLink = document.getElementById('continue-to-earn');
+        if (!earnLink) return;
+        earnLink.hidden = false;
+        earnLink.classList.remove('hidden');
+        earnLink.focus({ preventScroll: true });
     }, EARN_HANDOFF_DELAY_MS);
 }
 
@@ -454,6 +464,7 @@ function applyLocaleUI() {
     setText('lobby-title', t('ui.meditationRoom'));
     setText('completion-title', t('ui.journeyComplete'));
     setText('completion-message', t('ui.meditationCompleted'));
+    setText('continue-to-earn', t('ui.continueToEarn'));
     setText('close-completion', t('ui.returnToRoom'));
     setText('returning-journey-label', t('ui.returningJourney'));
     setText('save-config', t('ui.startMeditation'));
@@ -2755,9 +2766,11 @@ class MeditationController {
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');
+        const earnLink = document.getElementById('continue-to-earn');
         const btn = document.getElementById('close-completion');
         if (title) title.textContent = t('ui.journeyComplete');
         if (msg) msg.textContent = t('ui.meditationCompleted');
+        if (earnLink) earnLink.textContent = t('ui.continueToEarn');
         if (btn) btn.textContent = t('ui.returnToRoom');
 
         modal.classList.remove('hidden');

@@ -420,6 +420,20 @@ select:focus {
     transform: scale(0.95);
 }
 
+.completion-earn-link {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+}
+
+.completion-return-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
 .secondary-btn {
     background: transparent;
     border: 1px solid var(--glass-border);
