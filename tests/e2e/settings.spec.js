@@ -262,10 +262,10 @@ test('offers the Sleep Mode decision before an evening journey', async ({ page }
   await expect(page.locator('#lobby-screen')).toBeVisible();
 });
 
-test('blocks HRIM outside the daytime window before starting audio', async ({ page }) => {
+test('blocks HRIM at the 6 PM Sleep Mode boundary before starting audio', async ({ page }) => {
   await page.evaluate(() => {
     const NativeDate = Date;
-    const blockedTime = new NativeDate(2026, 7, 8, 13, 0, 0).getTime();
+    const blockedTime = new NativeDate(2026, 7, 8, 18, 0, 0).getTime();
     window.Date = class extends NativeDate {
       constructor(...args) { if (args.length) super(...args); else super(blockedTime); }
       static now() { return blockedTime; }
@@ -275,7 +275,7 @@ test('blocks HRIM outside the daytime window before starting audio', async ({ pa
   await page.locator('#high-energy-toggle').check();
   await page.locator('#start-meditation').click();
   await expect(page.locator('#hrim-time-block-modal')).toBeVisible();
-  await expect(page.locator('#hrim-time-block-message')).toContainText('3:30 AM');
+  await expect(page.locator('#hrim-time-block-message')).toContainText('6:00 PM');
   await page.locator('#hrim-time-block-lobby').click();
   await expect(page.locator('#hrim-time-block-modal')).toBeHidden();
   await expect(page.locator('#lobby-screen')).toBeVisible();

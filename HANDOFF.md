@@ -151,6 +151,14 @@
 - Validation: `static` PASS — handoff contract, audio-safety regression, assessment contract, bilingual content-safety regression, JavaScript syntax, English/Malayalam/package JSON parsing, and `git diff --check`. No Playwright or screenshots were used, per owner instruction.
 - Earn remains independently responsible for installed-PWA/custom-protocol handling and every financial decision after the HTTPS handoff.
 
+### CP-HRIM-002 — Extended daytime availability
+
+- Date: 2026-08-15 (Asia/Kolkata).
+- HRIM is available from 3:30 AM through 5:59 PM according to the device's local time. At exactly 6:00 PM, HRIM is blocked and the existing evening Sleep Mode decision takes priority, so the modes do not overlap.
+- Updated the runtime boundary and all visible English/Malayalam settings-help and blocked-time guidance from noon to 6:00 PM. The original 3:30 AM start remains unchanged.
+- Added `npm run test:hrim-time` covering 3:29 AM, 3:30 AM, noon, 5:59 PM, and 6:00 PM. The existing browser specification now uses 6:00 PM as its blocked boundary, but Playwright was not run per owner instruction.
+- Bumped the app query version and PWA shell cache so installed users receive the revised timing and copy.
+
 ## Documentation checkpoint
 
 - Date: 2026-08-09 (Asia/Kolkata)
