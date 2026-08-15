@@ -3795,10 +3795,9 @@ function attachEventListeners() {
         });
     }
 
-    function isHighEnergyTimeAllowed() {
-        const now = new Date();
+    function isHighEnergyTimeAllowed(now = new Date()) {
         const minutes = (now.getHours() * 60) + now.getMinutes();
-        return minutes >= (3 * 60 + 30) && minutes < (12 * 60);
+        return minutes >= (3 * 60 + 30) && minutes < (18 * 60);
     }
 
     function confirmHighEnergyTime() {
