@@ -259,6 +259,7 @@
                 </div>
                 <p id="drone-duration-help" class="drone-duration-help" data-i18n="ui.droneDurationHelp">The drone begins before narration and gently fades after this share of the active practice duration.</p>
                 <p id="drone-duration-hrim-note" class="drone-duration-help" data-i18n="ui.droneDurationHrimNote" hidden>For HRIM, Beginner is unavailable; Intermediate is the starting level.</p>
+                <p id="drone-duration-sleep-note" class="drone-duration-help" data-i18n="ui.droneDurationSleepNote" hidden>Sleep Mode uses Intermediate as its starting level and changes the sound gently at each stage.</p>
                 <p id="drone-duration-summary" class="drone-duration-summary" aria-live="polite">Active drone time: 01:00 from each chakra start</p>
             </fieldset>
 
@@ -282,6 +283,10 @@
                     <label class="checkbox-label experience-mode-toggle">
                         <input type="checkbox" id="high-energy-toggle">
                         <span data-i18n="ui.highEnergy">High Energy (HRIM)</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="sleep-mode-toggle">
+                        <span data-i18n="ui.sleepMode">🌙 Sleep Mode</span>
                     </label>
                     <label class="checkbox-label experience-mode-toggle">
                         <input type="checkbox" id="music-only-toggle">
@@ -411,18 +416,6 @@
             <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
         </div>
 
-        <div id="sleep-mode-prompt" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sleep-mode-prompt-title">
-            <div class="modal-content sleep-mode-prompt-content">
-                <button id="sleep-mode-prompt-close" class="sleep-mode-prompt-close" type="button" aria-label="Close and skip this journey" data-i18n-aria-label="ui.sleepModeClose">×</button>
-                <h2 id="sleep-mode-prompt-title" data-i18n="ui.sleepModePromptTitle">Evening journey</h2>
-                <p id="sleep-mode-prompt-text" data-i18n="ui.sleepModePrompt">It is evening. Would you like to use Sleep Mode for this journey?</p>
-                <div class="modal-actions sleep-mode-prompt-actions">
-                    <button id="sleep-mode-enable" class="primary-btn" data-i18n="ui.sleepModeEnable">Continue with Sleep Mode</button>
-                    <button id="sleep-mode-disable" class="secondary-btn" data-i18n="ui.sleepModeDisable">Continue without Sleep Mode</button>
-                </div>
-            </div>
-        </div>
-
         <div id="hrim-time-block-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="hrim-time-block-title">
             <div class="modal-content hrim-time-block-content">
                 <button id="hrim-time-block-close" class="sleep-mode-prompt-close" type="button" aria-label="Return to Lobby" data-i18n-aria-label="ui.hrimTimeBlockLobby">×</button>
@@ -458,6 +451,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.67"></script>
+    <script src="app.js?v=1.68"></script>
 </body>
 </html>

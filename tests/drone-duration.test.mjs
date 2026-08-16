@@ -7,6 +7,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
+const timingConfig = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 
 assert.deepEqual(
     Object.fromEntries(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy'].map(key => [key, scripts[key].frequency])),
@@ -17,17 +18,20 @@ assert.deepEqual(
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
 const normalizeMatch = app.match(/function normalizeDroneDurationMode\([\s\S]*?\n\}/);
 const hrimNormalizeMatch = app.match(/function normalizeHrimDroneDurationMode\([\s\S]*?\n\}/);
+const sleepNormalizeMatch = app.match(/function normalizeSleepDroneDurationMode\([\s\S]*?\n\}/);
 const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
-assert.ok(ratiosMatch && normalizeMatch && hrimNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
+assert.ok(ratiosMatch && normalizeMatch && hrimNormalizeMatch && sleepNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
 
 const helpers = vm.runInNewContext(`
     const DRONE_DURATION_RATIOS = Object.freeze(${ratiosMatch[1]});
     const DEFAULT_DRONE_DURATION_MODE = 'beginner';
     const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
+    const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
     ${normalizeMatch[0]}
     ${hrimNormalizeMatch[0]}
+    ${sleepNormalizeMatch[0]}
     ${durationMatch[0]}
-    ({ DRONE_DURATION_RATIOS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, getDroneDurationMs });
+    ({ DRONE_DURATION_RATIOS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, normalizeSleepDroneDurationMode, getDroneDurationMs });
 `);
 assert.deepEqual(
     JSON.parse(JSON.stringify(helpers.DRONE_DURATION_RATIOS)),
@@ -43,15 +47,34 @@ assert.equal(helpers.normalizeDroneDurationMode('unknown'), 'beginner', 'missing
 assert.equal(helpers.normalizeHrimDroneDurationMode('beginner'), 'intermediate', 'HRIM must not allow Beginner mode');
 assert.equal(helpers.normalizeHrimDroneDurationMode('unknown'), 'intermediate', 'HRIM must default to Intermediate');
 assert.equal(helpers.normalizeHrimDroneDurationMode('advanced'), 'advanced', 'HRIM may use Advanced mode');
+assert.equal(helpers.normalizeSleepDroneDurationMode('unknown'), 'intermediate', 'Sleep Mode should default to Intermediate');
+assert.equal(helpers.normalizeSleepDroneDurationMode('beginner'), 'beginner', 'Sleep Mode may use Beginner when selected');
+
+const sleepStagesMatch = app.match(/const SLEEP_STAGES = Object\.freeze\(([\s\S]*?)\);/);
+assert.ok(sleepStagesMatch, 'Sleep Mode should define its five staged beat targets');
+const sleepStages = vm.runInNewContext(sleepStagesMatch[1]);
+assert.deepEqual(JSON.parse(JSON.stringify(sleepStages)), [
+    { key: 'drowsiness', beatHz: 10 },
+    { key: 'lightSleep', beatHz: 6 },
+    { key: 'trueSleep', beatHz: 5 },
+    { key: 'deepSleep', beatHz: 2 },
+    { key: 'remRest', beatHz: 6 },
+], 'Sleep Mode should retain the approved Alpha/Theta/Delta-inspired targets');
 
 const controlMatch = html.match(/<fieldset id="drone-duration-control"[\s\S]*?<\/fieldset>/);
 assert.ok(controlMatch, 'the Lobby should expose the drone duration control');
 const modeValues = [...controlMatch[0].matchAll(/name="drone-duration-mode" value="([^"]+)"/g)].map(match => match[1]);
 assert.deepEqual(modeValues, ['beginner', 'intermediate', 'advanced', 'expert'], 'the Lobby should show all four modes in order');
 assert.match(controlMatch[0], /value="beginner" checked/, 'Beginner should be selected in clean HTML');
+assert.match(html, /id="sleep-mode-toggle"/, 'the Lobby should expose Sleep Mode as an Experience Mode');
+assert.match(html, /id="drone-duration-sleep-note"/, 'the Lobby should explain Sleep Mode drone behavior');
+assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a dedicated binaural sleep drone');
+assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
+assert.match(app, /state\.timeSleepStage \* SLEEP_STAGES\.length/, 'Sleep Mode should estimate one common duration across five stages');
+assert.equal(timingConfig.journey.sleepStageDuration.max, 10, 'Sleep Mode should cap the shared stage duration at 10 minutes');
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationActive', 'droneDurationActiveHrim']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
