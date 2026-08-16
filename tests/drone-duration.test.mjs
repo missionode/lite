@@ -8,6 +8,12 @@ const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
 
+assert.deepEqual(
+    Object.fromEntries(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy'].map(key => [key, scripts[key].frequency])),
+    { root: 396, sacral: 417, solar: 528, heart: 639, throat: 741, thirdeye: 852, crown: 963, high_energy: 528 },
+    'the production chakra and HRIM frequencies must remain the approved JSON values',
+);
+
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
 const normalizeMatch = app.match(/function normalizeDroneDurationMode\([\s\S]*?\n\}/);
 const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
@@ -48,12 +54,15 @@ const startDroneStart = app.indexOf('    startDrone(baseFreq, index = 0)');
 const startDroneEnd = app.indexOf('    stopBinaural()', startDroneStart);
 const startDrone = app.slice(startDroneStart, startDroneEnd);
 assert.match(startDrone, /mainOscillator\.frequency\.setValueAtTime\(droneFreq,/, 'the generated drone should retain its actual main tone');
+assert.match(startDrone, /const droneFreq = activeFreq;/, 'the main drone should use the validated JSON frequency directly');
+assert.doesNotMatch(startDrone, /activeFreq\s*\/\s*[24]/, 'higher chakra frequencies must not be octave-lowered');
 assert.doesNotMatch(startDrone, /droneFreq\s*\*\s*0\.5|\bf\s*:\s*0\.5/, 'the half-frequency lower oscillator must not return');
 assert.match(startDrone, /Number\.isFinite\(requestedFrequency\)/, 'the audio boundary should reject malformed custom frequencies');
 
 const meditationStart = app.indexOf('    async meditateOnChakra(chakra, key)');
 const meditationEnd = app.indexOf('    async narrateFeeble(', meditationStart);
 const meditationBlock = app.slice(meditationStart, meditationEnd);
+assert.match(meditationBlock, /this\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
 assert.ok(
     meditationBlock.indexOf('this.startTimedDrone(') < meditationBlock.indexOf('await this.narrate(localized(chakra'),
     'the timer and drone must start before chakra narration',
@@ -92,4 +101,4 @@ assert.equal(
     'an invalid custom frequency should be rejected before Web Audio initialization',
 );
 
-console.log('Drone duration contract passed for four modes, pause-safe timing, and one main oscillator.');
+console.log('Drone duration contract passed with exact JSON pitches, four modes, pause-safe timing, and one main oscillator.');

@@ -1391,9 +1391,10 @@ class AudioEngine {
             : 110;
         const activeFreq = state.chakraFrequencies ? safeBaseFrequency : 110;
 
-        let droneFreq = activeFreq;
-        if (activeFreq > 600) droneFreq = activeFreq / 2; 
-        if (activeFreq > 900) droneFreq = activeFreq / 4; 
+        // Preserve the configured chakra/HRIM frequency exactly. Higher
+        // frequencies must not be octave-shifted for comfort; the JSON value
+        // is the authoritative main-drone pitch.
+        const droneFreq = activeFreq;
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
