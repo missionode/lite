@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.54">
+    <link rel="stylesheet" href="style.css?v=1.55">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -237,6 +237,30 @@
                 <span id="high-energy-time-display">5 mins</span>
             </div>
 
+            <fieldset id="drone-duration-control" class="drone-duration-control" aria-describedby="drone-duration-help drone-duration-summary">
+                <legend data-i18n="ui.droneDurationMode">Drone Duration</legend>
+                <div class="drone-duration-options">
+                    <label class="drone-duration-option">
+                        <input type="radio" name="drone-duration-mode" value="beginner" checked>
+                        <span class="drone-duration-copy"><strong data-i18n="ui.droneBeginner">Beginner</strong><small>20%</small></span>
+                    </label>
+                    <label class="drone-duration-option">
+                        <input type="radio" name="drone-duration-mode" value="intermediate">
+                        <span class="drone-duration-copy"><strong data-i18n="ui.droneIntermediate">Intermediate</strong><small>50%</small></span>
+                    </label>
+                    <label class="drone-duration-option">
+                        <input type="radio" name="drone-duration-mode" value="advanced">
+                        <span class="drone-duration-copy"><strong data-i18n="ui.droneAdvanced">Advanced</strong><small>70%</small></span>
+                    </label>
+                    <label class="drone-duration-option">
+                        <input type="radio" name="drone-duration-mode" value="expert">
+                        <span class="drone-duration-copy"><strong data-i18n="ui.droneExpert">Expert</strong><small>100%</small></span>
+                    </label>
+                </div>
+                <p id="drone-duration-help" class="drone-duration-help" data-i18n="ui.droneDurationHelp">The drone begins before narration and gently fades after this share of the active practice duration.</p>
+                <p id="drone-duration-summary" class="drone-duration-summary" aria-live="polite">Active drone time: 01:00 from each chakra start</p>
+            </fieldset>
+
             <!-- Intention Seed -->
             <div class="config-group" style="margin-top: 1rem;">
                 <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
@@ -433,6 +457,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.64"></script>
+    <script src="app.js?v=1.65"></script>
 </body>
 </html>

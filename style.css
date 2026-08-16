@@ -1071,6 +1071,116 @@ input[type="range"]::-moz-range-progress {
     display: none;
 }
 
+.drone-duration-control {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 1.15rem;
+    border: 1px solid rgba(251, 191, 36, 0.24);
+    border-radius: 20px;
+    background: linear-gradient(145deg, rgba(251, 191, 36, 0.08), rgba(255, 255, 255, 0.025));
+    backdrop-filter: blur(18px);
+}
+
+.drone-duration-control[hidden] {
+    display: none;
+}
+
+.drone-duration-control legend {
+    padding: 0 0.45rem;
+    color: var(--accent-color);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.drone-duration-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.drone-duration-option {
+    position: relative;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.drone-duration-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.drone-duration-copy {
+    display: flex;
+    min-height: 68px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    padding: 0.65rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.16);
+    color: rgba(255, 255, 255, 0.74);
+    text-align: center;
+    transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.drone-duration-copy strong {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 0.76rem;
+}
+
+.drone-duration-copy small {
+    color: var(--accent-color);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.drone-duration-option input:checked + .drone-duration-copy {
+    border-color: var(--accent-color);
+    background: rgba(251, 191, 36, 0.14);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(251, 191, 36, 0.11);
+    transform: translateY(-1px);
+}
+
+.drone-duration-option input:focus-visible + .drone-duration-copy {
+    outline: 3px solid rgba(251, 191, 36, 0.3);
+    outline-offset: 3px;
+}
+
+.drone-duration-help,
+.drone-duration-summary {
+    margin: 0.75rem 0 0;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.drone-duration-help {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.76rem;
+}
+
+.drone-duration-summary {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 620px) {
+    .drone-duration-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 .range-current {
     min-width: 70px;
     padding: 0.35rem 0.65rem;
