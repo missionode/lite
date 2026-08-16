@@ -238,6 +238,11 @@ body {
     display: none !important;
 }
 
+/* Author layout rules must not override the native hidden contract. */
+[hidden] {
+    display: none !important;
+}
+
 h1 {
     font-weight: 200;
     letter-spacing: 8px;
@@ -1111,6 +1116,40 @@ input[type="range"]::-moz-range-progress {
 .shot-options input[type="number"] {
     width: 100%;
     box-sizing: border-box;
+}
+
+.custom-shot-frequency {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.7rem;
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.custom-shot-frequency label {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.shot-options input[type="number"] {
+    min-height: 44px;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    border-radius: 10px;
+    background: rgba(8, 8, 18, 0.82);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+}
+
+.shot-options input[type="number"]:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.16);
 }
 
 .shots-help {

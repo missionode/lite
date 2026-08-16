@@ -73,6 +73,8 @@ assert.match(html, /id="shot-frequency-input"/, 'the Lobby should expose a custo
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
+assert.match(app, /if \(!window\.confirm\(t\('ui\.shotConfirm'\)\)\)/, 'Shots should confirm when the toggle is enabled');
+assert.doesNotMatch(app.slice(app.indexOf('async runShot('), app.indexOf('finishShot()')), /window\.confirm/, 'Shot start should not prompt a second time');
 assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a dedicated binaural sleep drone');
 assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
 assert.match(app, /normalizeSleepStages\(this\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');

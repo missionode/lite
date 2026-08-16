@@ -2019,8 +2019,6 @@ class MeditationController {
             alert(t('ui.shotInvalidFrequency'));
             return;
         }
-        if (!window.confirm(t('ui.shotConfirm'))) return;
-
         this.isShotActive = true;
         const shotToggle = document.getElementById('shots-toggle');
         if (shotToggle) shotToggle.disabled = true;
@@ -3930,6 +3928,12 @@ function attachEventListeners() {
     if (shotsToggle) {
         shotsToggle.addEventListener('change', (event) => {
             if (event.target.checked) {
+                if (!window.confirm(t('ui.shotConfirm'))) {
+                    event.target.checked = false;
+                    updateExperienceModeVisibility();
+                    updateSessionEstimate();
+                    return;
+                }
                 clearMusicOnlyMode();
                 clearHighEnergyMode();
                 clearSleepMode();
