@@ -101,6 +101,16 @@ const prohibitedClaims = [
   /നിങ്ങൾ തീരുമാനിക്കുന്നത് സംഭവിക്കുന്നു/u,
   /പണം എളുപ്പത്തിലും സമൃദ്ധമായും/u,
   /പ്രപഞ്ചത്തിലെ ഏറ്റവും രോഗശാന്തി നൽകുന്ന/u,
+  /guaranteed healing/i,
+  /aura (?:guarantees|ensures) (?:complete|total|absolute) protection/i,
+  /nothing (?:negative|harmful) can (?:touch|reach|affect) you/i,
+  /this (?:meditation|chakra|aura) (?:will|can) cure/i,
+  /your chakra is (?:blocked|damaged|diseased)/i,
+  /you must (?:forgive|release|heal)/i,
+  /പൂർണ്ണമായ സൗഖ്യം ഉറപ്പാണ്/u,
+  /ഒന്നിനും നിങ്ങളെ സ്പർശിക്കാനാവില്ല/u,
+  /നിങ്ങളുടെ ചക്രം (?:തടസ്സപ്പെട്ടിരിക്കുന്നു|തകരാറിലായിരിക്കുന്നു)/u,
+  /നിങ്ങൾ (?:ക്ഷമിക്കണം|വിട്ടയക്കണം|സൗഖ്യപ്പെടണം)/u,
 ];
 
 for (const claim of prohibitedClaims) {
@@ -111,6 +121,31 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
   assert.ok(scripts[chakra].affirmation_en, `${chakra} English affirmation is required`);
   assert.ok(scripts[chakra].affirmation_ml, `${chakra} Malayalam affirmation is required`);
 }
+
+const auraJourney = {
+  en: [
+    scripts.intro.gratitude_en,
+    ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].map(chakra => scripts[chakra].meditation_en),
+    scripts.closing.en,
+  ].join(' '),
+  ml: [
+    scripts.intro.gratitude_ml,
+    ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].map(chakra => scripts[chakra].meditation_ml),
+    scripts.closing.ml,
+  ].join(' '),
+};
+assert.match(auraJourney.en, /receiv/i, 'English journey must retain the Receiving theme');
+assert.match(auraJourney.en, /aura/i, 'English journey must retain the Aura theme');
+assert.match(auraJourney.en, /healing/i, 'English journey must retain the Healing theme');
+assert.match(auraJourney.ml, /സ്വീകരി/u, 'Malayalam journey must retain the Receiving theme');
+assert.match(auraJourney.ml, /പ്രഭാവലയം/u, 'Malayalam journey must retain the Aura theme');
+assert.match(auraJourney.ml, /സൗഖ്യ/u, 'Malayalam journey must retain the Healing theme');
+assert.match(scripts.root.meditation_en, /grounded|grounding/i, 'Aura progression must begin with grounding');
+assert.match(scripts.solar.meditation_en, /clear boundary/i, 'Aura progression must strengthen boundaries');
+assert.match(scripts.heart.meditation_en, /healing/i, 'Heart practice must centre healing without promising a cure');
+assert.match(scripts.thirdeye.meditation_en, /discernment/i, 'Aura protection must include discernment');
+assert.match(scripts.crown.meditation_en, /sacred protection/i, 'Crown practice must integrate sacred protection');
+assert.match(scripts.closing.en, /familiar or new/i, 'Closing must welcome both local clients and travellers');
 
 const malayalamChakraNames = {
   root: 'മൂലാധാര ചക്രത്തിലേക്ക്',

@@ -40,6 +40,14 @@ assert.match(inlineScripts[0], /removeItem\("chakraAnswers"\)/, 'new-client rese
 assert.match(html, /--page-chakra:/, 'assessment should expose an active chakra theme variable');
 assert.match(inlineScripts[0], /function setPageTheme\(chakra\)/, 'active chakra changes should update the complete page theme');
 assert.match(inlineScripts[0], /themeMeta\.content=chakra\.color/, 'browser theme color should follow the active chakra');
+assert.match(inlineScripts[0], /document\.documentElement\.dataset\.activeChakra=chakra\.id/, 'the page root should identify its active chakra');
+assert.match(inlineScripts[0], /function activateChakra\(chakraId\)/, 'navigation and client interaction should share one chakra activation path');
+assert.match(inlineScripts[0], /activateChakra\(c\.id\)/, 'chakra navigation should apply its theme immediately');
+assert.match(inlineScripts[0], /activateChakra\(cid\)/, 'answer selection should apply the matching chakra theme');
+assert.match(inlineScripts[0], /cards\.addEventListener\("focusin"/, 'focused questions and notes should apply their chakra theme');
+assert.match(inlineScripts[0], /getBoundingClientRect\(\)\.top>marker/, 'scroll position should deterministically select the visible chakra');
+assert.match(inlineScripts[0], /window\.addEventListener\("scroll",scheduleThemeSync/, 'scrolling should keep the complete page theme synchronized');
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain its Back to Lobby CTA');
+assert.match(html, /id="lobbyLink" href="\.\.\/index\.html"/, 'new-client actions should include a nearby Return to Lobby link');
 
 console.log('Chakra assessment contract passed for seven cards and 35 questions.');

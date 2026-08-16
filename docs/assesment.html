@@ -11,6 +11,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
+@property --page-chakra{
+  syntax:"<color>";
+  inherits:true;
+  initial-value:#b81921;
+}
 :root{
   --fs:1;
   --page-chakra:#b81921;
@@ -26,6 +31,7 @@
   --warn:#c97918;
   --shadow:0 10px 28px rgba(85,41,31,.07);
   --radius:26px;
+  transition:--page-chakra .45s ease;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -164,8 +170,14 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
 }
 .context-note textarea:focus{outline:3px solid color-mix(in srgb,var(--chakra) 18%,transparent);border-color:var(--chakra)}
 .context-help{display:block;margin-top:7px;color:var(--muted);font-size:calc(14px * var(--fs));line-height:1.4}
-.assessment-actions{display:flex;justify-content:center;margin:26px 0 8px}
+.assessment-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:26px 0 8px}
 .new-assessment{color:var(--accent);border-color:#dfb8b4}
+.lobby-action{
+  display:inline-flex;align-items:center;justify-content:center;text-decoration:none;
+  background:var(--accent);border-color:var(--accent);color:#fff
+}
+.lobby-action:hover{background:color-mix(in srgb,var(--accent) 88%,black)}
+.lobby-action:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 28%,transparent);outline-offset:3px}
 .note{
   margin:8px 4px 0;color:var(--muted);font-size:calc(15px * var(--fs));line-height:1.5
 }
@@ -217,6 +229,7 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
   <p class="note">This is a wellness and meditation reflection tool, not a clinical diagnostic or emergency assessment. Its results describe the client’s current self-report and should guide conversation, not label the person. Google translation requires an internet connection.</p>
   <div class="assessment-actions">
     <button class="control new-assessment" id="newAssessment" type="button">Clear for New Client</button>
+    <a class="control lobby-action" id="lobbyLink" href="../index.html" aria-label="Return to meditation lobby">Return to Lobby</a>
   </div>
 </main>
 
@@ -406,11 +419,10 @@ function escapeHtml(value){
   return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[char]);
 }
 
-let activeChakraId="";
 function setPageTheme(chakra){
-  if(!chakra||chakra.id===activeChakraId) return;
-  activeChakraId=chakra.id;
+  if(!chakra) return;
   document.documentElement.style.setProperty("--page-chakra",chakra.color);
+  document.documentElement.dataset.activeChakra=chakra.id;
   document.body.dataset.activeChakra=chakra.id;
   const themeMeta=document.querySelector('meta[name="theme-color"]');
   if(themeMeta) themeMeta.content=chakra.color;
@@ -453,7 +465,7 @@ chakras.forEach((c,ci)=>{
   p.className="chakra-pill"+(ci===0?" active":"");
   p.textContent=c.name.replace(" Chakra","");
   p.onclick=()=>{
-    setPageTheme(c);
+    activateChakra(c.id);
     document.getElementById(c.id).scrollIntoView({behavior:"smooth",block:"start"});
   };
   nav.appendChild(p);
@@ -506,12 +518,14 @@ chakras.forEach((c,ci)=>{
 document.addEventListener("change",e=>{
   if(!e.target.matches('input[type="radio"]')) return;
   const [cid,qi]=e.target.name.split(/-(?=\d+$)/);
+  const chakra=chakras.find(c=>c.id===cid);
   state[cid]=state[cid]||{};
   state[cid][qi]=e.target.value;
   localStorage.setItem("chakraAnswers",JSON.stringify(state));
   e.target.closest(".answers").querySelectorAll(".answer").forEach(x=>x.classList.remove("selected"));
   e.target.closest(".answer").classList.add("selected");
-  renderEval(chakras.find(c=>c.id===cid));
+  activateChakra(cid);
+  renderEval(chakra);
 });
 document.addEventListener("input",e=>{
   if(!e.target.matches("textarea[data-note]")) return;
@@ -519,7 +533,6 @@ document.addEventListener("input",e=>{
   localStorage.setItem("chakraAssessmentNotes",JSON.stringify(notes));
 });
 chakras.forEach(renderEval);
-setPageTheme(chakras[0]);
 
 const savedScale=parseFloat(localStorage.getItem("chakraFontScale")||"1");
 document.documentElement.style.setProperty("--fs",Math.min(1.45,Math.max(.85,savedScale)));
@@ -557,13 +570,41 @@ function googleTranslateElementInit(){
 
 const sections=[...document.querySelectorAll(".chakra-card")];
 const pills=[...document.querySelectorAll(".chakra-pill")];
-const io=new IntersectionObserver(entries=>{
-  const visible=entries.filter(x=>x.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
-  if(!visible)return;
-  pills.forEach((p,i)=>p.classList.toggle("active",sections[i].id===visible.target.id));
-  setPageTheme(chakras.find(chakra=>chakra.id===visible.target.id));
-},{rootMargin:"-30% 0px -55% 0px",threshold:[0,.1,.25]});
-sections.forEach(s=>io.observe(s));
+function activateChakra(chakraId){
+  const index=chakras.findIndex(chakra=>chakra.id===chakraId);
+  if(index<0) return;
+  pills.forEach((pill,pillIndex)=>{
+    const isActive=pillIndex===index;
+    pill.classList.toggle("active",isActive);
+    if(isActive) pill.setAttribute("aria-current","step");
+    else pill.removeAttribute("aria-current");
+  });
+  setPageTheme(chakras[index]);
+}
+cards.addEventListener("focusin",event=>{
+  const card=event.target.closest(".chakra-card");
+  if(card) activateChakra(card.id);
+});
+function syncThemeToScroll(){
+  const marker=Math.min(280,Math.max(140,window.innerHeight*.32));
+  let activeSection=sections[0];
+  for(const section of sections){
+    if(section.getBoundingClientRect().top>marker) break;
+    activeSection=section;
+  }
+  activateChakra(activeSection.id);
+}
+let themeFrame=0;
+function scheduleThemeSync(){
+  if(themeFrame) return;
+  themeFrame=requestAnimationFrame(()=>{
+    themeFrame=0;
+    syncThemeToScroll();
+  });
+}
+window.addEventListener("scroll",scheduleThemeSync,{passive:true});
+window.addEventListener("resize",scheduleThemeSync);
+syncThemeToScroll();
 </script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
