@@ -88,6 +88,7 @@
     ,"droneAdvanced": "Advanced"
     ,"droneExpert": "Expert"
     ,"droneDurationHelp": "The drone begins before narration and gently fades after this share of the active practice duration."
+    ,"droneDurationHrimNote": "For HRIM, Beginner is unavailable; Intermediate is the starting level."
     ,"droneDurationActive": "Active drone time: {duration} from each chakra start"
     ,"droneDurationActiveHrim": "Active drone time: {duration} from HRIM start"
     ,"intentionPrompt": "What are you calling in today?"

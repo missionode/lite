@@ -24,9 +24,15 @@ const DRONE_DURATION_RATIOS = Object.freeze({
     expert: 1.00
 });
 const DEFAULT_DRONE_DURATION_MODE = 'beginner';
+const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
 
 function normalizeDroneDurationMode(value) {
     return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value) ? value : DEFAULT_DRONE_DURATION_MODE;
+}
+
+function normalizeHrimDroneDurationMode(value) {
+    const normalized = normalizeDroneDurationMode(value);
+    return normalized === 'beginner' ? DEFAULT_HRIM_DRONE_DURATION_MODE : normalized;
 }
 
 function getDroneDurationMs(practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
@@ -446,9 +452,21 @@ function updateDroneDurationSummary() {
     if (!summary) return;
     const highEnergy = getChecked('high-energy-toggle');
     const practiceMinutes = highEnergy ? state.timeHighEnergy : state.timePerChakra;
-    const duration = formatClockDuration(getDroneDurationMs(practiceMinutes, state.droneDurationMode));
+    const mode = highEnergy ? state.hrimDroneDurationMode : state.droneDurationMode;
+    const duration = formatClockDuration(getDroneDurationMs(practiceMinutes, mode));
     const template = t(highEnergy ? 'ui.droneDurationActiveHrim' : 'ui.droneDurationActive');
     summary.textContent = template.replace('{duration}', duration);
+}
+
+function syncDroneDurationModeControls() {
+    const highEnergy = getChecked('high-energy-toggle');
+    const activeMode = highEnergy ? state.hrimDroneDurationMode : state.droneDurationMode;
+    document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
+        input.disabled = highEnergy && input.value === 'beginner';
+        input.checked = input.value === activeMode;
+    });
+    const hrimNote = document.getElementById('drone-duration-hrim-note');
+    if (hrimNote) hrimNote.hidden = !highEnergy;
 }
 
 function defaultIntention(language = state.language) {
@@ -1781,11 +1799,11 @@ class MeditationController {
         return this.isMeditationActive && generation === this.droneTimerGeneration;
     }
 
-    startTimedDrone(baseFrequency, elementalIndex, practiceMinutes) {
+    startTimedDrone(baseFrequency, elementalIndex, practiceMinutes, durationMode = state.droneDurationMode) {
         this.cancelDroneTimer();
         this.audio.startDrone(baseFrequency, elementalIndex);
         const generation = this.droneTimerGeneration;
-        const durationMs = getDroneDurationMs(practiceMinutes, state.droneDurationMode);
+        const durationMs = getDroneDurationMs(practiceMinutes, durationMode);
         void this.stopDroneAfterDuration(durationMs, generation);
     }
 
@@ -2597,8 +2615,9 @@ class MeditationController {
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
         const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+        const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
 
-        this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes);
+        this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
 
         if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
         await this.narrate(localized(chakra, 'meditation') || localized(chakra));
@@ -2939,6 +2958,7 @@ const state = {
     timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
     timeHighEnergy: parseFloat(localStorage.getItem('chakra_time_high_energy')) || 5.0,
     droneDurationMode: normalizeDroneDurationMode(localStorage.getItem('chakra_drone_duration_mode')),
+    hrimDroneDurationMode: normalizeHrimDroneDurationMode(localStorage.getItem('chakra_hrim_drone_duration_mode')),
     voices: [],
     volVoice: storedNumber('chakra_vol_voice', 0.9),
     volDrone: storedNumber('chakra_vol_drone', 0.05),
@@ -3211,9 +3231,7 @@ function loadPreferences() {
         highEnergyTimeSlider.style.setProperty('--range-fill', pctHigh);
     }
     setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
-    document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
-        input.checked = input.value === state.droneDurationMode;
-    });
+    syncDroneDurationModeControls();
     updateDroneDurationSummary();
     
     // Sync Mixer Sliders
@@ -3596,6 +3614,7 @@ function attachEventListeners() {
         if (normalDuration) normalDuration.style.display = highEnergy ? 'none' : 'flex';
         if (highEnergyDuration) highEnergyDuration.style.display = highEnergy ? 'flex' : 'none';
         if (droneDuration) droneDuration.hidden = musicOnly;
+        syncDroneDurationModeControls();
         updateDroneDurationSummary();
     }
 
@@ -3847,8 +3866,14 @@ function attachEventListeners() {
     document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
         input.addEventListener('change', (event) => {
             if (!event.target.checked) return;
-            state.droneDurationMode = normalizeDroneDurationMode(event.target.value);
-            localStorage.setItem('chakra_drone_duration_mode', state.droneDurationMode);
+            if (getChecked('high-energy-toggle')) {
+                state.hrimDroneDurationMode = normalizeHrimDroneDurationMode(event.target.value);
+                localStorage.setItem('chakra_hrim_drone_duration_mode', state.hrimDroneDurationMode);
+            } else {
+                state.droneDurationMode = normalizeDroneDurationMode(event.target.value);
+                localStorage.setItem('chakra_drone_duration_mode', state.droneDurationMode);
+            }
+            syncDroneDurationModeControls();
             updateDroneDurationSummary();
         });
     });

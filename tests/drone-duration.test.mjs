@@ -16,15 +16,18 @@ assert.deepEqual(
 
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
 const normalizeMatch = app.match(/function normalizeDroneDurationMode\([\s\S]*?\n\}/);
+const hrimNormalizeMatch = app.match(/function normalizeHrimDroneDurationMode\([\s\S]*?\n\}/);
 const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
-assert.ok(ratiosMatch && normalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
+assert.ok(ratiosMatch && normalizeMatch && hrimNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
 
 const helpers = vm.runInNewContext(`
     const DRONE_DURATION_RATIOS = Object.freeze(${ratiosMatch[1]});
     const DEFAULT_DRONE_DURATION_MODE = 'beginner';
+    const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
     ${normalizeMatch[0]}
+    ${hrimNormalizeMatch[0]}
     ${durationMatch[0]}
-    ({ DRONE_DURATION_RATIOS, normalizeDroneDurationMode, getDroneDurationMs });
+    ({ DRONE_DURATION_RATIOS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, getDroneDurationMs });
 `);
 assert.deepEqual(
     JSON.parse(JSON.stringify(helpers.DRONE_DURATION_RATIOS)),
@@ -37,6 +40,9 @@ assert.equal(helpers.getDroneDurationMs(5, 'advanced'), 210_000, 'Advanced shoul
 assert.equal(helpers.getDroneDurationMs(5, 'expert'), 300_000, 'Expert should use 100% of five minutes');
 assert.equal(helpers.getDroneDurationMs(1, 'beginner'), 12_000, 'the calculation should follow the active core duration');
 assert.equal(helpers.normalizeDroneDurationMode('unknown'), 'beginner', 'missing or invalid preferences should safely default to Beginner');
+assert.equal(helpers.normalizeHrimDroneDurationMode('beginner'), 'intermediate', 'HRIM must not allow Beginner mode');
+assert.equal(helpers.normalizeHrimDroneDurationMode('unknown'), 'intermediate', 'HRIM must default to Intermediate');
+assert.equal(helpers.normalizeHrimDroneDurationMode('advanced'), 'advanced', 'HRIM may use Advanced mode');
 
 const controlMatch = html.match(/<fieldset id="drone-duration-control"[\s\S]*?<\/fieldset>/);
 assert.ok(controlMatch, 'the Lobby should expose the drone duration control');
@@ -45,7 +51,7 @@ assert.deepEqual(modeValues, ['beginner', 'intermediate', 'advanced', 'expert'],
 assert.match(controlMatch[0], /value="beginner" checked/, 'Beginner should be selected in clean HTML');
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationActive', 'droneDurationActiveHrim']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationActive', 'droneDurationActiveHrim']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
@@ -63,6 +69,7 @@ const meditationStart = app.indexOf('    async meditateOnChakra(chakra, key)');
 const meditationEnd = app.indexOf('    async narrateFeeble(', meditationStart);
 const meditationBlock = app.slice(meditationStart, meditationEnd);
 assert.match(meditationBlock, /this\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
+assert.match(meditationBlock, /key === 'high_energy' \? state\.hrimDroneDurationMode : state\.droneDurationMode/, 'HRIM and normal chakra stages must use separate duration preferences');
 assert.ok(
     meditationBlock.indexOf('this.startTimedDrone(') < meditationBlock.indexOf('await this.narrate(localized(chakra'),
     'the timer and drone must start before chakra narration',
@@ -71,6 +78,8 @@ assert.match(meditationBlock, /key === 'high_energy' \? state\.timeHighEnergy : 
 assert.match(app, /if \(!this\.isPaused\) remaining -= step;/, 'pausing the journey should pause the drone timer');
 assert.match(app, /generation !== this\.droneTimerGeneration/, 'a stale timer must not stop a later chakra drone');
 assert.match(app, /chakra_drone_duration_mode/, 'the selected mode should persist locally');
+assert.match(app, /chakra_hrim_drone_duration_mode/, 'the HRIM mode should persist separately');
+assert.match(app, /input\.disabled = highEnergy && input\.value === 'beginner'/, 'Beginner must be disabled in the HRIM UI');
 assert.match(app, /'high_energy\.frequency'/, 'HRIM custom scripts should require a frequency');
 assert.match(app, /frequency < 1 \|\| frequency > 20000/, 'custom frequency values should remain in the safe Web Audio range');
 
