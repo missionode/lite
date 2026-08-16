@@ -21,16 +21,17 @@
 
 ### Active snapshot — 2026-08-16 (Asia/Kolkata)
 
-- Branch: `drone-duration-modes`; its latest runtime-changing commit is `99bc581` (`fix(audio): preserve exact script drone frequencies`). The branch contains two audio commits plus this documentation-only context checkpoint on top of `origin/production`, has no configured upstream, and has not been pushed or merged.
+- Branch: `drone-duration-modes`; its latest runtime-changing commit is `fc243a1` (`fix(audio): use separate HRIM drone duration default`). The branch contains three audio commits plus a documentation-only context checkpoint on top of `origin/production`, has no configured upstream, and has not been pushed or merged.
 - `b7563b7` (`feat(audio): add progressive drone duration modes`) adds Beginner 20%, Intermediate 50%, Advanced 70%, and Expert 100%, with Beginner as the persisted default and a pause-aware fade-start timer beginning before narration.
 - `99bc581` removes octave reduction from the main oscillator. With Chakra Frequencies enabled, production centre pitches are Root 396, Sacral 417, Solar 528, Heart 639, Throat 741, Third Eye 852, Crown 963, and HRIM 528 Hz. Frequencies Off and malformed input intentionally retain the 110 Hz fallback.
+- `fc243a1` keeps Beginner as the normal chakra default but gives HRIM a separate persisted duration preference. HRIM normalizes missing, invalid, or Beginner values to Intermediate (50%); Advanced and Expert remain available. The HRIM Beginner radio is disabled and the active setting is explained in English and Malayalam.
 - The former half-frequency lower oscillator is gone. Independent support remains: a slow 0.04 Hz LFO modulates the main pitch by approximately ±0.1%, Eyes Close may add a 40 Hz anchor plus 80/82 Hz binaural pair, elemental noise remains, and Yoga retains 136.1 Hz.
 - Delivery versions: `style.css?v=1.55`, `app.js?v=1.66`, shell cache `chakra-v5.29`, Piper cache `chakra-piper-v3`, and language cache `chakra-language-v4`.
 - Validation at the latest implementation checkpoint: `unit/static` PASS — JavaScript syntax, service-worker syntax, exact-frequency/drone-duration contract, zero-volume audio contract, bilingual content-safety contract, assessment contract, Earn handoff contract, HRIM time-window contract, JSON parsing, and diff whitespace. No Playwright or screenshots were used.
-- Owner clarification: HRIM is for energizing/recharge. Current code still applies the four percentage modes to HRIM using `timeHighEnergy`; whether HRIM should instead keep an uninterrupted 528 Hz drone and hide the percentage control is **pending product approval**.
+- Owner clarification implemented: HRIM is for energizing/recharge, so Beginner is disabled for HRIM and Intermediate is the default. HRIM remains a timed path using its independent `timeHighEnergy` duration; uninterrupted full-stage drone behavior is not part of this approved change.
 - Additional HRIM audio observations remain unimplemented: `high_energy` currently resolves to elemental index `-1` and therefore receives the fallback bright high-pass texture; the stage named final silence stops the drone but leaves quiet background music running.
-- Next exact decision: confirm whether duration modes are standard-chakra-only. If approved, separate HRIM from the percentage timer, give HRIM an explicit texture policy, update tests/docs/cache versions, perform non-browser regression checks, and then complete real-device listening before any merge or push.
-- Progress: **85% complete** for the isolated audio-refinement scope | Confidence: medium | Current phase: behavior review | Main remaining scope: HRIM policy decision and real-device listening.
+- Next exact step: perform real-device listening for normal Beginner and HRIM Intermediate behavior, then decide whether the explicit HRIM elemental texture and background-music behavior during final integration need refinement before any merge or push.
+- Progress: **90% complete** for the isolated audio-refinement scope | Confidence: medium | Current phase: device-review preparation | Main remaining scope: real-device listening and optional HRIM texture/integration refinement.
 
 ### Historical context retained for reference
 
@@ -224,6 +225,15 @@
 - Preserved the existing 0.04 Hz vibration LFO, which moves the centre pitch by approximately ±0.1%; no octave or secondary lower-tone layer remains.
 - Preserved the explicit Chakra Frequencies Off behavior and malformed-input defense, both of which use the neutral 110 Hz fallback intentionally.
 - Strengthened `npm run test:drone-duration` to reject any return of `/2` or `/4` main-frequency shifting and to require direct use of the validated active frequency. No Playwright or screenshots were used.
+
+### CP-AUDIO-006 — HRIM Intermediate-default drone mode
+
+- Date: 2026-08-16 (Asia/Kolkata).
+- Commit: `fc243a1` — `fix(audio): use separate HRIM drone duration default`.
+- Normal chakra journeys retain the persisted Beginner default. HRIM now has a separate `chakra_hrim_drone_duration_mode` preference with Intermediate as the default; saved Beginner or invalid HRIM values normalize to Intermediate.
+- The Lobby disables the Beginner radio while HRIM is selected, shows a localized English/Malayalam explanation, and keeps Advanced/Expert available. The runtime passes the correct normal or HRIM mode into the pause-aware drone timer.
+- Bumped `app.js` to `v=1.67`, shell cache to `chakra-v5.30`, and language cache to `chakra-language-v5`. Updated the drone contract for HRIM normalization, separate persistence, UI disabling, and localization.
+- Validation: `static/unit` PASS — JavaScript syntax, `npm run test:drone-duration`, `npm run test:content-safety`, and `git diff --check`. No Playwright or screenshots were used.
 
 ## Documentation checkpoint
 
