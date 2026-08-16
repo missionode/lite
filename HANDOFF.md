@@ -2,19 +2,38 @@
 
 ## START
 
-- Objective: improve Yoga Bridge and Bath timing discoverability and toggle behavior.
+- Current objective: preserve the stable `production` branch while completing and reviewing isolated main-drone improvements on `drone-duration-modes`.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
-- Stack: static HTML/CSS/JavaScript PWA; no dependencies, backend, database, or browser gate.
-- Permanent constraint: preserve the existing journey order unless explicitly changed.
+- Reusable instructions root: this same repository; `loop.md` is the protected collaboration policy and must not be changed during routine application work.
+- Stack: static HTML/CSS/JavaScript PWA with Web Audio, Piper/Web Speech narration, local JSON content, service-worker caching, and npm-based test tooling. There is no backend, database, authentication layer, or production build step.
+- Permanent constraints: preserve existing journey order unless explicitly changed; keep `docs/dot.json` as custom facilitator content; add only missing schema fields to fixtures; commit each feature/fix with a detailed reference message; do not run Playwright or take screenshots unless the owner explicitly requests it.
+- External actions remain approval-gated: do not merge, push, deploy, or rewrite branch history unless the owner asks.
 
 ## MID
 
-- Yoga Bridge is a stage before the Crown chakra.
-- Bath is an optional nested stage that runs before Yoga.
-- Timing values persist in `localStorage` under the existing `chakra_time_*` keys.
-- The UI already had visibility helpers and estimate logic; this checkpoint consolidates the controls without changing the storage contract.
+- Stable production baseline: local and remote `production` are aligned at `71ecda1` (`merge: deliver aura journey and assessment theming`).
+- Delivered product shape: bilingual English/Malayalam guided journeys; seven-chakra customization; HRIM, Sleep, Music Only, Yoga/Bath/care extensions; Piper narration with browser fallback; trauma-aware wellness boundaries; assessment handoff; and a user-activated, `Source=Lite`-only Earn link after completion.
+- Runtime content source is `scripts.json`. `test-script.json` is a short schema fixture. `docs/dot.json` is independently authored facilitator content and is not synchronized from production wording.
+- HRIM is a separate energizing/recharge experience, available from 3:30 AM through 5:59 PM local device time; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
+- Chakra frequencies follow the widely used modern Solfeggio mapping in this product; they must not be represented as measured anatomy, clinical treatment, or a canonical fixed-Hz rule from classical yogic texts.
 
 ## NOW
+
+### Active snapshot — 2026-08-16 (Asia/Kolkata)
+
+- Branch: `drone-duration-modes`; its latest runtime-changing commit is `fc243a1` (`fix(audio): use separate HRIM drone duration default`). The branch contains three audio commits plus a documentation-only context checkpoint on top of `origin/production`, has no configured upstream, and has not been pushed or merged.
+- `b7563b7` (`feat(audio): add progressive drone duration modes`) adds Beginner 20%, Intermediate 50%, Advanced 70%, and Expert 100%, with Beginner as the persisted default and a pause-aware fade-start timer beginning before narration.
+- `99bc581` removes octave reduction from the main oscillator. With Chakra Frequencies enabled, production centre pitches are Root 396, Sacral 417, Solar 528, Heart 639, Throat 741, Third Eye 852, Crown 963, and HRIM 528 Hz. Frequencies Off and malformed input intentionally retain the 110 Hz fallback.
+- `fc243a1` keeps Beginner as the normal chakra default but gives HRIM a separate persisted duration preference. HRIM normalizes missing, invalid, or Beginner values to Intermediate (50%); Advanced and Expert remain available. The HRIM Beginner radio is disabled and the active setting is explained in English and Malayalam.
+- The former half-frequency lower oscillator is gone. Independent support remains: a slow 0.04 Hz LFO modulates the main pitch by approximately ±0.1%, Eyes Close may add a 40 Hz anchor plus 80/82 Hz binaural pair, elemental noise remains, and Yoga retains 136.1 Hz.
+- Delivery versions: `style.css?v=1.55`, `app.js?v=1.66`, shell cache `chakra-v5.29`, Piper cache `chakra-piper-v3`, and language cache `chakra-language-v4`.
+- Validation at the latest implementation checkpoint: `unit/static` PASS — JavaScript syntax, service-worker syntax, exact-frequency/drone-duration contract, zero-volume audio contract, bilingual content-safety contract, assessment contract, Earn handoff contract, HRIM time-window contract, JSON parsing, and diff whitespace. No Playwright or screenshots were used.
+- Owner clarification implemented: HRIM is for energizing/recharge, so Beginner is disabled for HRIM and Intermediate is the default. HRIM remains a timed path using its independent `timeHighEnergy` duration; uninterrupted full-stage drone behavior is not part of this approved change.
+- Additional HRIM audio observations remain unimplemented: `high_energy` currently resolves to elemental index `-1` and therefore receives the fallback bright high-pass texture; the stage named final silence stops the drone but leaves quiet background music running.
+- Next exact step: perform real-device listening for normal Beginner and HRIM Intermediate behavior, then decide whether the explicit HRIM elemental texture and background-music behavior during final integration need refinement before any merge or push.
+- Progress: **90% complete** for the isolated audio-refinement scope | Confidence: medium | Current phase: device-review preparation | Main remaining scope: real-device listening and optional HRIM texture/integration refinement.
+
+### Historical context retained for reference
 
 - Implemented grouped Yoga preparation, per-pose, pose-selection, Bath toggle, and Bath duration controls under Yoga Bridge.
 - Added visible copy explaining `Bath → Yoga → Crown` order.
@@ -186,10 +205,42 @@
 - Added a visible `Return to Lobby` link beside `Clear for New Client`. It uses the app-relative `../index.html` destination so GitHub Pages and local hosting both return to Lite rather than the domain root.
 - Extended the static assessment contract for all activation paths and the lower lobby link; bumped the PWA shell cache so installed clients receive the corrected assessment page. No questions, responses, scoring, notes, or stored client data were changed.
 
+### CP-AUDIO-004 — Main-drone duration modes
+
+- Date: 2026-08-16 (Asia/Kolkata).
+- Commit: `b7563b7` — `feat(audio): add progressive drone duration modes`.
+- Added a localized Lobby control with four persisted modes: Beginner 20%, Intermediate 50%, Advanced 70%, and Expert 100%. New and invalid preferences resolve to Beginner.
+- The drone still begins before each chakra narration. Its timer uses the active core-practice duration (`timePerChakra`, or `timeHighEnergy` for HRIM), pauses with the journey, and starts the existing five-second release when the selected percentage elapses. Generation guards prevent a cancelled or previous chakra timer from stopping a later stage.
+- Removed the half-frequency lower oscillator completely while retaining one main drone, elemental texture, and optional Eyes Close binaural support. Yoga keeps its independent untimed 136.1 Hz bridge-drone lifecycle.
+- Added a live `MM:SS` preview so the guide can see the exact fade-start time before beginning. Music Only hides the control because that path creates no chakra drone.
+- Strengthened custom-script handling by requiring HRIM's audio identity fields, validating every active chakra/HRIM frequency from 1–20,000 Hz, and retaining a defensive 110 Hz fallback at the audio boundary.
+- Added `npm run test:drone-duration` for exact ratios, defaulting, localization, stage ordering, pause behavior, stale-timer protection, one-main-oscillator output, persistence, and frequency validation. Bumped app/style query versions plus the PWA shell and language caches. No Playwright or screenshots were used.
+
+### CP-AUDIO-005 — Exact script-defined main-drone frequencies
+
+- Date: 2026-08-16 (Asia/Kolkata).
+- Commit: `99bc581` — `fix(audio): preserve exact script drone frequencies`.
+- Removed the remaining octave-reduction rules that halved script frequencies above 600 Hz and quartered frequencies above 900 Hz. The main oscillator now uses the validated active chakra or HRIM JSON value as its centre frequency: 396, 417, 528, 639, 741, 852, 963, and HRIM 528 Hz in the production bundle.
+- Preserved the separate 80/82 Hz optional Eyes Close binaural support, 40 Hz Eyes Close grounding anchor, elemental texture, and Yoga's independent 136.1 Hz drone. These supporting layers do not replace or retune the JSON-driven main oscillator.
+- Preserved the existing 0.04 Hz vibration LFO, which moves the centre pitch by approximately ±0.1%; no octave or secondary lower-tone layer remains.
+- Preserved the explicit Chakra Frequencies Off behavior and malformed-input defense, both of which use the neutral 110 Hz fallback intentionally.
+- Strengthened `npm run test:drone-duration` to reject any return of `/2` or `/4` main-frequency shifting and to require direct use of the validated active frequency. No Playwright or screenshots were used.
+
+### CP-AUDIO-006 — HRIM Intermediate-default drone mode
+
+- Date: 2026-08-16 (Asia/Kolkata).
+- Commit: `fc243a1` — `fix(audio): use separate HRIM drone duration default`.
+- Normal chakra journeys retain the persisted Beginner default. HRIM now has a separate `chakra_hrim_drone_duration_mode` preference with Intermediate as the default; saved Beginner or invalid HRIM values normalize to Intermediate.
+- The Lobby disables the Beginner radio while HRIM is selected, shows a localized English/Malayalam explanation, and keeps Advanced/Expert available. The runtime passes the correct normal or HRIM mode into the pause-aware drone timer.
+- Bumped `app.js` to `v=1.67`, shell cache to `chakra-v5.30`, and language cache to `chakra-language-v5`. Updated the drone contract for HRIM normalization, separate persistence, UI disabling, and localization.
+- Validation: `static/unit` PASS — JavaScript syntax, `npm run test:drone-duration`, `npm run test:content-safety`, and `git diff --check`. No Playwright or screenshots were used.
+
 ## Documentation checkpoint
 
-- Date: 2026-08-09 (Asia/Kolkata)
-- Baseline `HEAD`: `6da554d` — `update`
-- Status: the consultation architecture documentation and Loop procedure are **uncommitted working changes**; `6da554d` is not the commit containing these edits.
-- Validation: `git diff --check` passed; no production consultation implementation has started.
-- Next checkpoint: commit the documentation updates together with the first approved consultation implementation slice, then replace this baseline entry with the actual commit hash and subject.
+- Checkpoint: `CP-CONTEXT-001` — active audio-branch context refresh.
+- Date: 2026-08-16 (Asia/Kolkata).
+- Baseline `HEAD`: `99bc581` — `fix(audio): preserve exact script drone frequencies`.
+- Pre-refresh status: clean `drone-duration-modes` working tree; local branch two commits ahead of `origin/production`, with no upstream and no push performed.
+- Scope: documentation accuracy only. Runtime behavior, JSON content, locales, styles, tests, and protected `loop.md` are intentionally unchanged by this checkpoint.
+- Validation: `static/unit` PASS — documentation consistency, current Git state, current cache/query versions, npm test inventory, `npm run test:drone-duration`, `npm run test:hrim-time`, and `git diff --check`. Browser/manual evidence is intentionally not part of this refresh.
+- Next checkpoint: resolve the pending HRIM duration-mode policy; do not merge or push until explicitly requested.
