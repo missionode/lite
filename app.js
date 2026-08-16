@@ -3124,9 +3124,11 @@ const state = {
         return saved === null ? true : saved === 'true';
     })(),
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
-    bgMusicMode: localStorage.getItem('chakra_bg_music_mode') === 'true',
-    highEnergyEnabled: localStorage.getItem('chakra_high_energy') === 'true',
-    sleepExperienceEnabled: localStorage.getItem('chakra_sleep_experience') === 'true',
+    // Experience Mode selections are intentionally session-only. They should
+    // never be restored from or written to localStorage.
+    bgMusicMode: false,
+    highEnergyEnabled: false,
+    sleepExperienceEnabled: false,
     sleepDroneDurationMode: normalizeSleepDroneDurationMode(localStorage.getItem('chakra_sleep_drone_duration_mode')),
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
     corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
@@ -3403,17 +3405,12 @@ function loadPreferences() {
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    syncChecked('music-only-toggle', state.bgMusicMode);
-    syncChecked('high-energy-toggle', state.highEnergyEnabled);
-    syncChecked('sleep-mode-toggle', state.sleepExperienceEnabled);
-    if (state.sleepExperienceEnabled) {
-        state.bgMusicMode = false;
-        state.highEnergyEnabled = false;
-        syncChecked('music-only-toggle', false);
-        syncChecked('high-energy-toggle', false);
-        localStorage.setItem('chakra_bg_music_mode', 'false');
-        localStorage.setItem('chakra_high_energy', 'false');
-    }
+    localStorage.removeItem('chakra_bg_music_mode');
+    localStorage.removeItem('chakra_high_energy');
+    localStorage.removeItem('chakra_sleep_experience');
+    syncChecked('music-only-toggle', false);
+    syncChecked('high-energy-toggle', false);
+    syncChecked('sleep-mode-toggle', false);
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
@@ -3657,14 +3654,12 @@ function attachEventListeners() {
         if (!highEnergyToggle) return;
         highEnergyToggle.checked = false;
         state.highEnergyEnabled = false;
-        localStorage.setItem('chakra_high_energy', 'false');
     }
 
     function clearMusicOnlyMode() {
         if (!musicOnlyToggle) return;
         musicOnlyToggle.checked = false;
         state.bgMusicMode = false;
-        localStorage.setItem('chakra_bg_music_mode', 'false');
     }
 
     function clearSleepMode() {
@@ -3673,7 +3668,6 @@ function attachEventListeners() {
         sleepToggle.checked = false;
         state.sleepExperienceEnabled = false;
         state.sleepMode = false;
-        localStorage.setItem('chakra_sleep_experience', 'false');
     }
 
     function enforceMasterToggle(target) {
@@ -3743,7 +3737,6 @@ function attachEventListeners() {
     if (musicOnlyToggle) {
         musicOnlyToggle.addEventListener('change', (e) => {
             state.bgMusicMode = e.target.checked;
-            localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
             updateSessionEstimate();
@@ -3761,7 +3754,6 @@ function attachEventListeners() {
     if (highEnergyToggle) {
         highEnergyToggle.addEventListener('change', (e) => {
             state.highEnergyEnabled = e.target.checked;
-            localStorage.setItem('chakra_high_energy', state.highEnergyEnabled);
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
         });
@@ -3771,7 +3763,6 @@ function attachEventListeners() {
     if (sleepModeToggle) {
         sleepModeToggle.addEventListener('change', (e) => {
             state.sleepExperienceEnabled = e.target.checked;
-            localStorage.setItem('chakra_sleep_experience', state.sleepExperienceEnabled);
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
         });
@@ -4128,48 +4119,7 @@ function attachEventListeners() {
         });
     }
 
-    function isHighEnergyTimeAllowed(now = new Date()) {
-        const minutes = (now.getHours() * 60) + now.getMinutes();
-        return minutes >= (3 * 60 + 30) && minutes < (18 * 60);
-    }
-
-    function confirmHighEnergyTime() {
-        if (!getChecked('high-energy-toggle') || isHighEnergyTimeAllowed()) return Promise.resolve(true);
-
-        const modal = document.getElementById('hrim-time-block-modal');
-        const close = document.getElementById('hrim-time-block-close');
-        const lobby = document.getElementById('hrim-time-block-lobby');
-        const regular = document.getElementById('hrim-time-block-regular');
-        if (!modal || !close || !lobby || !regular) return Promise.resolve(false);
-
-        modal.classList.remove('hidden');
-        lobby.focus();
-        return new Promise(resolve => {
-            const finish = continueJourney => {
-                close.removeEventListener('click', returnToLobby);
-                lobby.removeEventListener('click', returnToLobby);
-                regular.removeEventListener('click', continueRegular);
-                modal.classList.add('hidden');
-                if (continueJourney) {
-                    const highEnergyToggle = document.getElementById('high-energy-toggle');
-                    if (highEnergyToggle) highEnergyToggle.checked = false;
-                    state.highEnergyEnabled = false;
-                    localStorage.setItem('chakra_high_energy', 'false');
-                }
-                resolve(continueJourney);
-            };
-            const returnToLobby = () => finish(false);
-            const continueRegular = () => finish(true);
-            close.addEventListener('click', returnToLobby);
-            lobby.addEventListener('click', returnToLobby);
-            regular.addEventListener('click', continueRegular);
-        });
-    }
-
     startMeditationBtn.addEventListener('click', async () => {
-        // HRIM is a daytime-only energy practice. Gate it before audio setup.
-        if (!await confirmHighEnergyTime()) return;
-
         state.sleepMode = getChecked('sleep-mode-toggle');
 
         // Select the intended narration character for this journey type.

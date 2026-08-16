@@ -238,23 +238,11 @@ test('offers Sleep Mode as a Lobby experience with a shared ten-minute stage max
   await expect(page.locator('#journey-roadmap')).toContainText('Drowsiness');
 });
 
-test('blocks HRIM at the 6 PM Sleep Mode boundary before starting audio', async ({ page }) => {
-  await page.evaluate(() => {
-    const NativeDate = Date;
-    const blockedTime = new NativeDate(2026, 7, 8, 18, 0, 0).getTime();
-    window.Date = class extends NativeDate {
-      constructor(...args) { if (args.length) super(...args); else super(blockedTime); }
-      static now() { return blockedTime; }
-    };
-  });
+test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await page.locator('#save-config').click();
   await page.locator('#high-energy-toggle').check();
-  await page.locator('#start-meditation').click();
-  await expect(page.locator('#hrim-time-block-modal')).toBeVisible();
-  await expect(page.locator('#hrim-time-block-message')).toContainText('6:00 PM');
-  await page.locator('#hrim-time-block-lobby').click();
-  await expect(page.locator('#hrim-time-block-modal')).toBeHidden();
-  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#high-energy-toggle')).toBeChecked();
+  await expect(page.locator('#hrim-time-block-modal')).toHaveCount(0);
 });
 
 test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {

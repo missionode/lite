@@ -72,6 +72,10 @@ assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a d
 assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
 assert.match(app, /state\.timeSleepStage \* SLEEP_STAGES\.length/, 'Sleep Mode should estimate one common duration across five stages');
 assert.equal(timingConfig.journey.sleepStageDuration.max, 10, 'Sleep Mode should cap the shared stage duration at 10 minutes');
+for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_experience']) {
+    assert.doesNotMatch(app, new RegExp(`localStorage\\.getItem\\(['"]${key}['"]\\)`), `${key} must not restore an Experience Mode selection`);
+    assert.doesNotMatch(app, new RegExp(`localStorage\\.setItem\\(['"]${key}['"]`), `${key} must not persist an Experience Mode selection`);
+}
 
 for (const locale of [en, ml]) {
     for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest']) {

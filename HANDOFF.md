@@ -14,7 +14,7 @@
 - Stable production baseline: local and remote `production` are aligned at `71ecda1` (`merge: deliver aura journey and assessment theming`).
 - Delivered product shape: bilingual English/Malayalam guided journeys; seven-chakra customization; HRIM, Sleep, Music Only, Yoga/Bath/care extensions; Piper narration with browser fallback; trauma-aware wellness boundaries; assessment handoff; and a user-activated, `Source=Lite`-only Earn link after completion.
 - Runtime content source is `scripts.json`. `test-script.json` is a short schema fixture. `docs/dot.json` is independently authored facilitator content and is not synchronized from production wording.
-- HRIM is a separate energizing/recharge experience, available from 3:30 AM through 5:59 PM local device time; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
+- HRIM is a separate energizing/recharge experience with no local-time restriction; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
 - Chakra frequencies follow the widely used modern Solfeggio mapping in this product; they must not be represented as measured anatomy, clinical treatment, or a canonical fixed-Hz rule from classical yogic texts.
 
 ## NOW
@@ -32,6 +32,8 @@
 - Additional HRIM audio observations remain unimplemented: `high_energy` currently resolves to elemental index `-1` and therefore receives the fallback bright high-pass texture; the stage named final silence stops the drone but leaves quiet background music running.
 - Sleep Mode now has five sequential, sleep-inspired binaural targets (10, 6, 5, 2, and 6 Hz), one shared stage duration capped at 10 minutes, continuous background music, and separate persisted drone-duration mode defaulting to Intermediate. It is mutually exclusive with HRIM, Music Only, and normal guided options.
 - Sleep targets are explicitly sound-design guidance rather than biological sleep-stage guarantees. The audible carrier remains 80 Hz; Delta 2 Hz is represented as a stereo beat difference rather than an inaudible main oscillator.
+- Experience Mode selections (Music Only, HRIM, and Sleep Mode) are session-only. They are reset on load and their legacy selection keys are removed from local storage; timing and drone-duration preferences remain persisted.
+- The former HRIM 03:30–18:00 gate and block modal are removed. HRIM can now be selected at any local time.
 - Validation for the current work: `static/unit` PASS — JavaScript syntax, JSON parsing, drone-duration/Sleep Mode contract, content safety, zero-volume audio safety, and diff whitespace. No Playwright or screenshots were used.
 - Next exact step: review the diff, commit the Sleep Mode feature with a detailed message, and perform real-device listening before any production merge or push.
 - Progress: **95% complete** for the isolated Sleep Mode implementation | Confidence: medium | Current phase: static validation and review | Main remaining scope: device audio/UX validation.
