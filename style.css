@@ -238,6 +238,11 @@ body {
     display: none !important;
 }
 
+/* Author layout rules must not override the native hidden contract. */
+[hidden] {
+    display: none !important;
+}
+
 h1 {
     font-weight: 200;
     letter-spacing: 8px;
@@ -1050,6 +1055,108 @@ input[type="range"]::-moz-range-progress {
     border: 1px solid rgba(251, 191, 36, 0.2);
     border-radius: 14px;
     background: rgba(0, 0, 0, 0.16);
+    text-align: center;
+}
+
+.shots-control {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 420px);
+    margin: 0 auto 0.85rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 18px;
+    background: rgba(15, 15, 25, 0.72);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(16px);
+}
+
+.shots-toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    min-height: 42px;
+    color: var(--accent-color);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+}
+
+.shots-toggle-label input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--accent-color);
+}
+
+.shots-control.shots-active {
+    border-color: rgba(248, 113, 113, 0.8);
+    box-shadow: 0 10px 32px rgba(248, 113, 113, 0.16);
+}
+
+.shots-control.shots-disabled {
+    opacity: 0.5;
+}
+
+.shot-options {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.65rem;
+    text-align: left;
+}
+
+.shot-options[hidden],
+.custom-shot-frequency[hidden] {
+    display: none;
+}
+
+.shot-options select,
+.shot-options input[type="number"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.custom-shot-frequency {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.7rem;
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.custom-shot-frequency label {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.shot-options input[type="number"] {
+    min-height: 44px;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    border-radius: 10px;
+    background: rgba(8, 8, 18, 0.82);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+}
+
+.shot-options input[type="number"]:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.16);
+}
+
+.shots-help {
+    margin: 0.25rem 0 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.72rem;
+    line-height: 1.45;
     text-align: center;
 }
 
