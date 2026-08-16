@@ -84,10 +84,6 @@ test('opens the full-screen mixer and safely restarts the active journey', async
 
   await page.locator('#save-config').click();
   await page.locator('#start-meditation').click();
-  const sleepPrompt = page.locator('#sleep-mode-prompt');
-  if (await sleepPrompt.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await page.locator('#sleep-mode-disable').click();
-  }
   await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
   await expect(page.locator('#voice-clarity')).toHaveValue('35');
   await expect(page.locator('#voice-warmth')).toHaveValue('65');
@@ -131,13 +127,6 @@ test('opens the full-screen mixer and safely restarts the active journey', async
   await page.locator('#btn-mixer').click();
   await page.locator('#restart-meditation').click();
   await expect(page.locator('#lobby-screen')).toBeVisible({ timeout: 10000 });
-  const restartSleepPrompt = page.locator('#sleep-mode-prompt');
-  try {
-    await expect(restartSleepPrompt).toBeVisible({ timeout: 3000 });
-    await page.locator('#sleep-mode-disable').click();
-  } catch {
-    // Daytime journeys do not show the evening Sleep Mode choice.
-  }
   await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
   await expect(page.locator('#lobby-screen')).toBeHidden();
 });
@@ -240,45 +229,20 @@ test('switches the generated intention for HRIM and preserves custom text', asyn
   await expect(intention).toHaveValue('A short custom intention.');
 });
 
-test('offers the Sleep Mode decision before an evening journey', async ({ page }) => {
-  await page.evaluate(() => {
-    const NativeDate = Date;
-    const evening = new NativeDate(2026, 7, 8, 19, 0, 0).getTime();
-    window.Date = class extends NativeDate {
-      constructor(...args) { if (args.length) super(...args); else super(evening); }
-      static now() { return evening; }
-    };
-  });
-  page.on('dialog', dialog => dialog.dismiss());
-
+test('offers Sleep Mode as a Lobby experience with a shared ten-minute stage maximum', async ({ page }) => {
   await page.locator('#save-config').click();
-  await page.locator('#start-meditation').click();
-  await expect(page.locator('#sleep-mode-prompt')).toBeVisible();
-  await expect(page.locator('#sleep-mode-enable')).toBeVisible();
-  await expect(page.locator('#sleep-mode-disable')).toBeVisible();
-  await expect(page.locator('#sleep-mode-prompt-close')).toBeVisible();
-  await page.locator('#sleep-mode-prompt-close').click();
-  await expect(page.locator('#sleep-mode-prompt')).toBeHidden();
-  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await page.locator('#sleep-mode-toggle').check();
+  await expect(page.locator('#sleep-mode-toggle')).toBeChecked();
+  await expect(page.locator('#time-per-chakra')).toHaveAttribute('max', '10');
+  await expect(page.locator('#journey-roadmap')).toContainText('Sleep Mode');
+  await expect(page.locator('#journey-roadmap')).toContainText('Drowsiness');
 });
 
-test('blocks HRIM at the 6 PM Sleep Mode boundary before starting audio', async ({ page }) => {
-  await page.evaluate(() => {
-    const NativeDate = Date;
-    const blockedTime = new NativeDate(2026, 7, 8, 18, 0, 0).getTime();
-    window.Date = class extends NativeDate {
-      constructor(...args) { if (args.length) super(...args); else super(blockedTime); }
-      static now() { return blockedTime; }
-    };
-  });
+test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await page.locator('#save-config').click();
   await page.locator('#high-energy-toggle').check();
-  await page.locator('#start-meditation').click();
-  await expect(page.locator('#hrim-time-block-modal')).toBeVisible();
-  await expect(page.locator('#hrim-time-block-message')).toContainText('6:00 PM');
-  await page.locator('#hrim-time-block-lobby').click();
-  await expect(page.locator('#hrim-time-block-modal')).toBeHidden();
-  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#high-energy-toggle')).toBeChecked();
+  await expect(page.locator('#hrim-time-block-modal')).toHaveCount(0);
 });
 
 test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {

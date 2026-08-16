@@ -25,6 +25,14 @@ const DRONE_DURATION_RATIOS = Object.freeze({
 });
 const DEFAULT_DRONE_DURATION_MODE = 'beginner';
 const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
+const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
+const SLEEP_STAGES = Object.freeze([
+    { key: 'drowsiness', beatHz: 10 },
+    { key: 'lightSleep', beatHz: 6 },
+    { key: 'trueSleep', beatHz: 5 },
+    { key: 'deepSleep', beatHz: 2 },
+    { key: 'remRest', beatHz: 6 }
+]);
 
 function normalizeDroneDurationMode(value) {
     return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value) ? value : DEFAULT_DRONE_DURATION_MODE;
@@ -33,6 +41,12 @@ function normalizeDroneDurationMode(value) {
 function normalizeHrimDroneDurationMode(value) {
     const normalized = normalizeDroneDurationMode(value);
     return normalized === 'beginner' ? DEFAULT_HRIM_DRONE_DURATION_MODE : normalized;
+}
+
+function normalizeSleepDroneDurationMode(value) {
+    return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value)
+        ? value
+        : DEFAULT_SLEEP_DRONE_DURATION_MODE;
 }
 
 function getDroneDurationMs(practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
@@ -382,6 +396,7 @@ async function loadTimingConfig() {
         const defaults = {
             timePerChakra: ['chakra_time', 'timePerChakra', 5],
             timeHighEnergy: ['chakra_time_high_energy', 'timeHighEnergy', 5],
+            timeSleepStage: ['chakra_time_sleep_stage', 'sleepStageDuration', 5],
             timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
             timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
             timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
@@ -451,22 +466,26 @@ function updateDroneDurationSummary() {
     const summary = document.getElementById('drone-duration-summary');
     if (!summary) return;
     const highEnergy = getChecked('high-energy-toggle');
-    const practiceMinutes = highEnergy ? state.timeHighEnergy : state.timePerChakra;
-    const mode = highEnergy ? state.hrimDroneDurationMode : state.droneDurationMode;
+    const sleep = getChecked('sleep-mode-toggle');
+    const practiceMinutes = highEnergy ? state.timeHighEnergy : (sleep ? state.timeSleepStage : state.timePerChakra);
+    const mode = highEnergy ? state.hrimDroneDurationMode : (sleep ? state.sleepDroneDurationMode : state.droneDurationMode);
     const duration = formatClockDuration(getDroneDurationMs(practiceMinutes, mode));
-    const template = t(highEnergy ? 'ui.droneDurationActiveHrim' : 'ui.droneDurationActive');
+    const template = t(highEnergy ? 'ui.droneDurationActiveHrim' : (sleep ? 'ui.droneDurationActiveSleep' : 'ui.droneDurationActive'));
     summary.textContent = template.replace('{duration}', duration);
 }
 
 function syncDroneDurationModeControls() {
     const highEnergy = getChecked('high-energy-toggle');
-    const activeMode = highEnergy ? state.hrimDroneDurationMode : state.droneDurationMode;
+    const sleep = getChecked('sleep-mode-toggle');
+    const activeMode = highEnergy ? state.hrimDroneDurationMode : (sleep ? state.sleepDroneDurationMode : state.droneDurationMode);
     document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
         input.disabled = highEnergy && input.value === 'beginner';
         input.checked = input.value === activeMode;
     });
     const hrimNote = document.getElementById('drone-duration-hrim-note');
     if (hrimNote) hrimNote.hidden = !highEnergy;
+    const sleepNote = document.getElementById('drone-duration-sleep-note');
+    if (sleepNote) sleepNote.hidden = !sleep;
 }
 
 function defaultIntention(language = state.language) {
@@ -484,6 +503,10 @@ function isGeneratedIntention(value, language = state.language) {
 
 function getJourneyRoadmapLabels() {
     if (getChecked('music-only-toggle')) return [t('ui.roadmapMusicOnly')];
+
+    if (getChecked('sleep-mode-toggle')) {
+        return [t('ui.roadmapSleep'), t('ui.roadmapDrowsiness'), t('ui.roadmapLightSleep'), t('ui.roadmapTrueSleep'), t('ui.roadmapDeepSleep'), t('ui.roadmapRemRest')];
+    }
 
     if (getChecked('high-energy-toggle')) {
         return [t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')];
@@ -561,6 +584,7 @@ function applyLocaleUI() {
         'frequencies-toggle': 'ui.chakraFrequencies',
         'eyes-close-mode-toggle': 'ui.eyesCloseMode',
         'music-only-toggle': 'ui.musicOnlyMode',
+        'sleep-mode-toggle': 'ui.sleepMode',
         'corpse-pose-toggle': 'ui.corpsePoseOption',
         'yoga-bridge-toggle': 'ui.yogaBridge',
         'bath-session-toggle': 'ui.bathSession',
@@ -1474,6 +1498,54 @@ class AudioEngine {
         this.binauralNodes = [leftOsc, rightOsc, binauralGain];
     }
 
+    startSleepDrone(beatFrequency) {
+        this.stopDrone();
+
+        const requestedBeat = Number(beatFrequency);
+        const beat = Number.isFinite(requestedBeat) ? Math.min(12, Math.max(0.5, requestedBeat)) : 6;
+        const now = this.ctx.currentTime;
+        const carrier = 80;
+
+        // Sleep targets are binaural beat differences. The audible carrier
+        // remains 80 Hz so the sub-1 Hz Delta target is not sent as an
+        // inaudible main oscillator.
+        const mainOscillator = this.ctx.createOscillator();
+        const mainGain = this.ctx.createGain();
+        const mainFilter = this.ctx.createBiquadFilter();
+        mainOscillator.type = 'sine';
+        mainOscillator.frequency.setValueAtTime(carrier, now);
+        mainFilter.type = 'lowpass';
+        mainFilter.frequency.setValueAtTime(220, now);
+        mainFilter.Q.setValueAtTime(0.5, now);
+        mainGain.gain.setValueAtTime(0, now);
+        mainGain.gain.linearRampToValueAtTime(0.06, now + 6);
+        mainOscillator.connect(mainFilter);
+        mainFilter.connect(mainGain);
+        mainGain.connect(this.masterGain);
+        mainOscillator.start(now);
+        this.droneOscillators.push({ osc: mainOscillator, gain: mainGain });
+
+        const leftOsc = this.ctx.createOscillator();
+        const rightOsc = this.ctx.createOscillator();
+        const leftPanner = this.ctx.createStereoPanner();
+        const rightPanner = this.ctx.createStereoPanner();
+        const binauralGain = this.ctx.createGain();
+        leftPanner.pan.setValueAtTime(-1, now);
+        rightPanner.pan.setValueAtTime(1, now);
+        leftOsc.frequency.setValueAtTime(carrier, now);
+        rightOsc.frequency.setValueAtTime(carrier + beat, now);
+        binauralGain.gain.setValueAtTime(0, now);
+        binauralGain.gain.linearRampToValueAtTime(0.002, now + 10);
+        leftOsc.connect(leftPanner);
+        rightOsc.connect(rightPanner);
+        leftPanner.connect(binauralGain);
+        rightPanner.connect(binauralGain);
+        binauralGain.connect(this.masterGain);
+        leftOsc.start(now);
+        rightOsc.start(now);
+        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+    }
+
     stopBinaural() {
         const now = this.ctx.currentTime;
         this.binauralNodes.forEach(node => {
@@ -1807,6 +1879,14 @@ class MeditationController {
         void this.stopDroneAfterDuration(durationMs, generation);
     }
 
+    startTimedSleepDrone(beatFrequency, practiceMinutes, durationMode = state.sleepDroneDurationMode) {
+        this.cancelDroneTimer();
+        this.audio.startSleepDrone(beatFrequency);
+        const generation = this.droneTimerGeneration;
+        const durationMs = getDroneDurationMs(practiceMinutes, durationMode);
+        void this.stopDroneAfterDuration(durationMs, generation);
+    }
+
     async stopDroneAfterDuration(durationMs, generation) {
         const completed = await this.waitForDroneDuration(durationMs, generation);
         if (!completed) return;
@@ -1817,6 +1897,58 @@ class MeditationController {
     stopStageDrone() {
         this.cancelDroneTimer();
         this.audio.stopDrone();
+    }
+
+    async runSleepJourney() {
+        if (this.isStarting || this.isMeditationActive) return;
+        alert("Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.");
+        const startBtn = document.getElementById('start-meditation');
+        if (startBtn) {
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.5';
+        }
+        this.isMeditationActive = true;
+        this.isPaused = false;
+        this.isHighEnergy = false;
+        this.sessionStartedAt = Date.now();
+        showScreen(meditationScreen);
+
+        const controls = document.getElementById('controls');
+        if (controls) controls.classList.remove('hidden');
+        setText('pause-meditation', 'II');
+        setText('mantra-display', t('ui.sleepMode'));
+        setText('narration-text', t('ui.sleepModeIntro'));
+        setText('timer-display', '');
+        this.visual.startPulsing('#355c7d');
+        await this.audio.startBackgroundMusic();
+        this.audio.fadeInBackgroundMusic(10, 0.32);
+
+        const stageDurationMs = state.timeSleepStage * 60 * 1000;
+        for (const [index, stage] of SLEEP_STAGES.entries()) {
+            if (!this.isMeditationActive) return;
+            setText('mantra-display', t(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
+            setText('narration-text', t('ui.sleepStageGuidance'));
+            setText('timer-display', formatClockDuration(stageDurationMs));
+            this.startTimedSleepDrone(stage.beatHz, state.timeSleepStage, state.sleepDroneDurationMode);
+
+            let remaining = stageDurationMs;
+            while (remaining > 0 && this.isMeditationActive) {
+                const step = Math.min(1000, remaining);
+                await this.pauseAwareSleep(step);
+                if (!this.isPaused) {
+                    remaining -= step;
+                    setText('timer-display', formatClockDuration(remaining));
+                }
+            }
+            this.stopStageDrone();
+            if (index < SLEEP_STAGES.length - 1) await this.pauseAwareSleep(3000);
+        }
+
+        if (this.isMeditationActive) {
+            this.audio.fadeOutBackgroundMusic(12);
+            await this.pauseAwareSleep(12000);
+            if (this.isMeditationActive) this.finish();
+        }
     }
 
     async start() {
@@ -2975,7 +3107,7 @@ const state = {
     },
     selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'],
     intention: localStorage.getItem('chakra_intention') || '',
-    sleepMode: localStorage.getItem('chakra_sleep_mode') === 'true',
+    sleepMode: false,
     // This preference controls the opening style; stats.journeys remains the
     // historical count of completed journeys.
     returningJourney: (() => {
@@ -2992,8 +3124,12 @@ const state = {
         return saved === null ? true : saved === 'true';
     })(),
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
-    bgMusicMode: localStorage.getItem('chakra_bg_music_mode') === 'true',
-    highEnergyEnabled: localStorage.getItem('chakra_high_energy') === 'true',
+    // Experience Mode selections are intentionally session-only. They should
+    // never be restored from or written to localStorage.
+    bgMusicMode: false,
+    highEnergyEnabled: false,
+    sleepExperienceEnabled: false,
+    sleepDroneDurationMode: normalizeSleepDroneDurationMode(localStorage.getItem('chakra_sleep_drone_duration_mode')),
     eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
     corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
@@ -3012,6 +3148,7 @@ const state = {
         localStorage.getItem('chakra_massage') === 'true',
     selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
     // Journey Timings (in seconds)
+    timeSleepStage: parseFloat(localStorage.getItem('chakra_time_sleep_stage')) || 5.0,
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
@@ -3268,8 +3405,12 @@ function loadPreferences() {
     syncChecked('hooponopono-toggle', state.hooponopono);
     syncChecked('frequencies-toggle', state.chakraFrequencies);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    syncChecked('music-only-toggle', state.bgMusicMode);
-    syncChecked('high-energy-toggle', state.highEnergyEnabled);
+    localStorage.removeItem('chakra_bg_music_mode');
+    localStorage.removeItem('chakra_high_energy');
+    localStorage.removeItem('chakra_sleep_experience');
+    syncChecked('music-only-toggle', false);
+    syncChecked('high-energy-toggle', false);
+    syncChecked('sleep-mode-toggle', false);
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
@@ -3513,14 +3654,20 @@ function attachEventListeners() {
         if (!highEnergyToggle) return;
         highEnergyToggle.checked = false;
         state.highEnergyEnabled = false;
-        localStorage.setItem('chakra_high_energy', 'false');
     }
 
     function clearMusicOnlyMode() {
         if (!musicOnlyToggle) return;
         musicOnlyToggle.checked = false;
         state.bgMusicMode = false;
-        localStorage.setItem('chakra_bg_music_mode', 'false');
+    }
+
+    function clearSleepMode() {
+        const sleepToggle = document.getElementById('sleep-mode-toggle');
+        if (!sleepToggle) return;
+        sleepToggle.checked = false;
+        state.sleepExperienceEnabled = false;
+        state.sleepMode = false;
     }
 
     function enforceMasterToggle(target) {
@@ -3532,6 +3679,7 @@ function attachEventListeners() {
             if (hooponoponoToggle) hooponoponoToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
             clearHighEnergyMode();
+            clearSleepMode();
         } else if (target !== musicOnlyToggle && target.checked) {
             // Disable Music Only if any other journey feature is enabled.
             clearMusicOnlyMode();
@@ -3547,7 +3695,19 @@ function attachEventListeners() {
 
         if (target === highEnergyToggle && highEnergyToggle.checked) {
             clearMusicOnlyMode();
+            clearSleepMode();
             if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
+        }
+
+        const sleepToggle = document.getElementById('sleep-mode-toggle');
+        if (target === sleepToggle && sleepToggle.checked) {
+            clearMusicOnlyMode();
+            clearHighEnergyMode();
+            if (yogaBridgeToggle) yogaBridgeToggle.checked = false;
+            if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
+            if (boxMeditationToggle) boxMeditationToggle.checked = false;
+            if (hooponoponoToggle) hooponoponoToggle.checked = false;
+            if (corpsePoseToggle) corpsePoseToggle.checked = false;
         }
 
         updateTimingRowVisibility();
@@ -3577,7 +3737,6 @@ function attachEventListeners() {
     if (musicOnlyToggle) {
         musicOnlyToggle.addEventListener('change', (e) => {
             state.bgMusicMode = e.target.checked;
-            localStorage.setItem('chakra_bg_music_mode', state.bgMusicMode);
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
             updateSessionEstimate();
@@ -3595,7 +3754,15 @@ function attachEventListeners() {
     if (highEnergyToggle) {
         highEnergyToggle.addEventListener('change', (e) => {
             state.highEnergyEnabled = e.target.checked;
-            localStorage.setItem('chakra_high_energy', state.highEnergyEnabled);
+            enforceMasterToggle(e.target);
+            updateExperienceModeVisibility();
+        });
+    }
+
+    const sleepModeToggle = document.getElementById('sleep-mode-toggle');
+    if (sleepModeToggle) {
+        sleepModeToggle.addEventListener('change', (e) => {
+            state.sleepExperienceEnabled = e.target.checked;
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
         });
@@ -3608,12 +3775,33 @@ function attachEventListeners() {
     function updateExperienceModeVisibility() {
         const highEnergy = getChecked('high-energy-toggle');
         const musicOnly = getChecked('music-only-toggle');
+        const sleep = getChecked('sleep-mode-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
         const droneDuration = document.getElementById('drone-duration-control');
+        const durationLabel = document.querySelector('label[for="time-per-chakra"]');
+        const timeInput = document.getElementById('time-per-chakra');
         if (normalDuration) normalDuration.style.display = highEnergy ? 'none' : 'flex';
         if (highEnergyDuration) highEnergyDuration.style.display = highEnergy ? 'flex' : 'none';
         if (droneDuration) droneDuration.hidden = musicOnly;
+        if (durationLabel) durationLabel.textContent = t(sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration');
+        if (timeInput) {
+            timeInput.max = sleep ? timingConfig.journey?.sleepStageDuration?.max || 10 : timingConfig.journey?.timePerChakra?.max || 7;
+            const activeValue = sleep ? state.timeSleepStage : state.timePerChakra;
+            timeInput.value = activeValue;
+            const pct = ((activeValue - Number(timeInput.min)) / (Number(timeInput.max) - Number(timeInput.min)) * 100).toFixed(1) + '%';
+            timeInput.style.setProperty('--range-fill', pct);
+            setText('time-display', `${Number(activeValue).toFixed(1)} mins`);
+            const rangeControl = timeInput.closest('.range-control');
+            if (rangeControl) {
+                const maximum = rangeControl.querySelector('.range-max');
+                if (maximum) maximum.textContent = timeInput.max;
+                const increment = rangeControl.querySelector('.range-increment');
+                const decrement = rangeControl.querySelector('.range-decrement');
+                if (increment) increment.disabled = Number(timeInput.value) >= Number(timeInput.max);
+                if (decrement) decrement.disabled = Number(timeInput.value) <= Number(timeInput.min);
+            }
+        }
         syncDroneDurationModeControls();
         updateDroneDurationSummary();
     }
@@ -3632,6 +3820,11 @@ function attachEventListeners() {
     function updateSessionEstimate() {
         if (getChecked('music-only-toggle')) {
             setText('session-estimate', 'Music only — stop anytime');
+            updateJourneyRoadmap();
+            return;
+        }
+        if (getChecked('sleep-mode-toggle')) {
+            setText('session-estimate', `~ ${Math.round(state.timeSleepStage * SLEEP_STAGES.length)} min sleep journey`);
             updateJourneyRoadmap();
             return;
         }
@@ -3841,9 +4034,16 @@ function attachEventListeners() {
     });
 
     timeSlider.addEventListener('input', (e) => {
-        state.timePerChakra = parseFloat(e.target.value);
-        timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
-        localStorage.setItem('chakra_time', state.timePerChakra);
+        const value = parseFloat(e.target.value);
+        if (getChecked('sleep-mode-toggle')) {
+            state.timeSleepStage = value;
+            timeDisplay.textContent = `${state.timeSleepStage.toFixed(1)} mins`;
+            localStorage.setItem('chakra_time_sleep_stage', state.timeSleepStage);
+        } else {
+            state.timePerChakra = value;
+            timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
+            localStorage.setItem('chakra_time', state.timePerChakra);
+        }
         const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
         e.target.style.setProperty('--range-fill', pct);
         updateDroneDurationSummary();
@@ -3869,6 +4069,9 @@ function attachEventListeners() {
             if (getChecked('high-energy-toggle')) {
                 state.hrimDroneDurationMode = normalizeHrimDroneDurationMode(event.target.value);
                 localStorage.setItem('chakra_hrim_drone_duration_mode', state.hrimDroneDurationMode);
+            } else if (getChecked('sleep-mode-toggle')) {
+                state.sleepDroneDurationMode = normalizeSleepDroneDurationMode(event.target.value);
+                localStorage.setItem('chakra_sleep_drone_duration_mode', state.sleepDroneDurationMode);
             } else {
                 state.droneDurationMode = normalizeDroneDurationMode(event.target.value);
                 localStorage.setItem('chakra_drone_duration_mode', state.droneDurationMode);
@@ -3916,83 +4119,8 @@ function attachEventListeners() {
         });
     }
 
-    function chooseSleepModeForJourney() {
-        const isEvening = new Date().getHours() >= 18;
-        const prompt = document.getElementById('sleep-mode-prompt');
-        const enable = document.getElementById('sleep-mode-enable');
-        const disable = document.getElementById('sleep-mode-disable');
-        const close = document.getElementById('sleep-mode-prompt-close');
-
-        if (!isEvening || !prompt || !enable || !disable || !close) {
-            state.sleepMode = false;
-            return Promise.resolve(!isEvening ? false : null);
-        }
-
-        prompt.classList.remove('hidden');
-        enable.focus();
-        return new Promise(resolve => {
-            const finish = enabled => {
-                enable.removeEventListener('click', enableSleep);
-                disable.removeEventListener('click', disableSleep);
-                close.removeEventListener('click', closePrompt);
-                prompt.classList.add('hidden');
-                state.sleepMode = enabled === true;
-                resolve(enabled);
-            };
-            const enableSleep = () => finish(true);
-            const disableSleep = () => finish(false);
-            const closePrompt = () => finish(null);
-            enable.addEventListener('click', enableSleep);
-            disable.addEventListener('click', disableSleep);
-            close.addEventListener('click', closePrompt);
-        });
-    }
-
-    function isHighEnergyTimeAllowed(now = new Date()) {
-        const minutes = (now.getHours() * 60) + now.getMinutes();
-        return minutes >= (3 * 60 + 30) && minutes < (18 * 60);
-    }
-
-    function confirmHighEnergyTime() {
-        if (!getChecked('high-energy-toggle') || isHighEnergyTimeAllowed()) return Promise.resolve(true);
-
-        const modal = document.getElementById('hrim-time-block-modal');
-        const close = document.getElementById('hrim-time-block-close');
-        const lobby = document.getElementById('hrim-time-block-lobby');
-        const regular = document.getElementById('hrim-time-block-regular');
-        if (!modal || !close || !lobby || !regular) return Promise.resolve(false);
-
-        modal.classList.remove('hidden');
-        lobby.focus();
-        return new Promise(resolve => {
-            const finish = continueJourney => {
-                close.removeEventListener('click', returnToLobby);
-                lobby.removeEventListener('click', returnToLobby);
-                regular.removeEventListener('click', continueRegular);
-                modal.classList.add('hidden');
-                if (continueJourney) {
-                    const highEnergyToggle = document.getElementById('high-energy-toggle');
-                    if (highEnergyToggle) highEnergyToggle.checked = false;
-                    state.highEnergyEnabled = false;
-                    localStorage.setItem('chakra_high_energy', 'false');
-                }
-                resolve(continueJourney);
-            };
-            const returnToLobby = () => finish(false);
-            const continueRegular = () => finish(true);
-            close.addEventListener('click', returnToLobby);
-            lobby.addEventListener('click', returnToLobby);
-            regular.addEventListener('click', continueRegular);
-        });
-    }
-
     startMeditationBtn.addEventListener('click', async () => {
-        // HRIM is a daytime-only energy practice. Gate it before audio setup.
-        if (!await confirmHighEnergyTime()) return;
-
-        // Sleep Mode is a local evening decision for this journey only.
-        const sleepChoice = await chooseSleepModeForJourney();
-        if (sleepChoice === null) return;
+        state.sleepMode = getChecked('sleep-mode-toggle');
 
         // Select the intended narration character for this journey type.
         // Users can still fine-tune it after the journey begins.
@@ -4010,6 +4138,13 @@ function attachEventListeners() {
                 if (app) app.style.opacity = targetOpacity;
             }
             await meditation.runBackgroundMusicOnly();
+        } else if (state.sleepMode) {
+            document.body.classList.add('sleep-mode-active');
+            meditation.runSleepJourney().catch(err => {
+                console.error('Failed to start Sleep Mode:', err);
+                alert('Failed to start Sleep Mode. Check console.');
+                meditation.stop();
+            });
         } else {
             let order = [...state.selectedChakras];
             if (state.reverseJourney) order.reverse();

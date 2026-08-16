@@ -2,7 +2,7 @@
 
 ## START
 
-- Current objective: preserve the stable `production` branch while completing and reviewing isolated main-drone improvements on `drone-duration-modes`.
+- Current objective: preserve the stable `production` branch while implementing and reviewing the isolated Sleep Mode experience on `sleep-experience-mode`.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: this same repository; `loop.md` is the protected collaboration policy and must not be changed during routine application work.
 - Stack: static HTML/CSS/JavaScript PWA with Web Audio, Piper/Web Speech narration, local JSON content, service-worker caching, and npm-based test tooling. There is no backend, database, authentication layer, or production build step.
@@ -14,14 +14,14 @@
 - Stable production baseline: local and remote `production` are aligned at `71ecda1` (`merge: deliver aura journey and assessment theming`).
 - Delivered product shape: bilingual English/Malayalam guided journeys; seven-chakra customization; HRIM, Sleep, Music Only, Yoga/Bath/care extensions; Piper narration with browser fallback; trauma-aware wellness boundaries; assessment handoff; and a user-activated, `Source=Lite`-only Earn link after completion.
 - Runtime content source is `scripts.json`. `test-script.json` is a short schema fixture. `docs/dot.json` is independently authored facilitator content and is not synchronized from production wording.
-- HRIM is a separate energizing/recharge experience, available from 3:30 AM through 5:59 PM local device time; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
+- HRIM is a separate energizing/recharge experience with no local-time restriction; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
 - Chakra frequencies follow the widely used modern Solfeggio mapping in this product; they must not be represented as measured anatomy, clinical treatment, or a canonical fixed-Hz rule from classical yogic texts.
 
 ## NOW
 
 ### Active snapshot — 2026-08-16 (Asia/Kolkata)
 
-- Branch: `drone-duration-modes`; its latest runtime-changing commit is `fc243a1` (`fix(audio): use separate HRIM drone duration default`). The branch contains three audio commits plus a documentation-only context checkpoint on top of `origin/production`, has no configured upstream, and has not been pushed or merged.
+- Branch: `sleep-experience-mode`; it is based on the verified production merge `8cf1260` and contains the current Sleep Mode implementation as uncommitted work pending review and commit.
 - `b7563b7` (`feat(audio): add progressive drone duration modes`) adds Beginner 20%, Intermediate 50%, Advanced 70%, and Expert 100%, with Beginner as the persisted default and a pause-aware fade-start timer beginning before narration.
 - `99bc581` removes octave reduction from the main oscillator. With Chakra Frequencies enabled, production centre pitches are Root 396, Sacral 417, Solar 528, Heart 639, Throat 741, Third Eye 852, Crown 963, and HRIM 528 Hz. Frequencies Off and malformed input intentionally retain the 110 Hz fallback.
 - `fc243a1` keeps Beginner as the normal chakra default but gives HRIM a separate persisted duration preference. HRIM normalizes missing, invalid, or Beginner values to Intermediate (50%); Advanced and Expert remain available. The HRIM Beginner radio is disabled and the active setting is explained in English and Malayalam.
@@ -30,8 +30,13 @@
 - Validation at the latest implementation checkpoint: `unit/static` PASS — JavaScript syntax, service-worker syntax, exact-frequency/drone-duration contract, zero-volume audio contract, bilingual content-safety contract, assessment contract, Earn handoff contract, HRIM time-window contract, JSON parsing, and diff whitespace. No Playwright or screenshots were used.
 - Owner clarification implemented: HRIM is for energizing/recharge, so Beginner is disabled for HRIM and Intermediate is the default. HRIM remains a timed path using its independent `timeHighEnergy` duration; uninterrupted full-stage drone behavior is not part of this approved change.
 - Additional HRIM audio observations remain unimplemented: `high_energy` currently resolves to elemental index `-1` and therefore receives the fallback bright high-pass texture; the stage named final silence stops the drone but leaves quiet background music running.
-- Next exact step: perform real-device listening for normal Beginner and HRIM Intermediate behavior, then decide whether the explicit HRIM elemental texture and background-music behavior during final integration need refinement before any merge or push.
-- Progress: **90% complete** for the isolated audio-refinement scope | Confidence: medium | Current phase: device-review preparation | Main remaining scope: real-device listening and optional HRIM texture/integration refinement.
+- Sleep Mode now has five sequential, sleep-inspired binaural targets (10, 6, 5, 2, and 6 Hz), one shared stage duration capped at 10 minutes, continuous background music, and separate persisted drone-duration mode defaulting to Intermediate. It is mutually exclusive with HRIM, Music Only, and normal guided options.
+- Sleep targets are explicitly sound-design guidance rather than biological sleep-stage guarantees. The audible carrier remains 80 Hz; Delta 2 Hz is represented as a stereo beat difference rather than an inaudible main oscillator.
+- Experience Mode selections (Music Only, HRIM, and Sleep Mode) are session-only. They are reset on load and their legacy selection keys are removed from local storage; timing and drone-duration preferences remain persisted.
+- The former HRIM 03:30–18:00 gate and block modal are removed. HRIM can now be selected at any local time.
+- Validation for the current work: `static/unit` PASS — JavaScript syntax, JSON parsing, drone-duration/Sleep Mode contract, content safety, zero-volume audio safety, and diff whitespace. No Playwright or screenshots were used.
+- Next exact step: review the diff, commit the Sleep Mode feature with a detailed message, and perform real-device listening before any production merge or push.
+- Progress: **95% complete** for the isolated Sleep Mode implementation | Confidence: medium | Current phase: static validation and review | Main remaining scope: device audio/UX validation.
 
 ### Historical context retained for reference
 
@@ -120,7 +125,7 @@
 - `docs/dot.json` remains intentionally unchanged as a custom facilitator script; its legacy anatomy-specific language is outside the production bundle and must be reviewed separately if that script is ever promoted to runtime content.
 - Audited mantra wording and pronunciation: canonical identifiers remain `LAM`, `VAM`, `RAM`, `YAM`, `HAM`, `OM`, `AUM`, and `HRIM`; English spoken narration now uses contextual forms such as “The Lam mantra” and “Hreem mantra,” while Malayalam uses the native forms such as `ഹ്രീം`. This keeps the HRIM key and `HREEM.mp3` asset stable while giving English Piper a clearer pronunciation input.
 - Confirmed Piper transport behavior: narration is segmented with explicit lead-in/sentence-gap timing; pause suspends the AudioContext and blocks queue advancement; stop/restart cancels the active source, clears queued synthesis, and terminates the Worker. Fixed persisted volume loading so `0` remains a true mute after reload. Focused Playwright validation passed 2/2 for mantra wording and mute persistence; syntax, JSON, and diff checks also passed.
-- Consultation architecture is documented in `TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md` as planning-only. The first implementation is single-participant: HRIM and Music Only stay in the Lobby, Reverse Journey stays in Settings, Sleep Mode is collected as a preference but remains governed by the evening runtime prompt, and Yoga remains compatible with Sleep Mode. No consultation production code, recording backend, or video-sharing infrastructure has started.
+- Consultation architecture is documented in `TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md` as planning-only. The first implementation is single-participant: HRIM, Sleep Mode, and Music Only stay in the Lobby, Reverse Journey stays in Settings, and Yoga remains separate from Sleep Mode. No consultation production code, recording backend, or video-sharing infrastructure has started.
 - Added the Lobby entry point CTA `Begin Session Consultation`, localized in English and Malayalam. It is currently a non-mutating placeholder that preserves the existing meditation flow until the consultation screen/state machine is implemented.
 
 ### CP-PSY-001 — Bilingual psychological-safety baseline
