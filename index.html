@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.55">
+    <link rel="stylesheet" href="style.css?v=1.56">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -225,6 +225,26 @@
         <!-- Lobby Screen -->
         <section id="lobby-screen" class="screen hidden">
             <h1 id="lobby-title">Meditation Room</h1>
+            <div id="shots-control" class="shots-control">
+                <label class="shots-toggle-label">
+                    <input type="checkbox" id="shots-toggle">
+                    <span data-i18n="ui.shotsMode">⚡ Shots</span>
+                </label>
+                <div id="shot-options" class="shot-options" hidden>
+                    <label for="shot-type-select" data-i18n="ui.shotType">Shot Type</label>
+                    <select id="shot-type-select">
+                        <option value="meditation" data-i18n="ui.meditationShot">Meditation Shot</option>
+                        <option value="high_energy" data-i18n="ui.highEnergyShot">High Energy Shot</option>
+                        <option value="sleep" data-i18n="ui.sleepShot">Sleep Shot</option>
+                        <option value="custom" data-i18n="ui.customShot">Custom Shot</option>
+                    </select>
+                    <div id="custom-shot-frequency" class="custom-shot-frequency" hidden>
+                        <label for="shot-frequency-input" data-i18n="ui.shotFrequency">Frequency (Hz)</label>
+                        <input id="shot-frequency-input" type="number" min="0" max="20000" step="0.1" value="0" inputmode="decimal">
+                    </div>
+                    <p class="shots-help" data-i18n="ui.shotsHelp">One short frequency-only activation. No narration or background music.</p>
+                </div>
+            </div>
             <div class="time-selector">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
@@ -264,20 +284,20 @@
             </fieldset>
 
             <!-- Intention Seed -->
-            <div class="config-group" style="margin-top: 1rem;">
+            <div id="intention-config-group" class="config-group" style="margin-top: 1rem;">
                 <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
                 <input type="text" id="intention-input" value="" placeholder="e.g. peace, clarity, gentle strength..." autocomplete="off">
             </div>
 
             <!-- Session preferences -->
-            <div class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
+            <div id="journey-preferences-group" class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
                     <input type="checkbox" id="returning-journey-toggle">
                     <span id="returning-journey-label">Returning Journey</span>
                 </label>
             </div>
 
-            <div class="config-group lobby-experience-mode">
+            <div id="experience-mode-group" class="config-group lobby-experience-mode">
                 <label data-i18n="ui.experienceMode">Experience Mode</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle">
@@ -439,6 +459,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.68"></script>
+    <script src="app.js?v=1.69"></script>
 </body>
 </html>

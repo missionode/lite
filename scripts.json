@@ -273,6 +273,16 @@
       "ml": "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ."
     }
   },
+  "sleep_mode": {
+    "stages": [
+      { "key": "drowsiness", "frequency": 10, "band": "alpha" },
+      { "key": "lightSleep", "frequency": 6, "band": "theta" },
+      { "key": "trueSleep", "frequency": 5, "band": "theta" },
+      { "key": "deepSleep", "frequency": 2, "band": "delta" },
+      { "key": "remRest", "frequency": 6, "band": "theta" }
+    ],
+    "intervalSeconds": 2
+  },
   "deities": {
     "shakthi": {
       "root": "presiding-deities/shakthi/root.png",

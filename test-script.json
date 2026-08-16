@@ -166,6 +166,16 @@
     },
     "closing": { "en": "Rest in peace.", "ml": "സമാധാനത്തിൽ വിശ്രമിക്കൂ." }
   },
+  "sleep_mode": {
+    "stages": [
+      { "key": "drowsiness", "frequency": 10, "band": "alpha" },
+      { "key": "lightSleep", "frequency": 6, "band": "theta" },
+      { "key": "trueSleep", "frequency": 5, "band": "theta" },
+      { "key": "deepSleep", "frequency": 2, "band": "delta" },
+      { "key": "remRest", "frequency": 6, "band": "theta" }
+    ],
+    "intervalSeconds": 2
+  },
   "deities": {
     "shakthi": {
       "root": "presiding-deities/shakthi/root.png", "sacral": "presiding-deities/shakthi/sacral.png", "solar": "presiding-deities/shakthi/solar.png", "heart": "presiding-deities/shakthi/heart.png", "throat": "presiding-deities/shakthi/throat.png", "thirdeye": "presiding-deities/shakthi/thirdeye.png", "crown": "presiding-deities/shakthi/crown.png"

@@ -177,6 +177,13 @@ For this client-only release, the main security boundary is untrusted browser/us
 
 ## Recommended delivery profile
 
+## Quick frequency Shots and script-defined Sleep Mode
+
+- Lobby Shots are a session-only safety-gated addon. They use the shared `timing-config.json` `shotDuration` contract (7-second default, 20-second maximum), hide unrelated journey controls, and never persist the selected mode.
+- Shots use a dedicated direct Web Audio oscillator: Meditation Shot walks Root→Crown, High Energy Shot uses the JSON HRIM frequency, Sleep Shot divides active time across the five script-defined sleep stages, and Custom Shot accepts a validated frequency. Narration, mantra audio, and background music are not started.
+- After confirmation and activation, the Shots toggle and shot inputs remain disabled until the page is refreshed. The two-second stage gaps are additional transition time and are not deducted from the selected active-frequency duration.
+- Sleep Mode stage frequencies and its interval now come from `scripts.json.sleep_mode`; `test-script.json` and `docs/dot.json` contain only the missing matching schema fields. Low script values such as 2 Hz are passed as the main oscillator frequency without octave reduction.
+
 Use any static host that serves the files over HTTPS with correct MIME types and SPA-safe asset paths. A lightweight local server is sufficient for development. No container, database, worker, or reverse proxy is required by the current codebase.
 
 ## Source of truth
