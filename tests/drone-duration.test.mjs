@@ -75,6 +75,7 @@ assert.ok(
     html.indexOf('id="shots-control"') < html.indexOf('id="lobby-title"'),
     'the Lobby should present Sound Healing, then Shots, then Meditation Room',
 );
+assert.match(app, /meditationRoomTitle\.hidden = shots/, 'Shots should hide the Meditation Room heading');
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');

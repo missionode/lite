@@ -3988,6 +3988,8 @@ function attachEventListeners() {
         const droneDuration = document.getElementById('drone-duration-control');
         const durationLabel = document.querySelector('label[for="time-per-chakra"]');
         const timeInput = document.getElementById('time-per-chakra');
+        const meditationRoomTitle = document.getElementById('lobby-title');
+        if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
         const hideForShots = ['drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'open-settings'];
         hideForShots.forEach(id => {
             const element = document.getElementById(id);
