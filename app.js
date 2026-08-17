@@ -28,6 +28,15 @@ const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
 const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
 const SLEEP_STAGE_COUNT = 5;
 const SHOT_CHAKRA_ORDER = Object.freeze(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
+// Conservative digital headroom for all app-owned output. This is not a
+// calibrated dB-SPL measurement because phones and headphones differ.
+const SAFE_OUTPUT_GAIN = 0.25; // approximately -12 dB after the master limiter
+const SAFE_BROWSER_SPEECH_VOLUME = 0.35;
+
+function safeBrowserSpeechVolume(scale = 1) {
+    const voiceLevel = Number(state?.volVoice);
+    return Math.min(SAFE_BROWSER_SPEECH_VOLUME, Math.max(0, Number.isFinite(voiceLevel) ? voiceLevel * scale : 0));
+}
 
 function normalizeDroneDurationMode(value) {
     return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value) ? value : DEFAULT_DRONE_DURATION_MODE;
@@ -1009,6 +1018,7 @@ class AudioEngine {
         // Studio Mastering Nodes
         this.masterCompressor = null;
         this.masterLimiter = null;
+        this.outputSafetyGain = null;
         this.presenceFilter = null;
         this.voiceWarmthFilter = null;
         this.voiceClarityFilter = null;
@@ -1241,7 +1251,12 @@ class AudioEngine {
         }
         
         this.masterCompressor.connect(this.masterLimiter);
-        this.masterLimiter.connect(this.ctx.destination);
+        // Keep a permanent, non-user-bypassable digital ceiling after the
+        // compressor/limiter. Device volume still determines physical SPL.
+        this.outputSafetyGain = this.ctx.createGain();
+        this.outputSafetyGain.gain.setValueAtTime(SAFE_OUTPUT_GAIN, this.ctx.currentTime);
+        this.masterLimiter.connect(this.outputSafetyGain);
+        this.outputSafetyGain.connect(this.ctx.destination);
 
         // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
         if (state.eyesCloseMode) {
@@ -2749,7 +2764,7 @@ class MeditationController {
             const baseRate = state.sleepMode ? 0.60 : 0.70;
             utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
             utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02;
-            utterance.volume = state.volVoice; 
+            utterance.volume = safeBrowserSpeechVolume();
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -2990,7 +3005,7 @@ class MeditationController {
             const baseRate = state.sleepMode ? 0.58 : 0.65;
             utterance.rate   = (state.eyesCloseMode ? baseRate * 0.85 : baseRate) * state.voicePace;
             utterance.pitch  = state.eyesCloseMode ? 0.82 : 0.95; 
-            utterance.volume = state.volVoice * 0.9; // Relative to master voice volume
+            utterance.volume = safeBrowserSpeechVolume(0.9); // Relative to the safety-capped voice volume
             
             let isResolved = false;
             const safetyTimeout = setTimeout(() => {
@@ -3068,7 +3083,7 @@ class MeditationController {
                     : (state.sleepMode ? 0.60 : 0.70);
                 utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
                 utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : 1.02);
-                utterance.volume = state.volVoice; 
+                utterance.volume = safeBrowserSpeechVolume();
                 
                 let isResolved = false;
                 
@@ -3143,7 +3158,7 @@ class MeditationController {
         if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
         utterance.rate   = state.sleepMode ? 0.45 : 0.55;
         utterance.pitch  = state.sleepMode ? 0.65 : 0.75;
-        utterance.volume = state.volVoice * 0.05;
+        utterance.volume = safeBrowserSpeechVolume(0.05);
         window.speechSynthesis.speak(utterance);
     }
 
@@ -3526,7 +3541,7 @@ async function testVoice() {
     // Test with new warm settings
     utterance.rate = 0.65 * state.voicePace;
     utterance.pitch = 0.88;
-    utterance.volume = state.volVoice;
+    utterance.volume = safeBrowserSpeechVolume();
     
     if ('speechSynthesis' in window) window.speechSynthesis.speak(utterance);
 }

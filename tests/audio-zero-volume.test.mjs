@@ -9,6 +9,17 @@ assert.match(
   /typeof this\.ctx\.setSinkId === 'function'[\s\S]*?await this\.ctx\.setSinkId\('default'\)/,
   'AudioContext should prefer the system default loudspeaker output when supported',
 );
+assert.match(
+  app,
+  /const SAFE_OUTPUT_GAIN = 0\.25[\s\S]*?this\.outputSafetyGain\.gain\.setValueAtTime\(SAFE_OUTPUT_GAIN/,
+  'Web Audio output should use a permanent conservative digital safety ceiling',
+);
+assert.match(
+  app,
+  /const SAFE_BROWSER_SPEECH_VOLUME = 0\.35[\s\S]*?function safeBrowserSpeechVolume[\s\S]*?Math\.min\(SAFE_BROWSER_SPEECH_VOLUME/,
+  'browser speech should use a separate safety-capped volume path',
+);
+assert.doesNotMatch(app, /utterance\.volume = state\.volVoice/, 'browser speech must not bypass the safety volume helper');
 
 assert.match(
   app,
