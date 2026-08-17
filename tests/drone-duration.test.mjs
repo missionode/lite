@@ -76,6 +76,8 @@ assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should rema
 assert.match(app, /finishShot\(\)[\s\S]*shotToggle\.disabled = true[\s\S]*window\.location\.reload\(\)/, 'Successful Shots should disable controls and reload the page');
 assert.match(app, /if \(!window\.confirm\(t\('ui\.shotConfirm'\)\)\)/, 'Shots should confirm when the toggle is enabled');
 assert.doesNotMatch(app.slice(app.indexOf('async runShot('), app.indexOf('finishShot()')), /window\.confirm/, 'Shot start should not prompt a second time');
+assert.match(app, /ui\.sleepStage\$\{stage\.key\[0\]\.toUpperCase\(\)\}/, 'Sleep Shot status labels should use localized sleep-stage values');
+assert.doesNotMatch(app, /t\(`ui\.\$\{stage\.key === 'thirdeye'/, 'Shot status labels must not expose raw ui paths for Sleep stages');
 assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a dedicated binaural sleep drone');
 assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
 assert.match(app, /normalizeSleepStages\(this\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');

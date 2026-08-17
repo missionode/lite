@@ -2071,7 +2071,15 @@ class MeditationController {
             const intervalMs = type === 'sleep' ? Number(this.scripts.sleep_mode?.intervalSeconds || 2) * 1000 : 2000;
             for (const [index, stage] of stages.entries()) {
                 if (!this.isMeditationActive) return;
-                setText('mantra-display', stage.key === 'high_energy' ? t('ui.highEnergyShot') : stage.key === 'custom' ? t('ui.customShot') : (t(`ui.${stage.key === 'thirdeye' ? 'thirdEye' : stage.key}`) || stage.key));
+                const stageLabelPath = type === 'sleep'
+                    ? `ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`
+                    : `ui.${stage.key === 'thirdeye' ? 'thirdEye' : stage.key}`;
+                const stageLabel = stage.key === 'high_energy'
+                    ? t('ui.highEnergyShot')
+                    : stage.key === 'custom'
+                        ? t('ui.customShot')
+                        : t(stageLabelPath);
+                setText('mantra-display', stageLabel === stageLabelPath ? stage.key : stageLabel);
                 this.audio.startFrequencyShot(stage.frequency);
                 await this.pauseAwareSleep(activeMs);
                 this.audio.stopFrequencyShot();
