@@ -171,7 +171,7 @@
     ,"activateHighEnergyShot": "Activate High Energy Shot"
     ,"activateSleepShot": "Activate Sleep Shot"
     ,"beginCustomShot": "Begin Custom Shot"
-    ,"shotConfirm": "Are you sure you want to activate this frequency shot? It will play without narration or background music."
+    ,"shotConfirm": "Are you sure you want to activate this frequency shot? It will play without narration or background music. Before continuing, check that your headset or Bluetooth audio device is connected and set to a safe, comfortable volume."
     ,"shotInvalidFrequency": "Enter a custom frequency greater than 0 Hz and no higher than 20,000 Hz."
     ,"safetySummary": "Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time."
     ,"beginConsultation": "Begin Session Consultation"
