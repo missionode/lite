@@ -10,7 +10,7 @@ const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const chakraDataMatch = inlineScripts[0].match(/const chakras = (\[[\s\S]*?\n\]);\n\nconst cards/);
+const chakraDataMatch = inlineScripts[0].match(/const chakras = (\[[\s\S]*?\n\]);\n\n\/\/ Consultant-facing/);
 assert.ok(chakraDataMatch, 'chakra question data should remain extractable');
 
 const chakras = vm.runInNewContext(chakraDataMatch[1]);
@@ -26,6 +26,37 @@ for (const chakra of chakras) {
     }
 }
 
+const consultationMetaMatch = inlineScripts[0].match(/const consultationMeta = (\{[\s\S]*?\n\});\n\nconst cards/);
+assert.ok(consultationMetaMatch, 'consultant interpretation metadata should remain extractable');
+const consultationMeta = vm.runInNewContext(`(${consultationMetaMatch[1]})`);
+for (const chakra of chakras) {
+    const meta = consultationMeta[chakra.id];
+    assert.ok(meta, `${chakra.id} should retain consultant interpretation metadata`);
+    for (const key of ['topics', 'directions', 'followUps', 'tags']) {
+        assert.equal(meta[key].length, 5, `${chakra.id}.${key} should align with its five questions`);
+    }
+    assert.ok(meta.focus.trim(), `${chakra.id} should retain a guide-reviewed meditation consideration`);
+}
+
+const insightFunctionSource = inlineScripts[0].slice(
+    inlineScripts[0].indexOf('function buildChakraInsight(chakra)'),
+    inlineScripts[0].indexOf('function listMarkup(', inlineScripts[0].indexOf('function buildChakraInsight(chakra)')),
+);
+const sampleInsight = vm.runInNewContext(`
+    ${insightFunctionSource}
+    buildChakraInsight(chakras[0]);
+`, {
+    chakras,
+    consultationMeta,
+    state: { root: { 0: 'aligned', 1: 'concern-0', 2: 'unsure', 3: 'aligned', 4: 'concern-0' } },
+    notes: { root: 'Client reports that uncertainty is strongest in the evening.' },
+});
+assert.equal(sampleInsight.strengths.length, 2, 'balanced selections should become reported strengths');
+assert.equal(sampleInsight.patterns.length, 2, 'concern selections should become patterns to explore');
+assert.equal(sampleInsight.uncertainties.length, 1, 'unsure selections should remain explicit discussion areas');
+assert.equal(sampleInsight.followUps.length, 3, 'concerns and uncertainty should generate follow-up prompts');
+assert.match(sampleInsight.note, /uncertainty is strongest/, 'client context should remain part of the consultant insight');
+
 assert.equal(
     chakras.reduce((count, chakra) => count + chakra.questions.length, 0),
     35,
@@ -35,6 +66,11 @@ assert.match(html, /past two weeks/i, 'assessment should provide a clear reflect
 assert.match(inlineScripts[0], /result\.answered<chakra\.questions\.length/, 'incomplete cards must not receive a final score');
 assert.match(inlineScripts[0], /value="unsure"/, 'each rendered question should offer a discuss/unsure path');
 assert.match(inlineScripts[0], /chakraAssessmentNotes/, 'client context notes should be persisted separately');
+assert.match(html, /CONSULTANT REFERENCE · BALANCED \/ SUPPORTED/, 'balanced answers should remain explicit consultant references');
+assert.match(html, /\.answer\.expected\.selected \.mark/, 'only a selected balanced reference should display as selected');
+assert.match(inlineScripts[0], /function buildChakraInsight\(chakra\)/, 'selected answers should generate per-chakra consultant insights');
+assert.match(inlineScripts[0], /function renderAssessmentReview\(\)/, 'the completed interview should generate a cross-chakra review');
+assert.match(inlineScripts[0], /Consultant decision:/, 'the final review should preserve manual consultant approval');
 assert.match(html, /id="newAssessment"/, 'guides need a deliberate way to clear data for a new client');
 assert.match(inlineScripts[0], /removeItem\("chakraAnswers"\)/, 'new-client reset should clear previous answers');
 assert.match(html, /--page-chakra:/, 'assessment should expose an active chakra theme variable');
