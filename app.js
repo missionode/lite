@@ -2074,6 +2074,13 @@ class MeditationController {
     }
 
     finishShot() {
+        // A completed Shot always resets the page. Disable the controls first
+        // so the success path cannot leave an active Shot affordance behind
+        // while the browser begins the safety reset.
+        const shotToggle = document.getElementById('shots-toggle');
+        if (shotToggle) shotToggle.disabled = true;
+        document.getElementById('shot-type-select')?.setAttribute('disabled', 'true');
+        document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
         this.audio.stopFrequencyShot();
         this.isMeditationActive = false;
         this.isShotActive = false;
@@ -2087,6 +2094,7 @@ class MeditationController {
         showScreen(lobbyScreen);
         const startBtn = document.getElementById('start-meditation');
         if (startBtn) { startBtn.disabled = false; startBtn.style.opacity = '1'; }
+        window.location.reload();
     }
 
     stopShot() {
