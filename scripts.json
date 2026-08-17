@@ -273,6 +273,9 @@
       "ml": "യോഗ പൂർത്തിയായിരിക്കുന്നു. അല്പനേരം നിശബ്ദമായിരിക്കൂ."
     }
   },
+  "sound_shots": {
+    "anesthetic": { "frequency": 174 }
+  },
   "sleep_mode": {
     "stages": [
       { "key": "drowsiness", "frequency": 10, "band": "alpha" },

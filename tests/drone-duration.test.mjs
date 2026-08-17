@@ -7,6 +7,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
+const testScripts = JSON.parse(fs.readFileSync(new URL('../test-script.json', import.meta.url), 'utf8'));
+const dotScripts = JSON.parse(fs.readFileSync(new URL('../docs/dot.json', import.meta.url), 'utf8'));
 const timingConfig = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 
 assert.deepEqual(
@@ -21,6 +23,8 @@ const hrimNormalizeMatch = app.match(/function normalizeHrimDroneDurationMode\([
 const sleepNormalizeMatch = app.match(/function normalizeSleepDroneDurationMode\([\s\S]*?\n\}/);
 const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
 assert.ok(ratiosMatch && normalizeMatch && hrimNormalizeMatch && sleepNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
+const shotDurationMatch = app.match(/function getShotDefaultDuration\([\s\S]*?\n\}/);
+assert.ok(shotDurationMatch, 'the per-type Shot duration helper must remain extractable');
 
 const helpers = vm.runInNewContext(`
     const DRONE_DURATION_RATIOS = Object.freeze(${ratiosMatch[1]});
@@ -50,6 +54,18 @@ assert.equal(helpers.normalizeHrimDroneDurationMode('advanced'), 'advanced', 'HR
 assert.equal(helpers.normalizeSleepDroneDurationMode('unknown'), 'intermediate', 'Sleep Mode should default to Intermediate');
 assert.equal(helpers.normalizeSleepDroneDurationMode('beginner'), 'beginner', 'Sleep Mode may use Beginner when selected');
 
+const shotHelpers = vm.runInNewContext(`
+    const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
+    const timingConfig = { journey: { shotDuration: { default: 7, singleFrequencyDefault: 1, min: 1, max: 20 } } };
+    ${shotDurationMatch[0]}
+    ({ getShotDefaultDuration });
+`);
+assert.equal(shotHelpers.getShotDefaultDuration('meditation'), 7, 'Meditation Shot should default to seven seconds');
+assert.equal(shotHelpers.getShotDefaultDuration('sleep'), 7, 'Sleep Shot should default to seven seconds');
+for (const type of ['high_energy', 'anesthetic', 'custom']) {
+    assert.equal(shotHelpers.getShotDefaultDuration(type), 1, `${type} should default to one second`);
+}
+
 assert.deepEqual(scripts.sleep_mode.stages.map(stage => ({ key: stage.key, frequency: stage.frequency })), [
     { key: 'drowsiness', frequency: 10 },
     { key: 'lightSleep', frequency: 6 },
@@ -59,7 +75,11 @@ assert.deepEqual(scripts.sleep_mode.stages.map(stage => ({ key: stage.key, frequ
 ], 'Sleep Mode should retain its five script-defined frequency targets');
 assert.equal(scripts.sleep_mode.intervalSeconds, 2, 'Sleep Mode stage intervals should remain script-defined');
 assert.equal(timingConfig.journey.shotDuration.default, 7, 'Shots should default to seven seconds');
+assert.equal(timingConfig.journey.shotDuration.singleFrequencyDefault, 1, 'Single-frequency Shots should default to one second');
 assert.equal(timingConfig.journey.shotDuration.max, 20, 'Shots should cap at twenty seconds');
+for (const bundle of [scripts, testScripts, dotScripts]) {
+    assert.equal(bundle.sound_shots?.anesthetic?.frequency, 174, 'every script bundle should provide the Anesthetic Shot at 174 Hz');
+}
 
 const controlMatch = html.match(/<fieldset id="drone-duration-control"[\s\S]*?<\/fieldset>/);
 assert.ok(controlMatch, 'the Lobby should expose the drone duration control');
@@ -70,12 +90,16 @@ assert.match(html, /id="sleep-mode-toggle"/, 'the Lobby should expose Sleep Mode
 assert.match(html, /id="drone-duration-sleep-note"/, 'the Lobby should explain Sleep Mode drone behavior');
 assert.match(html, /id="shots-toggle"/, 'the Lobby should expose the session-only Shots toggle');
 assert.match(html, /id="shot-frequency-input"/, 'the Lobby should expose a custom shot frequency input');
+assert.match(html, /option value="anesthetic"[^>]*data-i18n="ui\.anestheticShot"/, 'the Shot selector should offer the Anesthetic Shot');
 assert.ok(
     html.indexOf('id="sound-healing-title"') < html.indexOf('id="shots-control"') &&
     html.indexOf('id="shots-control"') < html.indexOf('id="lobby-title"'),
-    'the Lobby should present Sound Healing, then Shots, then Meditation Room',
+    'the Lobby should present Sound Shot, then Shots, then Meditation Room',
 );
 assert.match(app, /meditationRoomTitle\.hidden = shots/, 'Shots should hide the Meditation Room heading');
+assert.match(app, /MULTI_STAGE_SHOT_TYPES = Object\.freeze\(\['meditation', 'sleep'\]\)/, 'Meditation and Sleep should retain the multi-stage duration default');
+assert.match(app, /resetShotDurationForType\(event\.target\.value\)/, 'changing Shot type should apply that type\'s duration default');
+assert.match(app, /anesthetic: Number\(this\.scripts\.sound_shots\?\.anesthetic\?\.frequency\)/, 'Anesthetic Shot should load 174 Hz from the active script bundle');
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
@@ -96,7 +120,7 @@ for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_e
 }
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'anestheticShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateAnestheticShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }

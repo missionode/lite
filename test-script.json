@@ -166,6 +166,9 @@
     },
     "closing": { "en": "Rest in peace.", "ml": "സമാധാനത്തിൽ വിശ്രമിക്കൂ." }
   },
+  "sound_shots": {
+    "anesthetic": { "frequency": 174 }
+  },
   "sleep_mode": {
     "stages": [
       { "key": "drowsiness", "frequency": 10, "band": "alpha" },
