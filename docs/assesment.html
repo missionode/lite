@@ -141,8 +141,10 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
   width:32px;height:32px;border:3px solid #807873;border-radius:50%;
   display:grid;place-items:center;margin-top:2px;color:#fff;font-size:20px;font-weight:900
 }
-.answer.expected .mark{border-color:var(--ok);background:var(--ok)}
-.answer.expected .mark::after{content:"✓"}
+.answer.expected .mark{border-color:var(--ok);background:#fff}
+.answer.expected.selected .mark{background:var(--ok)}
+.answer.expected .mark::after{content:""}
+.answer.expected.selected .mark::after{content:"✓"}
 .answer:not(.expected) .mark::after{content:""}
 .answer.selected:not(.expected) .mark{border-color:var(--chakra);background:var(--chakra)}
 .answer.selected:not(.expected) .mark::after{content:"✓"}
@@ -170,6 +172,38 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
 }
 .context-note textarea:focus{outline:3px solid color-mix(in srgb,var(--chakra) 18%,transparent);border-color:var(--chakra)}
 .context-help{display:block;margin-top:7px;color:var(--muted);font-size:calc(14px * var(--fs));line-height:1.4}
+.consultation-status{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 11px;
+  border-radius:999px;background:var(--accent-soft);color:color-mix(in srgb,var(--accent) 72%,#342b27);
+  font-size:calc(14px * var(--fs));font-weight:800
+}
+.consultation-status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.chakra-insight{padding:0 22px 22px;background:#fffaf8}
+.chakra-insight[hidden]{display:none}
+.insight-card{
+  padding:17px;border:1px solid color-mix(in srgb,var(--chakra) 18%,var(--line));
+  border-radius:18px;background:#fff
+}
+.insight-card h4{margin:0 0 11px;font-size:calc(19px * var(--fs));color:var(--chakra)}
+.insight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.insight-block{padding:12px;border-radius:14px;background:#fffaf8}
+.insight-block h5{margin:0 0 7px;font-size:calc(14px * var(--fs));letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.insight-block ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.insight-block li,.insight-block p{margin:0;font-size:calc(16px * var(--fs));line-height:1.42}
+.consultant-review{
+  margin:24px 0;padding:24px 22px;border:1px solid var(--line);border-radius:28px;
+  background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--page-chakra) 7%,#fff));box-shadow:var(--shadow)
+}
+.consultant-review h2{margin:4px 0 8px;font-size:calc(30px * var(--fs));line-height:1.1}
+.review-intro{margin:0 0 18px;color:var(--muted);line-height:1.48}
+.review-progress{padding:15px;border-radius:16px;background:var(--accent-soft);font-weight:800}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.review-section{padding:16px;border-radius:17px;background:#fff;border:1px solid var(--line)}
+.review-section h3{margin:0 0 9px;font-size:calc(18px * var(--fs));color:var(--accent)}
+.review-section ul{margin:0;padding-left:20px;display:grid;gap:7px}
+.review-section li,.review-section p{margin:0;font-size:calc(16px * var(--fs));line-height:1.45}
+.review-wide{grid-column:1/-1}
+.review-caution{margin-top:15px;padding:13px 15px;border-left:4px solid var(--accent);background:#fff;font-size:calc(15px * var(--fs));line-height:1.45}
 .assessment-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:26px 0 8px}
 .new-assessment{color:var(--accent);border-color:#dfb8b4}
 .lobby-action{
@@ -196,6 +230,9 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
   .mark{width:30px;height:30px}
   .answer-copy{font-size:calc(24px * var(--fs))}
   .evaluation{padding:18px 17px}
+  .chakra-insight{padding:0 17px 18px}
+  .insight-grid,.review-grid{grid-template-columns:1fr}
+  .review-wide{grid-column:auto}
 }
 </style>
 </head>
@@ -221,10 +258,12 @@ h1{font-size:calc(40px * var(--fs));line-height:1.02;margin:8px 0 10px;max-width
     <div class="eyebrow">COUNSELLOR TOOL · 7 CHAKRAS</div>
     <h1>Chakra Training-Need Assessment</h1>
     <p>Ask each question conversationally and answer from how life has generally felt during the past two weeks. Choose the response that fits best, even when it is not the green balanced response. Use “it varies” whenever more context is needed.</p>
+    <div class="consultation-status">Private consultant-led interview · Autosaved on this device</div>
   </section>
 
   <nav class="chakra-nav" id="chakraNav" aria-label="Chakra navigation"></nav>
   <div id="cards"></div>
+  <section class="consultant-review" id="assessmentReview" aria-live="polite"></section>
 
   <p class="note">This is a wellness and meditation reflection tool, not a clinical diagnostic or emergency assessment. Its results describe the client’s current self-report and should guide conversation, not label the person. Google translation requires an internet connection.</p>
   <div class="assessment-actions">
@@ -404,6 +443,60 @@ const chakras = [
   }
 ];
 
+// Consultant-facing interpretation metadata. It supports follow-up and
+// synthesis without diagnosing the client or changing a session plan.
+const consultationMeta = {
+  root:{
+    topics:["recovering stability during uncertainty","security with flexibility","adapting to routine changes","relationship with basic security","grounded presence"],
+    directions:[["persistent worry or insecurity"],["control-seeking before relaxation"],["prolonged difficulty adapting"],["preoccupation with basic security"],["restlessness or disconnection"]],
+    followUps:["What helps you settle when uncertainty first appears?","What needs to feel controlled before relaxation becomes possible?","Which kinds of change remain unsettling for longest?","How often do money, home, or security concerns interrupt daily life?","When do you feel most present, and when do you feel disconnected?"],
+    tags:["safety","flexibility","flexibility","safety","grounding"],
+    focus:"Grounding, steady presence, and practical inner safety may be explored with the client."
+  },
+  sacral:{
+    topics:["emotional regulation","receiving enjoyment","creativity and play","closeness with individuality","emotional adaptation to change"],
+    directions:[["emotional suppression or disconnection","emotional overwhelm"],["difficulty receiving pleasure","stimulation-seeking"],["reduced creativity or play","novelty-seeking"],["emotional distance","over-dependence"],["resistance to change","difficulty with steadiness"]],
+    followUps:["What usually happens just before you suppress or become overwhelmed by emotion?","What makes enjoyment easy or uncomfortable to receive?","Where does creativity currently have room in everyday life?","What helps you stay close without losing your individuality?","How do you usually respond during the first days of an unexpected change?"],
+    tags:["emotional-regulation","receiving","creativity","relationships","flexibility"],
+    focus:"Emotional flow, healthy receiving, creativity, and adaptable closeness may be explored with the client."
+  },
+  solar:{
+    topics:["decision confidence","responding to challenge","personal boundaries","conduct during disagreement","relationship with ambition"],
+    directions:[["self-doubt or decision dependence","rigid control of decisions"],["avoidance of possible failure","compulsive proving"],["weak boundaries","overly rigid boundaries"],["self-silencing","dominating conflict"],["reduced motivation","achievement pressure"]],
+    followUps:["What makes an important decision easier to trust?","What does the possibility of failure mean to you?","Where is it hardest to protect a need or allow flexibility?","What happens internally before you give in or take control?","Does ambition currently provide direction, pressure, or both?"],
+    tags:["confidence","confidence","boundaries","communication","purpose"],
+    focus:"Confidence, choice, proportionate boundaries, and purposeful action may be explored with the client."
+  },
+  heart:{
+    topics:["care with self-protection","receiving affection","processing emotional hurt","compassion with boundaries","closeness with independence"],
+    directions:[["emotional guarding","self-sacrifice"],["difficulty receiving affection","reassurance dependence"],["closing after hurt","continued attachment to hurt"],["compassionate disconnection","rescue responsibility"],["distance from closeness","dependence on reassurance"]],
+    followUps:["How do you notice when caring begins to cost your own wellbeing?","What happens inside when appreciation is offered?","What has helped, or prevented, gradual movement after hurt?","How do you decide what support is genuinely yours to offer?","What helps closeness feel safe without requiring distance or reassurance?"],
+    tags:["boundaries","receiving","emotional-recovery","boundaries","relationships"],
+    focus:"Compassion, receiving, emotional recovery, and caring boundaries may be explored with the client."
+  },
+  throat:{
+    topics:["expressing wants","saying no","communication during disagreement","listening before responding","natural self-expression"],
+    directions:[["difficulty expressing wants","over-explaining"],["difficulty refusing","excessive force"],["withdrawal during disagreement","dominating disagreement"],["disengagement from listening","interrupting or rehearsing"],["expression feeling unsafe","constant need to be heard"]],
+    followUps:["What makes it easier or harder to name what you want?","What do you fear may happen when you say no?","What helps you remain present during disagreement?","What makes listening difficult in emotionally charged conversations?","Where does expression feel safest and most natural?"],
+    tags:["communication","boundaries","communication","communication","communication"],
+    focus:"Clear expression, respectful refusal, listening, and balanced communication may be explored with the client."
+  },
+  "third-eye":{
+    topics:["forming conclusions","using intuition with evidence","recognising patterns","considering other perspectives","imagination with practical reality"],
+    directions:[["reassurance-dependent judgment","premature certainty"],["distrust of inner signals","unquestioned intuition"],["difficulty noticing patterns","over-connecting events"],["loss of confidence around other views","rejection of other views"],["reduced imagination","retreat into imagination"]],
+    followUps:["What evidence or reassurance helps you reach a conclusion?","How do you check whether intuition fits the available facts?","Which recurring patterns have practical evidence behind them?","What happens when another perspective challenges your first view?","How does imagination support action rather than replace it?"],
+    tags:["discernment","discernment","discernment","confidence","grounding"],
+    focus:"Discernment, reality-checking, confident judgment, and practical imagination may be explored with the client."
+  },
+  crown:{
+    topics:["sense of meaning","spirituality and responsibility","tolerance of uncertainty","connection with individuality","contemplative practice in everyday life"],
+    directions:[["disconnection from meaning","compulsive search for hidden meaning"],["spiritual avoidance of responsibility"],["intolerance of uncertainty","premature spiritual explanation"],["over-identification with larger meaning"],["practice interfering with ordinary functioning"]],
+    followUps:["What currently gives life meaning, even in a small way?","How do spiritual ideas support or compete with practical responsibilities?","What helps you remain open when an explanation is not available?","How do you retain individuality and practical judgment within spiritual connection?","How do contemplative practices affect responsibilities, relationships, and daily functioning?"],
+    tags:["purpose","grounding","discernment","grounding","grounding"],
+    focus:"Meaning, openness to uncertainty, grounded spirituality, and everyday integration may be explored with the client."
+  }
+};
+
 const cards = document.getElementById("cards");
 const nav = document.getElementById("chakraNav");
 
@@ -443,6 +536,116 @@ function trainingNeed(chakra){
   const unsure=responses.filter(v=>v==="unsure").length;
   return {answered:responses.length,concerns,unsure,score:Math.min(5,concerns+1)};
 }
+function buildChakraInsight(chakra){
+  const answers=state[chakra.id]||{};
+  const meta=consultationMeta[chakra.id];
+  const strengths=[];
+  const patterns=[];
+  const uncertainties=[];
+  const followUps=[];
+  chakra.questions.forEach((question,index)=>{
+    const value=answers[index];
+    if(value==="aligned"){
+      strengths.push(question[1]);
+      return;
+    }
+    if(value==="unsure"){
+      uncertainties.push(question[0]);
+      followUps.push(meta.followUps[index]);
+      return;
+    }
+    if(value?.startsWith("concern-")){
+      const concernIndex=parseInt(value.split("-")[1],10)||0;
+      patterns.push({
+        topic:meta.topics[index],
+        direction:meta.directions[index]?.[concernIndex]||"support pattern",
+        response:question[concernIndex+2],
+        tag:meta.tags[index]
+      });
+      followUps.push(meta.followUps[index]);
+    }
+  });
+  return {
+    answered:Object.keys(answers).filter(key=>Number(key)<chakra.questions.length).length,
+    strengths,patterns,uncertainties,followUps,
+    note:(notes[chakra.id]||"").trim(),
+    focus:meta.focus
+  };
+}
+function listMarkup(items,emptyText){
+  if(!items.length) return `<p>${escapeHtml(emptyText)}</p>`;
+  return `<ul>${items.map(item=>`<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+function renderChakraInsight(chakra){
+  const container=document.querySelector(`[data-insight="${chakra.id}"]`);
+  if(!container) return;
+  const insight=buildChakraInsight(chakra);
+  if(insight.answered<chakra.questions.length){
+    container.hidden=true;
+    container.innerHTML="";
+    return;
+  }
+  const patternLines=insight.patterns.map(item=>`${item.topic}: ${item.response} Consultant pattern: ${item.direction}.`);
+  const uncertaintyLines=insight.uncertainties.map(question=>`Discuss further: ${question}`);
+  const context=insight.note?`<p>${escapeHtml(insight.note)}</p>`:"<p>No additional client context recorded.</p>";
+  container.hidden=false;
+  container.innerHTML=`<div class="insight-card">
+    <h4>Consultant reflection · ${escapeHtml(chakra.name)}</h4>
+    <div class="insight-grid">
+      <div class="insight-block"><h5>Reported strengths</h5>${listMarkup(insight.strengths,"No balanced reference was selected in this section.")}</div>
+      <div class="insight-block"><h5>Patterns to explore</h5>${listMarkup(patternLines,"No support pattern was selected in this section.")}</div>
+      <div class="insight-block"><h5>Uncertain areas</h5>${listMarkup(uncertaintyLines,"No uncertain response was selected.")}</div>
+      <div class="insight-block"><h5>Suggested follow-up</h5>${listMarkup([...new Set(insight.followUps)],"No additional follow-up is indicated by the selected references.")}</div>
+      <div class="insight-block"><h5>Client context</h5>${context}</div>
+      <div class="insight-block"><h5>Meditation consideration</h5><p>${escapeHtml(insight.focus)}</p></div>
+    </div>
+  </div>`;
+}
+const themeLabels={
+  safety:"felt safety",flexibility:"adapting to change",grounding:"practical grounding",
+  "emotional-regulation":"emotional regulation",receiving:"receiving support or enjoyment",creativity:"creativity and play",
+  relationships:"closeness and individuality",confidence:"confidence and self-trust",boundaries:"boundaries",
+  communication:"communication",purpose:"meaning and purposeful action","emotional-recovery":"emotional recovery",
+  discernment:"discernment and reality-checking"
+};
+function renderAssessmentReview(){
+  const review=document.getElementById("assessmentReview");
+  if(!review) return;
+  const insights=chakras.map(chakra=>({chakra,...buildChakraInsight(chakra)}));
+  const answered=insights.reduce((total,item)=>total+item.answered,0);
+  if(answered<35){
+    review.innerHTML=`<div class="eyebrow">CONSULTANT REVIEW</div><h2>Consultation insights</h2>
+      <p class="review-intro">Complete all seven cards to create a private, guide-reviewed synthesis of strengths, support patterns, uncertain areas, and follow-up questions.</p>
+      <div class="review-progress">${answered}/35 answered · ${35-answered} remaining</div>`;
+    return;
+  }
+  const priorities=insights.filter(item=>item.patterns.length).sort((a,b)=>b.patterns.length-a.patterns.length);
+  const tagCounts={};
+  priorities.forEach(item=>item.patterns.forEach(pattern=>{tagCounts[pattern.tag]=(tagCounts[pattern.tag]||0)+1}));
+  const recurring=Object.entries(tagCounts).filter(([,count])=>count>1).sort((a,b)=>b[1]-a[1])
+    .map(([tag,count])=>`${themeLabels[tag]||tag} appeared in ${count} responses`);
+  const strengthLines=insights.filter(item=>item.strengths.length)
+    .map(item=>`${item.chakra.name}: ${item.strengths.length} supported area${item.strengths.length===1?"":"s"}`);
+  const priorityLines=priorities.map(item=>`${item.chakra.name}: ${item.patterns.length} pattern${item.patterns.length===1?"":"s"} to explore`);
+  const uncertainLines=insights.filter(item=>item.uncertainties.length)
+    .map(item=>`${item.chakra.name}: ${item.uncertainties.length} response${item.uncertainties.length===1?"":"s"} need further discussion`);
+  const followUpLines=[...new Set(insights.flatMap(item=>item.followUps))].slice(0,8);
+  const focusLines=insights.filter(item=>item.patterns.length||item.uncertainties.length)
+    .map(item=>`${item.chakra.name}: ${item.focus}`);
+  const contextLines=insights.filter(item=>item.note).map(item=>`${item.chakra.name}: ${item.note}`);
+  review.innerHTML=`<div class="eyebrow">CONSULTANT REVIEW</div><h2>Consultation insights</h2>
+    <p class="review-intro">This synthesis reflects the client’s selected references and recorded context. Read it alongside the conversation; it does not diagnose the client or automatically determine a session plan.</p>
+    <div class="review-grid">
+      <div class="review-section"><h3>Reported strengths</h3>${listMarkup(strengthLines,"No balanced reference was selected.")}</div>
+      <div class="review-section"><h3>Conversation priorities</h3>${listMarkup(priorityLines,"No support pattern was selected. Confirm the reported strengths conversationally.")}</div>
+      <div class="review-section"><h3>Recurring themes</h3>${listMarkup(recurring,"No support theme repeated across multiple responses.")}</div>
+      <div class="review-section"><h3>Uncertain areas</h3>${listMarkup(uncertainLines,"No uncertain response was selected.")}</div>
+      <div class="review-section review-wide"><h3>Suggested follow-up questions</h3>${listMarkup(followUpLines,"No additional follow-up was generated.")}</div>
+      <div class="review-section review-wide"><h3>Meditation considerations for consultant review</h3>${listMarkup(focusLines,"Preserve the client’s reported strengths and discuss their preferred meditation direction.")}</div>
+      <div class="review-section review-wide"><h3>Recorded client context</h3>${listMarkup(contextLines,"No additional client context was recorded.")}</div>
+    </div>
+    <div class="review-caution"><strong>Consultant decision:</strong> Confirm these observations with the client. Use only the themes that fit their own words, and approve any meditation focus manually.</div>`;
+}
 function labelFor(n){
   return ["","Currently supported","Light support may help","Some support may help","More support requested","Priority for conversation"][n];
 }
@@ -453,11 +656,15 @@ function renderEval(chakra){
   if(result.answered<chakra.questions.length){
     el.querySelector(".eval-value").textContent = `${result.answered}/${chakra.questions.length} answered · Continue the conversation`;
     el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<result.answered?'on':''}"></span>`).join("");
+    renderChakraInsight(chakra);
+    renderAssessmentReview();
     return;
   }
   const followUp=result.unsure?` · ${result.unsure} to discuss`:"";
   el.querySelector(".eval-value").textContent = `${result.score}/5 · ${labelFor(result.score)}${followUp}`;
   el.querySelector(".meter").innerHTML = Array.from({length:5},(_,i)=>`<span class="dot ${i<result.score?'on':''}"></span>`).join("");
+  renderChakraInsight(chakra);
+  renderAssessmentReview();
 }
 
 chakras.forEach((c,ci)=>{
@@ -488,17 +695,17 @@ chakras.forEach((c,ci)=>{
           <label class="answer expected ${saved==="aligned"?"selected":""}">
             <input type="radio" name="${c.id}-${qi}" value="aligned" ${saved==="aligned"?"checked":""}>
             <span class="mark" aria-hidden="true"></span>
-            <span class="answer-copy">${q[1]}<small>BALANCED / SUPPORTED</small></span>
+            <span class="answer-copy">${q[1]}<small>CONSULTANT REFERENCE · BALANCED / SUPPORTED</small></span>
           </label>
           ${q.slice(2).map((copy,oi)=>`<label class="answer ${saved===`concern-${oi}`?"selected":""}">
             <input type="radio" name="${c.id}-${qi}" value="concern-${oi}" ${saved===`concern-${oi}`?"checked":""}>
             <span class="mark" aria-hidden="true"></span>
-            <span class="answer-copy">${copy}<small>MORE SUPPORT MAY HELP</small></span>
+            <span class="answer-copy">${copy}<small>CONSULTANT REFERENCE · MORE SUPPORT MAY HELP</small></span>
           </label>`).join("")}
           <label class="answer uncertain ${saved==="unsure"?"selected":""}">
             <input type="radio" name="${c.id}-${qi}" value="unsure" ${saved==="unsure"?"checked":""}>
             <span class="mark" aria-hidden="true"></span>
-            <span class="answer-copy">It changes by situation, or I am not sure yet.<small>IT VARIES / DISCUSS</small></span>
+            <span class="answer-copy">It changes by situation, or I am not sure yet.<small>DISCUSS WITH CLIENT · IT VARIES / UNSURE</small></span>
           </label>
         </div>
       </div>`;
@@ -511,7 +718,8 @@ chakras.forEach((c,ci)=>{
     <footer class="evaluation" data-eval="${c.id}" aria-live="polite">
       <div><div class="eval-label">Meditation support reflection</div><div class="eval-value"></div></div>
       <div class="meter" aria-hidden="true"></div>
-    </footer>`;
+    </footer>
+    <div class="chakra-insight" data-insight="${c.id}" hidden></div>`;
   cards.appendChild(section);
 });
 
@@ -531,6 +739,9 @@ document.addEventListener("input",e=>{
   if(!e.target.matches("textarea[data-note]")) return;
   notes[e.target.dataset.note]=e.target.value;
   localStorage.setItem("chakraAssessmentNotes",JSON.stringify(notes));
+  const chakra=chakras.find(item=>item.id===e.target.dataset.note);
+  if(chakra) renderChakraInsight(chakra);
+  renderAssessmentReview();
 });
 chakras.forEach(renderEval);
 
