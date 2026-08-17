@@ -5,6 +5,7 @@
     "test:content-safety": "node tests/content-safety.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:drone-duration": "node tests/drone-duration.test.mjs",
+    "test:repertory": "node tests/frequency-repertory.test.mjs",
     "test:assessment": "node tests/chakra-assessment.test.mjs",
     "test:handoff": "node tests/journey-completion-handoff.test.mjs",
     "test:hrim-time": "node tests/hrim-time-window.test.mjs",

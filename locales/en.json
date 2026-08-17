@@ -169,6 +169,7 @@
     ,"shotFrequency": "Frequency (Hz)"
     ,"shotDuration": "Shot Duration (seconds)"
     ,"shotsHelp": "One short frequency-only activation. No narration or background music."
+    ,"frequencyRepertory": "View Frequency Repertory"
     ,"activateMeditationShot": "Activate Meditation Shot"
     ,"activateHighEnergyShot": "Activate High Energy Shot"
     ,"activateAnestheticShot": "Activate Anesthetic Shot"

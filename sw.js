@@ -1,10 +1,11 @@
-const CACHE_NAME = 'chakra-v5.37';
+const CACHE_NAME = 'chakra-v5.38';
 const PIPER_CACHE_NAME = 'chakra-piper-v3';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v9';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v10';
 const ASSETS = [
   './',
   './index.html',
   './docs/assesment.html',
+  './docs/repertory.html',
   './timing-config.json',
   './style.css',
   './app.js',
