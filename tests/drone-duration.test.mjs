@@ -70,6 +70,11 @@ assert.match(html, /id="sleep-mode-toggle"/, 'the Lobby should expose Sleep Mode
 assert.match(html, /id="drone-duration-sleep-note"/, 'the Lobby should explain Sleep Mode drone behavior');
 assert.match(html, /id="shots-toggle"/, 'the Lobby should expose the session-only Shots toggle');
 assert.match(html, /id="shot-frequency-input"/, 'the Lobby should expose a custom shot frequency input');
+assert.ok(
+    html.indexOf('id="sound-healing-title"') < html.indexOf('id="shots-control"') &&
+    html.indexOf('id="shots-control"') < html.indexOf('id="lobby-title"'),
+    'the Lobby should present Sound Healing, then Shots, then Meditation Room',
+);
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
@@ -90,7 +95,7 @@ for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_e
 }
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'shotType', 'meditationShot', 'highEnergyShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
