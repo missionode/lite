@@ -6,6 +6,12 @@ const app = fs.readFileSync('app.js', 'utf8');
 
 assert.match(
   app,
+  /typeof this\.ctx\.setSinkId === 'function'[\s\S]*?await this\.ctx\.setSinkId\('default'\)/,
+  'AudioContext should prefer the system default loudspeaker output when supported',
+);
+
+assert.match(
+  app,
   /const storedValue = localStorage\.getItem\(key\);[\s\S]*?storedValue === null[\s\S]*?return fallback;[\s\S]*?Number\(storedValue\)/,
   'missing volume preferences must use defaults while explicit zero remains valid',
 );

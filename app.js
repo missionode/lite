@@ -1033,6 +1033,18 @@ class AudioEngine {
             sampleRate: 44100
         });
 
+        // Prefer the system default output on mobile so Web Audio follows the
+        // loudspeaker route instead of an earpiece-specific route when the
+        // browser exposes AudioContext.setSinkId. Unsupported browsers keep
+        // their normal platform audio routing and must not block startup.
+        if (typeof this.ctx.setSinkId === 'function') {
+            try {
+                await this.ctx.setSinkId('default');
+            } catch (error) {
+                console.warn('Default loudspeaker output selection unavailable:', error);
+            }
+        }
+
         // Crucial for mobile: Resume context on user gesture
         if (this.ctx.state === 'suspended') await this.ctx.resume();
         
