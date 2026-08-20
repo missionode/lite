@@ -604,7 +604,7 @@ function applyLocaleUI() {
         'reverse-journey-toggle': 'ui.reverseJourney',
         'box-meditation-toggle': 'ui.boxMeditation',
         'hooponopono-toggle': 'ui.hooponopono',
-        'frequencies-toggle': 'ui.chakraFrequencies',
+        'no-frequency-mode-toggle': 'ui.noFrequencyMode',
         'eyes-close-mode-toggle': 'ui.eyesCloseMode',
         'music-only-toggle': 'ui.musicOnlyMode',
         'sleep-mode-toggle': 'ui.sleepMode',
@@ -1255,7 +1255,7 @@ class AudioEngine {
         this.masterLimiter.connect(this.ctx.destination);
 
         // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
-        if (state.eyesCloseMode) {
+        if (state.eyesCloseMode && !state.noFrequencyMode) {
             const anchorOsc = this.ctx.createOscillator();
             const anchorGain = this.ctx.createGain();
             anchorOsc.type = 'sine';
@@ -1458,22 +1458,20 @@ class AudioEngine {
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
         this.stopBinaural();
+        if (state.noFrequencyMode) return;
         
         this.startElementalLayer(index);
 
         // Reject malformed custom-script values at the audio boundary as a
-        // final safeguard. When frequencies are disabled, retain the existing
-        // neutral 110 Hz fallback.
+        // final safeguard.
         const requestedFrequency = Number(baseFreq);
         const safeBaseFrequency = Number.isFinite(requestedFrequency) && requestedFrequency >= 1
             ? Math.min(requestedFrequency, 20000)
             : 110;
-        const activeFreq = state.chakraFrequencies ? safeBaseFrequency : 110;
-
         // Preserve the configured chakra/HRIM frequency exactly. Higher
         // frequencies must not be octave-shifted for comfort; the JSON value
         // is the authoritative main-drone pitch.
-        const droneFreq = activeFreq;
+        const droneFreq = safeBaseFrequency;
         
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
@@ -1537,6 +1535,7 @@ class AudioEngine {
 
     startSleepDrone(beatFrequency) {
         this.stopDrone();
+        if (state.noFrequencyMode) return;
 
         const requestedBeat = Number(beatFrequency);
         const beat = Number.isFinite(requestedBeat) ? Math.min(20000, Math.max(0.1, requestedBeat)) : 6;
@@ -1585,6 +1584,9 @@ class AudioEngine {
 
     startFrequencyShot(frequency) {
         this.stopFrequencyShot();
+        if (state.noFrequencyMode) {
+            throw new Error('No Frequency Mode prevents frequency-only Shots.');
+        }
         const requested = Number(frequency);
         if (!this.ctx || !Number.isFinite(requested) || requested <= 0 || requested > 20000) {
             throw new Error('Shot frequency must be between 0 and 20,000 Hz.');
@@ -1680,6 +1682,7 @@ class AudioEngine {
     }
 
     async playMantraTrack(key) {
+        if (state.noFrequencyMode) return;
         const filePath = MANTRA_AUDIO_MAP[key];
         if (!filePath) return;
 
@@ -1857,7 +1860,7 @@ class AudioEngine {
     playSingingBowl() {
         // A muted bell is an intentional setting, not an audio error. Avoid
         // creating oscillators whose exponential envelope would target zero.
-        if (!this.ctx || state.volBell <= 0) return;
+        if (!this.ctx || state.noFrequencyMode || state.volBell <= 0) return;
         const now = this.ctx.currentTime;
         const baseFreq = 180;
         const partials = [1, 2.8, 5.0, 8.1, 12.5];
@@ -2038,6 +2041,10 @@ class MeditationController {
 
     async runShot(type, customFrequency) {
         if (this.isStarting || this.isMeditationActive || this.isShotActive) return;
+        if (state.noFrequencyMode) {
+            alert(t('ui.noFrequencyShotsUnavailable'));
+            return;
+        }
         if (type === 'custom' && (!Number.isFinite(customFrequency) || customFrequency <= 0 || customFrequency > 20000)) {
             alert(t('ui.shotInvalidFrequency'));
             return;
@@ -3322,10 +3329,9 @@ const state = {
     reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
     boxMeditation: localStorage.getItem('chakra_box_meditation') === 'true',
     hooponopono: localStorage.getItem('chakra_hooponopono') === 'true',
-    chakraFrequencies: (() => {
-        const saved = localStorage.getItem('chakra_frequencies');
-        return saved === null ? true : saved === 'true';
-    })(),
+    // Default off: this mode disables intentional frequency generators while
+    // preserving narration and background music in a guided journey.
+    noFrequencyMode: localStorage.getItem('chakra_no_frequency_mode') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
@@ -3603,11 +3609,11 @@ function loadPreferences() {
     
     syncChecked('returning-journey-toggle', state.returningJourney);
     syncChecked('audio-filters-toggle', state.audioFilters);
-    syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
+    syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('reverse-journey-toggle', state.reverseJourney);
     syncChecked('box-meditation-toggle', state.boxMeditation);
     syncChecked('hooponopono-toggle', state.hooponopono);
-    syncChecked('frequencies-toggle', state.chakraFrequencies);
+    syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
     localStorage.removeItem('chakra_bg_music_mode');
     localStorage.removeItem('chakra_high_energy');
@@ -3752,7 +3758,7 @@ function attachEventListeners() {
         state.reverseJourney = getChecked('reverse-journey-toggle');
         state.boxMeditation = getChecked('box-meditation-toggle');
         state.hooponopono = getChecked('hooponopono-toggle');
-        state.chakraFrequencies = getChecked('frequencies-toggle');
+        state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.yogaBridgeEnabled = getChecked('yoga-bridge-toggle');
@@ -3772,7 +3778,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.setItem('chakra_box_meditation', state.boxMeditation);
         localStorage.setItem('chakra_hooponopono', state.hooponopono);
-        localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
+        localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
@@ -3982,6 +3988,13 @@ function attachEventListeners() {
     if (shotsToggle) {
         shotsToggle.addEventListener('change', (event) => {
             if (event.target.checked) {
+                if (state.noFrequencyMode) {
+                    event.target.checked = false;
+                    alert(t('ui.noFrequencyShotsUnavailable'));
+                    updateExperienceModeVisibility();
+                    updateSessionEstimate();
+                    return;
+                }
                 if (!window.confirm(t('ui.shotConfirm'))) {
                     event.target.checked = false;
                     updateExperienceModeVisibility();
@@ -4045,7 +4058,7 @@ function attachEventListeners() {
     });
     
     function updateExperienceModeVisibility() {
-        const shots = getChecked('shots-toggle');
+        const noFrequencyMode = state.noFrequencyMode;
         const highEnergy = getChecked('high-energy-toggle');
         const musicOnly = getChecked('music-only-toggle');
         const sleep = getChecked('sleep-mode-toggle');
@@ -4055,6 +4068,12 @@ function attachEventListeners() {
         const durationLabel = document.querySelector('label[for="time-per-chakra"]');
         const timeInput = document.getElementById('time-per-chakra');
         const meditationRoomTitle = document.getElementById('lobby-title');
+        if (shotsToggle) {
+            if (noFrequencyMode) shotsToggle.checked = false;
+            shotsToggle.disabled = noFrequencyMode;
+            shotsToggle.title = noFrequencyMode ? t('ui.noFrequencyShotsUnavailable') : '';
+        }
+        const shots = getChecked('shots-toggle');
         if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
         const hideForShots = ['drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'open-settings'];
         hideForShots.forEach(id => {
@@ -4062,12 +4081,12 @@ function attachEventListeners() {
             if (element) element.hidden = shots;
         });
         const shotOptions = document.getElementById('shot-options');
-        if (shotOptions) shotOptions.hidden = !shots;
+        if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
         const customFrequency = document.getElementById('custom-shot-frequency');
-        if (customFrequency) customFrequency.hidden = !shots || document.getElementById('shot-type-select')?.value !== 'custom';
+        if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || document.getElementById('shot-type-select')?.value !== 'custom';
         if (normalDuration) normalDuration.style.display = shots || !highEnergy ? 'flex' : 'none';
         if (highEnergyDuration) highEnergyDuration.style.display = shots ? 'none' : (highEnergy ? 'flex' : 'none');
-        if (droneDuration && !shots) droneDuration.hidden = musicOnly;
+        if (droneDuration && !shots) droneDuration.hidden = musicOnly || noFrequencyMode;
         if (durationLabel) durationLabel.textContent = t(shots ? 'ui.shotDuration' : (sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration'));
         if (timeInput) {
             const definition = shots ? timingConfig.journey?.shotDuration : sleep ? timingConfig.journey?.sleepStageDuration : timingConfig.journey?.timePerChakra;
@@ -4387,10 +4406,21 @@ function attachEventListeners() {
     document.getElementById('box-meditation-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('hooponopono-toggle').addEventListener('change', updateSessionEstimate);
     document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
-    document.getElementById('frequencies-toggle').addEventListener('change', (e) => {
-        syncChecked('mixer-frequencies-toggle', e.target.checked);
+    function setNoFrequencyMode(enabled) {
+        state.noFrequencyMode = Boolean(enabled);
+        localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
+        syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
+        syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
+        if (state.noFrequencyMode) {
+            meditation.cancelDroneTimer();
+            audio.stopDrone();
+            audio.stopFrequencyShot();
+            audio.stopMantraTrack();
+        }
+        updateExperienceModeVisibility();
         updateSessionEstimate();
-    });
+    }
+    document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('yoga-bridge-toggle').addEventListener('change', updateSessionEstimate);
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
@@ -4545,7 +4575,7 @@ function attachEventListeners() {
         e.stopPropagation();
         if (!mixer) return;
         mixer.classList.remove('hidden');
-        syncChecked('mixer-frequencies-toggle', state.chakraFrequencies);
+        syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
         const closeButton = document.getElementById('close-mixer');
         if (closeButton) closeButton.focus();
     });
@@ -4566,11 +4596,7 @@ function attachEventListeners() {
         }
         startMeditationBtn.click();
     });
-    document.getElementById('mixer-frequencies-toggle')?.addEventListener('change', (e) => {
-        state.chakraFrequencies = e.target.checked;
-        localStorage.setItem('chakra_frequencies', state.chakraFrequencies);
-        syncChecked('frequencies-toggle', state.chakraFrequencies);
-    });
+    document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     // Unified Volume Handlers
     const syncVolume = (key, value, elements) => {
         state[key] = parseFloat(value);

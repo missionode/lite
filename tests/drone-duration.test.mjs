@@ -120,7 +120,7 @@ for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_e
 }
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'anestheticShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateAnestheticShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'anestheticShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateAnestheticShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency', 'noFrequencyMode', 'noFrequencyModeNote', 'noFrequencyShotsUnavailable']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
@@ -133,8 +133,8 @@ const startDroneStart = app.indexOf('    startDrone(baseFreq, index = 0)');
 const startDroneEnd = app.indexOf('    stopBinaural()', startDroneStart);
 const startDrone = app.slice(startDroneStart, startDroneEnd);
 assert.match(startDrone, /mainOscillator\.frequency\.setValueAtTime\(droneFreq,/, 'the generated drone should retain its actual main tone');
-assert.match(startDrone, /const droneFreq = activeFreq;/, 'the main drone should use the validated JSON frequency directly');
-assert.doesNotMatch(startDrone, /activeFreq\s*\/\s*[24]/, 'higher chakra frequencies must not be octave-lowered');
+assert.match(startDrone, /const droneFreq = safeBaseFrequency;/, 'the main drone should use the validated JSON frequency directly');
+assert.doesNotMatch(startDrone, /safeBaseFrequency\s*\/\s*[24]/, 'higher chakra frequencies must not be octave-lowered');
 assert.doesNotMatch(startDrone, /droneFreq\s*\*\s*0\.5|\bf\s*:\s*0\.5/, 'the half-frequency lower oscillator must not return');
 assert.match(startDrone, /Number\.isFinite\(requestedFrequency\)/, 'the audio boundary should reject malformed custom frequencies');
 

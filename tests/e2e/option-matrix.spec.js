@@ -53,13 +53,13 @@ for (const combination of bathCombinations) {
 }
 
 const modeCombinations = [
-  { name: 'standard', high: false, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'high energy', high: true, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'reverse journey', high: false, reverse: true, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'box breathing', high: false, reverse: false, box: true, filters: false, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'audio filters', high: false, reverse: false, box: false, filters: true, hooponopono: false, frequencies: false, musicOnly: false },
-  { name: 'hooponopono and frequencies', high: false, reverse: false, box: false, filters: false, hooponopono: true, frequencies: true, musicOnly: false },
-  { name: 'music only', high: false, reverse: false, box: false, filters: false, hooponopono: false, frequencies: false, musicOnly: true }
+  { name: 'standard', high: false, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
+  { name: 'high energy', high: true, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
+  { name: 'reverse journey', high: false, reverse: true, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
+  { name: 'box breathing', high: false, reverse: false, box: true, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
+  { name: 'audio filters', high: false, reverse: false, box: false, filters: true, hooponopono: false, noFrequency: false, musicOnly: false },
+  { name: 'hooponopono without frequencies', high: false, reverse: false, box: false, filters: false, hooponopono: true, noFrequency: true, musicOnly: false },
+  { name: 'music only', high: false, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: true }
 ];
 
 for (const combination of modeCombinations) {
@@ -70,7 +70,7 @@ for (const combination of modeCombinations) {
     // Audio Filters now live in the active full-screen mixer. Their live
     // behavior is covered by the dedicated mixer journey test.
     await setChecked(page, 'hooponopono-toggle', combination.hooponopono);
-    await setChecked(page, 'frequencies-toggle', combination.frequencies);
+    await setChecked(page, 'no-frequency-mode-toggle', combination.noFrequency);
     await page.locator('#save-config').click();
     await expect(page.locator('#lobby-screen')).toBeVisible();
     await setChecked(page, 'high-energy-toggle', combination.high);

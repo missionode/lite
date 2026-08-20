@@ -38,7 +38,7 @@ assert.match(
 );
 assert.match(
   app,
-  /if \(!this\.ctx \|\| state\.volBell <= 0\) return;/,
+  /if \(!this\.ctx \|\| state\.noFrequencyMode \|\| state\.volBell <= 0\) return;/,
   'a muted singing bowl must be safely skipped',
 );
 assert.match(
