@@ -124,6 +124,10 @@ for (const locale of [en, ml]) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
+assert.match(en.ui.shotConfirm, /disconnect any Bluetooth or external speaker/i, 'the English Shot confirmation should instruct the guide to disconnect external audio');
+assert.match(en.ui.shotConfirm, /Lite cannot disconnect it for you/i, 'the English Shot confirmation should not imply the PWA can control Bluetooth');
+assert.match(ml.ui.shotConfirm, /ബ്ലൂടൂത്ത് അല്ലെങ്കിൽ മറ്റേതെങ്കിലും പുറം സ്പീക്കർ വിച്ഛേദിക്കൂ/, 'the Malayalam Shot confirmation should instruct the guide to disconnect external audio');
+assert.match(ml.ui.shotConfirm, /Lite-ന് അത് നിങ്ങൾക്കു പകരം വിച്ഛേദിക്കാനാകില്ല/, 'the Malayalam Shot confirmation should not imply the PWA can control Bluetooth');
 
 const startDroneStart = app.indexOf('    startDrone(baseFreq, index = 0)');
 const startDroneEnd = app.indexOf('    stopBinaural()', startDroneStart);
