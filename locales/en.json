@@ -22,7 +22,7 @@
     "continueToEarn": "Continue to Earn",
     "returnToRoom": "Return to Room",
     "meditationCompleted": "Meditation Completed. Stay Blessed.",
-    "yoga": "Yoga Bridge",
+    "yoga": "Yoga Experience",
     "yogaSubtitle": "Union of breath, movement, and spirit",
     "purification": "Purification",
     "corpsePose": "Corpse Pose",
@@ -41,12 +41,12 @@
     ,"options": "Options"
     ,"guidedPractices": "Guided Practices"
     ,"comfortVisuals": "Comfort & Visuals"
-    ,"yogaSection": "Yoga Bridge"
+    ,"yogaSection": "Yoga Experience Setup"
     ,"settingsHelp": "Settings help"
     ,"settingsHelpTitle": "How this journey works"
     ,"settingsHelpLanguages": "Meditation Language controls the narration. Display Language controls the visible interface."
-    ,"settingsHelpChakras": "Chakra Journey chooses the centers included. Reverse Journey changes the direction; Third Eye and Crown remain the closing centers."
-    ,"settingsHelpYoga": "Yoga Bridge adds the physical sequence. Corpse Pose, massage, perineal care, assisted bathing, and standard bathing are optional stages managed there."
+    ,"settingsHelpChakras": "Chakra Journey chooses exactly the centers included. Reverse Journey changes their direction."
+    ,"settingsHelpYoga": "Yoga Experience is selected in the Lobby. Its optional Corpse Pose, massage, perineal care, assisted bathing, and standard bathing stages are configured here."
     ,"settingsHelpModes": "Music Only, Sleep Mode, and High Energy are selected in the Lobby. Sleep Mode moves through five sound stages; Experience Modes are selected for the current journey only."
     ,"settingsHelpSave": "Save the settings to enter the Lobby. You can review the final mode and timing there before beginning."
     ,"presidingDeities": "Presiding Deities"
@@ -64,7 +64,8 @@
     ,"experienceMode": "Experience Mode"
     ,"musicOnlyMode": "Music Only"
     ,"corpsePoseOption": "Enable Corpse Pose (Savasana)"
-    ,"yogaBridge": "Enable Yoga Bridge (Physical Union)"
+    ,"yogaExperience": "Yoga Experience"
+    ,"beginYogaExperience": "Begin Yoga Experience"
     ,"bathSession": "Enable Bath Session"
     ,"perinealCare": "Perineal Care"
     ,"assistedBathing": "Assisted Bathing"

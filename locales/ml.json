@@ -22,7 +22,7 @@
     "continueToEarn": "Earn-ലേക്ക് തുടരുക",
     "returnToRoom": "മുറിയിലേക്ക് മടങ്ങുക",
     "meditationCompleted": "ധ്യാനം പൂർത്തിയായി. അനുഗ്രഹിക്കപ്പെടട്ടെ.",
-    "yoga": "യോഗ പാലം",
+    "yoga": "യോഗ അനുഭവം",
     "yogaSubtitle": "ശ്വാസവും ചലനവും ആത്മാവും തമ്മിലുള്ള ഐക്യം",
     "purification": "ശുദ്ധീകരണം",
     "corpsePose": "ശവാസനം",
@@ -41,12 +41,12 @@
     ,"options": "ഓപ്ഷനുകൾ"
     ,"guidedPractices": "മാർഗ്ഗനിർദ്ദേശമുള്ള അഭ്യാസങ്ങൾ"
     ,"comfortVisuals": "സുഖവും ദൃശ്യ ക്രമീകരണങ്ങളും"
-    ,"yogaSection": "യോഗ പാലം"
+    ,"yogaSection": "യോഗ അനുഭവ ക്രമീകരണം"
     ,"settingsHelp": "ക്രമീകരണ സഹായം"
     ,"settingsHelpTitle": "ഈ യാത്ര എങ്ങനെ പ്രവർത്തിക്കുന്നു"
     ,"settingsHelpLanguages": "Meditation Language ശബ്ദ മാർഗ്ഗനിർദ്ദേശം നിയന്ത്രിക്കുന്നു. Display Language സ്ക്രീനിലെ എഴുത്തുകൾ നിയന്ത്രിക്കുന്നു."
-    ,"settingsHelpChakras": "Chakra Journey ഉൾപ്പെടുന്ന കേന്ദ്രങ്ങൾ തിരഞ്ഞെടുക്കുന്നു. Reverse Journey ദിശ മാറ്റുന്നു; Third Eye, Crown എന്നിവ അവസാന കേന്ദ്രങ്ങളായി തുടരും."
-    ,"settingsHelpYoga": "Yoga Bridge ശാരീരിക ഘട്ടം ചേർക്കുന്നു. Corpse Pose, മസാജ്, പെരിനിയൽ പരിചരണം, സഹായത്തോടെയുള്ള കുളി, സാധാരണ കുളി എന്നിവ അവിടെ നിയന്ത്രിക്കാം."
+    ,"settingsHelpChakras": "Chakra Journey-ൽ ഉൾപ്പെടുത്തേണ്ട കേന്ദ്രങ്ങൾ തിരഞ്ഞെടുക്കാം. Reverse Journey അവയുടെ ദിശ മാറ്റുന്നു."
+    ,"settingsHelpYoga": "Yoga Experience Lobby-ൽ തിരഞ്ഞെടുക്കാം. അതിലെ ഐച്ഛിക Corpse Pose, മസാജ്, പെരിനിയൽ പരിചരണം, സഹായത്തോടെയുള്ള കുളി, സാധാരണ കുളി എന്നിവ ഇവിടെ ക്രമീകരിക്കാം."
     ,"settingsHelpModes": "Music Only, Sleep Mode, High Energy എന്നിവ Lobby-ൽ തിരഞ്ഞെടുക്കാം. Sleep Mode അഞ്ച് ശബ്ദ ഘട്ടങ്ങളിലൂടെ നീങ്ങുന്നു; Experience Modes നിലവിലെ യാത്രയ്ക്കായി മാത്രം തിരഞ്ഞെടുക്കപ്പെടുന്നു."
     ,"settingsHelpSave": "ക്രമീകരണങ്ങൾ സൂക്ഷിച്ചാൽ Lobby തുറക്കും. ആരംഭിക്കുന്നതിന് മുമ്പ് അവിടെ മോഡും സമയവും പരിശോധിക്കാം."
     ,"presidingDeities": "ആരാധനാ ദേവതകൾ"
@@ -64,7 +64,8 @@
     ,"experienceMode": "അനുഭവ രീതി"
     ,"musicOnlyMode": "സംഗീതം മാത്രം"
     ,"corpsePoseOption": "ശവാസനം പ്രവർത്തനക്ഷമമാക്കുക"
-    ,"yogaBridge": "യോഗ പാലം പ്രവർത്തനക്ഷമമാക്കുക (ശാരീരിക ഐക്യം)"
+    ,"yogaExperience": "യോഗ അനുഭവം"
+    ,"beginYogaExperience": "യോഗ അനുഭവം ആരംഭിക്കുക"
     ,"bathSession": "സ്നാന സെഷൻ പ്രവർത്തനക്ഷമമാക്കുക"
     ,"perinealCare": "പെരിനിയൽ പരിചരണം"
     ,"assistedBathing": "സഹായത്തോടെയുള്ള കുളി"

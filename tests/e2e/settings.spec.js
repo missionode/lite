@@ -58,7 +58,6 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
 });
 
 test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
-  await page.locator('#yoga-bridge-toggle').check();
   await page.locator('#bath-session-toggle').check();
   await page.locator('#massage-toggle').check();
   await page.locator('#perineal-care-toggle').check();
@@ -66,7 +65,7 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await expect(page.locator('#journey-roadmap')).toHaveText(
-    'Arrival » Intention » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing'
+    'Arrival » Intention » Chakras » Closing'
   );
 
   await page.locator('#high-energy-toggle').check();
@@ -78,6 +77,11 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#journey-roadmap')).toHaveText('Box Breathing');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Box Breathing');
   await page.locator('#hooponopono-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
+  await page.locator('#yoga-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Massage » Perineal Care » Assisted Bathing » Yoga Experience');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Yoga Experience');
   await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
 });
@@ -142,7 +146,6 @@ test('keeps the Corpse Pose timing slider synchronized', async ({ page }) => {
   await expect(corpse).toHaveAttribute('min', '1');
   await expect(corpse).toHaveAttribute('max', '5');
   await expect(page.locator('.yoga-timing-controls #row-corpse')).toHaveCount(1);
-  await page.locator('#yoga-bridge-toggle').check();
   await page.locator('#corpse-pose-toggle').check();
   await expect(page.locator('#row-corpse')).toHaveCSS('display', 'grid');
   await corpse.fill('4');
@@ -251,17 +254,15 @@ test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await expect(page.locator('#hrim-time-block-modal')).toHaveCount(0);
 });
 
-test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page }) => {
-  const yoga = page.locator('#yoga-bridge-toggle');
+test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page }) => {
   const bath = page.locator('#bath-session-toggle');
   const massage = page.locator('#massage-toggle');
   const perineal = page.locator('#perineal-care-toggle');
   const assisted = page.locator('#assisted-bathing-toggle');
 
-  await expect(bath).toBeDisabled();
+  await expect(bath).toBeEnabled();
   await expect(massage).toBeDisabled();
 
-  await yoga.check();
   await bath.check();
   await expect(massage).toBeEnabled();
   await expect(perineal).toBeEnabled();
@@ -275,7 +276,7 @@ test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page 
   await expect(page.locator('#row-assisted-bathing')).toBeVisible();
   await expect(page.locator('#row-bath')).toBeHidden();
 
-  await yoga.uncheck();
+  await bath.uncheck();
   await expect(bath).not.toBeChecked();
   await expect(massage).not.toBeChecked();
   await expect(perineal).not.toBeChecked();
@@ -284,7 +285,6 @@ test('enforces Yoga Bridge and Bath Session add-on dependencies', async ({ page 
 });
 
 test('persists timing changes through settings reload', async ({ page }) => {
-  await page.locator("#yoga-bridge-toggle").check();
   await page.locator("#bath-session-toggle").check();
   const bath = page.locator('#time-bath');
   await bath.fill('3');

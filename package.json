@@ -6,6 +6,7 @@
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:no-frequency": "node tests/no-frequency-mode.test.mjs",
     "test:focused-practices": "node tests/focused-practices.test.mjs",
+    "test:yoga-experience": "node tests/yoga-experience.test.mjs",
     "test:drone-duration": "node tests/drone-duration.test.mjs",
     "test:repertory": "node tests/frequency-repertory.test.mjs",
     "test:assessment": "node tests/chakra-assessment.test.mjs",

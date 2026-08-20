@@ -33,7 +33,6 @@ const bathCombinations = [
 for (const combination of bathCombinations) {
   test(`bath flow: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
-    await setChecked(page, 'yoga-bridge-toggle', true);
     await setChecked(page, 'bath-session-toggle', true);
     await setChecked(page, 'massage-toggle', combination.massage);
     await setChecked(page, 'perineal-care-toggle', combination.perineal);

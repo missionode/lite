@@ -67,26 +67,24 @@
             <div class="config-group" style="margin-top: 1rem;">
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <div id="chakra-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
-                    <label class="checkbox-label"><input type="checkbox" value="root" checked> <span data-i18n="ui.root">Root</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="sacral" checked> <span data-i18n="ui.sacral">Sacral</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="solar" checked> <span data-i18n="ui.solar">Solar</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="heart" checked> <span data-i18n="ui.heart">Heart</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="throat" checked> <span data-i18n="ui.throat">Throat</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="thirdeye" checked disabled> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="crown" checked disabled> <span data-i18n="ui.crown">Crown</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="root"> <span data-i18n="ui.root">Root</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <span data-i18n="ui.sacral">Sacral</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar"> <span data-i18n="ui.solar">Solar</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart"> <span data-i18n="ui.heart">Heart</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat"> <span data-i18n="ui.throat">Throat</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
             </div>
 
             <div class="config-group settings-panel">
-                <label data-i18n="ui.yogaSection">Yoga Bridge</label>
+                <label data-i18n="ui.yogaSection">Yoga Experience Setup</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                    <label class="checkbox-label" style="font-weight: bold;"><input type="checkbox" id="yoga-bridge-toggle"> Enable Yoga Bridge (Physical Union)</label>
-                    
-                    <div id="yoga-sub-options" style="display:none; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <div id="yoga-sub-options" style="display:flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                         <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle"> Enable Corpse Pose (Savasana)</label>
-                        <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Bath runs first, followed by Yoga, then the journey continues to Crown.</p>
+                        <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Optional care stages run before the Yoga Experience.</p>
                         <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
@@ -208,8 +206,8 @@
                 <h2 id="settings-help-title" data-i18n="ui.settingsHelpTitle">How this journey works</h2>
                 <div class="settings-help-list">
                     <p data-i18n="ui.settingsHelpLanguages">Meditation Language controls the narration. Display Language controls the visible interface.</p>
-                    <p data-i18n="ui.settingsHelpChakras">Chakra Journey chooses the centers included. Reverse Journey changes the direction; Third Eye and Crown remain the closing centers.</p>
-                    <p data-i18n="ui.settingsHelpYoga">Yoga Bridge adds the physical sequence. Corpse Pose, massage, perineal care, assisted bathing, and standard bathing are optional stages managed there.</p>
+                    <p data-i18n="ui.settingsHelpChakras">Chakra Journey chooses exactly the centers included. Reverse Journey changes their direction.</p>
+                    <p data-i18n="ui.settingsHelpYoga">Yoga Experience is selected in the Lobby. Its optional care stages are configured here.</p>
                     <p data-i18n="ui.settingsHelpModes">Music Only and High Energy are selected in the Lobby. High Energy is available from 3:30 AM until 6:00 PM; from 6:00 PM, Sleep Mode is offered at journey start.</p>
                     <p data-i18n="ui.settingsHelpSave">Save the settings to enter the Lobby. You can review the final mode and timing there before beginning.</p>
                 </div>
@@ -316,6 +314,10 @@
                     <label class="checkbox-label experience-mode-toggle">
                         <input type="checkbox" id="hooponopono-experience-toggle">
                         <span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="yoga-experience-toggle">
+                        <span data-i18n="ui.yogaExperience">Yoga Experience</span>
                     </label>
                 </div>
             </div>
@@ -464,6 +466,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.74"></script>
+    <script src="app.js?v=1.75"></script>
 </body>
 </html>
