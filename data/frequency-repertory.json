@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "title": "Exploring Sound Healing Frequencies",
+    "url": "https://share.gemini.google/Mw3YMZgwmsHQ",
+    "published": "2026-08-17"
+  },
+  "entries": [
+    {
+      "id": "delta",
+      "kind": "brainwave",
+      "frequencyLabel": "0.5–3 Hz",
+      "shotFrequency": 2,
+      "name": { "en": "Delta", "ml": "ഡെൽറ്റ" },
+      "focus": { "en": "Deep rest", "ml": "ഗാഢ വിശ്രമം" },
+      "features": {
+        "en": "Commonly associated with deep, dreamless sleep and physical recovery. The 2 Hz shot is a reference tone within this band.",
+        "ml": "ഗാഢമായ സ്വപ്നരഹിത ഉറക്കത്തോടും ശാരീരിക വീണ്ടെടുപ്പോടും സാധാരണയായി ബന്ധിപ്പിക്കുന്നു. 2 Hz ഷോട്ട് ഈ പരിധിയിലെ ഒരു റഫറൻസ് ശബ്ദമാണ്."
+      },
+      "searchTerms": ["sleep", "recovery", "rest", "deep sleep"]
+    },
+    {
+      "id": "theta",
+      "kind": "brainwave",
+      "frequencyLabel": "4–7 Hz",
+      "shotFrequency": 6,
+      "name": { "en": "Theta", "ml": "തീറ്റ" },
+      "focus": { "en": "Deep relaxation", "ml": "ആഴത്തിലുള്ള വിശ്രമം" },
+      "features": {
+        "en": "Commonly associated with deep meditation, imagery, intuition and creative reflection. The 6 Hz shot is a reference tone within this band.",
+        "ml": "ആഴത്തിലുള്ള ധ്യാനം, ദൃശ്യഭാവന, അന്തർബോധം, സൃഷ്ടിപരമായ ചിന്ത എന്നിവയുമായി സാധാരണയായി ബന്ധിപ്പിക്കുന്നു. 6 Hz ഷോട്ട് ഈ പരിധിയിലെ ഒരു റഫറൻസ് ശബ്ദമാണ്."
+      },
+      "searchTerms": ["meditation", "imagery", "intuition", "creativity"]
+    },
+    {
+      "id": "alpha",
+      "kind": "brainwave",
+      "frequencyLabel": "8–12 Hz",
+      "shotFrequency": 10,
+      "name": { "en": "Alpha", "ml": "ആൽഫ" },
+      "focus": { "en": "Calm flow", "ml": "ശാന്തമായ ഒഴുക്ക്" },
+      "features": {
+        "en": "Commonly associated with relaxed alertness, calm flow, light meditation and easing everyday stress. The 10 Hz shot is a reference tone within this band.",
+        "ml": "ശാന്തമായ ജാഗ്രത, സ്വാഭാവിക ഒഴുക്ക്, ലഘു ധ്യാനം, ദൈനംദിന സമ്മർദ്ദം അയയ്ക്കൽ എന്നിവയുമായി സാധാരണയായി ബന്ധിപ്പിക്കുന്നു. 10 Hz ഷോട്ട് ഈ പരിധിയിലെ ഒരു റഫറൻസ് ശബ്ദമാണ്."
+      },
+      "searchTerms": ["calm", "flow", "light meditation", "stress"]
+    },
+    {
+      "id": "beta",
+      "kind": "brainwave",
+      "frequencyLabel": "13–30 Hz",
+      "shotFrequency": 20,
+      "name": { "en": "Beta", "ml": "ബീറ്റ" },
+      "focus": { "en": "Active attention", "ml": "സജീവ ശ്രദ്ധ" },
+      "features": {
+        "en": "Commonly associated with an active, alert and analytical waking state. The 20 Hz shot is a reference tone within this band.",
+        "ml": "സജീവവും ജാഗ്രതയുള്ളതുമായ വിശകലനാത്മക ഉണർവുനിലയുമായി സാധാരണയായി ബന്ധിപ്പിക്കുന്നു. 20 Hz ഷോട്ട് ഈ പരിധിയിലെ ഒരു റഫറൻസ് ശബ്ദമാണ്."
+      },
+      "searchTerms": ["alert", "active", "analytical", "attention"]
+    },
+    {
+      "id": "gamma",
+      "kind": "brainwave",
+      "frequencyLabel": "30–100 Hz",
+      "shotFrequency": 40,
+      "name": { "en": "Gamma", "ml": "ഗാമ" },
+      "focus": { "en": "Focused processing", "ml": "കേന്ദ്രീകൃത പ്രോസസ്സിംഗ്" },
+      "features": {
+        "en": "Commonly associated with focused cognitive processing, learning and complex problem-solving. The 40 Hz shot is a reference tone within this band.",
+        "ml": "കേന്ദ്രീകൃത ബൗദ്ധിക പ്രോസസ്സിംഗ്, പഠനം, സങ്കീർണ്ണ പ്രശ്നപരിഹാരം എന്നിവയുമായി സാധാരണയായി ബന്ധിപ്പിക്കുന്നു. 40 Hz ഷോട്ട് ഈ പരിധിയിലെ ഒരു റഫറൻസ് ശബ്ദമാണ്."
+      },
+      "searchTerms": ["focus", "learning", "cognitive", "problem solving"]
+    },
+    {
+      "id": "solfeggio-174",
+      "kind": "solfeggio",
+      "frequencyLabel": "174 Hz",
+      "shotFrequency": 174,
+      "name": { "en": "Foundation & Comfort", "ml": "അടിത്തറയും ആശ്വാസവും" },
+      "focus": { "en": "Physical ease", "ml": "ശാരീരിക ആശ്വാസം" },
+      "features": {
+        "en": "Traditionally associated with physical ease, grounding and a sense of safety and security.",
+        "ml": "ശാരീരിക ആശ്വാസം, നിലയുറപ്പ്, സുരക്ഷിതത്വബോധം എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["comfort", "grounding", "security", "safety", "physical relief"]
+    },
+    {
+      "id": "solfeggio-285",
+      "kind": "solfeggio",
+      "frequencyLabel": "285 Hz",
+      "shotFrequency": 285,
+      "name": { "en": "Restoration", "ml": "പുനഃസ്ഥാപനം" },
+      "focus": { "en": "Renewal imagery", "ml": "പുതുക്കലിന്റെ ഭാവന" },
+      "features": {
+        "en": "Traditionally associated with restoration, renewal and visualising the body returning to balance.",
+        "ml": "പുനഃസ്ഥാപനം, പുതുക്കൽ, ശരീരം സമതുലിതാവസ്ഥയിലേക്ക് മടങ്ങുന്നതിന്റെ ഭാവന എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["restoration", "renewal", "balance", "tissue healing"]
+    },
+    {
+      "id": "solfeggio-396",
+      "kind": "solfeggio",
+      "frequencyLabel": "396 Hz",
+      "shotFrequency": 396,
+      "name": { "en": "Grounding & Release", "ml": "നിലയുറപ്പും വിടുതലും" },
+      "focus": { "en": "Emotional liberation", "ml": "വൈകാരിക വിടുതൽ" },
+      "features": {
+        "en": "Traditionally associated with grounding and gently releasing fear, guilt and emotional burdens.",
+        "ml": "നിലയുറപ്പ്, ഭയം, കുറ്റബോധം, വൈകാരിക ഭാരങ്ങൾ എന്നിവ സൗമ്യമായി വിട്ടയയ്ക്കൽ എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["root", "grounding", "fear", "guilt", "release"]
+    },
+    {
+      "id": "solfeggio-417",
+      "kind": "solfeggio",
+      "frequencyLabel": "417 Hz",
+      "shotFrequency": 417,
+      "name": { "en": "Change & Renewal", "ml": "മാറ്റവും പുതുക്കലും" },
+      "focus": { "en": "Facilitating change", "ml": "മാറ്റത്തിന് പിന്തുണ" },
+      "features": {
+        "en": "Traditionally associated with moving through difficult experiences, welcoming change and encouraging renewal.",
+        "ml": "പ്രയാസകരമായ അനുഭവങ്ങളിലൂടെ കടന്നുപോകൽ, മാറ്റത്തെ സ്വീകരിക്കൽ, പുതുക്കലിന് പ്രചോദനം നൽകൽ എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["sacral", "change", "renewal", "transition"]
+    },
+    {
+      "id": "tuning-432",
+      "kind": "tuning",
+      "frequencyLabel": "432 Hz",
+      "shotFrequency": 432,
+      "name": { "en": "Natural Harmony", "ml": "സ്വാഭാവിക ഐക്യം" },
+      "focus": { "en": "Gentle relaxation", "ml": "സൗമ്യമായ വിശ്രമം" },
+      "features": {
+        "en": "Commonly used as an alternative musical tuning and associated with gentle relaxation, harmony and connection with nature.",
+        "ml": "ഒരു വ്യത്യസ്ത സംഗീത ട്യൂണിങ്ങായി സാധാരണയായി ഉപയോഗിക്കുന്നു; സൗമ്യമായ വിശ്രമം, ഐക്യം, പ്രകൃതിയുമായുള്ള ബന്ധം എന്നിവയുമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["nature", "harmony", "relaxation", "tuning"]
+    },
+    {
+      "id": "solfeggio-528",
+      "kind": "solfeggio",
+      "frequencyLabel": "528 Hz",
+      "shotFrequency": 528,
+      "name": { "en": "Transformation", "ml": "പരിവർത്തനം" },
+      "focus": { "en": "Warm renewal", "ml": "ഊഷ്മളമായ പുതുക്കൽ" },
+      "features": {
+        "en": "Often called the “love” or “transformation” frequency and traditionally associated with stress release and deep relaxation.",
+        "ml": "“സ്നേഹത്തിന്റെ” അല്ലെങ്കിൽ “പരിവർത്തനത്തിന്റെ” ആവൃത്തി എന്ന് പലപ്പോഴും വിളിക്കുന്നു; സമ്മർദ്ദം അയയ്ക്കലും ആഴത്തിലുള്ള വിശ്രമവും ഇതുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["solar", "love", "transformation", "relaxation", "hrim"]
+    },
+    {
+      "id": "solfeggio-639",
+      "kind": "solfeggio",
+      "frequencyLabel": "639 Hz",
+      "shotFrequency": 639,
+      "name": { "en": "Connection & Harmony", "ml": "ബന്ധവും ഐക്യവും" },
+      "focus": { "en": "Interpersonal connection", "ml": "പരസ്പര ബന്ധം" },
+      "features": {
+        "en": "Traditionally associated with empathy, communication, harmonious relationships and reconnection.",
+        "ml": "സഹാനുഭൂതി, ആശയവിനിമയം, ഐക്യമുള്ള ബന്ധങ്ങൾ, പുനർബന്ധം എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["heart", "relationships", "empathy", "communication", "connection"]
+    },
+    {
+      "id": "solfeggio-741",
+      "kind": "solfeggio",
+      "frequencyLabel": "741 Hz",
+      "shotFrequency": 741,
+      "name": { "en": "Clarity & Expression", "ml": "വ്യക്തതയും ആവിഷ്കാരവും" },
+      "focus": { "en": "Clear expression", "ml": "വ്യക്തമായ ആവിഷ്കാരം" },
+      "features": {
+        "en": "Traditionally associated with mental clarity, problem-solving, self-expression and clearing stagnant patterns.",
+        "ml": "മാനസിക വ്യക്തത, പ്രശ്നപരിഹാരം, സ്വയം ആവിഷ്കരിക്കൽ, മന്ദമായ മാതൃകകൾ വിടൽ എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["throat", "clarity", "expression", "problem solving", "detox"]
+    },
+    {
+      "id": "solfeggio-852",
+      "kind": "solfeggio",
+      "frequencyLabel": "852 Hz",
+      "shotFrequency": 852,
+      "name": { "en": "Intuition & Awareness", "ml": "അന്തർബോധവും അവബോധവും" },
+      "focus": { "en": "Inner awareness", "ml": "ആന്തരിക അവബോധം" },
+      "features": {
+        "en": "Traditionally associated with intuition, heightened awareness and contemplative clarity.",
+        "ml": "അന്തർബോധം, ഉയർന്ന അവബോധം, ധ്യാനാത്മക വ്യക്തത എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["third eye", "intuition", "awareness", "spiritual clarity"]
+    },
+    {
+      "id": "solfeggio-963",
+      "kind": "solfeggio",
+      "frequencyLabel": "963 Hz",
+      "shotFrequency": 963,
+      "name": { "en": "Unity & Connection", "ml": "ഏകതയും ബന്ധവും" },
+      "focus": { "en": "Contemplative unity", "ml": "ധ്യാനാത്മക ഏകത" },
+      "features": {
+        "en": "Traditionally associated with crown-centred contemplation, unity and a sense of spiritual connection.",
+        "ml": "സഹസ്രാരകേന്ദ്രിത ധ്യാനം, ഏകത, ആത്മീയ ബന്ധബോധം എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "searchTerms": ["crown", "unity", "connection", "consciousness"]
+    }
+  ]
+}

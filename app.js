@@ -4003,6 +4003,43 @@ function attachEventListeners() {
         updateSessionEstimate();
     });
 
+    function prepareRepertoryShotFromUrl() {
+        const url = new URL(window.location.href);
+        const source = url.searchParams.get('shotSource');
+        const frequency = Number(url.searchParams.get('shotFrequency'));
+        if (source !== 'repertory') return;
+
+        // Consume the handoff before showing the confirmation. A cancel or a
+        // later safety reload must not silently prepare the same Shot again.
+        url.searchParams.delete('shotSource');
+        url.searchParams.delete('shotFrequency');
+        window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+
+        if (!shotsToggle || !shotTypeSelect || !Number.isFinite(frequency) || frequency <= 0 || frequency > 20000) {
+            alert(t('ui.shotInvalidFrequency'));
+            return;
+        }
+
+        const frequencyInput = document.getElementById('shot-frequency-input');
+        shotTypeSelect.value = 'custom';
+        if (frequencyInput) frequencyInput.value = String(frequency);
+        resetShotDurationForType('custom');
+
+        // Dispatch the normal Shots change event so the existing headset,
+        // loudspeaker and short-exposure confirmation remains authoritative.
+        shotsToggle.checked = true;
+        shotsToggle.dispatchEvent(new Event('change', { bubbles: true }));
+        if (!shotsToggle.checked) return;
+
+        showScreen(lobbyScreen);
+        updateExperienceModeVisibility();
+        updateSessionEstimate();
+        window.requestAnimationFrame(() => {
+            document.getElementById('shots-control')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            frequencyInput?.focus({ preventScroll: true });
+        });
+    }
+
     [reverseJourneyToggle, boxMeditationToggle, hooponoponoToggle, corpsePoseToggle].forEach(toggle => {
         if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
     });
@@ -4064,6 +4101,7 @@ function attachEventListeners() {
     // Initial call
     updateTimingRowVisibility();
     updateExperienceModeVisibility();
+    prepareRepertoryShotFromUrl();
     if (isGeneratedIntention(state.intention)) {
         state.intention = state.highEnergyEnabled
             ? hrimDefaultIntention(state.language)
