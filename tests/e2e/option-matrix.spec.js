@@ -53,23 +53,19 @@ for (const combination of bathCombinations) {
 }
 
 const modeCombinations = [
-  { name: 'standard', high: false, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
-  { name: 'high energy', high: true, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
-  { name: 'reverse journey', high: false, reverse: true, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
-  { name: 'box breathing', high: false, reverse: false, box: true, filters: false, hooponopono: false, noFrequency: false, musicOnly: false },
-  { name: 'audio filters', high: false, reverse: false, box: false, filters: true, hooponopono: false, noFrequency: false, musicOnly: false },
-  { name: 'hooponopono without frequencies', high: false, reverse: false, box: false, filters: false, hooponopono: true, noFrequency: true, musicOnly: false },
-  { name: 'music only', high: false, reverse: false, box: false, filters: false, hooponopono: false, noFrequency: false, musicOnly: true }
+  { name: 'standard', high: false, reverse: false, filters: false, noFrequency: false, musicOnly: false },
+  { name: 'high energy', high: true, reverse: false, filters: false, noFrequency: false, musicOnly: false },
+  { name: 'reverse journey', high: false, reverse: true, filters: false, noFrequency: false, musicOnly: false },
+  { name: 'audio filters', high: false, reverse: false, filters: true, noFrequency: false, musicOnly: false },
+  { name: 'music only', high: false, reverse: false, filters: false, noFrequency: false, musicOnly: true }
 ];
 
 for (const combination of modeCombinations) {
   test(`journey mode: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
     await setChecked(page, 'reverse-journey-toggle', combination.reverse);
-    await setChecked(page, 'box-meditation-toggle', combination.box);
     // Audio Filters now live in the active full-screen mixer. Their live
     // behavior is covered by the dedicated mixer journey test.
-    await setChecked(page, 'hooponopono-toggle', combination.hooponopono);
     await setChecked(page, 'no-frequency-mode-toggle', combination.noFrequency);
     await page.locator('#save-config').click();
     await expect(page.locator('#lobby-screen')).toBeVisible();
@@ -79,8 +75,6 @@ for (const combination of modeCombinations) {
     if (combination.musicOnly) {
       await expect(page.locator('#session-estimate')).toContainText('Music only');
       await expect(page.locator('#high-energy-toggle')).not.toBeChecked();
-      await expect(page.locator('#box-meditation-toggle')).not.toBeChecked();
-      await expect(page.locator('#hooponopono-toggle')).not.toBeChecked();
     } else if (combination.high) {
       await expect(page.locator('#high-energy-duration-control')).toBeVisible();
       await expect(page.locator('#time-per-chakra').locator('..')).toBeHidden();

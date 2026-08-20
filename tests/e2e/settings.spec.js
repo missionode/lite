@@ -46,7 +46,8 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
 test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
   await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
   await expect(page.locator('#reverse-journey-toggle').locator('..')).toContainText('Reverse Journey');
-  await expect(page.locator('.config-group').filter({ hasText: 'Guided Practices' })).toContainText('Box Meditation');
+  await expect(page.locator('#box-meditation-toggle')).toHaveCount(0);
+  await expect(page.locator('#hooponopono-toggle')).toHaveCount(0);
   await expect(page.locator('#volume-mixer')).toContainText('Comfort & Visuals');
   await expect(page.locator('#audio-filters-toggle')).toHaveCount(1);
   await expect(page.locator('#settings-help-button')).toBeVisible();
@@ -57,23 +58,28 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
 });
 
 test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
-  await page.locator('#box-meditation-toggle').check();
   await page.locator('#yoga-bridge-toggle').check();
   await page.locator('#bath-session-toggle').check();
   await page.locator('#massage-toggle').check();
   await page.locator('#perineal-care-toggle').check();
   await page.locator('#assisted-bathing-toggle').check();
-  await page.locator('#hooponopono-toggle').check();
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await expect(page.locator('#journey-roadmap')).toHaveText(
-    'Arrival » Intention » Breathing » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing » Ho\'oponopono'
+    'Arrival » Intention » Chakras » Yoga » Massage » Perineal Care » Assisted Bathing » Closing'
   );
 
   await page.locator('#high-energy-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Intention » HRIM » Closing');
   await page.locator('#music-only-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Music Only');
+
+  await page.locator('#box-breathing-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Box Breathing');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Box Breathing');
+  await page.locator('#hooponopono-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
 });
 
 test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
