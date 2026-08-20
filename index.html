@@ -79,7 +79,7 @@
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
             </div>
 
-            <div class="config-group settings-panel">
+            <div id="yoga-experience-setup" class="config-group settings-panel" hidden>
                 <label data-i18n="ui.yogaSection">Yoga Experience Setup</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <div id="yoga-sub-options" style="display:flex; flex-direction: column; gap: 10px; margin-top: 10px;">
@@ -321,6 +321,7 @@
                     </label>
                 </div>
             </div>
+            <div id="yoga-experience-panel-host" aria-live="polite"></div>
 
             <div id="session-estimate">~ 36 mins</div>
             <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
@@ -466,6 +467,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.75"></script>
+    <script src="app.js?v=1.76"></script>
 </body>
 </html>

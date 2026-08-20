@@ -20,6 +20,12 @@ async function setChecked(page, id, enabled) {
   else if (await toggle.isChecked()) await toggle.uncheck();
 }
 
+async function openYogaExperience(page) {
+  await page.locator('#save-config').click();
+  await page.locator('#yoga-experience-toggle').check();
+  await expect(page.locator('#yoga-experience-setup')).toBeVisible();
+}
+
 const bathCombinations = [
   { name: 'standard bath', massage: false, perineal: false, assisted: false },
   { name: 'massage only', massage: true, perineal: false, assisted: false },
@@ -33,6 +39,7 @@ const bathCombinations = [
 for (const combination of bathCombinations) {
   test(`bath flow: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
+    await openYogaExperience(page);
     await setChecked(page, 'bath-session-toggle', true);
     await setChecked(page, 'massage-toggle', combination.massage);
     await setChecked(page, 'perineal-care-toggle', combination.perineal);

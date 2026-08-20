@@ -2,6 +2,12 @@ const { test, expect } = require('@playwright/test');
 
 const fastProfile = '/?timingProfile=fast-test';
 
+async function openYogaExperience(page) {
+  await page.locator('#save-config').click();
+  await page.locator('#yoga-experience-toggle').check();
+  await expect(page.locator('#yoga-experience-setup')).toBeVisible();
+}
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (!sessionStorage.getItem("e2e-initialized")) {
@@ -58,10 +64,6 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
 });
 
 test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
-  await page.locator('#bath-session-toggle').check();
-  await page.locator('#massage-toggle').check();
-  await page.locator('#perineal-care-toggle').check();
-  await page.locator('#assisted-bathing-toggle').check();
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await expect(page.locator('#journey-roadmap')).toHaveText(
@@ -80,10 +82,12 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
   await page.locator('#yoga-experience-toggle').check();
+  await page.locator('#bath-session-toggle').check();
+  await page.locator('#massage-toggle').check();
+  await page.locator('#perineal-care-toggle').check();
+  await page.locator('#assisted-bathing-toggle').check();
   await expect(page.locator('#journey-roadmap')).toHaveText('Massage » Perineal Care » Assisted Bathing » Yoga Experience');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Yoga Experience');
-  await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
-  await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
 });
 
 test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
@@ -142,6 +146,7 @@ test('opens the full-screen mixer and safely restarts the active journey', async
 });
 
 test('keeps the Corpse Pose timing slider synchronized', async ({ page }) => {
+  await openYogaExperience(page);
   const corpse = page.locator('#time-corpse');
   await expect(corpse).toHaveAttribute('min', '1');
   await expect(corpse).toHaveAttribute('max', '5');
@@ -255,6 +260,7 @@ test('keeps HRIM selectable without a time restriction', async ({ page }) => {
 });
 
 test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page }) => {
+  await openYogaExperience(page);
   const bath = page.locator('#bath-session-toggle');
   const massage = page.locator('#massage-toggle');
   const perineal = page.locator('#perineal-care-toggle');
@@ -285,6 +291,7 @@ test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page 
 });
 
 test('persists timing changes through settings reload', async ({ page }) => {
+  await openYogaExperience(page);
   await page.locator("#bath-session-toggle").check();
   const bath = page.locator('#time-bath');
   await bath.fill('3');
