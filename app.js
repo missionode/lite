@@ -254,6 +254,7 @@ const timingFallbacks = {
     'transitions.breathingCompletion': 5,
     'transitions.corpseTransitionAt': 60,
     'transitions.corpseFinalSettle': 3,
+    'transitions.bathToYogaRest': 900,
     'transitions.yogaPoseGap': 5,
     'transitions.yogaFinalSettle': 5,
     'transitions.chakraPostMantra': 4,
@@ -538,6 +539,7 @@ function getJourneyRoadmapLabels() {
             if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassage'));
             if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
             labels.push(t(getChecked('assisted-bathing-toggle') ? 'ui.roadmapAssistedBathing' : 'ui.roadmapBath'));
+            labels.push(t('ui.roadmapRestBeforeYoga'));
         }
         labels.push(t('ui.roadmapYoga'));
         return labels;
@@ -1917,6 +1919,7 @@ class MeditationController {
         this.isShotActive = false;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
+        this.guideRestResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
@@ -2610,6 +2613,50 @@ class MeditationController {
         }
     }
 
+    async runGuideControlledRest({ durationSeconds, title, subtitle, readyText, continueLabel }) {
+        const restButton = document.getElementById('guide-rest-continue');
+        const titleEl = document.getElementById('icebreaker-title');
+        const subtitleEl = document.getElementById('icebreaker-subtitle');
+        const timerEl = document.getElementById('icebreaker-timer');
+
+        if (!restButton || !titleEl || !subtitleEl || !timerEl) return false;
+
+        showScreen(icebreakerScreen);
+        restButton.hidden = true;
+        restButton.disabled = true;
+        titleEl.textContent = title;
+        subtitleEl.textContent = subtitle;
+
+        for (let remaining = Math.max(0, Math.round(durationSeconds)); remaining > 0; remaining--) {
+            if (!this.isMeditationActive) return false;
+            timerEl.textContent = formatClockDuration(remaining * 1000);
+            await this.pauseAwareSleep(1000);
+        }
+
+        if (!this.isMeditationActive) return false;
+        timerEl.textContent = formatClockDuration(0);
+        subtitleEl.textContent = readyText;
+        restButton.textContent = continueLabel;
+        restButton.disabled = false;
+        restButton.hidden = false;
+        restButton.focus();
+
+        return new Promise(resolve => {
+            const complete = (shouldContinue) => {
+                restButton.removeEventListener('click', onContinue);
+                restButton.hidden = true;
+                restButton.disabled = true;
+                if (this.guideRestResolve === complete) this.guideRestResolve = null;
+                resolve(shouldContinue);
+            };
+            const onContinue = () => {
+                if (this.isMeditationActive && !this.isPaused) complete(true);
+            };
+            this.guideRestResolve = complete;
+            restButton.addEventListener('click', onContinue);
+        });
+    }
+
     async runYogaSession() {
         if (!this.isMeditationActive) return;
 
@@ -2622,6 +2669,15 @@ class MeditationController {
             if (state.perinealCareEnabled) await this.runPerinealCare();
             if (state.assistedBathingEnabled) await this.runAssistedBathing();
             else await this.runBathSession();
+
+            const shouldBeginYoga = await this.runGuideControlledRest({
+                durationSeconds: timing('transitions', 'bathToYogaRest'),
+                title: t('ui.bathToYogaRestTitle'),
+                subtitle: t('ui.bathToYogaRestGuidance'),
+                readyText: t('ui.restReadyToContinue'),
+                continueLabel: t('ui.beginYogaAfterRest')
+            });
+            if (!shouldBeginYoga) return;
         }
 
         // Transition Screen
@@ -3251,6 +3307,12 @@ class MeditationController {
 
     stop() {
         this.isMeditationActive = false; this.isShotActive = false; this.audio.stopFrequencyShot(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        if (this.guideRestResolve) this.guideRestResolve(false);
+        const guideRestButton = document.getElementById('guide-rest-continue');
+        if (guideRestButton) {
+            guideRestButton.hidden = true;
+            guideRestButton.disabled = true;
+        }
         this.sessionStartedAt = null;
         const startBtn = document.getElementById('start-meditation');
         if (startBtn) {
@@ -4207,6 +4269,7 @@ function attachEventListeners() {
                 if (getChecked('massage-toggle')) seconds += state.timeMassage;
                 if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
                 seconds += getChecked('assisted-bathing-toggle') ? state.timeAssistedBathing : state.timeBath;
+                seconds += timing('transitions', 'bathToYogaRest');
             }
             setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.yogaExperience').toLowerCase()}`);
             updateJourneyRoadmap();

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.43';
+const CACHE_NAME = 'chakra-v5.44';
 const PIPER_CACHE_NAME = 'chakra-piper-v3';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v13';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v14';
 const ASSETS = [
   './',
   './index.html',
