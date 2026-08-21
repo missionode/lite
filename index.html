@@ -198,6 +198,22 @@
             </div>
 
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
+            <button id="open-experiment-mode" class="link-btn" type="button">Experiment Mode</button>
+        </section>
+
+        <section id="experiment-screen" class="screen settings-screen-container hidden">
+            <div class="settings-title-row"><h1>Experiment Mode</h1></div>
+            <p class="subtitle">Run one isolated guide activity. It does not change the journey plan or history.</p>
+            <div class="config-group settings-panel">
+                <label for="experiment-activity">Activity</label>
+                <select id="experiment-activity">
+                    <optgroup label="Guided practice"><option value="chakra:root">Root Chakra</option><option value="chakra:sacral">Sacral Chakra</option><option value="chakra:solar">Solar Chakra</option><option value="chakra:heart">Heart Chakra</option><option value="chakra:throat">Throat Chakra</option><option value="chakra:thirdeye">Third Eye Chakra</option><option value="chakra:crown">Crown Chakra</option><option value="hrim">HRIM</option><option value="box">Box Breathing</option><option value="hooponopono">Ho’oponopono</option><option value="corpse">Savasana</option></optgroup>
+                    <optgroup label="Care"><option value="massage">Massage</option><option value="perineal">Perineal Care</option><option value="bath">Bath Session</option><option value="assisted-bath">Assisted Bathing</option></optgroup>
+                </select>
+            </div>
+            <p class="experiment-note">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
+            <button id="start-experiment" class="primary-btn" type="button">Run Activity</button>
+            <button id="close-experiment" class="link-btn" type="button">Back to Settings</button>
         </section>
 
         <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
@@ -468,6 +484,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.78"></script>
+    <script src="app.js?v=1.79"></script>
 </body>
 </html>

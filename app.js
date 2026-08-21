@@ -89,6 +89,7 @@ let earnHandoffTimer = null;
 
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
+const experimentScreen = document.getElementById('experiment-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
@@ -1917,6 +1918,7 @@ class MeditationController {
         this.isPaused = false;
         this.isHighEnergy = false;
         this.isShotActive = false;
+        this.isExperimentActive = false;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
         this.guideControlledResolve = null;
@@ -2313,6 +2315,68 @@ class MeditationController {
                 startBtn.style.opacity = "1";
             }
         }
+    }
+
+    async startExperiment(activity) {
+        if (this.isStarting || this.isMeditationActive) return;
+        this.isStarting = true;
+        try {
+            if (!this.scripts || this.scriptsLanguage !== state.language) {
+                if (state.scriptSource === 'custom' && state.customScript) this.scripts = state.customScript;
+                else {
+                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
+                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
+                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
+                    this.scripts = await response.json();
+                }
+                this.scriptsLanguage = state.language;
+            }
+            await this.audio.init();
+            await this.audio.startBackgroundMusic();
+            this.isMeditationActive = true;
+            this.isExperimentActive = true;
+            this.isPaused = false;
+            this.sessionStartedAt = Date.now();
+            try { await wakeLock.request(); } catch (error) {}
+            document.getElementById('controls')?.classList.remove('hidden');
+            setText('pause-meditation', 'II');
+            this.audio.fadeInBackgroundMusic(3);
+
+            if (activity.startsWith('chakra:')) {
+                const key = activity.slice('chakra:'.length);
+                this.chakraOrder = [key];
+                showScreen(meditationScreen);
+                await this.meditateOnChakra(this.scripts[key], key);
+            } else if (activity === 'hrim') {
+                this.chakraOrder = ['high_energy'];
+                showScreen(meditationScreen);
+                await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
+            } else if (activity === 'box') await this.runBoxBreathing();
+            else if (activity === 'hooponopono') { showScreen(meditationScreen); await this.runHooponopono(); }
+            else if (activity === 'corpse') await this.runCorpsePose();
+            else if (activity === 'massage') await this.runMassage();
+            else if (activity === 'perineal') await this.runPerinealCare();
+            else if (activity === 'bath') await this.runBathSession();
+            else if (activity === 'assisted-bath') await this.runAssistedBathing();
+
+            if (this.isMeditationActive) this.stopExperiment();
+        } catch (error) {
+            console.error('Experiment activity failed:', error);
+            alert(`Experiment activity failed: ${error.message}`);
+            this.stopExperiment();
+        } finally { this.isStarting = false; }
+    }
+
+    stopExperiment() {
+        this.isMeditationActive = false;
+        this.isExperimentActive = false;
+        this.stopStageDrone();
+        this.audio.stopMantraTrack();
+        this.audio.stopBackgroundMusic();
+        this.visual.stop();
+        wakeLock.release();
+        document.getElementById('controls')?.classList.add('hidden');
+        showScreen(experimentScreen);
     }
 
     async runGratitude(isHighEnergy = false) {
@@ -3317,7 +3381,9 @@ class MeditationController {
     }
 
     stop() {
+        const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.audio.stopFrequencyShot(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        this.isExperimentActive = false;
         if (this.guideControlledResolve) this.guideControlledResolve(false);
         const guideRestButton = document.getElementById('guide-controlled-continue');
         if (guideRestButton) {
@@ -3347,7 +3413,7 @@ class MeditationController {
             aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
             aura.style.opacity = '1';
         }
-        showScreen(lobbyScreen);
+        showScreen(returnScreen);
     }
 }
 
@@ -3798,7 +3864,7 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    [configScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
+    [configScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
     if (screen) screen.classList.remove('hidden');
@@ -4543,6 +4609,12 @@ function attachEventListeners() {
         cb.addEventListener('change', updateSessionEstimate);
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
+    document.getElementById('open-experiment-mode')?.addEventListener('click', () => showScreen(experimentScreen));
+    document.getElementById('close-experiment')?.addEventListener('click', () => showScreen(configScreen));
+    document.getElementById('start-experiment')?.addEventListener('click', () => {
+        const activity = document.getElementById('experiment-activity')?.value;
+        if (activity) meditation.startExperiment(activity);
+    });
     beginConsultationBtn?.addEventListener('click', () => {
         window.location.href = './docs/assesment.html';
     });
