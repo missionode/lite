@@ -1919,6 +1919,7 @@ class MeditationController {
         this.isHighEnergy = false;
         this.isShotActive = false;
         this.isExperimentActive = false;
+        this.experimentDurationMinutes = null;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
         this.guideControlledResolve = null;
@@ -2321,6 +2322,10 @@ class MeditationController {
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
         try {
+            const durationInput = document.getElementById('experiment-core-duration');
+            this.experimentDurationMinutes = activity.startsWith('chakra:') || activity === 'hrim'
+                ? Number(durationInput?.value) || state.timePerChakra
+                : null;
             if (!this.scripts || this.scriptsLanguage !== state.language) {
                 if (state.scriptSource === 'custom' && state.customScript) this.scripts = state.customScript;
                 else {
@@ -2370,6 +2375,7 @@ class MeditationController {
     stopExperiment() {
         this.isMeditationActive = false;
         this.isExperimentActive = false;
+        this.experimentDurationMinutes = null;
         this.stopStageDrone();
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
@@ -3103,7 +3109,9 @@ class MeditationController {
         
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
-        const practiceMinutes = key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+        const practiceMinutes = this.isExperimentActive && this.experimentDurationMinutes != null
+            ? this.experimentDurationMinutes
+            : key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
         const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
 
         this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
@@ -4611,6 +4619,23 @@ function attachEventListeners() {
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     document.getElementById('open-experiment-mode')?.addEventListener('click', () => showScreen(experimentScreen));
     document.getElementById('close-experiment')?.addEventListener('click', () => showScreen(configScreen));
+    const experimentActivity = document.getElementById('experiment-activity');
+    const experimentDuration = document.getElementById('experiment-core-duration');
+    const experimentDurationGroup = document.getElementById('experiment-core-duration-group');
+    const syncExperimentDuration = () => {
+        const usesCoreDuration = experimentActivity?.value?.startsWith('chakra:') || experimentActivity?.value === 'hrim';
+        if (experimentDurationGroup) experimentDurationGroup.hidden = !usesCoreDuration;
+        if (experimentDuration) {
+            if (!experimentDuration.dataset.initialized) {
+                experimentDuration.value = String(state.timePerChakra);
+                experimentDuration.dataset.initialized = 'true';
+            }
+            setText('experiment-core-duration-value', `${experimentDuration.value} min`);
+        }
+    };
+    experimentActivity?.addEventListener('change', syncExperimentDuration);
+    experimentDuration?.addEventListener('input', syncExperimentDuration);
+    syncExperimentDuration();
     document.getElementById('start-experiment')?.addEventListener('click', () => {
         const activity = document.getElementById('experiment-activity')?.value;
         if (activity) meditation.startExperiment(activity);
