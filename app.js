@@ -1919,7 +1919,7 @@ class MeditationController {
         this.isHighEnergy = false;
         this.isShotActive = false;
         this.isExperimentActive = false;
-        this.experimentDurationMinutes = null;
+        this.experimentDuration = null;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
         this.guideControlledResolve = null;
@@ -2323,9 +2323,7 @@ class MeditationController {
         this.isStarting = true;
         try {
             const durationInput = document.getElementById('experiment-core-duration');
-            this.experimentDurationMinutes = activity.startsWith('chakra:') || activity === 'hrim'
-                ? Number(durationInput?.value) || state.timePerChakra
-                : null;
+            this.experimentDuration = durationInput ? Number(durationInput.value) : null;
             if (!this.scripts || this.scriptsLanguage !== state.language) {
                 if (state.scriptSource === 'custom' && state.customScript) this.scripts = state.customScript;
                 else {
@@ -2375,7 +2373,7 @@ class MeditationController {
     stopExperiment() {
         this.isMeditationActive = false;
         this.isExperimentActive = false;
-        this.experimentDurationMinutes = null;
+        this.experimentDuration = null;
         this.stopStageDrone();
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
@@ -2455,6 +2453,7 @@ class MeditationController {
 
     async runBoxBreathing() {
         const screen = document.getElementById('breathing-screen');
+        const breathingStep = this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBreathing;
         const tutorial = document.getElementById('breathing-tutorial');
         const instruction = document.getElementById('breathing-instruction');
         const circle = document.getElementById('breathing-circle');
@@ -2493,12 +2492,12 @@ class MeditationController {
                 
                 instruction.textContent = step.text;
                 // Sync visual timing with configurable breathing duration
-                circle.style.transition = `transform ${state.timeBreathing}s linear`;
+                circle.style.transition = `transform ${breathingStep}s linear`;
                 circle.style.transform = `scale(${step.scale})`;
                 
                 this.narrateSoft(step.text);
 
-                for (let s = state.timeBreathing; s > 0; s--) {
+                for (let s = breathingStep; s > 0; s--) {
                     if (!this.isMeditationActive) return;
                     timer.textContent = s.toString().padStart(2, '0');
                     
@@ -2557,7 +2556,7 @@ class MeditationController {
             this.audio.fadeInBackgroundMusic(12, 0.30);
 
             // Configurable Duration Countdown
-            const totalSeconds = state.timeCorpse;
+            const totalSeconds = this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeCorpse;
             const transitionSecond = timing('transitions', 'corpseTransitionAt');
             for (let i = totalSeconds; i > 0; i--) {
                 if (!this.isMeditationActive) return;
@@ -2636,19 +2635,19 @@ class MeditationController {
     }
 
     async runBathSession() {
-        return this.runBathStage('bath_session', state.timeBath);
+        return this.runBathStage('bath_session', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBath);
     }
 
     async runPerinealCare() {
-        return this.runBathStage('perineal_care', state.timePerinealCare);
+        return this.runBathStage('perineal_care', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timePerinealCare);
     }
 
     async runAssistedBathing() {
-        return this.runBathStage('assisted_bathing', state.timeAssistedBathing);
+        return this.runBathStage('assisted_bathing', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeAssistedBathing);
     }
 
     async runMassage() {
-        return this.runBathStage('massage', state.timeMassage);
+        return this.runBathStage('massage', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeMassage);
     }
 
     async runBackgroundMusicOnly() {
@@ -3109,8 +3108,8 @@ class MeditationController {
         
         // Define absolute index for correct elemental layers regardless of journey order
         const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
-        const practiceMinutes = this.isExperimentActive && this.experimentDurationMinutes != null
-            ? this.experimentDurationMinutes
+        const practiceMinutes = this.isExperimentActive && this.experimentDuration != null && (key === 'high_energy' || this.chakraOrder.length === 1)
+            ? this.experimentDuration
             : key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
         const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
 
@@ -4623,18 +4622,45 @@ function attachEventListeners() {
     const experimentDuration = document.getElementById('experiment-core-duration');
     const experimentDurationGroup = document.getElementById('experiment-core-duration-group');
     const syncExperimentDuration = () => {
-        const usesCoreDuration = experimentActivity?.value?.startsWith('chakra:') || experimentActivity?.value === 'hrim';
-        if (experimentDurationGroup) experimentDurationGroup.hidden = !usesCoreDuration;
+        const activity = experimentActivity?.value || '';
+        const config = activity.startsWith('chakra:') || activity === 'hrim'
+            ? { min: 1, max: 7, step: 0.5, value: state.timePerChakra, unit: 'min' }
+            : activity === 'box'
+                ? { min: 4, max: 16, step: 1, value: state.timeBreathing, unit: 'sec' }
+                : activity === 'corpse'
+                    ? { min: 60, max: 600, step: 30, value: state.timeCorpse, unit: 'sec' }
+                    : activity === 'massage'
+                        ? { min: 60, max: 1800, step: 60, value: state.timeMassage, unit: 'min' }
+                        : activity === 'perineal'
+                            ? { min: 30, max: 900, step: 30, value: state.timePerinealCare, unit: 'min' }
+                            : activity === 'assisted-bath'
+                                ? { min: 60, max: 1800, step: 60, value: state.timeAssistedBathing, unit: 'min' }
+                                : activity === 'bath'
+                                    ? { min: 60, max: 1800, step: 60, value: state.timeBath, unit: 'min' }
+                                    : null;
+        if (experimentDurationGroup) experimentDurationGroup.hidden = !config;
         if (experimentDuration) {
-            if (!experimentDuration.dataset.initialized) {
-                experimentDuration.value = String(state.timePerChakra);
-                experimentDuration.dataset.initialized = 'true';
+            if (config) {
+                experimentDuration.min = String(config.min);
+                experimentDuration.max = String(config.max);
+                experimentDuration.step = String(config.step);
+                experimentDuration.value = String(config.value);
+                experimentDuration.dataset.unit = config.unit;
             }
-            setText('experiment-core-duration-value', `${experimentDuration.value} min`);
+            const displayValue = experimentDuration.dataset.unit === 'min' && Number(experimentDuration.value) >= 60
+                ? `${Number(experimentDuration.value) / 60} min`
+                : `${experimentDuration.value} ${experimentDuration.dataset.unit || 'min'}`;
+            setText('experiment-core-duration-value', displayValue);
         }
     };
     experimentActivity?.addEventListener('change', syncExperimentDuration);
-    experimentDuration?.addEventListener('input', syncExperimentDuration);
+    experimentDuration?.addEventListener('input', () => {
+        const unit = experimentDuration.dataset.unit || 'min';
+        const displayValue = unit === 'min' && Number(experimentDuration.value) >= 60
+            ? `${Number(experimentDuration.value) / 60} min`
+            : `${experimentDuration.value} ${unit}`;
+        setText('experiment-core-duration-value', displayValue);
+    });
     syncExperimentDuration();
     document.getElementById('start-experiment')?.addEventListener('click', () => {
         const activity = document.getElementById('experiment-activity')?.value;
