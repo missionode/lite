@@ -42,19 +42,36 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 99999;
+    overflow: hidden;
+    isolation: isolate;
     transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+}
+
+#splash-screen::before {
+    content: '';
+    position: absolute;
+    inset: -2rem;
+    z-index: -1;
+    background: #000 url('Splash.png') center / cover no-repeat;
+    filter: blur(18px) brightness(0.38);
+    transform: scale(1.08);
 }
 
 #splash-screen img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    animation: splashPulse 3s ease-in-out infinite alternate;
+    object-fit: contain;
+    transform-origin: center;
+    animation: splashReveal 2.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes splashPulse {
-    from { opacity: 0.8; transform: scale(1); }
-    to { opacity: 1; transform: scale(1.03); }
+@keyframes splashReveal {
+    0%, 30% { opacity: 1; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #splash-screen img { animation: none; }
 }
 
 #splash-screen.hidden {
