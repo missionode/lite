@@ -198,29 +198,29 @@
             </div>
 
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
-            <button id="open-experiment-mode" class="link-btn" type="button">Experiment Mode</button>
+            <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
         </section>
 
         <section id="experiment-screen" class="screen settings-screen-container hidden">
-            <div class="settings-title-row"><h1>Experiment Mode</h1></div>
-            <p class="subtitle">Run one isolated guide activity. It does not change the journey plan or history.</p>
+            <div class="settings-title-row"><h1 data-i18n="ui.experimentMode">Experiment Mode</h1></div>
+            <p class="subtitle" data-i18n="ui.experimentSubtitle">Run one isolated guide activity. It does not change the journey plan or history.</p>
             <div class="config-group settings-panel">
-                <label for="experiment-activity">Activity</label>
+                <label for="experiment-activity" data-i18n="ui.experimentActivity">Activity</label>
                 <select id="experiment-activity">
-                    <optgroup label="Guided practice"><option value="chakra:root">Root Chakra</option><option value="chakra:sacral">Sacral Chakra</option><option value="chakra:solar">Solar Chakra</option><option value="chakra:heart">Heart Chakra</option><option value="chakra:throat">Throat Chakra</option><option value="chakra:thirdeye">Third Eye Chakra</option><option value="chakra:crown">Crown Chakra</option><option value="hrim">HRIM</option><option value="box">Box Breathing</option><option value="hooponopono">Ho’oponopono</option><option value="corpse">Savasana</option></optgroup>
-                    <optgroup label="Care"><option value="massage">Massage</option><option value="perineal">Perineal Care</option><option value="bath">Bath Session</option><option value="assisted-bath">Assisted Bathing</option></optgroup>
+                    <optgroup id="experiment-guided-group" label="Guided practice"><option value="chakra:root" data-i18n="ui.root">Root</option><option value="chakra:sacral" data-i18n="ui.sacral">Sacral</option><option value="chakra:solar" data-i18n="ui.solar">Solar</option><option value="chakra:heart" data-i18n="ui.heart">Heart</option><option value="chakra:throat" data-i18n="ui.throat">Throat</option><option value="chakra:thirdeye" data-i18n="ui.thirdEye">Third Eye</option><option value="chakra:crown" data-i18n="ui.crown">Crown</option><option value="hrim">HRIM</option><option value="box" data-i18n="ui.boxBreathingExperience">Box Breathing</option><option value="hooponopono" data-i18n="ui.hooponoponoExperience">Ho’oponopono</option><option value="corpse" data-i18n="ui.corpsePose">Savasana</option></optgroup>
+                    <optgroup id="experiment-care-group" label="Care"><option value="massage" data-i18n="ui.massage">Massage</option><option value="perineal" data-i18n="ui.perinealCare">Perineal Care</option><option value="bath" data-i18n="ui.bathSession">Bath Session</option><option value="assisted-bath" data-i18n="ui.assistedBathing">Assisted Bathing</option></optgroup>
                 </select>
             </div>
             <div id="experiment-core-duration-group" class="config-group settings-panel">
-                <label for="experiment-core-duration">Experiment Duration</label>
+                <label for="experiment-core-duration" data-i18n="ui.experimentDuration">Experiment Duration</label>
                 <div class="mixer-row">
                     <input id="experiment-core-duration" type="range" min="1" max="7" step="0.5" value="5">
                     <span id="experiment-core-duration-value">5 min</span>
                 </div>
             </div>
-            <p class="experiment-note">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
-            <button id="start-experiment" class="primary-btn" type="button">Run Activity</button>
-            <button id="close-experiment" class="link-btn" type="button">Back to Settings</button>
+            <p class="experiment-note" data-i18n="ui.experimentNote">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
+            <button id="start-experiment" class="primary-btn" type="button" data-i18n="ui.runExperiment">Run Activity</button>
+            <button id="close-experiment" class="link-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
         </section>
 
         <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
@@ -491,6 +491,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.81"></script>
+    <script src="app.js?v=1.82"></script>
 </body>
 </html>

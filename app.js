@@ -591,6 +591,10 @@ function applyLocaleUI() {
     setText('returning-journey-label', t('ui.returningJourney'));
     setText('save-config', t('ui.startMeditation'));
     setText('start-meditation', t('ui.beginJourney'));
+    const experimentGuidedGroup = document.getElementById('experiment-guided-group');
+    const experimentCareGroup = document.getElementById('experiment-care-group');
+    if (experimentGuidedGroup) experimentGuidedGroup.label = t('ui.experimentGuidedPractice');
+    if (experimentCareGroup) experimentCareGroup.label = t('ui.experimentCare');
     document.querySelectorAll('.stat-lbl').forEach((element) => {
         element.textContent = t('ui.sessionTime');
     });
