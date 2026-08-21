@@ -1919,7 +1919,7 @@ class MeditationController {
         this.isShotActive = false;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
-        this.guideRestResolve = null;
+        this.guideControlledResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
 
@@ -2553,6 +2553,16 @@ class MeditationController {
             }
             await this.pauseAwareSleep(1000);
         }
+
+        if (!this.isMeditationActive) return false;
+        return this.runGuideControlledTransition({
+            durationSeconds: 0,
+            showTimer: false,
+            title: t('ui.guideReadyForNextSession'),
+            subtitle: t('ui.guideReadyForNextSessionGuidance'),
+            readyText: t('ui.guideReadyForNextSessionGuidance'),
+            continueLabel: t('ui.proceedToNextSession')
+        });
     }
 
     async runBathSession() {
@@ -2613,8 +2623,8 @@ class MeditationController {
         }
     }
 
-    async runGuideControlledRest({ durationSeconds, title, subtitle, readyText, continueLabel }) {
-        const restButton = document.getElementById('guide-rest-continue');
+    async runGuideControlledTransition({ durationSeconds, title, subtitle, readyText, continueLabel, showTimer = true }) {
+        const restButton = document.getElementById('guide-controlled-continue');
         const titleEl = document.getElementById('icebreaker-title');
         const subtitleEl = document.getElementById('icebreaker-subtitle');
         const timerEl = document.getElementById('icebreaker-timer');
@@ -2626,15 +2636,16 @@ class MeditationController {
         restButton.disabled = true;
         titleEl.textContent = title;
         subtitleEl.textContent = subtitle;
+        timerEl.hidden = !showTimer;
 
         for (let remaining = Math.max(0, Math.round(durationSeconds)); remaining > 0; remaining--) {
             if (!this.isMeditationActive) return false;
-            timerEl.textContent = formatClockDuration(remaining * 1000);
+            if (showTimer) timerEl.textContent = formatClockDuration(remaining * 1000);
             await this.pauseAwareSleep(1000);
         }
 
         if (!this.isMeditationActive) return false;
-        timerEl.textContent = formatClockDuration(0);
+        if (showTimer) timerEl.textContent = formatClockDuration(0);
         subtitleEl.textContent = readyText;
         restButton.textContent = continueLabel;
         restButton.disabled = false;
@@ -2646,13 +2657,13 @@ class MeditationController {
                 restButton.removeEventListener('click', onContinue);
                 restButton.hidden = true;
                 restButton.disabled = true;
-                if (this.guideRestResolve === complete) this.guideRestResolve = null;
+                if (this.guideControlledResolve === complete) this.guideControlledResolve = null;
                 resolve(shouldContinue);
             };
             const onContinue = () => {
                 if (this.isMeditationActive && !this.isPaused) complete(true);
             };
-            this.guideRestResolve = complete;
+            this.guideControlledResolve = complete;
             restButton.addEventListener('click', onContinue);
         });
     }
@@ -2665,12 +2676,12 @@ class MeditationController {
         // the standard Bath Session, and Perineal Care precedes either path.
         if (state.corpsePoseEnabled) await this.runCorpsePose();
         if (state.bathSessionEnabled && this.isMeditationActive) {
-            if (state.massageEnabled) await this.runMassage();
-            if (state.perinealCareEnabled) await this.runPerinealCare();
-            if (state.assistedBathingEnabled) await this.runAssistedBathing();
-            else await this.runBathSession();
+            if (state.massageEnabled && !await this.runMassage()) return;
+            if (state.perinealCareEnabled && !await this.runPerinealCare()) return;
+            if (state.assistedBathingEnabled && !await this.runAssistedBathing()) return;
+            else if (!state.assistedBathingEnabled && !await this.runBathSession()) return;
 
-            const shouldBeginYoga = await this.runGuideControlledRest({
+            const shouldBeginYoga = await this.runGuideControlledTransition({
                 durationSeconds: timing('transitions', 'bathToYogaRest'),
                 title: t('ui.bathToYogaRestTitle'),
                 subtitle: t('ui.bathToYogaRestGuidance'),
@@ -3307,8 +3318,8 @@ class MeditationController {
 
     stop() {
         this.isMeditationActive = false; this.isShotActive = false; this.audio.stopFrequencyShot(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
-        if (this.guideRestResolve) this.guideRestResolve(false);
-        const guideRestButton = document.getElementById('guide-rest-continue');
+        if (this.guideControlledResolve) this.guideControlledResolve(false);
+        const guideRestButton = document.getElementById('guide-controlled-continue');
         if (guideRestButton) {
             guideRestButton.hidden = true;
             guideRestButton.disabled = true;
