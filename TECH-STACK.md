@@ -1,195 +1,301 @@
-# Chakra Meditation — Technology Stack
+# NexaForge Generic Technology and Implementation Architecture
 
-This document describes the stack that is actually implemented in this repository. It replaces the earlier Laravel/WebSocket proposal, which did not match the current application shape.
+This document defines a language-neutral technology-selection policy for applications built under the NexaForge collaboration loop. It is the implementation companion to [`communication-architecture.md`](./communication-architecture.md); it is not the architecture of `loop.md`.
 
-## Current implementation
+The communication model, safety rules, local-first process, evidence levels, and testing standards are reusable across programming languages, frameworks, transports, databases, deployment models, and application domains. A project selects a concrete implementation profile during preflight and records the choice in `HANDOFF.md`.
 
-| Area | Technology | Status / evidence |
-|---|---|---|
-| Application type | Static, single-page web application | Implemented in `index.html`, `app.js`, and `style.css` |
-| Markup | HTML5 | Five primary screens and completion modal in `index.html` |
-| Client logic | Plain modern JavaScript (ES classes, async/await) | `AudioEngine`, `VisualEngine`, `MeditationController`, and `WakeLockManager` in `app.js` |
-| Styling | Hand-authored CSS with CSS custom properties | `style.css`; no CSS framework or preprocessor |
-| Content/configuration | Manifest-driven JSON language packs with backward-compatible localized lookup | `language-manifest.json`, `locales/*.json`, and `scripts.json` |
-| Audio | Web Audio API, HTML audio buffers, MP3 assets | Procedural drones/effects plus `audio/*.mp3` in `app.js` |
-| Narration | Piper neural TTS in a Web Worker + Web Speech API fallback | Local ONNX/WASM Piper runtime, Malayalam/English voice registry, rolling sentence buffer, and browser voice fallback in `app.js`/`piper-worker.js` |
-| Visuals | DOM/CSS animation and Canvas 2D star/particle effects | `VisualEngine` and `#particle-canvas` |
-| Persistence | Browser `localStorage` | Preferences, custom scripts, journal entries, and aggregate stats |
-| Offline/installability | Service Worker + Web App Manifest | `sw.js` and `manifest.json` |
-| Device integration | Screen Wake Lock API and Media Session API where supported | Session lifecycle in `app.js` |
-| Backend/API | None | No server routes, database, authentication, or WebSocket layer |
-| Dependencies/build | No production build; npm is used for tests only | `package.json`/`package-lock.json` pin Playwright tooling and expose six Node regression scripts plus optional browser tests |
+## Core decision
 
-## Runtime architecture
+Do not treat the technology choices in this document as mandatory products. Treat them as capability requirements and selection criteria.
 
 ```text
-Browser
-  ├─ index.html: screen structure and controls
-  ├─ style.css: visual system, responsive layout, animations
-  ├─ app.js
-  │   ├─ state + localStorage preferences
-  │   ├─ MeditationController: journey orchestration
-  │   ├─ AudioEngine: Web Audio graph and asset playback
-  │   ├─ VisualEngine: symbols, aura, particles, progress
-  │   └─ WakeLockManager / Media Session integration
-  ├─ language-manifest.json: language, locale, content, preview, and browser-voice metadata
-  ├─ locales/: localized UI/system strings with fallback resolution
-  ├─ scripts.json: current bilingual narration/content pack
-  ├─ piper-models.json: versioned local voice registry and model metadata
-  ├─ piper-worker.js: isolated Piper model loading and synthesis queue
-  ├─ piper/: vendored Piper phonemizer, ONNX Runtime Web, and WASM assets
-  ├─ audio/ + symbols/ + presiding-deities/: media assets
-  └─ sw.js: cache-first static asset delivery
+Generic architecture and invariants
+  -> project constraints and product needs
+  -> implementation profile
+  -> dependency preparation
+  -> local proof and validation
+  -> measured production decision
 ```
 
-The application is designed to be served from a static HTTP(S) origin. Opening `index.html` directly from `file://` is not a supported runtime because service workers, fetch, and some browser media APIs require an origin. Piper binary paths resolve from the runtime module URL, so static hosts must preserve the `piper/` directory and serve `.wasm` files as binary assets.
+Every implementation must preserve the generic communication contracts, security controls, local-first validation model, checkpoint process, and evidence classifications even when its tools differ.
 
-## Narration architecture
+## Technology decision matrix
 
-Piper neural TTS is now implemented as the preferred narration path for registered local voices. Piper ONNX/WASM inference runs in a dedicated Web Worker; the service worker caches the runtime and selected model requests on demand; the existing Web Audio engine plays generated narration alongside background music; and browser `speechSynthesis` remains the fallback. The configured journey interval remains the minimum meditation pause and can extend only when the next Piper segment is not ready. The current registry starts with Malayalam Arjun/Meera and English Lessac; additional languages require a registry entry, compatible model path, license review, and device validation.
+| Capability | Required decision | Selection rule |
+|---|---|---|
+| Primary language | Project-selected | Choose a maintained language with suitable libraries, tooling, security support, and local compatibility. |
+| Application framework | Project-selected or minimal runtime | Use a framework when it reduces risk; avoid adopting one without a measured need. |
+| Public transport | Project-selected adapter | Choose HTTP, WebSocket, SSE, QUIC, messaging, native IPC, or another transport according to client and delivery needs. |
+| Protocol format | Project-selected | JSON is the default interoperable format; use a typed or binary format when measured requirements justify it. |
+| Route/message model | Required | Use versioned envelopes, schemas, owners, policies, correlation, idempotency, and observability. |
+| Durable data store | Project-selected | Choose a transactional database or equivalent durable store appropriate to consistency, query, scale, and retention needs. |
+| Queue/cache/coordination | Conditional | Add only when required for asynchronous work, rate limits, locks, pub/sub, or short-lived state. |
+| Background execution | Project-selected | Use processes, workers, jobs, actors, functions, containers, or platform tasks as appropriate. |
+| Frontend | Project-selected | Use the smallest client technology that satisfies the product and accessibility requirements. |
+| Styling/design system | Project-selected | Define semantic tokens, responsive behavior, focus states, and component states before feature UI. |
+| Ingress and transport security | Project-selected | Use a maintained proxy, gateway, platform ingress, or direct secure runtime with documented TLS and origin controls. |
+| Testing | Required layers | Use static, unit, protocol, runtime, browser, security, load, and manual evidence only where applicable. |
+| Dependency management | Project-selected | Use a lockfile, trusted package source, reproducible install, audit, and documented versions. |
+| Source history | Local Git preferred | Initialize local Git in the target project when possible; continue with file snapshots if unavailable. |
 
-Audio quality controls: the Web Audio graph now ends in a conservative master safety limiter after the musical compressor, and the bell path is included in that final protection stage. Piper clips receive restrained per-clip RMS/peak matching and short edge fades before entering the shared voice chain. Background and mantra loops retain crossfades, but their next instances are now scheduled ahead on the AudioContext timeline to reduce mobile timer-jitter gaps. Browser speech synthesis remains outside the Web Audio graph and therefore cannot receive the limiter or Piper normalization.
+## Implementation profile
 
-Journey Tuning also includes a compact, collapsed Voice Tuning section. Clarity and Warmth use voice-only Web Audio filters, Pace applies to the next generated Piper phrase through a bounded `lengthScale` override and maps to browser speech rate for fallback voices, and Soft/Balanced/Clear presets provide approachable starting points. Voice Space uses a short pre-delay into a generated stereo room impulse, filtered and mixed quietly; its user-facing presets are Off, Soft Room, and Temple Air, with Soft Room as the default for new users. Soft Room is approximately 14% wet and Temple Air approximately 20% wet so the effect remains perceptible on mobile without masking narration. This replaces the earlier flat single-delay echo. Voice Preview uses the same selected tuning. Voice model selection remains in Settings because changing a Piper model requires worker/session reinitialization.
+Before implementation, record one concrete profile. The profile may be a monolith, modular monolith, service-based system, serverless system, desktop application, mobile application, CLI, library, embedded application, or another justified shape.
 
-Journey type applies an initial narration profile at start: regular guided journeys use Soft voice tuning with Temple Air, while HRIM uses Balanced voice tuning with Soft Room. The profile is persisted as the current starting preference and can still be adjusted from Journey Tuning after the journey begins. Chakra Frequencies/Solfeggio is enabled by default for new users; an existing explicit Off preference is preserved.
+```text
+profileName: <name>
+scope: production-shaped | protocol-proof | technical-spike
+language: <language and version>
+framework: <framework and version, or none>
+client: <browser | native | CLI | service | none>
+publicTransport: <HTTP | WebSocket | SSE | QUIC | IPC | none | other>
+protocolFormat: <JSON | MessagePack | Protobuf | other>
+durableStore: <database or none>
+queueOrCoordination: <technology or none>
+backgroundExecution: <worker/process/function/actor/none>
+frontend: <technology or none>
+styling: <technology or none>
+ingressAndTLS: <proxy/platform/direct/none>
+testRunner: <tool>
+browserRunner: Playwright | not-applicable
+modelRouting: optional | unavailable | active
+activeComponents: <list>
+deferredComponents: <list>
+notApplicableComponents: <list with reasons>
+fallbacks: <list>
+```
 
-The generated chakra drone contains one main oscillator; the former half-frequency lower oscillator is not created. That oscillator now uses each active chakra or HRIM `frequency` from the script bundle as its centre pitch, without halving values above 600 Hz or quartering values above 900 Hz. A retained 0.04 Hz LFO applies approximately ±0.1% slow pitch movement around that centre. The intentional 110 Hz fallback is used only when Chakra Frequencies is turned off or an invalid value reaches the defensive audio boundary. Normal chakra journeys use a persisted Lobby mode with Beginner 20% as the default. HRIM has a separate persisted mode with Intermediate 50% as the default; Beginner is disabled for HRIM, while Advanced 70% and Expert 100% remain available. Timing begins with the drone before narration, pauses with the journey, and is generation-guarded so an expired stage cannot stop a later chakra. Normal chakras use `timePerChakra`; HRIM uses its independent `timeHighEnergy` duration. Yoga retains its independent 136.1 Hz bridge-drone lifecycle. Elemental texture and Eyes Close binaural support remain unchanged. Custom chakra and HRIM frequencies are required to be finite values from 1–20,000 Hz and are defensively normalized again at the Web Audio boundary.
+The profile must explain why each major choice fits the product, machine, delivery target, security model, and proof scope. It must identify installed, missing, incompatible, cached, and deferred dependencies.
 
-Asset audit baseline: `audio/background_music.mp3` and the mantra MP3s are stereo, 44.1 kHz, 192 kbps, approximately 30 seconds long. No lossless master is present in the repository; the existing MP3s were not re-encoded because repeated lossy conversion would reduce quality. A future source replacement should start from WAV/FLAC masters, then normalize and export a delivery asset once the source material is available.
+## Generic application structure
 
-## Multilingual architecture
+Use boundaries that fit the selected language and framework. Names may change, but responsibilities remain clear:
 
-`language-manifest.json` is the source of truth for supported languages. Each entry defines its language ID, locale, display label, content source, locale dictionary, browser voice prefixes, preview sentence, and preferred Piper voice. `app.js` loads the manifest before settings initialization, populates the language selector from it, resolves UI/system copy through `t(path)`, and resolves content through `localized(...)`. Existing Malayalam/English suffix fields remain supported during migration, while new content should use language-keyed values such as `{ "text": { "hi": "...", "en": "..." } }` or `{ "name": { "hi": "..." } }`. The validator accepts both the current compatibility shape and this language-keyed shape.
+```text
+application/
+├── protocol/          # envelopes, schemas, codecs, transport adapters
+├── routes/            # versioned route registry and policy metadata
+├── domain/            # business rules and domain modules
+├── application/       # commands, queries, workflows, use cases
+├── infrastructure/   # persistence, queues, external systems, telemetry
+├── tasks/             # asynchronous task contracts and workers
+├── client/            # optional browser, native, CLI, or service client
+└── tests/             # static, unit, protocol, runtime, browser, and load tests
+```
 
-Piper model entries now include model and config paths plus phonemizer metadata. The Worker passes the complete registry definition to the runtime, which prefers those paths and retains its built-in voice map only as a compatibility fallback. Adding a new Piper voice should therefore be a registry/content/locale change rather than a runtime source edit. The service worker keeps language bundles in a separate on-demand cache from the app shell and Piper model cache.
+The transport layer routes messages and enforces boundary controls. Domain modules own business decisions. Long-running, resource-sensitive, or resumable work uses the project’s selected worker model while preserving the Ghost task invariants defined in `communication-architecture.md`.
 
-Remaining migration work: move all remaining user-visible controller strings into locale dictionaries, convert the full content pack to the language-neutral shape, and validate each language with native speakers and target-device audio tests.
+## Protocol and transport implementation
 
-The Lobby exposes a `Returning Journey` preference for selecting the timeless sea/ocean opening. It is persisted independently from `state.stats.journeys`, which remains the completed-journey statistic; when no preference has been saved, the toggle defaults on for users with prior completed journeys.
+The protocol is transport-neutral. A project may expose it through one or more adapters:
 
-Display localization is intentionally independent from meditation content: `language-select` controls narration and content, while `display-language-select` controls the visible interface and defaults to English. `t()` resolves UI copy through the display language; `contentT()` resolves system narration/in-session content through the meditation language.
+```text
+Client
+  -> transport adapter
+  -> frame/message decoder
+  -> version and schema validation
+  -> authentication/session checks
+  -> route policy and rate limits
+  -> route handler or task scheduler
+  -> response/event/progress adapter
+```
 
-The intention field has a localized prompt, placeholder, and positive default intention in every registered locale. A saved custom intention is preserved; while the generated default is still active, changing Meditation Language switches it to that language’s equivalent so Piper narration receives matching text.
+WebSocket is supported but not required for every project. If WebSocket is selected, apply the WebSocket security controls in `loop.md` and `communication-architecture.md`. If another transport is selected, document its equivalent origin, authentication, authorization, framing, replay, backpressure, and connection controls.
 
-Bath/Yoga extension behavior: `Enable Bath Session` remains the master switch. Optional Perineal Care and Assisted Bathing have independent persisted durations and localized scripts. Perineal Care may precede the standard bath; selecting Assisted Bathing replaces the standard bath, so both add-ons execute as `Perineal Care → Assisted Bathing → Yoga`.
+The selected transport must support the required application behaviors or document a safe fallback for:
 
-Massage is an additional optional Bath Session add-on with an independent persisted duration. It always runs before Perineal Care and the bathing stage; the full add-on order is `Massage → Perineal Care → Assisted Bathing → Yoga`, with Assisted Bathing replacing the standard Bath Session.
+- Request/response
+- Commands and queries
+- Events and subscriptions
+- Progress and completion
+- Cancellation and expiry
+- Reconnect and resume where applicable
+- Correlation and tracing
+- Idempotency and duplicate delivery
+- Payload limits and backpressure
+- Binary or large-payload transfer where applicable
 
-Music Only is a Lobby-level experience mode rather than a Settings option. It opens the existing background-music-only journey with `symbols/background-only.png` and remains mutually exclusive with guided journey selections; the internal `state.bgMusicMode` and `chakra_bg_music_mode` storage key are retained for compatibility with existing users and the runner. Its visible Music Only label follows Display Language, while narration/content remains governed by Meditation Language. Audio Levels remain part of the meditation-room experience and are intentionally separate.
+## Data, persistence, and consistency
 
-High Energy (HRIM) is also a Lobby-level Experience Mode. It uses a focused flow of icebreaker → HRIM-specific intention → full-system HRIM activation → final silence → closing; Moon Phase and Returning Journey openings are intentionally skipped. Box Breathing, Corpse Pose, Ho'oponopono, the normal seven-chakra sequence, Yoga, Bath, Massage, and Music Only are not run in this mode. HRIM duration is independently configured by `timeHighEnergy`, persisted under `chakra_time_high_energy`, and bounded to 1–30 minutes in production; normal chakra duration remains controlled by `timePerChakra`.
+Choose durable storage according to the application’s consistency, query, scale, privacy, retention, and recovery needs.
 
-Sleep Mode is a separate Lobby Experience Mode and is mutually exclusive with HRIM, Music Only, and the normal guided options. It uses one shared `sleepStageDuration` for five sequential sleep-inspired stages (Drowsiness/Alpha 10 Hz, Light Sleep/Theta 6 Hz, True Sleep/Theta 5 Hz, Deep Rest/Delta 2 Hz, and REM-inspired Rest/Theta 6 Hz), with a production maximum of 10 minutes per stage. Background music runs continuously beneath the journey, while a dedicated 80 Hz stereo carrier uses the target value as a binaural beat difference. The four drone-duration modes apply independently to every stage; Sleep Mode defaults to Intermediate. These are sound-design targets, not claims that the app can induce or verify biological sleep stages.
+Required rules:
 
-HRIM intention narration is intentionally shorter and uses dedicated `hrimLeadIn`/`hrimSentenceGap` pacing. Browser fallback narration uses a normal-speed profile for this branch; Piper retains its model-native voice character while using the shorter text and reduced inter-sentence gap.
+- Use migrations or an equivalent repeatable schema process.
+- Use transactions or equivalent atomic operations for related state changes.
+- Use unique constraints or equivalent invariant enforcement for idempotency.
+- Persist durable task state before starting asynchronous execution.
+- Persist results before publishing completion.
+- Use an outbox or equivalent consistency pattern when state changes and event publication must be coordinated.
+- Do not use caches, browser storage, queues, or process memory as the only source of durable business truth.
+- Define backup, restore, retention, deletion, and recovery expectations.
 
-The meditation-room `Journey Tuning` mixer is a full-screen, mobile-safe dialog opened from `btn-mixer`. It owns live Audio Levels, Audio Filters, Eyes Close Mode, Screen Brightness, and Solfeggio frequency controls, while Settings retains only configuration that belongs before the journey. Changes are applied to the active Web Audio graph and synchronized with the persisted Settings checkbox where applicable. `Restart Journey` stops the current controller safely, restores the Lobby Start button, and waits for any pending asynchronous start sequence to release before beginning again. The header close control remains a visible `×` icon with a localized accessible label; a localized text Close action is also available at the bottom.
+## Queues, workers, and Ghost execution
 
-Journey timing configuration is centralized in [`timing-config.json`](./timing-config.json). It owns stage defaults/ranges, fixed journey transitions, narration pacing/safety buffers, and session-estimate constants. Audio-engine fades, filter ramps, and visual animation timers remain in their playback/visual layers rather than being treated as user journey durations.
+Queues, workers, actors, scheduled jobs, functions, and other execution systems are implementation choices. Their behavior must satisfy the generic Ghost contract:
 
-## End-to-end testing
+```text
+accepted task
+  -> durable task record
+  -> bounded execution
+  -> lease/heartbeat/deadline where applicable
+  -> checkpointing where required
+  -> result persistence
+  -> response/event publication
+  -> acknowledgement and release
+```
 
-Playwright is the optional browser test runner for the static PWA. The suite lives in [`tests/e2e/settings.spec.js`](./tests/e2e/settings.spec.js) and [`tests/e2e/option-matrix.spec.js`](./tests/e2e/option-matrix.spec.js), and runs through the local static server configured in [`playwright.config.js`](./playwright.config.js). It covers display/content language separation, Settings organization and help, the compact selection-driven Lobby roadmap, Sleep Mode as a five-stage experience with a ten-minute shared stage maximum, the full-screen Journey Tuning mixer and safe restart, Corpse Pose timing synchronization and production bounds, Yoga/Bath/add-on dependencies, production narration-field quality, unrestricted HRIM selection, normal and HRIM timing persistence, generated-versus-custom HRIM intention behavior, all seven valid bath/add-on combinations, and representative global journey-mode combinations. The current Sleep Mode branch has not run Playwright because the owner requested browser/screenshots only when explicitly asked; its present evidence is static/unit rather than browser-level.
+Every asynchronous task must define:
 
-`scripts.json` remains the production narration source. `test-script.json` is a short, fast validation fixture and receives matching additions when a newly introduced script field is needed; it is not a production-content replacement. `docs/dot.json` is a facilitator-custom script, so new schema fields are added there additively only—its existing custom copy is never synchronized with `scripts.json`.
+- Task identity and correlation fields
+- Execution mode and capability limits
+- Deadline, timeout, lease, or cancellation behavior
+- Retry and idempotency policy
+- Progress and checkpoint behavior
+- Failure and dead-letter behavior
+- Completion persistence and publication order
+- Cleanup and worker-release behavior
 
-Production chakra narration uses the optional `meditation_en`/`meditation_ml` fields for experiential guidance and expected benefits such as grounding, creativity, confidence, compassion, expression, clarity, and connection. This keeps meditation guidance non-clinical and avoids directing attention to specific organs or implying medical effects. The runtime falls back to the legacy language fields for backward-compatible custom uploads.
+Do not introduce a queue, cache, container, service, or worker pool solely because it is conventional. Add infrastructure when the product behavior, isolation, reliability, or measured load requires it.
 
-HRIM is a Lobby-level Experience Mode with no local-time restriction. Experience Mode selections are session-only and are not restored from or written to `localStorage`; timing preferences and drone-duration preferences remain persisted separately.
+## Client and frontend
 
-Tests use `?timingProfile=fast-test`, defined in `timing-config.json`, so journey controls use short values without changing production defaults. Production interval selection starts at 10 seconds so the “take a break” narration has enough room; the explicit fast-test profile uses a 2-second minimum, and the interval stage awaits narration completion before advancing. Persisted values are bounded to the active configuration range on load. The profile is selected at runtime by the app and is not enabled unless the query parameter is present. Functional tests block service workers for deterministic behavior; a separate PWA pass should run with service workers allowed to verify caching/offline behavior.
+The client may be a browser, native application, CLI, service, or no client at all. Client SDKs should own transport concerns rather than business rules:
 
-### Migration tracking
+- Connection or request lifecycle
+- Authentication refresh where applicable
+- Correlation and timeout handling
+- Retry and reconnect behavior
+- Subscription restoration and event sequencing
+- Typed payload conversion
+- Safe public error conversion
+- Local test instrumentation
 
-- Active checklist: [`TEMP-MULTILINGUAL-ARCHITECTURE.md`](./TEMP-MULTILINGUAL-ARCHITECTURE.md)
-- Language source of truth: [`language-manifest.json`](./language-manifest.json)
-- Locale dictionaries: [`locales/`](./locales/)
-- Narration/model registry: [`piper-models.json`](./piper-models.json)
-- Implementation: [`app.js`](./app.js), [`piper-worker.js`](./piper-worker.js), and [`piper/runtime/piper-tts-web.js`](./piper/runtime/piper-tts-web.js)
-- Current status: architecture implementation and static validation complete; native-speaker, browser, device, model-license, and full content-pack validation remain release gates.
+For browser applications, define responsive design tokens and component states before feature screens. The `.screen-brand-logo` rule is reusable where that component exists: use a maximum dimension of `80px` in horizontal flex rows, center standalone logos with a maximum width of `125px`, preserve aspect ratio, shrink inside narrow containers, and prevent horizontal overflow.
 
-### Piper language-integration lessons
+## Ingress, deployment, and scaling
 
-Every new language/voice must pass these checks before being added to `piper-models.json`:
+Use the simplest local and deployment topology that meets the proof scope. Possible components include a development server, reverse proxy, platform ingress, TLS terminator, gateway, worker supervisor, scheduler, or direct application process.
 
-- Use the exact upstream voice ID and model path. Add the matching model configuration path as well as the `.onnx` path; a model URL alone is insufficient.
-- Resolve all local ONNX, phonemizer WASM, and `.data` assets from the runtime module URL (`import.meta.url`). Relative paths can fall through to the app HTML and produce a misleading WebAssembly “expected magic word” error.
-- Verify the server response for every `.wasm` asset: it must be binary WASM (`00 61 73 6d`) with an appropriate binary content type, not an HTML fallback. Bump the Piper cache when correcting a bad asset response.
-- Do not assume model metadata is uniform. Single-speaker voices may omit or set `speaker_id_map` to `null`; only send `sid` for models with a real speaker map.
-- Confirm the model’s phonemizer/espeak language metadata and pronunciation coverage with representative native-language preview sentences, including punctuation and script-specific terms.
-- Keep browser fallback voices language-compatible. Never use an English browser voice to narrate Malayalam text, or silently preserve a saved voice after switching content languages.
-- Keep the Worker error visible in development logs. User-facing status can remain friendly, but initialization, model-config, phonemizer, decode, and synthesis errors must retain their original cause in the console.
-- Keep the model lazy-loaded and verify cold start, warm synthesis, Cache API reuse, offline behavior, cancellation, and device CPU/thermal impact separately for each language.
-- Record model provenance, size, quality, license, and upstream identifier. Engine licensing does not automatically cover redistribution of every voice model.
+Production or shared environments must document:
 
-## Product-facing stack decisions
+- Secure transport and certificate/trust mode
+- Origin and host allowlists where relevant
+- Process ownership and graceful shutdown
+- Health/readiness checks
+- Port and socket exposure
+- Scaling boundaries and shared state
+- Logs, metrics, traces, alerts, and redaction
+- Backup, rollback, and recovery
 
-- Keep the first release client-only. This preserves privacy and enables offline meditation without accounts or a network dependency.
-- Use the browser’s native audio and speech capabilities instead of adding a media framework. The current app needs careful user-gesture handling because browsers may suspend audio until interaction.
-- Keep scripts and media as replaceable static assets. The custom JSON upload/URL path is a runtime extension point, not a backend content-management system.
-- Treat `localStorage` as convenience persistence only. It is device-local, synchronous, unencrypted, and not suitable for cross-device history or sensitive personal records.
-- Use progressive enhancement for optional APIs. The core journey should remain usable when Wake Lock, Media Session, Canvas, or Malayalam voices are unavailable.
-- Do not use Tailwind Play CDN in production. The app remains on local hand-authored CSS to preserve offline behavior, avoid runtime network dependencies, and keep the current animation/audio presentation stable. Tailwind may be reconsidered later only through a build step that emits local static CSS.
+Scale from measured connections, requests, messages, bytes, latency, CPU, memory, queue depth, storage, error rate, and reconnect behavior. Do not claim capacity without representative load evidence.
 
-## Asset and caching behavior
+## Testing and quality
 
-`sw.js` precaches the application shell, core chakra symbols, and core audio assets. Its fetch handler is cache-first and falls back to the network. The cache is versioned by `CACHE_NAME` and old caches are removed during activation.
+Required validation is proportional to the application profile:
 
-The cache list should be kept synchronized with the application. In particular, deity images, yoga pose images, backup audio, and any newly added media are not all currently listed. External Google Fonts also remain network-dependent.
+- Static checks: syntax, types, configuration, formatting, dependency and schema checks.
+- Unit checks: isolated domain rules, handlers, policies, codecs, and utilities.
+- Protocol checks: envelope, framing, route, schema, correlation, error, idempotency, replay, and duplicate-delivery contracts.
+- Runtime checks: real local processes, readiness, routes, persistence, workers, queues, timers, and cleanup.
+- Security checks: threat model, secrets, authentication, authorization, injection, origin, rate limits, replay, safe errors, and auditability.
+- Load checks: representative connections, requests, messages, payloads, latency, throughput, memory, queues, and failure recovery.
+- Browser checks: headless Playwright for browser behavior whenever the application has a browser interface or browser evidence is relevant.
+- Manual checks: optional human visual or exploratory review; never silently substitute for required automated evidence.
 
-## Deferred technology
+### Local-first headless Playwright standard
 
-The following are intentionally not part of the current implementation:
+Codex may invoke Playwright automatically whenever browser behavior, browser protocol behavior, accessibility behavior, responsive behavior, or a browser release gate is relevant. A separate manual trigger is not required. Tests run against the local target application and local supporting services with disposable local data.
 
-- Laravel, PHP, PostgreSQL, Redis/Valkey, Workerman, OpenSwoole, queues, and WebSockets
-- TypeScript, Tailwind CSS, React/Vue, and a frontend build pipeline
-- Accounts, authentication, server-side journals, cloud sync, analytics, and remote content management
+Use:
 
-These may become appropriate if the product later needs multi-device sync, protected content, social features, server-managed scripts, or operational reporting. They should not be introduced until that product requirement exists.
+- Isolated browser contexts and deterministic fixtures
+- Stable user-facing locators and web-first assertions
+- No arbitrary sleeps or implementation-detail selectors
+- Local mocks or controlled fixtures for third-party services
+- Chromium headless as the default browser project
+- Firefox/WebKit headless compatibility projects when required
+- Zero local retries; CI retries only for diagnosis, with retry-passing tests reported as `FLAKY`
+- Traces on first retry or failure
+- Temporary screenshots only when page-design or responsive checks are in scope
 
-## Quality and security baseline
+Minimum responsive viewports when applicable:
 
-The repository now includes a Playwright suite under `tests/e2e/` with a local static `webServer`; `timing-config.json` supports the explicit `fast-test` profile so long narration and interval flows can be exercised quickly without changing production defaults. Current narration regression coverage checks both English and Malayalam production sections for organ/gland/blood/cell/disease-directed claims.
+```text
+mobile:  390x844
+tablet:  768x1024
+desktop: 1440x900
+```
 
-Before a release, validate:
+Screenshots, traces, videos, browser contexts, cookies, local/session storage, reports, and temporary test data remain local to the task. Remove disposable artifacts and close browser contexts and processes after evaluation. Do not commit them or place secrets/private data in them. Missing browsers or unhealthy local services are `BLOCKED`, not application failures. Browser dependency installation that requires network access remains approval-gated.
 
-- JSON parsing for `scripts.json` and custom script uploads
-- Required DOM IDs and media paths
-- A real HTTP(S) runtime, service-worker registration, offline reload, and cache update behavior
-- Audio start/resume/stop, pause/resume, timer cleanup, and completion paths on mobile browsers
-- Safe handling of remote custom-script URLs, including CORS failure and untrusted content
-- Journal/privacy expectations, since entries are stored in browser storage without encryption
-- No secrets in the static bundle; the app currently has no server secrets
+Equivalent project commands should be documented when applicable, for example:
 
-## Narration content policy
+```text
+<package-manager> run test:e2e
+<package-manager> run test:e2e:critical
+<package-manager> run test:e2e:report
+```
 
-- Production guided meditation copy in `scripts.json` should describe felt experience and practical outcomes—grounding, calm, emotional release, confidence, compassion, clarity, renewal, and purposeful action—without claiming to treat or directly change organs, glands, blood, cells, hormones, disease, or other medical conditions.
-- Every guided path must narrate the app-owned bilingual safety contract from `locales/*.json` before reflective or activation content. Custom script bundles may supplement content but cannot remove informed choice, natural-breathing permission, grounding guidance, wellness-not-treatment boundaries, or stop/support instructions.
-- Affirmations must build agency through realistic choices, preparation, boundaries, support, and evidence-aware judgment. Do not guarantee safety, healing, money, relationships, opportunities, spiritual protection, perfect intuition, or predetermined outcomes.
-- Trauma-sensitive content must not require closed eyes, body awareness, forgiveness, emotional recall, controlled breathing, or spiritual interpretation. Optional physical stages must include device/water, balance, pain, dizziness, breathlessness, and consent safeguards.
-- Keep English and Malayalam fields aligned in meaning and intent. Run the bilingual Playwright narration regression after editing `en`, `ml`, `meditation_en`, or `meditation_ml` fields.
-- Keep canonical mantra keys stable for UI/audio lookup (`LAM`, `VAM`, `RAM`, `YAM`, `HAM`, `OM`, `AUM`, `HRIM`), while using contextual spoken forms in narration. The English HRIM pronunciation is written as `Hreem mantra`; Malayalam uses `ഹ്രീം`. This avoids asking English Piper to infer the short `hrim` spelling while preserving the established `HRIM` journey identifier and `HREEM.mp3` asset.
-- Piper narration is sentence-queued with an explicit lead-in and sentence gap. `piperTTS.setPaused(true)` stops queue advancement while the AudioContext suspension holds the current clip; `piperTTS.cancel()` stops the active source, rejects queued synthesis, and terminates the Worker for journey stop/restart. Voice volume is a live Web Audio gain, and zero is a valid persisted mute value.
-- `docs/dot.json` is a custom facilitator script and is intentionally not synchronized with the production bundle. Review it separately before promoting any of its content into runtime narration.
+## Dependency and source management
 
-For this client-only release, the main security boundary is untrusted browser/user content and remote custom script input. If a backend is added, authentication, authorization, storage, rate limiting, and a formal threat model must be designed at that point.
+Before implementation:
 
-## Recommended delivery profile
+- Inspect manifests, lockfiles, runtime versions, and package sources.
+- Prefer reproducible lockfile installation.
+- Record dependency status as available, cached, missing, incompatible, or blocked.
+- Run dependency health, audit, type, lint, build, test-discovery, and local-start checks as applicable.
+- Request one consolidated approval before network package, browser, toolchain, or system dependency installation.
+- Never commit secrets, generated noise, browser artifacts, credentials, or unapproved files.
 
-## Quick frequency Shots and script-defined Sleep Mode
+## Optional reference implementation profile: PHP/Laravel
 
-- Lobby Shots are a session-only safety-gated addon. They use the shared `timing-config.json` `shotDuration` contract (7-second default, 20-second maximum), hide unrelated journey controls, and never persist the selected mode.
-- Shots use a dedicated direct Web Audio oscillator: Meditation Shot walks Root→Crown, High Energy Shot uses the JSON HRIM frequency, Sleep Shot divides active time across the five script-defined sleep stages, and Custom Shot accepts a validated frequency. Narration, mantra audio, and background music are not started.
-- After confirmation and activation, the Shots toggle and shot inputs remain disabled until the page is refreshed. The two-second stage gaps are additional transition time and are not deducted from the selected active-frequency duration.
-- Sleep Mode stage frequencies and its interval now come from `scripts.json.sleep_mode`; `test-script.json` and `docs/dot.json` contain only the missing matching schema fields. Low script values such as 2 Hz are passed as the main oscillator frequency without octave reduction.
+The following is an example, not the generic default. Use it only when the project’s constraints and product needs justify it:
 
-Use any static host that serves the files over HTTPS with correct MIME types and SPA-safe asset paths. A lightweight local server is sufficient for development. No container, database, worker, or reverse proxy is required by the current codebase.
+```text
+language: PHP 8.5, with PHP 8.4 compatibility where required
+framework: Laravel 13 modular monolith
+public transport: Workerman-based secure WebSocket gateway
+data format: JSON
+durable store: PostgreSQL
+queue/coordination: Redis or Valkey when required
+background execution: Laravel queue workers implementing Ghost contracts
+browser client: TypeScript SDK around the native WebSocket API
+styling: Tailwind CSS v4
+ingress: Nginx or Caddy
+tests: PHPUnit/Pest, PHPStan, Pint or PHP CS Fixer, Playwright, protocol and load tests
+```
 
-## Source of truth
+This reference profile must not override a project’s declared language, framework, transport, database, or deployment requirements. Any substitution must be recorded with its effect on confidence and validation.
 
-- Product intent and implemented feature history: [`plan.md`](./plan.md), [`Phase.md`](./Phase.md)
-- User flow and reverse-engineered architecture: [`INITIAL-HANDOFF.md`](./INITIAL-HANDOFF.md)
-- Runtime implementation: [`index.html`](./index.html), [`app.js`](./app.js), [`style.css`](./style.css), [`sw.js`](./sw.js)
-- Narration content: [`scripts.json`](./scripts.json)
-- Consultation planning (not yet implemented): [`TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md`](./TEMP-CONSULTATION-CONSENT-ARCHITECTURE.md). The first release is single-participant and must hydrate a versioned session plan before entering the existing Lobby.
+## Decisions still required from each project
+
+- Product domain and route list
+- Client types and supported platforms
+- Language, framework, and version policy
+- Transport and protocol format
+- Authentication, session, and authorization model
+- Durable entities, consistency, privacy, and retention
+- File/media and payload limits
+- Queue, worker, and task requirements
+- Browser support and required Playwright projects
+- Accessibility and responsive targets
+- Concurrency, latency, availability, and recovery targets
+- Deployment environment and operating system
+- External services and managed infrastructure
+- Selected security level and exclusions
+
+## Confidence assessment
+
+Confidence must be reported by capability, not assumed from the selected tools:
+
+- Language/framework fit: <high | medium | low>
+- Protocol and transport fit: <high | medium | low>
+- Persistence and consistency fit: <high | medium | low>
+- Worker/task fit: <high | medium | low>
+- Browser and Playwright fit: <high | medium | low | not-applicable>
+- Security evidence: <tested scope and remaining gaps>
+- Production capacity: <measured | unmeasured>
+- Overall architecture confidence: <high | medium | low>
+
+No implementation profile is production-approved solely because its tools are popular or its tests pass. Report tested controls, untested controls, evidence level, open risks, and next validation step.

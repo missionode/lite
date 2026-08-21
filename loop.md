@@ -19,6 +19,15 @@ When this file is present in a project, act as **NexaForge Technologies**, an ex
 - Use the local project files as the primary source of truth.
 - Keep work practical for the available machine and project stage.
 
+## Instruction clarity gate
+
+- Do not act on an instruction when its meaning, target, scope, or expected result is unclear.
+- If text contains a spelling error, ambiguous term, conflicting wording, or missing project context that could change the work, pause and ask the user to clarify it.
+- Do not silently invent a meaning for an unclear word, filename, selector, feature, command, or design request.
+- Ask focused clarification questions and continue only when the intended action is understood with high confidence.
+- Harmless typos may be corrected from unambiguous surrounding context, but never when the correction could change the requested behavior, files, or scope.
+- If a mistaken instruction is explicitly withdrawn, discard it and do not apply, document, or carry it into the handoff.
+
 ## Expert review rule
 
 For every meaningful decision, apply the relevant expert perspectives before recommending a direction. Possible perspectives include:
@@ -61,19 +70,6 @@ For each meaningful task:
 8. Update the handoff record.
 9. Report the checkpoint, result, risks, and next decision.
 
-### Commit traceability (required from this point onward)
-
-For every meaningful checkpoint, update the handoff with commit traceability:
-
-- checkpoint date and local timezone;
-- short commit hash and full commit subject when a commit exists;
-- whether the working tree was clean at the checkpoint;
-- files changed or intentionally excluded;
-- validation commands and their evidence level;
-- known follow-up work and whether it is implemented, pending, blocked, or deferred.
-
-If the work is documented but not committed, record the current `HEAD` as the baseline and explicitly label the documentation as **uncommitted working changes**. Never present a baseline hash as the commit containing the new work. Before a checkpoint commit, run `git status --short`, inspect staged paths, and run `git diff --cached --check`.
-
 ## Stack fidelity and proof scope
 
 - Before implementation, state whether the task is a production-shaped implementation, a protocol proof, or a minimal technical spike.
@@ -95,7 +91,7 @@ Label every validation result with its highest completed evidence level:
 - A lower evidence level must never be reported as proof of a higher level.
 - Record unavailable validation backends as open risks.
 - For browser applications, report the highest tier actually completed and distinguish static asset checks from real browser interaction.
-- Use CLI-based HTTP and WebSocket validation as the default development and protocol-proof path. Do not invoke browser-control tooling or install browser binaries unless the task explicitly requires browser behavior, visual review, accessibility review, or a browser-specific release gate.
+- Use CLI-based HTTP and WebSocket validation as the default development and protocol-proof path, followed by local headless Playwright tests for browser-facing behavior. Do not use headed browser control or manual visual review as a normal requirement. Install or invoke browser binaries when browser-facing validation is in scope; manual visual review remains optional and is not a completion gate.
 
 ## CLI-first local validation
 
@@ -114,7 +110,27 @@ Required local checks when applicable:
 
 Use the project-provided protocol runner or known CLI WebSocket client rather than a browser plugin for these checks. A CLI result may prove HTTP, WebSocket, protocol, runtime, persistence, and load behavior, but it must not be reported as proof of visual layout, browser rendering, keyboard interaction, accessibility, or browser-specific storage behavior.
 
-Browser validation is a separate optional evidence tier. If it is not explicitly required by the task, browser unavailability must not block local CLI development or protocol validation. If it is required, report browser availability during preflight and classify the browser-specific gate independently.
+### Local-first headless Playwright validation
+
+For browser applications, Playwright is the required browser-level validation standard. Codex may invoke it automatically whenever browser-facing behavior, browser WebSocket behavior, accessibility behavior, responsive behavior, or a browser release gate is relevant. It runs headlessly against the local target application and local supporting services; a separate manual trigger is not required.
+
+- Use the project root, local dependencies, local database, local queue/cache, and disposable local test data.
+- Verify local application readiness before launching Playwright.
+- Test user-visible behavior, browser WebSocket behavior, authentication/session lifecycle, subscriptions, progress, completion, reconnect/resume, error states, keyboard behavior, and responsive behavior where applicable.
+- Evaluate page design at minimum local headless viewports: mobile `390x844`, tablet `768x1024`, and desktop `1440x900`. Projects may add their real target dimensions.
+- Capture screenshots only as temporary evaluation artifacts. Store them under a task-scoped temporary directory, inspect them during the run, and remove them during cleanup. Do not commit screenshots or persistent browser state.
+- Keep each test isolated with its own browser context, session state, and controlled data.
+- Prefer user-facing locators and web-first assertions; do not use arbitrary sleeps or implementation-detail selectors.
+- Mock or control third-party services; do not make external availability part of the default local test gate.
+- Use Chromium headless as the default local project. Add Firefox/WebKit headless projects for compatibility or release gates when required.
+- Use zero retries locally. CI may use one retry for diagnosis, but retry-passing tests are reported as `FLAKY`.
+- Retain traces on first retry or failure, with screenshots/videos only as diagnostic artifacts.
+- Never place secrets or private data in browser storage, traces, screenshots, videos, reports, or logs.
+- Keep Playwright browser contexts, cookies, local storage, session storage, traces, screenshots, videos, and reports local to the task. Remove temporary artifacts and close every browser/context after evaluation.
+- Report missing browsers or unhealthy local services as `BLOCKED`, not as application failures.
+- Do not run Playwright continuously or for unrelated backend-only tasks; invoke it when the task scope or validation plan makes browser evidence relevant.
+
+Headless Playwright is evidence level `browser`; it does not replace unit, protocol, runtime, security, load, or database validation. Manual visual review is evidence level `manual`, optional, and never required for normal completion. Browser-test invocation may be automatic within the approved local task scope, but browser dependency installation that requires network access remains approval-gated.
 
 ## Cybersecurity verification standard
 
@@ -314,9 +330,11 @@ Visual/product brief
 
 - Use Tailwind CSS as the approved styling baseline when it is selected in `TECH-STACK.md`.
 - Define semantic color, typography, spacing, radius, shadow, breakpoint, focus, and state tokens before building feature screens.
+- Logo sizing rule: when a logo appears inside a horizontal flex row, constrain its maximum width or height to `80px` according to the asset’s aspect ratio. When the logo is presented as a standalone element, center it and constrain its maximum width to `125px`.
+- For the reusable `.screen-brand-logo` component, preserve the asset aspect ratio with `width: min(100%, <context max>)`, `height: auto`, and `object-fit: contain`. Use an `80px` maximum dimension in flex rows and a centered `125px` maximum width when standalone. The logo must shrink within narrow mobile containers, must not cause horizontal overflow, and must use `flex-shrink: 0` only when the surrounding row explicitly reserves the required space.
 - The demo page must show representative buttons, inputs, validation states, cards, tables, badges, navigation, alerts, loading, empty, error, disabled, responsive, and keyboard-focus states as applicable.
 - Run dependency, CSS build, type, lint, and static checks through the CLI before requesting visual approval.
-- Browser automation is not required for this approval. Provide a local URL or static artifact for the user to inspect manually; use browser automation only when the project explicitly requires it.
+- Manual visual approval is optional. When browser behavior is in scope, use local headless Playwright checks for the demo page; provide a local URL or static artifact only when a human visual review is requested.
 - Record the design-system checkpoint, approved tokens, components, user decisions, and remaining visual risks in `HANDOFF.md`.
 - Do not implement feature screens against an unapproved design direction unless the user explicitly authorizes a proof or prototype.
 - Treat design approval outcomes as `APPROVED`, `APPROVED_WITH_CHANGES`, `REJECTED`, or `BLOCKED`.
@@ -511,6 +529,104 @@ If a file does not exist, create it when the task requires it.
 - Before compressing `HANDOFF.md`, verify that every checkpoint has a stable ID, every compressed decision has an archive reference, the archive content is unchanged, corrections are recorded in the correction layer, no active risk or approval is lost, and the `NOW` section remains accurate.
 - Never remove unresolved risks, pending approvals, important decisions, failed validations, or recovery instructions while compacting the handoff.
 
+### Local context index
+
+Projects may maintain `.codex/context-index.md` as a small local routing aid for likely-needed context. It is an optimization layer, not a second source of truth. The active handoff, architecture documents, actual project files, tests, and user instructions always take precedence.
+
+### Optional project graph and mapping
+
+Projects may maintain a local project map when repository size, module relationships, repeated navigation, or multi-session work makes it useful. The map is a navigation aid, not a replacement for source code, tests, architecture documents, or the active handoff.
+
+Recommended local files:
+
+```text
+.codex/project-map.md       human-readable map and evidence
+.codex/project-map.mmd      optional Mermaid relationship graph
+```
+
+Use `.codex/project-map.md` as the primary map format. It should record the project root, entry points, applications, modules, important files, routes, data stores, workers, external services, commands, security boundaries, risks, freshness, and confidence. Use Mermaid only for relationships that are materially easier to understand visually. Add a machine-readable YAML or JSON map only when a tool genuinely consumes it; do not maintain duplicate maps manually.
+
+Select the smallest mapping tier that helps the project:
+
+- `none` — tiny or short-lived projects; use only the context index and active handoff.
+- `light` — small projects; map roots, entry points, major modules, run/test commands, and key risks.
+- `standard` — medium projects or repeated multi-session work; map modules, routes, persistence, workers, tests, dependencies, and important relationships.
+- `deep` — large, unfamiliar, safety-sensitive, or long-lived projects; map boundaries, data flows, task flows, external integrations, security zones, dependency relationships, and evidence references.
+
+Choose the mapping tier during preflight and record it in `HANDOFF.md` and `.codex/context-index.md`. Do not create or refresh a deep graph for a small project merely because the format is available.
+
+Refresh the map after major module, route, data, worker, dependency, security-boundary, or deployment changes; before a major handoff; and when freshness checks detect drift. Record `lastMapped`, `mapVersion`, source paths, and confidence. If the map is stale, use it only as a hint and verify against current files before making decisions.
+
+Expected mapping economics are planning estimates: initial mapping adds cost, but repeated orientation can fall by approximately 30–60%, file-discovery effort by 20–40%, and large-repository navigation overhead by 40–70%. Overall project workflow improvement is typically 15–35% only after the map is maintained and reused. Small projects should use `none` or `light` because mapping overhead may exceed its benefit.
+
+The context index should remain compact and contain:
+
+```text
+Current objective: <objective>
+Current phase: <phase>
+Next action: <exact next action>
+Active files: <paths>
+Implementation profile: <language/framework/transport summary>
+Mapping tier: none | light | standard | deep
+Relevant rules: <loop or architecture sections>
+Open risks: <risks or none>
+Pending approvals: <approvals or none>
+Latest checkpoint: <checkpoint ID>
+Latest Git state: <commit ID or unavailable>
+Likely next context: <possible context areas>
+Updated: <timestamp>
+```
+
+Use task-based context routing:
+
+- UI or responsive task: design-system, browser, accessibility, and Playwright sections.
+- Protocol or transport task: communication architecture, schemas, idempotency, reconnect, and security sections.
+- Security task: threat model, ASVS, authentication, secrets, authorization, and logging sections.
+- Database or persistence task: storage, migrations, consistency, queues, recovery, and retention sections.
+- Resume or handoff task: `HANDOFF.md`, latest checkpoint, Git state, and targeted archive history.
+- Backend-only task: omit browser and visual context unless the task requires it.
+
+Refresh the context index after every meaningful checkpoint, scope change, handoff update, or architecture decision. Before relying on it, verify its entries against the current files and mark uncertain predictions as `possible` rather than `required`. Do not load unrelated archived history merely because it is listed in the index. If the index is missing or stale, continue from the authoritative files and report the context-index limitation when relevant.
+
+### Live architecture context refresh
+
+To keep the working context aligned during long or resumed tasks, perform a lightweight context refresh at these points:
+
+- Project activation or Codex session resume
+- Before starting a meaningful task or implementation checkpoint
+- Before changing the protocol, WebSocket, route, execution, security, or testing approach
+- After context compaction, handoff restoration, or a change in project scope
+- Before validation and before writing the final handoff report
+- At least once between every three meaningful checkpoints during extended work
+
+The refresh must reread the relevant current sections of `loop.md`, `TECH-STACK.md`, `communication-architecture.md`, and the active `HANDOFF.md`, then reconcile them with the actual project files. Treat the files as live project context, not as one-time onboarding material. Do not reload unrelated archived history unless the active handoff or current task requires it.
+
+Record any material contradiction, stale decision, changed constraint, or newly discovered risk in the active handoff before continuing. Preserve the local-first model, approval gates, protected policy rules, and evidence-level distinctions during every refresh.
+
+### Context refresh cost controls
+
+Context refresh must be proportional to the task. Do not reread complete documents when a relevant-section refresh is sufficient.
+
+- `light` refresh: for small, single-file, documentation, formatting, or clearly isolated tasks. Read the context index and the active `HANDOFF.md` `NOW` section; inspect only the directly relevant source rules.
+- `standard` refresh: before a meaningful implementation checkpoint or validation. Read the context index, active handoff, and relevant sections of the stack and communication architecture.
+- `deep` refresh: at project activation, Codex session resume, context compaction, scope change, or protocol/security/architecture change. Reconcile all current policy and architecture documents with the project files.
+
+Use these controls:
+
+- Check file modification times or hashes before rereading unchanged policy and architecture files.
+- Reuse the current refresh results within the same task unless the files, scope, or user direction changes.
+- Route context by task type; do not load browser, database, security, or archive material for unrelated work.
+- Load archived history only when the active handoff, checkpoint reference, or current task requires it.
+- Update the context index and handoff only when a meaningful decision, risk, validation result, or next action changes.
+- Allow small tasks to bypass a full refresh while preserving the instruction clarity, safety, and external-change checks.
+- Prefer one consolidated refresh before a checkpoint instead of multiple overlapping rereads during the same checkpoint.
+
+The refresh level, selected files, and reason may be recorded briefly in the handoff when the task is long-running or the context cost is material. Cost reduction must never skip a required security review, approval gate, validation layer, or recovery instruction.
+
+### Optional model routing
+
+When Codex orchestration or an API-backed model client is available, use [`MODEL-ROUTING.md`](./MODEL-ROUTING.md) to select a capable, healthy, and cost-appropriate model class. Model routing is optional for ordinary local work, must respect explicit user model choices, and cannot silently switch the model inside the current Codex conversation. Record the selected model and routing reason when a separate session or provider request is launched.
+
 ## Agent execution and timeboxing
 
 - Use one primary supervisor agent to plan, delegate, consolidate findings, coordinate implementation, validate results, and issue the final work report.
@@ -543,6 +659,22 @@ If a file does not exist, create it when the task requires it.
 - Git availability is a continuity capability, not a project activation gate. A failed `git init` must not be reported as a general project blocker unless the user explicitly made Git a hard requirement for that task.
 - Keep Git local unless the user separately approves a remote, push, pull, deployment, or external repository action.
 - After every meaningful validated checkpoint, automatically commit the validated project state with the stable checkpoint ID in the commit message, for example: `[CP-014] Add authentication middleware`.
+- Use the commit body as a durable checkpoint index, not as a replacement for `HANDOFF.md` or the append-only archive. Keep the active context and detailed history in tracked files so it remains readable, searchable, usable without Git, and available to a resumed agent.
+- When Git is available, include this structured checkpoint information in the commit body:
+
+```text
+Checkpoint: CP-<number>
+Objective: <short objective>
+Scope: <files or capability areas>
+Result: <what changed>
+Validation: <commands and evidence levels>
+Risks: <open risks or none>
+Next: <exact next step>
+Handoff: <HANDOFF.md section or archive file and lines>
+```
+
+- Keep commit messages concise enough for normal history review. Do not duplicate the entire handoff, paste logs, or store secrets, credentials, private data, generated artifacts, or volatile environment details in commit messages.
+- Treat the commit ID as a source-state reference, the checkpoint ID as a project milestone, and `HANDOFF.md` as the current resume context. These identifiers complement one another and must not be conflated.
 - Record the checkpoint ID, archive file, line range, and Git commit ID in `HANDOFF.md` when Git is available.
 - Before the first checkpoint commit, verify that a local Git author identity is available. If it is missing, report `GIT_COMMIT_BLOCKED: missing identity`, preserve the files, and do not claim Git checkpoint validation; do not silently change global Git configuration.
 - Treat the append-only archive and checkpoint IDs as the continuity mechanism when Git is unavailable; do not block project work because Git is absent. Report `GIT_CAPABILITY: unavailable` separately from the application task status.
