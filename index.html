@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.58">
+    <link rel="stylesheet" href="style.css?v=1.60">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -64,17 +64,8 @@
                 <button id="test-voice" class="secondary-btn">Preview Voice</button>
             </div>
 
-            <div class="config-group" style="margin-top: 1rem;">
-                <label data-i18n="ui.chakraJourney">Chakra Journey</label>
-                <div id="chakra-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:0.5rem;">
-                    <label class="checkbox-label"><input type="checkbox" value="root"> <span data-i18n="ui.root">Root</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <span data-i18n="ui.sacral">Sacral</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="solar"> <span data-i18n="ui.solar">Solar</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="heart"> <span data-i18n="ui.heart">Heart</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="throat"> <span data-i18n="ui.throat">Throat</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
-                </div>
+            <div class="config-group settings-panel">
+                <label data-i18n="ui.options">Options</label>
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
             </div>
@@ -263,6 +254,19 @@
                 </div>
             </div>
             <h1 id="lobby-title">Meditation Room</h1>
+            <div id="chakra-selection-panel" class="config-group lobby-chakra-selection">
+                <label data-i18n="ui.chakraJourney">Chakra Journey</label>
+                <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
+                <div id="chakra-selection" class="chakra-selection-list">
+                    <label class="checkbox-label"><input type="checkbox" value="root"> <span data-i18n="ui.root">Root</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <span data-i18n="ui.sacral">Sacral</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar"> <span data-i18n="ui.solar">Solar</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart"> <span data-i18n="ui.heart">Heart</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat"> <span data-i18n="ui.throat">Throat</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
+                </div>
+            </div>
             <div class="time-selector">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
@@ -360,6 +364,9 @@
         <section id="icebreaker-screen" class="screen hidden">
             <h1 id="icebreaker-title">Arriving</h1>
             <p id="icebreaker-subtitle" class="subtitle">Breathe and settle into the space</p>
+            <div id="icebreaker-narration-scroll-container" class="narration-scroll-container is-empty" data-narration-ticker dir="ltr" role="status" aria-live="polite" data-i18n-aria-label="ui.currentNarration" aria-label="Current narration">
+                <div id="icebreaker-narration-text" class="narration-scroll-text" data-narration-text></div>
+            </div>
             <div id="icebreaker-timer" style="font-size: 1.2rem; opacity: 0.5; margin-top: 2rem;">60</div>
             <button id="guide-controlled-continue" class="primary-btn" type="button" hidden>Continue</button>
         </section>
@@ -368,7 +375,9 @@
         <section id="breathing-screen" class="screen hidden">
             <div id="breathing-tutorial" class="tutorial-overlay">
                 <h2 id="tutorial-title">Preparation</h2>
-                <p id="tutorial-text">Sit comfortably. We will start with a centering breath.</p>
+                <div id="breathing-narration-scroll-container" class="narration-scroll-container is-empty" data-narration-ticker dir="ltr" role="status" aria-live="polite" data-i18n-aria-label="ui.currentNarration" aria-label="Current narration">
+                    <div id="breathing-narration-text" class="narration-scroll-text" data-narration-text></div>
+                </div>
             </div>
             <h1 id="breathing-instruction">Prepare</h1>
             <div id="breathing-circle-container">
@@ -388,6 +397,9 @@
             </div>
 
             <div id="session-overlay" style="padding: 10px 20px 10px 20px; margin-top: auto;">
+                <div id="narration-scroll-container" class="narration-scroll-container is-empty" data-narration-ticker dir="ltr" role="status" aria-live="polite" data-i18n-aria-label="ui.currentNarration" aria-label="Current narration">
+                    <div id="narration-text" class="narration-scroll-text" data-narration-text></div>
+                </div>
                 <div id="timer-display" class="timer" style="position: relative; margin-bottom: 10px; font-size: 0.9rem; opacity: 0.5;">00:00</div>
                 <div id="mantra-display" style="font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px;"></div>
                 
@@ -491,6 +503,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.83"></script>
+    <script src="app.js?v=1.84"></script>
 </body>
 </html>

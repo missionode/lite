@@ -23,6 +23,9 @@ const DRONE_DURATION_RATIOS = Object.freeze({
     advanced: 0.70,
     expert: 1.00
 });
+// Frequency drones use a fixed exposure window. The core-practice duration
+// controls the session, but must never extend a drone's frequency exposure.
+const DRONE_REFERENCE_SECONDS = 20;
 const DEFAULT_DRONE_DURATION_MODE = 'beginner';
 const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
 const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
@@ -55,10 +58,8 @@ function normalizeSleepDroneDurationMode(value) {
         : DEFAULT_SLEEP_DRONE_DURATION_MODE;
 }
 
-function getDroneDurationMs(practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
-    const minutes = Number(practiceMinutes);
-    if (!Number.isFinite(minutes) || minutes <= 0) return 0;
-    return Math.round(minutes * 60 * 1000 * DRONE_DURATION_RATIOS[normalizeDroneDurationMode(mode)]);
+function getDroneDurationMs(_practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
+    return Math.round(DRONE_REFERENCE_SECONDS * 1000 * DRONE_DURATION_RATIOS[normalizeDroneDurationMode(mode)]);
 }
 
 function formatClockDuration(durationMs) {
@@ -119,7 +120,95 @@ const syncValue = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.value = val;
 };
-const setText = (id, txt) => {
+const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
+    const text = String(txt ?? '').trim();
+    if (!text) return 0;
+
+    // Keep the estimate deliberately conservative. Browser speech and Piper
+    // have different timing, and Malayalam generally needs more reading time
+    // than Latin text. A slower ticker is preferable to outrunning the voice.
+    const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
+    const charactersPerSecond = isMalayalam ? 5.5 : 7.5;
+    const pacingFactor = pacing === 'hrim' ? 1.1 : pacing === 'soft' ? 0.82 : pacing === 'feeble' ? 0.76 : 1;
+    const sentenceCount = text.split(/[.!?।]/).filter(sentence => sentence.trim()).length;
+    const sentenceGaps = Math.max(0, sentenceCount - 1) * 1.5;
+    return 1.2 + (text.length / (charactersPerSecond * pacingFactor)) + sentenceGaps;
+};
+const refreshNarrationTicker = (el) => {
+    const container = el?.closest('[data-narration-ticker]');
+    if (!el || !container) return;
+
+    el.classList.remove('is-scrolling');
+    el.style.removeProperty('--narration-duration');
+    if (!el.textContent.trim() || container.clientWidth === 0) return;
+
+    // Keep the behavior marquee-like even for short prompts. The first word
+    // starts near the reader and later words arrive in normal LTR order.
+    const textWidth = el.scrollWidth;
+    const startOffset = container.clientWidth * 0.68;
+    const travel = textWidth + startOffset;
+    el.style.setProperty('--narration-width', `${textWidth}px`);
+    el.style.setProperty('--narration-start', `${startOffset}px`);
+    const isMobile = container.clientWidth <= 600;
+    const pixelsPerSecond = isMobile ? 42 : 34;
+    const motionDuration = travel / pixelsPerSecond;
+    const speechDuration = Number(container.dataset.narrationDurationHint);
+    // Mobile gets a modest speed increase, but never at the cost of racing
+    // ahead of the spoken block. The ticker may repeat only if speech itself
+    // lasts longer than one complete pass.
+    const duration = Math.max(14, motionDuration, Number.isFinite(speechDuration) ? speechDuration * 1.15 : 0);
+    el.style.setProperty('--narration-duration', `${duration}s`);
+    el.classList.add('is-scrolling');
+};
+const setNarrationText = (txt, narrationDurationSeconds = null) => {
+    const text = String(txt ?? '').trim();
+    document.querySelectorAll('[data-narration-text]').forEach((el) => {
+        const renderId = String(Number(el.dataset.renderId || 0) + 1);
+        el.dataset.renderId = renderId;
+        el.textContent = text;
+        el.classList.remove('is-scrolling', 'is-paused');
+        el.style.removeProperty('--narration-duration');
+        const container = el.closest('[data-narration-ticker]');
+        if (container) {
+            container.classList.toggle('is-empty', !text);
+            if (text && Number.isFinite(Number(narrationDurationSeconds))) {
+                container.dataset.narrationDurationHint = String(narrationDurationSeconds);
+            } else if (!text) {
+                delete container.dataset.narrationDurationHint;
+            }
+        }
+        if (!text || !container) return;
+
+        // Measure after the new narration is painted so every visible screen
+        // receives the same responsive LTR reading marquee.
+        const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
+        schedule(() => {
+            if (el.dataset.renderId !== renderId || !container.isConnected) return;
+            refreshNarrationTicker(el);
+        });
+    });
+};
+const setNarrationTickerPaused = (paused) => {
+    document.querySelectorAll('[data-narration-text]').forEach((el) => {
+        el.classList.toggle('is-paused', Boolean(paused));
+    });
+};
+let narrationPlaybackGeneration = 0;
+const beginNarrationPlayback = () => ++narrationPlaybackGeneration;
+const finishNarrationPlayback = (generation) => {
+    // A soft reminder can overlap a regular narration. Only the narration
+    // that is still current may clear the shared ticker when it finishes.
+    if (generation === narrationPlaybackGeneration) setNarrationText('');
+};
+const cancelNarrationPlayback = () => {
+    narrationPlaybackGeneration += 1;
+    setNarrationText('');
+};
+const setText = (id, txt, narrationDurationSeconds = null) => {
+    if (id === 'narration-text') {
+        setNarrationText(txt, narrationDurationSeconds);
+        return;
+    }
     const el = document.getElementById(id);
     if (el) el.textContent = txt;
 };
@@ -2030,7 +2119,9 @@ class MeditationController {
         if (controls) controls.classList.remove('hidden');
         setText('pause-meditation', 'II');
         setText('mantra-display', t('ui.sleepMode'));
-        setText('narration-text', t('ui.sleepModeIntro'));
+        // Sleep mode has no spoken narration; keep the narration-only ticker
+        // hidden while the visual guidance, music, and sleep tones run.
+        setText('narration-text', '');
         setText('timer-display', '');
         this.visual.startPulsing('#355c7d');
         await this.audio.startBackgroundMusic();
@@ -2040,7 +2131,7 @@ class MeditationController {
         for (const [index, stage] of sleepStages.entries()) {
             if (!this.isMeditationActive) return;
             setText('mantra-display', t(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
-            setText('narration-text', t('ui.sleepStageGuidance'));
+            setText('narration-text', '');
             setText('timer-display', formatClockDuration(stageDurationMs));
             this.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
 
@@ -2098,7 +2189,9 @@ class MeditationController {
             showScreen(meditationScreen);
             document.getElementById('controls')?.classList.remove('hidden');
             setText('mantra-display', t('ui.shotsMode'));
-            setText('narration-text', t('ui.shotsHelp'));
+            // Shots intentionally have no narration, so they must not leave
+            // a looping narration marquee on screen.
+            setText('narration-text', '');
             setText('timer-display', formatClockDuration(state.timeShot * 1000));
             this.visual.startPulsing('#7c3aed');
 
@@ -2162,6 +2255,7 @@ class MeditationController {
         this.audio.stopBackgroundMusic();
         this.audio.stopMantraTrack();
         wakeLock.release();
+        cancelNarrationPlayback();
         document.body.classList.remove('sleep-mode-active');
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(lobbyScreen);
@@ -2180,6 +2274,7 @@ class MeditationController {
         this.audio.stopBackgroundMusic();
         this.audio.stopMantraTrack();
         wakeLock.release();
+        cancelNarrationPlayback();
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(lobbyScreen);
         const startBtn = document.getElementById('start-meditation');
@@ -2390,6 +2485,7 @@ class MeditationController {
         this.isMeditationActive = false;
         this.isExperimentActive = false;
         this.experimentDuration = null;
+        cancelNarrationPlayback();
         this.stopStageDrone();
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
@@ -2403,7 +2499,6 @@ class MeditationController {
         const screen = document.getElementById('breathing-screen');
         const tutorial = document.getElementById('breathing-tutorial');
         const tutTitle = document.getElementById('tutorial-title');
-        const tutText = document.getElementById('tutorial-text');
 
         showScreen(screen);
         tutorial.classList.remove('hidden');
@@ -2418,7 +2513,6 @@ class MeditationController {
         // with Yoga, bathing, massage, and assisted-care stages.
         tutTitle.textContent = t('ui.preparation');
         const prePracticeSafety = contentT('system.prePracticeSafety');
-        tutText.textContent = prePracticeSafety;
         await this.narrate(prePracticeSafety, false);
         if (!this.isMeditationActive) return;
 
@@ -2434,7 +2528,6 @@ class MeditationController {
                 : moonText;
             if (openingText && this.isMeditationActive) {
                 tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
-                tutText.textContent = openingText;
                 await this.narrate(openingText, false); // Keep music playing
                 await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
             }
@@ -2450,17 +2543,13 @@ class MeditationController {
         const personalIntention = state.intention && state.intention.trim();
         if (isHighEnergy) {
             const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
-            tutText.textContent = intentionText;
             await this.narrate(intentionText, false, false, 'hrim');
         } else if (personalIntention) {
-            tutText.textContent = text;
             await this.narrate(text, false); // Still keep music playing for next part
             const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
             tutTitle.textContent = t('ui.intention');
-            tutText.textContent = intentionText;
             await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
         } else {
-            tutText.textContent = text;
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
 
@@ -2480,11 +2569,8 @@ class MeditationController {
         tutorial.style.opacity = "1";
 
         const tutTitle = document.getElementById('tutorial-title');
-        const tutText = document.getElementById('tutorial-text');
         tutTitle.textContent = t('ui.preparation');
         const text = contentT('system.centeringBreath');
-        tutText.textContent = text;
-
         // Fade out music before box meditation
         this.audio.fadeOutBackgroundMusic(4);
 
@@ -2688,7 +2774,7 @@ class MeditationController {
         // This is visible interface copy, so follow Display Language rather
         // than the selected meditation/narration language.
         if (mantraEl) mantraEl.textContent = t('system.musicOnly');
-        if (narrationEl) narrationEl.textContent = "";
+        setText('narration-text', '');
         if (timerEl) timerEl.textContent = "";
         
         // Start background music loop
@@ -2717,6 +2803,9 @@ class MeditationController {
         if (!restButton || !titleEl || !subtitleEl || !timerEl) return false;
 
         showScreen(icebreakerScreen);
+        // Icebreaker is also used for guide-controlled waiting. Clear the
+        // previous narration so an empty marquee never appears as stale UI.
+        setText('narration-text', '');
         restButton.hidden = true;
         restButton.disabled = true;
         titleEl.textContent = title;
@@ -2786,8 +2875,9 @@ class MeditationController {
         subtitle.textContent = t('ui.yogaSubtitle');
         
         // Grounding Drone for Yoga (136.1 Hz - OM frequency)
-        this.cancelDroneTimer();
-        this.audio.startDrone(136.1, 3); // Using heart-level elemental layer for warmth
+        // Use the shared fixed exposure window; Yoga must not leave a drone
+        // running for the length of the entire session.
+        this.startTimedDrone(136.1, 3, state.timeYogaPose, state.droneDurationMode);
         // Keep music at 30% deep smooth level
         this.audio.fadeInBackgroundMusic(8, 0.30);
 
@@ -2868,6 +2958,7 @@ class MeditationController {
 
     async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal') {
         if (!text || !this.isMeditationActive && !fadeOut) return;
+        setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
         if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
@@ -2893,9 +2984,8 @@ class MeditationController {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
 
-            setText('narration-text', sentences[i]);
             if (piperFailed) {
-                await this.narrateBrowser(sentences[i], false, true, pacing);
+                await this.narrateBrowser(sentences[i], false, true, pacing, false);
                 continue;
             }
 
@@ -2908,7 +2998,7 @@ class MeditationController {
                 pending.forEach(job => job.catch(() => {}));
                 piperTTS.cancel('sentence failed');
                 setVoiceStatus(t('ui.piperFallback'), 'error');
-                await this.narrateBrowser(sentences[i], false, true, pacing);
+                await this.narrateBrowser(sentences[i], false, true, pacing, false);
             }
 
             if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
@@ -2925,18 +3015,24 @@ class MeditationController {
     }
 
     async narrateSoft(text) {
-        if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, false, false, 1); }
-            catch (error) {
-                console.error('[Piper] soft narration failed:', error);
-                if (!this.isMeditationActive) return;
-                setVoiceStatus(t('ui.piperFallback'), 'error');
+        const generation = beginNarrationPlayback();
+        try {
+            if (this.shouldUsePiper()) {
+                try { return await this.narrateWithPiper(text, false, false, 1); }
+                catch (error) {
+                    console.error('[Piper] soft narration failed:', error);
+                    if (!this.isMeditationActive) return;
+                    setVoiceStatus(t('ui.piperFallback'), 'error');
+                }
             }
+            return await this.narrateSoftBrowser(text);
+        } finally {
+            finishNarrationPlayback(generation);
         }
-        return this.narrateSoftBrowser(text);
     }
 
     async narrateSoftBrowser(text) {
+        setText('narration-text', text, estimateNarrationDurationSeconds(text, 'soft'));
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -2965,6 +3061,7 @@ class MeditationController {
         console.log("DEBUG: togglePause updated isPaused to:", this.isPaused);
         const btn = document.getElementById('pause-meditation');
         if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
+        setNarrationTickerPaused(this.isPaused);
         
         if (this.isPaused) {
             console.log("Action: Pausing session...");
@@ -3039,7 +3136,6 @@ class MeditationController {
             for (let i = 0; i < phrases.length; i++) {
                 if (!this.isMeditationActive) return;
                 const phrase = phrases[i];
-                setText('narration-text', phrase);
                 
                 // Keep music for all phrases, fade out only on the very last phrase of the last cycle
                 const isLast = (cycle === 2 && i === phrases.length - 1);
@@ -3167,18 +3263,24 @@ class MeditationController {
     }
 
     async narrateFeeble(text) {
-        if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, false, false, 0.9); }
-            catch (error) {
-                console.error('[Piper] feeble narration failed:', error);
-                if (!this.isMeditationActive) return;
-                setVoiceStatus(t('ui.piperFallback'), 'error');
+        const generation = beginNarrationPlayback();
+        try {
+            if (this.shouldUsePiper()) {
+                try { return await this.narrateWithPiper(text, false, false, 0.9); }
+                catch (error) {
+                    console.error('[Piper] feeble narration failed:', error);
+                    if (!this.isMeditationActive) return;
+                    setVoiceStatus(t('ui.piperFallback'), 'error');
+                }
             }
+            return await this.narrateFeebleBrowser(text);
+        } finally {
+            finishNarrationPlayback(generation);
         }
-        return this.narrateFeebleBrowser(text);
     }
 
     async narrateFeebleBrowser(text) {
+        setText('narration-text', text, estimateNarrationDurationSeconds(text, 'feeble'));
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -3202,18 +3304,24 @@ class MeditationController {
     }
 
     async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
-        if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing); }
-            catch (error) {
-                console.error('[Piper] narration failed:', error);
-                if (!this.isMeditationActive) return;
-                setVoiceStatus(t('ui.piperFallback'), 'error');
+        const generation = beginNarrationPlayback();
+        try {
+            if (this.shouldUsePiper()) {
+                try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing); }
+                catch (error) {
+                    console.error('[Piper] narration failed:', error);
+                    if (!this.isMeditationActive) return;
+                    setVoiceStatus(t('ui.piperFallback'), 'error');
+                }
             }
+            return await this.narrateBrowser(text, fadeOut, keepSilence, pacing);
+        } finally {
+            finishNarrationPlayback(generation);
         }
-        return this.narrateBrowser(text, fadeOut, keepSilence, pacing);
     }
 
-    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal') {
+    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal', updateTicker = true) {
+        if (updateTicker) setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
@@ -3248,8 +3356,6 @@ class MeditationController {
             
             // Wait while paused
             while (this.isPaused && this.isMeditationActive) await new Promise(r => setTimeout(r, 100));
-
-            setText('narration-text', sentence.trim());
 
             await new Promise(resolve => {
                 const utterance = new SpeechSynthesisUtterance(sentence);
@@ -3368,6 +3474,7 @@ class MeditationController {
         this.stopStageDrone();
         this.audio.stopMantraTrack(); 
         this.audio.fadeOutBackgroundMusic(2.5);
+        cancelNarrationPlayback();
         setTimeout(() => this.audio.stopBackgroundMusic(), EARN_HANDOFF_DELAY_MS);
         wakeLock.release();
         piperTTS.cancel('journey finished');
@@ -3407,6 +3514,7 @@ class MeditationController {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.audio.stopFrequencyShot(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         this.isExperimentActive = false;
+        cancelNarrationPlayback();
         if (this.guideControlledResolve) this.guideControlledResolve(false);
         const guideRestButton = document.getElementById('guide-controlled-continue');
         if (guideRestButton) {
@@ -3890,7 +3998,11 @@ function showScreen(screen) {
     [configScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
-    if (screen) screen.classList.remove('hidden');
+    if (screen) {
+        screen.classList.remove('hidden');
+        const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
+        schedule(() => document.querySelectorAll('[data-narration-text]').forEach(refreshNarrationTicker));
+    }
 }
 
 function attachEventListeners() {
@@ -3925,10 +4037,15 @@ function attachEventListeners() {
     voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
     testVoiceBtn.addEventListener('click', testVoice);
     document.getElementById('mixer-voice-preview')?.addEventListener('click', testVoice);
-    saveConfigBtn.addEventListener('click', () => {
-        const checked = Array.from(document.querySelectorAll('#chakra-selection input:checked')).map(cb => cb.value);
-        state.selectedChakras = checked;
+    function persistChakraSelection() {
+        state.selectedChakras = Array.from(document.querySelectorAll('#chakra-selection input:checked')).map(cb => cb.value);
         localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
+        updateSessionEstimate();
+        updateJourneyRoadmap();
+    }
+
+    saveConfigBtn.addEventListener('click', () => {
+        persistChakraSelection();
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_display_language', state.displayLanguage);
         state.voiceName = voiceSelect.value;
@@ -4276,7 +4393,7 @@ function attachEventListeners() {
         }
         const shots = getChecked('shots-toggle');
         if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
-        const hideForShots = ['drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'open-settings'];
+        const hideForShots = ['chakra-selection-panel', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'open-settings'];
         hideForShots.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.hidden = shots;
@@ -4630,6 +4747,9 @@ function attachEventListeners() {
     document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
+    });
+    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', persistChakraSelection);
     });
     openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
     document.getElementById('open-experiment-mode')?.addEventListener('click', () => showScreen(experimentScreen));

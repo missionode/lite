@@ -10,6 +10,7 @@
     "previewVoice": "Preview Voice",
     "saveSettings": "Save Settings",
     "meditationRoom": "Meditation Room",
+    "currentNarration": "Current narration",
     "returning": "Returning",
     "returningJourney": "Returning Journey",
     "moon": "Moon",
@@ -45,7 +46,8 @@
     ,"settingsHelp": "Settings help"
     ,"settingsHelpTitle": "How this journey works"
     ,"settingsHelpLanguages": "Meditation Language controls the narration. Display Language controls the visible interface."
-    ,"settingsHelpChakras": "Chakra Journey chooses exactly the centers included. Reverse Journey changes their direction."
+    ,"settingsHelpChakras": "Choose the chakras for the current journey in the Meditation Room. Reverse Journey changes their direction."
+    ,"chakraSelectionHelp": "Choose the centres to include in this journey. You can adjust them here before beginning."
     ,"settingsHelpYoga": "Yoga Experience is selected in the Lobby. Its optional Corpse Pose, massage, perineal care, assisted bathing, and standard bathing stages are configured here."
     ,"settingsHelpModes": "Music Only, Sleep Mode, and High Energy are selected in the Lobby. Sleep Mode moves through five sound stages; Experience Modes are selected for the current journey only."
     ,"settingsHelpSave": "Save the settings to enter the Lobby. You can review the final mode and timing there before beginning."
@@ -92,7 +94,7 @@
     ,"droneIntermediate": "Intermediate"
     ,"droneAdvanced": "Advanced"
     ,"droneExpert": "Expert"
-    ,"droneDurationHelp": "The drone begins before narration and gently fades after this share of the active practice duration."
+    ,"droneDurationHelp": "The drone uses a fixed 20-second exposure window: Beginner 4s, Intermediate 10s, Advanced 14s, Expert 20s. Core practice duration does not change it."
     ,"droneDurationHrimNote": "For HRIM, Beginner is unavailable; Intermediate is the starting level."
     ,"droneDurationActive": "Active drone time: {duration} from each chakra start"
     ,"droneDurationActiveHrim": "Active drone time: {duration} from HRIM start"

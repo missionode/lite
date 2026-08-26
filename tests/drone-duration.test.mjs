@@ -18,16 +18,18 @@ assert.deepEqual(
 );
 
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
+const referenceMatch = app.match(/const DRONE_REFERENCE_SECONDS = (\d+);/);
 const normalizeMatch = app.match(/function normalizeDroneDurationMode\([\s\S]*?\n\}/);
 const hrimNormalizeMatch = app.match(/function normalizeHrimDroneDurationMode\([\s\S]*?\n\}/);
 const sleepNormalizeMatch = app.match(/function normalizeSleepDroneDurationMode\([\s\S]*?\n\}/);
 const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
-assert.ok(ratiosMatch && normalizeMatch && hrimNormalizeMatch && sleepNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
+assert.ok(ratiosMatch && referenceMatch && normalizeMatch && hrimNormalizeMatch && sleepNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
 const shotDurationMatch = app.match(/function getShotDefaultDuration\([\s\S]*?\n\}/);
 assert.ok(shotDurationMatch, 'the per-type Shot duration helper must remain extractable');
 
 const helpers = vm.runInNewContext(`
     const DRONE_DURATION_RATIOS = Object.freeze(${ratiosMatch[1]});
+    const DRONE_REFERENCE_SECONDS = ${referenceMatch[1]};
     const DEFAULT_DRONE_DURATION_MODE = 'beginner';
     const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
     const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
@@ -35,18 +37,20 @@ const helpers = vm.runInNewContext(`
     ${hrimNormalizeMatch[0]}
     ${sleepNormalizeMatch[0]}
     ${durationMatch[0]}
-    ({ DRONE_DURATION_RATIOS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, normalizeSleepDroneDurationMode, getDroneDurationMs });
+    ({ DRONE_DURATION_RATIOS, DRONE_REFERENCE_SECONDS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, normalizeSleepDroneDurationMode, getDroneDurationMs });
 `);
 assert.deepEqual(
     JSON.parse(JSON.stringify(helpers.DRONE_DURATION_RATIOS)),
     { beginner: 0.2, intermediate: 0.5, advanced: 0.7, expert: 1 },
     'the four approved drone duration percentages must remain exact',
 );
-assert.equal(helpers.getDroneDurationMs(5, 'beginner'), 60_000, 'Beginner should use 20% of five minutes');
-assert.equal(helpers.getDroneDurationMs(5, 'intermediate'), 150_000, 'Intermediate should use 50% of five minutes');
-assert.equal(helpers.getDroneDurationMs(5, 'advanced'), 210_000, 'Advanced should use 70% of five minutes');
-assert.equal(helpers.getDroneDurationMs(5, 'expert'), 300_000, 'Expert should use 100% of five minutes');
-assert.equal(helpers.getDroneDurationMs(1, 'beginner'), 12_000, 'the calculation should follow the active core duration');
+assert.equal(helpers.DRONE_REFERENCE_SECONDS, 20, 'drone exposure should use a fixed 20-second reference');
+assert.equal(helpers.getDroneDurationMs(5, 'beginner'), 4_000, 'Beginner should use 20% of the fixed 20-second reference');
+assert.equal(helpers.getDroneDurationMs(5, 'intermediate'), 10_000, 'Intermediate should use 50% of the fixed 20-second reference');
+assert.equal(helpers.getDroneDurationMs(5, 'advanced'), 14_000, 'Advanced should use 70% of the fixed 20-second reference');
+assert.equal(helpers.getDroneDurationMs(5, 'expert'), 20_000, 'Expert should use 100% of the fixed 20-second reference');
+assert.equal(helpers.getDroneDurationMs(1, 'expert'), 20_000, 'core practice duration must not change drone exposure');
+assert.equal(helpers.getDroneDurationMs(30, 'expert'), 20_000, 'long HRIM duration must not extend drone exposure');
 assert.equal(helpers.normalizeDroneDurationMode('unknown'), 'beginner', 'missing or invalid preferences should safely default to Beginner');
 assert.equal(helpers.normalizeHrimDroneDurationMode('beginner'), 'intermediate', 'HRIM must not allow Beginner mode');
 assert.equal(helpers.normalizeHrimDroneDurationMode('unknown'), 'intermediate', 'HRIM must default to Intermediate');
@@ -112,6 +116,8 @@ assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a d
 assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
 assert.match(app, /normalizeSleepStages\(this\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');
 assert.match(app, /mainOscillator\.frequency\.setValueAtTime\(beat, now\)/, 'Sleep Mode should play low script frequencies as the main oscillator');
+assert.match(app, /this\.startTimedDrone\(136\.1, 3, state\.timeYogaPose, state\.droneDurationMode\)/, 'Yoga grounding drone should use the fixed exposure timer');
+assert.doesNotMatch(app, /this\.audio\.startDrone\(136\.1, 3\)/, 'Yoga must not start an unbounded grounding drone');
 assert.match(app, /state\.timeSleepStage \* SLEEP_STAGE_COUNT/, 'Sleep Mode should estimate one common duration across five stages');
 assert.equal(timingConfig.journey.sleepStageDuration.max, 10, 'Sleep Mode should cap the shared stage duration at 10 minutes');
 for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_experience']) {

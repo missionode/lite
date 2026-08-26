@@ -19,24 +19,15 @@
 
 ## NOW
 
-### Active snapshot — 2026-08-16 (Asia/Kolkata)
+### Active snapshot — 2026-08-27 (Asia/Kolkata)
 
-- Branch: `sleep-experience-mode`; it is based on the verified production merge `8cf1260` and contains the current Sleep Mode implementation as uncommitted work pending review and commit.
-- `b7563b7` (`feat(audio): add progressive drone duration modes`) adds Beginner 20%, Intermediate 50%, Advanced 70%, and Expert 100%, with Beginner as the persisted default and a pause-aware fade-start timer beginning before narration.
-- `99bc581` removes octave reduction from the main oscillator. With Chakra Frequencies enabled, production centre pitches are Root 396, Sacral 417, Solar 528, Heart 639, Throat 741, Third Eye 852, Crown 963, and HRIM 528 Hz. Frequencies Off and malformed input intentionally retain the 110 Hz fallback.
-- `fc243a1` keeps Beginner as the normal chakra default but gives HRIM a separate persisted duration preference. HRIM normalizes missing, invalid, or Beginner values to Intermediate (50%); Advanced and Expert remain available. The HRIM Beginner radio is disabled and the active setting is explained in English and Malayalam.
-- The former half-frequency lower oscillator is gone. Independent support remains: a slow 0.04 Hz LFO modulates the main pitch by approximately ±0.1%, Eyes Close may add a 40 Hz anchor plus 80/82 Hz binaural pair, elemental noise remains, and Yoga retains 136.1 Hz.
-- Delivery versions: `style.css?v=1.55`, `app.js?v=1.66`, shell cache `chakra-v5.29`, Piper cache `chakra-piper-v3`, and language cache `chakra-language-v4`.
-- Validation at the latest implementation checkpoint: `unit/static` PASS — JavaScript syntax, service-worker syntax, exact-frequency/drone-duration contract, zero-volume audio contract, bilingual content-safety contract, assessment contract, Earn handoff contract, HRIM time-window contract, JSON parsing, and diff whitespace. No Playwright or screenshots were used.
-- Owner clarification implemented: HRIM is for energizing/recharge, so Beginner is disabled for HRIM and Intermediate is the default. HRIM remains a timed path using its independent `timeHighEnergy` duration; uninterrupted full-stage drone behavior is not part of this approved change.
-- Additional HRIM audio observations remain unimplemented: `high_energy` currently resolves to elemental index `-1` and therefore receives the fallback bright high-pass texture; the stage named final silence stops the drone but leaves quiet background music running.
-- Sleep Mode now has five sequential, sleep-inspired binaural targets (10, 6, 5, 2, and 6 Hz), one shared stage duration capped at 10 minutes, continuous background music, and separate persisted drone-duration mode defaulting to Intermediate. It is mutually exclusive with HRIM, Music Only, and normal guided options.
-- Sleep targets are explicitly sound-design guidance rather than biological sleep-stage guarantees. The audible carrier remains 80 Hz; Delta 2 Hz is represented as a stereo beat difference rather than an inaudible main oscillator.
-- Experience Mode selections (Music Only, HRIM, and Sleep Mode) are session-only. They are reset on load and their legacy selection keys are removed from local storage; timing and drone-duration preferences remain persisted.
-- The former HRIM 03:30–18:00 gate and block modal are removed. HRIM can now be selected at any local time.
-- Validation for the current work: `static/unit` PASS — JavaScript syntax, JSON parsing, drone-duration/Sleep Mode contract, content safety, zero-volume audio safety, and diff whitespace. No Playwright or screenshots were used.
-- Next exact step: review the diff, commit the Sleep Mode feature with a detailed message, and perform real-device listening before any production merge or push.
-- Progress: **95% complete** for the isolated Sleep Mode implementation | Confidence: medium | Current phase: static validation and review | Main remaining scope: device audio/UX validation.
+- Branch: `production`; current work is a local checkpoint awaiting commit and push. The working tree also contains unrelated tracked macOS `.DS_Store` changes, which must not be included in the feature commit.
+- Latest application work includes Meditation Room-owned chakra selection, centralized continuous narration marquee surfaces, narration-only ticker lifecycle, and fixed 20-second drone exposure modes: Beginner 4s, Intermediate 10s, Advanced 14s, and Expert 20s.
+- Chakra, HRIM, Sleep, and Yoga drone paths use the shared timed exposure boundary. Yoga's former unbounded 136.1 Hz grounding drone now uses that timer. Shot mode remains independently capped by `timing-config.json`.
+- Narration displays the complete spoken block continuously and clears on actual audio completion. Mobile receives a modest speed increase, constrained by a conservative Piper/browser speech-duration estimate so the marquee does not intentionally outrun the voice.
+- Validation at this checkpoint: `static/unit` PASS — JavaScript syntax, narration ticker, drone-duration, and diff whitespace. No Playwright or screenshots were used, per owner instruction.
+- Model-router status: the local Codex adapter and `codex-cli 0.148.0` are available, but no automatic model dispatch evidence was recorded for this checkpoint; do not claim routed execution.
+- Next exact step: commit only the application, locale, cache, package, and regression-test changes with a detailed checkpoint message; push `production`; then re-check the remaining `.DS_Store` state and perform real-device audio/UX validation separately.
 
 ### Historical context retained for reference
 
@@ -361,3 +352,12 @@
 - Fixed No Frequency Mode activation before Web Audio initialization. `stopBinaural()` and `stopDrone()` now clear dormant node state and return safely when `AudioEngine.ctx` is still null, preventing the `currentTime` TypeError reported at the former line 1634.
 - Added regression assertions for both null-safe stop boundaries and refreshed the PWA shell/app cache versions.
 - Validation: JavaScript/service-worker syntax PASS; No Frequency Mode, zero-volume audio safety, bilingual content safety, and `git diff --check` PASS. No Playwright or screenshots were used.
+
+### CP-AUDIO-010 — Fixed drone exposure window and continuous narration ticker
+
+- Date: 2026-08-27 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Replaced core-practice-based drone duration with a fixed 20-second exposure reference: Beginner 4s, Intermediate 10s, Advanced 14s, and Expert 20s. Chakra, HRIM, Sleep, and Yoga drone paths use the shared timer; the previously unbounded Yoga grounding drone is now timed.
+- Narration ticker behavior is continuous at the complete narration-block level rather than sentence-by-sentence. It clears on actual narration completion and cancellation. Mobile uses a modest speed increase constrained by a conservative voice-duration estimate so it does not intentionally outrun Piper or browser speech.
+- Updated bilingual guidance and regression contracts. Validation: JavaScript syntax, narration ticker, drone-duration, and `git diff --check` PASS. No Playwright or screenshots were used.
+- Remaining release evidence: real-device listening and visual UX validation; this checkpoint does not claim browser/manual evidence.

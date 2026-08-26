@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "test:content-safety": "node tests/content-safety.test.mjs",
+    "test:chakra-selection": "node tests/chakra-selection.test.mjs",
+    "test:narration-ticker": "node tests/narration-ticker.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:no-frequency": "node tests/no-frequency-mode.test.mjs",
     "test:focused-practices": "node tests/focused-practices.test.mjs",

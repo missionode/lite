@@ -421,6 +421,41 @@ select:focus {
     margin-top: 0.75rem;
 }
 
+.lobby-chakra-selection {
+    width: min(100%, 420px);
+    margin: -0.5rem auto 0;
+    padding: 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.16);
+    text-align: center;
+}
+
+.lobby-chakra-selection > label:first-child {
+    color: var(--accent-color);
+    opacity: 0.9;
+}
+
+.chakra-selection-help {
+    color: var(--accent-color);
+    opacity: 0.65;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.chakra-selection-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
+.chakra-selection-list .checkbox-label {
+    flex: 1 1 105px;
+    justify-content: center;
+}
+
 .primary-btn {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
@@ -608,15 +643,62 @@ input[type="range"]::-moz-range-progress {
     text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
-#narration-text {
-    font-size: 1rem;
+.narration-scroll-container {
+    width: 100%;
+    max-width: 920px;
+    min-height: 3.6rem;
+    margin: 0 auto 1.15rem;
+    padding: 0.85rem 1.25rem;
+    overflow: hidden;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.28);
+    box-shadow: inset 0 0 24px rgba(124, 58, 237, 0.12);
+    text-align: center;
+    direction: ltr;
+}
+
+.narration-scroll-container.is-empty {
+    display: none;
+}
+
+.narration-scroll-text {
+    display: inline-block;
+    min-width: 100%;
+    max-width: none;
+    font-size: clamp(1.08rem, 2.8vw, 1.45rem);
     font-weight: 300;
-    line-height: 1.6;
-    letter-spacing: 1px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
     color: #ffffff;
-    opacity: 0.7;
-    max-width: 85%;
+    opacity: 0.92;
     margin: 0 auto;
+    white-space: nowrap;
+    will-change: transform;
+    text-align: left;
+}
+
+.narration-scroll-text.is-scrolling {
+    animation: narrationTickerReadOrder var(--narration-duration, 24s) linear infinite;
+}
+
+.narration-scroll-text.is-paused {
+    animation-play-state: paused;
+}
+
+#breathing-narration-scroll-container {
+    margin-top: 1.25rem;
+}
+
+#icebreaker-narration-scroll-container {
+    margin-top: 1.25rem;
+}
+
+@keyframes narrationTickerReadOrder {
+    /* The content remains LTR; the line moves left so the first word is
+       presented near the reader before later words arrive in order. */
+    from { transform: translateX(var(--narration-start, 68%)); }
+    to { transform: translateX(calc(-1 * var(--narration-width, 100%))); }
 }
 
 .timer {
@@ -1553,6 +1635,7 @@ input[type="range"]::-moz-range-progress {
         animation: none;
     }
     #mantra-display { animation: none; }
+    .narration-scroll-text.is-scrolling { animation: none; }
     .chakra-gold-ring { animation: none; }
     .tutorial-overlay { backdrop-filter: none; }
     .cosmic-entrance { animation: none; }
@@ -1566,6 +1649,11 @@ input[type="range"]::-moz-range-progress {
     .screen { gap: 1.5rem; }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
+    .narration-scroll-container {
+        min-height: 3.4rem;
+        margin-bottom: 0.9rem;
+        padding-inline: 1rem;
+    }
 }
 
 /* ── Eyes Close Mode ────────────────────────────────────────────────────────── */
