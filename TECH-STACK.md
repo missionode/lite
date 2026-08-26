@@ -59,6 +59,7 @@ ingressAndTLS: <proxy/platform/direct/none>
 testRunner: <tool>
 browserRunner: Playwright | not-applicable
 modelRouting: optional | unavailable | active
+localModelRouting: optional | unavailable | configured | active
 activeComponents: <list>
 deferredComponents: <list>
 notApplicableComponents: <list with reasons>
@@ -66,6 +67,10 @@ fallbacks: <list>
 ```
 
 The profile must explain why each major choice fits the product, machine, delivery target, security model, and proof scope. It must identify installed, missing, incompatible, cached, and deferred dependencies.
+
+### Loop deployment boundary
+
+Loop policy and internal context belong in the private source repository when the project needs them, but are excluded from production deployment artifacts and public web roots by default. A project must record any intentional internal deployment copy and its access controls. Secrets and private runtime data never belong in Loop documents.
 
 ## Generic application structure
 
