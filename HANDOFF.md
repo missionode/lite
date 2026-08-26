@@ -345,3 +345,19 @@
 - Replaced the cropping `cover` splash treatment with a full-image `contain` reveal. The complete source image is visible first, then gently expands during the existing 2.5-second launch window.
 - Added a dimmed, blurred Splash image backdrop so wide screens retain an immersive full-screen presentation without cropping the primary artwork. Reduced-motion preference disables the zoom.
 - Added a static splash contract test. No Playwright, screenshots, or browser/manual evidence was run.
+
+### CP-POLICY-002 — Loop 0.3 root package refresh
+
+- Date: 2026-08-27 (Asia/Kolkata).
+- Branch: `production`; local checkpoint only, with no push performed.
+- Installed the supplied `Loop/` source package into the Lite repository root so its root policy documents, plugin manifest, Loop skill, delivery workflow, benchmark, installation guide, local/model routing policies, routing configuration, Codex adapter, and tests remain together with valid relative links.
+- The original untracked source folder was moved, not deleted, to `/private/tmp/lite-loop-source-20260827` after the overlay. The root-level `communication-architecture.md` was already identical to the supplied version.
+- Validation: Loop manifest/routing JSON parse PASS; six model-router unit tests PASS; `git diff --check` PASS.
+
+### CP-AUDIO-009 — Null-safe No Frequency Mode activation
+
+- Date: 2026-08-27 (Asia/Kolkata).
+- Branch: `production`; local checkpoint only, with no push performed.
+- Fixed No Frequency Mode activation before Web Audio initialization. `stopBinaural()` and `stopDrone()` now clear dormant node state and return safely when `AudioEngine.ctx` is still null, preventing the `currentTime` TypeError reported at the former line 1634.
+- Added regression assertions for both null-safe stop boundaries and refreshed the PWA shell/app cache versions.
+- Validation: JavaScript/service-worker syntax PASS; No Frequency Mode, zero-volume audio safety, bilingual content safety, and `git diff --check` PASS. No Playwright or screenshots were used.

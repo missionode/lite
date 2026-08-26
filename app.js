@@ -1631,9 +1631,13 @@ class AudioEngine {
     }
 
     stopBinaural() {
+        if (!this.ctx) {
+            this.binauralNodes = [];
+            return;
+        }
         const now = this.ctx.currentTime;
         this.binauralNodes.forEach(node => {
-            if (node instanceof AudioParam) return;
+            if (typeof AudioParam !== 'undefined' && node instanceof AudioParam) return;
             try { 
                 if (node.gain) {
                     node.gain.cancelScheduledValues(now);
@@ -1648,6 +1652,14 @@ class AudioEngine {
     }
 
     stopDrone() {
+        if (!this.ctx) {
+            this.binauralNodes = [];
+            this.droneOscillators = [];
+            this.groundingAnchor = null;
+            this.elementalNodes = [];
+            this.vibrationLFO = null;
+            return;
+        }
         this.stopBinaural();
         const now = this.ctx.currentTime;
         

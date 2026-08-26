@@ -22,6 +22,8 @@ const method = (name, nextName) => {
 const drone = method('startDrone(baseFreq, index = 0)', 'startSleepDrone(beatFrequency)');
 const sleepDrone = method('startSleepDrone(beatFrequency)', 'startFrequencyShot(frequency)');
 const shot = method('startFrequencyShot(frequency)', 'stopFrequencyShot()');
+const stopBinaural = method('stopBinaural()', 'stopDrone()');
+const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
 const mantra = method('async playMantraTrack(key)', 'stopMantraTrack()');
 const bowlStart = app.indexOf('    playSingingBowl()');
 const bowlEnd = app.indexOf('\n}\n\n// Visual Engine', bowlStart);
@@ -31,6 +33,8 @@ const bowl = app.slice(bowlStart, bowlEnd);
 assert.match(drone, /this\.stopDrone\(\);[\s\S]*?if \(state\.noFrequencyMode\) return;/, 'chakra and HRIM drones should stop or skip in No Frequency Mode');
 assert.match(sleepDrone, /this\.stopDrone\(\);[\s\S]*?if \(state\.noFrequencyMode\) return;/, 'sleep-stage drones should stop or skip in No Frequency Mode');
 assert.match(shot, /if \(state\.noFrequencyMode\)[\s\S]*?frequency-only Shots/, 'frequency-only Shots should be rejected at the audio boundary');
+assert.match(stopBinaural, /if \(!this\.ctx\)[\s\S]*?this\.binauralNodes = \[\];[\s\S]*?return;/, 'stopping binaural audio before Web Audio initialization should be safe');
+assert.match(stopDrone, /if \(!this\.ctx\)[\s\S]*?return;/, 'No Frequency Mode should safely stop an uninitialized drone graph');
 assert.match(mantra, /if \(state\.noFrequencyMode\) return;/, 'mantra tracks should be silent in No Frequency Mode');
 assert.match(bowl, /state\.noFrequencyMode/, 'singing-bowl tones should be silent in No Frequency Mode');
 assert.match(app, /if \(state\.eyesCloseMode && !state\.noFrequencyMode\)/, 'Eyes Close anchoring should not create a 40 Hz tone in No Frequency Mode');
