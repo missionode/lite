@@ -157,6 +157,18 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start; /* not center */
+    min-height: 100vh;
+    height: auto;
+    overflow-y: visible;
+}
+
+/* Desktop Lobby content is taller than one viewport. Let the document grow
+   and always reopen the section from its top rather than clipping its header. */
+#lobby-screen {
+    min-height: 100vh;
+    height: auto;
+    justify-content: flex-start;
+    overflow-y: visible;
 }
 
 @media (max-width: 600px) {
@@ -679,7 +691,17 @@ input[type="range"]::-moz-range-progress {
 }
 
 .narration-scroll-text.is-scrolling {
-    animation: narrationTickerReadOrder var(--narration-duration, 24s) linear infinite;
+    /* One narration gets one pass. Repeating would jump back to the first
+       word at the exact moment the spoken clip is finishing. */
+    animation: narrationTickerReadOrder var(--narration-duration, 24s) linear 1 both;
+}
+
+.narration-scroll-text.is-awaiting-playback {
+    opacity: 0;
+}
+
+.narration-scroll-text {
+    transition: opacity 0.7s ease;
 }
 
 .narration-scroll-text.is-paused {
@@ -696,9 +718,23 @@ input[type="range"]::-moz-range-progress {
 
 @keyframes narrationTickerReadOrder {
     /* The content remains LTR; the line moves left so the first word is
-       presented near the reader before later words arrive in order. */
-    from { transform: translateX(var(--narration-start, 68%)); }
-    to { transform: translateX(calc(-1 * var(--narration-width, 100%))); }
+       presented near the reader before later words arrive in order. The
+       final word finishes at the center reading point instead of clipping
+       beyond the left edge. */
+    0% {
+        transform: translateX(var(--narration-start, 68%));
+        opacity: 0;
+    }
+    7% {
+        opacity: 0.92;
+    }
+    93% {
+        opacity: 0.92;
+    }
+    100% {
+        transform: translateX(calc(var(--narration-end, 50%) - var(--narration-width, 100%)));
+        opacity: 0;
+    }
 }
 
 .timer {
@@ -1001,11 +1037,13 @@ input[type="range"]::-moz-range-progress {
     font-size: 0.78rem;
 }
 
-#voice-echo {
+#voice-echo,
+#music-echo {
     flex: 1 1 auto;
 }
 
-.mixer-row label[for="voice-echo"] {
+.mixer-row label[for="voice-echo"],
+.mixer-row label[for="music-echo"] {
     width: auto;
     min-width: 92px;
     white-space: nowrap;

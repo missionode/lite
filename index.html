@@ -68,6 +68,7 @@
                 <label data-i18n="ui.options">Options</label>
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
+                <label class="checkbox-label"><input type="checkbox" id="no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
             </div>
 
             <div id="yoga-experience-setup" class="config-group settings-panel" hidden>
@@ -453,6 +454,17 @@
                     </div>
                 </details>
 
+                <details id="music-tuning-panel" class="mixer-section mixer-collapsible">
+                    <summary class="mixer-section-title">
+                        <span data-i18n="ui.musicTuning">Background Music</span>
+                        <span class="mixer-chevron" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div class="mixer-section-body">
+                        <div class="mixer-row"><label for="music-echo" data-i18n="ui.musicEcho">Music Space</label><select id="music-echo"><option value="off" data-i18n="ui.musicEchoOff">Off</option><option value="light" selected data-i18n="ui.musicEchoLight">Soft Room</option><option value="spacious" data-i18n="ui.musicEchoSpacious">Temple Air</option></select></div>
+                        <p class="mixer-note" data-i18n="ui.musicEchoNote">Applies to background music only.</p>
+                    </div>
+                </details>
+
                 <div class="mixer-section">
                     <label class="mixer-section-title" data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>
                     <label class="checkbox-label"><input type="checkbox" id="audio-filters-toggle"> <span data-i18n="ui.audioFilters">Enable Audio Filters (Warmth)</span></label>
@@ -463,7 +475,9 @@
 
                 <div class="mixer-section">
                     <label class="checkbox-label"><input type="checkbox" id="mixer-no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
-                    <p class="mixer-note" data-i18n="ui.noFrequencyModeNote">Disables tones, drones, bells and mantra tracks. Narration and background music continue.</p>
+                    <p class="mixer-note" data-i18n="ui.noFrequencyModeNote">Disables generated tones, drones, bells and Shots. Recorded mantra audio remains available.</p>
+                    <label class="checkbox-label"><input type="checkbox" id="mixer-no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
+                    <p class="mixer-note" data-i18n="ui.noMantraModeNote">Disables recorded mantra audio while keeping narration and background music available.</p>
                 </div>
 
                 <div class="mixer-actions">

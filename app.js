@@ -32,6 +32,8 @@ const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
 const SLEEP_STAGE_COUNT = 5;
 const SHOT_CHAKRA_ORDER = Object.freeze(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
 const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
+const MANTRA_MUSIC_FADE_SECONDS = 1.5;
+const MANTRA_FADE_SECONDS = 2;
 
 function getShotDefaultDuration(type, definition = timingConfig.journey?.shotDuration || {}) {
     const isMultiStage = MULTI_STAGE_SHOT_TYPES.includes(type);
@@ -134,31 +136,58 @@ const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
     const sentenceGaps = Math.max(0, sentenceCount - 1) * 1.5;
     return 1.2 + (text.length / (charactersPerSecond * pacingFactor)) + sentenceGaps;
 };
+let narrationTickerAwaitingPlayback = false;
 const refreshNarrationTicker = (el) => {
     const container = el?.closest('[data-narration-ticker]');
     if (!el || !container) return;
 
     el.classList.remove('is-scrolling');
     el.style.removeProperty('--narration-duration');
+    if (narrationTickerAwaitingPlayback) {
+        el.classList.add('is-awaiting-playback');
+        return;
+    }
+    el.classList.remove('is-awaiting-playback');
     if (!el.textContent.trim() || container.clientWidth === 0) return;
 
     // Keep the behavior marquee-like even for short prompts. The first word
     // starts near the reader and later words arrive in normal LTR order.
     const textWidth = el.scrollWidth;
     const startOffset = container.clientWidth * 0.68;
-    const travel = textWidth + startOffset;
+    const endOffset = container.clientWidth * 0.5;
     el.style.setProperty('--narration-width', `${textWidth}px`);
     el.style.setProperty('--narration-start', `${startOffset}px`);
-    const isMobile = container.clientWidth <= 600;
-    const pixelsPerSecond = isMobile ? 42 : 34;
-    const motionDuration = travel / pixelsPerSecond;
+    el.style.setProperty('--narration-end', `${endOffset}px`);
     const speechDuration = Number(container.dataset.narrationDurationHint);
-    // Mobile gets a modest speed increase, but never at the cost of racing
-    // ahead of the spoken block. The ticker may repeat only if speech itself
-    // lasts longer than one complete pass.
-    const duration = Math.max(14, motionDuration, Number.isFinite(speechDuration) ? speechDuration * 1.15 : 0);
+    // The voice timing is the only timing authority. Width still determines
+    // the geometric travel distance, but never changes the ticker duration;
+    // otherwise identical narration drifts on different devices.
+    const duration = Number.isFinite(speechDuration)
+        ? Math.max(1, speechDuration)
+        : Math.max(1, estimateNarrationDurationSeconds(el.textContent));
     el.style.setProperty('--narration-duration', `${duration}s`);
     el.classList.add('is-scrolling');
+};
+const setNarrationTickerAwaitingPlayback = (awaiting) => {
+    narrationTickerAwaitingPlayback = Boolean(awaiting);
+    if (narrationTickerAwaitingPlayback) {
+        document.querySelectorAll('[data-narration-text]').forEach((el) => {
+            el.classList.remove('is-scrolling');
+            el.classList.add('is-awaiting-playback');
+        });
+    }
+};
+const startNarrationTicker = (durationSeconds) => {
+    setNarrationTickerAwaitingPlayback(false);
+    document.querySelectorAll('[data-narration-text]').forEach((el) => {
+        const container = el.closest('[data-narration-ticker]');
+        if (!container || !el.textContent.trim()) return;
+        const duration = Number(durationSeconds);
+        if (Number.isFinite(duration) && duration > 0) {
+            container.dataset.narrationDurationHint = String(duration);
+        }
+        refreshNarrationTicker(el);
+    });
 };
 const setNarrationText = (txt, narrationDurationSeconds = null) => {
     const text = String(txt ?? '').trim();
@@ -167,6 +196,7 @@ const setNarrationText = (txt, narrationDurationSeconds = null) => {
         el.dataset.renderId = renderId;
         el.textContent = text;
         el.classList.remove('is-scrolling', 'is-paused');
+        el.classList.toggle('is-awaiting-playback', narrationTickerAwaitingPlayback && Boolean(text));
         el.style.removeProperty('--narration-duration');
         const container = el.closest('[data-narration-ticker]');
         if (container) {
@@ -704,6 +734,7 @@ function applyLocaleUI() {
         'box-breathing-experience-toggle': 'ui.boxBreathingExperience',
         'hooponopono-experience-toggle': 'ui.hooponoponoExperience',
         'no-frequency-mode-toggle': 'ui.noFrequencyMode',
+        'no-mantra-mode-toggle': 'ui.noMantraMode',
         'eyes-close-mode-toggle': 'ui.eyesCloseMode',
         'music-only-toggle': 'ui.musicOnlyMode',
         'sleep-mode-toggle': 'ui.sleepMode',
@@ -933,10 +964,19 @@ class PiperTTS {
         return Math.max(0.7, Math.min(1.5, gain));
     }
 
-    async play(blob, volumeScale = 1) {
+    async decode(blob) {
         if (!blob) return;
         const arrayBuffer = await blob.arrayBuffer();
         const buffer = await this.audio.ctx.decodeAudioData(arrayBuffer);
+        return buffer || null;
+    }
+
+    async play(blob, volumeScale = 1, callbacks = {}) {
+        const buffer = await this.decode(blob);
+        return this.playBuffer(buffer, volumeScale, callbacks);
+    }
+
+    async playBuffer(buffer, volumeScale = 1, callbacks = {}) {
         if (!buffer || !this.audio.ctx) return;
 
         return new Promise((resolve) => {
@@ -952,7 +992,12 @@ class PiperTTS {
                     this.currentSource = null;
                     this.currentResolve = null;
                 }
-                resolve();
+                try {
+                    callbacks.onEnd?.({ duration: buffer.duration, endedAt: this.audio.ctx.currentTime });
+                } catch (error) {
+                    console.warn('[Piper] playback end callback failed:', error);
+                }
+                resolve({ duration: buffer.duration });
             };
             const now = this.audio.ctx.currentTime;
             const fadeTime = Math.min(0.05, buffer.duration / 4);
@@ -965,6 +1010,11 @@ class PiperTTS {
             }
             if (this.audio.voiceGain) {
                 this.audio.voiceGain.gain.setValueAtTime(state.volVoice * volumeScale, now);
+            }
+            try {
+                callbacks.onStart?.({ duration: buffer.duration, startedAt: now });
+            } catch (error) {
+                console.warn('[Piper] playback start callback failed:', error);
             }
             source.start();
         });
@@ -1127,6 +1177,16 @@ class AudioEngine {
         this.voiceEchoConvolver = null;
         this.voiceEchoFilter = null;
         this.voiceEchoWetGain = null;
+        this.musicEchoSend = null;
+        this.musicEchoDelay = null;
+        this.musicEchoConvolver = null;
+        this.musicEchoFilter = null;
+        this.musicEchoWetGain = null;
+        this.bgMusicBusGain = null;
+        this.bgMusicTargetVolume = null;
+        this.bgMusicTargetEQ = 0;
+        this.bgMusicRestoreTimer = null;
+        this.bgMusicSuppressedByMantra = false;
         this.lowCutFilter = null;
         this.mantraPresenceLFO = null; // New: Organic Mantra Motion
     }
@@ -1276,11 +1336,39 @@ class AudioEngine {
         this.bgMusicSmoothGain = this.ctx.createGain();
         this.bgMusicSmoothGain.gain.value = state.eyesCloseMode ? 0.7 : 1.0;
 
+        // Background-music-only echo. Keep this separate from voice echo so
+        // the guide can tune the room around the music without colouring
+        // narration or mantra audio.
+        this.musicEchoSend = this.ctx.createGain();
+        this.musicEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.musicEchoDelay = this.ctx.createDelay(0.5);
+        this.musicEchoDelay.delayTime.setValueAtTime(0.06, this.ctx.currentTime);
+        this.musicEchoConvolver = this.ctx.createConvolver();
+        this.musicEchoConvolver.buffer = this.createImpulseResponse(1.1, 3.2);
+        this.musicEchoFilter = this.ctx.createBiquadFilter();
+        this.musicEchoFilter.type = 'lowpass';
+        this.musicEchoFilter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+        this.musicEchoWetGain = this.ctx.createGain();
+        this.musicEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        this.musicEchoSend.connect(this.musicEchoDelay);
+        this.musicEchoDelay.connect(this.musicEchoConvolver);
+        this.musicEchoConvolver.connect(this.musicEchoFilter);
+        this.musicEchoFilter.connect(this.musicEchoWetGain);
+
+        // One final music-only gate controls both dry music and its echo.
+        // This makes mantra muting complete and click-free without touching
+        // the drone master gain.
+        this.bgMusicBusGain = this.ctx.createGain();
+        this.bgMusicBusGain.gain.setValueAtTime(1, this.ctx.currentTime);
+
         this.bgMusicGain.connect(this.bgMusicEQ);
         this.bgMusicEQ.connect(this.bgMusicLPF);
         this.bgMusicLPF.connect(this.bgMusicHumFilter);
         this.bgMusicHumFilter.connect(this.bgMusicSmoothGain);
-        this.bgMusicSmoothGain.connect(this.lowCutFilter);
+        this.bgMusicSmoothGain.connect(this.bgMusicBusGain);
+        this.bgMusicGain.connect(this.musicEchoSend);
+        this.musicEchoWetGain.connect(this.bgMusicBusGain);
+        this.bgMusicBusGain.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -1383,6 +1471,7 @@ class AudioEngine {
         this.isInitialized = true;
         this.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
         this.setVoiceEcho(state.voiceEcho);
+        this.setMusicEcho(state.musicEcho);
     }
 
     setVoiceTuning(warmth = 50, clarity = 50) {
@@ -1407,6 +1496,25 @@ class AudioEngine {
         this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
         this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
         this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
+    }
+
+    setMusicEcho(mode = 'light') {
+        if (!this.ctx || !this.musicEchoSend || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
+        const settings = {
+            off: { delay: 0.06, wet: 0 },
+            light: { delay: 0.055, wet: 0.10 },
+            spacious: { delay: 0.09, wet: 0.15 }
+        }[mode] || { delay: 0.055, wet: 0.10 };
+        const now = this.ctx.currentTime;
+        this.musicEchoDelay.delayTime.cancelScheduledValues(now);
+        this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
+        this.musicEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
+        this.musicEchoSend.gain.cancelScheduledValues(now);
+        this.musicEchoSend.gain.setValueAtTime(this.musicEchoSend.gain.value, now);
+        this.musicEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
+        this.musicEchoWetGain.gain.cancelScheduledValues(now);
+        this.musicEchoWetGain.gain.setValueAtTime(this.musicEchoWetGain.gain.value, now);
+        this.musicEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
     }
 
     toggleEyesCloseMode(enabled) {
@@ -1793,11 +1901,15 @@ class AudioEngine {
     }
 
     async playMantraTrack(key) {
-        if (state.noFrequencyMode) return;
+        if (state.noMantraMode) return;
         const filePath = MANTRA_AUDIO_MAP[key];
         if (!filePath) return;
 
-        this.stopMantraTrack();
+        this.stopMantraTrack({ restoreMusic: false });
+        // Mute the complete music bus before loading/starting the mantra.
+        // The dedicated gate also silences any echo tail, not only the dry
+        // background track.
+        this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
 
         try {
             if (!this.mantraBuffer[key]) {
@@ -1836,12 +1948,6 @@ class AudioEngine {
                 this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
             }
 
-            // Deep spectral carving on BG music when mantra is active
-            if (this.bgMusicEQ) {
-                this.bgMusicEQ.gain.cancelScheduledValues(now);
-                this.bgMusicEQ.gain.linearRampToValueAtTime(-12, now + 8); // Hollow out space
-            }
-
             // Explicitly fade out any elemental noise during mantra
             this.elementalNodes.forEach(({ gain }) => {
                 gain.gain.cancelScheduledValues(now);
@@ -1852,11 +1958,15 @@ class AudioEngine {
             // SOFT FAIL: Log error but don't crash the journey. 
             // This prevents the "Stable Connection" alert if a specific file fails.
             console.error(`Audio Load Error (${key}):`, e);
+            this.restoreBackgroundMusicAfterMantra();
         }
     }
 
-    stopMantraTrack() {
-        if (!this.mantraLoop) return;
+    stopMantraTrack({ restoreMusic = true } = {}) {
+        if (!this.mantraLoop) {
+            if (restoreMusic) this.restoreBackgroundMusicAfterMantra();
+            return;
+        }
         const now = this.ctx.currentTime;
 
         if (this.mantraPresenceLFO) {
@@ -1866,17 +1976,12 @@ class AudioEngine {
 
         this.mantraGain.gain.cancelScheduledValues(now);
         this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
-        this.mantraGain.gain.linearRampToValueAtTime(0, now + 8); // Gentler exit
+        this.mantraGain.gain.linearRampToValueAtTime(0, now + MANTRA_FADE_SECONDS);
 
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
             this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
             this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 6);
-        }
-
-        if (this.bgMusicEQ) {
-            this.bgMusicEQ.gain.cancelScheduledValues(now);
-            this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + 6); // Restore spectrum
         }
 
         // Restore elemental layer subtly after mantra
@@ -1886,8 +1991,18 @@ class AudioEngine {
             gain.gain.linearRampToValueAtTime(0.015, now + 4);
         });
 
-        this.mantraLoop.stop(4);
+        this.mantraLoop.stop(MANTRA_FADE_SECONDS);
         this.mantraLoop = null;
+
+        // Keep music muted until the mantra fade is complete. Restoring it
+        // immediately would create an avoidable overlap at every chakra.
+        if (restoreMusic) {
+            this.cancelBackgroundMusicRestore();
+            this.bgMusicRestoreTimer = setTimeout(() => {
+                this.bgMusicRestoreTimer = null;
+                this.restoreBackgroundMusicAfterMantra();
+            }, MANTRA_FADE_SECONDS * 1000);
+        }
     }
 
     // New: Studio Reverb Swell for Transitions
@@ -1912,6 +2027,14 @@ class AudioEngine {
             this.bgMusicLoop.stop(0);
         }
 
+        this.cancelBackgroundMusicRestore();
+        this.bgMusicSuppressedByMantra = false;
+        if (this.bgMusicBusGain) {
+            const now = this.ctx.currentTime;
+            this.bgMusicBusGain.gain.cancelScheduledValues(now);
+            this.bgMusicBusGain.gain.setValueAtTime(1, now);
+        }
+
         // Standardized to 3.0s crossfade
         this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
         this.bgMusicLoop.start();
@@ -1928,6 +2051,8 @@ class AudioEngine {
 
         const targetVol = state.volMusic * factor;
         const targetEQ = factor < 1.0 ? -12 : 0; // Deeper -12dB cut clears space for voice
+        this.bgMusicTargetVolume = targetVol;
+        this.bgMusicTargetEQ = targetEQ;
         
         const now = this.ctx.currentTime;
         
@@ -1948,6 +2073,15 @@ class AudioEngine {
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
         this.bgMusicLoop.setGain(1.0);
+
+        // A narration request during the mantra fade may update the desired
+        // level, but must not reopen the music bus until the mantra is done.
+        if (this.bgMusicSuppressedByMantra) return;
+        if (this.bgMusicBusGain) {
+            this.bgMusicBusGain.gain.cancelScheduledValues(now);
+            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+            this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + duration);
+        }
     }
 
     fadeOutBackgroundMusic(duration = 4) {
@@ -1961,7 +2095,37 @@ class AudioEngine {
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
     }
+
+    cancelBackgroundMusicRestore() {
+        if (this.bgMusicRestoreTimer) {
+            clearTimeout(this.bgMusicRestoreTimer);
+            this.bgMusicRestoreTimer = null;
+        }
+    }
+
+    muteBackgroundMusicForMantra(duration = MANTRA_MUSIC_FADE_SECONDS) {
+        if (!this.ctx || !this.bgMusicBusGain) return;
+        this.cancelBackgroundMusicRestore();
+        this.bgMusicSuppressedByMantra = true;
+        const now = this.ctx.currentTime;
+        this.bgMusicBusGain.gain.cancelScheduledValues(now);
+        this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+        this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + Math.max(0, duration));
+    }
+
+    restoreBackgroundMusicAfterMantra(duration = MANTRA_MUSIC_FADE_SECONDS) {
+        if (!this.ctx || !this.bgMusicBusGain) return;
+        this.cancelBackgroundMusicRestore();
+        this.bgMusicSuppressedByMantra = false;
+        const now = this.ctx.currentTime;
+        this.bgMusicBusGain.gain.cancelScheduledValues(now);
+        this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+        this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
+    }
+
     stopBackgroundMusic() {
+        this.cancelBackgroundMusicRestore();
+        this.bgMusicSuppressedByMantra = false;
         if (this.bgMusicLoop) {
             this.bgMusicLoop.stop(2);
             this.bgMusicLoop = null;
@@ -2062,6 +2226,7 @@ class MeditationController {
     }
 
     startTimedDrone(baseFrequency, elementalIndex, practiceMinutes, durationMode = state.droneDurationMode) {
+        if (state.noFrequencyMode || state.noMantraMode) return;
         this.cancelDroneTimer();
         this.audio.startDrone(baseFrequency, elementalIndex);
         const generation = this.droneTimerGeneration;
@@ -2958,6 +3123,7 @@ class MeditationController {
 
     async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal') {
         if (!text || !this.isMeditationActive && !fadeOut) return;
+        setNarrationTickerAwaitingPlayback(true);
         setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
         if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
         if (this.audio.voiceCarveFilter) {
@@ -2977,31 +3143,32 @@ class MeditationController {
         await this.pauseAwareSleep(leadIn * 1000);
 
         const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
-        const pending = sentences.slice(0, 2).map(sentence => piperTTS.synthesize(sentence));
-        let piperFailed = false;
+        // Keep Piper's natural sentence-level prosody, but use the same queued
+        // clips for the visual timeline. No audio is split into word-sized
+        // pieces, so the voice remains continuous and expressive.
+        const clipBlobs = await Promise.all(sentences.map(sentence => piperTTS.synthesize(sentence)));
+        const clipBuffers = [];
+        for (const blob of clipBlobs) {
+            const buffer = await piperTTS.decode(blob);
+            if (!buffer) throw new Error('Piper returned an empty audio clip.');
+            clipBuffers.push(buffer);
+        }
+        const piperDuration = clipBuffers.reduce((total, buffer) => total + buffer.duration, 0) +
+            Math.max(0, sentences.length - 1) * sentenceGap;
+        let tickerStarted = false;
 
-        for (let i = 0; i < sentences.length; i++) {
+        for (let i = 0; i < clipBuffers.length; i++) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
-
-            if (piperFailed) {
-                await this.narrateBrowser(sentences[i], false, true, pacing, false);
-                continue;
-            }
-
-            try {
-                const blob = await pending.shift();
-                if (i + 2 < sentences.length) pending.push(piperTTS.synthesize(sentences[i + 2]));
-                await piperTTS.play(blob, volumeScale);
-            } catch (error) {
-                piperFailed = true;
-                pending.forEach(job => job.catch(() => {}));
-                piperTTS.cancel('sentence failed');
-                setVoiceStatus(t('ui.piperFallback'), 'error');
-                await this.narrateBrowser(sentences[i], false, true, pacing, false);
-            }
-
-            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
+            await piperTTS.playBuffer(clipBuffers[i], volumeScale, {
+                onStart: () => {
+                    if (!tickerStarted) {
+                        tickerStarted = true;
+                        startNarrationTicker(piperDuration);
+                    }
+                }
+            });
+            if (i < clipBuffers.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         if (fadeOut) {
@@ -3033,6 +3200,7 @@ class MeditationController {
 
     async narrateSoftBrowser(text) {
         setText('narration-text', text, estimateNarrationDurationSeconds(text, 'soft'));
+        setNarrationTickerAwaitingPlayback(false);
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -3225,14 +3393,17 @@ class MeditationController {
             : key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
         const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
 
-        this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
-
         if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
         await this.narrate(localized(chakra, 'meditation') || localized(chakra));
         if (!this.isMeditationActive) return;
 
-        // Start looping mantra audio track (fades in, drone fades down)
+        // Start the mantra first. The matching drone must never run under the
+        // narration; it begins only after mantra playback is active.
         await this.audio.playMantraTrack(key);
+        if (!this.isMeditationActive) return;
+        if (!state.noMantraMode && this.audio.mantraLoop) {
+            this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
+        }
 
         const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
@@ -3281,6 +3452,7 @@ class MeditationController {
 
     async narrateFeebleBrowser(text) {
         setText('narration-text', text, estimateNarrationDurationSeconds(text, 'feeble'));
+        setNarrationTickerAwaitingPlayback(false);
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -3322,6 +3494,7 @@ class MeditationController {
 
     async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal', updateTicker = true) {
         if (updateTicker) setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
+        setNarrationTickerAwaitingPlayback(false);
         if (!window.speechSynthesis) return;
 
         // Cancel any queued speech to prevent buildup on mobile
@@ -3597,6 +3770,7 @@ const state = {
     voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
     voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
     voiceEcho: localStorage.getItem('chakra_voice_echo') || 'light',
+    musicEcho: localStorage.getItem('chakra_music_echo') || 'light',
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -3621,6 +3795,7 @@ const state = {
     // Default off: this mode disables intentional frequency generators while
     // preserving narration and background music in a guided journey.
     noFrequencyMode: localStorage.getItem('chakra_no_frequency_mode') === 'true',
+    noMantraMode: localStorage.getItem('chakra_no_mantra_mode') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
@@ -3804,6 +3979,7 @@ function applyJourneyVoiceProfile(isHighEnergy) {
     syncValue('voice-warmth', state.voiceWarmth);
     syncValue('voice-pace', state.voicePace);
     syncValue('voice-echo', state.voiceEcho);
+    syncValue('music-echo', state.musicEcho);
     document.querySelectorAll('[data-voice-preset]').forEach(button => {
         button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : 'soft'));
     });
@@ -3871,6 +4047,7 @@ function loadPreferences() {
     syncValue('voice-warmth', state.voiceWarmth);
     syncValue('voice-pace', state.voicePace);
     syncValue('voice-echo', state.voiceEcho);
+    syncValue('music-echo', state.musicEcho);
 
     // Sync Settings Sliders
     syncValue('settings-vol-voice', state.volVoice);
@@ -3890,12 +4067,14 @@ function loadPreferences() {
     syncChecked('returning-journey-toggle', state.returningJourney);
     syncChecked('audio-filters-toggle', state.audioFilters);
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
+    syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
     syncChecked('reverse-journey-toggle', state.reverseJourney);
     localStorage.removeItem('chakra_box_meditation');
     localStorage.removeItem('chakra_hooponopono');
     syncChecked('box-breathing-experience-toggle', false);
     syncChecked('hooponopono-experience-toggle', false);
     syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
+    syncChecked('no-mantra-mode-toggle', state.noMantraMode);
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
     localStorage.removeItem('chakra_bg_music_mode');
     localStorage.removeItem('chakra_high_energy');
@@ -4000,6 +4179,12 @@ function showScreen(screen) {
     });
     if (screen) {
         screen.classList.remove('hidden');
+        // Screen sections can be taller than a desktop viewport. Reset both
+        // possible scroll containers so returning to the Lobby never leaves
+        // the header and controls above Core Practice Duration out of view.
+        screen.scrollTop = 0;
+        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+        if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
         const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
         schedule(() => document.querySelectorAll('[data-narration-text]').forEach(refreshNarrationTicker));
     }
@@ -4739,12 +4924,25 @@ function attachEventListeners() {
             meditation.cancelDroneTimer();
             audio.stopDrone();
             audio.stopFrequencyShot();
+        }
+        updateExperienceModeVisibility();
+        updateSessionEstimate();
+    }
+    function setNoMantraMode(enabled) {
+        state.noMantraMode = Boolean(enabled);
+        localStorage.setItem('chakra_no_mantra_mode', state.noMantraMode);
+        syncChecked('no-mantra-mode-toggle', state.noMantraMode);
+        syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
+        if (state.noMantraMode) {
+            meditation.cancelDroneTimer();
+            audio.stopDrone();
             audio.stopMantraTrack();
         }
         updateExperienceModeVisibility();
         updateSessionEstimate();
     }
     document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
+    document.getElementById('no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
     });
@@ -4957,6 +5155,7 @@ function attachEventListeners() {
         if (!mixer) return;
         mixer.classList.remove('hidden');
         syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
+        syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
         const closeButton = document.getElementById('close-mixer');
         if (closeButton) closeButton.focus();
     });
@@ -4978,6 +5177,7 @@ function attachEventListeners() {
         startMeditationBtn.click();
     });
     document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
+    document.getElementById('mixer-no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
     // Unified Volume Handlers
     const syncVolume = (key, value, elements) => {
         state[key] = parseFloat(value);
@@ -5011,6 +5211,11 @@ function attachEventListeners() {
         state.voiceEcho = event.target.value;
         localStorage.setItem('chakra_voice_echo', state.voiceEcho);
         if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
+    });
+    document.getElementById('music-echo')?.addEventListener('change', (event) => {
+        state.musicEcho = event.target.value;
+        localStorage.setItem('chakra_music_echo', state.musicEcho);
+        if (audio.setMusicEcho) audio.setMusicEcho(state.musicEcho);
     });
     const voicePresets = {
         soft: { clarity: 35, warmth: 65, pace: 0.9 },

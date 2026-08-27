@@ -8,6 +8,8 @@ const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.
 
 assert.match(html, /id="no-frequency-mode-toggle"/, 'Settings should expose No Frequency Mode');
 assert.match(html, /id="mixer-no-frequency-mode-toggle"/, 'the in-session mixer should expose No Frequency Mode');
+assert.match(html, /id="no-mantra-mode-toggle"/, 'Settings should expose the independent No Mantra Mode');
+assert.match(html, /id="mixer-no-mantra-mode-toggle"/, 'the in-session mixer should expose the independent No Mantra Mode');
 assert.doesNotMatch(html, /id="frequencies-toggle"|id="mixer-frequencies-toggle"/, 'the former 110 Hz fallback controls should not remain');
 assert.match(app, /noFrequencyMode: localStorage\.getItem\('chakra_no_frequency_mode'\) === 'true'/, 'No Frequency Mode should default to off and persist only when enabled');
 assert.doesNotMatch(app, /state\.chakraFrequencies|chakra_frequencies/, 'the former fallback preference must not control generated audio');
@@ -24,7 +26,7 @@ const sleepDrone = method('startSleepDrone(beatFrequency)', 'startFrequencyShot(
 const shot = method('startFrequencyShot(frequency)', 'stopFrequencyShot()');
 const stopBinaural = method('stopBinaural()', 'stopDrone()');
 const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
-const mantra = method('async playMantraTrack(key)', 'stopMantraTrack()');
+const mantra = method('async playMantraTrack(key)', 'stopMantraTrack({ restoreMusic = true } = {})');
 const bowlStart = app.indexOf('    playSingingBowl()');
 const bowlEnd = app.indexOf('\n}\n\n// Visual Engine', bowlStart);
 assert.ok(bowlStart >= 0 && bowlEnd > bowlStart, 'playSingingBowl() must remain readable');
@@ -35,17 +37,21 @@ assert.match(sleepDrone, /this\.stopDrone\(\);[\s\S]*?if \(state\.noFrequencyMod
 assert.match(shot, /if \(state\.noFrequencyMode\)[\s\S]*?frequency-only Shots/, 'frequency-only Shots should be rejected at the audio boundary');
 assert.match(stopBinaural, /if \(!this\.ctx\)[\s\S]*?this\.binauralNodes = \[\];[\s\S]*?return;/, 'stopping binaural audio before Web Audio initialization should be safe');
 assert.match(stopDrone, /if \(!this\.ctx\)[\s\S]*?return;/, 'No Frequency Mode should safely stop an uninitialized drone graph');
-assert.match(mantra, /if \(state\.noFrequencyMode\) return;/, 'mantra tracks should be silent in No Frequency Mode');
+assert.doesNotMatch(mantra, /if \(state\.noFrequencyMode\) return;/, 'No Frequency Mode must not disable recorded mantra tracks');
+assert.match(mantra, /if \(state\.noMantraMode\) return;/, 'mantra tracks should have their own independent disable mode');
 assert.match(bowl, /state\.noFrequencyMode/, 'singing-bowl tones should be silent in No Frequency Mode');
 assert.match(app, /if \(state\.eyesCloseMode && !state\.noFrequencyMode\)/, 'Eyes Close anchoring should not create a 40 Hz tone in No Frequency Mode');
-assert.match(app, /function setNoFrequencyMode\(enabled\)[\s\S]*?meditation\.cancelDroneTimer\(\);[\s\S]*?audio\.stopDrone\(\);[\s\S]*?audio\.stopFrequencyShot\(\);[\s\S]*?audio\.stopMantraTrack\(\);/, 'enabling the setting during a journey should stop active frequency audio');
+assert.match(app, /function setNoFrequencyMode\(enabled\)[\s\S]*?meditation\.cancelDroneTimer\(\);[\s\S]*?audio\.stopDrone\(\);[\s\S]*?audio\.stopFrequencyShot\(\);/, 'enabling the setting during a journey should stop active frequency audio');
+const noFrequencySetter = app.slice(app.indexOf('function setNoFrequencyMode(enabled)'), app.indexOf('function setNoMantraMode(enabled)'));
+assert.doesNotMatch(noFrequencySetter, /audio\.stopMantraTrack\(\)/, 'No Frequency Mode must leave mantra playback available');
+assert.match(app, /function setNoMantraMode\(enabled\)[\s\S]*?audio\.stopDrone\(\);[\s\S]*?audio\.stopMantraTrack\(\)/, 'No Mantra Mode should stop both mantra and its matching drone');
 assert.match(app, /shotsToggle\.disabled = noFrequencyMode/, 'Shots should be unavailable in the Lobby while the setting is active');
 assert.match(app, /if \(state\.noFrequencyMode\) \{\s*alert\(t\('ui\.noFrequencyShotsUnavailable'\)\);\s*return;/, 'direct Shot activation should also be rejected');
 assert.match(app, /audio\.startBackgroundMusic\(/, 'background music remains part of normal journeys');
 assert.match(app, /this\.narrate\(/, 'narration remains part of normal journeys');
 
 for (const locale of [en, ml]) {
-    for (const key of ['noFrequencyMode', 'noFrequencyModeNote', 'noFrequencyShotsUnavailable']) {
+    for (const key of ['noFrequencyMode', 'noFrequencyModeNote', 'noFrequencyShotsUnavailable', 'noMantraMode', 'noMantraModeNote']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
