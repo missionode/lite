@@ -2326,6 +2326,7 @@ class MeditationController {
         this.experimentDuration = null;
         this.sessionStartedAt = null;
         this.droneTimerGeneration = 0;
+        this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
     }
@@ -2358,6 +2359,58 @@ class MeditationController {
             await new Promise(resolve => setTimeout(resolve, step));
         }
         return this.isMeditationActive && generation === this.droneTimerGeneration;
+    }
+
+    async waitForIntentionFrequencyDuration(durationMs, generation) {
+        let remaining = durationMs;
+        const step = 100;
+        while (remaining > 0) {
+            if (!this.isMeditationActive || generation !== this.intentionFrequencyGeneration) return false;
+            if (!this.isPaused) remaining -= step;
+            await new Promise(resolve => setTimeout(resolve, step));
+        }
+        return this.isMeditationActive && generation === this.intentionFrequencyGeneration;
+    }
+
+    startTimedIntentionFrequency() {
+        if (!state.moodRelaxationIntentionEnabled || state.noFrequencyMode) return false;
+        const frequency = Number(this.scripts?.sound_shots?.mood_relaxation?.frequency);
+        if (!Number.isFinite(frequency) || frequency <= 0 || frequency > 20000) return false;
+
+        const practiceMinutes = this.isHighEnergy
+            ? state.timeHighEnergy
+            : state.sleepMode ? state.timeSleepStage : state.timePerChakra;
+        const durationMode = this.isHighEnergy
+            ? state.hrimDroneDurationMode
+            : state.sleepMode ? state.sleepDroneDurationMode : state.droneDurationMode;
+        const durationMs = getDroneDurationMs(practiceMinutes, durationMode);
+        this.stopIntentionFrequency();
+        try {
+            this.audio.startFrequencyShot(frequency);
+        } catch (error) {
+            console.warn('[Mood & Relaxation] intention tone could not start:', error);
+            return false;
+        }
+
+        const generation = this.intentionFrequencyGeneration;
+        void this.waitForIntentionFrequencyDuration(durationMs, generation).then(shouldStop => {
+            if (shouldStop) this.audio.stopFrequencyShot();
+        });
+        return true;
+    }
+
+    stopIntentionFrequency() {
+        this.intentionFrequencyGeneration += 1;
+        this.audio.stopFrequencyShot();
+    }
+
+    async narrateIntentionWithFrequency(text, pacing = 'normal') {
+        const toneStarted = this.startTimedIntentionFrequency();
+        try {
+            return await this.narrate(text, false, false, pacing);
+        } finally {
+            if (toneStarted) this.stopIntentionFrequency();
+        }
     }
 
     startTimedDrone(baseFrequency, elementalIndex, practiceMinutes, durationMode = state.droneDurationMode) {
@@ -2504,6 +2557,7 @@ class MeditationController {
                 const singleFrequencies = {
                     high_energy: Number(this.scripts.high_energy?.frequency),
                     anesthetic: Number(this.scripts.sound_shots?.anesthetic?.frequency),
+                    mood_relaxation: Number(this.scripts.sound_shots?.mood_relaxation?.frequency),
                     custom: customFrequency
                 };
                 stages = [{ key: type, frequency: singleFrequencies[type] }];
@@ -2522,9 +2576,11 @@ class MeditationController {
                     ? t('ui.highEnergyShot')
                     : stage.key === 'anesthetic'
                         ? t('ui.anestheticShot')
-                    : stage.key === 'custom'
-                        ? t('ui.customShot')
-                        : t(stageLabelPath);
+                        : stage.key === 'mood_relaxation'
+                            ? t('ui.moodRelaxationShot')
+                            : stage.key === 'custom'
+                                ? t('ui.customShot')
+                                : t(stageLabelPath);
                 setText('mantra-display', stageLabel === stageLabelPath ? stage.key : stageLabel);
                 this.audio.startFrequencyShot(stage.frequency);
                 await this.pauseAwareSleep(activeMs);
@@ -2786,6 +2842,7 @@ class MeditationController {
         this.isExperimentActive = false;
         this.experimentDuration = null;
         cancelNarrationPlayback();
+        this.stopIntentionFrequency();
         this.stopStageDrone();
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
@@ -2843,12 +2900,12 @@ class MeditationController {
         const personalIntention = state.intention && state.intention.trim();
         if (isHighEnergy) {
             const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
-            await this.narrate(intentionText, false, false, 'hrim');
+            await this.narrateIntentionWithFrequency(intentionText, 'hrim');
         } else if (personalIntention) {
             await this.narrate(text, false); // Still keep music playing for next part
             const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
             tutTitle.textContent = t('ui.intention');
-            await this.narrate(intentionText, false); // Keep music playing seamlessly into breathing
+            await this.narrateIntentionWithFrequency(intentionText); // Keep music playing seamlessly into breathing
         } else {
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
@@ -3822,7 +3879,7 @@ class MeditationController {
 
     stop() {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.audio.stopFrequencyShot(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.isShotActive = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
         this.isExperimentActive = false;
         cancelNarrationPlayback();
         if (this.guideControlledResolve) this.guideControlledResolve(false);
@@ -3934,6 +3991,9 @@ const state = {
     // preserving narration and background music in a guided journey.
     noFrequencyMode: localStorage.getItem('chakra_no_frequency_mode') === 'true',
     noMantraMode: localStorage.getItem('chakra_no_mantra_mode') === 'true',
+    // This optional intention tone is a saved preference. No Frequency Mode
+    // overrides playback without erasing the saved preference.
+    moodRelaxationIntentionEnabled: localStorage.getItem('chakra_mood_relaxation_intention') === 'true',
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
@@ -4215,6 +4275,9 @@ function loadPreferences() {
     syncChecked('hooponopono-experience-toggle', false);
     syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('no-mantra-mode-toggle', state.noMantraMode);
+    syncChecked('mood-relaxation-intention-toggle', state.moodRelaxationIntentionEnabled);
+    const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
+    if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
     localStorage.removeItem('chakra_bg_music_mode');
     localStorage.removeItem('chakra_high_energy');
@@ -4384,6 +4447,7 @@ function attachEventListeners() {
         syncChecked('hooponopono-experience-toggle', false);
         syncChecked('yoga-experience-toggle', false);
         state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
+        state.moodRelaxationIntentionEnabled = getChecked('mood-relaxation-intention-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
@@ -4399,6 +4463,7 @@ function attachEventListeners() {
         localStorage.removeItem('chakra_box_meditation');
         localStorage.removeItem('chakra_hooponopono');
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
+        localStorage.setItem('chakra_mood_relaxation_intention', state.moodRelaxationIntentionEnabled);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
@@ -4732,6 +4797,12 @@ function attachEventListeners() {
         if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
         const customFrequency = document.getElementById('custom-shot-frequency');
         if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || document.getElementById('shot-type-select')?.value !== 'custom';
+        const shotFrequencyNote = document.getElementById('shot-frequency-note');
+        const selectedShotType = document.getElementById('shot-type-select')?.value;
+        if (shotFrequencyNote) {
+            shotFrequencyNote.textContent = selectedShotType === 'mood_relaxation' ? t('ui.moodRelaxationShotNote') : '';
+            shotFrequencyNote.hidden = !shots || noFrequencyMode || selectedShotType !== 'mood_relaxation';
+        }
         if (normalDuration) normalDuration.style.display = shots || focusedExperience || !highEnergy ? (focusedExperience ? 'none' : 'flex') : 'none';
         if (highEnergyDuration) highEnergyDuration.style.display = shots || focusedExperience ? 'none' : (highEnergy ? 'flex' : 'none');
         if (droneDuration && !shots) droneDuration.hidden = musicOnly || noFrequencyMode || focusedExperience;
@@ -4757,7 +4828,7 @@ function attachEventListeners() {
             }
         }
         const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
+        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
         const focusedLabel = getChecked('box-breathing-experience-toggle')
             ? 'ui.beginBoxBreathing'
             : getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience' : 'ui.beginHooponopono';
@@ -5060,6 +5131,8 @@ function attachEventListeners() {
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
         syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
         syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
+        const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
+        if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
         if (state.noFrequencyMode) {
             meditation.cancelDroneTimer();
             audio.stopDrone();
@@ -5083,6 +5156,14 @@ function attachEventListeners() {
     }
     document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
+    document.getElementById('mood-relaxation-intention-toggle')?.addEventListener('change', (e) => {
+        if (state.noFrequencyMode) {
+            e.target.checked = state.moodRelaxationIntentionEnabled;
+            return;
+        }
+        state.moodRelaxationIntentionEnabled = e.target.checked;
+        localStorage.setItem('chakra_mood_relaxation_intention', state.moodRelaxationIntentionEnabled);
+    });
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
     });

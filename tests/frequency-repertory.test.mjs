@@ -18,7 +18,7 @@ assert.doesNotThrow(() => new Function(inlineScript), 'the repertory rendering s
 
 assert.equal(catalog.schemaVersion, 1, 'the reference catalog should use the supported schema');
 assert.equal(catalog.source.url, 'https://share.gemini.google/Mw3YMZgwmsHQ', 'the supplied reference document should be attributed');
-assert.equal(catalog.entries.length, 15, 'the catalog should contain five brainwave bands and ten tone references');
+assert.equal(catalog.entries.length, 16, 'the catalog should contain five brainwave bands and eleven tone references');
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind === 'brainwave').map(entry => entry.frequencyLabel),
   ['0.5–3 Hz', '4–7 Hz', '8–12 Hz', '13–30 Hz', '30–100 Hz'],
@@ -26,7 +26,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind !== 'brainwave').map(entry => entry.shotFrequency),
-  [174, 285, 396, 417, 432, 528, 639, 741, 852, 963],
+  [174, 285, 396, 417, 432, 528, 639, 741, 852, 963, 221.23],
   'all source tone frequencies should be present in order',
 );
 for (const entry of catalog.entries) {
@@ -37,6 +37,7 @@ for (const entry of catalog.entries) {
 }
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 285), '285 Hz should be added to the reference');
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 432), '432 Hz should be added to the reference');
+assert.ok(catalog.entries.some(entry => entry.shotFrequency === 221.23 && entry.kind === 'wellness'), '221.23 Hz should be included as a mood and relaxation reference');
 
 assert.match(page, /fetch\('\.\.\/scripts\.json',\{cache:'no-store'\}\)/, 'the repertory should verify the active script bundle');
 assert.match(page, /fetch\('\.\.\/data\/frequency-repertory\.json',\{cache:'no-store'\}\)/, 'the repertory should load reference features from the catalog');
@@ -65,10 +66,11 @@ const configuredUses = [
   ...['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].map(key => scripts[key].frequency),
   scripts.high_energy.frequency,
   scripts.sound_shots.anesthetic.frequency,
+  scripts.sound_shots.mood_relaxation.frequency,
   ...scripts.sleep_mode.stages.map(stage => stage.frequency),
 ];
-assert.equal(configuredUses.length, 14, 'Lite should still contain fourteen configured frequency uses');
-assert.equal(new Set(configuredUses).size, 12, 'Lite should still contain twelve distinct configured values');
+assert.equal(configuredUses.length, 15, 'Lite should contain fifteen configured frequency uses');
+assert.equal(new Set(configuredUses).size, 13, 'Lite should contain thirteen distinct configured values');
 assert.match(index, /href="\.\/docs\/repertory\.html"[^>]*data-i18n="ui\.frequencyRepertory"/, 'Sound Shot options should link to the repertory');
 assert.match(serviceWorker, /'\.\/docs\/repertory\.html'/, 'the repertory page should be available from the installed PWA cache');
 assert.match(serviceWorker, /'\.\/data\/frequency-repertory\.json'/, 'the reference catalog should be available from the installed PWA cache');

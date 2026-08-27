@@ -200,6 +200,19 @@
         "ml": "സഹസ്രാരകേന്ദ്രിത ധ്യാനം, ഏകത, ആത്മീയ ബന്ധബോധം എന്നിവയുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
       },
       "searchTerms": ["crown", "unity", "connection", "consciousness"]
+    },
+    {
+      "id": "mood-relaxation-221-23",
+      "kind": "wellness",
+      "frequencyLabel": "221.23 Hz",
+      "shotFrequency": 221.23,
+      "name": { "en": "Mood & Relaxation", "ml": "മനോഭാവവും ശാന്തതയും" },
+      "focus": { "en": "Sensual relaxation and connection", "ml": "സെൻഷ്വൽ ശാന്തതയും ബന്ധവും" },
+      "features": {
+        "en": "A contemplative tone sometimes associated with sensual relaxation, intimacy and emotional connection. Evidence for a frequency-specific effect is limited.",
+        "ml": "സെൻഷ്വൽ ശാന്തത, അടുപ്പം, വൈകാരിക ബന്ധം എന്നിവയെക്കുറിച്ചുള്ള ധ്യാനാത്മക ശ്രദ്ധയുമായി ചിലപ്പോൾ ബന്ധിപ്പിക്കുന്ന ശബ്ദം. പ്രത്യേക ആവൃത്തി പ്രത്യേക ഫലം നൽകുമെന്ന് തെളിയിക്കുന്ന തെളിവുകൾ പരിമിതമാണ്."
+      },
+      "searchTerms": ["mood", "relaxation", "sensual", "intimacy", "connection", "venus"]
     }
   ]
 }

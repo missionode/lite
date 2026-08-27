@@ -274,7 +274,8 @@
     }
   },
   "sound_shots": {
-    "anesthetic": { "frequency": 174 }
+    "anesthetic": { "frequency": 174 },
+    "mood_relaxation": { "frequency": 221.23 }
   },
   "sleep_mode": {
     "stages": [

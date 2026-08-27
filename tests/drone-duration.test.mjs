@@ -66,7 +66,7 @@ const shotHelpers = vm.runInNewContext(`
 `);
 assert.equal(shotHelpers.getShotDefaultDuration('meditation'), 7, 'Meditation Shot should default to seven seconds');
 assert.equal(shotHelpers.getShotDefaultDuration('sleep'), 7, 'Sleep Shot should default to seven seconds');
-for (const type of ['high_energy', 'anesthetic', 'custom']) {
+for (const type of ['high_energy', 'anesthetic', 'mood_relaxation', 'custom']) {
     assert.equal(shotHelpers.getShotDefaultDuration(type), 1, `${type} should default to one second`);
 }
 
@@ -83,6 +83,7 @@ assert.equal(timingConfig.journey.shotDuration.singleFrequencyDefault, 1, 'Singl
 assert.equal(timingConfig.journey.shotDuration.max, 20, 'Shots should cap at twenty seconds');
 for (const bundle of [scripts, testScripts, dotScripts]) {
     assert.equal(bundle.sound_shots?.anesthetic?.frequency, 174, 'every script bundle should provide the Anesthetic Shot at 174 Hz');
+    assert.equal(bundle.sound_shots?.mood_relaxation?.frequency, 221.23, 'every script bundle should provide the Mood & Relaxation Shot at 221.23 Hz');
 }
 
 const controlMatch = html.match(/<fieldset id="drone-duration-control"[\s\S]*?<\/fieldset>/);
@@ -95,6 +96,8 @@ assert.match(html, /id="drone-duration-sleep-note"/, 'the Lobby should explain S
 assert.match(html, /id="shots-toggle"/, 'the Lobby should expose the session-only Shots toggle');
 assert.match(html, /id="shot-frequency-input"/, 'the Lobby should expose a custom shot frequency input');
 assert.match(html, /option value="anesthetic"[^>]*data-i18n="ui\.anestheticShot"/, 'the Shot selector should offer the Anesthetic Shot');
+assert.match(html, /option value="mood_relaxation"[^>]*data-i18n="ui\.moodRelaxationShot"/, 'the Shot selector should offer the Mood & Relaxation Shot');
+assert.match(html, /id="mood-relaxation-intention-toggle"/, 'Settings should expose the session-only intention tone toggle');
 assert.ok(
     html.indexOf('id="sound-healing-title"') < html.indexOf('id="shots-control"') &&
     html.indexOf('id="shots-control"') < html.indexOf('id="lobby-title"'),
@@ -104,6 +107,15 @@ assert.match(app, /meditationRoomTitle\.hidden = shots/, 'Shots should hide the 
 assert.match(app, /MULTI_STAGE_SHOT_TYPES = Object\.freeze\(\['meditation', 'sleep'\]\)/, 'Meditation and Sleep should retain the multi-stage duration default');
 assert.match(app, /resetShotDurationForType\(event\.target\.value\)/, 'changing Shot type should apply that type\'s duration default');
 assert.match(app, /anesthetic: Number\(this\.scripts\.sound_shots\?\.anesthetic\?\.frequency\)/, 'Anesthetic Shot should load 174 Hz from the active script bundle');
+assert.match(app, /mood_relaxation: Number\(this\.scripts\.sound_shots\?\.mood_relaxation\?\.frequency\)/, 'Mood & Relaxation Shot should load 221.23 Hz from the active script bundle');
+assert.match(app, /mood_relaxation: 'ui\.activateMoodRelaxationShot'/, 'the Mood & Relaxation Shot should have a localized activation label');
+assert.match(app, /moodRelaxationShotNote/, 'the Mood & Relaxation Shot should explain its evidence limits in the Lobby');
+assert.doesNotMatch(app, /localStorage\.(?:getItem|setItem)\(['"](?:chakra_)?shot_type['"]\)/, 'the selected Shot type must remain session-only');
+assert.match(app, /if \(!state\.moodRelaxationIntentionEnabled \|\| state\.noFrequencyMode\) return false;/, 'the intention tone must require explicit activation and respect No Frequency Mode');
+assert.match(app, /getDroneDurationMs\(practiceMinutes, durationMode\)/, 'the intention tone must use the active drone-duration timing');
+assert.match(app, /narrateIntentionWithFrequency\(intentionText/, 'the intention narration must be the activation point for the optional tone');
+assert.match(app, /moodRelaxationIntentionEnabled: localStorage\.getItem\('chakra_mood_relaxation_intention'\) === 'true'/, 'the intention tone choice should be restored from local storage');
+assert.match(app, /localStorage\.setItem\('chakra_mood_relaxation_intention', state\.moodRelaxationIntentionEnabled\)/, 'the intention tone choice should be saved to local storage');
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
@@ -126,7 +138,7 @@ for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_e
 }
 
 for (const locale of [en, ml]) {
-    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'anestheticShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'activateMeditationShot', 'activateHighEnergyShot', 'activateAnestheticShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency', 'noFrequencyMode', 'noFrequencyModeNote', 'noFrequencyShotsUnavailable']) {
+    for (const key of ['droneDurationMode', 'droneBeginner', 'droneIntermediate', 'droneAdvanced', 'droneExpert', 'droneDurationHelp', 'droneDurationHrimNote', 'droneDurationSleepNote', 'droneDurationActive', 'droneDurationActiveHrim', 'droneDurationActiveSleep', 'sleepModeIntro', 'sleepStageGuidance', 'sleepStageDrowsiness', 'sleepStageLightSleep', 'sleepStageTrueSleep', 'sleepStageDeepSleep', 'sleepStageRemRest', 'shotsMode', 'soundHealing', 'shotType', 'meditationShot', 'highEnergyShot', 'anestheticShot', 'moodRelaxationShot', 'sleepShot', 'customShot', 'shotFrequency', 'shotDuration', 'shotsHelp', 'moodRelaxationShotNote', 'moodRelaxationIntention', 'moodRelaxationIntentionNote', 'activateMeditationShot', 'activateHighEnergyShot', 'activateAnestheticShot', 'activateMoodRelaxationShot', 'activateSleepShot', 'beginCustomShot', 'shotConfirm', 'shotInvalidFrequency', 'noFrequencyMode', 'noFrequencyModeNote', 'noFrequencyShotsUnavailable']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }

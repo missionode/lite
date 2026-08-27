@@ -69,6 +69,8 @@
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
                 <label class="checkbox-label"><input type="checkbox" id="no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
+                <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Intention Tone</span></label>
+                <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the script-defined 221.23 Hz tone accompanies the personal intention narration. This is session-only and works with either voice.</p>
             </div>
 
             <div class="config-group settings-panel">
@@ -254,6 +256,7 @@
                         <option value="meditation" data-i18n="ui.meditationShot">Meditation Shot</option>
                         <option value="high_energy" data-i18n="ui.highEnergyShot">High Energy Shot</option>
                         <option value="anesthetic" data-i18n="ui.anestheticShot">Anesthetic Shot</option>
+                        <option value="mood_relaxation" data-i18n="ui.moodRelaxationShot">Mood &amp; Relaxation Shot</option>
                         <option value="sleep" data-i18n="ui.sleepShot">Sleep Shot</option>
                         <option value="custom" data-i18n="ui.customShot">Custom Shot</option>
                     </select>
@@ -262,6 +265,7 @@
                         <input id="shot-frequency-input" type="number" min="0" max="20000" step="0.1" value="0" inputmode="decimal">
                     </div>
                     <p class="shots-help" data-i18n="ui.shotsHelp">One short frequency-only activation. No narration or background music.</p>
+                    <p id="shot-frequency-note" class="shots-help" hidden></p>
                     <a class="shots-repertory-link" href="./docs/repertory.html" data-i18n="ui.frequencyRepertory">View Frequency Repertory</a>
                 </div>
             </div>
