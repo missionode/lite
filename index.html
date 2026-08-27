@@ -71,6 +71,17 @@
                 <label class="checkbox-label"><input type="checkbox" id="no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
             </div>
 
+            <div class="config-group settings-panel">
+                <label for="spatial-mode" data-i18n="ui.spatialSound">Spatial Sound</label>
+                <select id="spatial-mode">
+                    <option value="off" data-i18n="ui.spatialOff">Off (Stereo Safe)</option>
+                    <option value="stereo" data-i18n="ui.spatialStereo">Stereo Wide</option>
+                    <option value="headphones" data-i18n="ui.spatialHeadphones">Headphone 3D</option>
+                    <option value="room" data-i18n="ui.spatialRoom">Room Spatial</option>
+                </select>
+                <p class="mixer-note" data-i18n="ui.spatialNote">Narration stays centered; spatial depth shapes music, drone and mantra.</p>
+            </div>
+
             <div id="yoga-experience-setup" class="config-group settings-panel" hidden>
                 <label data-i18n="ui.yogaSection">Yoga Experience Setup</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -464,6 +475,19 @@
                         <p class="mixer-note" data-i18n="ui.musicEchoNote">Applies to background music only.</p>
                     </div>
                 </details>
+
+                <div class="mixer-section">
+                    <div class="mixer-row">
+                        <label for="mixer-spatial-mode" data-i18n="ui.spatialSound">Spatial Sound</label>
+                        <select id="mixer-spatial-mode">
+                            <option value="off" data-i18n="ui.spatialOff">Off (Stereo Safe)</option>
+                            <option value="stereo" data-i18n="ui.spatialStereo">Stereo Wide</option>
+                            <option value="headphones" data-i18n="ui.spatialHeadphones">Headphone 3D</option>
+                            <option value="room" data-i18n="ui.spatialRoom">Room Spatial</option>
+                        </select>
+                    </div>
+                    <p class="mixer-note" data-i18n="ui.spatialNote">Narration stays centered; spatial depth shapes music, drone and mantra.</p>
+                </div>
 
                 <div class="mixer-section">
                     <label class="mixer-section-title" data-i18n="ui.comfortVisuals">Comfort &amp; Visuals</label>

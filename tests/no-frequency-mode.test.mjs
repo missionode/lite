@@ -26,7 +26,7 @@ const sleepDrone = method('startSleepDrone(beatFrequency)', 'startFrequencyShot(
 const shot = method('startFrequencyShot(frequency)', 'stopFrequencyShot()');
 const stopBinaural = method('stopBinaural()', 'stopDrone()');
 const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
-const mantra = method('async playMantraTrack(key)', 'stopMantraTrack({ restoreMusic = true } = {})');
+const mantra = method('async playMantraTrack(key)', 'stopMantraTrack({ restoreMusic = true, invalidate = true } = {})');
 const bowlStart = app.indexOf('    playSingingBowl()');
 const bowlEnd = app.indexOf('\n}\n\n// Visual Engine', bowlStart);
 assert.ok(bowlStart >= 0 && bowlEnd > bowlStart, 'playSingingBowl() must remain readable');

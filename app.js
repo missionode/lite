@@ -32,8 +32,13 @@ const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
 const SLEEP_STAGE_COUNT = 5;
 const SHOT_CHAKRA_ORDER = Object.freeze(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
 const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
-const MANTRA_MUSIC_FADE_SECONDS = 1.5;
-const MANTRA_FADE_SECONDS = 2;
+const SPATIAL_MODES = Object.freeze(['off', 'stereo', 'headphones', 'room']);
+const DEFAULT_SPATIAL_MODE = 'off';
+const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 5;
+const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
+const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
+const MANTRA_MUSIC_FADE_SECONDS = 4;
+const MANTRA_FADE_SECONDS = 4;
 
 function getShotDefaultDuration(type, definition = timingConfig.journey?.shotDuration || {}) {
     const isMultiStage = MULTI_STAGE_SHOT_TYPES.includes(type);
@@ -58,6 +63,10 @@ function normalizeSleepDroneDurationMode(value) {
     return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value)
         ? value
         : DEFAULT_SLEEP_DRONE_DURATION_MODE;
+}
+
+function normalizeSpatialMode(value) {
+    return SPATIAL_MODES.includes(value) ? value : DEFAULT_SPATIAL_MODE;
 }
 
 function getDroneDurationMs(_practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
@@ -1154,6 +1163,10 @@ class AudioEngine {
         this.voiceGain = null;
         this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
+        this.spatialPanLfoGain = null;
+        this.spatialDronePanner = null;
+        this.spatialMusicPanner = null;
+        this.spatialMantraPanner = null;
         this.isInitialized = false;
 
         // Looping Managers
@@ -1189,6 +1202,8 @@ class AudioEngine {
         this.bgMusicSuppressedByMantra = false;
         this.lowCutFilter = null;
         this.mantraPresenceLFO = null; // New: Organic Mantra Motion
+        this.mantraRequestId = 0;
+        this.spatialMode = DEFAULT_SPATIAL_MODE;
     }
 
     async init() {
@@ -1361,6 +1376,11 @@ class AudioEngine {
         this.bgMusicBusGain = this.ctx.createGain();
         this.bgMusicBusGain.gain.setValueAtTime(1, this.ctx.currentTime);
 
+        // Create the spatial buses before any source is connected to them.
+        // Some browsers reject AudioNode.connect() when the destination is
+        // still null, which would prevent the entire audio context starting.
+        this.spatialMusicPanner = this.createSpatialPanner();
+
         this.bgMusicGain.connect(this.bgMusicEQ);
         this.bgMusicEQ.connect(this.bgMusicLPF);
         this.bgMusicLPF.connect(this.bgMusicHumFilter);
@@ -1368,7 +1388,8 @@ class AudioEngine {
         this.bgMusicSmoothGain.connect(this.bgMusicBusGain);
         this.bgMusicGain.connect(this.musicEchoSend);
         this.musicEchoWetGain.connect(this.bgMusicBusGain);
-        this.bgMusicBusGain.connect(this.lowCutFilter);
+        this.bgMusicBusGain.connect(this.spatialMusicPanner);
+        this.spatialMusicPanner.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -1381,9 +1402,16 @@ class AudioEngine {
         pannerLfo.type = 'sine';
         pannerLfo.frequency.setValueAtTime(0.03, this.ctx.currentTime);
         pannerLfoGain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        this.spatialPanLfoGain = pannerLfoGain;
         pannerLfo.connect(pannerLfoGain);
         pannerLfoGain.connect(this.pannerNode.pan);
         pannerLfo.start();
+
+        // Keep the source buses separate until after their spatial treatment.
+        // A PannerNode can render HRTF positioning for headphones; ordinary
+        // speakers receive a safe stereo/equal-power fallback.
+        this.spatialDronePanner = this.createSpatialPanner();
+        this.spatialMantraPanner = this.createSpatialPanner();
 
         this.reverbGain = this.ctx.createGain();
         this.reverbGain.gain.value = 0.35; 
@@ -1404,8 +1432,8 @@ class AudioEngine {
         this.masterGain.connect(this.delayNode);
         this.masterGain.connect(this.pannerNode);
         this.delayNode.connect(this.pannerNode);
-        
-        this.pannerNode.connect(this.lowCutFilter);
+        this.pannerNode.connect(this.spatialDronePanner);
+        this.spatialDronePanner.connect(this.lowCutFilter);
 
         // Local Piper narration enters the same clarity/comfort chain as the
         // existing voice mix without being coupled to the drone gain.
@@ -1463,7 +1491,8 @@ class AudioEngine {
         this.mantraFilter.type = 'lowpass';
         this.mantraFilter.frequency.setValueAtTime(state.audioFilters ? 2200 : 20000, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
-        this.mantraFilter.connect(this.lowCutFilter);
+        this.mantraFilter.connect(this.spatialMantraPanner);
+        this.spatialMantraPanner.connect(this.lowCutFilter);
 
         // Apply initial Eyes Close state
         this.toggleEyesCloseMode(state.eyesCloseMode);
@@ -1472,6 +1501,81 @@ class AudioEngine {
         this.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
         this.setVoiceEcho(state.voiceEcho);
         this.setMusicEcho(state.musicEcho);
+        this.setSpatialMode(state.spatialMode);
+    }
+
+    createSpatialPanner() {
+        if (this.ctx?.createPanner) {
+            const panner = this.ctx.createPanner();
+            panner.distanceModel = 'inverse';
+            panner.refDistance = 1;
+            panner.maxDistance = 10000;
+            panner.rolloffFactor = 0;
+            panner.panningModel = 'equalpower';
+            if (panner.positionX) {
+                panner.positionX.value = 0;
+                panner.positionY.value = 0;
+                panner.positionZ.value = -1;
+            } else if (typeof panner.setPosition === 'function') {
+                panner.setPosition(0, 0, -1);
+            }
+            return panner;
+        }
+        return this.ctx.createStereoPanner();
+    }
+
+    setSpatialPosition(node, position, now) {
+        if (!node) return;
+        if (node.positionX && node.positionY && node.positionZ) {
+            [['x', node.positionX], ['y', node.positionY], ['z', node.positionZ]].forEach(([axis, param]) => {
+                param.cancelScheduledValues(now);
+                param.setValueAtTime(param.value, now);
+                param.linearRampToValueAtTime(position[axis], now + 1.2);
+            });
+        } else if (node.pan) {
+            node.pan.cancelScheduledValues(now);
+            node.pan.setValueAtTime(node.pan.value, now);
+            node.pan.linearRampToValueAtTime(Math.max(-1, Math.min(1, position.x)), now + 1.2);
+        } else if (typeof node.setPosition === 'function') {
+            node.setPosition(position.x, position.y, position.z);
+        }
+    }
+
+    setSpatialMode(mode = DEFAULT_SPATIAL_MODE) {
+        const normalized = normalizeSpatialMode(mode);
+        this.spatialMode = normalized;
+        if (!this.ctx || !this.spatialDronePanner || !this.spatialMusicPanner || !this.spatialMantraPanner) return;
+
+        const configurations = {
+            off: {
+                model: 'equalpower', lfo: 0.30,
+                drone: { x: 0, y: 0, z: -1 }, music: { x: 0, y: 0, z: -1 }, mantra: { x: 0, y: 0, z: -1 }
+            },
+            stereo: {
+                model: 'equalpower', lfo: 0.38,
+                drone: { x: 0, y: -0.05, z: -1 }, music: { x: -0.28, y: 0, z: -1 }, mantra: { x: 0.28, y: 0, z: -1 }
+            },
+            headphones: {
+                model: 'HRTF', lfo: 0.08,
+                drone: { x: 0, y: -0.45, z: 0.65 }, music: { x: -0.65, y: 0.12, z: -0.75 }, mantra: { x: 0.65, y: 0.16, z: 0.25 }
+            },
+            room: {
+                model: 'equalpower', lfo: 0.14,
+                drone: { x: 0, y: -0.20, z: 0.35 }, music: { x: -0.22, y: 0, z: -0.85 }, mantra: { x: 0.22, y: 0.16, z: 0.30 }
+            }
+        }[normalized];
+        const now = this.ctx.currentTime;
+        [this.spatialDronePanner, this.spatialMusicPanner, this.spatialMantraPanner].forEach((panner) => {
+            if ('panningModel' in panner) panner.panningModel = configurations.model;
+        });
+        this.setSpatialPosition(this.spatialDronePanner, configurations.drone, now);
+        this.setSpatialPosition(this.spatialMusicPanner, configurations.music, now);
+        this.setSpatialPosition(this.spatialMantraPanner, configurations.mantra, now);
+        if (this.spatialPanLfoGain) {
+            this.spatialPanLfoGain.gain.cancelScheduledValues(now);
+            this.spatialPanLfoGain.gain.setValueAtTime(this.spatialPanLfoGain.gain.value, now);
+            this.spatialPanLfoGain.gain.linearRampToValueAtTime(configurations.lfo, now + 1.2);
+        }
     }
 
     setVoiceTuning(warmth = 50, clarity = 50) {
@@ -1905,11 +2009,12 @@ class AudioEngine {
         const filePath = MANTRA_AUDIO_MAP[key];
         if (!filePath) return;
 
-        this.stopMantraTrack({ restoreMusic: false });
+        const requestId = ++this.mantraRequestId;
+        this.stopMantraTrack({ restoreMusic: false, invalidate: false });
         // Mute the complete music bus before loading/starting the mantra.
         // The dedicated gate also silences any echo tail, not only the dry
         // background track.
-        this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
+        const musicFade = this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
 
         try {
             if (!this.mantraBuffer[key]) {
@@ -1918,6 +2023,16 @@ class AudioEngine {
                 const arrayBuffer = await response.arrayBuffer();
                 this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
             }
+
+            // Cached mantra files can be ready immediately. Keep the same
+            // deliberate handoff in that case: music must finish fading before
+            // the mantra source starts.
+            if (musicFade) {
+                const elapsedMs = (this.ctx.currentTime - musicFade.startedAt) * 1000;
+                const remainingMs = Math.max(0, musicFade.duration * 1000 - elapsedMs);
+                if (remainingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingMs));
+            }
+            if (requestId !== this.mantraRequestId || state.noMantraMode) return;
 
             // Standardized to 3.0s crossfade
             this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
@@ -1958,11 +2073,12 @@ class AudioEngine {
             // SOFT FAIL: Log error but don't crash the journey. 
             // This prevents the "Stable Connection" alert if a specific file fails.
             console.error(`Audio Load Error (${key}):`, e);
-            this.restoreBackgroundMusicAfterMantra();
+            if (requestId === this.mantraRequestId) this.restoreBackgroundMusicAfterMantra();
         }
     }
 
-    stopMantraTrack({ restoreMusic = true } = {}) {
+    stopMantraTrack({ restoreMusic = true, invalidate = true } = {}) {
+        if (invalidate) this.mantraRequestId += 1;
         if (!this.mantraLoop) {
             if (restoreMusic) this.restoreBackgroundMusicAfterMantra();
             return;
@@ -2022,9 +2138,17 @@ class AudioEngine {
             const arrayBuffer = await response.arrayBuffer();
             this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         }
-        
+
+        // Reusing the active loop preserves its timeline and avoids an
+        // audible restart when an experience enters another stage.
+        if (this.bgMusicLoop?.isRunning) {
+            return;
+        }
+
+        // A previously stopped loop may still be completing its fade. Let it
+        // finish while the new loop fades in instead of cutting it abruptly.
         if (this.bgMusicLoop) {
-            this.bgMusicLoop.stop(0);
+            this.bgMusicLoop.stop(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         }
 
         this.cancelBackgroundMusicRestore();
@@ -2044,9 +2168,10 @@ class AudioEngine {
         if (!this.bgMusicLoop || !this.ctx) return;
         
         // Support for boolean (legacy) and numeric (fine-tuned) volume levels
-        // Whisper Quality: Deeper ducking (0.28 vs 0.45) by default for intimacy
+        // Whisper Quality: Keep narration clearly in front of a very quiet
+        // atmospheric bed without muting the room completely.
         let factor = 1.0;
-        if (isDucked === true) factor = 0.28;
+        if (isDucked === true) factor = 0.15;
         else if (typeof isDucked === 'number') factor = isDucked;
 
         const targetVol = state.volMusic * factor;
@@ -2108,26 +2233,36 @@ class AudioEngine {
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = true;
         const now = this.ctx.currentTime;
-        this.bgMusicBusGain.gain.cancelScheduledValues(now);
-        this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-        this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + Math.max(0, duration));
+        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
+            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
+        } else {
+            this.bgMusicBusGain.gain.cancelScheduledValues(now);
+            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+        }
+        const fadeDuration = Math.max(0, duration);
+        this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + fadeDuration);
+        return { startedAt: now, duration: fadeDuration };
     }
 
-    restoreBackgroundMusicAfterMantra(duration = MANTRA_MUSIC_FADE_SECONDS) {
+    restoreBackgroundMusicAfterMantra(duration = BACKGROUND_MUSIC_RESTORE_FADE_SECONDS) {
         if (!this.ctx || !this.bgMusicBusGain) return;
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = false;
         const now = this.ctx.currentTime;
-        this.bgMusicBusGain.gain.cancelScheduledValues(now);
-        this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
+            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
+        } else {
+            this.bgMusicBusGain.gain.cancelScheduledValues(now);
+            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
+        }
         this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
     }
 
-    stopBackgroundMusic() {
+    stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = false;
         if (this.bgMusicLoop) {
-            this.bgMusicLoop.stop(2);
+            this.bgMusicLoop.stop(Math.max(0, fadeTime));
             this.bgMusicLoop = null;
         }
     }
@@ -2531,7 +2666,7 @@ class MeditationController {
             // deliberately bypass the arrival, gratitude, chakra, and closing
             // stages of a meditation journey.
             if (focusedExperience) {
-                this.audio.fadeInBackgroundMusic(4);
+                this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
                 if (focusedExperience === 'box') await this.runBoxBreathing();
                 else if (focusedExperience === 'yoga') await this.runYogaSession();
                 else {
@@ -2619,7 +2754,7 @@ class MeditationController {
             try { await wakeLock.request(); } catch (error) {}
             document.getElementById('controls')?.classList.remove('hidden');
             setText('pause-meditation', 'II');
-            this.audio.fadeInBackgroundMusic(3);
+            this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
 
             if (activity.startsWith('chakra:')) {
                 const key = activity.slice('chakra:'.length);
@@ -2944,7 +3079,7 @@ class MeditationController {
         
         // Start background music loop
         await this.audio.startBackgroundMusic();
-        this.audio.fadeInBackgroundMusic(4, false);
+        this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS, false);
         this.visual.startPulsing("#7c3aed"); // Standard meditation pulse
         
         // Reuse the global controls so Music Only has a visible stop/pause path.
@@ -3645,10 +3780,12 @@ class MeditationController {
         this.sessionStartedAt = null;
         this.visual.stop(); 
         this.stopStageDrone();
-        this.audio.stopMantraTrack(); 
-        this.audio.fadeOutBackgroundMusic(2.5);
+        // The completion path must not restore music after the mantra fades.
+        // Schedule one coordinated fade for both layers instead.
+        this.audio.stopMantraTrack({ restoreMusic: false });
+        this.audio.fadeOutBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+        this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         cancelNarrationPlayback();
-        setTimeout(() => this.audio.stopBackgroundMusic(), EARN_HANDOFF_DELAY_MS);
         wakeLock.release();
         piperTTS.cancel('journey finished');
         document.getElementById('aura-bg').style.opacity = "0";
@@ -3771,6 +3908,7 @@ const state = {
     voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
     voiceEcho: localStorage.getItem('chakra_voice_echo') || 'light',
     musicEcho: localStorage.getItem('chakra_music_echo') || 'light',
+    spatialMode: normalizeSpatialMode(localStorage.getItem('chakra_spatial_mode')),
     stats: {
         journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
         time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
@@ -3980,6 +4118,8 @@ function applyJourneyVoiceProfile(isHighEnergy) {
     syncValue('voice-pace', state.voicePace);
     syncValue('voice-echo', state.voiceEcho);
     syncValue('music-echo', state.musicEcho);
+    syncValue('spatial-mode', state.spatialMode);
+    syncValue('mixer-spatial-mode', state.spatialMode);
     document.querySelectorAll('[data-voice-preset]').forEach(button => {
         button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : 'soft'));
     });
@@ -5156,6 +5296,7 @@ function attachEventListeners() {
         mixer.classList.remove('hidden');
         syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
         syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
+        syncValue('mixer-spatial-mode', state.spatialMode);
         const closeButton = document.getElementById('close-mixer');
         if (closeButton) closeButton.focus();
     });
@@ -5217,6 +5358,15 @@ function attachEventListeners() {
         localStorage.setItem('chakra_music_echo', state.musicEcho);
         if (audio.setMusicEcho) audio.setMusicEcho(state.musicEcho);
     });
+    const setSpatialMode = (mode) => {
+        state.spatialMode = normalizeSpatialMode(mode);
+        localStorage.setItem('chakra_spatial_mode', state.spatialMode);
+        syncValue('spatial-mode', state.spatialMode);
+        syncValue('mixer-spatial-mode', state.spatialMode);
+        if (audio.setSpatialMode) audio.setSpatialMode(state.spatialMode);
+    };
+    document.getElementById('spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
+    document.getElementById('mixer-spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
     const voicePresets = {
         soft: { clarity: 35, warmth: 65, pace: 0.9 },
         balanced: { clarity: 50, warmth: 50, pace: 1 },

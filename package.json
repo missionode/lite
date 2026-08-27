@@ -8,6 +8,7 @@
     "test:narration-ticker": "node tests/narration-ticker.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
+    "test:spatial-audio": "node tests/spatial-audio.test.mjs",
     "test:no-frequency": "node tests/no-frequency-mode.test.mjs",
     "test:focused-practices": "node tests/focused-practices.test.mjs",
     "test:yoga-experience": "node tests/yoga-experience.test.mjs",

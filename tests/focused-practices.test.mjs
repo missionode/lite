@@ -20,7 +20,7 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
 }
 
 assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?box-breathing-experience-toggle[\s\S]*?hooponopono-experience-toggle[\s\S]*?yoga-experience-toggle/, 'one focused practice should be selected at a time');
-assert.match(app, /if \(focusedExperience\) \{[\s\S]*?this\.audio\.fadeInBackgroundMusic\(4\);[\s\S]*?focusedExperience === 'box'[\s\S]*?this\.runBoxBreathing\(\)[\s\S]*?focusedExperience === 'yoga'[\s\S]*?this\.runYogaSession\(\)[\s\S]*?this\.runHooponopono\(\)[\s\S]*?this\.finish\(\);/, 'focused practices should finish directly without a chakra sequence');
+assert.match(app, /if \(focusedExperience\) \{[\s\S]*?this\.audio\.fadeInBackgroundMusic\(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS\);[\s\S]*?focusedExperience === 'box'[\s\S]*?this\.runBoxBreathing\(\)[\s\S]*?focusedExperience === 'yoga'[\s\S]*?this\.runYogaSession\(\)[\s\S]*?this\.runHooponopono\(\)[\s\S]*?this\.finish\(\);/, 'focused practices should finish directly without a chakra sequence');
 assert.doesNotMatch(app, /state\.boxMeditation\) await this\.runBoxBreathing\(\)|state\.hooponopono\) \{ await this\.runHooponopono\(\)/, 'normal journeys must no longer append either practice');
 assert.match(app, /clearFocusedExperiences\(target\)/, 'Experience Modes should be mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');
