@@ -416,7 +416,6 @@
                 <div id="narration-scroll-container" class="narration-scroll-container is-empty" data-narration-ticker dir="ltr" role="status" aria-live="polite" data-i18n-aria-label="ui.currentNarration" aria-label="Current narration">
                     <div id="narration-text" class="narration-scroll-text" data-narration-text></div>
                 </div>
-                <div id="timer-display" class="timer" style="position: relative; margin-bottom: 10px; font-size: 0.9rem; opacity: 0.5;">00:00</div>
                 <div id="mantra-display" style="font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px;"></div>
                 
                 <div id="progress-tracker" style="margin-top: 20px; margin-bottom: 80px; display: flex; justify-content: center; gap: 16px;">
@@ -430,6 +429,23 @@
                 </div>
             </div>
         </section>
+
+        <!-- Journey-level timer lives outside individual screens so it remains
+             visible from preparation through the final closing stage. -->
+        <div id="session-countdown-layer" aria-hidden="true">
+            <div id="session-countdown" class="session-countdown session-countdown-left" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">
+                <svg class="session-countdown-ring" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle class="session-countdown-track" cx="50" cy="50" r="44"></circle>
+                    <circle id="session-countdown-progress-left" data-session-countdown-progress class="session-countdown-progress" cx="50" cy="50" r="44"></circle>
+                </svg>
+            </div>
+            <div id="session-countdown-right" class="session-countdown session-countdown-right" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">
+                <svg class="session-countdown-ring" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle class="session-countdown-track" cx="50" cy="50" r="44"></circle>
+                    <circle id="session-countdown-progress-right" data-session-countdown-progress class="session-countdown-progress" cx="50" cy="50" r="44"></circle>
+                </svg>
+            </div>
+        </div>
 
         <!-- Full-screen in-session tuning panel -->
         <div id="volume-mixer" class="hidden" role="dialog" aria-modal="true" aria-labelledby="mixer-title">
@@ -461,6 +477,7 @@
                         <div class="mixer-row"><label for="voice-echo" data-i18n="ui.voiceEcho">Voice Space</label><select id="voice-echo"><option value="off" data-i18n="ui.voiceEchoOff">Off</option><option value="light" selected data-i18n="ui.voiceEchoLight">Soft Room</option><option value="spacious" data-i18n="ui.voiceEchoSpacious">Temple Air</option></select></div>
                         <div class="mixer-preset-row" role="group" data-i18n-aria-label="ui.voicePresets">
                             <button type="button" class="mixer-preset" data-voice-preset="soft" data-i18n="ui.voicePresetSoft">Soft</button>
+                            <button type="button" class="mixer-preset" data-voice-preset="shringara" data-i18n="ui.voicePresetShringara">Shringara</button>
                             <button type="button" class="mixer-preset mixer-preset-active" data-voice-preset="balanced" data-i18n="ui.voicePresetBalanced">Balanced</button>
                             <button type="button" class="mixer-preset" data-voice-preset="clear" data-i18n="ui.voicePresetClear">Clear</button>
                         </div>
@@ -545,6 +562,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.84"></script>
+    <script src="app.js?v=1.89"></script>
 </body>
 </html>

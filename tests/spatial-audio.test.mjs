@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 
@@ -37,8 +38,34 @@ assert.match(app, /createSpatialPanner\(\)[\s\S]*?if \(this\.ctx\?\.createPanner
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'HRTF'/, 'Headphone mode should use HRTF positioning');
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'equalpower'/, 'Speaker-safe modes should use equal-power positioning');
 assert.match(app, /setSpatialMode\(state\.spatialMode\)/, 'Saved spatial mode should apply when the audio graph initializes');
+assert.match(app, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spatial mode should apply the narration ambience without changing the saved voice preference');
 assert.match(app, /localStorage\.setItem\('chakra_spatial_mode', state\.spatialMode\)/, 'Spatial mode changes should persist');
 assert.match(app, /getElementById\('spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(app, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);
+assert.match(app, /ethereal: \{ delay: 0\.11, wet: 0\.22, filter: 5000 \}/, 'Spatial Sound should use a perceptible but centered ethereal narration ambience');
+assert.match(app, /const effectiveMode = this\.spatialMode !== 'off' \? 'ethereal' : requestedMode/, 'Spatial Sound should apply ethereal ambience only while enabled');
+assert.match(html, /id="session-countdown"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a circular session countdown');
+assert.match(html, /id="session-countdown-right"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a mirrored circular session countdown');
+assert.match(html, /id="session-countdown-layer"[\s\S]*?id="session-countdown-right"/, 'The countdown should live in a shared layer outside individual screens');
+assert.doesNotMatch(html, /id="timer-display"/, 'The legacy text timer should be removed');
+assert.doesNotMatch(html, /data-session-countdown-value/, 'The circular countdown should not contain a numeric ticker');
+assert.match(app, /startSessionCountdown\(totalMs\)/, 'The meditation controller should start one journey-level countdown');
+assert.match(app, /this\.sessionCountdownRemainingMs/, 'The journey countdown should retain continuous remaining time');
+assert.match(app, /this\.startSessionCountdown\(this\.getSessionDurationMs\(focusedExperience\)\)/, 'The main journey should initialize its total duration once');
+assert.doesNotMatch(app, /setSessionCountdown\(remaining, chantDurationMs\)/, 'The circular countdown must not reset for each chakra');
+assert.doesNotMatch(app, /setSessionCountdown\(remaining, activeMs\)/, 'The circular countdown must not reset for each shot stage');
+assert.match(styles, /\.session-countdown\s*\{[\s\S]*?position:\s*fixed[\s\S]*?top:\s*max\(1rem, env\(safe-area-inset-top\)\)/, 'The countdown should stay pinned to the upper screen corners');
+assert.match(styles, /\.session-countdown\s*\{[\s\S]*?opacity:\s*0\.24/, 'The mirrored countdowns should remain visually subtle');
+assert.match(styles, /#session-countdown-layer\s*\{[\s\S]*?z-index:\s*100/, 'The shared countdown layer should remain above meditation content');
+assert.match(styles, /#session-overlay #mantra-display\s*\{[\s\S]*?opacity:\s*0\.48/, 'The chakra title should remain visually secondary');
+assert.match(styles, /#session-overlay #progress-tracker\s*\{[\s\S]*?opacity:\s*0\.34/, 'The progress dots should remain visually secondary');
+assert.match(styles, /#breathing-screen\s*\{[\s\S]*?position:\s*fixed[\s\S]*?height:\s*100dvh/, 'The breathing experience should fill the viewport responsively');
+assert.match(styles, /\.tutorial-overlay\s*\{[\s\S]*?position:\s*fixed[\s\S]*?overflow-y:\s*auto/, 'The breathing tutorial should be a full-screen responsive layer');
+assert.match(styles, /\.tutorial-overlay::before[\s\S]*?conic-gradient[\s\S]*?animation:\s*liveChakraGradientA/, 'The breathing tutorial should use a live layered gradient');
+assert.match(styles, /color-mix\(in srgb, var\(--primary-color\)/, 'The live gradient should follow the active chakra color');
+assert.match(en.ui.spatialNote, /ethereal/i, 'English spatial guidance should explain the ethereal narration presence');
+assert.match(ml.ui.spatialNote, /അശരീരി/u, 'Malayalam spatial guidance should explain the ethereal narration presence');
+assert.ok(en.ui.sessionCountdown?.trim() && en.ui.sessionCountdownLabel?.trim(), 'English countdown labels are required');
+assert.ok(ml.ui.sessionCountdown?.trim() && ml.ui.sessionCountdownLabel?.trim(), 'Malayalam countdown labels are required');
 
 console.log('Spatial audio routing contract passed.');

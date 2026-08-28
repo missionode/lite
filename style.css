@@ -150,6 +150,16 @@ body {
     animation: fadeIn 1.2s ease-out;
 }
 
+#breathing-screen {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+    z-index: 10;
+}
+
 /* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */
 .settings-screen-container {
     padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
@@ -737,17 +747,84 @@ input[type="range"]::-moz-range-progress {
     }
 }
 
-.timer {
-    font-size: 1.1rem;
-    font-family: 'Courier New', Courier, monospace;
-    opacity: 0.4;
-    letter-spacing: 3px;
-    position: absolute;
-    top: 22.1rem;
-    right: 0;
-    left: 0;
-    margin-left: auto;
-    margin-right: auto;
+.session-countdown {
+    width: clamp(2.65rem, 5.5vw, 3.4rem);
+    aspect-ratio: 1;
+    position: fixed;
+    top: max(1rem, env(safe-area-inset-top));
+    margin: 0;
+    color: var(--accent-color);
+    opacity: 0.24;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent-color) 28%, transparent));
+    pointer-events: none;
+    z-index: 12;
+}
+
+#session-countdown-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.session-countdown-left {
+    left: max(1rem, env(safe-area-inset-left));
+}
+
+.session-countdown-right {
+    right: max(1rem, env(safe-area-inset-right));
+}
+
+/* The symbol/deity is the visual anchor. Keep supporting metadata quiet and
+   leave the mirrored journey timers at the screen edges. */
+#session-overlay #mantra-display {
+    opacity: 0.48;
+    font-size: 1.15rem !important;
+    letter-spacing: 0.28em;
+    text-shadow: none;
+    margin-bottom: 0.3rem !important;
+}
+
+#session-overlay #progress-tracker {
+    opacity: 0.34;
+    transform: scale(0.82);
+    transform-origin: center;
+    margin-top: 0.65rem !important;
+    margin-bottom: 4.3rem !important;
+}
+
+#session-overlay #progress-tracker .dot.active {
+    box-shadow: none;
+}
+
+.session-countdown-ring {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.session-countdown-track,
+.session-countdown-progress {
+    fill: rgba(255, 255, 255, 0.025);
+    stroke-width: 3;
+}
+
+.session-countdown-track {
+    stroke: rgba(255, 255, 255, 0.12);
+}
+
+.session-countdown-progress {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-dasharray: 276.46;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.35s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .session-countdown-progress { transition: none; }
 }
 
 #progress-tracker {
@@ -1466,23 +1543,77 @@ input[type="range"]::-moz-range-progress {
 
 /* Box Breathing */
 .tutorial-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    isolation: isolate;
     background:
-        radial-gradient(ellipse at 50% 40%, rgba(124, 58, 237, 0.35) 0%, transparent 60%),
-        rgba(0, 0, 0, 0.92);
+        radial-gradient(ellipse 90% 80% at 8% 12%, color-mix(in srgb, var(--primary-color) 18%, transparent) 0%, transparent 68%),
+        radial-gradient(ellipse 85% 75% at 92% 86%, color-mix(in srgb, var(--primary-color) 14%, #46d9ff 8%) 0%, transparent 70%),
+        linear-gradient(135deg, #05050b 0%, #0b0b19 48%, #030307 100%);
     backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: clamp(0.8rem, 2.5vh, 1.5rem);
     z-index: 5;
-    padding: 2rem;
+    padding: calc(2rem + env(safe-area-inset-top, 0px)) clamp(1.15rem, 5vw, 3rem) calc(2rem + env(safe-area-inset-bottom, 0px));
     transition: opacity 1s ease;
     text-align: center;
+}
+
+.tutorial-overlay::before,
+.tutorial-overlay::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    width: 125vw;
+    height: 115vh;
+    border-radius: 43% 57% 64% 36% / 52% 38% 62% 48%;
+    background:
+        radial-gradient(circle at 28% 32%, color-mix(in srgb, var(--primary-color) 72%, white 18%), transparent 58%),
+        conic-gradient(from 120deg, color-mix(in srgb, var(--primary-color) 74%, #ff4fd8 26%), #46d9ff, #ffd166, color-mix(in srgb, var(--primary-color) 68%, #6d28d9 32%), color-mix(in srgb, var(--primary-color) 74%, #ff4fd8 26%));
+    filter: blur(58px) saturate(1.05);
+    opacity: 0.14;
+    transform: translate3d(-20%, -18%, 0) rotate(-12deg) scale(1.05);
+    animation: liveChakraGradientA 28s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.tutorial-overlay::after {
+    left: auto;
+    right: -20%;
+    bottom: -18%;
+    width: 120vw;
+    height: 110vh;
+    border-radius: 62% 38% 41% 59% / 35% 58% 42% 65%;
+    opacity: 0.11;
+    transform: translate3d(16%, 12%, 0) rotate(18deg) scale(1.08);
+    animation: liveChakraGradientB 34s ease-in-out infinite alternate-reverse;
+}
+
+.tutorial-overlay > * {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 54rem);
+}
+
+@keyframes liveChakraGradientA {
+    0% { transform: translate3d(-20%, -18%, 0) rotate(-12deg) scale(1.05); }
+    50% { transform: translate3d(10%, 10%, 0) rotate(8deg) scale(1.12); }
+    100% { transform: translate3d(-4%, 4%, 0) rotate(22deg) scale(1.02); }
+}
+
+@keyframes liveChakraGradientB {
+    0% { transform: translate3d(16%, 12%, 0) rotate(18deg) scale(1.08); }
+    50% { transform: translate3d(-12%, -8%, 0) rotate(-10deg) scale(1.16); }
+    100% { transform: translate3d(4%, -4%, 0) rotate(-24deg) scale(1.04); }
 }
 
 .tutorial-overlay h2 {
@@ -1678,6 +1809,8 @@ input[type="range"]::-moz-range-progress {
     .tutorial-overlay { backdrop-filter: none; }
     .cosmic-entrance { animation: none; }
     .gold-burst { animation: none; }
+    .tutorial-overlay::before,
+    .tutorial-overlay::after { animation: none; }
 }
 
 @media (max-width: 600px) {

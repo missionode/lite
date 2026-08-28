@@ -80,6 +80,31 @@ function formatClockDuration(durationMs) {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+const SESSION_COUNTDOWN_CIRCUMFERENCE = 276.46;
+function setSessionCountdown(remainingMs, totalMs) {
+    const countdowns = document.querySelectorAll('[data-session-countdown]');
+    const progressNodes = document.querySelectorAll('[data-session-countdown-progress]');
+    const total = Number(totalMs);
+    const remaining = Number(remainingMs);
+    if (!countdowns.length || !progressNodes.length || !Number.isFinite(total) || total <= 0) {
+        countdowns.forEach(countdown => { countdown.hidden = true; });
+        return;
+    }
+
+    const safeRemaining = Math.min(total, Math.max(0, Number.isFinite(remaining) ? remaining : total));
+    const ratio = safeRemaining / total;
+    countdowns.forEach(countdown => { countdown.hidden = false; });
+    progressNodes.forEach(progress => {
+        progress.style.strokeDashoffset = String(SESSION_COUNTDOWN_CIRCUMFERENCE * (1 - ratio));
+    });
+}
+
+function hideSessionCountdown() {
+    document.querySelectorAll('[data-session-countdown]').forEach(countdown => {
+        countdown.hidden = true;
+    });
+}
+
 function normalizeSleepStages(scripts) {
     const stages = scripts?.sleep_mode?.stages;
     if (!Array.isArray(stages) || stages.length !== SLEEP_STAGE_COUNT) {
@@ -819,6 +844,27 @@ function isPiperVoice(value) {
 
 function piperVoiceId(value) {
     return isPiperVoice(value) ? value.slice('piper:'.length) : '';
+}
+
+function getPiperVoiceDefinition(value = state.voiceName) {
+    if (!isPiperVoice(value)) return null;
+    return piperVoiceRegistry.find(voice => voice.id === piperVoiceId(value)) || null;
+}
+
+function isFeminineNarrationVoice(value = state.voiceName) {
+    const piperVoice = getPiperVoiceDefinition(value);
+    if (piperVoice) return String(piperVoice.gender || '').toLowerCase() === 'female';
+    // Unknown Piper voices are intentionally neutral until their registry
+    // entry declares a gender. This keeps future languages data-driven.
+    if (isPiperVoice(value)) return false;
+
+    const selected = getBrowserVoiceForContent();
+    const browserGender = String(selected?.gender || selected?.voiceGender || '').toLowerCase();
+    if (browserGender) return browserGender === 'female';
+    const name = `${selected?.name || ''} ${value || ''}`.toLowerCase();
+    // Web Speech has no consistently supported gender field, so keep a
+    // language-neutral fallback for browser voices that advertise it by name.
+    return /\b(female|woman|samantha|victoria|karen|moira|zira|ava|susan|veena|lekha|meera)\b/i.test(name);
 }
 
 function setVoiceStatus(message, tone = 'muted') {
@@ -1576,6 +1622,9 @@ class AudioEngine {
             this.spatialPanLfoGain.gain.setValueAtTime(this.spatialPanLfoGain.gain.value, now);
             this.spatialPanLfoGain.gain.linearRampToValueAtTime(configurations.lfo, now + 1.2);
         }
+        // Spatial sound adds an ethereal presence to narration through the
+        // voice-only ambience bus while keeping the dry voice centered.
+        this.setVoiceEcho(state.voiceEcho);
     }
 
     setVoiceTuning(warmth = 50, clarity = 50) {
@@ -1591,15 +1640,22 @@ class AudioEngine {
 
     setVoiceEcho(mode = 'off') {
         if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
-        const settings = {
+        const voiceEchoSettings = {
             off: { delay: 0.04, wet: 0 },
-            light: { delay: 0.035, wet: 0.14 },
-            spacious: { delay: 0.07, wet: 0.20 }
-        }[mode] || { delay: 0.04, wet: 0 };
+            light: { delay: 0.035, wet: 0.14, filter: 2600 },
+            spacious: { delay: 0.07, wet: 0.20, filter: 2600 },
+            // A restrained, centered ambience for Spatial Sound. The dry
+            // narration remains untouched; only this stereo wet return widens.
+            ethereal: { delay: 0.11, wet: 0.22, filter: 5000 }
+        };
+        const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
+        const effectiveMode = this.spatialMode !== 'off' ? 'ethereal' : requestedMode;
+        const settings = voiceEchoSettings[effectiveMode];
         const now = this.ctx.currentTime;
         this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
         this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
         this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
+        this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter || 2600, now + 0.25);
     }
 
     setMusicEcho(mode = 'light') {
@@ -2325,10 +2381,89 @@ class MeditationController {
         this.isExperimentActive = false;
         this.experimentDuration = null;
         this.sessionStartedAt = null;
+        this.sessionCountdownTotalMs = 0;
+        this.sessionCountdownRemainingMs = 0;
+        this.sessionCountdownLastTickAt = 0;
+        this.sessionCountdownTicker = null;
         this.droneTimerGeneration = 0;
         this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+    }
+
+    getSessionDurationMs(focusedExperience = null) {
+        if (state.bgMusicMode) return 0;
+
+        if (focusedExperience === 'box') {
+            return Math.max(1, state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60) * 1000;
+        }
+        if (focusedExperience === 'hooponopono') {
+            return 4 * 60 * 1000;
+        }
+        if (focusedExperience === 'yoga') {
+            const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
+            let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
+            if (state.corpsePoseEnabled) seconds += state.timeCorpse;
+            if (state.bathSessionEnabled) {
+                if (state.massageEnabled) seconds += state.timeMassage;
+                if (state.perinealCareEnabled) seconds += state.timePerinealCare;
+                seconds += state.assistedBathingEnabled ? state.timeAssistedBathing : state.timeBath;
+                seconds += timing('transitions', 'bathToYogaRest');
+            }
+            return Math.max(1, seconds) * 1000;
+        }
+        if (state.sleepMode) {
+            const stageSeconds = state.timeSleepStage * SLEEP_STAGE_COUNT * 60;
+            const intervalSeconds = Math.max(0, SLEEP_STAGE_COUNT - 1) * Number(this.scripts?.sleep_mode?.intervalSeconds || 3);
+            return Math.max(1, stageSeconds + intervalSeconds + 12) * 1000;
+        }
+
+        const estimateMinutes = this.isHighEnergy
+            ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
+            : this.chakraOrder.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                + (state.timeIcebreaker / 60)
+                + timing('estimate', 'baseOverhead')
+                + timing('estimate', 'normalExtra');
+        return Math.max(1, Math.round(estimateMinutes)) * 60 * 1000;
+    }
+
+    startSessionCountdown(totalMs) {
+        this.stopSessionCountdown();
+        const total = Number(totalMs);
+        if (!Number.isFinite(total) || total <= 0) return;
+
+        this.sessionCountdownTotalMs = total;
+        this.sessionCountdownRemainingMs = total;
+        this.sessionCountdownLastTickAt = Date.now();
+        this.renderSessionCountdown();
+        this.sessionCountdownTicker = window.setInterval(() => {
+            const now = Date.now();
+            if (!this.isMeditationActive || this.isPaused) {
+                this.sessionCountdownLastTickAt = now;
+                return;
+            }
+            this.sessionCountdownRemainingMs = Math.max(
+                0,
+                this.sessionCountdownRemainingMs - Math.max(0, now - this.sessionCountdownLastTickAt)
+            );
+            this.sessionCountdownLastTickAt = now;
+            this.renderSessionCountdown();
+        }, 250);
+    }
+
+    renderSessionCountdown() {
+        setSessionCountdown(this.sessionCountdownRemainingMs, this.sessionCountdownTotalMs);
+    }
+
+    stopSessionCountdown() {
+        if (this.sessionCountdownTicker !== null) {
+            window.clearInterval(this.sessionCountdownTicker);
+            this.sessionCountdownTicker = null;
+        }
+        this.sessionCountdownTotalMs = 0;
+        this.sessionCountdownRemainingMs = 0;
+        this.sessionCountdownLastTickAt = 0;
+        hideSessionCountdown();
     }
 
     async pauseAwareSleep(ms) {
@@ -2467,6 +2602,7 @@ class MeditationController {
         this.isHighEnergy = false;
         this.sessionStartedAt = Date.now();
         showScreen(meditationScreen);
+        this.startSessionCountdown(this.getSessionDurationMs());
 
         const controls = document.getElementById('controls');
         if (controls) controls.classList.remove('hidden');
@@ -2475,7 +2611,6 @@ class MeditationController {
         // Sleep mode has no spoken narration; keep the narration-only ticker
         // hidden while the visual guidance, music, and sleep tones run.
         setText('narration-text', '');
-        setText('timer-display', '');
         this.visual.startPulsing('#355c7d');
         await this.audio.startBackgroundMusic();
         this.audio.fadeInBackgroundMusic(10, 0.32);
@@ -2485,7 +2620,6 @@ class MeditationController {
             if (!this.isMeditationActive) return;
             setText('mantra-display', t(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
             setText('narration-text', '');
-            setText('timer-display', formatClockDuration(stageDurationMs));
             this.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
 
             let remaining = stageDurationMs;
@@ -2494,7 +2628,6 @@ class MeditationController {
                 await this.pauseAwareSleep(step);
                 if (!this.isPaused) {
                     remaining -= step;
-                    setText('timer-display', formatClockDuration(remaining));
                 }
             }
             this.stopStageDrone();
@@ -2545,7 +2678,6 @@ class MeditationController {
             // Shots intentionally have no narration, so they must not leave
             // a looping narration marquee on screen.
             setText('narration-text', '');
-            setText('timer-display', formatClockDuration(state.timeShot * 1000));
             this.visual.startPulsing('#7c3aed');
 
             let stages;
@@ -2567,6 +2699,7 @@ class MeditationController {
             }
             const activeMs = (state.timeShot * 1000) / stages.length;
             const intervalMs = type === 'sleep' ? Number(this.scripts.sleep_mode?.intervalSeconds || 2) * 1000 : 2000;
+            this.startSessionCountdown((state.timeShot * 1000) + Math.max(0, stages.length - 1) * intervalMs);
             for (const [index, stage] of stages.entries()) {
                 if (!this.isMeditationActive) return;
                 const stageLabelPath = type === 'sleep'
@@ -2583,7 +2716,14 @@ class MeditationController {
                                 : t(stageLabelPath);
                 setText('mantra-display', stageLabel === stageLabelPath ? stage.key : stageLabel);
                 this.audio.startFrequencyShot(stage.frequency);
-                await this.pauseAwareSleep(activeMs);
+                let remaining = activeMs;
+                while (remaining > 0 && this.isMeditationActive) {
+                    const step = Math.min(100, remaining);
+                    await this.pauseAwareSleep(step);
+                    if (!this.isPaused) {
+                        remaining -= step;
+                    }
+                }
                 this.audio.stopFrequencyShot();
                 if (index < stages.length - 1) await this.pauseAwareSleep(intervalMs);
             }
@@ -2610,6 +2750,7 @@ class MeditationController {
         this.visual.stop();
         this.audio.stopBackgroundMusic();
         this.audio.stopMantraTrack();
+        this.stopSessionCountdown();
         wakeLock.release();
         cancelNarrationPlayback();
         document.body.classList.remove('sleep-mode-active');
@@ -2629,6 +2770,7 @@ class MeditationController {
         this.visual.stop();
         this.audio.stopBackgroundMusic();
         this.audio.stopMantraTrack();
+        this.stopSessionCountdown();
         wakeLock.release();
         cancelNarrationPlayback();
         document.getElementById('controls')?.classList.add('hidden');
@@ -2713,6 +2855,11 @@ class MeditationController {
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
             this.sessionStartedAt = Date.now();
+            const openingChakra = this.isHighEnergy ? this.scripts.high_energy : this.scripts[this.chakraOrder[0]];
+            if (openingChakra?.color) document.body.style.setProperty('--primary-color', openingChakra.color);
+            // One continuous estimate spans the complete journey. It is not
+            // reset when narration, a chakra, an interval, or silence begins.
+            this.startSessionCountdown(this.getSessionDurationMs(focusedExperience));
             
             setText('pause-meditation', 'II');
             const controls = document.getElementById('controls');
@@ -2807,6 +2954,11 @@ class MeditationController {
             this.isExperimentActive = true;
             this.isPaused = false;
             this.sessionStartedAt = Date.now();
+            const durationUnit = durationInput?.dataset.unit || 'min';
+            const experimentDurationMs = durationUnit === 'seconds'
+                ? Number(this.experimentDuration) * 1000
+                : Number(this.experimentDuration) * 60 * 1000;
+            this.startSessionCountdown(experimentDurationMs);
             try { await wakeLock.request(); } catch (error) {}
             document.getElementById('controls')?.classList.remove('hidden');
             setText('pause-meditation', 'II');
@@ -2847,6 +2999,7 @@ class MeditationController {
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
         this.visual.stop();
+        this.stopSessionCountdown();
         wakeLock.release();
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(experimentScreen);
@@ -3126,13 +3279,12 @@ class MeditationController {
         
         const mantraEl = document.getElementById('mantra-display');
         const narrationEl = document.getElementById('narration-text');
-        const timerEl = document.getElementById('timer-display');
 
         // This is visible interface copy, so follow Display Language rather
         // than the selected meditation/narration language.
         if (mantraEl) mantraEl.textContent = t('system.musicOnly');
         setText('narration-text', '');
-        if (timerEl) timerEl.textContent = "";
+        hideSessionCountdown();
         
         // Start background music loop
         await this.audio.startBackgroundMusic();
@@ -3254,7 +3406,6 @@ class MeditationController {
         const symbolEl = document.getElementById('chakra-symbol');
         const mantraEl = document.getElementById('mantra-display');
         const narrationEl = document.getElementById('narration-text');
-        const timerEl = document.getElementById('timer-display');
         
         // Aura for Yoga
         const aura = document.getElementById('aura-bg');
@@ -3290,7 +3441,6 @@ class MeditationController {
             while (remaining > 0) {
                 if (!this.isMeditationActive) break;
                 if (!this.isPaused) {
-                    timerEl.textContent = `${contentT('system.hold')}: ${remaining}s`;
                     remaining--;
                 }
                 await this.pauseAwareSleep(1000);
@@ -3401,7 +3551,7 @@ class MeditationController {
             // Warmth & Comfort: Deeper pitch and slower rate for transitions
             const baseRate = state.sleepMode ? 0.60 : 0.70;
             utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
-            utterance.pitch  = state.eyesCloseMode ? 0.88 : 1.02;
+            utterance.pitch  = state.eyesCloseMode ? 0.88 : isFeminineNarrationVoice() ? 0.96 : 1.02;
             utterance.volume = state.volVoice;
             
             let isResolved = false;
@@ -3522,7 +3672,6 @@ class MeditationController {
 
     async handleInterval() {
         this.stopStageDrone();
-        const timerEl = document.getElementById('timer-display');
         setText('mantra-display', contentT('system.breathe'));
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) symbolEl.style.opacity = "0.3";
@@ -3538,9 +3687,6 @@ class MeditationController {
             if (!this.isMeditationActive) break;
             if (!this.isPaused) {
                 elapsed += 100;
-                const remaining = Math.max(0, intervalMs - elapsed);
-                const secs = Math.ceil(remaining / 1000);
-                if (timerEl) timerEl.textContent = `00:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
@@ -3599,7 +3745,6 @@ class MeditationController {
 
         const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
         let elapsed = 0;
-        const timerEl = document.getElementById('timer-display');
 
         while (elapsed < chantDurationMs) {
             if (!this.isMeditationActive) break;
@@ -3609,14 +3754,9 @@ class MeditationController {
 
             if (!this.isPaused) {
                 elapsed += 100;
-                const remaining = Math.max(0, chantDurationMs - elapsed);
-                const mins = Math.floor(remaining / 60000);
-                const secs = Math.floor((remaining % 60000) / 1000);
-                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
             await new Promise(r => setTimeout(r, 100));
         }
-        timerEl.textContent = "00:00";
 
         // Fade out mantra, restore drone before affirmation
         this.audio.stopMantraTrack();
@@ -3653,7 +3793,7 @@ class MeditationController {
             // Feeble prompts: Extra slow and deep for minimal intrusion
             const baseRate = state.sleepMode ? 0.58 : 0.65;
             utterance.rate   = (state.eyesCloseMode ? baseRate * 0.85 : baseRate) * state.voicePace;
-            utterance.pitch  = state.eyesCloseMode ? 0.82 : 0.95; 
+            utterance.pitch  = state.eyesCloseMode ? 0.82 : isFeminineNarrationVoice() ? 0.91 : 0.95;
             utterance.volume = state.volVoice * 0.9; // Relative to master voice volume
             
             let isResolved = false;
@@ -3736,7 +3876,7 @@ class MeditationController {
                     ? (state.sleepMode ? 0.78 : 0.90)
                     : (state.sleepMode ? 0.60 : 0.70);
                 utterance.rate   = (state.eyesCloseMode ? baseRate * 0.88 : baseRate) * state.voicePace;
-                utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : 1.02);
+                utterance.pitch  = pacing === 'hrim' ? 1.0 : (state.eyesCloseMode ? 0.88 : isFeminineNarrationVoice() ? 0.96 : 1.02);
                 utterance.volume = state.volVoice;
                 
                 let isResolved = false;
@@ -3823,10 +3963,8 @@ class MeditationController {
         if (symbolEl) symbolEl.style.opacity = "0.2";
         this.stopStageDrone();
         const silenceTime = timing('transitions', 'finalSilence') * 1000;
-        const timerEl = document.getElementById('timer-display');
         for (let i = Math.ceil(silenceTime / 1000); i > 0; i--) {
             if (!this.isMeditationActive) break;
-            if (timerEl) timerEl.textContent = `00:${i.toString().padStart(2, '0')}`;
             await this.pauseAwareSleep(1000);
         }
     }
@@ -3835,6 +3973,7 @@ class MeditationController {
         const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
         this.sessionStartedAt = null;
+        this.stopSessionCountdown();
         this.visual.stop(); 
         this.stopStageDrone();
         // The completion path must not restore music after the mantra fades.
@@ -3880,6 +4019,7 @@ class MeditationController {
     stop() {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        this.stopSessionCountdown();
         this.isExperimentActive = false;
         cancelNarrationPlayback();
         if (this.guideControlledResolve) this.guideControlledResolve(false);
@@ -4161,9 +4301,12 @@ function autoSelectVoice() {
 }
 
 function applyJourneyVoiceProfile(isHighEnergy) {
+    const shringaraVoice = !isHighEnergy && isFeminineNarrationVoice();
     const profile = isHighEnergy
         ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
-        : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
+        : shringaraVoice
+            ? { clarity: 28, warmth: 82, pace: 0.92, echo: 'light' }
+            : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
 
     state.voiceClarity = profile.clarity;
     state.voiceWarmth = profile.warmth;
@@ -4181,7 +4324,7 @@ function applyJourneyVoiceProfile(isHighEnergy) {
     syncValue('spatial-mode', state.spatialMode);
     syncValue('mixer-spatial-mode', state.spatialMode);
     document.querySelectorAll('[data-voice-preset]').forEach(button => {
-        button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : 'soft'));
+        button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : shringaraVoice ? 'shringara' : 'soft'));
     });
     if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
     if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
@@ -5450,6 +5593,7 @@ function attachEventListeners() {
     document.getElementById('mixer-spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
     const voicePresets = {
         soft: { clarity: 35, warmth: 65, pace: 0.9 },
+        shringara: { clarity: 28, warmth: 82, pace: 0.92 },
         balanced: { clarity: 50, warmth: 50, pace: 1 },
         clear: { clarity: 70, warmth: 40, pace: 1.05 }
     };

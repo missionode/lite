@@ -4,7 +4,7 @@
 
 - Current objective: preserve the stable `production` branch while implementing and reviewing the isolated Sleep Mode experience on `sleep-experience-mode`.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
-- Reusable instructions root: this same repository; `loop.md` is the protected collaboration policy and must not be changed during routine application work.
+- Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
 - Stack: static HTML/CSS/JavaScript PWA with Web Audio, Piper/Web Speech narration, local JSON content, service-worker caching, and npm-based test tooling. There is no backend, database, authentication layer, or production build step.
 - Permanent constraints: preserve existing journey order unless explicitly changed; keep `docs/dot.json` as custom facilitator content; add only missing schema fields to fixtures; commit each feature/fix with a detailed reference message; do not run Playwright or take screenshots unless the owner explicitly requests it.
 - External actions remain approval-gated: do not merge, push, deploy, or rewrite branch history unless the owner asks.
@@ -27,6 +27,7 @@
 - Narration displays the complete spoken block continuously and clears on actual audio completion. Mobile receives a modest speed increase, constrained by a conservative Piper/browser speech-duration estimate so the marquee does not intentionally outrun the voice.
 - Validation at this checkpoint: `static/unit` PASS — JavaScript syntax, narration ticker, drone-duration, and diff whitespace. No Playwright or screenshots were used, per owner instruction.
 - Model-router status: the local Codex adapter and `codex-cli 0.148.0` are available, but no automatic model dispatch evidence was recorded for this checkpoint; do not claim routed execution.
+- Loop package location: the authoritative policy, routing, architecture, plugin, skill, and Loop test files are kept under `Loop/`; duplicate copies previously stored at the project root have been removed.
 - Next exact step: commit only the application, locale, cache, package, and regression-test changes with a detailed checkpoint message; push `production`; then re-check the remaining `.DS_Store` state and perform real-device audio/UX validation separately.
 
 ### Historical context retained for reference
@@ -361,3 +362,59 @@
 - Narration ticker behavior is continuous at the complete narration-block level rather than sentence-by-sentence. It clears on actual narration completion and cancellation. Mobile uses a modest speed increase constrained by a conservative voice-duration estimate so it does not intentionally outrun Piper or browser speech.
 - Updated bilingual guidance and regression contracts. Validation: JavaScript syntax, narration ticker, drone-duration, and `git diff --check` PASS. No Playwright or screenshots were used.
 - Remaining release evidence: real-device listening and visual UX validation; this checkpoint does not claim browser/manual evidence.
+
+### CP-AUDIO-011 — Centered ethereal narration for Spatial Sound
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Spatial Sound now adds a restrained ethereal presence to narration through the existing voice-only ambience bus. The dry narration remains centered and unchanged, while only the stereo wet return receives a short delay, airy filtered tail, and gradual 13% wet mix.
+- The effect is derived from the selected spatial mode: it activates for Stereo Wide, Headphone 3D, and Room Spatial, and returns to the guide's saved Voice Space preference when Spatial Sound is Off. The saved voice preference is not overwritten.
+- Updated bilingual Spatial Sound guidance and bumped the application shell/app cache versions. No content schema or facilitator script fields changed.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, locale JSON parsing, spatial routing, background-music/mantra echo, drone-duration, bilingual content safety, and `git diff --check`. No Playwright, screenshots, or browser/manual evidence were used.
+- Open risk: headphone and speaker listening quality still needs real-device confirmation, especially perceived reverb level and intelligibility across spatial modes.
+
+### CP-AUDIO-012 — Stage countdown and stronger ethereal presence
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Added a circular countdown indicator to the active meditation view. It is driven by the real remaining time for chakra practice, Sleep stages, Shots, Yoga pose holds, intervals, and final silence, and is hidden when no timed stage is active.
+- Strengthened the Spatial Sound narration ambience to a perceptible but controlled 110 ms delay, 22% wet return, and 5 kHz filtered tail. The dry narration remains centered, and the saved Voice Space preference is restored when Spatial Sound is turned off.
+- Updated cache versions, bilingual countdown/spatial guidance, and static regression contracts. No Playwright, screenshots, or browser/manual evidence were used.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, locale JSON parsing, spatial audio, narration ticker, background-music/mantra echo, drone-duration, bilingual content safety, chakra selection, and `git diff --check`.
+- Open risk: the new ambience level should be listened to on both headphones and speakers before release to confirm it feels ethereal without masking words.
+
+### CP-AUDIO-013 — Journey-level countdown and quiet focus hierarchy
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Corrected the countdown behavior so it starts once from the estimated complete journey duration and remains continuous across preparation, narration, every chakra, intervals, silence, Sleep stages, Shots, Yoga poses, and closing transitions. It no longer resets to an individual chakra or stage timer.
+- Kept the circular indicator compact and low-emphasis at the edge of the meditation overlay. The chakra symbol/deity image remains the primary visual focus; the mantra/title and progress dots are intentionally dimmed. The legacy timer node remains synchronized for compatibility but is visually suppressed to avoid a second, conflicting timer.
+- Updated cache versions and static regression contracts. No Playwright, screenshots, or browser/manual evidence were used.
+- Validation: JavaScript/service-worker syntax, focused static tests, and `git diff --check` PASS. No Playwright, screenshots, or browser/manual evidence were used.
+
+### CP-AUDIO-016 — Full-viewport ambient gradient and ring-only countdown
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Expanded the breathing tutorial’s live gradient across the full viewport with broad layered fields and slow-moving organic forms. Reduced brightness, saturation, and animation intensity so the effect remains atmospheric and comfortable for the eyes.
+- Moved the countdown layer above the meditation screen stacking context so the mirrored rings remain visible during mantra playback and throughout the complete journey. Removed the numeric time and label content; only the small circular progress rings remain.
+- Bumped cache versions and expanded the static regression contract. No Playwright, screenshots, or browser/manual evidence were used.
+- Validation: JavaScript/service-worker syntax, focused static tests, and `git diff --check` PASS.
+
+### CP-AUDIO-014 — Mirrored low-distraction journey countdown
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Repositioned the journey-level countdown as two smaller synchronized circular indicators pinned to the lower left and lower right screen corners, keeping them clear of the controls and reducing their visual weight.
+- Removed the legacy text timer entirely. The circular indicators are now the only countdown display; both are updated from the same continuous session state and are hidden together when the session ends or a non-timed mode is active.
+- Bumped cache versions and refreshed the static countdown regression contract. No Playwright, screenshots, or browser/manual evidence were used.
+- Validation: JavaScript/service-worker syntax, focused static tests, and `git diff --check` PASS.
+
+### CP-AUDIO-015 — Full-screen live chakra gradient and global countdown visibility
+
+- Date: 2026-08-28 (Asia/Kolkata).
+- Branch: `production`; local checkpoint pending commit and push.
+- Made the breathing tutorial a true full-viewport responsive layer with safe-area spacing and overflow handling. Added a slow, low-contrast live gradient made from blurred irregular forms, vibrant complementary colors, and the selected chakra color; no flashing or rapid brightness changes are used.
+- Moved the mirrored circular countdown layer outside individual screen sections so it remains visible from journey preparation through completion. Its single continuous session estimate is now visible during the breathing tutorial instead of appearing only after the meditation screen opens.
+- Bumped cache versions and expanded the static regression contract. No Playwright, screenshots, or browser/manual evidence were used.
+- Validation: JavaScript/service-worker syntax, focused static tests, and `git diff --check` PASS. No Playwright, screenshots, or browser/manual evidence were used.

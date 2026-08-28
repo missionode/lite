@@ -56,6 +56,9 @@ for (const [language, bundle] of [['en', en], ['ml', ml]]) {
   assert.ok(bundle.system.prePracticeSafety, `${language} guided preparation narration is required`);
 }
 
+assert.match(ml.system.prePracticeSafety, /മാർഗദർശി/u, 'Malayalam preparation should use the requested മാർഗദർശി spelling');
+assert.doesNotMatch(ml.system.prePracticeSafety, /മാർഗ്ഗദർശി/u, 'Malayalam preparation should not use the older മാർഗ്ഗദർശി spelling');
+
 assert.match(app, /contentT\('system\.prePracticeSafety'\)/, 'runtime must narrate the guided preparation');
 assert.doesNotMatch(app, /contentT\('system\.groundingSupport'\)/, 'runtime must not add a global crisis narration');
 assert.match(app, /meditationMatch[\s\S]*?parentPath[\s\S]*?meditationMatch\[1\]/,

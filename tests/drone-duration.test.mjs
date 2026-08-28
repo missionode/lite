@@ -10,6 +10,7 @@ const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.met
 const testScripts = JSON.parse(fs.readFileSync(new URL('../test-script.json', import.meta.url), 'utf8'));
 const dotScripts = JSON.parse(fs.readFileSync(new URL('../docs/dot.json', import.meta.url), 'utf8'));
 const timingConfig = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
+const piperModels = JSON.parse(fs.readFileSync(new URL('../piper-models.json', import.meta.url), 'utf8'));
 
 assert.deepEqual(
     Object.fromEntries(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy'].map(key => [key, scripts[key].frequency])),
@@ -110,6 +111,18 @@ assert.match(app, /anesthetic: Number\(this\.scripts\.sound_shots\?\.anesthetic\
 assert.match(app, /mood_relaxation: Number\(this\.scripts\.sound_shots\?\.mood_relaxation\?\.frequency\)/, 'Mood & Relaxation Shot should load 221.23 Hz from the active script bundle');
 assert.match(app, /mood_relaxation: 'ui\.activateMoodRelaxationShot'/, 'the Mood & Relaxation Shot should have a localized activation label');
 assert.match(app, /moodRelaxationShotNote/, 'the Mood & Relaxation Shot should explain its evidence limits in the Lobby');
+assert.match(app, /function getPiperVoiceDefinition\(/, 'voice styling should resolve Piper voice metadata from the registry');
+assert.match(app, /piperVoice\.gender[\s\S]{0,80}=== 'female'/, 'voice styling should use registry gender metadata for Piper voices');
+assert.doesNotMatch(app, /(?:^|[-_])meera(?:[-_]|$)/i, 'voice styling must not be hard-coded to the Meera Piper model');
+assert.match(app, /function isFeminineNarrationVoice\(/, 'voice styling should identify feminine voices without changing the audio model');
+assert.match(app, /shringaraVoice[\s\S]{0,120}clarity: 28, warmth: 82, pace: 0\.92, echo: 'light'/, 'the normal feminine journey profile should use a warm, gentle Shringara-inspired tuning');
+assert.match(html, /data-voice-preset="shringara"/, 'the voice mixer should expose the Shringara preset');
+assert.ok(piperModels.voices.length > 0, 'the Piper registry should contain at least one voice');
+for (const voice of piperModels.voices) {
+    assert.ok(['female', 'male', 'neutral'].includes(voice.gender), `${voice.id} must declare a supported gender for voice styling`);
+}
+assert.equal(piperModels.voices.find(voice => voice.id === 'ml_IN-meera-medium')?.gender, 'female', 'Meera should remain classified as feminine');
+assert.equal(piperModels.voices.find(voice => voice.id === 'en_US-lessac-medium')?.gender, 'female', 'the bundled English feminine voice should receive the same styling');
 assert.doesNotMatch(app, /localStorage\.(?:getItem|setItem)\(['"](?:chakra_)?shot_type['"]\)/, 'the selected Shot type must remain session-only');
 assert.match(app, /if \(!state\.moodRelaxationIntentionEnabled \|\| state\.noFrequencyMode\) return false;/, 'the intention tone must require explicit activation and respect No Frequency Mode');
 assert.match(app, /getDroneDurationMs\(practiceMinutes, durationMode\)/, 'the intention tone must use the active drone-duration timing');
