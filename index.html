@@ -69,8 +69,6 @@
                 <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
                 <label class="checkbox-label"><input type="checkbox" id="no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
-                <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Intention Tone</span></label>
-                <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the script-defined 221.23 Hz tone accompanies the personal intention narration. This is session-only and works with either voice.</p>
             </div>
 
             <div class="config-group settings-panel">
@@ -237,6 +235,7 @@
                     <p data-i18n="ui.settingsHelpChakras">Chakra Journey chooses exactly the centers included. Reverse Journey changes their direction.</p>
                     <p data-i18n="ui.settingsHelpYoga">Yoga Experience is selected in the Lobby. Its optional care stages are configured here.</p>
                     <p data-i18n="ui.settingsHelpModes">Music Only and High Energy are selected in the Lobby. High Energy is available from 3:30 AM until 6:00 PM; from 6:00 PM, Sleep Mode is offered at journey start.</p>
+                    <p><span data-i18n="ui.settingsHelpAudioCredit">Pleasure ambience audio (audio/pleasure.mp3): supplied from Wikimedia Commons under CC0 1.0 Universal. Attribution is not legally required by CC0, but this credit is retained for provenance.</span> <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer" data-i18n="ui.cc0Details">CC0 details</a></p>
                     <p data-i18n="ui.settingsHelpSave">Save the settings to enter the Lobby. You can review the final mode and timing there before beginning.</p>
                 </div>
             </div>
@@ -458,11 +457,28 @@
 
                 <div class="mixer-section">
                     <label class="mixer-section-title" data-i18n="ui.audioLevels">Audio Levels</label>
-                    <div class="mixer-row"><label data-i18n="ui.voice">Voice</label><input type="range" id="vol-voice" min="0" max="2" step="0.1" value="1.0"></div>
-                    <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0" max="0.2" step="0.01" value="0.01"></div>
-                    <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0" max="1" step="0.1" value="0.5"></div>
-                    <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0" max="1" step="0.05" value="0.8"></div>
-                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0" max="0.5" step="0.01" value="0.15"></div>
+                    <div class="mixer-row"><label data-i18n="ui.voice">Voice</label><input type="range" id="vol-voice" min="0.2" max="2" step="0.1" value="1.0"></div>
+                    <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0.02" max="0.2" step="0.01" value="0.05"></div>
+                    <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0.2" max="1" step="0.1" value="0.2"></div>
+                    <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0.1" max="1" step="0.05" value="0.35"></div>
+                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
+                </div>
+
+                <div id="mood-relaxation-ambience-section" class="mixer-section">
+                    <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</span></label>
+                    <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the supplied pleasure ambience loops throughout the guided session. Use the bounded level below to keep it subtle; No Frequency Mode overrides it.</p>
+                    <div id="mood-relaxation-ambience-level-control" class="mixer-row range-control" hidden>
+                        <label for="mood-relaxation-ambience-level" data-i18n="ui.moodRelaxationAmbienceLevel">Ambience Level</label>
+                        <input id="mood-relaxation-ambience-level" type="range" min="0.2" max="3.0" step="0.1" value="0.3" aria-describedby="mood-relaxation-ambience-level-note">
+                        <div class="range-meta">
+                            <button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button>
+                            <span class="range-min" data-i18n="ui.moodRelaxationAmbienceMin">Min 0.2%</span>
+                            <output id="mood-relaxation-ambience-level-value" class="range-current">0.3%</output>
+                            <span class="range-max" data-i18n="ui.moodRelaxationAmbienceMax">Max 3.0%</span>
+                            <button type="button" class="range-step range-increment" aria-label="Increase value">+</button>
+                        </div>
+                        <p id="mood-relaxation-ambience-level-note" class="mixer-note" data-i18n="ui.moodRelaxationAmbienceLevelNote">This is a bounded source level from 0.2% to 3.0%, not a calibrated decibel reading. Actual loudness depends on the device and output volume.</p>
+                    </div>
                 </div>
 
                 <details id="voice-tuning-panel" class="mixer-section mixer-collapsible">
@@ -562,6 +578,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.89"></script>
+    <script src="app.js?v=1.90"></script>
 </body>
 </html>

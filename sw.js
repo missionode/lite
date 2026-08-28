@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.58';
+const CACHE_NAME = 'chakra-v5.60';
 const PIPER_CACHE_NAME = 'chakra-piper-v3';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v16';
 const ASSETS = [
@@ -8,6 +8,7 @@ const ASSETS = [
   './docs/repertory.html',
   './data/frequency-repertory.json',
   './timing-config.json',
+  './audio/ambience-manifest.json',
   './style.css',
   './app.js',
   './manifest.json',

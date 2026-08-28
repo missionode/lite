@@ -39,6 +39,30 @@ const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
 const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 const MANTRA_MUSIC_FADE_SECONDS = 4;
 const MANTRA_FADE_SECONDS = 4;
+// Pleasure ambience is a separate, fixed-level support layer. It is not
+// tied to the user music slider or the short frequency-exposure timer.
+const PLEASURE_AMBIENCE_GAIN = 0.003;
+const PLEASURE_AMBIENCE_MIN_GAIN = 0.002;
+const PLEASURE_AMBIENCE_MAX_GAIN = 0.03;
+const PLEASURE_AMBIENCE_FADE_SECONDS = 5;
+const PLEASURE_AMBIENCE_HARMONIC_MIX = 0.04;
+const PLEASURE_AMBIENCE_MANIFEST_URL = 'audio/ambience-manifest.json';
+
+function clampPleasureAmbienceGain(value) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return PLEASURE_AMBIENCE_GAIN;
+    return Math.min(PLEASURE_AMBIENCE_MAX_GAIN, Math.max(PLEASURE_AMBIENCE_MIN_GAIN, numericValue));
+}
+
+function clampAudioLevel(value, min, max, fallback) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return fallback;
+    return Math.min(max, Math.max(min, numericValue));
+}
+
+function formatPleasureAmbienceLevel(gain) {
+    return `${(clampPleasureAmbienceGain(gain) * 100).toFixed(1)}%`;
+}
 
 function getShotDefaultDuration(type, definition = timingConfig.journey?.shotDuration || {}) {
     const isMultiStage = MULTI_STAGE_SHOT_TYPES.includes(type);
@@ -483,6 +507,7 @@ function formatRangeControlValue(input) {
     if (input.id === 'time-per-chakra') return document.getElementById('shots-toggle')?.checked
         ? `${value.toFixed(0)} secs`
         : `${value.toFixed(1)} mins`;
+    if (input.id === 'mood-relaxation-ambience-level') return `${value.toFixed(1)}%`;
     if (input.id === 'time-high-energy') return `${value} mins`;
     if (['time-bath', 'time-perineal-care', 'time-assisted-bathing', 'time-massage'].includes(input.id)) {
         return `${Math.floor(value / 60)}m`;
@@ -499,32 +524,53 @@ function enhanceRangeControls() {
         container.dataset.rangeEnhanced = 'true';
         container.classList.add('range-control');
 
-        let current = container.querySelector(':scope > span');
+        const existingMeta = container.querySelector(':scope > .range-meta');
+        let current = existingMeta?.querySelector('.range-current') || container.querySelector(':scope > span');
         if (!current) {
             current = document.createElement('span');
             container.appendChild(current);
         }
         current.classList.add('range-current');
 
-        const meta = document.createElement('div');
-        meta.className = 'range-meta';
-        const decrement = document.createElement('button');
-        decrement.type = 'button';
-        decrement.className = 'range-step range-decrement';
-        decrement.setAttribute('aria-label', 'Decrease value');
-        decrement.textContent = '−';
-        const minimum = document.createElement('span');
-        minimum.className = 'range-min';
-        const maximum = document.createElement('span');
-        maximum.className = 'range-max';
-        const increment = document.createElement('button');
-        increment.type = 'button';
-        increment.className = 'range-step range-increment';
-        increment.setAttribute('aria-label', 'Increase value');
-        increment.textContent = '+';
-        meta.append(decrement, minimum, current, maximum, increment);
-        container.appendChild(meta);
+        const meta = existingMeta || document.createElement('div');
+        if (!existingMeta) {
+            meta.className = 'range-meta';
+            container.appendChild(meta);
+        }
+        // A generated range starts with its current value beside the input;
+        // move it into the metadata row before using it as an insertion anchor.
+        if (current.parentElement !== meta) meta.appendChild(current);
 
+        const createStepButton = (className, label, text) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `range-step ${className}`;
+            button.setAttribute('aria-label', label);
+            button.textContent = text;
+            return button;
+        };
+        let decrement = meta.querySelector('.range-decrement');
+        if (!decrement) {
+            decrement = createStepButton('range-decrement', 'Decrease value', '−');
+            meta.prepend(decrement);
+        }
+        let increment = meta.querySelector('.range-increment');
+        if (!increment) {
+            increment = createStepButton('range-increment', 'Increase value', '+');
+            meta.appendChild(increment);
+        }
+        let minimum = meta.querySelector('.range-min');
+        if (!minimum) {
+            minimum = document.createElement('span');
+            minimum.className = 'range-min';
+            meta.insertBefore(minimum, current);
+        }
+        let maximum = meta.querySelector('.range-max');
+        if (!maximum) {
+            maximum = document.createElement('span');
+            maximum.className = 'range-max';
+            meta.insertBefore(maximum, increment);
+        }
         const adjust = direction => {
             const step = Number(input.step) || 1;
             const precision = (String(step).split('.')[1] || '').length;
@@ -536,8 +582,8 @@ function enhanceRangeControls() {
         increment.addEventListener('click', () => adjust(1));
 
         const update = () => {
-            minimum.textContent = input.min;
-            maximum.textContent = input.max;
+            if (!minimum.dataset.i18n) minimum.textContent = input.min;
+            if (!maximum.dataset.i18n) maximum.textContent = input.max;
             current.textContent = formatRangeControlValue(input);
             decrement.disabled = Number(input.value) <= Number(input.min);
             increment.disabled = Number(input.value) >= Number(input.max);
@@ -1245,9 +1291,14 @@ class AudioEngine {
         // Looping Managers
         this.mantraLoop = null;
         this.bgMusicLoop = null;
+        this.pleasureLoops = [];
 
         this.mantraBuffer = {};
         this.bgMusicBuffer = null;
+        this.pleasureBuffers = new Map();
+        this.pleasureManifest = null;
+        this.pleasureGeneration = 0;
+        this.pleasureAudioAvailable = null;
 
         // Permanent Absolute Grounding Anchor (Closed Eyes Mode)
         this.groundingAnchor = null;
@@ -1268,6 +1319,10 @@ class AudioEngine {
         this.musicEchoConvolver = null;
         this.musicEchoFilter = null;
         this.musicEchoWetGain = null;
+        this.pleasureSourceGain = null;
+        this.pleasureGain = null;
+        this.pleasureEnhancer = null;
+        this.pleasureEnhancerGain = null;
         this.bgMusicBusGain = null;
         this.bgMusicTargetVolume = null;
         this.bgMusicTargetEQ = 0;
@@ -1463,6 +1518,33 @@ class AudioEngine {
         this.musicEchoWetGain.connect(this.bgMusicBusGain);
         this.bgMusicBusGain.connect(this.spatialMusicPanner);
         this.spatialMusicPanner.connect(this.lowCutFilter);
+
+        // The optional pleasure ambience bypasses the background-music bus so
+        // mantra muting cannot accidentally cut or reopen it. Keep the source
+        // at unity so its parallel harmonic layer can work on the original
+        // signal before both paths are reduced to the barely-audible mix level.
+        this.pleasureSourceGain = this.ctx.createGain();
+        this.pleasureSourceGain.gain.setValueAtTime(1, this.ctx.currentTime);
+        this.pleasureGain = this.ctx.createGain();
+        this.pleasureGain.gain.setValueAtTime(state.pleasureAmbienceGain, this.ctx.currentTime);
+
+        // Parallel harmonic enrichment: the original ambience stays clean,
+        // while a very quiet oversampled soft-clip path adds gentle presence.
+        // This is dedicated to pleasure.mp3 and cannot colour narration,
+        // mantras, drones, or background music.
+        this.pleasureEnhancer = this.ctx.createWaveShaper();
+        this.pleasureEnhancer.curve = this.makeDistortionCurve(0.12);
+        this.pleasureEnhancer.oversample = '2x';
+        this.pleasureEnhancerGain = this.ctx.createGain();
+        this.pleasureEnhancerGain.gain.setValueAtTime(
+            state.pleasureAmbienceGain * PLEASURE_AMBIENCE_HARMONIC_MIX,
+            this.ctx.currentTime
+        );
+        this.pleasureSourceGain.connect(this.pleasureGain);
+        this.pleasureSourceGain.connect(this.pleasureEnhancer);
+        this.pleasureEnhancer.connect(this.pleasureEnhancerGain);
+        this.pleasureGain.connect(this.lowCutFilter);
+        this.pleasureEnhancerGain.connect(this.lowCutFilter);
 
         this.bellGain = this.ctx.createGain();
         this.bellGain.gain.value = state.volBell;
@@ -2247,6 +2329,100 @@ class AudioEngine {
         this.bgMusicLoop.start();
     }
 
+    async loadPleasureAmbienceBuffers() {
+        if (this.pleasureManifest) return this.pleasureBuffers;
+
+        const response = await fetch(PLEASURE_AMBIENCE_MANIFEST_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${PLEASURE_AMBIENCE_MANIFEST_URL}`);
+        const manifest = await response.json();
+        const entries = Array.isArray(manifest) ? manifest : manifest?.files;
+        if (!Array.isArray(entries)) throw new Error('Pleasure ambience manifest has no files array');
+
+        // The app reads the folder manifest instead of embedding individual
+        // filenames. The manifest accepts pleasure.mp3, pleasure-1.ogg,
+        // pleasure-2.wav, and any other browser-decodable audio extension.
+        const paths = entries
+            .map(entry => typeof entry === 'string' ? entry.trim() : '')
+            .map(entry => entry.replace(/^\.\/?/, '').replace(/^audio\//i, ''))
+            .filter(entry => /^pleasure(?:-\d+)?\.[^./]+$/i.test(entry))
+            .map(entry => `audio/${entry}`);
+        this.pleasureManifest = [...new Set(paths)];
+        if (!this.pleasureManifest.length) throw new Error('Pleasure ambience manifest contains no valid audio files');
+
+        await Promise.all(this.pleasureManifest.map(async path => {
+            if (this.pleasureBuffers.has(path)) return;
+            try {
+                const assetResponse = await fetch(path);
+                if (!assetResponse.ok) throw new Error(`HTTP ${assetResponse.status}`);
+                const arrayBuffer = await assetResponse.arrayBuffer();
+                const buffer = await this.ctx.decodeAudioData(arrayBuffer);
+                if (buffer) this.pleasureBuffers.set(path, buffer);
+            } catch (error) {
+                console.warn(`[Pleasure Ambience] skipped ${path}:`, error);
+            }
+        }));
+
+        if (!this.pleasureBuffers.size) throw new Error('No pleasure ambience files could be decoded');
+        return this.pleasureBuffers;
+    }
+
+    async startPleasureAmbience() {
+        if (!state.moodRelaxationIntentionEnabled || state.noFrequencyMode || !this.ctx || !this.pleasureGain) return false;
+        if (this.pleasureAudioAvailable === false) return false;
+        if (this.pleasureLoops.some(loop => loop.isRunning)) return true;
+
+        const generation = ++this.pleasureGeneration;
+        try {
+            await this.loadPleasureAmbienceBuffers();
+            this.pleasureAudioAvailable = true;
+            syncPleasureAmbienceControl();
+            if (generation !== this.pleasureGeneration || !state.moodRelaxationIntentionEnabled || state.noFrequencyMode) return false;
+
+            this.pleasureLoops = [...this.pleasureBuffers.values()].map(buffer => {
+                const loop = new SeamlessLoop(
+                    this.ctx,
+                    buffer,
+                    this.pleasureSourceGain,
+                    1.0,
+                    PLEASURE_AMBIENCE_FADE_SECONDS
+                );
+                loop.start();
+                return loop;
+            });
+            return this.pleasureLoops.length > 0;
+        } catch (error) {
+            if (generation === this.pleasureGeneration) {
+                this.pleasureAudioAvailable = false;
+                state.moodRelaxationIntentionEnabled = false;
+                syncPleasureAmbienceControl();
+                console.warn('[Pleasure Ambience] audio could not start:', error);
+            }
+            return false;
+        }
+    }
+
+    stopPleasureAmbience(fadeTime = PLEASURE_AMBIENCE_FADE_SECONDS) {
+        this.pleasureGeneration += 1;
+        this.pleasureLoops.forEach(loop => loop.stop(Math.max(0, fadeTime)));
+        this.pleasureLoops = [];
+    }
+
+    setPleasureAmbienceGain(gain) {
+        const level = clampPleasureAmbienceGain(gain);
+        if (!this.ctx || !this.pleasureGain || !this.pleasureEnhancerGain) return level;
+        const now = this.ctx.currentTime;
+        this.pleasureGain.gain.cancelScheduledValues(now);
+        this.pleasureGain.gain.setValueAtTime(this.pleasureGain.gain.value, now);
+        this.pleasureGain.gain.linearRampToValueAtTime(level, now + 0.5);
+        this.pleasureEnhancerGain.gain.cancelScheduledValues(now);
+        this.pleasureEnhancerGain.gain.setValueAtTime(this.pleasureEnhancerGain.gain.value, now);
+        this.pleasureEnhancerGain.gain.linearRampToValueAtTime(
+            level * PLEASURE_AMBIENCE_HARMONIC_MIX,
+            now + 0.5
+        );
+        return level;
+    }
+
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
         if (!this.bgMusicLoop || !this.ctx) return;
         
@@ -2640,6 +2816,7 @@ class MeditationController {
         setText('narration-text', '');
         this.visual.startPulsing('#355c7d');
         await this.audio.startBackgroundMusic();
+        void this.audio.startPleasureAmbience();
         this.audio.fadeInBackgroundMusic(10, 0.32);
 
         const stageDurationMs = state.timeSleepStage * 60 * 1000;
@@ -2866,6 +3043,7 @@ class MeditationController {
             await this.audio.init();
             // Start background music looping silently immediately
             await this.audio.startBackgroundMusic();
+            if (!state.bgMusicMode) void this.audio.startPleasureAmbience();
 
             let piperWarmup = null;
             if (isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName)) {
@@ -2977,6 +3155,7 @@ class MeditationController {
             }
             await this.audio.init();
             await this.audio.startBackgroundMusic();
+            if (!state.bgMusicMode) void this.audio.startPleasureAmbience();
             this.isMeditationActive = true;
             this.isExperimentActive = true;
             this.isPaused = false;
@@ -3025,6 +3204,7 @@ class MeditationController {
         this.stopStageDrone();
         this.audio.stopMantraTrack();
         this.audio.stopBackgroundMusic();
+        this.audio.stopPleasureAmbience();
         this.visual.stop();
         this.stopSessionCountdown();
         wakeLock.release();
@@ -4045,6 +4225,7 @@ class MeditationController {
         this.audio.stopMantraTrack({ restoreMusic: false });
         this.audio.fadeOutBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+        this.audio.stopPleasureAmbience();
         cancelNarrationPlayback();
         wakeLock.release();
         piperTTS.cancel('journey finished');
@@ -4082,7 +4263,7 @@ class MeditationController {
 
     stop() {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.isShotActive = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
         this.isExperimentActive = false;
         cancelNarrationPlayback();
@@ -4159,11 +4340,12 @@ const state = {
     droneDurationMode: normalizeDroneDurationMode(localStorage.getItem('chakra_drone_duration_mode')),
     hrimDroneDurationMode: normalizeHrimDroneDurationMode(localStorage.getItem('chakra_hrim_drone_duration_mode')),
     voices: [],
-    volVoice: storedNumber('chakra_vol_voice', 0.9),
-    volDrone: storedNumber('chakra_vol_drone', 0.05),
-    volBell: storedNumber('chakra_vol_bell', 0.05),
-    volMantra: storedNumber('chakra_vol_mantra', 0.35),
-    volMusic: storedNumber('chakra_vol_music', 0.20),
+    volVoice: clampAudioLevel(storedNumber('chakra_vol_voice', 0.9), 0.2, 2, 0.9),
+    volDrone: clampAudioLevel(storedNumber('chakra_vol_drone', 0.05), 0.02, 0.2, 0.05),
+    volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.05), 0.2, 1, 0.2),
+    volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.1, 1, 0.35),
+    volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
+    pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
     voiceClarity: parseFloat(localStorage.getItem('chakra_voice_clarity')) || 50,
     voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
     voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
@@ -4195,9 +4377,9 @@ const state = {
     // preserving narration and background music in a guided journey.
     noFrequencyMode: localStorage.getItem('chakra_no_frequency_mode') === 'true',
     noMantraMode: localStorage.getItem('chakra_no_mantra_mode') === 'true',
-    // This optional intention tone is a saved preference. No Frequency Mode
-    // overrides playback without erasing the saved preference.
-    moodRelaxationIntentionEnabled: localStorage.getItem('chakra_mood_relaxation_intention') === 'true',
+    // This ambience choice is intentionally session-only. It must not be
+    // restored after a reload or written to localStorage.
+    moodRelaxationIntentionEnabled: false,
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
@@ -4230,6 +4412,25 @@ const state = {
     customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
 
+function syncPleasureAmbienceControl() {
+    const section = document.getElementById('mood-relaxation-ambience-section');
+    const toggle = document.getElementById('mood-relaxation-intention-toggle');
+    const control = document.getElementById('mood-relaxation-ambience-level-control');
+    const slider = document.getElementById('mood-relaxation-ambience-level');
+    const output = document.getElementById('mood-relaxation-ambience-level-value');
+    const audioUnavailable = audio.pleasureAudioAvailable === false;
+    if (section) section.hidden = audioUnavailable;
+    if (toggle) toggle.disabled = state.noFrequencyMode || audioUnavailable;
+    if (control) control.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (slider) {
+        slider.disabled = state.noFrequencyMode || audioUnavailable;
+        slider.value = (state.pleasureAmbienceGain * 100).toFixed(1);
+        const pct = ((Number(slider.value) - Number(slider.min)) / (Number(slider.max) - Number(slider.min)) * 100).toFixed(1) + '%';
+        slider.style.setProperty('--range-fill', pct);
+    }
+    if (output) output.textContent = formatPleasureAmbienceLevel(state.pleasureAmbienceGain);
+}
+
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
 function getMoonPhase() {
     const knownNewMoon = new Date('2025-01-29T12:35:00Z');
@@ -4255,6 +4456,9 @@ async function loadPiperVoiceRegistry() {
 }
 
 async function init() {
+    // Migrate away from the former persisted ambience selection. The current
+    // choice is deliberately session-only; the level itself may remain saved.
+    localStorage.removeItem('chakra_mood_relaxation_intention');
     await loadTimingConfig();
     await loadLanguageManifest();
     await loadPiperVoiceRegistry();
@@ -4483,6 +4687,7 @@ function loadPreferences() {
     syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('no-mantra-mode-toggle', state.noMantraMode);
     syncChecked('mood-relaxation-intention-toggle', state.moodRelaxationIntentionEnabled);
+    syncPleasureAmbienceControl();
     const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
     if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
@@ -4654,7 +4859,6 @@ function attachEventListeners() {
         syncChecked('hooponopono-experience-toggle', false);
         syncChecked('yoga-experience-toggle', false);
         state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
-        state.moodRelaxationIntentionEnabled = getChecked('mood-relaxation-intention-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
@@ -4670,7 +4874,6 @@ function attachEventListeners() {
         localStorage.removeItem('chakra_box_meditation');
         localStorage.removeItem('chakra_hooponopono');
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
-        localStorage.setItem('chakra_mood_relaxation_intention', state.moodRelaxationIntentionEnabled);
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
@@ -5344,7 +5547,11 @@ function attachEventListeners() {
             meditation.cancelDroneTimer();
             audio.stopDrone();
             audio.stopFrequencyShot();
+            audio.stopPleasureAmbience();
+        } else if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
+            void audio.startPleasureAmbience();
         }
+        syncPleasureAmbienceControl();
         updateExperienceModeVisibility();
         updateSessionEstimate();
     }
@@ -5369,7 +5576,18 @@ function attachEventListeners() {
             return;
         }
         state.moodRelaxationIntentionEnabled = e.target.checked;
-        localStorage.setItem('chakra_mood_relaxation_intention', state.moodRelaxationIntentionEnabled);
+        syncPleasureAmbienceControl();
+        if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
+            void audio.startPleasureAmbience();
+        } else if (!state.moodRelaxationIntentionEnabled) {
+            audio.stopPleasureAmbience();
+        }
+    });
+    document.getElementById('mood-relaxation-ambience-level')?.addEventListener('input', (event) => {
+        state.pleasureAmbienceGain = clampPleasureAmbienceGain(Number(event.target.value) / 100);
+        localStorage.setItem('chakra_pleasure_ambience_gain', state.pleasureAmbienceGain);
+        syncPleasureAmbienceControl();
+        audio.setPleasureAmbienceGain(state.pleasureAmbienceGain);
     });
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
