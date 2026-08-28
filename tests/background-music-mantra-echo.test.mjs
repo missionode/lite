@@ -122,6 +122,7 @@ assert.match(stopMantraBlock, /linearRampToValueAtTime\(0, now \+ MANTRA_FADE_SE
 assert.match(stopMantraBlock, /setTimeout\(\(\) => \{[\s\S]*?restoreBackgroundMusicAfterMantra\(\)/, 'music should remain muted until the mantra fade completes');
 assert.match(app, /const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 5/);
 assert.match(app, /const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10/);
+assert.match(app, /this\.bgMusicLoop = new SeamlessLoop\([\s\S]*?BACKGROUND_MUSIC_ENTRY_FADE_SECONDS\n\s*\);/, 'background loop startup should use the full entry fade');
 assert.match(app, /const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8/);
 assert.match(app, /const MANTRA_MUSIC_FADE_SECONDS = 4/, 'music should receive a deliberate handoff fade before mantra playback');
 assert.match(app, /const MANTRA_FADE_SECONDS = 4/, 'mantra should use a deliberate fade when stopping');

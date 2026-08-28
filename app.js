@@ -2437,8 +2437,17 @@ class AudioEngine {
             this.bgMusicBusGain.gain.setValueAtTime(1, now);
         }
 
-        // Standardized to 3.0s crossfade
-        this.bgMusicLoop = new SeamlessLoop(this.ctx, this.bgMusicBuffer, this.bgMusicGain, 1.0, 3.0);
+        // Match the source-loop startup envelope to the outer music gain.
+        // Keeping both at the full entry duration prevents a restarted loop
+        // from becoming audible through its inner 3-second fade while the
+        // outer gain still carries a previous session's level.
+        this.bgMusicLoop = new SeamlessLoop(
+            this.ctx,
+            this.bgMusicBuffer,
+            this.bgMusicGain,
+            1.0,
+            BACKGROUND_MUSIC_ENTRY_FADE_SECONDS
+        );
         this.bgMusicLoop.start();
     }
 
