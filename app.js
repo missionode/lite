@@ -223,6 +223,33 @@ const startNarrationTicker = (durationSeconds) => {
         refreshNarrationTicker(el);
     });
 };
+const updateNarrationTickerDuration = (durationSeconds) => {
+    const duration = Number(durationSeconds);
+    if (!Number.isFinite(duration) || duration <= 0) return;
+
+    document.querySelectorAll('[data-narration-text]').forEach((el) => {
+        const animation = el.getAnimations?.().find(item => item.animationName === 'narrationTickerReadOrder');
+        const currentTime = animation && Number(animation.currentTime);
+        const previousDuration = animation?.effect?.getComputedTiming?.().duration;
+        const position = Number.isFinite(currentTime) && Number.isFinite(previousDuration) && previousDuration > 0
+            ? Math.max(0, Math.min(1, currentTime / previousDuration))
+            : null;
+        el.style.setProperty('--narration-duration', `${duration}s`);
+
+        // Changing a CSS animation variable can recreate the animation in
+        // some browsers. Preserve its visible position so replacing an
+        // estimate with Piper's decoded duration never causes a visible jump.
+        // The remaining speed may change, but the words already on screen do
+        // not move backward or forward when a later clip is measured.
+        if (animation && position !== null) {
+            const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
+            schedule(() => {
+                const nextAnimation = el.getAnimations?.().find(item => item.animationName === 'narrationTickerReadOrder');
+                if (nextAnimation) nextAnimation.currentTime = position * duration * 1000;
+            });
+        }
+    });
+};
 const setNarrationText = (txt, narrationDurationSeconds = null) => {
     const text = String(txt ?? '').trim();
     document.querySelectorAll('[data-narration-text]').forEach((el) => {
@@ -3485,32 +3512,69 @@ class MeditationController {
         await this.pauseAwareSleep(leadIn * 1000);
 
         const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
-        // Keep Piper's natural sentence-level prosody, but use the same queued
-        // clips for the visual timeline. No audio is split into word-sized
-        // pieces, so the voice remains continuous and expressive.
-        const clipBlobs = await Promise.all(sentences.map(sentence => piperTTS.synthesize(sentence)));
-        const clipBuffers = [];
-        for (const blob of clipBlobs) {
-            const buffer = await piperTTS.decode(blob);
-            if (!buffer) throw new Error('Piper returned an empty audio clip.');
-            clipBuffers.push(buffer);
-        }
-        const piperDuration = clipBuffers.reduce((total, buffer) => total + buffer.duration, 0) +
+        // Keep the first two sentences ready so narration begins promptly,
+        // then continue synthesizing one sentence ahead while the current
+        // sentence plays. Piper's worker is serial, so waiting for the whole
+        // passage here would leave the user with music and silence for a long
+        // time before the first voice clip can start.
+        const queueSynthesis = (sentence) => {
+            const job = piperTTS.synthesize(sentence);
+            // A Stop action may cancel jobs that have not reached the active
+            // await yet. Attach a sink immediately so intentional cancellation
+            // cannot create unhandled promise errors.
+            job.catch(() => {});
+            return job;
+        };
+        const pending = sentences.slice(0, 2).map(queueSynthesis);
+        // The estimate helper includes a lead-in for a complete narration.
+        // The ticker begins at the first audio clip, so remove that lead-in
+        // from each sentence estimate before composing the rolling total.
+        const estimatedDurations = sentences.map(sentence =>
+            Math.max(0.1, estimateNarrationDurationSeconds(sentence, pacing) - timing('narration', 'piperLeadIn'))
+        );
+        let narrationDuration = estimatedDurations.reduce((total, duration) => total + duration, 0) +
             Math.max(0, sentences.length - 1) * sentenceGap;
+        let piperFailed = false;
         let tickerStarted = false;
 
-        for (let i = 0; i < clipBuffers.length; i++) {
+        for (let i = 0; i < sentences.length; i++) {
             if (!this.isMeditationActive) break;
             while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
-            await piperTTS.playBuffer(clipBuffers[i], volumeScale, {
-                onStart: () => {
-                    if (!tickerStarted) {
-                        tickerStarted = true;
-                        startNarrationTicker(piperDuration);
-                    }
+
+            if (piperFailed) {
+                await this.narrateBrowser(sentences[i], false, true, pacing, false);
+                continue;
+            }
+
+            try {
+                const blob = await pending.shift();
+                if (i + 2 < sentences.length) pending.push(queueSynthesis(sentences[i + 2]));
+                const buffer = await piperTTS.decode(blob);
+                if (!buffer) throw new Error('Piper returned an empty audio clip.');
+                // Replace the estimate for this clip as soon as its real
+                // decoded duration is available. The ticker keeps its current
+                // elapsed position while its total timing becomes more exact.
+                narrationDuration += buffer.duration - estimatedDurations[i];
+                updateNarrationTickerDuration(narrationDuration);
+                if (!tickerStarted) {
+                    tickerStarted = true;
+                    // The complete text is already visible, but the marquee
+                    // must wait for real voice playback. The rolling estimate
+                    // is progressively replaced by decoded Piper durations.
+                    startNarrationTicker(narrationDuration);
                 }
-            });
-            if (i < clipBuffers.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
+                await piperTTS.playBuffer(buffer, volumeScale);
+            } catch (error) {
+                // Stopping a journey intentionally cancels Piper. Do not turn
+                // that cancellation into a new browser-speech utterance.
+                if (!this.isMeditationActive) return;
+                piperFailed = true;
+                piperTTS.cancel('sentence failed');
+                setVoiceStatus(t('ui.piperFallback'), 'error');
+                await this.narrateBrowser(sentences[i], false, true, pacing, false);
+            }
+
+            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         if (fadeOut) {
