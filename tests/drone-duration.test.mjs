@@ -176,10 +176,11 @@ const meditationBlock = app.slice(meditationStart, meditationEnd);
 assert.match(meditationBlock, /this\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
 assert.match(meditationBlock, /key === 'high_energy' \? state\.hrimDroneDurationMode : state\.droneDurationMode/, 'HRIM and normal chakra stages must use separate duration preferences');
 assert.ok(
-    meditationBlock.indexOf('await this.narrate(localized(chakra') < meditationBlock.indexOf('await this.audio.playMantraTrack(key)') &&
+    meditationBlock.indexOf('await this.narrate(') < meditationBlock.indexOf('await this.audio.playMantraTrack(key)') &&
     meditationBlock.indexOf('await this.audio.playMantraTrack(key)') < meditationBlock.indexOf('this.startTimedDrone('),
     'the narration must finish and mantra playback must start before the drone',
 );
+assert.match(meditationBlock, /'normal',\s*'mantra'/, 'chakra narration should use the coordinated mantra transition profile');
 assert.match(meditationBlock, /if \(!state\.noMantraMode && this\.audio\.mantraLoop\) \{[\s\S]*?this\.startTimedDrone\(/, 'the drone must be conditional on active mantra playback');
 assert.match(meditationBlock, /key === 'high_energy' \? state\.timeHighEnergy : state\.timePerChakra/, 'normal and HRIM paths should use their active practice durations');
 assert.match(app, /if \(!this\.isPaused\) remaining -= step;/, 'pausing the journey should pause the drone timer');

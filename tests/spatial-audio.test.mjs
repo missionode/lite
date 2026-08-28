@@ -28,9 +28,16 @@ for (const locale of [en, ml]) {
 assert.match(app, /this\.spatialDronePanner = this\.createSpatialPanner\(\)/);
 assert.match(app, /this\.spatialMusicPanner = this\.createSpatialPanner\(\)/);
 assert.match(app, /this\.spatialMantraPanner = this\.createSpatialPanner\(\)/);
+assert.match(app, /this\.spatialPleasurePanner = this\.createSpatialPanner\(\)/);
+assert.match(app, /const PLEASURE_SPATIAL_APPROACH_SECONDS = 45/);
+assert.match(app, /this\.spatialPleasurePanner\.rolloffFactor = 0\.55/);
+assert.match(app, /schedulePleasureSpatialApproach\(\)[\s\S]*?positionZ\.linearRampToValueAtTime/);
+assert.match(app, /pleasure: \{ x: 0, y: 0\.2, z: -10, nearZ: -5 \}/, 'headphone pleasure ambience should approach from a closer distant position');
 assert.match(app, /this\.pannerNode\.connect\(this\.spatialDronePanner\)[\s\S]*?this\.spatialDronePanner\.connect\(this\.lowCutFilter\)/);
 assert.match(app, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/);
 assert.match(app, /this\.mantraFilter\.connect\(this\.spatialMantraPanner\)[\s\S]*?this\.spatialMantraPanner\.connect\(this\.lowCutFilter\)/);
+assert.match(app, /this\.pleasureGain\.connect\(this\.pleasureBlurDryGain\)[\s\S]*?this\.pleasureSpatialDepthGain\.connect\(this\.spatialPleasurePanner\)[\s\S]*?this\.spatialPleasurePanner\.connect\(this\.lowCutFilter\)/);
+assert.match(app, /this\.setSpatialPosition\(this\.spatialPleasurePanner, configurations\.pleasure, now\)/);
 assert.match(app, /this\.voiceClarityFilter\.connect\(this\.lowCutFilter\)/, 'Narration should remain on its centered path');
 assert.doesNotMatch(app, /this\.voiceClarityFilter\.connect\(this\.spatial[A-Za-z]+Panner\)/, 'Narration must not be spatialized');
 

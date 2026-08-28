@@ -45,11 +45,13 @@ assert.doesNotMatch(app, /Promise\.all\(sentences\.map\(sentence => piperTTS\.sy
 assert.match(app, /if \(i \+ 2 < sentences\.length\) pending\.push\(queueSynthesis\(sentences\[i \+ 2\]\)\)/, 'Piper should continue generating the next sentence while playback flows');
 assert.match(app, /const estimatedDurations = sentences\.map\(sentence =>[\s\S]*?estimateNarrationDurationSeconds\(sentence, pacing\)[\s\S]*?\)/, 'The hybrid ticker should have a fallback duration for sentences not decoded yet');
 assert.match(app, /const buffer = await piperTTS\.decode\(blob\)[\s\S]*?narrationDuration \+= buffer\.duration - estimatedDurations\[i\][\s\S]*?updateNarrationTickerDuration\(narrationDuration\)/, 'The hybrid ticker should progressively replace estimates with real Piper durations');
-assert.match(app, /await piperTTS\.playBuffer\(buffer, volumeScale\)/, 'Piper should play each ready sentence progressively');
+assert.match(app, /await piperTTS\.playBuffer\(buffer, volumeScale, \{[\s\S]*?fadeOutSeconds:[\s\S]*?\}\)/, 'Piper should play each ready sentence progressively with a transition-aware fade');
+assert.match(app, /const isFinalClip = i === sentences\.length - 1/, 'Piper should identify the final narration clip for a mantra handoff');
+assert.match(app, /NARRATION_MANTRA_FADE_SECONDS/, 'the final narration clip should use a centralized mantra transition fade');
 assert.match(app, /startNarrationTicker\(narrationDuration\)/, 'The marquee should start when the first Piper clip is ready');
 assert.match(app, /const updateNarrationTickerDuration = \(durationSeconds\)[\s\S]*?const position = Number\.isFinite\(currentTime\)[\s\S]*?currentTime \/ previousDuration[\s\S]*?nextAnimation\.currentTime = position \* duration \* 1000/, 'Updating to real Piper timing should preserve the marquee position');
 assert.match(app, /if \(!this\.isMeditationActive\) return;[\s\S]*?piperFailed = true[\s\S]*?piperTTS\.cancel\('sentence failed'\)/, 'A stopped journey should not trigger browser fallback after Piper cancellation');
-assert.match(app, /async narrateBrowser\(text[\s\S]*?updateTicker = true\)[\s\S]*?if \(updateTicker\) setText\('narration-text', text, estimateNarrationDurationSeconds\(text, pacing\)\)/, 'Browser narration should show the complete narration block');
+assert.match(app, /async narrateBrowser\(text[\s\S]*?updateTicker = true, transition = 'none'\)[\s\S]*?if \(updateTicker\) setText\('narration-text', text, estimateNarrationDurationSeconds\(text, pacing\)\)/, 'Browser narration should show the complete narration block');
 assert.doesNotMatch(app, /for \(let i = 0; i < sentences\.length; i\+\+\) \{[\s\S]*?setText\('narration-text', sentences\[i\]/, 'The ticker must not replace the full narration with each sentence');
 assert.match(app, /async narrateSoftBrowser\(text\) \{\s*setText\('narration-text', text, estimateNarrationDurationSeconds\(text, 'soft'\)\)/, 'Soft prompts should also use the ticker');
 assert.match(app, /async narrateFeebleBrowser\(text\) \{\s*setText\('narration-text', text, estimateNarrationDurationSeconds\(text, 'feeble'\)\)/, 'Feeble prompts should also use the ticker');

@@ -2,7 +2,7 @@
 
 ## START
 
-- Current objective: preserve the stable `production` branch while implementing and reviewing the isolated Sleep Mode experience on `sleep-experience-mode`.
+- Current objective: preserve the stable `production` branch while completing the current pleasure-ambience audio work and reviewing narration/mantra transition fades.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
 - Stack: static HTML/CSS/JavaScript PWA with Web Audio, Piper/Web Speech narration, local JSON content, service-worker caching, and npm-based test tooling. There is no backend, database, authentication layer, or production build step.
@@ -11,7 +11,7 @@
 
 ## MID
 
-- Stable production baseline: local and remote `production` are aligned at `71ecda1` (`merge: deliver aura journey and assessment theming`).
+- Stable production baseline: local and remote `production` are aligned at `487d03d` (`feat(audio): layer pleasure ambience from manifest`).
 - Delivered product shape: bilingual English/Malayalam guided journeys; seven-chakra customization; HRIM, Sleep, Music Only, Yoga/Bath/care extensions; Piper narration with browser fallback; trauma-aware wellness boundaries; assessment handoff; and a user-activated, `Source=Lite`-only Earn link after completion.
 - Runtime content source is `scripts.json`. `test-script.json` is a short schema fixture. `docs/dot.json` is independently authored facilitator content and is not synchronized from production wording.
 - HRIM is a separate energizing/recharge experience with no local-time restriction; it is not an eighth chakra. Its script-defined drone centre is 528 Hz.
@@ -19,16 +19,18 @@
 
 ## NOW
 
-### Active snapshot — 2026-08-27 (Asia/Kolkata)
+### Active snapshot — 2026-08-29 (Asia/Kolkata)
 
-- Branch: `production`; current work is a local checkpoint awaiting commit and push. The working tree also contains unrelated tracked macOS `.DS_Store` changes, which must not be included in the feature commit.
-- Latest application work includes Meditation Room-owned chakra selection, centralized continuous narration marquee surfaces, narration-only ticker lifecycle, and fixed 20-second drone exposure modes: Beginner 4s, Intermediate 10s, Advanced 14s, and Expert 20s.
-- Chakra, HRIM, Sleep, and Yoga drone paths use the shared timed exposure boundary. Yoga's former unbounded 136.1 Hz grounding drone now uses that timer. Shot mode remains independently capped by `timing-config.json`.
-- Narration displays the complete spoken block continuously and clears on actual audio completion. Mobile receives a modest speed increase, constrained by a conservative Piper/browser speech-duration estimate so the marquee does not intentionally outrun the voice.
-- Validation at this checkpoint: `static/unit` PASS — JavaScript syntax, narration ticker, drone-duration, and diff whitespace. No Playwright or screenshots were used, per owner instruction.
-- Model-router status: the local Codex adapter and `codex-cli 0.148.0` are available, but no automatic model dispatch evidence was recorded for this checkpoint; do not claim routed execution.
-- Loop package location: the authoritative policy, routing, architecture, plugin, skill, and Loop test files are kept under `Loop/`; duplicate copies previously stored at the project root have been removed.
-- Next exact step: commit only the application, locale, cache, package, and regression-test changes with a detailed checkpoint message; push `production`; then re-check the remaining `.DS_Store` state and perform real-device audio/UX validation separately.
+- Branch: `production`; local and `origin/production` both point to `487d03d`. The working tree contains uncommitted pleasure-ambience spatial/blur changes and unrelated tracked macOS `.DS_Store` changes. Preserve `.DS_Store` and exclude it from any feature commit.
+- Latest committed application work loads pleasure ambience layers from tracked `audio/ambience-manifest.json`. The local-only source assets `audio/pleasure.mp3` and `audio/pleasure-1.ogg` are intentionally ignored by Git; future `pleasure-*` layers may use any browser-decodable audio extension and are discovered through the manifest.
+- Uncommitted pleasure-audio work adds a dedicated spatial panner with a 45-second far-to-near approach for Spatial Sound modes, a stereo fallback depth ramp, and a session-only soft blur path using a low-pass filter plus short convolution. Blur defaults on when Mood & Relaxation Ambience is enabled and can be toggled while preserving the clean source path. Every manifest layer shares this processing bus, and the profile is explicitly reapplied on initial start and stage-level re-entry so it remains consistent through the complete journey.
+- Pleasure ambience remains bounded at a 0.2%–7.0% source-level range, fades through the existing five-second stop path, and remains separate from the centred narration route. Crossing above 5.0% requires a localized confirmation; cancelling restores the previous level. The app and shell cache versions are bumped for delivery. No claim is made that this percentage equals a calibrated decibel level.
+- Audio fade audit checkpoint `CP-AUDIO-018`: the normal chakra path previously called `narrate(..., false)` and then immediately called `playMantraTrack()`, so no multi-second narration fade was scheduled before mantra. Piper clips used only a maximum 50ms end fade; browser speech has no Web Audio fade path. Background music could also be muted before a slow first-use mantra decode, creating an avoidable silent gap.
+- CP-AUDIO-019 implementation now coordinates the handoff: the final Piper clip uses a centralized two-second exit fade only when handing off to mantra, ordinary clip boundaries retain the 50ms edge fade, and the browser-speech path documents its platform limitation while waiting for `speechSynthesis.onend`. Mantra music muting starts only after its buffer is decoded, preserving the already-ducked music bed during loading. Manual stop, finish, pause, and Experiment stop remain immediate safety paths; non-emergency Piper cancellation has a short 120ms gain ramp. Mantra/music/pleasure/drone stop paths retain their existing scheduled fades.
+- Validation at this refresh: `static/unit` PASS — `node --check app.js`, every `tests/*.test.mjs` contract, and `git diff --check`. The focused narration, background-music/mantra, and drone contracts include the new fade and cancellation boundaries. No Playwright, screenshots, browser, or real-device evidence was used, per owner instruction.
+- Model-router status: Loop routing configuration and the local Codex adapter are present, but no automatic model dispatch evidence is recorded for this checkpoint; do not claim routed execution.
+- Loop status: authoritative policy and supporting routing/architecture files remain under `Loop/`; `Loop/loop.md` is unchanged and protected. The active handoff is the current continuity source; no additional Loop policy file needs modification for this refresh.
+- Next exact step: perform real-device headphone/speaker listening checks for the coordinated fade package, then make a detailed feature commit if the owner approves; do not commit or push the current uncommitted pleasure-audio and fade work without explicit instruction.
 
 ### Historical context retained for reference
 
