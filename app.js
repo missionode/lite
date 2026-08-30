@@ -250,10 +250,13 @@ const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
     // than Latin text. A slower ticker is preferable to outrunning the voice.
     const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
     const charactersPerSecond = isMalayalam ? 5.5 : 7.5;
+    const piperPaceMultiplier = isPiperVoice()
+        ? getPiperMeditationPaceMultiplier()
+        : 1;
     const pacingFactor = pacing === 'hrim' ? 1.1 : pacing === 'soft' ? 0.82 : pacing === 'feeble' ? 0.76 : 1;
     const sentenceCount = text.split(/[.!?।]/).filter(sentence => sentence.trim()).length;
     const sentenceGaps = Math.max(0, sentenceCount - 1) * 1.5;
-    return 1.2 + (text.length / (charactersPerSecond * pacingFactor)) + sentenceGaps;
+    return 1.2 + (text.length / (charactersPerSecond * pacingFactor * piperPaceMultiplier)) + sentenceGaps;
 };
 let narrationTickerAwaitingPlayback = false;
 const refreshNarrationTicker = (el) => {
@@ -995,6 +998,16 @@ function getPiperVoiceDefinition(value = state.voiceName) {
     return piperVoiceRegistry.find(voice => voice.id === piperVoiceId(value)) || null;
 }
 
+function getPiperMeditationPaceMultiplier(value = state.voiceName) {
+    const multiplier = Number(getPiperVoiceDefinition(value)?.meditationPaceMultiplier);
+    return Number.isFinite(multiplier) && multiplier > 0 && multiplier <= 1.15 ? multiplier : 1;
+}
+
+function getEffectivePiperPace() {
+    const selectedPace = Number(state.voicePace) || 1;
+    return Math.max(0.7, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier()));
+}
+
 function isFeminineNarrationVoice(value = state.voiceName) {
     const piperVoice = getPiperVoiceDefinition(value);
     if (piperVoice) return String(piperVoice.gender || '').toLowerCase() === 'female';
@@ -1136,7 +1149,9 @@ class PiperTTS {
     synthesize(text) {
         return this.request('synthesize', {
             text,
-            settings: { lengthScale: 1 / Math.max(0.85, Math.min(1.15, state.voicePace || 1)) }
+            // Keep the user Pace control intact while allowing a voice model
+            // to declare a calmer meditation baseline in its registry.
+            settings: { lengthScale: 1 / getEffectivePiperPace() }
         });
     }
 

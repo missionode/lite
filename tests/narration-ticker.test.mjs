@@ -6,6 +6,12 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
+const piperModels = JSON.parse(fs.readFileSync(new URL('../piper-models.json', import.meta.url), 'utf8'));
+
+const englishPiperVoices = piperModels.voices.filter(voice => voice.language === 'en');
+assert.equal(englishPiperVoices.length, 1, 'the registry should currently expose one English Piper voice');
+assert.equal(englishPiperVoices[0]?.id, 'en_US-lessac-medium', 'Lessac should remain the bundled English Piper voice');
+assert.equal(englishPiperVoices[0]?.meditationPaceMultiplier, 0.88, 'English Lessac should use the calmer meditation baseline');
 
 const symbolPosition = html.indexOf('id="chakra-symbol"');
 const tickerPosition = html.indexOf('id="narration-scroll-container"');
@@ -25,6 +31,9 @@ assert.match(app, /const refreshNarrationTicker = \(el\)[\s\S]*?container\.clien
 assert.match(app, /const startOffset = container\.clientWidth \* 0\.68[\s\S]*?--narration-start/, 'The container width may position the text but must not control its timing');
 assert.match(app, /const endOffset = container\.clientWidth \* 0\.5[\s\S]*?--narration-end/, 'The final spoken word should finish at the center reading point');
 assert.match(app, /const estimateNarrationDurationSeconds = \(txt, pacing = 'normal'\)/, 'Narration should provide a conservative voice-duration estimate');
+assert.match(app, /function getPiperMeditationPaceMultiplier\(value = state\.voiceName\)/, 'Piper voices should be able to declare a meditative pace baseline');
+assert.match(app, /function getEffectivePiperPace\(\)[\s\S]*?selectedPace \* getPiperMeditationPaceMultiplier\(\)/, 'the user pace control should combine with the selected Piper meditation baseline');
+assert.match(app, /settings: \{ lengthScale: 1 \/ getEffectivePiperPace\(\) \}/, 'Piper synthesis should apply the effective meditative pace');
 assert.match(app, /const speechDuration = Number\(container\.dataset\.narrationDurationHint\)[\s\S]*?Number\.isFinite\(speechDuration\)[\s\S]*?Math\.max\(1, speechDuration\)/, 'Ticker duration should follow narration timing rather than device width');
 assert.doesNotMatch(app, /const isMobile = container\.clientWidth <= 600|const pixelsPerSecond = isMobile \? 42 : 34|speechDuration \* 1\.15/, 'Ticker speed must not vary by device width or mobile-specific pixel rates');
 assert.match(app, /schedule\(\(\) => document\.querySelectorAll\('\[data-narration-text\]'\)\.forEach\(refreshNarrationTicker\)\)/, 'Screen changes should remeasure the active ticker');

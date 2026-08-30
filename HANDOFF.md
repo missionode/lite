@@ -29,7 +29,8 @@
 - Validation: `static/unit` PASS — `node --check app.js`, `node --check sw.js`, English/Malayalam locale JSON parsing, `npm run test:background-music`, `npm run test:spatial-audio`, `npm run test:audio-safety`, `npm run test:no-frequency`, and `git diff --check`. Playwright, screenshots, and manual listening were not run by owner direction.
 - Commit scope: `HANDOFF.md`, `app.js`, `index.html`, `style.css`, `locales/en.json`, `locales/ml.json`, `sw.js`, `tests/background-music-mantra-echo.test.mjs`, and `tests/spatial-audio.test.mjs` only.
 - Preserved external/unrelated work: `.DS_Store`, `audio/.DS_Store`, `audio/background_music.mp3`, untracked `audio/BACKUP/background_music.mp3`, and the existing deletion of `docs/dot.json`. The missing `docs/dot.json` prevents the content-safety fixture test and remains excluded pending owner direction.
-- Next action: create the detailed checkpoint commit from the scoped validated files and push `production` to `origin`.
+- Follow-up checkpoint: English Piper currently has one bundled voice, `en_US-lessac-medium` (female). It now declares a 0.88 meditation pace multiplier, making its default synthesis about 12% slower while retaining the user Pace slider and leaving Malayalam Piper voices unchanged. `static/unit` validation passed: app/service-worker syntax, Piper registry JSON, narration ticker, background-music, spatial-audio, and audio-safety contracts, plus `git diff --check`.
+- Next action: create the detailed local checkpoint commit for the English Piper pace adjustment; push only when the owner requests it.
 
 ### Active snapshot — 2026-08-30 (Asia/Kolkata)
 
