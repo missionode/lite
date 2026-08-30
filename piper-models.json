@@ -44,7 +44,7 @@
       "modelSize": 63201294,
       "modelLfsOid": "5efe09e69902187827af646e1a6e9d269dee769f9877d17b16b1b46eeaaf019f",
       "quality": "medium",
-      "meditationPaceMultiplier": 0.88,
+      "meditationPaceMultiplier": 0.74,
       "license": "See the voice MODEL_CARD before redistribution",
       "source": "https://huggingface.co/rhasspy/piper-voices"
     }

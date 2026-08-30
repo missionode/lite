@@ -11,7 +11,7 @@ const piperModels = JSON.parse(fs.readFileSync(new URL('../piper-models.json', i
 const englishPiperVoices = piperModels.voices.filter(voice => voice.language === 'en');
 assert.equal(englishPiperVoices.length, 1, 'the registry should currently expose one English Piper voice');
 assert.equal(englishPiperVoices[0]?.id, 'en_US-lessac-medium', 'Lessac should remain the bundled English Piper voice');
-assert.equal(englishPiperVoices[0]?.meditationPaceMultiplier, 0.88, 'English Lessac should use the calmer meditation baseline');
+assert.equal(englishPiperVoices[0]?.meditationPaceMultiplier, 0.74, 'English Lessac should match the calmer Malayalam meditation reading baseline');
 
 const symbolPosition = html.indexOf('id="chakra-symbol"');
 const tickerPosition = html.indexOf('id="narration-scroll-container"');
