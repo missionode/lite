@@ -815,6 +815,15 @@ function isGeneratedIntention(value, language = state.language) {
     return !current || current === defaultIntention(language) || current === hrimDefaultIntention(language);
 }
 
+function shouldRefreshLocalizedIntention(value, previousLanguage) {
+    // Current and earlier releases may have saved either language's generated
+    // wording. Recognize both defaults so changing Meditation Language always
+    // refreshes app-generated copy, while a guide's own intention stays intact.
+    const supportedLanguages = languageRegistry.map(language => language.id);
+    const languagesToCheck = [...new Set([previousLanguage, state.language, ...supportedLanguages])];
+    return languagesToCheck.some(language => isGeneratedIntention(value, language));
+}
+
 function getJourneyRoadmapLabels() {
     if (getChecked('music-only-toggle')) return [t('ui.roadmapMusicOnly')];
 
@@ -5310,14 +5319,15 @@ function attachEventListeners() {
     if (yogaExperienceSetup && yogaExperiencePanelHost) yogaExperiencePanelHost.append(yogaExperienceSetup);
 
     languageSelect.addEventListener('change', (e) => {
-        const previousDefault = defaultIntention(state.language);
-        const previousHrimDefault = hrimDefaultIntention(state.language);
+        const previousLanguage = state.language;
+        const shouldUpdateGeneratedIntention = shouldRefreshLocalizedIntention(state.intention, previousLanguage);
         state.language = e.target.value;
-        if (!state.intention.trim() || state.intention === previousDefault || state.intention === previousHrimDefault) {
+        if (shouldUpdateGeneratedIntention) {
             state.intention = state.highEnergyEnabled
                 ? hrimDefaultIntention(state.language)
                 : defaultIntention(state.language);
             syncValue('intention-input', state.intention);
+            localStorage.setItem('chakra_intention', state.intention);
         }
         setupVoices();
         autoSelectVoice();

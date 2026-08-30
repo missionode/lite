@@ -6,6 +6,7 @@
     "test:chakra-selection": "node tests/chakra-selection.test.mjs",
     "test:lobby-scroll": "node tests/lobby-scroll.test.mjs",
     "test:narration-ticker": "node tests/narration-ticker.test.mjs",
+    "test:language-intention": "node tests/language-intention.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
     "test:spatial-audio": "node tests/spatial-audio.test.mjs",

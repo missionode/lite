@@ -21,6 +21,8 @@
 
 ### Active snapshot — 2026-08-31 (Asia/Kolkata)
 
+- In progress: changing **Meditation Language** now recognizes generated English or Malayalam regular/HRIM intentions saved by either current or earlier releases, replaces them with the selected language’s equivalent, and persists the result immediately. A guide-written custom intention remains unchanged. The app shell cache is bumped so installed PWA clients receive the change.
+- Validation pending checkpoint: `npm run test:language-intention`, JavaScript syntax checks, and `git diff --check`; no Playwright/screenshots by owner direction. The dedicated static test guards cross-language default recognition and persistence.
 - Checkpoint: `CP-AUDIO-020` — ambience intensity, closer spatial pleasure ambience, stronger heavenly voice/music space, extended-but-tempered narration/mantra tails, and role-preserving Music `+`/`−` handling.
 - Branch: `production`, baseline `3f898de`. The owner explicitly approved production push; this branch is already production, so no merge commit is required.
 - Git checkpoint: `0bf5183` (`[CP-AUDIO-020] Refine immersive audio behavior`).
