@@ -26,31 +26,24 @@ async function openYogaExperience(page) {
   await expect(page.locator('#yoga-experience-setup')).toBeVisible();
 }
 
-const bathCombinations = [
-  { name: 'standard bath', massage: false, perineal: false, assisted: false },
+const intimateServiceCombinations = [
   { name: 'massage only', massage: true, perineal: false, assisted: false },
   { name: 'perineal only', massage: false, perineal: true, assisted: false },
   { name: 'assisted only', massage: false, perineal: false, assisted: true },
-  { name: 'massage and perineal', massage: true, perineal: true, assisted: false },
-  { name: 'massage and assisted', massage: true, perineal: false, assisted: true },
-  { name: 'all bath add-ons', massage: true, perineal: true, assisted: true }
+  { name: 'all intimate stages', massage: true, perineal: true, assisted: true }
 ];
 
-for (const combination of bathCombinations) {
-  test(`bath flow: ${combination.name}`, async ({ page }) => {
+for (const combination of intimateServiceCombinations) {
+  test(`intimate service: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
-    await openYogaExperience(page);
-    await setChecked(page, 'bath-session-toggle', true);
+    await page.locator('#save-config').click();
     await setChecked(page, 'massage-toggle', combination.massage);
     await setChecked(page, 'perineal-care-toggle', combination.perineal);
     await setChecked(page, 'assisted-bathing-toggle', combination.assisted);
 
-    await expect(page.locator('#bath-session-toggle')).toBeChecked();
     for (const [id, visible] of [
-      ['#row-massage', combination.massage],
       ['#row-perineal-care', combination.perineal],
-      ['#row-assisted-bathing', combination.assisted],
-      ['#row-bath', !combination.assisted]
+      ['#row-assisted-bathing', combination.assisted]
     ]) {
       if (visible) await expect(page.locator(id)).toBeVisible();
       else await expect(page.locator(id)).toBeHidden();
@@ -59,17 +52,15 @@ for (const combination of bathCombinations) {
 }
 
 const modeCombinations = [
-  { name: 'standard', high: false, reverse: false, filters: false, noFrequency: false, musicOnly: false },
-  { name: 'high energy', high: true, reverse: false, filters: false, noFrequency: false, musicOnly: false },
-  { name: 'reverse journey', high: false, reverse: true, filters: false, noFrequency: false, musicOnly: false },
-  { name: 'audio filters', high: false, reverse: false, filters: true, noFrequency: false, musicOnly: false },
-  { name: 'music only', high: false, reverse: false, filters: false, noFrequency: false, musicOnly: true }
+  { name: 'standard', high: false, filters: false, noFrequency: false, musicOnly: false },
+  { name: 'high energy', high: true, filters: false, noFrequency: false, musicOnly: false },
+  { name: 'audio filters', high: false, filters: true, noFrequency: false, musicOnly: false },
+  { name: 'music only', high: false, filters: false, noFrequency: false, musicOnly: true }
 ];
 
 for (const combination of modeCombinations) {
   test(`journey mode: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
-    await setChecked(page, 'reverse-journey-toggle', combination.reverse);
     // Audio Filters now live in the active full-screen mixer. Their live
     // behavior is covered by the dedicated mixer journey test.
     await setChecked(page, 'no-frequency-mode-toggle', combination.noFrequency);

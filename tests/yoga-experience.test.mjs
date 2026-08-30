@@ -15,7 +15,7 @@ assert.match(app, /selectedChakras: JSON\.parse\(localStorage\.getItem\('chakra_
 assert.doesNotMatch(html, /value="(?:thirdeye|crown)" checked|value="(?:thirdeye|crown)"[^>]*disabled/, 'Third Eye and Crown should be optional and editable');
 assert.doesNotMatch(app, /state\.yogaBridgeEnabled|getChecked\('yoga-bridge-toggle'\)/, 'normal journeys must not use a Yoga Bridge flag');
 
-const sequenceStart = app.indexOf('    async runSequence()');
+const sequenceStart = app.indexOf('    async runSequence({ complete = true } = {})');
 const sequenceEnd = app.indexOf('    async runClosing()', sequenceStart);
 const sequence = app.slice(sequenceStart, sequenceEnd);
 assert.doesNotMatch(sequence, /runYogaSession/, 'a normal chakra sequence must never insert Yoga');
@@ -24,11 +24,22 @@ const yogaStart = app.indexOf('    async runYogaSession()');
 const yogaEnd = app.indexOf('    shouldUsePiper()', yogaStart);
 const yoga = app.slice(yogaStart, yogaEnd);
 assert.match(yoga, /if \(state\.corpsePoseEnabled\) await this\.runCorpsePose\(\);/, 'Yoga Experience should retain its optional Corpse Pose');
-assert.match(yoga, /if \(state\.bathSessionEnabled/, 'Yoga Experience should retain optional care stages');
+assert.match(yoga, /if \(state\.bathSessionEnabled/, 'Yoga Experience should retain its optional standard Bath Session');
 assert.match(yoga, /await this\.runGuideControlledTransition\(\{[\s\S]*?durationSeconds: timing\('transitions', 'bathToYogaRest'\)/, 'Yoga should rest after a bath/care stage before its introduction');
-assert.match(yoga, /if \(state\.massageEnabled && !await this\.runMassage\(\)\) return;/, 'Massage should wait for the guide before Yoga continues');
-assert.match(yoga, /if \(state\.perinealCareEnabled && !await this\.runPerinealCare\(\)\) return;/, 'Perineal Care should wait for the guide before Yoga continues');
-assert.match(yoga, /if \(state\.assistedBathingEnabled && !await this\.runAssistedBathing\(\)\) return;/, 'Assisted Bathing should wait for the guide before Yoga continues');
+assert.match(yoga, /if \(!await this\.runBathSession\(\)\) return;/, 'Yoga should retain the standard Bath Session only');
+assert.doesNotMatch(yoga, /runMassage|runPerinealCare|runAssistedBathing/, 'Intimate Service stages must not be coupled into Yoga');
+const intimateStart = app.indexOf('    async runIntimateService()');
+const intimateEnd = app.indexOf('    getFocusedExperience()', intimateStart);
+const intimate = app.slice(intimateStart, intimateEnd);
+assert.match(intimate, /runPerinealCare\(\)/, 'Intimate Service should start with optional Perineal Care');
+assert.match(intimate, /showScreen\(meditationScreen\);[\s\S]*?runSequence\(/, 'Massage should enter the meditation screen before its narrated chakra sequence');
+assert.match(intimate, /runSequence\(\{ complete: !state\.assistedBathingEnabled \}\)/, 'Massage should wrap the reverse chakra sequence without a separate timer');
+assert.match(intimate, /runAssistedBathing\(\)/, 'Intimate Service should finish with optional Assisted Bathing');
+assert.match(html, /id="intimate-service-panel"/, 'Intimate Service should be a dedicated Lobby section');
+assert.doesNotMatch(html, /id="reverse-journey-toggle"/, 'normal Settings must not offer Reverse Journey');
+assert.doesNotMatch(html, /id="time-massage"/, 'Massage must not expose a standalone duration');
+assert.match(app, /\['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'\]/, 'Massage should force all chakras in Crown-to-Root order');
+assert.match(app, /if \(focusedExperience\) \{[\s\S]*?if \(piperWarmup\) await piperWarmup;/, 'focused care should wait for Piper before narration begins');
 assert.match(app, /focusedExperience === 'yoga' && state\.selectedYogaPoses\.length === 0/, 'Yoga Experience should require at least one configured pose when launched');
 assert.match(app, /roadmapYoga/, 'Yoga Experience should have a focused Lobby roadmap');
 assert.match(app, /roadmapRestBeforeYoga/, 'Yoga roadmap should show the required rest stage after Bath Session');
@@ -44,6 +55,9 @@ assert.equal(timings.profiles['fast-test'].transitions.bathToYogaRest, 1, 'fast-
 for (const locale of [english, malayalam]) {
     for (const key of ['roadmapRestBeforeYoga', 'bathToYogaRestTitle', 'bathToYogaRestGuidance', 'restReadyToContinue', 'beginYogaAfterRest', 'guideReadyForNextSession', 'guideReadyForNextSessionGuidance', 'proceedToNextSession']) {
         assert.ok(locale.ui[key], `missing guide-rest locale key: ${key}`);
+    }
+    for (const key of ['intimateService', 'intimateServiceNote', 'beginIntimateService', 'massageReverseJourneyNote', 'roadmapMassageReverse']) {
+        assert.ok(locale.ui[key], `missing Intimate Service locale key: ${key}`);
     }
 }
 
