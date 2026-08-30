@@ -241,6 +241,7 @@
     ,"pleasureAmbienceUrlLoaded": "pleasure audio ലോഡ് ചെയ്തു. നമ്പർ ചെയ്ത manifest layers സജീവമായി തുടരും."
     ,"pleasureAmbienceUrlCleared": "സാധാരണ manifest pleasure audio പുനഃസ്ഥാപിച്ചു."
     ,"pleasureAmbienceUrlError": "pleasure audio ലോഡ് ചെയ്യാനായില്ല: {error}"
+    ,"pleasureAmbienceSourceUnavailable": "ഈ ഉപകരണത്തിൽ പ്രാദേശിക ambience audio ലഭ്യമല്ല. Mood & Relaxation Ambience ഉപയോഗിക്കാൻ നേരിട്ടുള്ള audio URL നൽകി ലോഡ് ചെയ്യുക."
     ,"moodRelaxationAmbienceLevel": "അന്തരീക്ഷ ശബ്ദ നില"
     ,"moodRelaxationAmbienceMin": "കുറഞ്ഞത് 0.2%"
     ,"moodRelaxationAmbienceMax": "കൂടിയത് 7.0%"

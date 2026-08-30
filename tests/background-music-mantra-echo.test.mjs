@@ -49,7 +49,10 @@ assert.match(app, /const PLEASURE_AMBIENCE_MIN_GAIN = 0\.002/, 'the ambience eng
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience selection must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience selection must not be saved to local storage');
 assert.match(app, /this\.pleasureLoops\.forEach\(loop => loop\.stop\(Math\.max\(0, fadeTime\)\)\)/, 'all ambience layers should use the same smooth fade');
-assert.match(app, /if \(section\) section\.hidden = audioUnavailable/, 'the ambience section should hide when its asset is unavailable');
+assert.match(app, /if \(section\) section\.hidden = false/, 'the ambience section should remain available when optional local audio is missing');
+assert.match(app, /if \(urlControl\) urlControl\.hidden = !state\.moodRelaxationIntentionEnabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
+assert.match(app, /t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable source message');
+assert.doesNotMatch(app, /pleasureAudioAvailable = false;\s*state\.moodRelaxationIntentionEnabled = false;/, 'a missing optional asset must not clear the selected ambience state');
 for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.2'], ['vol-mantra', '0\.1'], ['vol-music', '0\.02']]) {
     assert.match(html, new RegExp(`id="${id}"[^>]*min="${min}"`), `${id} should skip the first non-zero step`);
 }
@@ -57,7 +60,7 @@ assert.match(css, /\.settings-help-content\s*\{[\s\S]*?max-height:\s*calc\(100vh
 assert.match(css, /\.settings-help-list\s*\{[\s\S]*?overflow-y:\s*auto;/, 'the Help content should scroll inside the modal');
 
 for (const locale of [en, ml]) {
-    for (const key of ['musicTuning', 'musicEcho', 'musicEchoOff', 'musicEchoLight', 'musicEchoSpacious', 'musicEchoNote', 'settingsHelpAudioCredit', 'cc0Details', 'moodRelaxationIntention', 'moodRelaxationIntentionNote', 'pleasureAmbienceUrl', 'pleasureAmbienceUrlPlaceholder', 'loadPleasureAmbience', 'pleasureAmbienceUrlNote', 'pleasureAmbienceUrlLoading', 'pleasureAmbienceUrlLoaded', 'pleasureAmbienceUrlCleared', 'pleasureAmbienceUrlError', 'pleasureAmbienceBlur', 'pleasureAmbienceBlurNote', 'pleasureAmbienceBlurLevel', 'pleasureAmbienceBlurMin', 'pleasureAmbienceBlurMax', 'pleasureAmbienceBlurLevelNote', 'pleasureAmbienceAboveFiveConfirm']) {
+    for (const key of ['musicTuning', 'musicEcho', 'musicEchoOff', 'musicEchoLight', 'musicEchoSpacious', 'musicEchoNote', 'settingsHelpAudioCredit', 'cc0Details', 'moodRelaxationIntention', 'moodRelaxationIntentionNote', 'pleasureAmbienceUrl', 'pleasureAmbienceUrlPlaceholder', 'loadPleasureAmbience', 'pleasureAmbienceUrlNote', 'pleasureAmbienceUrlLoading', 'pleasureAmbienceUrlLoaded', 'pleasureAmbienceUrlCleared', 'pleasureAmbienceUrlError', 'pleasureAmbienceSourceUnavailable', 'pleasureAmbienceBlur', 'pleasureAmbienceBlurNote', 'pleasureAmbienceBlurLevel', 'pleasureAmbienceBlurMin', 'pleasureAmbienceBlurMax', 'pleasureAmbienceBlurLevelNote', 'pleasureAmbienceAboveFiveConfirm']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }

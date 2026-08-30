@@ -241,6 +241,7 @@
     ,"pleasureAmbienceUrlLoaded": "Pleasure audio loaded. The numbered manifest layers remain active."
     ,"pleasureAmbienceUrlCleared": "Standard manifest pleasure audio restored."
     ,"pleasureAmbienceUrlError": "Pleasure audio could not be loaded: {error}"
+    ,"pleasureAmbienceSourceUnavailable": "The local ambience audio is unavailable on this device. Add and load a direct audio URL to use Mood & Relaxation Ambience."
     ,"moodRelaxationAmbienceLevel": "Ambience Level"
     ,"moodRelaxationAmbienceMin": "Min 0.2%"
     ,"moodRelaxationAmbienceMax": "Max 7.0%"

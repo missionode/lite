@@ -2599,7 +2599,6 @@ class AudioEngine {
                     await this.startPleasureAmbience();
                 } catch (restoreError) {
                     this.pleasureAudioAvailable = false;
-                    state.moodRelaxationIntentionEnabled = false;
                     console.warn('[Pleasure Ambience] previous source could not be restored:', restoreError);
                 }
             }
@@ -2644,7 +2643,6 @@ class AudioEngine {
         } catch (error) {
             if (generation === this.pleasureGeneration) {
                 this.pleasureAudioAvailable = false;
-                state.moodRelaxationIntentionEnabled = false;
                 syncPleasureAmbienceControl();
                 console.warn('[Pleasure Ambience] audio could not start:', error);
             }
@@ -4759,23 +4757,27 @@ function syncPleasureAmbienceControl() {
     const blurLevelOutput = document.getElementById('pleasure-ambience-blur-level-value');
     const slider = document.getElementById('mood-relaxation-ambience-level');
     const output = document.getElementById('mood-relaxation-ambience-level-value');
+    const status = document.getElementById('pleasure-ambience-url-status');
     const audioUnavailable = audio.pleasureAudioAvailable === false;
-    if (section) section.hidden = audioUnavailable;
-    if (toggle) toggle.disabled = state.noFrequencyMode || audioUnavailable;
-    if (control) control.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
-    if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    // Optional local ambience files can be absent in a deployed build. Keep
+    // this recovery surface visible so a guide can supply a URL; hiding it
+    // would make the missing local source impossible to replace on mobile.
+    if (section) section.hidden = false;
+    if (toggle) toggle.disabled = state.noFrequencyMode;
+    if (control) control.hidden = !state.moodRelaxationIntentionEnabled;
+    if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled;
     if (urlInput) {
-        urlInput.disabled = state.noFrequencyMode || audioUnavailable;
+        urlInput.disabled = state.noFrequencyMode;
         urlInput.value = state.pleasureAmbienceUrl;
     }
-    if (blurControl) blurControl.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (blurControl) blurControl.hidden = !state.moodRelaxationIntentionEnabled;
     if (blurToggle) {
         blurToggle.checked = state.pleasureAmbienceBlur;
-        blurToggle.disabled = state.noFrequencyMode || audioUnavailable;
+        blurToggle.disabled = state.noFrequencyMode;
     }
-    if (blurLevel) blurLevel.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (blurLevel) blurLevel.hidden = !state.moodRelaxationIntentionEnabled;
     if (blurLevelInput) {
-        blurLevelInput.disabled = state.noFrequencyMode || audioUnavailable;
+        blurLevelInput.disabled = state.noFrequencyMode;
         blurLevelInput.value = (state.pleasureAmbienceBlurAmount * 100).toFixed(0);
         const pct = ((Number(blurLevelInput.value) - Number(blurLevelInput.min)) / (Number(blurLevelInput.max) - Number(blurLevelInput.min)) * 100).toFixed(1) + '%';
         blurLevelInput.style.setProperty('--range-fill', pct);
@@ -4788,6 +4790,16 @@ function syncPleasureAmbienceControl() {
         slider.style.setProperty('--range-fill', pct);
     }
     if (output) output.textContent = formatPleasureAmbienceLevel(state.pleasureAmbienceGain);
+    if (status && audioUnavailable && state.moodRelaxationIntentionEnabled) {
+        status.dataset.availability = 'unavailable';
+        status.textContent = t('ui.pleasureAmbienceSourceUnavailable');
+        status.hidden = false;
+        status.style.color = '#fbbf24';
+    } else if (status?.dataset.availability === 'unavailable') {
+        delete status.dataset.availability;
+        status.hidden = true;
+        status.textContent = '';
+    }
 }
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -6006,6 +6018,7 @@ function attachEventListeners() {
     const pleasureAmbienceUrlStatus = document.getElementById('pleasure-ambience-url-status');
     const setPleasureAmbienceUrlStatus = (message, tone = 'neutral') => {
         if (!pleasureAmbienceUrlStatus) return;
+        delete pleasureAmbienceUrlStatus.dataset.availability;
         pleasureAmbienceUrlStatus.textContent = message;
         pleasureAmbienceUrlStatus.hidden = false;
         pleasureAmbienceUrlStatus.style.color = tone === 'success'
