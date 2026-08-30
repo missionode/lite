@@ -66,7 +66,6 @@
 
             <div class="config-group settings-panel">
                 <label data-i18n="ui.options">Options</label>
-                <label class="checkbox-label"><input type="checkbox" id="reverse-journey-toggle"> Reverse Journey (Crown ➔ Root)</label>
                 <label class="checkbox-label"><input type="checkbox" id="no-frequency-mode-toggle"> <span data-i18n="ui.noFrequencyMode">No Frequency Mode</span></label>
                 <label class="checkbox-label"><input type="checkbox" id="no-mantra-mode-toggle"> <span data-i18n="ui.noMantraMode">No Mantra Mode</span></label>
             </div>
@@ -87,7 +86,7 @@
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <div id="yoga-sub-options" style="display:flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                         <label class="checkbox-label"><input type="checkbox" id="corpse-pose-toggle"> Enable Corpse Pose (Savasana)</label>
-                        <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Optional care stages run before the Yoga Experience.</p>
+                        <p class="yoga-flow-note" data-i18n="ui.yogaFlowNote">Yoga includes its selected poses and optional standard Bath Session.</p>
                         <div id="yoga-pose-selection" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:5px;">
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="vrikshasana" checked> Vrikshasana</label>
                             <label class="checkbox-label" style="font-size: 0.75rem;"><input type="checkbox" value="adho_mukha_svanasana" checked> Downward Dog</label>
@@ -117,24 +116,6 @@
                                 <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.bathDuration">Bath Duration</label>
                                 <input type="range" id="time-bath" min="60" max="1800" step="60" value="600">
                                 <span id="display-bath" style="font-size: 0.7rem; width: 40px;">10m</span>
-                            </div>
-                            <label class="checkbox-label"><input type="checkbox" id="perineal-care-toggle"> Perineal Care</label>
-                            <div class="mixer-row" id="row-perineal-care">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perinealCareDuration">Perineal Duration</label>
-                                <input type="range" id="time-perineal-care" min="30" max="900" step="30" value="300">
-                                <span id="display-perineal-care" style="font-size: 0.7rem; width: 40px;">5m</span>
-                            </div>
-                            <label class="checkbox-label"><input type="checkbox" id="assisted-bathing-toggle"> Assisted Bathing</label>
-                            <div class="mixer-row" id="row-assisted-bathing">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.assistedBathingDuration">Assisted Duration</label>
-                                <input type="range" id="time-assisted-bathing" min="60" max="1800" step="60" value="600">
-                                <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
-                            </div>
-                            <label class="checkbox-label"><input type="checkbox" id="massage-toggle"> Massage</label>
-                            <div class="mixer-row" id="row-massage">
-                                <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.massageDuration">Massage Duration</label>
-                                <input type="range" id="time-massage" min="60" max="1800" step="60" value="600">
-                                <span id="display-massage" style="font-size: 0.7rem; width: 40px;">10m</span>
                             </div>
                         </div>
                     </div>
@@ -211,7 +192,7 @@
                 <label for="experiment-activity" data-i18n="ui.experimentActivity">Activity</label>
                 <select id="experiment-activity">
                     <optgroup id="experiment-guided-group" label="Guided practice"><option value="chakra:root" data-i18n="ui.root">Root</option><option value="chakra:sacral" data-i18n="ui.sacral">Sacral</option><option value="chakra:solar" data-i18n="ui.solar">Solar</option><option value="chakra:heart" data-i18n="ui.heart">Heart</option><option value="chakra:throat" data-i18n="ui.throat">Throat</option><option value="chakra:thirdeye" data-i18n="ui.thirdEye">Third Eye</option><option value="chakra:crown" data-i18n="ui.crown">Crown</option><option value="hrim">HRIM</option><option value="box" data-i18n="ui.boxBreathingExperience">Box Breathing</option><option value="hooponopono" data-i18n="ui.hooponoponoExperience">Ho’oponopono</option><option value="corpse" data-i18n="ui.corpsePose">Savasana</option></optgroup>
-                    <optgroup id="experiment-care-group" label="Care"><option value="massage" data-i18n="ui.massage">Massage</option><option value="perineal" data-i18n="ui.perinealCare">Perineal Care</option><option value="bath" data-i18n="ui.bathSession">Bath Session</option><option value="assisted-bath" data-i18n="ui.assistedBathing">Assisted Bathing</option></optgroup>
+                    <optgroup id="experiment-care-group" label="Care"><option value="perineal" data-i18n="ui.perinealCare">Perineal Care</option><option value="bath" data-i18n="ui.bathSession">Bath Session</option><option value="assisted-bath" data-i18n="ui.assistedBathing">Assisted Bathing</option></optgroup>
                 </select>
             </div>
             <div id="experiment-core-duration-group" class="config-group settings-panel">
@@ -364,6 +345,38 @@
                 </div>
             </div>
             <div id="yoga-experience-panel-host" aria-live="polite"></div>
+
+            <section id="intimate-service-panel" class="config-group lobby-intimate-service" aria-live="polite">
+                <label data-i18n="ui.intimateService">Intimate Service</label>
+                <p class="mixer-note" data-i18n="ui.intimateServiceNote">Select the care stages needed for this guided service. Their order is always Perineal Care, Massage, then Assisted Bathing.</p>
+                <div class="experience-mode-options">
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="perineal-care-toggle">
+                        <span data-i18n="ui.perinealCare">Perineal Care</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="massage-toggle">
+                        <span data-i18n="ui.massage">Massage</span>
+                    </label>
+                    <label class="checkbox-label experience-mode-toggle">
+                        <input type="checkbox" id="assisted-bathing-toggle">
+                        <span data-i18n="ui.assistedBathing">Assisted Bathing</span>
+                    </label>
+                </div>
+                <p id="massage-reverse-journey-note" class="mixer-note" data-i18n="ui.massageReverseJourneyNote" hidden>Massage wraps a complete Crown-to-Root journey. All seven chakras are included and there is no separate massage timer.</p>
+                <div id="intimate-service-timings" class="settings-panel">
+                    <div class="mixer-row" id="row-perineal-care">
+                        <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.perinealCareDuration">Perineal Duration</label>
+                        <input type="range" id="time-perineal-care" min="30" max="900" step="30" value="300">
+                        <span id="display-perineal-care" style="font-size: 0.7rem; width: 40px;">5m</span>
+                    </div>
+                    <div class="mixer-row" id="row-assisted-bathing">
+                        <label style="font-size: 0.8rem; width: 100px; text-align: left;" data-i18n="ui.assistedBathingDuration">Assisted Duration</label>
+                        <input type="range" id="time-assisted-bathing" min="60" max="1800" step="60" value="600">
+                        <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
+                    </div>
+                </div>
+            </section>
 
             <div id="session-estimate">~ 36 mins</div>
             <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
@@ -603,6 +616,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.94"></script>
+    <script src="app.js?v=1.96"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
   await expect(page.locator('#time-icebreaker')).toHaveAttribute('min', '1');
   await expect(page.locator('#time-yoga-pose')).toHaveAttribute('max', '5');
   await expect(page.locator('#time-bath')).toHaveAttribute('max', '5');
-  await expect(page.locator('#time-massage')).toHaveAttribute('min', '1');
+  await expect(page.locator('#time-massage')).toHaveCount(0);
   await expect(page.locator('#time-per-chakra')).toHaveAttribute('min', '0.1');
   await expect(page.locator('#time-high-energy')).toHaveAttribute('min', '0.1');
   await expect(page.locator('#time-high-energy')).toHaveAttribute('max', '1');
@@ -51,7 +51,7 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
 
 test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
   await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
-  await expect(page.locator('#reverse-journey-toggle').locator('..')).toContainText('Reverse Journey');
+  await expect(page.locator('#reverse-journey-toggle')).toHaveCount(0);
   await expect(page.locator('#box-meditation-toggle')).toHaveCount(0);
   await expect(page.locator('#hooponopono-toggle')).toHaveCount(0);
   await expect(page.locator('#volume-mixer')).toContainText('Comfort & Visuals');
@@ -83,11 +83,14 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
   await page.locator('#yoga-experience-toggle').check();
   await page.locator('#bath-session-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Bath » 15 min Rest » Yoga Experience');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Yoga Experience');
+  await page.locator('#yoga-experience-toggle').uncheck();
   await page.locator('#massage-toggle').check();
   await page.locator('#perineal-care-toggle').check();
   await page.locator('#assisted-bathing-toggle').check();
-  await expect(page.locator('#journey-roadmap')).toHaveText('Massage » Perineal Care » Assisted Bathing » Yoga Experience');
-  await expect(page.locator('#start-meditation')).toHaveText('Begin Yoga Experience');
+  await expect(page.locator('#journey-roadmap')).toHaveText('Perineal Care » Massage · Crown to Root » Assisted Bathing');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Intimate Service');
 });
 
 test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
@@ -259,7 +262,7 @@ test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await expect(page.locator('#hrim-time-block-modal')).toHaveCount(0);
 });
 
-test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page }) => {
+test('keeps Intimate Service independent from Yoga and shows only selected care timings', async ({ page }) => {
   await openYogaExperience(page);
   const bath = page.locator('#bath-session-toggle');
   const massage = page.locator('#massage-toggle');
@@ -267,9 +270,6 @@ test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page 
   const assisted = page.locator('#assisted-bathing-toggle');
 
   await expect(bath).toBeEnabled();
-  await expect(massage).toBeDisabled();
-
-  await bath.check();
   await expect(massage).toBeEnabled();
   await expect(perineal).toBeEnabled();
   await expect(assisted).toBeEnabled();
@@ -277,17 +277,12 @@ test('enforces Yoga Experience Bath Session add-on dependencies', async ({ page 
   await massage.check();
   await perineal.check();
   await assisted.check();
-  await expect(page.locator('#row-massage')).toBeVisible();
+  await expect(page.locator('#yoga-experience-toggle')).not.toBeChecked();
+  await expect(page.locator('#yoga-experience-setup')).toBeHidden();
   await expect(page.locator('#row-perineal-care')).toBeVisible();
   await expect(page.locator('#row-assisted-bathing')).toBeVisible();
-  await expect(page.locator('#row-bath')).toBeHidden();
-
-  await bath.uncheck();
-  await expect(bath).not.toBeChecked();
-  await expect(massage).not.toBeChecked();
-  await expect(perineal).not.toBeChecked();
-  await expect(assisted).not.toBeChecked();
-  await expect(massage).toBeDisabled();
+  await expect(page.locator('#time-massage')).toHaveCount(0);
+  await expect(page.locator('#massage-reverse-journey-note')).toBeVisible();
 });
 
 test('persists timing changes through settings reload', async ({ page }) => {

@@ -548,7 +548,7 @@ function formatRangeControlValue(input) {
     if (input.id === 'mood-relaxation-ambience-level') return `${value.toFixed(1)}%`;
     if (input.id === 'pleasure-ambience-blur-level') return `${Math.round(value)}%`;
     if (input.id === 'time-high-energy') return `${value} mins`;
-    if (['time-bath', 'time-perineal-care', 'time-assisted-bathing', 'time-massage'].includes(input.id)) {
+    if (['time-bath', 'time-perineal-care', 'time-assisted-bathing'].includes(input.id)) {
         return `${Math.floor(value / 60)}m`;
     }
     if (input.id.startsWith('time-')) return `${value}s`;
@@ -652,8 +652,7 @@ function applyTimingControls() {
         'time-yoga-pose': 'yogaPose',
         'time-bath': 'bath',
         'time-perineal-care': 'perinealCare',
-        'time-assisted-bathing': 'assistedBathing',
-        'time-massage': 'massage'
+        'time-assisted-bathing': 'assistedBathing'
     };
     Object.entries(controls).forEach(([id, key]) => {
         const input = document.getElementById(id);
@@ -695,8 +694,7 @@ async function loadTimingConfig() {
             timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
             timeBath: ['chakra_time_bath', 'bath', 600],
             timePerinealCare: ['chakra_time_perineal_care', 'perinealCare', 300],
-            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600],
-            timeMassage: ['chakra_time_massage', 'massage', 600]
+            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600]
         };
         Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
             if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
@@ -798,13 +796,19 @@ function getJourneyRoadmapLabels() {
 
     if (getChecked('hooponopono-experience-toggle')) return [t('ui.roadmapHooponopono')];
 
+    if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
+        const labels = [];
+        if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
+        if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassageReverse'));
+        if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
+        return labels;
+    }
+
     if (getChecked('yoga-experience-toggle')) {
         const labels = [];
         if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
         if (getChecked('bath-session-toggle')) {
-            if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassage'));
-            if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
-            labels.push(t(getChecked('assisted-bathing-toggle') ? 'ui.roadmapAssistedBathing' : 'ui.roadmapBath'));
+            labels.push(t('ui.roadmapBath'));
             labels.push(t('ui.roadmapRestBeforeYoga'));
         }
         labels.push(t('ui.roadmapYoga'));
@@ -878,7 +882,6 @@ function applyLocaleUI() {
 
     const controlLabels = {
         'audio-filters-toggle': 'ui.audioFilters',
-        'reverse-journey-toggle': 'ui.reverseJourney',
         'box-breathing-experience-toggle': 'ui.boxBreathingExperience',
         'hooponopono-experience-toggle': 'ui.hooponoponoExperience',
         'no-frequency-mode-toggle': 'ui.noFrequencyMode',
@@ -2882,12 +2885,21 @@ class MeditationController {
             let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
             if (state.corpsePoseEnabled) seconds += state.timeCorpse;
             if (state.bathSessionEnabled) {
-                if (state.massageEnabled) seconds += state.timeMassage;
-                if (state.perinealCareEnabled) seconds += state.timePerinealCare;
-                seconds += state.assistedBathingEnabled ? state.timeAssistedBathing : state.timeBath;
+                seconds += state.timeBath;
                 seconds += timing('transitions', 'bathToYogaRest');
             }
             return Math.max(1, seconds) * 1000;
+        }
+        if (focusedExperience === 'intimate') {
+            let seconds = 0;
+            if (state.perinealCareEnabled) seconds += state.timePerinealCare;
+            if (state.massageEnabled) {
+                const massageChakras = 7;
+                seconds += (massageChakras * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
+            }
+            if (state.assistedBathingEnabled) seconds += state.timeAssistedBathing;
+            return Math.max(1, Math.round(seconds)) * 1000;
         }
         if (state.sleepMode) {
             const stageSeconds = state.timeSleepStage * SLEEP_STAGE_COUNT * 60;
@@ -3303,10 +3315,10 @@ class MeditationController {
             const scriptCheck = validateScriptBundle(this.scripts, {
                 highEnergy: getChecked('high-energy-toggle'),
                 corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
-                bath: focusedExperience === 'yoga' && state.bathSessionEnabled && !state.assistedBathingEnabled,
-                perinealCare: focusedExperience === 'yoga' && state.bathSessionEnabled && state.perinealCareEnabled,
-                assistedBathing: focusedExperience === 'yoga' && state.bathSessionEnabled && state.assistedBathingEnabled,
-                massage: focusedExperience === 'yoga' && state.bathSessionEnabled && state.massageEnabled,
+                bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
+                perinealCare: focusedExperience === 'intimate' && state.perinealCareEnabled,
+                assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
+                massage: false,
                 yoga: focusedExperience === 'yoga',
                 hooponopono: focusedExperience === 'hooponopono'
             });
@@ -3333,6 +3345,11 @@ class MeditationController {
             this.isMeditationActive = true;
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
+            if (focusedExperience === 'intimate' && state.massageEnabled) {
+                // Massage is a full reverse chakra wrapper, never a separately
+                // timed care stage. Keep the user's normal selection intact.
+                this.chakraOrder = ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'];
+            }
             this.sessionStartedAt = Date.now();
             const openingChakra = this.isHighEnergy ? this.scripts.high_energy : this.scripts[this.chakraOrder[0]];
             if (openingChakra?.color) document.body.style.setProperty('--primary-color', openingChakra.color);
@@ -3348,9 +3365,16 @@ class MeditationController {
             // deliberately bypass the arrival, gratitude, chakra, and closing
             // stages of a meditation journey.
             if (focusedExperience) {
+                // Focused flows bypass the normal icebreaker, which is where
+                // Piper normally finishes loading. Wait here so a care stage
+                // or Massage's first Crown narration cannot race model setup
+                // and appear to advance directly to a mantra.
+                if (piperWarmup) await piperWarmup;
+                if (!this.isMeditationActive) return;
                 this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
                 if (focusedExperience === 'box') await this.runBoxBreathing();
                 else if (focusedExperience === 'yoga') await this.runYogaSession();
+                else if (focusedExperience === 'intimate') await this.runIntimateService();
                 else {
                     showScreen(meditationScreen);
                     await this.runHooponopono();
@@ -3456,7 +3480,6 @@ class MeditationController {
             } else if (activity === 'box') await this.runBoxBreathing();
             else if (activity === 'hooponopono') { showScreen(meditationScreen); await this.runHooponopono(); }
             else if (activity === 'corpse') await this.runCorpsePose();
-            else if (activity === 'massage') await this.runMassage();
             else if (activity === 'perineal') await this.runPerinealCare();
             else if (activity === 'bath') await this.runBathSession();
             else if (activity === 'assisted-bath') await this.runAssistedBathing();
@@ -3741,10 +3764,6 @@ class MeditationController {
         return this.runBathStage('assisted_bathing', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeAssistedBathing);
     }
 
-    async runMassage() {
-        return this.runBathStage('massage', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeMassage);
-    }
-
     async runBackgroundMusicOnly() {
         this.isMeditationActive = true;
         this.isPaused = false;
@@ -3837,15 +3856,11 @@ class MeditationController {
     async runYogaSession() {
         if (!this.isMeditationActive) return;
 
-        // Bath is an optional Yoga Experience stage. Add-ons run in a fixed,
-        // respectful order. Massage comes first, Assisted Bathing replaces
-        // the standard Bath Session, and Perineal Care precedes either path.
+        // Yoga keeps its own standard Bath Session and rest-before-yoga stage.
+        // Intimate care runs separately from the Lobby.
         if (state.corpsePoseEnabled) await this.runCorpsePose();
         if (state.bathSessionEnabled && this.isMeditationActive) {
-            if (state.massageEnabled && !await this.runMassage()) return;
-            if (state.perinealCareEnabled && !await this.runPerinealCare()) return;
-            if (state.assistedBathingEnabled && !await this.runAssistedBathing()) return;
-            else if (!state.assistedBathingEnabled && !await this.runBathSession()) return;
+            if (!await this.runBathSession()) return;
 
             const shouldBeginYoga = await this.runGuideControlledTransition({
                 durationSeconds: timing('transitions', 'bathToYogaRest'),
@@ -4113,7 +4128,7 @@ class MeditationController {
         }
     }
 
-    async runSequence() {
+    async runSequence({ complete = true } = {}) {
         if (state.bgMusicMode) {
             await this.runBackgroundMusicOnly();
             return;
@@ -4128,6 +4143,7 @@ class MeditationController {
             const isLastChakra = (i === this.chakraOrder.length - 1);
             if (!isLastChakra && this.isMeditationActive) await this.handleInterval();
         }
+        if (!complete) return;
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
         if (this.isMeditationActive) { this.finish(); }
@@ -4191,10 +4207,26 @@ class MeditationController {
         await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
     }
 
+    async runIntimateService() {
+        if (!this.isMeditationActive) return;
+        if (state.perinealCareEnabled && !await this.runPerinealCare()) return;
+        if (state.massageEnabled) {
+            // Massage is held by a full Crown-to-Root chakra journey. When
+            // Assisted Bathing follows, defer closing until it is complete.
+            // The chakra narration/ticker belongs to the meditation screen;
+            // focused care otherwise still has the Icebreaker stage visible.
+            showScreen(meditationScreen);
+            await this.runSequence({ complete: !state.assistedBathingEnabled });
+            if (!this.isMeditationActive) return;
+        }
+        if (state.assistedBathingEnabled && !await this.runAssistedBathing()) return;
+    }
+
     getFocusedExperience() {
         if (getChecked('box-breathing-experience-toggle')) return 'box';
         if (getChecked('hooponopono-experience-toggle')) return 'hooponopono';
         if (getChecked('yoga-experience-toggle')) return 'yoga';
+        if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) return 'intimate';
         return null;
     }
 
@@ -4618,6 +4650,12 @@ function storedNumber(key, fallback) {
     return Number.isFinite(value) ? value : fallback;
 }
 
+function storedBooleanWithLegacy(key, legacyKey) {
+    const storedValue = localStorage.getItem(key);
+    if (storedValue !== null) return storedValue === 'true';
+    return legacyKey ? localStorage.getItem(legacyKey) === 'true' : false;
+}
+
 document.addEventListener('visibilitychange', async () => {
     if (wakeLock.wakeLock !== null && document.visibilityState === 'visible') await wakeLock.request();
 });
@@ -4663,7 +4701,7 @@ const state = {
         return (parseInt(localStorage.getItem('chakra_stats_journeys')) || 0) > 0;
     })(),
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
-    reverseJourney: localStorage.getItem('chakra_reverse_journey') === 'true',
+    // Reverse order is intentionally derived only for the Massage wrapper.
     // These focused practices are Lobby-only Experience Modes. They are
     // intentionally session-only and must never be added to a chakra journey.
     boxBreathingExperienceEnabled: false,
@@ -4688,9 +4726,9 @@ const state = {
     corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
     brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
     bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
-    perinealCareEnabled: localStorage.getItem('chakra_bath_enabled') === 'true' && localStorage.getItem('chakra_perineal_care') === 'true',
-    assistedBathingEnabled: localStorage.getItem('chakra_bath_enabled') === 'true' && localStorage.getItem('chakra_assisted_bathing') === 'true',
-    massageEnabled: localStorage.getItem('chakra_bath_enabled') === 'true' && localStorage.getItem('chakra_massage') === 'true',
+    perinealCareEnabled: storedBooleanWithLegacy('chakra_intimate_perineal_care', 'chakra_perineal_care'),
+    assistedBathingEnabled: storedBooleanWithLegacy('chakra_intimate_assisted_bathing', 'chakra_assisted_bathing'),
+    massageEnabled: storedBooleanWithLegacy('chakra_intimate_massage', 'chakra_massage'),
     selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
     // Journey Timings (in seconds)
     timeSleepStage: parseFloat(localStorage.getItem('chakra_time_sleep_stage')) || 5.0,
@@ -4704,7 +4742,6 @@ const state = {
     timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
     timePerinealCare: parseInt(localStorage.getItem('chakra_time_perineal_care')) || 300,
     timeAssistedBathing: parseInt(localStorage.getItem('chakra_time_assisted_bathing')) || 600,
-    timeMassage: parseInt(localStorage.getItem('chakra_time_massage')) || 600,
     scriptSource: localStorage.getItem('chakra_script_source') || 'default',
     customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
@@ -5001,7 +5038,9 @@ function loadPreferences() {
     syncChecked('audio-filters-toggle', state.audioFilters);
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
-    syncChecked('reverse-journey-toggle', state.reverseJourney);
+    // The former normal-journey reverse preference is retired. Massage now
+    // derives its complete Crown-to-Root order without changing this state.
+    localStorage.removeItem('chakra_reverse_journey');
     localStorage.removeItem('chakra_box_meditation');
     localStorage.removeItem('chakra_hooponopono');
     syncChecked('box-breathing-experience-toggle', false);
@@ -5065,8 +5104,6 @@ function loadPreferences() {
     setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
     syncValue('time-assisted-bathing', state.timeAssistedBathing);
     setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
-    syncValue('time-massage', state.timeMassage);
-    setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.opacity = state.brightness;
@@ -5173,7 +5210,6 @@ function attachEventListeners() {
         state.voiceName = voiceSelect.value;
         localStorage.setItem('chakra_voice', state.voiceName);
         state.audioFilters = getChecked('audio-filters-toggle');
-        state.reverseJourney = getChecked('reverse-journey-toggle');
         state.boxBreathingExperienceEnabled = false;
         state.hooponoponoExperienceEnabled = false;
         state.yogaExperienceEnabled = false;
@@ -5184,15 +5220,11 @@ function attachEventListeners() {
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.perinealCareEnabled = getChecked('perineal-care-toggle');
-        state.assistedBathingEnabled = getChecked('assisted-bathing-toggle');
-        state.massageEnabled = getChecked('massage-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
-        localStorage.setItem('chakra_reverse_journey', state.reverseJourney);
         localStorage.removeItem('chakra_box_meditation');
         localStorage.removeItem('chakra_hooponopono');
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
@@ -5201,9 +5233,6 @@ function attachEventListeners() {
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.removeItem('chakra_yoga_bridge');
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_perineal_care', state.perinealCareEnabled);
-        localStorage.setItem('chakra_assisted_bathing', state.assistedBathingEnabled);
-        localStorage.setItem('chakra_massage', state.massageEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         localStorage.setItem('chakra_script_source', state.scriptSource);
 
@@ -5220,9 +5249,6 @@ function attachEventListeners() {
     function updateTimingRowVisibility() {
         const corpseEnabled = getChecked('corpse-pose-toggle');
         const bathEnabled = getChecked('bath-session-toggle');
-        const perinealEnabled = getChecked('perineal-care-toggle');
-        const assistedEnabled = getChecked('assisted-bathing-toggle');
-        const massageEnabled = getChecked('massage-toggle');
 
         const toggleDisplay = (id, show) => {
             const el = document.getElementById(id);
@@ -5232,29 +5258,16 @@ function attachEventListeners() {
             el.style.display = show ? '' : 'none';
         };
 
-        // Bath add-ons only apply when Bath Session is selected.
         const bathToggle = document.getElementById('bath-session-toggle');
         if (bathToggle) {
             bathToggle.disabled = false;
             bathToggle.setAttribute('aria-disabled', 'false');
         }
-        const addonToggles = ['perineal-care-toggle', 'assisted-bathing-toggle', 'massage-toggle'];
-        addonToggles.forEach(id => {
-            const toggle = document.getElementById(id);
-            if (!toggle) return;
-            if (!bathEnabled) toggle.checked = false;
-            toggle.disabled = !bathEnabled;
-            toggle.setAttribute('aria-disabled', String(toggle.disabled));
-        });
-
         toggleDisplay('row-breathing', false);
         toggleDisplay('row-corpse', corpseEnabled);
         toggleDisplay('row-yoga-prep', true);
         toggleDisplay('row-yoga-pose', true);
-        toggleDisplay('row-bath', bathEnabled && !assistedEnabled);
-        toggleDisplay('row-perineal-care', bathEnabled && perinealEnabled);
-        toggleDisplay('row-assisted-bathing', bathEnabled && assistedEnabled);
-        toggleDisplay('row-massage', bathEnabled && massageEnabled);
+        toggleDisplay('row-bath', bathEnabled);
         
         const yogaSubOptions = document.getElementById('yoga-sub-options');
         if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
@@ -5263,21 +5276,27 @@ function attachEventListeners() {
     function persistYogaExperienceSetup() {
         state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
         state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.perinealCareEnabled = getChecked('perineal-care-toggle');
-        state.assistedBathingEnabled = getChecked('assisted-bathing-toggle');
-        state.massageEnabled = getChecked('massage-toggle');
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(input => input.value);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_perineal_care', state.perinealCareEnabled);
-        localStorage.setItem('chakra_assisted_bathing', state.assistedBathingEnabled);
-        localStorage.setItem('chakra_massage', state.massageEnabled);
         localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
+    }
+
+    function persistIntimateServiceSetup() {
+        state.perinealCareEnabled = getChecked('perineal-care-toggle');
+        state.assistedBathingEnabled = getChecked('assisted-bathing-toggle');
+        state.massageEnabled = getChecked('massage-toggle');
+        localStorage.setItem('chakra_intimate_perineal_care', state.perinealCareEnabled);
+        localStorage.setItem('chakra_intimate_assisted_bathing', state.assistedBathingEnabled);
+        localStorage.setItem('chakra_intimate_massage', state.massageEnabled);
+        // Complete the one-time move out of the Yoga/Bath preference namespace.
+        localStorage.removeItem('chakra_perineal_care');
+        localStorage.removeItem('chakra_assisted_bathing');
+        localStorage.removeItem('chakra_massage');
     }
 
     // Master Toggle Logic
     const musicOnlyToggle = document.getElementById('music-only-toggle');
-    const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
     const boxBreathingExperienceToggle = document.getElementById('box-breathing-experience-toggle');
     const hooponoponoExperienceToggle = document.getElementById('hooponopono-experience-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
@@ -5320,6 +5339,26 @@ function attachEventListeners() {
         if (!except || except !== yogaExperienceToggle) state.yogaExperienceEnabled = false;
     }
 
+    const intimateServiceToggles = [
+        document.getElementById('perineal-care-toggle'),
+        document.getElementById('massage-toggle'),
+        document.getElementById('assisted-bathing-toggle')
+    ].filter(Boolean);
+
+    function clearIntimateService() {
+        intimateServiceToggles.forEach(toggle => { toggle.checked = false; });
+        state.perinealCareEnabled = false;
+        state.massageEnabled = false;
+        state.assistedBathingEnabled = false;
+        localStorage.setItem('chakra_intimate_perineal_care', 'false');
+        localStorage.setItem('chakra_intimate_massage', 'false');
+        localStorage.setItem('chakra_intimate_assisted_bathing', 'false');
+    }
+
+    function isIntimateServiceToggle(target) {
+        return intimateServiceToggles.includes(target);
+    }
+
     function isFocusedExperienceToggle(target) {
         return target === boxBreathingExperienceToggle || target === hooponoponoExperienceToggle || target === yogaExperienceToggle;
     }
@@ -5327,11 +5366,11 @@ function attachEventListeners() {
     function enforceMasterToggle(target) {
         if (target === musicOnlyToggle && musicOnlyToggle.checked) {
             // Disable other journey features
-            if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
             clearHighEnergyMode();
             clearSleepMode();
             clearFocusedExperiences();
+            clearIntimateService();
         } else if (target !== musicOnlyToggle && target.checked) {
             // Disable Music Only if any other journey feature is enabled.
             clearMusicOnlyMode();
@@ -5341,15 +5380,16 @@ function attachEventListeners() {
             clearMusicOnlyMode();
             clearSleepMode();
             clearFocusedExperiences();
+            clearIntimateService();
         }
 
         const sleepToggle = document.getElementById('sleep-mode-toggle');
         if (target === sleepToggle && sleepToggle.checked) {
             clearMusicOnlyMode();
             clearHighEnergyMode();
-            if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
             clearFocusedExperiences();
+            clearIntimateService();
         }
 
         if (isFocusedExperienceToggle(target) && target.checked) {
@@ -5357,7 +5397,15 @@ function attachEventListeners() {
             clearHighEnergyMode();
             clearSleepMode();
             clearFocusedExperiences(target);
-            if (reverseJourneyToggle) reverseJourneyToggle.checked = false;
+            if (corpsePoseToggle) corpsePoseToggle.checked = false;
+            clearIntimateService();
+        }
+
+        if (isIntimateServiceToggle(target) && target.checked) {
+            clearMusicOnlyMode();
+            clearHighEnergyMode();
+            clearSleepMode();
+            clearFocusedExperiences();
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
         }
 
@@ -5374,10 +5422,18 @@ function attachEventListeners() {
     }
 
     // Event Listeners for Toggles
-    ['corpse-pose-toggle', 'bath-session-toggle', 'perineal-care-toggle', 'assisted-bathing-toggle', 'massage-toggle'].forEach(id => {
+    ['corpse-pose-toggle', 'bath-session-toggle'].forEach(id => {
         document.getElementById(id)?.addEventListener('change', () => {
             persistYogaExperienceSetup();
             updateTimingRowVisibility();
+            updateSessionEstimate();
+        });
+    });
+    intimateServiceToggles.forEach(toggle => {
+        toggle.addEventListener('change', (event) => {
+            enforceMasterToggle(event.target);
+            persistIntimateServiceSetup();
+            updateExperienceModeVisibility();
             updateSessionEstimate();
         });
     });
@@ -5442,6 +5498,7 @@ function attachEventListeners() {
                 clearHighEnergyMode();
                 clearSleepMode();
                 clearFocusedExperiences();
+                clearIntimateService();
                 resetShotDurationForType(shotTypeSelect?.value || 'meditation');
             }
             updateExperienceModeVisibility();
@@ -5491,7 +5548,7 @@ function attachEventListeners() {
         });
     }
 
-    [reverseJourneyToggle, corpsePoseToggle].forEach(toggle => {
+    [corpsePoseToggle].forEach(toggle => {
         if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
     });
     
@@ -5500,7 +5557,8 @@ function attachEventListeners() {
         const highEnergy = getChecked('high-energy-toggle');
         const musicOnly = getChecked('music-only-toggle');
         const sleep = getChecked('sleep-mode-toggle');
-        const focusedExperience = getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('yoga-experience-toggle');
+        const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
+        const focusedExperience = getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('yoga-experience-toggle') || intimateService;
         const yogaExperience = getChecked('yoga-experience-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
@@ -5515,7 +5573,7 @@ function attachEventListeners() {
         }
         const shots = getChecked('shots-toggle');
         if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
-        const hideForShots = ['chakra-selection-panel', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'open-settings'];
+        const hideForShots = ['chakra-selection-panel', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
         hideForShots.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.hidden = shots;
@@ -5525,6 +5583,14 @@ function attachEventListeners() {
             if (element) element.hidden = shots || focusedExperience;
         });
         if (yogaExperienceSetup) yogaExperienceSetup.hidden = !yogaExperience || shots;
+        const intimateTiming = document.getElementById('intimate-service-timings');
+        if (intimateTiming) intimateTiming.hidden = shots || !intimateService;
+        const perinealTiming = document.getElementById('row-perineal-care');
+        if (perinealTiming) perinealTiming.style.display = getChecked('perineal-care-toggle') ? '' : 'none';
+        const assistedBathingTiming = document.getElementById('row-assisted-bathing');
+        if (assistedBathingTiming) assistedBathingTiming.style.display = getChecked('assisted-bathing-toggle') ? '' : 'none';
+        const massageNote = document.getElementById('massage-reverse-journey-note');
+        if (massageNote) massageNote.hidden = shots || !getChecked('massage-toggle');
         const shotOptions = document.getElementById('shot-options');
         if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
         const customFrequency = document.getElementById('custom-shot-frequency');
@@ -5563,7 +5629,8 @@ function attachEventListeners() {
         const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
         const focusedLabel = getChecked('box-breathing-experience-toggle')
             ? 'ui.beginBoxBreathing'
-            : getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience' : 'ui.beginHooponopono';
+            : getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
+                : intimateService ? 'ui.beginIntimateService' : 'ui.beginHooponopono';
         if (startMeditationBtn) startMeditationBtn.textContent = t(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
         document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
         refreshRangeControlDisplays();
@@ -5605,15 +5672,25 @@ function attachEventListeners() {
             updateJourneyRoadmap();
             return;
         }
+        if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
+            let seconds = 0;
+            if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
+            if (getChecked('massage-toggle')) {
+                seconds += (7 * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
+            }
+            if (getChecked('assisted-bathing-toggle')) seconds += state.timeAssistedBathing;
+            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.intimateService').toLowerCase()}`);
+            updateJourneyRoadmap();
+            return;
+        }
         if (getChecked('yoga-experience-toggle')) {
             const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
             const bathEnabled = getChecked('bath-session-toggle');
             let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
             if (getChecked('corpse-pose-toggle')) seconds += state.timeCorpse;
             if (bathEnabled) {
-                if (getChecked('massage-toggle')) seconds += state.timeMassage;
-                if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
-                seconds += getChecked('assisted-bathing-toggle') ? state.timeAssistedBathing : state.timeBath;
+                seconds += state.timeBath;
                 seconds += timing('transitions', 'bathToYogaRest');
             }
             setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.yogaExperience').toLowerCase()}`);
@@ -5797,13 +5874,6 @@ function attachEventListeners() {
         updateSessionEstimate();
     });
 
-    document.getElementById('time-massage').addEventListener('input', (e) => {
-        state.timeMassage = parseInt(e.target.value);
-        setText('display-massage', Math.floor(state.timeMassage / 60) + 'm');
-        localStorage.setItem('chakra_time_massage', state.timeMassage);
-        updateSessionEstimate();
-    });
-
     timeSlider.addEventListener('input', (e) => {
         const value = parseFloat(e.target.value);
         if (getChecked('shots-toggle')) {
@@ -5857,7 +5927,6 @@ function attachEventListeners() {
     });
 
     document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
-    document.getElementById('reverse-journey-toggle').addEventListener('change', updateSessionEstimate);
     function setNoFrequencyMode(enabled) {
         state.noFrequencyMode = Boolean(enabled);
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
@@ -5986,9 +6055,7 @@ function attachEventListeners() {
                 ? { min: 4, max: 16, step: 1, value: state.timeBreathing, unit: 'sec' }
                 : activity === 'corpse'
                     ? { min: 60, max: 600, step: 30, value: state.timeCorpse, unit: 'sec' }
-                    : activity === 'massage'
-                        ? { min: 60, max: 1800, step: 60, value: state.timeMassage, unit: 'min' }
-                        : activity === 'perineal'
+                    : activity === 'perineal'
                             ? { min: 30, max: 900, step: 30, value: state.timePerinealCare, unit: 'min' }
                             : activity === 'assisted-bath'
                                 ? { min: 60, max: 1800, step: 60, value: state.timeAssistedBathing, unit: 'min' }
@@ -6087,8 +6154,10 @@ function attachEventListeners() {
                 meditation.stop();
             });
         } else {
-            let order = [...state.selectedChakras];
-            if (state.reverseJourney) order.reverse();
+            const intimateMassage = focusedExperience === 'intimate' && getChecked('massage-toggle');
+            const order = intimateMassage
+                ? ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root']
+                : [...state.selectedChakras];
             const isHighEnergy = getChecked('high-energy-toggle');
             if (!focusedExperience && !isHighEnergy && order.length === 0) {
                 alert("Please select at least one chakra before beginning the journey.");
