@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.63">
+    <link rel="stylesheet" href="style.css?v=1.64">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -480,6 +480,15 @@
                 <div id="mood-relaxation-ambience-section" class="mixer-section">
                     <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</span></label>
                     <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the supplied pleasure ambience loops throughout the guided session. Use the bounded level below to keep it subtle; No Frequency Mode overrides it.</p>
+                    <div id="pleasure-ambience-intensity-control" class="mixer-row mixer-select-control" hidden>
+                        <label for="pleasure-ambience-intensity" data-i18n="ui.pleasureAmbienceIntensity">Ambience Intensity</label>
+                        <select id="pleasure-ambience-intensity">
+                            <option value="gentle" data-i18n="ui.pleasureAmbienceGentle">Gentle</option>
+                            <option value="immersive" data-i18n="ui.pleasureAmbienceImmersive">Immersive</option>
+                            <option value="deep" data-i18n="ui.pleasureAmbienceDeep">Deep</option>
+                        </select>
+                        <p class="mixer-note" data-i18n="ui.pleasureAmbienceIntensityNote">Changes clarity, texture and spatial presence without raising the bounded Ambience Level.</p>
+                    </div>
                     <div id="pleasure-ambience-url-control" class="mixer-row mixer-url-control" hidden>
                         <label for="pleasure-ambience-url" data-i18n="ui.pleasureAmbienceUrl">Pleasure Audio URL</label>
                         <div class="mixer-url-entry">
@@ -616,6 +625,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=1.97"></script>
+    <script src="app.js?v=2.04"></script>
 </body>
 </html>

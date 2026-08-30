@@ -22,6 +22,8 @@ assert.match(html, /id="music-echo"/, 'the mixer should expose a separate music 
 assert.match(html, /data-i18n="ui\.musicEcho"/, 'the music echo selector should use localized labels');
 assert.match(html, /id="mood-relaxation-ambience-level-control"[^>]*hidden/, 'the ambience level control should be hidden until the ambience is selected');
 assert.match(html, /id="mood-relaxation-intention-toggle"/, 'Journey Tuning should expose the ambience toggle');
+assert.match(html, /id="pleasure-ambience-intensity-control"[^>]*hidden/, 'the ambience intensity selector should be hidden until the ambience is selected');
+assert.match(html, /id="pleasure-ambience-intensity"/, 'Journey Tuning should expose a session-only ambience intensity selector');
 assert.match(html, /id="pleasure-ambience-url-control"[^>]*hidden/, 'the pleasure URL control should be hidden until the ambience is selected');
 assert.match(html, /id="pleasure-ambience-url"[^>]*type="url"/, 'Journey Tuning should expose a URL input for the primary pleasure track');
 assert.match(html, /id="load-pleasure-ambience-url"[^>]*data-i18n="ui\.loadPleasureAmbience"/, 'the pleasure URL input should have a localized Load action');
@@ -60,7 +62,7 @@ assert.match(css, /\.settings-help-content\s*\{[\s\S]*?max-height:\s*calc\(100vh
 assert.match(css, /\.settings-help-list\s*\{[\s\S]*?overflow-y:\s*auto;/, 'the Help content should scroll inside the modal');
 
 for (const locale of [en, ml]) {
-    for (const key of ['musicTuning', 'musicEcho', 'musicEchoOff', 'musicEchoLight', 'musicEchoSpacious', 'musicEchoNote', 'settingsHelpAudioCredit', 'cc0Details', 'moodRelaxationIntention', 'moodRelaxationIntentionNote', 'pleasureAmbienceUrl', 'pleasureAmbienceUrlPlaceholder', 'loadPleasureAmbience', 'pleasureAmbienceUrlNote', 'pleasureAmbienceUrlLoading', 'pleasureAmbienceUrlLoaded', 'pleasureAmbienceUrlCleared', 'pleasureAmbienceUrlError', 'pleasureAmbienceSourceUnavailable', 'pleasureAmbienceBlur', 'pleasureAmbienceBlurNote', 'pleasureAmbienceBlurLevel', 'pleasureAmbienceBlurMin', 'pleasureAmbienceBlurMax', 'pleasureAmbienceBlurLevelNote', 'pleasureAmbienceAboveFiveConfirm']) {
+    for (const key of ['musicTuning', 'musicEcho', 'musicEchoOff', 'musicEchoLight', 'musicEchoSpacious', 'musicEchoNote', 'settingsHelpAudioCredit', 'cc0Details', 'moodRelaxationIntention', 'moodRelaxationIntentionNote', 'pleasureAmbienceIntensity', 'pleasureAmbienceGentle', 'pleasureAmbienceImmersive', 'pleasureAmbienceDeep', 'pleasureAmbienceIntensityNote', 'pleasureAmbienceUrl', 'pleasureAmbienceUrlPlaceholder', 'loadPleasureAmbience', 'pleasureAmbienceUrlNote', 'pleasureAmbienceUrlLoading', 'pleasureAmbienceUrlLoaded', 'pleasureAmbienceUrlCleared', 'pleasureAmbienceUrlError', 'pleasureAmbienceSourceUnavailable', 'pleasureAmbienceBlur', 'pleasureAmbienceBlurNote', 'pleasureAmbienceBlurLevel', 'pleasureAmbienceBlurMin', 'pleasureAmbienceBlurMax', 'pleasureAmbienceBlurLevelNote', 'pleasureAmbienceAboveFiveConfirm']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
@@ -74,8 +76,15 @@ assert.match(app, /this\.bgMusicGain\.connect\(this\.musicEchoSend\)/, 'music ec
 assert.match(app, /this\.musicEchoWetGain\.connect\(this\.bgMusicBusGain\)/, 'music echo must return to the music-only bus');
 assert.match(app, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/, 'the complete music bus must enter the shared output chain through spatial routing');
 assert.match(app, /this\.voiceClarityFilter\.connect\(this\.voiceEchoSend\)/, 'narration echo should remain on the voice-only path');
+assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 3\.0/, 'narration should use an extended heavenly tail');
+assert.match(app, /this\.voiceEchoConvolver\.buffer = this\.createImpulseResponse\([\s\S]*?VOICE_REVERB_TAIL_SECONDS,[\s\S]*?VOICE_REVERB_TAIL_DECAY/, 'voice tail should use the dedicated longer impulse response');
 assert.match(app, /const PLEASURE_AMBIENCE_GAIN = 0\.003/, 'pleasure ambience should use a fixed barely-audible gain');
 assert.match(app, /const PLEASURE_AMBIENCE_HARMONIC_MIX = 0\.04/, 'pleasure harmonic enrichment should remain a very low parallel mix');
+assert.match(app, /const PLEASURE_AMBIENCE_INTENSITIES = Object\.freeze/, 'ambience intensity should use explicit bounded profiles');
+assert.match(app, /pleasureAmbienceIntensity: 'gentle'/, 'Gentle should be the default session ambience profile');
+assert.doesNotMatch(app, /localStorage\.getItem\('chakra_pleasure_ambience_intensity'\)/, 'ambience intensity must reset rather than persist');
+assert.doesNotMatch(app, /localStorage\.setItem\('chakra_pleasure_ambience_intensity'/, 'ambience intensity must not be saved to local storage');
+assert.match(app, /translation && translation !== path\) element\.textContent = translation/, 'stale language bundles should preserve readable fallback labels instead of showing raw ui keys');
 assert.match(app, /const PLEASURE_BLUR_DEFAULT_AMOUNT = 0\.35/, 'pleasure blur should have a higher 35% default amount');
 assert.match(app, /const PLEASURE_BLUR_MAX_AMOUNT = 0\.65/, 'pleasure blur should have a bounded maximum amount');
 assert.match(app, /function clampPleasureAmbienceBlurAmount\(value\)/, 'pleasure blur intensity should be clamped before use');
@@ -104,8 +113,14 @@ assert.match(app, /this\.pleasureGain\.connect\(this\.pleasureBlurDryGain\)/, 'p
 assert.match(app, /this\.pleasureLoops = \[\.\.\.this\.pleasureBuffers\.values\(\)\]\.map\(buffer =>/, 'each listed pleasure file should feed its own loop');
 assert.match(app, /async startPleasureAmbience\(\)/, 'the pleasure ambience should have an explicit session start method');
 assert.match(app, /await this\.loadPleasureAmbienceBuffers\(\)/, 'the pleasure ambience should load its files from the manifest');
-assert.match(app, /if \(this\.pleasureLoops\.some\(loop => loop\.isRunning\)\) \{[\s\S]*?this\.setPleasureAmbienceBlur\(state\.pleasureAmbienceBlur\)[\s\S]*?return true;/, 'an already-running ambience bus should reapply the shared blur profile');
-assert.match(app, /this\.pleasureLoops = \[\.\.\.this\.pleasureBuffers\.values\(\)\]\.map\(buffer =>[\s\S]*?this\.setPleasureAmbienceBlur\(state\.pleasureAmbienceBlur\)[\s\S]*?this\.schedulePleasureSpatialApproach\(\)/, 'every manifest layer should use the same blur profile throughout the journey');
+assert.match(app, /setPleasureAmbienceIntensity\(intensity = 'gentle'\)/, 'the audio engine should apply a session ambience intensity profile');
+assert.match(app, /profile\.blurCutoff/, 'the intensity profile should control blur clarity');
+assert.match(app, /profile\.nearDistanceMultiplier/, 'the intensity profile should control spatial presence');
+assert.match(app, /pleasure: \{ x: 0, y: 0\.15, z: -6, nearZ: -2\.4 \}/, 'stereo pleasure ambience should approach a closer position');
+assert.match(app, /pleasure: \{ x: 0, y: 0\.2, z: -7, nearZ: -2\.8 \}/, 'headphone pleasure ambience should approach a closer position');
+assert.match(app, /pleasure: \{ x: 0, y: 0\.25, z: -6\.5, nearZ: -2\.5 \}/, 'room pleasure ambience should approach a closer position');
+assert.match(app, /if \(this\.pleasureLoops\.some\(loop => loop\.isRunning\)\) \{[\s\S]*?this\.setPleasureAmbienceIntensity\(state\.pleasureAmbienceIntensity\)[\s\S]*?return true;/, 'an already-running ambience bus should reapply the selected profile');
+assert.match(app, /this\.pleasureLoops = \[\.\.\.this\.pleasureBuffers\.values\(\)\]\.map\(buffer =>[\s\S]*?this\.setPleasureAmbienceIntensity\(state\.pleasureAmbienceIntensity\)/, 'every manifest layer should use the selected clarity and spatial profile throughout the journey');
 assert.doesNotMatch(app, /fetch\('audio\/pleasure\.mp3'\)/, 'individual pleasure filenames should not be hardcoded in the app');
 assert.match(app, /catch \(error\) \{[\s\S]*?pleasureAudioAvailable = false[\s\S]*?return false;/, 'a missing pleasure asset must fail soft without stopping the journey');
 assert.match(app, /stopPleasureAmbience\(fadeTime = PLEASURE_AMBIENCE_FADE_SECONDS\)/, 'the pleasure ambience should have an explicit stop method');
@@ -127,8 +142,8 @@ const setMusicEchoEnd = app.indexOf('\n    toggleEyesCloseMode(', setMusicEchoSt
 assert.ok(setMusicEchoStart >= 0 && setMusicEchoEnd > setMusicEchoStart, 'setMusicEcho() must remain readable');
 const setMusicEcho = app.slice(setMusicEchoStart, setMusicEchoEnd);
 assert.match(setMusicEcho, /off: \{ delay: 0\.06, wet: 0 \}/);
-assert.match(setMusicEcho, /light: \{ delay: 0\.055, wet: 0\.10 \}/);
-assert.match(setMusicEcho, /spacious: \{ delay: 0\.09, wet: 0\.15 \}/);
+assert.match(setMusicEcho, /light: \{ delay: 0\.065, wet: 0\.16 \}/);
+assert.match(setMusicEcho, /spacious: \{ delay: 0\.11, wet: 0\.24 \}/);
 assert.match(setMusicEcho, /musicEchoSend\.gain\.linearRampToValueAtTime/);
 assert.match(setMusicEcho, /musicEchoWetGain\.gain\.linearRampToValueAtTime/);
 
@@ -179,6 +194,9 @@ assert.match(app, /if \(requestId !== this\.mantraRequestId \|\| state\.noMantra
 assert.match(app, /cancelAndHoldAtTime\(now\)/, 'the music fade should preserve the live gain value without a jump');
 assert.match(app, /const fadeDuration = Math\.max\(0, duration\)[\s\S]*?this\.bgMusicBusGain\.gain\.linearRampToValueAtTime\(0, now \+ fadeDuration\)/, 'music mute should fade the complete music bus to silence');
 assert.match(app, /restoreBackgroundMusicAfterMantra\(duration = BACKGROUND_MUSIC_RESTORE_FADE_SECONDS\)[\s\S]*?this\.bgMusicBusGain\.gain\.linearRampToValueAtTime\(1, now \+ Math\.max\(0, duration\)\)/, 'music restore should use a smooth bus fade-in');
+assert.match(app, /fadeOutBackgroundMusic\(duration = 4\)[\s\S]*?this\.bgMusicTargetVolume = 0/, 'an intentional music fade-out should remain muted through later slider changes');
+assert.match(app, /setBackgroundMusicVolume\(level, previousLevel = level\)[\s\S]*?const roleFactor = Math\.max\(0, Math\.min\(1, currentTarget \/ previous\)\)/, 'music volume updates should preserve the active full, ducked, or silent role');
+assert.match(app, /const previousVolume = state\.volMusic;[\s\S]*?audio\.setBackgroundMusicVolume\(state\.volMusic, previousVolume\)/, 'the music slider should use the role-preserving update rather than forcing full gain');
 assert.doesNotMatch(app, /this\.bgMusicLoop\.stop\(0\)/, 'background music must never be restarted with an immediate cut');
 assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?this\.bgMusicLoop\.stop\(Math\.max\(0, fadeTime\)\)/, 'background music stops should use a controlled fade');
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?fadeOutBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion should coordinate mantra and music fades without restoring music');

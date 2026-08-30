@@ -1106,6 +1106,27 @@ input[type="range"]::-moz-range-progress {
     width: auto;
 }
 
+.mixer-select-control {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.mixer-select-control > label {
+    width: auto;
+}
+
+.mixer-select-control select {
+    width: 100%;
+    min-height: 42px;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font: inherit;
+}
+
 .mixer-url-entry {
     display: flex;
     align-items: center;

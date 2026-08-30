@@ -39,6 +39,11 @@ const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
 const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 const MANTRA_MUSIC_FADE_SECONDS = 4;
 const MANTRA_FADE_SECONDS = 4;
+const VOICE_REVERB_TAIL_SECONDS = 3.0;
+const VOICE_REVERB_TAIL_DECAY = 2.0;
+const MANTRA_REVERB_TAIL_SECONDS = 3.6;
+const MANTRA_REVERB_TAIL_DECAY = 1.8;
+const MANTRA_REVERB_TAIL_WET = 0.26;
 const PIPER_CLIP_FADE_SECONDS = 0.05;
 const NARRATION_MANTRA_FADE_SECONDS = 2;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
@@ -55,6 +60,13 @@ const PLEASURE_AMBIENCE_MANIFEST_URL = 'audio/ambience-manifest.json';
 const PLEASURE_SPATIAL_APPROACH_SECONDS = 45;
 const PLEASURE_SPATIAL_FALLBACK_FAR_GAIN = 0.35;
 const PLEASURE_SPATIAL_FALLBACK_NEAR_GAIN = 0.8;
+// Intensity changes texture, clarity, and spatial presence while the explicit
+// Ambience Level slider remains the only source-level loudness control.
+const PLEASURE_AMBIENCE_INTENSITIES = Object.freeze({
+    gentle: { blurMultiplier: 1, blurCutoff: 2400, harmonicMix: PLEASURE_AMBIENCE_HARMONIC_MIX, nearDistanceMultiplier: 0.8, fallbackNearGain: PLEASURE_SPATIAL_FALLBACK_NEAR_GAIN, approachSeconds: PLEASURE_SPATIAL_APPROACH_SECONDS },
+    immersive: { blurMultiplier: 0.7, blurCutoff: 4200, harmonicMix: 0.055, nearDistanceMultiplier: 0.58, fallbackNearGain: 0.86, approachSeconds: 35 },
+    deep: { blurMultiplier: 0.38, blurCutoff: 6500, harmonicMix: 0.07, nearDistanceMultiplier: 0.42, fallbackNearGain: 0.93, approachSeconds: 22 }
+});
 // Blur is a restrained parallel effect: the default is noticeably softer
 // than the original 12% wet mix, while the dry signal remains present for
 // clarity. The Journey Tuning slider controls the wet amount only.
@@ -93,8 +105,19 @@ function clampPleasureAmbienceBlurAmount(value) {
     return Math.min(PLEASURE_BLUR_MAX_AMOUNT, Math.max(PLEASURE_BLUR_MIN_AMOUNT, numericValue));
 }
 
+function normalizePleasureAmbienceIntensity(value) {
+    return Object.hasOwn(PLEASURE_AMBIENCE_INTENSITIES, value) ? value : 'gentle';
+}
+
+function getPleasureAmbienceIntensityProfile() {
+    return PLEASURE_AMBIENCE_INTENSITIES[normalizePleasureAmbienceIntensity(state?.pleasureAmbienceIntensity)];
+}
+
 function getPleasureBlurMix(enabled) {
-    const wet = enabled ? clampPleasureAmbienceBlurAmount(state.pleasureAmbienceBlurAmount) : 0;
+    const profile = getPleasureAmbienceIntensityProfile();
+    const wet = enabled
+        ? clampPleasureAmbienceBlurAmount(state.pleasureAmbienceBlurAmount) * profile.blurMultiplier
+        : 0;
     return { dry: 1 - wet, wet };
 }
 
@@ -873,7 +896,11 @@ function applyLocaleUI() {
     if (pleasureAmbienceUrlInput) pleasureAmbienceUrlInput.placeholder = t('ui.pleasureAmbienceUrlPlaceholder');
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const path = element.dataset.i18n;
-        if (path) element.textContent = t(path);
+        const translation = path ? t(path) : null;
+        // A stale cached language bundle can be temporarily behind a newly
+        // deployed interface. Keep the readable HTML fallback in that case
+        // instead of replacing it with a raw `ui.*` lookup key.
+        if (translation && translation !== path) element.textContent = translation;
     });
     document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
         const path = element.dataset.i18nAriaLabel;
@@ -1358,6 +1385,9 @@ class AudioEngine {
         this.spatialDronePanner = null;
         this.spatialMusicPanner = null;
         this.spatialMantraPanner = null;
+        this.mantraTailConvolver = null;
+        this.mantraTailFilter = null;
+        this.mantraTailWetGain = null;
         this.spatialPleasurePanner = null;
         this.pleasureSpatialDepthGain = null;
         this.pleasureSpatialPosition = null;
@@ -1490,7 +1520,12 @@ class AudioEngine {
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
         this.voiceEchoDelay.delayTime.setValueAtTime(0.04, this.ctx.currentTime);
         this.voiceEchoConvolver = this.ctx.createConvolver();
-        this.voiceEchoConvolver.buffer = this.createImpulseResponse(1.1, 3.2);
+        // A longer, slower-decaying voice space gives narration an airy tail
+        // without changing the dry centered guide signal.
+        this.voiceEchoConvolver.buffer = this.createImpulseResponse(
+            VOICE_REVERB_TAIL_SECONDS,
+            VOICE_REVERB_TAIL_DECAY
+        );
         this.voiceEchoFilter = this.ctx.createBiquadFilter();
         this.voiceEchoFilter.type = 'lowpass';
         this.voiceEchoFilter.frequency.setValueAtTime(2600, this.ctx.currentTime);
@@ -1753,8 +1788,24 @@ class AudioEngine {
         this.mantraFilter = this.ctx.createBiquadFilter();
         this.mantraFilter.type = 'lowpass';
         this.mantraFilter.frequency.setValueAtTime(state.audioFilters ? 2200 : 20000, this.ctx.currentTime);
+        // Mantras receive their own long, filtered tail. It is spatialized
+        // with the mantra rather than being sent through narration or music.
+        this.mantraTailConvolver = this.ctx.createConvolver();
+        this.mantraTailConvolver.buffer = this.createImpulseResponse(
+            MANTRA_REVERB_TAIL_SECONDS,
+            MANTRA_REVERB_TAIL_DECAY
+        );
+        this.mantraTailFilter = this.ctx.createBiquadFilter();
+        this.mantraTailFilter.type = 'lowpass';
+        this.mantraTailFilter.frequency.setValueAtTime(4200, this.ctx.currentTime);
+        this.mantraTailWetGain = this.ctx.createGain();
+        this.mantraTailWetGain.gain.setValueAtTime(MANTRA_REVERB_TAIL_WET, this.ctx.currentTime);
         this.mantraGain.connect(this.mantraFilter);
         this.mantraFilter.connect(this.spatialMantraPanner);
+        this.mantraFilter.connect(this.mantraTailConvolver);
+        this.mantraTailConvolver.connect(this.mantraTailFilter);
+        this.mantraTailFilter.connect(this.mantraTailWetGain);
+        this.mantraTailWetGain.connect(this.spatialMantraPanner);
         this.spatialMantraPanner.connect(this.lowCutFilter);
 
         // Apply initial Eyes Close state
@@ -1764,8 +1815,8 @@ class AudioEngine {
         this.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
         this.setVoiceEcho(state.voiceEcho);
         this.setMusicEcho(state.musicEcho);
-        this.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
         this.setSpatialMode(state.spatialMode);
+        this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
     }
 
     createSpatialPanner() {
@@ -1810,19 +1861,21 @@ class AudioEngine {
         const now = this.ctx.currentTime;
         const position = this.pleasureSpatialPosition;
         const isSpatial = this.spatialMode !== 'off';
+        const profile = getPleasureAmbienceIntensityProfile();
+        const approachSeconds = profile.approachSeconds;
 
         if (this.spatialPleasurePanner.positionZ) {
-            const nearZ = Number(position.nearZ ?? position.z);
+            const nearZ = Number(position.nearZ ?? position.z) * profile.nearDistanceMultiplier;
             this.spatialPleasurePanner.positionZ.cancelScheduledValues(now);
             this.spatialPleasurePanner.positionZ.setValueAtTime(Number(position.z), now);
             this.spatialPleasurePanner.positionZ.linearRampToValueAtTime(
                 isSpatial ? nearZ : -1,
-                now + (isSpatial ? PLEASURE_SPATIAL_APPROACH_SECONDS : 0)
+                now + (isSpatial ? approachSeconds : 0)
             );
         } else if (this.pleasureSpatialDepthGain) {
             // StereoPanner fallback: approximate distance with a gentle gain
             // approach when true 3D distance positioning is unavailable.
-            const target = isSpatial ? PLEASURE_SPATIAL_FALLBACK_NEAR_GAIN : 1;
+            const target = isSpatial ? profile.fallbackNearGain : 1;
             this.pleasureSpatialDepthGain.gain.cancelScheduledValues(now);
             this.pleasureSpatialDepthGain.gain.setValueAtTime(
                 isSpatial ? PLEASURE_SPATIAL_FALLBACK_FAR_GAIN : 1,
@@ -1830,7 +1883,7 @@ class AudioEngine {
             );
             this.pleasureSpatialDepthGain.gain.linearRampToValueAtTime(
                 target,
-                now + (isSpatial ? PLEASURE_SPATIAL_APPROACH_SECONDS : 0)
+                now + (isSpatial ? approachSeconds : 0)
             );
         }
     }
@@ -1847,15 +1900,15 @@ class AudioEngine {
             },
             stereo: {
                 model: 'equalpower', lfo: 0.38,
-                drone: { x: 0, y: -0.05, z: -1 }, music: { x: -0.28, y: 0, z: -1 }, mantra: { x: 0.28, y: 0, z: -1 }, pleasure: { x: 0, y: 0.15, z: -8, nearZ: -4.5 }
+                drone: { x: 0, y: -0.05, z: -1 }, music: { x: -0.28, y: 0, z: -1 }, mantra: { x: 0.28, y: 0, z: -1 }, pleasure: { x: 0, y: 0.15, z: -6, nearZ: -2.4 }
             },
             headphones: {
                 model: 'HRTF', lfo: 0.08,
-                drone: { x: 0, y: -0.45, z: 0.65 }, music: { x: -0.65, y: 0.12, z: -0.75 }, mantra: { x: 0.65, y: 0.16, z: 0.25 }, pleasure: { x: 0, y: 0.2, z: -10, nearZ: -5 }
+                drone: { x: 0, y: -0.45, z: 0.65 }, music: { x: -0.65, y: 0.12, z: -0.75 }, mantra: { x: 0.65, y: 0.16, z: 0.25 }, pleasure: { x: 0, y: 0.2, z: -7, nearZ: -2.8 }
             },
             room: {
                 model: 'equalpower', lfo: 0.14,
-                drone: { x: 0, y: -0.20, z: 0.35 }, music: { x: -0.22, y: 0, z: -0.85 }, mantra: { x: 0.22, y: 0.16, z: 0.30 }, pleasure: { x: 0, y: 0.25, z: -9, nearZ: -4.5 }
+                drone: { x: 0, y: -0.20, z: 0.35 }, music: { x: -0.22, y: 0, z: -0.85 }, mantra: { x: 0.22, y: 0.16, z: 0.30 }, pleasure: { x: 0, y: 0.25, z: -6.5, nearZ: -2.5 }
             }
         }[normalized];
         const now = this.ctx.currentTime;
@@ -1893,11 +1946,12 @@ class AudioEngine {
         if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
         const voiceEchoSettings = {
             off: { delay: 0.04, wet: 0 },
-            light: { delay: 0.035, wet: 0.14, filter: 2600 },
-            spacious: { delay: 0.07, wet: 0.20, filter: 2600 },
-            // A restrained, centered ambience for Spatial Sound. The dry
-            // narration remains untouched; only this stereo wet return widens.
-            ethereal: { delay: 0.11, wet: 0.22, filter: 5000 }
+            light: { delay: 0.05, wet: 0.19, filter: 3000 },
+            spacious: { delay: 0.095, wet: 0.28, filter: 3600 },
+            // A stronger, centered heavenly ambience for Spatial Sound. The
+            // dry narration remains untouched; only the stereo wet return
+            // widens, so the words remain clear at the centre.
+            ethereal: { delay: 0.14, wet: 0.32, filter: 5600 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const effectiveMode = this.spatialMode !== 'off' ? 'ethereal' : requestedMode;
@@ -1913,9 +1967,12 @@ class AudioEngine {
         if (!this.ctx || !this.musicEchoSend || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
         const settings = {
             off: { delay: 0.06, wet: 0 },
-            light: { delay: 0.055, wet: 0.10 },
-            spacious: { delay: 0.09, wet: 0.15 }
-        }[mode] || { delay: 0.055, wet: 0.10 };
+            // Lift the music-only room return enough to be appreciable while
+            // keeping it below the narration-space treatment and free of a
+            // distinct repeating echo.
+            light: { delay: 0.065, wet: 0.16 },
+            spacious: { delay: 0.11, wet: 0.24 }
+        }[mode] || { delay: 0.065, wet: 0.16 };
         const now = this.ctx.currentTime;
         this.musicEchoDelay.delayTime.cancelScheduledValues(now);
         this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
@@ -2615,7 +2672,7 @@ class AudioEngine {
         // blur remains consistent for the complete journey and after a
         // stop/restart without touching narration, mantra, or frequencies.
         if (this.pleasureLoops.some(loop => loop.isRunning)) {
-            this.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+            this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
             return true;
         }
 
@@ -2637,8 +2694,7 @@ class AudioEngine {
                 loop.start();
                 return loop;
             });
-            this.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
-            this.schedulePleasureSpatialApproach();
+            this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
             return this.pleasureLoops.length > 0;
         } catch (error) {
             if (generation === this.pleasureGeneration) {
@@ -2665,6 +2721,7 @@ class AudioEngine {
     setPleasureAmbienceGain(gain) {
         const level = clampPleasureAmbienceGain(gain);
         if (!this.ctx || !this.pleasureGain || !this.pleasureEnhancerGain) return level;
+        const profile = getPleasureAmbienceIntensityProfile();
         const now = this.ctx.currentTime;
         this.pleasureGain.gain.cancelScheduledValues(now);
         this.pleasureGain.gain.setValueAtTime(this.pleasureGain.gain.value, now);
@@ -2672,7 +2729,7 @@ class AudioEngine {
         this.pleasureEnhancerGain.gain.cancelScheduledValues(now);
         this.pleasureEnhancerGain.gain.setValueAtTime(this.pleasureEnhancerGain.gain.value, now);
         this.pleasureEnhancerGain.gain.linearRampToValueAtTime(
-            level * PLEASURE_AMBIENCE_HARMONIC_MIX,
+            level * profile.harmonicMix,
             now + 0.5
         );
         return level;
@@ -2681,8 +2738,14 @@ class AudioEngine {
     setPleasureAmbienceBlur(enabled = true) {
         const blurEnabled = Boolean(enabled);
         if (!this.ctx || !this.pleasureBlurDryGain || !this.pleasureBlurWetGain) return blurEnabled;
+        const profile = getPleasureAmbienceIntensityProfile();
         const blurMix = getPleasureBlurMix(blurEnabled);
         const now = this.ctx.currentTime;
+        if (this.pleasureBlurFilter) {
+            this.pleasureBlurFilter.frequency.cancelScheduledValues(now);
+            this.pleasureBlurFilter.frequency.setValueAtTime(this.pleasureBlurFilter.frequency.value, now);
+            this.pleasureBlurFilter.frequency.linearRampToValueAtTime(profile.blurCutoff, now + 1.2);
+        }
         this.pleasureBlurDryGain.gain.cancelScheduledValues(now);
         this.pleasureBlurDryGain.gain.setValueAtTime(this.pleasureBlurDryGain.gain.value, now);
         this.pleasureBlurDryGain.gain.linearRampToValueAtTime(
@@ -2696,6 +2759,14 @@ class AudioEngine {
             now + 1.2
         );
         return blurEnabled;
+    }
+
+    setPleasureAmbienceIntensity(intensity = 'gentle') {
+        state.pleasureAmbienceIntensity = normalizePleasureAmbienceIntensity(intensity);
+        this.setPleasureAmbienceGain(state.pleasureAmbienceGain);
+        this.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+        if (this.pleasureLoops.some(loop => loop.isRunning)) this.schedulePleasureSpatialApproach();
+        return state.pleasureAmbienceIntensity;
     }
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
@@ -2745,6 +2816,11 @@ class AudioEngine {
 
     fadeOutBackgroundMusic(duration = 4) {
         if (!this.bgMusicLoop) return;
+        // A manual volume adjustment must not revive a deliberately silent
+        // practice such as Box Breathing. Mark this bus as intentionally
+        // muted before the envelope reaches zero.
+        this.bgMusicTargetVolume = 0;
+        this.bgMusicTargetEQ = 0;
         const now = this.ctx.currentTime;
         this.bgMusicGain.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.cancelScheduledValues(now);
@@ -2753,6 +2829,31 @@ class AudioEngine {
         this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
+    }
+
+    setBackgroundMusicVolume(level, previousLevel = level) {
+        if (!this.ctx || !this.bgMusicGain || !this.bgMusicLoop) return;
+        const nextLevel = Number(level);
+        const previous = Number(previousLevel);
+        const currentTarget = Number(this.bgMusicTargetVolume);
+        if (!Number.isFinite(nextLevel) || !Number.isFinite(previous) || previous <= 0 || !Number.isFinite(currentTarget)) return;
+
+        // Preserve the current role of music (full bed, narration duck, or
+        // intentional silence) instead of replacing the envelope with the
+        // slider's full value. A zero target deliberately remains silent.
+        const roleFactor = Math.max(0, Math.min(1, currentTarget / previous));
+        const nextTarget = nextLevel * roleFactor;
+        this.bgMusicTargetVolume = nextTarget;
+        if (roleFactor === 0) return;
+
+        const now = this.ctx.currentTime;
+        const currentGain = this.bgMusicGain.gain.value;
+        this.bgMusicGain.gain.cancelScheduledValues(now);
+        this.bgMusicGain.gain.setValueAtTime(currentGain, now);
+        // Do not wake a bus that is still intentionally at silence during a
+        // fade; the next explicit fade-in remains responsible for that start.
+        if (currentGain <= 0.0001) return;
+        this.bgMusicGain.gain.linearRampToValueAtTime(nextTarget, now + 0.25);
     }
 
     cancelBackgroundMusicRestore() {
@@ -4678,6 +4779,9 @@ const state = {
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
     pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
     pleasureAmbienceBlurAmount: clampPleasureAmbienceBlurAmount(storedNumber('chakra_pleasure_ambience_blur_amount', PLEASURE_BLUR_DEFAULT_AMOUNT)),
+    // Intensity is a session-only character preset. It never changes the
+    // saved Ambience Level or the user's base Blur Intensity preference.
+    pleasureAmbienceIntensity: 'gentle',
     voiceClarity: parseFloat(localStorage.getItem('chakra_voice_clarity')) || 50,
     voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
     voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
@@ -4748,6 +4852,8 @@ function syncPleasureAmbienceControl() {
     const section = document.getElementById('mood-relaxation-ambience-section');
     const toggle = document.getElementById('mood-relaxation-intention-toggle');
     const control = document.getElementById('mood-relaxation-ambience-level-control');
+    const intensityControl = document.getElementById('pleasure-ambience-intensity-control');
+    const intensitySelect = document.getElementById('pleasure-ambience-intensity');
     const urlControl = document.getElementById('pleasure-ambience-url-control');
     const urlInput = document.getElementById('pleasure-ambience-url');
     const blurControl = document.getElementById('pleasure-ambience-blur-control');
@@ -4765,6 +4871,11 @@ function syncPleasureAmbienceControl() {
     if (section) section.hidden = false;
     if (toggle) toggle.disabled = state.noFrequencyMode;
     if (control) control.hidden = !state.moodRelaxationIntentionEnabled;
+    if (intensityControl) intensityControl.hidden = !state.moodRelaxationIntentionEnabled;
+    if (intensitySelect) {
+        intensitySelect.value = state.pleasureAmbienceIntensity;
+        intensitySelect.disabled = state.noFrequencyMode;
+    }
     if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled;
     if (urlInput) {
         urlInput.disabled = state.noFrequencyMode;
@@ -5988,6 +6099,11 @@ function attachEventListeners() {
             audio.stopPleasureAmbience();
         }
     });
+    document.getElementById('pleasure-ambience-intensity')?.addEventListener('change', (event) => {
+        state.pleasureAmbienceIntensity = normalizePleasureAmbienceIntensity(event.target.value);
+        audio.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
+        syncPleasureAmbienceControl();
+    });
     document.getElementById('mood-relaxation-ambience-level')?.addEventListener('input', (event) => {
         const requestedGain = clampPleasureAmbienceGain(Number(event.target.value) / 100);
         const previousGain = state.pleasureAmbienceGain;
@@ -6389,12 +6505,9 @@ function attachEventListeners() {
     // Music
     const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')].filter(Boolean);
     volMusicEls.forEach(el => el.addEventListener('input', (e) => {
+        const previousVolume = state.volMusic;
         syncVolume('volMusic', e.target.value, volMusicEls);
-        if (audio.bgMusicGain && audio.bgMusicLoop) {
-            // Note: fadeIn/fadeOut and ducking logic will use the new state.volMusic on their next trigger
-            // For immediate feedback during play:
-            audio.bgMusicGain.gain.setValueAtTime(state.volMusic, audio.ctx.currentTime);
-        }
+        audio.setBackgroundMusicVolume(state.volMusic, previousVolume);
     }));
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
