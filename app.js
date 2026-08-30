@@ -48,14 +48,21 @@ const PLEASURE_AMBIENCE_GAIN = 0.003;
 const PLEASURE_AMBIENCE_MIN_GAIN = 0.002;
 const PLEASURE_AMBIENCE_MAX_GAIN = 0.07;
 const PLEASURE_AMBIENCE_CONFIRM_THRESHOLD = 0.05;
+const PLEASURE_AMBIENCE_URL_STORAGE_KEY = 'chakra_pleasure_ambience_url';
 const PLEASURE_AMBIENCE_FADE_SECONDS = 5;
 const PLEASURE_AMBIENCE_HARMONIC_MIX = 0.04;
 const PLEASURE_AMBIENCE_MANIFEST_URL = 'audio/ambience-manifest.json';
 const PLEASURE_SPATIAL_APPROACH_SECONDS = 45;
 const PLEASURE_SPATIAL_FALLBACK_FAR_GAIN = 0.35;
 const PLEASURE_SPATIAL_FALLBACK_NEAR_GAIN = 0.8;
-const PLEASURE_BLUR_DRY_MIX = 0.88;
-const PLEASURE_BLUR_WET_MIX = 0.12;
+// Blur is a restrained parallel effect: the default is noticeably softer
+// than the original 12% wet mix, while the dry signal remains present for
+// clarity. The Journey Tuning slider controls the wet amount only.
+const PLEASURE_BLUR_MIN_AMOUNT = 0.10;
+const PLEASURE_BLUR_DEFAULT_AMOUNT = 0.35;
+const PLEASURE_BLUR_MAX_AMOUNT = 0.65;
+const PLEASURE_BLUR_DRY_MIX = 1 - PLEASURE_BLUR_DEFAULT_AMOUNT;
+const PLEASURE_BLUR_WET_MIX = PLEASURE_BLUR_DEFAULT_AMOUNT;
 
 function clampPleasureAmbienceGain(value) {
     const numericValue = Number(value);
@@ -67,6 +74,28 @@ function clampAudioLevel(value, min, max, fallback) {
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return fallback;
     return Math.min(max, Math.max(min, numericValue));
+}
+
+function normalizePleasureAmbienceUrl(value) {
+    const candidate = String(value ?? '').trim();
+    if (!candidate) return '';
+    try {
+        const parsed = new URL(candidate, window.location.href);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+    } catch (error) {
+        return '';
+    }
+}
+
+function clampPleasureAmbienceBlurAmount(value) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return PLEASURE_BLUR_DEFAULT_AMOUNT;
+    return Math.min(PLEASURE_BLUR_MAX_AMOUNT, Math.max(PLEASURE_BLUR_MIN_AMOUNT, numericValue));
+}
+
+function getPleasureBlurMix(enabled) {
+    const wet = enabled ? clampPleasureAmbienceBlurAmount(state.pleasureAmbienceBlurAmount) : 0;
+    return { dry: 1 - wet, wet };
 }
 
 function formatPleasureAmbienceLevel(gain) {
@@ -517,6 +546,7 @@ function formatRangeControlValue(input) {
         ? `${value.toFixed(0)} secs`
         : `${value.toFixed(1)} mins`;
     if (input.id === 'mood-relaxation-ambience-level') return `${value.toFixed(1)}%`;
+    if (input.id === 'pleasure-ambience-blur-level') return `${Math.round(value)}%`;
     if (input.id === 'time-high-energy') return `${value} mins`;
     if (['time-bath', 'time-perineal-care', 'time-assisted-bathing', 'time-massage'].includes(input.id)) {
         return `${Math.floor(value / 60)}m`;
@@ -835,6 +865,8 @@ function applyLocaleUI() {
     });
     const intentionInput = document.getElementById('intention-input');
     if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
+    const pleasureAmbienceUrlInput = document.getElementById('pleasure-ambience-url');
+    if (pleasureAmbienceUrlInput) pleasureAmbienceUrlInput.placeholder = t('ui.pleasureAmbienceUrlPlaceholder');
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const path = element.dataset.i18n;
         if (path) element.textContent = t(path);
@@ -1341,6 +1373,7 @@ class AudioEngine {
         this.bgMusicBuffer = null;
         this.pleasureBuffers = new Map();
         this.pleasureManifest = null;
+        this.pleasureManifestKey = null;
         this.pleasureGeneration = 0;
         this.pleasureAudioAvailable = null;
 
@@ -1592,14 +1625,9 @@ class AudioEngine {
         this.pleasureBlurConvolver.buffer = this.createImpulseResponse(0.9, 4.5);
         this.pleasureBlurDryGain = this.ctx.createGain();
         this.pleasureBlurWetGain = this.ctx.createGain();
-        this.pleasureBlurDryGain.gain.setValueAtTime(
-            state.pleasureAmbienceBlur ? PLEASURE_BLUR_DRY_MIX : 1,
-            this.ctx.currentTime
-        );
-        this.pleasureBlurWetGain.gain.setValueAtTime(
-            state.pleasureAmbienceBlur ? PLEASURE_BLUR_WET_MIX : 0,
-            this.ctx.currentTime
-        );
+        const blurMix = getPleasureBlurMix(state.pleasureAmbienceBlur);
+        this.pleasureBlurDryGain.gain.setValueAtTime(blurMix.dry, this.ctx.currentTime);
+        this.pleasureBlurWetGain.gain.setValueAtTime(blurMix.wet, this.ctx.currentTime);
         this.spatialPleasurePanner = this.createSpatialPanner();
         if ('distanceModel' in this.spatialPleasurePanner) {
             this.spatialPleasurePanner.distanceModel = 'inverse';
@@ -2431,6 +2459,14 @@ class AudioEngine {
 
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = false;
+        // A stopped loop leaves the shared outer gain at its previous target.
+        // Reset it before creating the replacement so a restart cannot bypass
+        // the deliberate entry fade through stale gain state.
+        if (this.bgMusicGain) {
+            const now = this.ctx.currentTime;
+            this.bgMusicGain.gain.cancelScheduledValues(now);
+            this.bgMusicGain.gain.setValueAtTime(0, now);
+        }
         if (this.bgMusicBusGain) {
             const now = this.ctx.currentTime;
             this.bgMusicBusGain.gain.cancelScheduledValues(now);
@@ -2452,9 +2488,11 @@ class AudioEngine {
     }
 
     async loadPleasureAmbienceBuffers() {
-        if (this.pleasureManifest) return this.pleasureBuffers;
+        const customUrl = normalizePleasureAmbienceUrl(state.pleasureAmbienceUrl);
+        const manifestKey = customUrl || 'manifest-primary';
+        if (this.pleasureManifest && this.pleasureManifestKey === manifestKey) return this.pleasureBuffers;
 
-        const response = await fetch(PLEASURE_AMBIENCE_MANIFEST_URL);
+        const response = await fetch(PLEASURE_AMBIENCE_MANIFEST_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${PLEASURE_AMBIENCE_MANIFEST_URL}`);
         const manifest = await response.json();
         const entries = Array.isArray(manifest) ? manifest : manifest?.files;
@@ -2463,29 +2501,108 @@ class AudioEngine {
         // The app reads the folder manifest instead of embedding individual
         // filenames. The manifest accepts pleasure.mp3, pleasure-1.ogg,
         // pleasure-2.wav, and any other browser-decodable audio extension.
-        const paths = entries
+        const manifestPaths = entries
             .map(entry => typeof entry === 'string' ? entry.trim() : '')
             .map(entry => entry.replace(/^\.\/?/, '').replace(/^audio\//i, ''))
             .filter(entry => /^pleasure(?:-\d+)?\.[^./]+$/i.test(entry))
             .map(entry => `audio/${entry}`);
+        const serialPaths = manifestPaths.filter(path => !/^audio\/pleasure\.[^./]+$/i.test(path));
+        const paths = customUrl ? [customUrl, ...serialPaths] : manifestPaths;
         this.pleasureManifest = [...new Set(paths)];
+        this.pleasureManifestKey = manifestKey;
         if (!this.pleasureManifest.length) throw new Error('Pleasure ambience manifest contains no valid audio files');
 
-        await Promise.all(this.pleasureManifest.map(async path => {
-            if (this.pleasureBuffers.has(path)) return;
-            try {
-                const assetResponse = await fetch(path);
-                if (!assetResponse.ok) throw new Error(`HTTP ${assetResponse.status}`);
-                const arrayBuffer = await assetResponse.arrayBuffer();
-                const buffer = await this.ctx.decodeAudioData(arrayBuffer);
-                if (buffer) this.pleasureBuffers.set(path, buffer);
-            } catch (error) {
-                console.warn(`[Pleasure Ambience] skipped ${path}:`, error);
-            }
-        }));
+        try {
+            await Promise.all(this.pleasureManifest.map(async path => {
+                if (this.pleasureBuffers.has(path)) return;
+                try {
+                    const assetResponse = await fetch(path, { cache: 'no-store' });
+                    if (!assetResponse.ok) throw new Error(`HTTP ${assetResponse.status}`);
+                    const arrayBuffer = await assetResponse.arrayBuffer();
+                    const buffer = await this.ctx.decodeAudioData(arrayBuffer);
+                    if (buffer) this.pleasureBuffers.set(path, buffer);
+                } catch (error) {
+                    if (path === customUrl) throw new Error(`Unable to load the pleasure ambience URL (${error.message})`);
+                    // Manifest layers are optional local assets. A missing
+                    // optional file is normal while a contributor is moving
+                    // or replacing the local pleasure source, so do not turn
+                    // an expected 404 into console noise. Keep other decode,
+                    // network, and format failures visible for diagnosis.
+                    if (error?.message !== 'HTTP 404') {
+                        console.warn(`[Pleasure Ambience] skipped ${path}:`, error);
+                    }
+                }
+            }));
+        } catch (error) {
+            // Do not retain a partially decoded custom source. A later retry
+            // must fetch and validate the selected URL again.
+            this.pleasureManifest = null;
+            this.pleasureManifestKey = null;
+            this.pleasureBuffers.clear();
+            throw error;
+        }
 
         if (!this.pleasureBuffers.size) throw new Error('No pleasure ambience files could be decoded');
         return this.pleasureBuffers;
+    }
+
+    async loadPleasureAmbienceUrl(url) {
+        const rawUrl = String(url ?? '').trim();
+        const normalizedUrl = normalizePleasureAmbienceUrl(rawUrl);
+        if (rawUrl && !normalizedUrl) {
+            throw new Error('Please enter a valid HTTP or HTTPS audio URL.');
+        }
+
+        const previousUrl = state.pleasureAmbienceUrl;
+        const previousAmbienceEnabled = state.moodRelaxationIntentionEnabled;
+        const shouldRestart = previousAmbienceEnabled && this.ctx && !state.noFrequencyMode;
+        this.stopPleasureAmbience();
+        this.pleasureManifest = null;
+        this.pleasureManifestKey = null;
+        this.pleasureBuffers.clear();
+        this.pleasureAudioAvailable = null;
+        state.pleasureAmbienceUrl = normalizedUrl;
+
+        try {
+            // Decode the candidate before persisting it. This keeps a bad URL
+            // from becoming the source used by the next journey.
+            if (!this.isInitialized) await this.init();
+            await this.loadPleasureAmbienceBuffers();
+            this.pleasureAudioAvailable = true;
+            if (normalizedUrl) localStorage.setItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY, normalizedUrl);
+            else localStorage.removeItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY);
+            syncPleasureAmbienceControl();
+            if (shouldRestart) {
+                const started = await this.startPleasureAmbience();
+                if (!started) throw new Error('The pleasure ambience could not start. Check the URL and its CORS permissions.');
+            }
+            return normalizedUrl;
+        } catch (error) {
+            // Restore the previous preference and, when possible, the active
+            // ambience so an unsuccessful edit does not disrupt a journey.
+            state.pleasureAmbienceUrl = previousUrl;
+            if (previousUrl) localStorage.setItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY, previousUrl);
+            else localStorage.removeItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY);
+            this.stopPleasureAmbience();
+            this.pleasureManifest = null;
+            this.pleasureManifestKey = null;
+            this.pleasureBuffers.clear();
+            this.pleasureAudioAvailable = null;
+            state.moodRelaxationIntentionEnabled = previousAmbienceEnabled;
+            if (shouldRestart) {
+                try {
+                    await this.loadPleasureAmbienceBuffers();
+                    this.pleasureAudioAvailable = true;
+                    await this.startPleasureAmbience();
+                } catch (restoreError) {
+                    this.pleasureAudioAvailable = false;
+                    state.moodRelaxationIntentionEnabled = false;
+                    console.warn('[Pleasure Ambience] previous source could not be restored:', restoreError);
+                }
+            }
+            syncPleasureAmbienceControl();
+            throw error;
+        }
     }
 
     async startPleasureAmbience() {
@@ -2536,6 +2653,12 @@ class AudioEngine {
         this.pleasureGeneration += 1;
         this.pleasureLoops.forEach(loop => loop.stop(Math.max(0, fadeTime)));
         this.pleasureLoops = [];
+        // A stopped loop may otherwise leave its decoded AudioBuffer available
+        // for the next journey, causing a moved or replaced local file to keep
+        // playing until a full page reload.
+        this.pleasureManifest = null;
+        this.pleasureManifestKey = null;
+        this.pleasureBuffers.clear();
     }
 
     setPleasureAmbienceGain(gain) {
@@ -2557,17 +2680,18 @@ class AudioEngine {
     setPleasureAmbienceBlur(enabled = true) {
         const blurEnabled = Boolean(enabled);
         if (!this.ctx || !this.pleasureBlurDryGain || !this.pleasureBlurWetGain) return blurEnabled;
+        const blurMix = getPleasureBlurMix(blurEnabled);
         const now = this.ctx.currentTime;
         this.pleasureBlurDryGain.gain.cancelScheduledValues(now);
         this.pleasureBlurDryGain.gain.setValueAtTime(this.pleasureBlurDryGain.gain.value, now);
         this.pleasureBlurDryGain.gain.linearRampToValueAtTime(
-            blurEnabled ? PLEASURE_BLUR_DRY_MIX : 1,
+            blurMix.dry,
             now + 1.2
         );
         this.pleasureBlurWetGain.gain.cancelScheduledValues(now);
         this.pleasureBlurWetGain.gain.setValueAtTime(this.pleasureBlurWetGain.gain.value, now);
         this.pleasureBlurWetGain.gain.linearRampToValueAtTime(
-            blurEnabled ? PLEASURE_BLUR_WET_MIX : 0,
+            blurMix.wet,
             now + 1.2
         );
         return blurEnabled;
@@ -4516,6 +4640,8 @@ const state = {
     volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.1, 1, 0.35),
     volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
+    pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
+    pleasureAmbienceBlurAmount: clampPleasureAmbienceBlurAmount(storedNumber('chakra_pleasure_ambience_blur_amount', PLEASURE_BLUR_DEFAULT_AMOUNT)),
     voiceClarity: parseFloat(localStorage.getItem('chakra_voice_clarity')) || 50,
     voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
     voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
@@ -4587,19 +4713,37 @@ function syncPleasureAmbienceControl() {
     const section = document.getElementById('mood-relaxation-ambience-section');
     const toggle = document.getElementById('mood-relaxation-intention-toggle');
     const control = document.getElementById('mood-relaxation-ambience-level-control');
+    const urlControl = document.getElementById('pleasure-ambience-url-control');
+    const urlInput = document.getElementById('pleasure-ambience-url');
     const blurControl = document.getElementById('pleasure-ambience-blur-control');
     const blurToggle = document.getElementById('pleasure-ambience-blur-toggle');
+    const blurLevel = document.getElementById('pleasure-ambience-blur-level-control');
+    const blurLevelInput = document.getElementById('pleasure-ambience-blur-level');
+    const blurLevelOutput = document.getElementById('pleasure-ambience-blur-level-value');
     const slider = document.getElementById('mood-relaxation-ambience-level');
     const output = document.getElementById('mood-relaxation-ambience-level-value');
     const audioUnavailable = audio.pleasureAudioAvailable === false;
     if (section) section.hidden = audioUnavailable;
     if (toggle) toggle.disabled = state.noFrequencyMode || audioUnavailable;
     if (control) control.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (urlInput) {
+        urlInput.disabled = state.noFrequencyMode || audioUnavailable;
+        urlInput.value = state.pleasureAmbienceUrl;
+    }
     if (blurControl) blurControl.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
     if (blurToggle) {
         blurToggle.checked = state.pleasureAmbienceBlur;
         blurToggle.disabled = state.noFrequencyMode || audioUnavailable;
     }
+    if (blurLevel) blurLevel.hidden = !state.moodRelaxationIntentionEnabled || audioUnavailable;
+    if (blurLevelInput) {
+        blurLevelInput.disabled = state.noFrequencyMode || audioUnavailable;
+        blurLevelInput.value = (state.pleasureAmbienceBlurAmount * 100).toFixed(0);
+        const pct = ((Number(blurLevelInput.value) - Number(blurLevelInput.min)) / (Number(blurLevelInput.max) - Number(blurLevelInput.min)) * 100).toFixed(1) + '%';
+        blurLevelInput.style.setProperty('--range-fill', pct);
+    }
+    if (blurLevelOutput) blurLevelOutput.textContent = `${Math.round(state.pleasureAmbienceBlurAmount * 100)}%`;
     if (slider) {
         slider.disabled = state.noFrequencyMode || audioUnavailable;
         slider.value = (state.pleasureAmbienceGain * 100).toFixed(1);
@@ -5781,6 +5925,46 @@ function attachEventListeners() {
     document.getElementById('pleasure-ambience-blur-toggle')?.addEventListener('change', (event) => {
         state.pleasureAmbienceBlur = event.target.checked;
         audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+    });
+    document.getElementById('pleasure-ambience-blur-level')?.addEventListener('input', (event) => {
+        state.pleasureAmbienceBlurAmount = clampPleasureAmbienceBlurAmount(Number(event.target.value) / 100);
+        localStorage.setItem('chakra_pleasure_ambience_blur_amount', state.pleasureAmbienceBlurAmount);
+        syncPleasureAmbienceControl();
+        audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+    });
+    const pleasureAmbienceUrlInput = document.getElementById('pleasure-ambience-url');
+    const loadPleasureAmbienceUrlButton = document.getElementById('load-pleasure-ambience-url');
+    const pleasureAmbienceUrlStatus = document.getElementById('pleasure-ambience-url-status');
+    const setPleasureAmbienceUrlStatus = (message, tone = 'neutral') => {
+        if (!pleasureAmbienceUrlStatus) return;
+        pleasureAmbienceUrlStatus.textContent = message;
+        pleasureAmbienceUrlStatus.hidden = false;
+        pleasureAmbienceUrlStatus.style.color = tone === 'success'
+            ? '#4ade80'
+            : tone === 'error'
+                ? '#f87171'
+                : 'rgba(255, 255, 255, 0.72)';
+    };
+    loadPleasureAmbienceUrlButton?.addEventListener('click', async () => {
+        const url = pleasureAmbienceUrlInput?.value.trim() || '';
+        loadPleasureAmbienceUrlButton.disabled = true;
+        setPleasureAmbienceUrlStatus(t('ui.pleasureAmbienceUrlLoading'));
+        try {
+            await audio.loadPleasureAmbienceUrl(url);
+            setPleasureAmbienceUrlStatus(
+                url ? t('ui.pleasureAmbienceUrlLoaded') : t('ui.pleasureAmbienceUrlCleared'),
+                'success'
+            );
+        } catch (error) {
+            const errorMessage = error?.message || String(error);
+            setPleasureAmbienceUrlStatus(
+                t('ui.pleasureAmbienceUrlError').replace('{error}', errorMessage),
+                'error'
+            );
+            syncPleasureAmbienceControl();
+        } finally {
+            loadPleasureAmbienceUrlButton.disabled = state.noFrequencyMode;
+        }
     });
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);

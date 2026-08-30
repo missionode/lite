@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.61';
+const CACHE_NAME = 'chakra-v5.65';
 const PIPER_CACHE_NAME = 'chakra-piper-v3';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v16';
 const ASSETS = [
@@ -81,7 +81,20 @@ function isLanguageRequest(request) {
     return url.pathname.endsWith('/language-manifest.json') || url.pathname.includes('/locales/');
 }
 
+function isPleasureRequest(request) {
+    const url = new URL(request.url);
+    return url.pathname.endsWith('/audio/ambience-manifest.json') ||
+        /\/audio\/pleasure(?:-\d+)?\.[^/]+$/i.test(url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
+    if (isPleasureRequest(event.request)) {
+        // Pleasure files are optional and may be replaced or moved while the
+        // app is being tuned. Do not resurrect an old copy from a cache.
+        event.respondWith(fetch(event.request, { cache: 'no-store' }));
+        return;
+    }
+
     if (isPiperRequest(event.request)) {
         event.respondWith(caches.open(PIPER_CACHE_NAME).then(async (cache) => {
             const cached = await cache.match(event.request);

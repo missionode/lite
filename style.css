@@ -1096,6 +1096,47 @@ input[type="range"]::-moz-range-progress {
     gap: 1rem;
 }
 
+.mixer-url-control {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.mixer-url-control > label {
+    width: auto;
+}
+
+.mixer-url-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.mixer-url-entry input[type="url"] {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.78rem;
+}
+
+.mixer-url-entry .secondary-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 4.5rem;
+    max-width: 7.5rem;
+    min-height: 40px;
+    margin: 0;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.65rem;
+    white-space: nowrap;
+}
+
 .mixer-row label {
     font-size: 0.7rem;
     width: 50px;
