@@ -8,6 +8,7 @@
     "test:narration-ticker": "node tests/narration-ticker.test.mjs",
     "test:language-intention": "node tests/language-intention.test.mjs",
     "test:russian-language": "node tests/russian-language.test.mjs",
+    "test:hindi-language": "node tests/hindi-language.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
     "test:spatial-audio": "node tests/spatial-audio.test.mjs",

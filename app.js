@@ -407,8 +407,14 @@ function cancelEarnHandoff() {
     }
 }
 
+function canUseEarnHandoff() {
+    // Hindi is an intentionally non-commercial, browser-TTS-only experience.
+    return state.language !== 'hi';
+}
+
 function scheduleEarnHandoff() {
     cancelEarnHandoff();
+    if (!canUseEarnHandoff()) return;
     earnHandoffTimer = window.setTimeout(() => {
         earnHandoffTimer = null;
         const earnLink = document.getElementById('continue-to-earn');
@@ -991,7 +997,8 @@ async function loadLanguageManifest() {
         languageRegistry = [
             { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
             { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' },
-            { id: 'ru', locale: 'ru-RU', label: 'Русский', browserPrefixes: ['ru'], defaultPiperVoice: 'ru_RU-irina-medium' }
+            { id: 'ru', locale: 'ru-RU', label: 'Русский', browserPrefixes: ['ru'], defaultPiperVoice: 'ru_RU-irina-medium' },
+            { id: 'hi', locale: 'hi-IN', label: 'हिन्दी', browserPrefixes: ['hi'] }
         ];
     }
 }
