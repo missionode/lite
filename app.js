@@ -1448,13 +1448,13 @@ class AudioEngine {
         this.voiceClarityFilter = null;
         this.voiceEchoSend = null;
         this.voiceEchoDelay = null;
+        this.voiceEchoConvolver = null;
         this.voiceEchoFilter = null;
-        this.voiceEchoFeedback = null;
         this.voiceEchoWetGain = null;
         this.musicEchoSend = null;
         this.musicEchoDelay = null;
+        this.musicEchoConvolver = null;
         this.musicEchoFilter = null;
-        this.musicEchoFeedback = null;
         this.musicEchoWetGain = null;
         this.pleasureSourceGain = null;
         this.pleasureGain = null;
@@ -1540,25 +1540,23 @@ class AudioEngine {
         this.voiceClarityFilter.Q.setValueAtTime(0.8, this.ctx.currentTime);
         this.voiceClarityFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
-        // Controlled voice-only echo. A filtered feedback delay gives stable,
-        // musical repeats; randomized convolution here previously made the
-        // effect sound inconsistent between sessions and devices.
+        // Voice Space is a diffuse filtered reverb, not a repeating echo. A
+        // deterministic impulse makes the tail consistent on every device.
         this.voiceEchoSend = this.ctx.createGain();
         this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
-        this.voiceEchoDelay.delayTime.setValueAtTime(0.18, this.ctx.currentTime);
+        this.voiceEchoDelay.delayTime.setValueAtTime(0.025, this.ctx.currentTime);
+        this.voiceEchoConvolver = this.ctx.createConvolver();
+        this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(2.8, 3.2, 731);
         this.voiceEchoFilter = this.ctx.createBiquadFilter();
         this.voiceEchoFilter.type = 'lowpass';
         this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
-        this.voiceEchoFeedback = this.ctx.createGain();
-        this.voiceEchoFeedback.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoWetGain = this.ctx.createGain();
         this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoSend.connect(this.voiceEchoDelay);
-        this.voiceEchoDelay.connect(this.voiceEchoFilter);
+        this.voiceEchoDelay.connect(this.voiceEchoConvolver);
+        this.voiceEchoConvolver.connect(this.voiceEchoFilter);
         this.voiceEchoFilter.connect(this.voiceEchoWetGain);
-        this.voiceEchoFilter.connect(this.voiceEchoFeedback);
-        this.voiceEchoFeedback.connect(this.voiceEchoDelay);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -1616,25 +1614,23 @@ class AudioEngine {
         this.bgMusicSmoothGain = this.ctx.createGain();
         this.bgMusicSmoothGain.gain.value = state.eyesCloseMode ? 0.7 : 1.0;
 
-        // Background-music-only echo. It shares the music tone path before
-        // repeating, so the return cannot sound brighter or disconnected from
-        // the dry bed. Feedback remains conservatively below unity.
+        // Background Music Space uses the same non-repeating diffuse design.
+        // Its send is placed after the dry music tone shaping below.
         this.musicEchoSend = this.ctx.createGain();
         this.musicEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoDelay = this.ctx.createDelay(0.5);
-        this.musicEchoDelay.delayTime.setValueAtTime(0.16, this.ctx.currentTime);
+        this.musicEchoDelay.delayTime.setValueAtTime(0.018, this.ctx.currentTime);
+        this.musicEchoConvolver = this.ctx.createConvolver();
+        this.musicEchoConvolver.buffer = this.createDiffuseReverbImpulse(1.8, 4.2, 1777);
         this.musicEchoFilter = this.ctx.createBiquadFilter();
         this.musicEchoFilter.type = 'lowpass';
         this.musicEchoFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
-        this.musicEchoFeedback = this.ctx.createGain();
-        this.musicEchoFeedback.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoWetGain = this.ctx.createGain();
         this.musicEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoSend.connect(this.musicEchoDelay);
-        this.musicEchoDelay.connect(this.musicEchoFilter);
+        this.musicEchoDelay.connect(this.musicEchoConvolver);
+        this.musicEchoConvolver.connect(this.musicEchoFilter);
         this.musicEchoFilter.connect(this.musicEchoWetGain);
-        this.musicEchoFilter.connect(this.musicEchoFeedback);
-        this.musicEchoFeedback.connect(this.musicEchoDelay);
 
         // One final music-only gate controls both dry music and its echo.
         // This makes mantra muting complete and click-free without touching
@@ -1966,38 +1962,37 @@ class AudioEngine {
     }
 
     setVoiceEcho(mode = 'off') {
-        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoFeedback || !this.voiceEchoWetGain) return;
+        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
         const voiceEchoSettings = {
-            off: { delay: 0.18, wet: 0, feedback: 0, filter: 3200 },
-            light: { delay: 0.18, wet: 0.14, feedback: 0.19, filter: 3200 },
-            spacious: { delay: 0.32, wet: 0.20, feedback: 0.30, filter: 3600 },
+            off: { delay: 0.025, wet: 0, filter: 3200 },
+            light: { delay: 0.025, wet: 0.14, filter: 3200 },
+            spacious: { delay: 0.04, wet: 0.20, filter: 3600 },
             // A stronger, centered heavenly ambience for Spatial Sound. The
             // dry narration remains untouched; only the stereo wet return
             // widens, so the words remain clear at the centre.
-            ethereal: { delay: 0.42, wet: 0.22, feedback: 0.34, filter: 4600 }
+            ethereal: { delay: 0.06, wet: 0.24, filter: 4600 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const effectiveMode = this.spatialMode !== 'off' ? 'ethereal' : requestedMode;
         const settings = voiceEchoSettings[effectiveMode];
         const now = this.ctx.currentTime;
-        [this.voiceEchoDelay.delayTime, this.voiceEchoSend.gain, this.voiceEchoFeedback.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
+        [this.voiceEchoDelay.delayTime, this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
             param.cancelScheduledValues(now);
             param.setValueAtTime(param.value, now);
         });
         this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
         this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
-        this.voiceEchoFeedback.gain.linearRampToValueAtTime(settings.feedback, now + 0.25);
         this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
         this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
     }
 
     setMusicEcho(mode = 'light') {
-        if (!this.ctx || !this.musicEchoSend || !this.musicEchoDelay || !this.musicEchoFeedback || !this.musicEchoWetGain) return;
+        if (!this.ctx || !this.musicEchoSend || !this.musicEchoDelay || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
         const settings = {
-            off: { delay: 0.16, wet: 0, feedback: 0, filter: 2800 },
-            light: { delay: 0.16, wet: 0.12, feedback: 0.18, filter: 2800 },
-            spacious: { delay: 0.28, wet: 0.18, feedback: 0.28, filter: 3400 }
-        }[mode] || { delay: 0.16, wet: 0.12, feedback: 0.18, filter: 2800 };
+            off: { delay: 0.018, wet: 0, filter: 2800 },
+            light: { delay: 0.018, wet: 0.12, filter: 2800 },
+            spacious: { delay: 0.035, wet: 0.18, filter: 3400 }
+        }[mode] || { delay: 0.018, wet: 0.12, filter: 2800 };
         const now = this.ctx.currentTime;
         this.musicEchoDelay.delayTime.cancelScheduledValues(now);
         this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
@@ -2005,9 +2000,6 @@ class AudioEngine {
         this.musicEchoSend.gain.cancelScheduledValues(now);
         this.musicEchoSend.gain.setValueAtTime(this.musicEchoSend.gain.value, now);
         this.musicEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
-        this.musicEchoFeedback.gain.cancelScheduledValues(now);
-        this.musicEchoFeedback.gain.setValueAtTime(this.musicEchoFeedback.gain.value, now);
-        this.musicEchoFeedback.gain.linearRampToValueAtTime(settings.feedback, now + 0.25);
         this.musicEchoWetGain.gain.cancelScheduledValues(now);
         this.musicEchoWetGain.gain.setValueAtTime(this.musicEchoWetGain.gain.value, now);
         this.musicEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
@@ -2089,6 +2081,26 @@ class AudioEngine {
             for (let i = 0; i < length; i++) {
                 const envelope = Math.pow(1 - i / length, decay);
                 data[i] = (Math.random() * 2 - 1) * envelope;
+            }
+        }
+        return buffer;
+    }
+
+    createDiffuseReverbImpulse(duration, decay, seed) {
+        const sampleRate = this.ctx.sampleRate;
+        const length = Math.max(1, Math.floor(sampleRate * duration));
+        const buffer = this.ctx.createBuffer(2, length, sampleRate);
+        for (let channel = 0; channel < 2; channel++) {
+            const data = buffer.getChannelData(channel);
+            let randomState = (seed + (channel * 104729)) >>> 0;
+            for (let i = 0; i < length; i++) {
+                // Deterministic decorrelated noise produces a diffuse tail,
+                // with no periodic feedback repeats and no session-to-session
+                // character change.
+                randomState = (1664525 * randomState + 1013904223) >>> 0;
+                const noise = (randomState / 4294967296) * 2 - 1;
+                const envelope = Math.pow(1 - (i / length), decay);
+                data[i] = noise * envelope;
             }
         }
         return buffer;

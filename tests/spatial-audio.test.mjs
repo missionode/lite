@@ -51,7 +51,7 @@ assert.match(app, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spatial mode should
 assert.match(app, /localStorage\.setItem\('chakra_spatial_mode', state\.spatialMode\)/, 'Spatial mode changes should persist');
 assert.match(app, /getElementById\('spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(app, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);
-assert.match(app, /ethereal: \{ delay: 0\.42, wet: 0\.22, feedback: 0\.34, filter: 4600 \}/, 'Spatial Sound should use a bounded, filtered ethereal narration echo');
+assert.match(app, /ethereal: \{ delay: 0\.06, wet: 0\.24, filter: 4600 \}/, 'Spatial Sound should use a diffuse, non-repeating ethereal narration reverb');
 assert.match(app, /const effectiveMode = this\.spatialMode !== 'off' \? 'ethereal' : requestedMode/, 'Spatial Sound should apply ethereal ambience only while enabled');
 assert.match(html, /id="session-countdown"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a circular session countdown');
 assert.match(html, /id="session-countdown-right"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a mirrored circular session countdown');
