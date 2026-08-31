@@ -14,7 +14,7 @@ This document contains only the remaining work from the multilingual architectur
 
 ### Hindi (`hi` / `hi-IN`) — approved, in progress
 
-- Product decision: Hindi is a complete meditation-content and display-language integration, but it is **browser-TTS-only**. Do not add a Hindi Piper model unless the owner separately approves a voice whose redistribution and commercial-use terms are compatible with Lite.
+- Product decision: Hindi is a complete meditation-content and display-language integration and is approved to ship now with **browser TTS only**. Hindi implementation is not blocked by Piper licensing. Do not add a Hindi Piper model unless the owner separately approves a voice whose redistribution and commercial-use terms are compatible with Lite; that is a later, independent enhancement.
 - Commercial boundary: when Hindi is the selected **Meditation Language**, do not reveal or schedule Lite's `Continue to Earn` handoff. This is a product boundary; it does not itself change a third-party voice licence.
 - Content requirement: add professional Hindi counterparts for every English UI key and every English production narration field in `scripts.json`. Preserve the established stage order, durations, canonical mantra identifiers, safety boundaries, and all existing English/Malayalam/Russian behavior.
 - Custom-script compatibility: existing guide-authored English/Malayalam bundles must remain uploadable. When a Hindi custom field is absent, runtime may use the existing English content fallback; shipped production content remains strict and must include Hindi fields.
