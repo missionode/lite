@@ -20,7 +20,7 @@ This document contains only the remaining work from the multilingual architectur
 - Custom-script compatibility: existing guide-authored English/Malayalam bundles must remain uploadable. When a Hindi custom field is absent, runtime may use the existing English content fallback; shipped production content remains strict and must include Hindi fields.
 - Required implementation paths: `language-manifest.json`, `locales/hi.json`, `scripts.json`, `app.js` language fallback and Earn visibility, app/language cache versions, and a Hindi language contract test. Do not modify `docs/dot.json`; it is independent facilitator content.
 - Required release evidence: Hindi locale/narration parity, generated-intention switching, Hindi browser-voice filtering/preview fallback, Hindi custom-script fallback, no Earn control or delayed handoff for Hindi, installed-PWA cache update, native Hindi review, and real-device full-journey listening.
-- Current state: branch `add-hindi-language` contains only uncommitted integration scaffolding. Do not commit, merge, or push it until full Hindi locale/narration coverage and the required static checks are complete.
+- Current state: no Hindi runtime scaffold is registered yet. Begin registration only in the same checkpoint that adds the complete Hindi locale/narration bundle and required static checks; do not commit, merge, or push a partial integration.
 
 ### Content and narration
 
