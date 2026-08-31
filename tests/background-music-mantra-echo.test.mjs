@@ -69,15 +69,19 @@ for (const locale of [en, ml]) {
 
 assert.match(app, /musicEchoSend = null/);
 assert.match(app, /musicEchoDelay = null/);
-assert.match(app, /musicEchoConvolver = null/);
+assert.match(app, /musicEchoFeedback = null/);
 assert.match(app, /musicEchoWetGain = null/);
 assert.match(app, /bgMusicBusGain = null/);
-assert.match(app, /this\.bgMusicGain\.connect\(this\.musicEchoSend\)/, 'music echo must receive background music only');
+assert.match(app, /this\.bgMusicSmoothGain\.connect\(this\.musicEchoSend\)/, 'music echo must receive the shaped background-music signal only');
 assert.match(app, /this\.musicEchoWetGain\.connect\(this\.bgMusicBusGain\)/, 'music echo must return to the music-only bus');
 assert.match(app, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/, 'the complete music bus must enter the shared output chain through spatial routing');
 assert.match(app, /this\.voiceClarityFilter\.connect\(this\.voiceEchoSend\)/, 'narration echo should remain on the voice-only path');
-assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 3\.0/, 'narration should use an extended heavenly tail');
-assert.match(app, /this\.voiceEchoConvolver\.buffer = this\.createImpulseResponse\([\s\S]*?VOICE_REVERB_TAIL_SECONDS,[\s\S]*?VOICE_REVERB_TAIL_DECAY/, 'voice tail should use the dedicated longer impulse response');
+assert.match(app, /this\.voiceEchoFilter\.connect\(this\.voiceEchoFeedback\)[\s\S]*?this\.voiceEchoFeedback\.connect\(this\.voiceEchoDelay\)/, 'narration echo should use a bounded filtered feedback loop rather than randomized convolution');
+assert.match(app, /this\.musicEchoFilter\.connect\(this\.musicEchoFeedback\)[\s\S]*?this\.musicEchoFeedback\.connect\(this\.musicEchoDelay\)/, 'music echo should use the same bounded filtered feedback design');
+assert.doesNotMatch(app, /voiceEchoConvolver|musicEchoConvolver/, 'voice and music echo should not use randomized convolution');
+assert.match(app, /const BACKGROUND_MUSIC_ASSET_VERSION = '20260831\.1'/, 'a committed background-music replacement should have an explicit release version');
+assert.match(app, /fetch\(BACKGROUND_MUSIC_URL, \{ cache: 'reload' \}\)/, 'the music loader should request the release-versioned asset from the network');
+assert.match(serviceWorker, /audio\/background_music\.mp3\?v=20260831\.1/, 'the service worker should precache the matching versioned music asset');
 assert.match(app, /const PLEASURE_AMBIENCE_GAIN = 0\.003/, 'pleasure ambience should use a fixed barely-audible gain');
 assert.match(app, /const PLEASURE_AMBIENCE_HARMONIC_MIX = 0\.04/, 'pleasure harmonic enrichment should remain a very low parallel mix');
 assert.match(app, /const PLEASURE_AMBIENCE_INTENSITIES = Object\.freeze/, 'ambience intensity should use explicit bounded profiles');
@@ -141,10 +145,11 @@ const setMusicEchoStart = app.indexOf('    setMusicEcho(mode = \'light\')');
 const setMusicEchoEnd = app.indexOf('\n    toggleEyesCloseMode(', setMusicEchoStart);
 assert.ok(setMusicEchoStart >= 0 && setMusicEchoEnd > setMusicEchoStart, 'setMusicEcho() must remain readable');
 const setMusicEcho = app.slice(setMusicEchoStart, setMusicEchoEnd);
-assert.match(setMusicEcho, /off: \{ delay: 0\.06, wet: 0 \}/);
-assert.match(setMusicEcho, /light: \{ delay: 0\.065, wet: 0\.16 \}/);
-assert.match(setMusicEcho, /spacious: \{ delay: 0\.11, wet: 0\.24 \}/);
+assert.match(setMusicEcho, /off: \{ delay: 0\.16, wet: 0, feedback: 0, filter: 2800 \}/);
+assert.match(setMusicEcho, /light: \{ delay: 0\.16, wet: 0\.12, feedback: 0\.18, filter: 2800 \}/);
+assert.match(setMusicEcho, /spacious: \{ delay: 0\.28, wet: 0\.18, feedback: 0\.28, filter: 3400 \}/);
 assert.match(setMusicEcho, /musicEchoSend\.gain\.linearRampToValueAtTime/);
+assert.match(setMusicEcho, /musicEchoFeedback\.gain\.linearRampToValueAtTime/, 'music feedback should transition click-free');
 assert.match(setMusicEcho, /musicEchoWetGain\.gain\.linearRampToValueAtTime/);
 
 const mantraStart = app.indexOf('    async playMantraTrack(key)');

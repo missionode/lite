@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.78';
+const CACHE_NAME = 'chakra-v5.79';
 const PIPER_CACHE_NAME = 'chakra-piper-v5';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v17';
 const ASSETS = [
@@ -37,7 +37,7 @@ const ASSETS = [
   './audio/AUM.mp3',
   './audio/HREEM.mp3',
   './audio/OM.mp3',
-  './audio/background_music.mp3'
+  './audio/background_music.mp3?v=20260831.1'
 ];
 
 self.addEventListener('install', (event) => {

@@ -37,10 +37,13 @@ const DEFAULT_SPATIAL_MODE = 'off';
 const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 5;
 const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
 const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
+// Change this alongside any committed replacement of background_music.mp3.
+// The versioned request avoids reviving an earlier track from an installed
+// PWA's cache while keeping the filename simple for local contributors.
+const BACKGROUND_MUSIC_ASSET_VERSION = '20260831.1';
+const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_ASSET_VERSION}`;
 const MANTRA_MUSIC_FADE_SECONDS = 4;
 const MANTRA_FADE_SECONDS = 4;
-const VOICE_REVERB_TAIL_SECONDS = 3.0;
-const VOICE_REVERB_TAIL_DECAY = 2.0;
 const MANTRA_REVERB_TAIL_SECONDS = 3.6;
 const MANTRA_REVERB_TAIL_DECAY = 1.8;
 const MANTRA_REVERB_TAIL_WET = 0.26;
@@ -1445,13 +1448,13 @@ class AudioEngine {
         this.voiceClarityFilter = null;
         this.voiceEchoSend = null;
         this.voiceEchoDelay = null;
-        this.voiceEchoConvolver = null;
         this.voiceEchoFilter = null;
+        this.voiceEchoFeedback = null;
         this.voiceEchoWetGain = null;
         this.musicEchoSend = null;
         this.musicEchoDelay = null;
-        this.musicEchoConvolver = null;
         this.musicEchoFilter = null;
+        this.musicEchoFeedback = null;
         this.musicEchoWetGain = null;
         this.pleasureSourceGain = null;
         this.pleasureGain = null;
@@ -1537,30 +1540,25 @@ class AudioEngine {
         this.voiceClarityFilter.Q.setValueAtTime(0.8, this.ctx.currentTime);
         this.voiceClarityFilter.gain.setValueAtTime(0, this.ctx.currentTime);
 
-        // Controlled voice-only echo. It is intentionally dry by default;
-        // the mixer exposes only safe presets rather than raw feedback knobs.
+        // Controlled voice-only echo. A filtered feedback delay gives stable,
+        // musical repeats; randomized convolution here previously made the
+        // effect sound inconsistent between sessions and devices.
         this.voiceEchoSend = this.ctx.createGain();
         this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
-        this.voiceEchoDelay.delayTime.setValueAtTime(0.04, this.ctx.currentTime);
-        this.voiceEchoConvolver = this.ctx.createConvolver();
-        // A longer, slower-decaying voice space gives narration an airy tail
-        // without changing the dry centered guide signal.
-        this.voiceEchoConvolver.buffer = this.createImpulseResponse(
-            VOICE_REVERB_TAIL_SECONDS,
-            VOICE_REVERB_TAIL_DECAY
-        );
+        this.voiceEchoDelay.delayTime.setValueAtTime(0.18, this.ctx.currentTime);
         this.voiceEchoFilter = this.ctx.createBiquadFilter();
         this.voiceEchoFilter.type = 'lowpass';
-        this.voiceEchoFilter.frequency.setValueAtTime(2600, this.ctx.currentTime);
+        this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
+        this.voiceEchoFeedback = this.ctx.createGain();
+        this.voiceEchoFeedback.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoWetGain = this.ctx.createGain();
         this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoSend.connect(this.voiceEchoDelay);
         this.voiceEchoDelay.connect(this.voiceEchoFilter);
-        this.voiceEchoDelay.disconnect();
-        this.voiceEchoDelay.connect(this.voiceEchoConvolver);
-        this.voiceEchoConvolver.connect(this.voiceEchoFilter);
         this.voiceEchoFilter.connect(this.voiceEchoWetGain);
+        this.voiceEchoFilter.connect(this.voiceEchoFeedback);
+        this.voiceEchoFeedback.connect(this.voiceEchoDelay);
 
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -1618,24 +1616,25 @@ class AudioEngine {
         this.bgMusicSmoothGain = this.ctx.createGain();
         this.bgMusicSmoothGain.gain.value = state.eyesCloseMode ? 0.7 : 1.0;
 
-        // Background-music-only echo. Keep this separate from voice echo so
-        // the guide can tune the room around the music without colouring
-        // narration or mantra audio.
+        // Background-music-only echo. It shares the music tone path before
+        // repeating, so the return cannot sound brighter or disconnected from
+        // the dry bed. Feedback remains conservatively below unity.
         this.musicEchoSend = this.ctx.createGain();
         this.musicEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoDelay = this.ctx.createDelay(0.5);
-        this.musicEchoDelay.delayTime.setValueAtTime(0.06, this.ctx.currentTime);
-        this.musicEchoConvolver = this.ctx.createConvolver();
-        this.musicEchoConvolver.buffer = this.createImpulseResponse(1.1, 3.2);
+        this.musicEchoDelay.delayTime.setValueAtTime(0.16, this.ctx.currentTime);
         this.musicEchoFilter = this.ctx.createBiquadFilter();
         this.musicEchoFilter.type = 'lowpass';
-        this.musicEchoFilter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+        this.musicEchoFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
+        this.musicEchoFeedback = this.ctx.createGain();
+        this.musicEchoFeedback.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoWetGain = this.ctx.createGain();
         this.musicEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.musicEchoSend.connect(this.musicEchoDelay);
-        this.musicEchoDelay.connect(this.musicEchoConvolver);
-        this.musicEchoConvolver.connect(this.musicEchoFilter);
+        this.musicEchoDelay.connect(this.musicEchoFilter);
         this.musicEchoFilter.connect(this.musicEchoWetGain);
+        this.musicEchoFilter.connect(this.musicEchoFeedback);
+        this.musicEchoFeedback.connect(this.musicEchoDelay);
 
         // One final music-only gate controls both dry music and its echo.
         // This makes mantra muting complete and click-free without touching
@@ -1653,7 +1652,7 @@ class AudioEngine {
         this.bgMusicLPF.connect(this.bgMusicHumFilter);
         this.bgMusicHumFilter.connect(this.bgMusicSmoothGain);
         this.bgMusicSmoothGain.connect(this.bgMusicBusGain);
-        this.bgMusicGain.connect(this.musicEchoSend);
+        this.bgMusicSmoothGain.connect(this.musicEchoSend);
         this.musicEchoWetGain.connect(this.bgMusicBusGain);
         this.bgMusicBusGain.connect(this.spatialMusicPanner);
         this.spatialMusicPanner.connect(this.lowCutFilter);
@@ -1967,36 +1966,38 @@ class AudioEngine {
     }
 
     setVoiceEcho(mode = 'off') {
-        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
+        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoFeedback || !this.voiceEchoWetGain) return;
         const voiceEchoSettings = {
-            off: { delay: 0.04, wet: 0 },
-            light: { delay: 0.05, wet: 0.19, filter: 3000 },
-            spacious: { delay: 0.095, wet: 0.28, filter: 3600 },
+            off: { delay: 0.18, wet: 0, feedback: 0, filter: 3200 },
+            light: { delay: 0.18, wet: 0.14, feedback: 0.19, filter: 3200 },
+            spacious: { delay: 0.32, wet: 0.20, feedback: 0.30, filter: 3600 },
             // A stronger, centered heavenly ambience for Spatial Sound. The
             // dry narration remains untouched; only the stereo wet return
             // widens, so the words remain clear at the centre.
-            ethereal: { delay: 0.14, wet: 0.32, filter: 5600 }
+            ethereal: { delay: 0.42, wet: 0.22, feedback: 0.34, filter: 4600 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const effectiveMode = this.spatialMode !== 'off' ? 'ethereal' : requestedMode;
         const settings = voiceEchoSettings[effectiveMode];
         const now = this.ctx.currentTime;
+        [this.voiceEchoDelay.delayTime, this.voiceEchoSend.gain, this.voiceEchoFeedback.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
+            param.cancelScheduledValues(now);
+            param.setValueAtTime(param.value, now);
+        });
         this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
         this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
+        this.voiceEchoFeedback.gain.linearRampToValueAtTime(settings.feedback, now + 0.25);
         this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
-        this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter || 2600, now + 0.25);
+        this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
     }
 
     setMusicEcho(mode = 'light') {
-        if (!this.ctx || !this.musicEchoSend || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
+        if (!this.ctx || !this.musicEchoSend || !this.musicEchoDelay || !this.musicEchoFeedback || !this.musicEchoWetGain) return;
         const settings = {
-            off: { delay: 0.06, wet: 0 },
-            // Lift the music-only room return enough to be appreciable while
-            // keeping it below the narration-space treatment and free of a
-            // distinct repeating echo.
-            light: { delay: 0.065, wet: 0.16 },
-            spacious: { delay: 0.11, wet: 0.24 }
-        }[mode] || { delay: 0.065, wet: 0.16 };
+            off: { delay: 0.16, wet: 0, feedback: 0, filter: 2800 },
+            light: { delay: 0.16, wet: 0.12, feedback: 0.18, filter: 2800 },
+            spacious: { delay: 0.28, wet: 0.18, feedback: 0.28, filter: 3400 }
+        }[mode] || { delay: 0.16, wet: 0.12, feedback: 0.18, filter: 2800 };
         const now = this.ctx.currentTime;
         this.musicEchoDelay.delayTime.cancelScheduledValues(now);
         this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
@@ -2004,9 +2005,15 @@ class AudioEngine {
         this.musicEchoSend.gain.cancelScheduledValues(now);
         this.musicEchoSend.gain.setValueAtTime(this.musicEchoSend.gain.value, now);
         this.musicEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
+        this.musicEchoFeedback.gain.cancelScheduledValues(now);
+        this.musicEchoFeedback.gain.setValueAtTime(this.musicEchoFeedback.gain.value, now);
+        this.musicEchoFeedback.gain.linearRampToValueAtTime(settings.feedback, now + 0.25);
         this.musicEchoWetGain.gain.cancelScheduledValues(now);
         this.musicEchoWetGain.gain.setValueAtTime(this.musicEchoWetGain.gain.value, now);
         this.musicEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
+        this.musicEchoFilter.frequency.cancelScheduledValues(now);
+        this.musicEchoFilter.frequency.setValueAtTime(this.musicEchoFilter.frequency.value, now);
+        this.musicEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
     }
 
     toggleEyesCloseMode(enabled) {
@@ -2524,7 +2531,7 @@ class AudioEngine {
 
     async startBackgroundMusic() {
         if (!this.bgMusicBuffer) {
-            const response = await fetch('audio/background_music.mp3');
+            const response = await fetch(BACKGROUND_MUSIC_URL, { cache: 'reload' });
             const arrayBuffer = await response.arrayBuffer();
             this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         }
