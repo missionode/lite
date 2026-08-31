@@ -347,9 +347,21 @@ const _TtsSession = class _TtsSession {
     const speakerId = 0;
     const sampleRate = __privateGet(this, _modelConfig).audio.sample_rate;
     const inference = __privateGet(this, _modelConfig).inference;
-    const noiseScale = inference.noise_scale;
-    const lengthScale = Math.max(0.75, Math.min(1.35, Number(settings.lengthScale) || inference.length_scale));
-    const noiseW = inference.noise_w;
+    const requestedNoiseScale = Number(settings.noiseScale);
+    const noiseScale = Number.isFinite(requestedNoiseScale)
+      ? Math.max(0.4, Math.min(1.1, requestedNoiseScale))
+      : inference.noise_scale;
+    // A registered voice may request a slightly longer meditation cadence,
+    // but the runtime never accepts an unbounded length scale from the UI.
+    const requestedLengthScaleMax = Number(settings.lengthScaleMax);
+    const lengthScaleMax = Number.isFinite(requestedLengthScaleMax)
+      ? Math.max(1.35, Math.min(1.5, requestedLengthScaleMax))
+      : 1.35;
+    const lengthScale = Math.max(0.75, Math.min(lengthScaleMax, Number(settings.lengthScale) || inference.length_scale));
+    const requestedNoiseW = Number(settings.noiseW);
+    const noiseW = Number.isFinite(requestedNoiseW)
+      ? Math.max(0.4, Math.min(1.1, requestedNoiseW))
+      : inference.noise_w;
     const session = __privateGet(this, _ortSession);
     const feeds = {
       input: new (__privateGet(this, _ort)).Tensor("int64", phonemeIds, [1, phonemeIds.length]),

@@ -1017,7 +1017,19 @@ function getPiperMeditationPaceMultiplier(value = state.voiceName) {
 
 function getEffectivePiperPace() {
     const selectedPace = Number(state.voicePace) || 1;
-    return Math.max(0.7, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier()));
+    return Math.max(0.6, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier()));
+}
+
+function getPiperMeditationSettings(value = state.voiceName) {
+    const definition = getPiperVoiceDefinition(value) || {};
+    return {
+        lengthScale: 1 / getEffectivePiperPace(),
+        // The normal runtime ceiling remains conservative. A model may opt in
+        // to a modestly longer meditation cadence through its registry entry.
+        lengthScaleMax: Number(definition.meditationLengthScaleMax) || 1.35,
+        noiseScale: Number(definition.meditationNoiseScale),
+        noiseW: Number(definition.meditationNoiseW)
+    };
 }
 
 function isFeminineNarrationVoice(value = state.voiceName) {
@@ -1163,7 +1175,7 @@ class PiperTTS {
             text,
             // Keep the user Pace control intact while allowing a voice model
             // to declare a calmer meditation baseline in its registry.
-            settings: { lengthScale: 1 / getEffectivePiperPace() }
+            settings: getPiperMeditationSettings()
         });
     }
 
@@ -5095,9 +5107,14 @@ function autoSelectVoice() {
 
 function applyJourneyVoiceProfile(isHighEnergy) {
     const shringaraVoice = !isHighEnergy && isFeminineNarrationVoice();
+    const englishFemininePiper = shringaraVoice && getPiperVoiceDefinition()?.language === 'en';
     const profile = isHighEnergy
         ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
-        : shringaraVoice
+        : englishFemininePiper
+            // Lessac benefits from a softer upper-mid balance and a slower
+            // cadence. The model registry supplies its synthesis smoothing.
+            ? { clarity: 22, warmth: 88, pace: 0.90, echo: 'light' }
+            : shringaraVoice
             ? { clarity: 28, warmth: 82, pace: 0.92, echo: 'light' }
             : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
 
