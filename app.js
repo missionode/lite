@@ -444,7 +444,7 @@ function hasScriptPath(source, path) {
     return getScriptPath(source, path) != null;
 }
 
-function hasLocalizedScriptPath(scripts, path) {
+function hasLocalizedScriptPath(scripts, path, fallbackLanguage = null) {
     if (hasScriptPath(scripts, path)) return true;
     const parts = path.split('.');
     const final = parts.pop() || '';
@@ -458,11 +458,25 @@ function hasLocalizedScriptPath(scripts, path) {
     if (/^[a-zA-Z-]+$/.test(final) && hasScriptPath(scripts, `${parentPath}.meditation_${final}`)) return true;
 
     const suffixMatch = final.match(/^(.+)_([a-zA-Z-]+)$/);
-    if (!suffixMatch) return false;
+    if (!suffixMatch) {
+        // Section-level language fields (for example closing.ru) are used by
+        // legacy custom bundles as well as newer localized content.
+        return Boolean(
+            fallbackLanguage && final !== fallbackLanguage &&
+            hasLocalizedScriptPath(scripts, parts.concat(fallbackLanguage).join('.'))
+        );
+    }
     const basePath = parts.concat(suffixMatch[1]).join('.');
     if (hasScriptPath(scripts, `${basePath}.${suffixMatch[2]}`)) return true;
-    return ['text', 'content', 'value'].some(field =>
+    if (['text', 'content', 'value'].some(field =>
         hasScriptPath(scripts, `${parentPath}.${field}.${suffixMatch[2]}`)
+    )) return true;
+    // Existing guide-authored uploads commonly contain English/Malayalam only.
+    // Runtime localization already falls back to English, so accepting that
+    // fallback keeps those bundles usable after a new app language is added.
+    return Boolean(
+        fallbackLanguage && suffixMatch[2] !== fallbackLanguage &&
+        hasLocalizedScriptPath(scripts, `${basePath}_${fallbackLanguage}`)
     );
 }
 
@@ -494,7 +508,8 @@ function validateScriptBundle(scripts, options = {}) {
     if (options.massage) required.push(...languageIds.flatMap(language => [`massage.title.${language}`, `massage.intro.${language}`, `massage.instructions.${language}`, `massage.reminder.${language}`]));
     if (options.yoga) required.push(...languageIds.flatMap(language => [`yoga.intro.${language}`, `yoga.preparation.${language}`, `yoga.next_pose_prompt.${language}`, `yoga.session_complete.${language}`]), 'yoga.poses');
     if (options.hooponopono) required.push(...languageIds.flatMap(language => [`hooponopono.intro.${language}`, `hooponopono.phrases.${language}`, `hooponopono.closing.${language}`]));
-    const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path));
+    const fallbackLanguage = options.allowLanguageFallback ? 'en' : null;
+    const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path, fallbackLanguage));
     const frequencyKeys = options.highEnergy ? [...chakraKeys, 'high_energy'] : chakraKeys;
     const invalidFrequencies = frequencyKeys
         .filter(key => hasScriptPath(scripts, `${key}.frequency`))
@@ -975,7 +990,8 @@ async function loadLanguageManifest() {
         console.warn('Language manifest unavailable; using built-in language options.', error);
         languageRegistry = [
             { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
-            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' }
+            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' },
+            { id: 'ru', locale: 'ru-RU', label: 'Русский', browserPrefixes: ['ru'], defaultPiperVoice: 'ru_RU-irina-medium' }
         ];
     }
 }
@@ -3471,6 +3487,7 @@ class MeditationController {
 
             const focusedExperience = this.getFocusedExperience();
             const scriptCheck = validateScriptBundle(this.scripts, {
+                allowLanguageFallback: state.scriptSource === 'custom',
                 highEnergy: getChecked('high-energy-toggle'),
                 corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
                 bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
@@ -5961,6 +5978,7 @@ function attachEventListeners() {
                 try {
                     const json = JSON.parse(event.target.result);
                     const check = validateScriptBundle(json, {
+                        allowLanguageFallback: true,
                         highEnergy: getChecked('high-energy-toggle'),
                         corpse: getChecked('corpse-pose-toggle'),
                         bath: false,
@@ -6009,6 +6027,7 @@ function attachEventListeners() {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const json = await response.json();
                 const check = validateScriptBundle(json, {
+                    allowLanguageFallback: true,
                     highEnergy: getChecked('high-energy-toggle'),
                     corpse: getChecked('corpse-pose-toggle'),
                     bath: false,

@@ -22,6 +22,16 @@
       "browserPrefixes": ["en"],
       "defaultPiperVoice": "en_US-lessac-medium",
       "preview": "Breathe gently. You are safe in this moment."
+    },
+    {
+      "id": "ru",
+      "locale": "ru-RU",
+      "label": "Русский",
+      "contentSource": "scripts.json",
+      "localeSource": "locales/ru.json",
+      "browserPrefixes": ["ru"],
+      "defaultPiperVoice": "ru_RU-irina-medium",
+      "preview": "Дышите мягко. В этот момент вы в безопасности."
     }
   ]
 }

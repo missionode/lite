@@ -49,6 +49,21 @@
       "meditationLengthScaleMax": 1.5,
       "license": "See the voice MODEL_CARD before redistribution",
       "source": "https://huggingface.co/rhasspy/piper-voices"
+    },
+    {
+      "id": "ru_RU-irina-medium",
+      "language": "ru",
+      "locale": "ru-RU",
+      "label": "Piper Russian — Irina (Medium)",
+      "gender": "female",
+      "modelPath": "ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx",
+      "configPath": "ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx.json",
+      "phonemizerVoice": "ru",
+      "modelSize": 63201294,
+      "modelLfsOid": "72ce7bc6abc97d9fb9def817474f172baa45d9985320f4ba4f8cfb58cb7718c9",
+      "quality": "medium",
+      "license": "See the voice MODEL_CARD before redistribution",
+      "source": "https://huggingface.co/rhasspy/piper-voices"
     }
   ]
 }
