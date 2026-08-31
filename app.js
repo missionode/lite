@@ -975,7 +975,8 @@ async function loadLanguageManifest() {
         console.warn('Language manifest unavailable; using built-in language options.', error);
         languageRegistry = [
             { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
-            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' }
+            { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' },
+            { id: 'ru', locale: 'ru-RU', label: 'Русский', browserPrefixes: ['ru'], defaultPiperVoice: 'ru_RU-irina-medium' }
         ];
     }
 }
