@@ -218,4 +218,25 @@ assert.equal(
     'an invalid custom frequency should be rejected before Web Audio initialization',
 );
 
+const preRussianCustomScript = structuredClone(scripts);
+function removeRussianFields(value) {
+    if (Array.isArray(value)) return value.forEach(removeRussianFields);
+    if (!value || typeof value !== 'object') return;
+    Object.keys(value).forEach((key) => {
+        if (key === 'ru' || key.endsWith('_ru')) delete value[key];
+        else removeRussianFields(value[key]);
+    });
+}
+removeRussianFields(preRussianCustomScript);
+assert.equal(
+    validation.validateScriptBundle(preRussianCustomScript, { languages: ['ml', 'en', 'ru'] }).valid,
+    false,
+    'production validation should continue to require Russian content when Russian is requested',
+);
+assert.equal(
+    validation.validateScriptBundle(preRussianCustomScript, { languages: ['ml', 'en', 'ru'], allowLanguageFallback: true }).valid,
+    true,
+    'legacy custom scripts should use their English narration fallback for Russian',
+);
+
 console.log('Drone duration contract passed with exact JSON pitches, four modes, pause-safe timing, and one main oscillator.');
