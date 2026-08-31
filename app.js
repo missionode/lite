@@ -1015,20 +1015,24 @@ function getPiperMeditationPaceMultiplier(value = state.voiceName) {
     return Number.isFinite(multiplier) && multiplier > 0 && multiplier <= 1.15 ? multiplier : 1;
 }
 
-function getEffectivePiperPace() {
+function getEffectivePiperPace(value = state.voiceName) {
     const selectedPace = Number(state.voicePace) || 1;
-    return Math.max(0.6, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier()));
+    const requestedMinimum = Number(getPiperVoiceDefinition(value)?.meditationPaceMin);
+    // Standard voices retain the existing 0.70 floor. Only an explicitly
+    // registered meditation voice may opt into the lower calm-cadence floor.
+    const minimum = Number.isFinite(requestedMinimum)
+        ? Math.max(0.6, Math.min(0.7, requestedMinimum))
+        : 0.7;
+    return Math.max(minimum, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier(value)));
 }
 
 function getPiperMeditationSettings(value = state.voiceName) {
     const definition = getPiperVoiceDefinition(value) || {};
     return {
-        lengthScale: 1 / getEffectivePiperPace(),
+        lengthScale: 1 / getEffectivePiperPace(value),
         // The normal runtime ceiling remains conservative. A model may opt in
         // to a modestly longer meditation cadence through its registry entry.
-        lengthScaleMax: Number(definition.meditationLengthScaleMax) || 1.35,
-        noiseScale: Number(definition.meditationNoiseScale),
-        noiseW: Number(definition.meditationNoiseW)
+        lengthScaleMax: Number(definition.meditationLengthScaleMax) || 1.35
     };
 }
 
@@ -5107,14 +5111,9 @@ function autoSelectVoice() {
 
 function applyJourneyVoiceProfile(isHighEnergy) {
     const shringaraVoice = !isHighEnergy && isFeminineNarrationVoice();
-    const englishFemininePiper = shringaraVoice && getPiperVoiceDefinition()?.language === 'en';
     const profile = isHighEnergy
         ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
-        : englishFemininePiper
-            // Lessac benefits from a softer upper-mid balance and a slower
-            // cadence. The model registry supplies its synthesis smoothing.
-            ? { clarity: 22, warmth: 88, pace: 0.90, echo: 'light' }
-            : shringaraVoice
+        : shringaraVoice
             ? { clarity: 28, warmth: 82, pace: 0.92, echo: 'light' }
             : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
 

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'chakra-v5.81';
-const PIPER_CACHE_NAME = 'chakra-piper-v6';
+const CACHE_NAME = 'chakra-v5.82';
+const PIPER_CACHE_NAME = 'chakra-piper-v7';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v17';
 const ASSETS = [
   './',

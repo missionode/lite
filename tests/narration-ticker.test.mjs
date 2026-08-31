@@ -12,9 +12,8 @@ const englishPiperVoices = piperModels.voices.filter(voice => voice.language ===
 assert.equal(englishPiperVoices.length, 1, 'the registry should currently expose one English Piper voice');
 assert.equal(englishPiperVoices[0]?.id, 'en_US-lessac-medium', 'Lessac should remain the bundled English Piper voice');
 assert.equal(englishPiperVoices[0]?.meditationPaceMultiplier, 0.74, 'English Lessac should match the calmer Malayalam meditation reading baseline');
+assert.equal(englishPiperVoices[0]?.meditationPaceMin, 0.6, 'English Lessac alone may use the lower meditation pace floor');
 assert.equal(englishPiperVoices[0]?.meditationLengthScaleMax, 1.5, 'English Lessac may use a bounded extended meditation cadence');
-assert.equal(englishPiperVoices[0]?.meditationNoiseScale, 0.6, 'English Lessac should use a restrained smoothing noise scale');
-assert.equal(englishPiperVoices[0]?.meditationNoiseW, 0.7, 'English Lessac should use a restrained phoneme-width variation');
 
 const symbolPosition = html.indexOf('id="chakra-symbol"');
 const tickerPosition = html.indexOf('id="narration-scroll-container"');
@@ -35,13 +34,12 @@ assert.match(app, /const startOffset = container\.clientWidth \* 0\.68[\s\S]*?--
 assert.match(app, /const endOffset = container\.clientWidth \* 0\.5[\s\S]*?--narration-end/, 'The final spoken word should finish at the center reading point');
 assert.match(app, /const estimateNarrationDurationSeconds = \(txt, pacing = 'normal'\)/, 'Narration should provide a conservative voice-duration estimate');
 assert.match(app, /function getPiperMeditationPaceMultiplier\(value = state\.voiceName\)/, 'Piper voices should be able to declare a meditative pace baseline');
-assert.match(app, /function getEffectivePiperPace\(\)[\s\S]*?selectedPace \* getPiperMeditationPaceMultiplier\(\)/, 'the user pace control should combine with the selected Piper meditation baseline');
-assert.match(app, /function getPiperMeditationSettings\(value = state\.voiceName\)[\s\S]*?lengthScale: 1 \/ getEffectivePiperPace\(\)[\s\S]*?lengthScaleMax: Number\(definition\.meditationLengthScaleMax\)/, 'Piper voices should declare a bounded meditation cadence in their registry');
+assert.match(app, /function getEffectivePiperPace\(value = state\.voiceName\)[\s\S]*?selectedPace \* getPiperMeditationPaceMultiplier\(value\)/, 'the user pace control should combine with the selected Piper meditation baseline');
+assert.match(app, /function getPiperMeditationSettings\(value = state\.voiceName\)[\s\S]*?lengthScale: 1 \/ getEffectivePiperPace\(value\)[\s\S]*?lengthScaleMax: Number\(definition\.meditationLengthScaleMax\)/, 'Piper voices should declare a bounded meditation cadence in their registry');
 assert.match(app, /settings: getPiperMeditationSettings\(\)/, 'Piper synthesis should apply the selected meditation voice settings');
-assert.match(app, /englishFemininePiper[\s\S]*?clarity: 22, warmth: 88, pace: 0\.90, echo: 'light'/, 'English feminine Piper should receive its softer meditation profile');
-assert.match(app, /return Math\.max\(0\.6, Math\.min\(1\.15, selectedPace \* getPiperMeditationPaceMultiplier\(\)\)\)/, 'The app should permit the registered slower English meditation cadence');
-assert.match(app, /noiseScale: Number\(definition\.meditationNoiseScale\)[\s\S]*?noiseW: Number\(definition\.meditationNoiseW\)/, 'registry smoothing controls should reach the Piper runtime');
-assert.match(fs.readFileSync(new URL('../piper/runtime/piper-tts-web.js', import.meta.url), 'utf8'), /const lengthScaleMax = Number\.isFinite\(requestedLengthScaleMax\)[\s\S]*?Math\.min\(1\.5, requestedLengthScaleMax\)[\s\S]*?const noiseW = Number\.isFinite\(requestedNoiseW\)/, 'The Piper runtime should bound model-specific meditation cadence and smoothing values');
+assert.match(app, /const requestedMinimum = Number\(getPiperVoiceDefinition\(value\)\?\.meditationPaceMin\)[\s\S]*?const minimum = Number\.isFinite\(requestedMinimum\)[\s\S]*?: 0\.7;/, 'Only a registered voice may opt into the lower meditation pace floor');
+assert.doesNotMatch(app, /meditationNoiseScale|meditationNoiseW|englishFemininePiper/, 'English refinement should not alter synthesis texture or the shared feminine voice profile');
+assert.match(fs.readFileSync(new URL('../piper/runtime/piper-tts-web.js', import.meta.url), 'utf8'), /const lengthScaleMax = Number\.isFinite\(requestedLengthScaleMax\)[\s\S]*?Math\.min\(1\.5, requestedLengthScaleMax\)[\s\S]*?const noiseW = inference\.noise_w/, 'The Piper runtime should bound only the registered meditation cadence');
 assert.match(app, /const speechDuration = Number\(container\.dataset\.narrationDurationHint\)[\s\S]*?Number\.isFinite\(speechDuration\)[\s\S]*?Math\.max\(1, speechDuration\)/, 'Ticker duration should follow narration timing rather than device width');
 assert.doesNotMatch(app, /const isMobile = container\.clientWidth <= 600|const pixelsPerSecond = isMobile \? 42 : 34|speechDuration \* 1\.15/, 'Ticker speed must not vary by device width or mobile-specific pixel rates');
 assert.match(app, /schedule\(\(\) => document\.querySelectorAll\('\[data-narration-text\]'\)\.forEach\(refreshNarrationTicker\)\)/, 'Screen changes should remeasure the active ticker');
