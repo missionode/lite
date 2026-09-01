@@ -19,6 +19,13 @@
 
 ## NOW
 
+### Active snapshot — 2026-09-01 (facilitator fixture restoration)
+
+- `docs/dot.json` has been restored by the owner and is again a tracked, facilitator-maintained English/Malayalam script fixture. It contains all English/Malayalam localized string fields required by the current production schema; no facilitator narration was rewritten or supplemented because no such gaps existed.
+- A top-level `_note` is intentional JSON metadata, not a runnable narration field: preserve existing facilitator wording exactly; add only genuinely missing English/Malayalam siblings; do not add partial new-language content to this fixture. Full new-language support belongs to the atomic production-language workflow.
+- `tests/content-safety.test.mjs` now separates structural schema validation from localization validation. It requires the short test fixture and facilitator fixture to retain complete English/Malayalam content, while allowing their intentionally absent Russian/Hindi siblings to use the established custom-script English fallback. This corrects the stale assertion surfaced only after `docs/dot.json` returned.
+- Validation: PASS — JSON parsing, `test:content-safety`, `test:drone-duration`, and `git diff --check`. Preserve unrelated `.DS_Store` changes, `.codex/`, and the untracked backup audio.
+
 ### Active snapshot — 2026-09-01 (Asia/Kolkata)
 
 - Active feature branch: `hypnosis-integration-journey`, created from production base `b3a68b2` (`[CP-I18N-044] Confirm Hindi production push`). Do not merge or push this branch until the owner explicitly approves the completed feature.
