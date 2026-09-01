@@ -12,7 +12,7 @@ This document contains only the remaining work from the multilingual architectur
 
 ## Language integration register
 
-### Hindi (`hi` / `hi-IN`) — static release contract complete; manual review deferred
+### Hindi (`hi` / `hi-IN`) — merged to local production; manual review deferred
 
 - Product decision: Hindi is a complete meditation-content and display-language integration and is approved to ship now with **browser TTS only**. Hindi implementation is not blocked by Piper licensing. Do not add a Hindi Piper model unless the owner separately approves a voice whose redistribution and commercial-use terms are compatible with Lite; that is a later, independent enhancement.
 - Commercial boundary: when Hindi is the selected **Meditation Language**, do not reveal or schedule Lite's `Continue to Earn` handoff. This is a product boundary; it does not itself change a third-party voice licence.
@@ -21,7 +21,7 @@ This document contains only the remaining work from the multilingual architectur
 - Implemented paths: `language-manifest.json`, `locales/hi.json`, all English production narration siblings in `scripts.json`, the manifest fallback registry, Hindi Earn-timer suppression, app/language cache versions, and `tests/hindi-language.test.mjs`. `piper-models.json` and independent facilitator content in `docs/dot.json` remain untouched by this feature.
 - Static/unit contract: exact locale shape and placeholder parity, narration sibling parity, canonical mantra and sleep-stage preservation, Hindi safety wording, browser-prefix voice filtering, absence of Hindi Piper/default Piper configuration, strict shipped-content validation, legacy custom-script English fallback, Earn timer suppression, and cache/app rotation.
 - Completed static release evidence: generated-intention switching through the existing registry-wide contract; strict shipped-content validation; legacy custom-script English fallback; Hindi Earn suppression; and cache/app rotation. `tests/hindi-language.test.mjs` guards these contracts.
-- Deferred manual evidence: native Hindi review, target-device browser-voice filtering and preview fallback, real-device full-journey listening, and installed-PWA/offline cache verification. The owner has authorized the production merge/push with these manual quality gates recorded as deferred rather than completed.
+- Deferred manual evidence: native Hindi review, target-device browser-voice filtering and preview fallback, real-device full-journey listening, and installed-PWA/offline cache verification. The owner has authorized the production merge/push with these manual quality gates recorded as deferred rather than completed. Local production merge: `8e1dead`; remote push is pending at this documentation checkpoint.
 
 ### Content and narration
 
