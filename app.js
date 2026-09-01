@@ -3332,6 +3332,17 @@ class MeditationController {
         return this.isHypnosisJourney && this.isMeditationActive;
     }
 
+    getJourneySystemNarration(key) {
+        // Facilitator custom scripts may optionally provide their own Arrival
+        // and Emergence wording. Built-in scripts and incomplete custom bundles
+        // keep the app-localized copy, so this is an override, never a second
+        // narration block.
+        const customText = state.scriptSource === 'custom'
+            ? localized(this.scripts?.system, key)
+            : undefined;
+        return customText || contentT(`system.${key}`);
+    }
+
     async runGuidedTransitionTone(frequency, durationMs, { beforeGap = 0, afterGap = 0 } = {}) {
         if (!this.isMeditationActive) return;
         if (beforeGap > 0) await this.pauseAwareSleep(beforeGap * 1000);
@@ -3357,7 +3368,7 @@ class MeditationController {
 
     async runArrivalInduction() {
         if (!this.shouldRunHypnosisWrapper()) return;
-        const text = contentT('system.arrivalInduction');
+        const text = this.getJourneySystemNarration('arrivalInduction');
         if (text) await this.narrate(text, false);
         if (!this.isMeditationActive) return;
         const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
@@ -3370,7 +3381,7 @@ class MeditationController {
 
     async runArrivalReadiness() {
         if (!this.shouldRunHypnosisWrapper()) return;
-        const text = contentT('system.arrivalReadiness');
+        const text = this.getJourneySystemNarration('arrivalReadiness');
         if (text) await this.narrate(text, false);
         if (!this.isMeditationActive) return;
         const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
@@ -3389,7 +3400,7 @@ class MeditationController {
         if (!state.noFrequencyMode) this.audio.playSingingBowl();
         await this.pauseAwareSleep(timing('transitions', 'emergenceBellSettle') * 1000);
         if (!this.isMeditationActive) return;
-        const text = contentT('system.emergence');
+        const text = this.getJourneySystemNarration('emergence');
         if (text) await this.narrate(text, false);
         if (!this.isMeditationActive) return;
         await this.pauseAwareSleep(state.timeEmergence * 1000);

@@ -7,6 +7,7 @@ const timing = JSON.parse(fs.readFileSync(new URL('../timing-config.json', impor
 const locales = ['en', 'ml', 'ru', 'hi'].map((language) => JSON.parse(
     fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8')
 ));
+const facilitator = JSON.parse(fs.readFileSync(new URL('../docs/dot.json', import.meta.url), 'utf8'));
 
 assert.deepEqual(timing.journey.emergence, {
     default: 60, min: 30, max: 300, step: 5, unit: 'seconds'
@@ -15,8 +16,9 @@ assert.equal(timing.journey.icebreaker.max, 300, 'Arriving should allow up to fi
 assert.match(html, /id="time-emergence"[^>]*min="30"[^>]*max="300"[^>]*value="60"/, 'Journey Timings should expose Emergence.');
 assert.match(html, /id="vol-bell"[^>]*min="0\.02"[^>]*max="0\.12"[^>]*value="0\.04"/, 'The transition bell should be deliberately feeble but never muted.');
 
-assert.match(app, /async runArrivalInduction\(\)[\s\S]*?contentT\('system\.arrivalInduction'\)[\s\S]*?this\.narrate\(text, false\)[\s\S]*?runGuidedTransitionTone\(432/, 'Arrival induction narration should lead into the calming 432 Hz cue.');
-assert.match(app, /async runArrivalReadiness\(\)[\s\S]*?contentT\('system\.arrivalReadiness'\)[\s\S]*?this\.narrate\(text, false\)[\s\S]*?runGuidedTransitionTone\(528/, 'Arrival readiness narration should lead into the 528 Hz cue before the chakra path.');
+assert.match(app, /getJourneySystemNarration\(key\)[\s\S]*?state\.scriptSource === 'custom'[\s\S]*?localized\(this\.scripts\?\.system, key\)[\s\S]*?contentT\(`system\.\$\{key\}`\)/, 'Custom scripts should optionally override Arrival/Emergence narration while built-in copy remains the fallback.');
+assert.match(app, /async runArrivalInduction\(\)[\s\S]*?getJourneySystemNarration\('arrivalInduction'\)[\s\S]*?this\.narrate\(text, false\)[\s\S]*?runGuidedTransitionTone\(432/, 'Arrival induction narration should lead into the calming 432 Hz cue.');
+assert.match(app, /async runArrivalReadiness\(\)[\s\S]*?getJourneySystemNarration\('arrivalReadiness'\)[\s\S]*?this\.narrate\(text, false\)[\s\S]*?runGuidedTransitionTone\(528/, 'Arrival readiness narration should lead into the 528 Hz cue before the chakra path.');
 assert.match(app, /const halfDuration = Math\.max\(1000, Math\.round\(totalDuration \/ 2\)\)/, 'The two Arrival cues must share one Drone Duration exposure budget.');
 assert.match(app, /async runGuidedTransitionTone[\s\S]*?fadeInBackgroundMusic\(1\.2, 0\.08\)[\s\S]*?stopGuidedTransitionTone\(1\.1\)[\s\S]*?fadeInBackgroundMusic\(2\.4, true\)/, 'Each Arrival cue should duck and restore music with explicit fades.');
 assert.match(app, /if \(state\.noFrequencyMode\) \{[\s\S]*?if \(afterGap > 0\) await this\.pauseAwareSleep/, 'No Frequency Mode should retain quiet pacing while omitting generated cues.');
@@ -31,12 +33,17 @@ const runSequence = app.slice(runSequenceStart, runSequenceEnd);
 assert.match(runSequence, /for \(let i = 0; i < this\.chakraOrder\.length; i\+\+\)[\s\S]*?await this\.meditateOnChakra\(this\.scripts\[key\], key\)/, 'The original chakra loop must remain the core journey.');
 assert.match(runSequence, /await this\.runClosing\(\);[\s\S]*?await this\.runEmergence\(\);[\s\S]*?this\.finish\(\)/, 'Emergence must wrap the existing closing rather than replace the chakra journey.');
 assert.match(app, /isHypnosisJourney = !this\.isHighEnergy && !isDemoScriptSelected\(\)/, 'Only normal non-demo chakra journeys should enable the wrapper.');
-assert.match(app, /async runEmergence\(\)[\s\S]*?playSingingBowl\(\)[\s\S]*?contentT\('system\.emergence'\)[\s\S]*?state\.timeEmergence/, 'Emergence should progress from a feeble bell to narration and a configurable quiet return.');
+assert.match(app, /async runEmergence\(\)[\s\S]*?playSingingBowl\(\)[\s\S]*?getJourneySystemNarration\('emergence'\)[\s\S]*?state\.timeEmergence/, 'Emergence should progress from a feeble bell to custom-or-built-in narration and a configurable quiet return.');
 assert.doesNotMatch(app.slice(app.indexOf('    finish() {'), app.indexOf('    stop() {')), /playSingingBowl\(\)/, 'Completion must not add a second abrupt bell after Emergence.');
 assert.equal(timing.estimate.hypnosisNarrationSeconds, 40, 'The estimate should include the two Arrival narration blocks.');
 for (const locale of locales) {
     assert.ok(locale.system.arrivalInduction?.trim(), 'Every supported language needs Arrival induction guidance.');
     assert.ok(locale.system.arrivalReadiness?.trim(), 'Every supported language needs Arrival readiness guidance.');
+}
+for (const key of ['arrivalInduction', 'arrivalReadiness', 'emergence']) {
+    for (const language of ['en', 'ml']) {
+        assert.ok(facilitator.system?.[`${key}_${language}`]?.trim(), `Facilitator script needs ${key}_${language}.`);
+    }
 }
 
 console.log('Hypnosis journey contract passed: Arrival/Emergence wrap, rather than replace, the chakra journey.');

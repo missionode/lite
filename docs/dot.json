@@ -16,6 +16,14 @@
       "waning_ml": "ഇന്ന് ചന്ദ്രൻ മായുകയാണ് .  വിശ്രമിക്കാനുള്ള ക്ഷണമാണ്. ഈ അപ്രത്യക്ഷം  പ്രത്യക്ഷത്തിനു  ഇടം ഒരുക്കുന്നു."
     }
   },
+  "system": {
+    "arrivalInduction_en": "Feel the support beneath you. There is nothing to achieve or force. With each natural breath, you may become more settled and more relaxed, while remaining comfortably aware of the room and free to adjust at any time.",
+    "arrivalInduction_ml": "നിങ്ങളെ താങ്ങുന്ന പ്രതലം അനുഭവിക്കൂ. നേടാനോ നിർബന്ധിക്കാനോ ഒന്നുമില്ല. ഓരോ സ്വാഭാവിക ശ്വാസത്തോടെയും നിങ്ങൾ കൂടുതൽ ശാന്തരായും കൂടുതൽ വിശ്രമിച്ചും അനുഭവപ്പെടാം; അതേസമയം മുറിയെക്കുറിച്ച് സൗകര്യപ്രദമായി ബോധവാന്മാരായിരിക്കുകയും ഏത് സമയത്തും മാറ്റം വരുത്താൻ സ്വതന്ത്രരായിരിക്കുകയും ചെയ്യാം.",
+    "arrivalReadiness_en": "Let your intention rest quietly within you. Keep only what feels supportive. With each breath, allow your attention to become a little steadier and a little deeper, in the way that feels right for you.",
+    "arrivalReadiness_ml": "നിങ്ങളുടെ ഉദ്ദേശ്യം ശാന്തമായി ഉള്ളിൽ വിശ്രമിക്കട്ടെ. പിന്തുണ നൽകുന്നതായി തോന്നുന്നതു മാത്രം സൂക്ഷിക്കൂ. ഓരോ ശ്വാസത്തോടെയും, നിങ്ങൾക്കു ശരിയെന്നു തോന്നുന്ന രീതിയിൽ, ശ്രദ്ധ അല്പം കൂടി സ്ഥിരവും അല്പം കൂടി ആഴമുള്ളതുമായി മാറട്ടെ.",
+    "emergence_en": "Take your time returning to the room. Notice the support beneath you, gently move your fingers and toes, and let your eyes open when you feel ready. Carry only what feels useful from this practice into the rest of your day.",
+    "emergence_ml": "മുറിയിലേക്കുള്ള തിരിച്ചുവരവിന് സമയം എടുക്കൂ. നിങ്ങളെ താങ്ങുന്ന പ്രതലം ശ്രദ്ധിക്കൂ, വിരലുകളും കാൽവിരലുകളും സാവധാനം ചലിപ്പിക്കൂ, തയ്യാറാകുമ്പോൾ കണ്ണുകൾ തുറക്കൂ. ഈ അഭ്യാസത്തിൽ നിന്നു ഉപകാരപ്രദമായി തോന്നുന്നതു മാത്രം ദിവസത്തിന്റെ ബാക്കിയിലേക്കു കൂടെ കൊണ്ടുപോകൂ."
+  },
   "root": {
     "name": "Root Chakra (Muladhara)",
     "mantra": "LAM",
