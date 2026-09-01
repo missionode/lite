@@ -217,7 +217,7 @@ assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn 
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
 assert.match(html, /app\.js\?v=2\.16/, 'The application query version must be rotated for the current language delivery.');
-assert.match(serviceWorker, /chakra-v5\.88/, 'The shell cache must be rotated for the current language delivery.');
+assert.match(serviceWorker, /chakra-v5\.89/, 'The shell cache must be rotated for the current language delivery.');
 assert.match(serviceWorker, /chakra-language-v21/, 'The language cache must be rotated for the current language delivery.');
 
 console.log('Hindi language contract passed.');

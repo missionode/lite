@@ -76,6 +76,14 @@ for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye',
   }
 }
 
+for (const language of ['en', 'ml', 'ru', 'hi']) {
+  assert.ok(scripts.heart[`meditation_${language}`]?.trim(), `Heart meditation must remain available in ${language}`);
+}
+assert.match(scripts.heart.meditation_en, /Keep the learning, release the burden, and allow compassion to guide your next step\./,
+  'Heart narration should frame release as learning, compassion, and a next step rather than karma cleansing.');
+assert.doesNotMatch(scripts.heart.meditation_en, /karma/i,
+  'Heart narration should not introduce karma terminology into the production journey.');
+
 for (const bundle of [scripts, facilitatorScripts, testScripts]) {
   for (const language of ['en', 'ml']) {
     assert.ok(bundle.closing[language], `closing.${language} is the canonical closing narration`);
