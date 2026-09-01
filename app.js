@@ -42,13 +42,18 @@ const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 // PWA's cache while keeping the filename simple for local contributors.
 const BACKGROUND_MUSIC_ASSET_VERSION = '20260831.1';
 const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_ASSET_VERSION}`;
-const MANTRA_MUSIC_FADE_SECONDS = 4;
+// A mantra begins only after this extended music fade completes. The fading
+// bed is the calm interval between narration and chant; do not replace it
+// with an abrupt mute or a separate dead-silence delay.
+const MANTRA_MUSIC_FADE_SECONDS = 6;
 const MANTRA_FADE_SECONDS = 4;
 const MANTRA_REVERB_TAIL_SECONDS = 3.6;
 const MANTRA_REVERB_TAIL_DECAY = 1.8;
 const MANTRA_REVERB_TAIL_WET = 0.26;
 const PIPER_CLIP_FADE_SECONDS = 0.05;
-const NARRATION_MANTRA_FADE_SECONDS = 2;
+// The final narration sentence receives a longer tail before every mantra.
+// This keeps Crown/AUM and all other chakra handoffs unhurried and seamless.
+const NARRATION_MANTRA_FADE_SECONDS = 3;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
