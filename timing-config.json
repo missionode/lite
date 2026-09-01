@@ -5,7 +5,8 @@
     "timeHighEnergy": { "default": 5, "min": 1, "max": 30, "step": 1, "unit": "minutes" },
     "sleepStageDuration": { "default": 5, "min": 1, "max": 10, "step": 0.5, "unit": "minutes" },
     "shotDuration": { "default": 7, "singleFrequencyDefault": 1, "min": 1, "max": 20, "step": 1, "unit": "seconds" },
-    "icebreaker": { "default": 60, "min": 10, "max": 120, "step": 5, "unit": "seconds" },
+    "icebreaker": { "default": 60, "min": 10, "max": 300, "step": 5, "unit": "seconds" },
+    "emergence": { "default": 60, "min": 30, "max": 300, "step": 5, "unit": "seconds" },
     "breathingStep": { "default": 8, "min": 4, "max": 16, "step": 1, "unit": "seconds" },
     "corpsePose": { "default": 300, "min": 60, "max": 600, "step": 30, "unit": "seconds" },
     "interval": { "default": 10, "min": 10, "max": 20, "step": 1, "unit": "seconds" },
@@ -36,11 +37,17 @@
     "hooponoponoIntroPause": 2,
     "hooponoponoPhrasePause": 2,
     "hooponoponoFinalRest": 15,
-    "finalSilence": 60
+    "finalSilence": 60,
+    "arrivalToneLeadGap": 2,
+    "arrivalToneExitGap": 3,
+    "arrivalReadinessGap": 3,
+    "emergenceBellSettle": 3,
+    "emergenceFinalQuiet": 3
   },
   "narration": {
     "piperLeadIn": 1.2,
     "sentenceGap": 1.5,
+    "exitGap": 2,
     "hrimLeadIn": 0.4,
     "hrimSentenceGap": 0.5,
     "fadeOutPause": 2.5,
@@ -54,7 +61,9 @@
     "chakraStageOverhead": 2,
     "boxBreathingOverhead": 4,
     "hooponoponoOverhead": 3,
-    "yogaPoseTransitionEstimate": 15
+    "yogaPoseTransitionEstimate": 15,
+    "hypnosisTransitionToneSeconds": 20,
+    "hypnosisNarrationSeconds": 40
   },
   "profiles": {
     "fast-test": {
@@ -64,6 +73,7 @@
         "sleepStageDuration": { "default": 0.1, "min": 0.1, "max": 1, "step": 0.1, "unit": "minutes" },
         "shotDuration": { "default": 3, "singleFrequencyDefault": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
         "icebreaker": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
+        "emergence": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
         "breathingStep": { "default": 1, "min": 1, "max": 2, "step": 1, "unit": "seconds" },
         "corpsePose": { "default": 1, "min": 1, "max": 5, "step": 1, "unit": "seconds" },
         "interval": { "default": 2, "min": 2, "max": 3, "step": 1, "unit": "seconds" },
@@ -94,11 +104,17 @@
         "hooponoponoIntroPause": 0,
         "hooponoponoPhrasePause": 0,
         "hooponoponoFinalRest": 0,
-        "finalSilence": 1
+        "finalSilence": 1,
+        "arrivalToneLeadGap": 0,
+        "arrivalToneExitGap": 0,
+        "arrivalReadinessGap": 0,
+        "emergenceBellSettle": 0,
+        "emergenceFinalQuiet": 0
       },
       "narration": {
         "piperLeadIn": 0,
         "sentenceGap": 0,
+        "exitGap": 0,
         "hrimLeadIn": 0,
         "hrimSentenceGap": 0,
         "fadeOutPause": 0,
@@ -112,7 +128,9 @@
         "chakraStageOverhead": 0,
         "boxBreathingOverhead": 0,
         "hooponoponoOverhead": 0,
-        "yogaPoseTransitionEstimate": 0
+        "yogaPoseTransitionEstimate": 0,
+        "hypnosisTransitionToneSeconds": 0,
+        "hypnosisNarrationSeconds": 0
       }
     }
   }

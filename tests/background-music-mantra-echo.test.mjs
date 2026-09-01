@@ -55,7 +55,7 @@ assert.match(app, /if \(section\) section\.hidden = false/, 'the ambience sectio
 assert.match(app, /if \(urlControl\) urlControl\.hidden = !state\.moodRelaxationIntentionEnabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
 assert.match(app, /t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable source message');
 assert.doesNotMatch(app, /pleasureAudioAvailable = false;\s*state\.moodRelaxationIntentionEnabled = false;/, 'a missing optional asset must not clear the selected ambience state');
-for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.2'], ['vol-mantra', '0\.1'], ['vol-music', '0\.02']]) {
+for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.02'], ['vol-mantra', '0\.1'], ['vol-music', '0\.02']]) {
     assert.match(html, new RegExp(`id="${id}"[^>]*min="${min}"`), `${id} should skip the first non-zero step`);
 }
 assert.match(css, /\.settings-help-content\s*\{[\s\S]*?max-height:\s*calc\(100vh - 2rem\);[\s\S]*?overflow:\s*hidden;/, 'the Help modal should remain within the viewport');
@@ -180,10 +180,10 @@ const backgroundBlock = app.slice(backgroundStart, backgroundEnd);
 assert.match(backgroundBlock, /this\.bgMusicGain\.gain\.setValueAtTime\(0, now\)/, 'background restarts should clear stale outer gain before fading in');
 assert.match(backgroundBlock, /this\.bgMusicLoop = new SeamlessLoop\([\s\S]*?BACKGROUND_MUSIC_ENTRY_FADE_SECONDS\n\s*\);/, 'background loop startup should use the full entry fade');
 assert.match(app, /const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8/);
-assert.match(app, /const MANTRA_MUSIC_FADE_SECONDS = 4/, 'music should receive a deliberate handoff fade before mantra playback');
+assert.match(app, /const MANTRA_MUSIC_FADE_SECONDS = 6/, 'music should receive an extended, deliberate handoff fade before mantra playback');
 assert.match(app, /const MANTRA_FADE_SECONDS = 4/, 'mantra should use a deliberate fade when stopping');
 assert.match(app, /const PIPER_CLIP_FADE_SECONDS = 0\.05/);
-assert.match(app, /const NARRATION_MANTRA_FADE_SECONDS = 2/);
+assert.match(app, /const NARRATION_MANTRA_FADE_SECONDS = 3/, 'the final narration tail should be long enough to make the mantra handoff unhurried');
 assert.match(app, /const PIPER_CANCEL_FADE_SECONDS = 0\.12/);
 assert.match(app, /const requestedFadeIn = Number\(callbacks\.fadeInSeconds\)/, 'Piper should keep the normal clip fade-in separate from the transition fade-out');
 assert.match(app, /const requestedFadeOut = Number\(callbacks\.fadeOutSeconds\)/, 'Piper should support an explicit final-clip fade-out');

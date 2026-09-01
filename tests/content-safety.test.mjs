@@ -9,6 +9,12 @@ const en = readJson('locales/en.json');
 const ml = readJson('locales/ml.json');
 const app = fs.readFileSync('app.js', 'utf8');
 
+const languageIds = new Set(['en', 'ml', 'ru', 'hi']);
+
+function isLocalizedKey(key) {
+  return languageIds.has(key) || /_(?:en|ml|ru|hi)$/.test(key);
+}
+
 function collectSchemaPaths(value, path = '', output = new Set()) {
   if (Array.isArray(value)) {
     for (const item of value) collectSchemaPaths(item, `${path}[]`, output);
@@ -18,6 +24,10 @@ function collectSchemaPaths(value, path = '', output = new Set()) {
   for (const [key, child] of Object.entries(value)) {
     // Underscore-prefixed entries are production metadata, not script fields.
     if (key.startsWith('_')) continue;
+    // Fixtures may intentionally support fewer complete languages than the
+    // production bundle. Validate their shared structure separately from the
+    // language siblings they explicitly declare below.
+    if (isLocalizedKey(key)) continue;
     const nextPath = path ? `${path}.${key}` : key;
     output.add(nextPath);
     collectSchemaPaths(child, nextPath, output);
@@ -32,6 +42,29 @@ for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.jso
   assert.deepEqual(missing, [], `${name} is missing production script fields`);
 }
 
+function collectLocalizedStringPaths(value, path = '', output = new Set()) {
+  if (Array.isArray(value)) {
+    for (const item of value) collectLocalizedStringPaths(item, `${path}[]`, output);
+    return output;
+  }
+  if (!value || typeof value !== 'object') return output;
+  for (const [key, child] of Object.entries(value)) {
+    if (key.startsWith('_')) continue;
+    const nextPath = path ? `${path}.${key}` : key;
+    if (isLocalizedKey(key) && typeof child === 'string') output.add(nextPath);
+    collectLocalizedStringPaths(child, nextPath, output);
+  }
+  return output;
+}
+
+const productionEnglishMalayalam = [...collectLocalizedStringPaths(scripts)]
+  .filter(path => /(?:^|_)(?:en|ml)$/.test(path) || /\.(?:en|ml)$/.test(path));
+for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.json', facilitatorScripts]]) {
+  const fixtureLocalized = collectLocalizedStringPaths(fixture);
+  const missing = productionEnglishMalayalam.filter(path => !fixtureLocalized.has(path));
+  assert.deepEqual(missing, [], `${name} is missing English/Malayalam script fields`);
+}
+
 for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy']) {
   for (const language of ['en', 'ml']) {
     assert.ok(scripts[section][`meditation_${language}`], `${section} ${language} meditation is required`);
@@ -42,6 +75,14 @@ for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye',
     assert.equal(testScripts[section][language], undefined, `${section}.${language} test duplicate must stay removed`);
   }
 }
+
+for (const language of ['en', 'ml', 'ru', 'hi']) {
+  assert.ok(scripts.heart[`meditation_${language}`]?.trim(), `Heart meditation must remain available in ${language}`);
+}
+assert.match(scripts.heart.meditation_en, /Keep the learning, release the burden, and allow compassion to guide your next step\./,
+  'Heart narration should frame release as learning, compassion, and a next step rather than karma cleansing.');
+assert.doesNotMatch(scripts.heart.meditation_en, /karma/i,
+  'Heart narration should not introduce karma terminology into the production journey.');
 
 for (const bundle of [scripts, facilitatorScripts, testScripts]) {
   for (const language of ['en', 'ml']) {

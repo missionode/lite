@@ -37,6 +37,8 @@ for (const entry of catalog.entries) {
 }
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 285), '285 Hz should be added to the reference');
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 432), '432 Hz should be added to the reference');
+assert.match(catalog.entries.find(entry => entry.shotFrequency === 432)?.journeyUse?.en || '', /Arrival transition cue/, '432 Hz should document its Arrival transition use.');
+assert.match(catalog.entries.find(entry => entry.shotFrequency === 528)?.journeyUse?.en || '', /Arrival readiness cue/, '528 Hz should document its Arrival readiness use.');
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 221.23 && entry.kind === 'wellness'), '221.23 Hz should be included as a mood and relaxation reference');
 
 assert.match(page, /fetch\('\.\.\/scripts\.json',\{cache:'no-store'\}\)/, 'the repertory should verify the active script bundle');
@@ -44,6 +46,8 @@ assert.match(page, /fetch\('\.\.\/data\/frequency-repertory\.json',\{cache:'no-s
 assert.match(page, /id="frequencySearch"[^>]*type="search"/, 'the repertory should provide a search control');
 assert.match(page, /search\.addEventListener\('input'/, 'search should filter as the guide types');
 assert.match(page, /searchableText\(entry\)\.includes\(needle\)/, 'search should include each entry’s reference content');
+assert.match(page, /localized\(entry\.journeyUse\)/, 'search and rendering should include an optional Lite journey-use note');
+assert.match(page, /text\('journeyUse'\)/, 'the optional journey-use note should use a localized label');
 assert.match(page, /id="noResults"/, 'search should provide a clear empty state');
 assert.match(page, /shotFrequency=\$\{encodeURIComponent\(entry\.shotFrequency\)\}&shotSource=repertory/, 'every repertory CTA should carry only the chosen frequency and source');
 assert.match(page, /Prepare 1 sec Shot/, 'the CTA should state its one-second result');

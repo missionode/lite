@@ -19,6 +19,56 @@
 
 ## NOW
 
+### Active snapshot — 2026-09-01 (Heart release and renewal narration)
+
+- The owner rejected karma terminology as unnecessarily complex. `scripts.json` now adds one approved short Heart Chakra passage immediately before the YAM mantra in English, Malayalam, Russian, and Hindi: old heaviness may soften; keep the learning, release the burden, and let compassion guide the next step. It explicitly avoids forced forgiveness, erasing the past, blame, or promised cleansing.
+- The production Heart passage is intentionally a single integrated narration addition, not a separate stage, toggle, frequency, or facilitator-script rewrite. `docs/dot.json`, `demo-script.json`, and `test-script.json` remain unchanged.
+- Shell cache rotates to `chakra-v5.89` for fresh script delivery. `test:content-safety` locks the approved English framing and no-karma boundary; Hindi/Russian language checks, JSON parsing, service-worker syntax, and diff check passed.
+
+### Active snapshot — 2026-09-01 (Arrival guided relaxation narration)
+
+- On `hypnosis-integration-journey`, the normal non-demo chakra journey now speaks two brief, choice-preserving Arrival passages around the existing transition cues: `system.arrivalInduction` before the 432 Hz cue and `system.arrivalReadiness` before the 528 Hz cue. The wording uses a gentle repeated rhythm (more settled, more relaxed; steadier, a little deeper) while explicitly retaining room awareness, comfort, and the freedom to adjust.
+- Both passages are application-localized in English, Malayalam, Russian, and Hindi; custom scripts require no new fields. The existing chakra narration, moon/returning opening, gratitude, personal intention, mantras, and Emergence are unchanged. No Frequency Mode still narrates both passages while omitting only generated tones; No Mantra Mode remains independent; demo journeys still bypass the whole Arrival/Emergence wrapper.
+- Session estimates add a fixed 40-second allowance for the two voice passages. Delivery caches rotate to shell `chakra-v5.90` and language `chakra-language-v22`.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, locale/timing JSON parsing, `test:hypnosis-journey`, `test:no-frequency`, `test:demo-script`, `test:hindi-language`, `test:russian-language`, `test:content-safety`, and `git diff --check`. No Playwright, screenshots, browser run, or human listening evidence was performed.
+
+### Active snapshot — 2026-09-01 (Unhurried narration-to-mantra handoff)
+
+- Every chakra narration, including Crown before AUM, keeps its dedicated Piper final-clip fade before a mantra. The tail is now 3 seconds (was 2); then the already ducked background bed fades steadily to silence over 6 seconds (was 4) before the mantra’s established gradual entrance. The fading music is the intentional contemplative interval—there is no abrupt mute or extra dead-silence delay.
+- Browser TTS remains platform-controlled and cannot receive an equivalent Web Audio gain ramp; it still waits for the spoken utterance to finish before this same music/mantra handoff. Mantra loading still completes before music muting, avoiding slow-device loading silence.
+- Delivery rotates to `app.js?v=2.17` and shell cache `chakra-v5.91`; language cache remains `chakra-language-v22`. Regression tests lock the longer tail and music fade.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, `test:narration-ticker`, `test:background-music`, `test:hypnosis-journey`, `test:no-frequency`, `test:hindi-language`, `test:russian-language`, and `git diff --check`. No Playwright, screenshots, browser run, or human listening evidence was performed.
+
+### Active snapshot — 2026-09-01 (repertory journey-use annotation)
+
+- `data/frequency-repertory.json` already contained 432 Hz and 528 Hz. Their reference associations were preserved; each now has a bilingual `journeyUse` annotation: 432 Hz is the post-preparation Arrival transition cue and 528 Hz is the pre-first-chakra Arrival readiness cue. Both share the selected Drone Duration budget; 528 Hz also remains marked as Solar/HRIM-configured.
+- `docs/repertory.html` renders this optional “Lite journey use” note in the existing family cell and includes it in search. The reference page does not turn the annotation into a medical claim or alter the one-second Custom Shot handoff.
+- Shell cache rotates to `chakra-v5.88` so installed PWAs receive the updated repertory data. Validation: JSON parsing, `test:repertory`, `test:hindi-language`, service-worker syntax, and `git diff --check` passed.
+
+### Active snapshot — 2026-09-01 (narration boundary spacing)
+
+- Ordinary narration blocks now end with one shared 2-second `narration.exitGap` for both Piper and Browser TTS. This replaces Browser TTS’s former final 1.5-second sentence gap and gives Piper the same explicit settling time; internal sentence spacing remains 1.5 seconds.
+- Mantra handoffs deliberately do not stack the new exit gap: their final Piper clip retains the existing dedicated 2-second narration-to-mantra fade. Arrival/Emergence retain their dedicated 2–3 second gaps.
+- `tests/narration-ticker.test.mjs` guards the timing value and confirms both narration engines apply it without doubling Browser TTS’s final sentence gap. Static validation passed: narration ticker, hypnosis journey, and diff check.
+
+### Active snapshot — 2026-09-01 (facilitator fixture restoration)
+
+- `docs/dot.json` has been restored by the owner and is again a tracked, facilitator-maintained English/Malayalam script fixture. It contains all English/Malayalam localized string fields required by the current production schema; no facilitator narration was rewritten or supplemented because no such gaps existed.
+- A top-level `_note` is intentional JSON metadata, not a runnable narration field: preserve existing facilitator wording exactly; add only genuinely missing English/Malayalam siblings; do not add partial new-language content to this fixture. Full new-language support belongs to the atomic production-language workflow.
+- `tests/content-safety.test.mjs` now separates structural schema validation from localization validation. It requires the short test fixture and facilitator fixture to retain complete English/Malayalam content, while allowing their intentionally absent Russian/Hindi siblings to use the established custom-script English fallback. This corrects the stale assertion surfaced only after `docs/dot.json` returned.
+- Validation: PASS — JSON parsing, `test:content-safety`, `test:drone-duration`, and `git diff --check`. Preserve unrelated `.DS_Store` changes, `.codex/`, and the untracked backup audio.
+
+### Active snapshot — 2026-09-01 (Asia/Kolkata)
+
+- Active feature branch: `hypnosis-integration-journey`, created from production base `b3a68b2` (`[CP-I18N-044] Confirm Hindi production push`). Do not merge or push this branch until the owner explicitly approves the completed feature.
+- Scope: the normal chakra journey is preserved as `Arrival → existing selected chakra sequence → Closing → Emergence`. Arrival/Emergence are a wrapper only; they do not change chakra order, script frequencies, mantra routing, focused experiences, HRIM, Sleep, Yoga, Intimate Service, Shots, Music Only, or the stakeholder demo.
+- Arrival: after the established guide preparation narration, a restrained 432 Hz internal transition cue plays; after the existing moon/returning/gratitude/intention narration, a restrained 528 Hz readiness cue plays before the first chakra. Both cues share the existing Drone Duration exposure budget equally (Beginner 2s + 2s, Intermediate 5s + 5s, Advanced 7s + 7s, Expert 10s + 10s). These are not public Shots and do not activate their Bluetooth/confirmation flow.
+- Emergence: after the existing Closing, a very feeble bowl/bell begins the return, followed by localized room-orientation narration, then a configurable quiet return. Journey Timings now include Arriving (10–300s, default 60s) and Emergence (30–300s, default 60s). The bell default/range is intentionally restrained at 0.04 / 0.02–0.12.
+- Transitions: Arrival uses explicit pre-tone, post-tone, and readiness gaps; music ducks before each cue, fades the cue itself in/out, then restores to the narration bed. Closing pauses before the bell; Emergence pauses after the bell and after narration. No Frequency Mode omits the two generated cues and bowl while retaining the same quiet gaps, narration, and background music. `finish()` no longer fires a second bell.
+- Demo boundary: `demo-script.json` continues to skip the hypnosis wrapper so a stakeholder/client demonstration remains the established ordinary short journey. Custom scripts do not need new schema fields; Arrival/Emergence narration is application-localized in all four UI/content languages.
+- Regression coverage: `tests/hypnosis-journey.test.mjs` checks the wrapper order, shared duration budget, fade/duck routing, No Frequency behavior, demo exclusion, restrained bell, and absence of a second completion bell. `test:background-music` now expects the deliberately reduced bell minimum. Cache delivery is rotated to `app.js?v=2.16`, shell `chakra-v5.87`, language cache `chakra-language-v21`.
+- Current static validation: PASS — `node --check app.js`; JSON parsing; `test:hypnosis-journey`; `test:no-frequency`; `test:background-music`; `test:demo-script`; `test:hindi-language`; `test:russian-language`; `test:language-intention`; `test:audio-safety`; `test:focused-practices`; and `git diff --check`. `test:drone-duration` remains blocked before assertions by the owner-managed deleted `docs/dot.json`, which is preserved untouched. No Playwright, screenshots, browser run, or manual listening was performed by owner direction.
+
 ### Active snapshot — 2026-08-31 (Asia/Kolkata)
 
 - Production release scope: `add-hindi-language` was merged into `production` as `8e1dead` after confirming `origin/production` remained at `2a7f27b`. The merge and documentation checkpoint were pushed successfully to `origin/production` through `491e8c2`. It contains complete `hi-IN` UI/narration with browser TTS only; no Hindi Piper model is registered pending a separate licence-approved voice decision. Hindi meditation sessions do not expose or schedule the Earn handoff. `locales/hi.json` and all Hindi narration fields are registered atomically, avoiding the earlier partial `hi.json` request. Static Hindi locale/narration parity and handoff-suppression checks pass. Native Hindi review and target-device listening remain explicitly deferred manual release gates. See `TEMP-MULTILINGUAL-ARCHITECTURE.md` → “Hindi (`hi` / `hi-IN`)”.

@@ -134,6 +134,10 @@
         "en": "Commonly used as an alternative musical tuning and associated with gentle relaxation, harmony and connection with nature.",
         "ml": "ഒരു വ്യത്യസ്ത സംഗീത ട്യൂണിങ്ങായി സാധാരണയായി ഉപയോഗിക്കുന്നു; സൗമ്യമായ വിശ്രമം, ഐക്യം, പ്രകൃതിയുമായുള്ള ബന്ധം എന്നിവയുമായി ബന്ധിപ്പിക്കുന്നു."
       },
+      "journeyUse": {
+        "en": "Arrival transition cue after the preparation narration; shares the selected Drone Duration budget.",
+        "ml": "തയ്യാറെടുപ്പ് നറേഷനുശേഷമുള്ള എത്തിച്ചേരൽ ട്രാൻസിഷൻ സൂചന; തിരഞ്ഞെടുത്ത ഡ്രോൺ ദൈർഘ്യ ബജറ്റ് പങ്കിടുന്നു."
+      },
       "searchTerms": ["nature", "harmony", "relaxation", "tuning"]
     },
     {
@@ -146,6 +150,10 @@
       "features": {
         "en": "Often called the “love” or “transformation” frequency and traditionally associated with stress release and deep relaxation.",
         "ml": "“സ്നേഹത്തിന്റെ” അല്ലെങ്കിൽ “പരിവർത്തനത്തിന്റെ” ആവൃത്തി എന്ന് പലപ്പോഴും വിളിക്കുന്നു; സമ്മർദ്ദം അയയ്ക്കലും ആഴത്തിലുള്ള വിശ്രമവും ഇതുമായി പരമ്പരാഗതമായി ബന്ധിപ്പിക്കുന്നു."
+      },
+      "journeyUse": {
+        "en": "Arrival readiness cue before the first chakra; shares the selected Drone Duration budget. Also configured for Solar and HRIM practice.",
+        "ml": "ആദ്യ ചക്രത്തിന് മുമ്പുള്ള എത്തിച്ചേരൽ സന്നദ്ധതാ സൂചന; തിരഞ്ഞെടുത്ത ഡ്രോൺ ദൈർഘ്യ ബജറ്റ് പങ്കിടുന്നു. മണിപൂരക, ഹ്രീം അഭ്യാസങ്ങൾക്കും ക്രമീകരിച്ചിരിക്കുന്നു."
       },
       "searchTerms": ["solar", "love", "transformation", "relaxation", "hrim"]
     },
