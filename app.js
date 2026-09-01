@@ -528,6 +528,29 @@ function validateScriptBundle(scripts, options = {}) {
     return { valid: issues.length === 0, missing: issues };
 }
 
+const DEMO_SCRIPT_ID = 'stakeholder-client-demo';
+const DEMO_CORE_DURATION_SECONDS = 30;
+const DEMO_CORE_DURATION_MINUTES = DEMO_CORE_DURATION_SECONDS / 60;
+const DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY = 'chakra_demo_previous_time';
+
+function getDemoCoreDurationMinutes(script) {
+    const metadata = script?._demo;
+    return metadata?.id === DEMO_SCRIPT_ID &&
+        Number(metadata.recommendedCoreDurationSeconds) === DEMO_CORE_DURATION_SECONDS
+        ? DEMO_CORE_DURATION_MINUTES
+        : null;
+}
+
+function getDemoScriptTimingMessage() {
+    const key = 'ui.demoScriptTimingApplied';
+    const message = t(key);
+    // A stale installed language cache must never expose an implementation
+    // key to a client during a demonstration.
+    return message === key
+        ? 'Demo journey ready — 30 seconds per selected chakra.'
+        : message;
+}
+
 let piperVoiceRegistry = [];
 let languageRegistry = [];
 let localeBundles = {};
@@ -759,6 +782,7 @@ async function loadTimingConfig() {
                 }
             }
         });
+        applyDemoCoreDurationPreset();
     }
 }
 
@@ -4931,6 +4955,51 @@ const state = {
     customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
 };
 
+function isDemoScriptSelected() {
+    return state.scriptSource === 'custom' && getDemoCoreDurationMinutes(state.customScript) !== null;
+}
+
+function syncCorePracticeDuration(value) {
+    const definition = timingConfig.journey?.timePerChakra || { min: 1, max: 7, step: 0.5 };
+    const demoDuration = isDemoScriptSelected() ? getDemoCoreDurationMinutes(state.customScript) : null;
+    const minimum = demoDuration ?? Number(definition.min);
+    const maximum = Number(definition.max);
+    const duration = Math.min(maximum, Math.max(minimum, Number(value)));
+    state.timePerChakra = duration;
+    localStorage.setItem('chakra_time', String(duration));
+
+    if (!getChecked('shots-toggle') && !getChecked('sleep-mode-toggle') && timeSlider) {
+        timeSlider.min = String(minimum);
+        timeSlider.max = String(maximum);
+        timeSlider.step = String(definition.step ?? 0.5);
+        timeSlider.value = String(duration);
+        const pct = ((duration - minimum) / (maximum - minimum) * 100).toFixed(1) + '%';
+        timeSlider.style.setProperty('--range-fill', pct);
+        setText('time-display', `${duration.toFixed(1)} mins`);
+        refreshRangeControlDisplays();
+    }
+    updateDroneDurationSummary();
+}
+
+function applyDemoCoreDurationPreset() {
+    const demoDuration = getDemoCoreDurationMinutes(state.customScript);
+    if (!isDemoScriptSelected() || demoDuration === null) return false;
+    if (localStorage.getItem(DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY) === null && state.timePerChakra !== demoDuration) {
+        localStorage.setItem(DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY, String(state.timePerChakra));
+    }
+    syncCorePracticeDuration(demoDuration);
+    return true;
+}
+
+function restorePreDemoCoreDuration() {
+    if (isDemoScriptSelected()) return false;
+    const storedDuration = Number(localStorage.getItem(DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY));
+    localStorage.removeItem(DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY);
+    if (!Number.isFinite(storedDuration)) return false;
+    syncCorePracticeDuration(storedDuration);
+    return true;
+}
+
 function syncPleasureAmbienceControl() {
     const section = document.getElementById('mood-relaxation-ambience-section');
     const toggle = document.getElementById('mood-relaxation-intention-toggle');
@@ -5323,7 +5392,7 @@ function loadPreferences() {
     if (state.customScript) {
         const statusEl = document.getElementById('script-status');
         if (statusEl) {
-            statusEl.textContent = "Custom script loaded and ready.";
+            statusEl.textContent = isDemoScriptSelected() ? getDemoScriptTimingMessage() : "Custom script loaded and ready.";
             statusEl.style.display = 'block';
             statusEl.style.color = '#4ade80';
         }
@@ -5814,7 +5883,8 @@ function attachEventListeners() {
         if (durationLabel) durationLabel.textContent = t(shots ? 'ui.shotDuration' : (sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration'));
         if (timeInput) {
             const definition = shots ? timingConfig.journey?.shotDuration : sleep ? timingConfig.journey?.sleepStageDuration : timingConfig.journey?.timePerChakra;
-            timeInput.min = definition?.min ?? (shots ? 1 : 1);
+            const demoDuration = !shots && !sleep && isDemoScriptSelected() ? getDemoCoreDurationMinutes(state.customScript) : null;
+            timeInput.min = demoDuration ?? definition?.min ?? (shots ? 1 : 1);
             timeInput.max = definition?.max ?? (shots ? 20 : sleep ? 10 : 7);
             timeInput.step = definition?.step ?? (shots ? 1 : 0.5);
             const activeValue = shots ? state.timeShot : sleep ? state.timeSleepStage : state.timePerChakra;
@@ -5848,6 +5918,7 @@ function attachEventListeners() {
     // Initial call
     updateTimingRowVisibility();
     updateExperienceModeVisibility();
+    updateSessionEstimate();
     prepareRepertoryShotFromUrl();
     if (isGeneratedIntention(state.intention)) {
         state.intention = state.highEnergyEnabled
@@ -5968,6 +6039,9 @@ function attachEventListeners() {
     if (scriptSourceSelect) {
         scriptSourceSelect.addEventListener('change', (e) => {
             state.scriptSource = e.target.value;
+            if (isDemoScriptSelected()) applyDemoCoreDurationPreset();
+            else restorePreDemoCoreDuration();
+            updateSessionEstimate();
             if (customScriptUI) customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
             localStorage.setItem('chakra_script_source', state.scriptSource);
             // Clear cached scripts to force reload if switching
@@ -5997,8 +6071,11 @@ function attachEventListeners() {
                     if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
                     state.customScript = json;
                     localStorage.setItem('chakra_custom_script', JSON.stringify(json));
+                    const isDemo = applyDemoCoreDurationPreset();
+                    if (!isDemo) restorePreDemoCoreDuration();
+                    updateSessionEstimate();
                     if (scriptStatus) {
-                        scriptStatus.textContent = "Script uploaded successfully!";
+                        scriptStatus.textContent = isDemo ? getDemoScriptTimingMessage() : "Script uploaded successfully!";
                         scriptStatus.style.display = 'block';
                         scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
                         scriptStatus.style.color = '#4ade80';
@@ -6046,8 +6123,11 @@ function attachEventListeners() {
                 if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
                 state.customScript = json;
                 localStorage.setItem('chakra_custom_script', JSON.stringify(json));
+                const isDemo = applyDemoCoreDurationPreset();
+                if (!isDemo) restorePreDemoCoreDuration();
+                updateSessionEstimate();
                 if (scriptStatus) {
-                    scriptStatus.textContent = "Script loaded from URL successfully!";
+                    scriptStatus.textContent = isDemo ? getDemoScriptTimingMessage() : "Script loaded from URL successfully!";
                     scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
                     scriptStatus.style.color = '#4ade80';
                 }

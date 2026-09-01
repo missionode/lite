@@ -1,0 +1,201 @@
+{
+  "_demo": {
+    "id": "stakeholder-client-demo",
+    "recommendedCoreDurationSeconds": 30,
+    "purpose_en": "Client-facing guided demonstration: a concise but meaningful introduction to the Chakra Meditation experience, its reflective purpose, and its optional guided-care modules.",
+    "purpose_ml": "ക്ലയന്റ്-മുഖമായ മാർഗനിർദ്ദേശ പ്രദർശനം: ചക്രധ്യാന അനുഭവം, അതിന്റെ ആത്മപരിശോധനാപരമായ ലക്ഷ്യം, ഐച്ഛിക മാർഗനിർദ്ദേശ പരിചരണഘട്ടങ്ങൾ എന്നിവ അർഥവത്തായി പരിചയപ്പെടുത്തുന്ന സംക്ഷിപ്ത യാത്ര.",
+    "audience_en": "Stakeholders and prospective clients",
+    "audience_ml": "ഓഹരിയുടമകളും ഭാവി ക്ലയന്റുകളും",
+    "note_en": "This file is intended for demonstrations. It is not the production script and does not change the application’s standard journey timings or audio settings.",
+    "note_ml": "ഈ ഫയൽ പ്രദർശനങ്ങൾക്കായുള്ളതാണ്. ഇത് പ്രൊഡക്ഷൻ സ്ക്രിപ്റ്റല്ല; ആപ്പിന്റെ സാധാരണ യാത്രാസമയമോ ഓഡിയോ ക്രമീകരണങ്ങളോ ഇതിലൂടെ മാറുന്നില്ല."
+  },
+  "intro": {
+    "gratitude_en": "Take one slow, comfortable breath. Arrive fully in this moment, appreciate the support beneath you, and choose a simple intention for the practice ahead. Let your attention rest with the guide's voice as you begin.",
+    "gratitude_ml": "ശ്വാസത്തിന്റെ ആഴം നിർബന്ധിക്കാതെ സാവധാനവും സുഖകരവുമായ ഒരു ശ്വാസം എടുക്കൂ. ഈ നിമിഷത്തിൽ പൂർണ്ണമായി എത്തിച്ചേരൂ, നിങ്ങളെ താങ്ങുന്ന പിന്തുണയെ അനുഭവിക്കൂ, ഇന്നത്തെ പരിശീലനത്തിന് ഒരു ലളിതമായ ഉദ്ദേശ്യം തിരഞ്ഞെടുക്കൂ. ഇനി പൂർണ്ണമായി മാർഗദർശിയുടെ ശബ്ദത്തിൽ ശ്രദ്ധിക്കൂ.",
+    "returning_en": "Welcome back. Like a wave returning to open water, receive what supports you and release what has completed its work. Let this return be simple and steady.",
+    "returning_ml": "വീണ്ടും സ്വാഗതം. തുറന്ന കടലിലേക്ക് മടങ്ങുന്ന തിരയെപ്പോലെ, നിങ്ങളെ പിന്തുണയ്ക്കുന്നതിനെ സ്വീകരിക്കുകയും പൂർത്തിയായതിനെ സാവധാനം വിട്ടയക്കുകയും ചെയ്യൂ. ഈ മടങ്ങിവരവ് ലളിതവും സ്ഥിരവുമായിരിക്കട്ടെ.",
+    "moon": {
+      "new_en": "Let the new moon be a quiet symbol of beginning. Choose one small intention you can support with a realistic action; nothing needs to be forced or made certain today.",
+      "new_ml": "പുതുചന്ദ്രനെ ഒരു പുതിയ തുടക്കത്തിന്റെ ശാന്തമായ പ്രതീകമായി കാണൂ. യാഥാർഥ്യബോധമുള്ള ഒരു പ്രവർത്തനത്തിലൂടെ പിന്തുണയ്ക്കാവുന്ന ചെറിയൊരു ഉദ്ദേശ്യം തിരഞ്ഞെടുക്കൂ; ഇന്ന് ഒന്നും നിർബന്ധിക്കുകയോ ഉറപ്പാക്കുകയോ വേണ്ട.",
+      "waxing_en": "Let the waxing moon suggest gradual growth. Notice one effort already under way and choose only the next manageable step, with room for rest.",
+      "waxing_ml": "വളരുന്ന ചന്ദ്രനെ ക്രമേണയുള്ള വളർച്ചയുടെ പ്രതീകമായി കാണൂ. ഇപ്പോൾ തുടരുന്ന ഒരു ശ്രമം ശ്രദ്ധിച്ച്, വിശ്രമത്തിനും ഇടം നൽകി കൈകാര്യം ചെയ്യാവുന്ന അടുത്ത ചെറിയ ചുവട് തിരഞ്ഞെടുക്കൂ.",
+      "full_en": "Let the full moon invite reflection. Notice what is clear and what remains uncertain, receiving this moment without needing to predict an outcome.",
+      "full_ml": "പൂർണ്ണചന്ദ്രനെ ആത്മപരിശോധനയ്ക്കുള്ള ക്ഷണമായി കാണൂ. വ്യക്തമായതും ഇപ്പോഴും അനിശ്ചിതമായതും ശ്രദ്ധിച്ച്, ഫലം പ്രവചിക്കാതെ ഈ നിമിഷത്തെ സ്വീകരിക്കൂ.",
+      "waning_en": "Let the waning moon symbolize return. Come back to your own quiet clarity and allow what has completed its work to soften and settle.",
+      "waning_ml": "പിൻവാങ്ങുന്ന ചന്ദ്രനെ തിരിച്ചുവരവിന്റെ പ്രതീകമായി കാണൂ. നിങ്ങളുടെ ഉള്ളിലെ ശാന്തമായ വ്യക്തതയിലേക്ക് മടങ്ങി, പൂർത്തിയായതിനെ മൃദുവായി അയഞ്ഞ് വിശ്രമിക്കാൻ അനുവദിക്കൂ."
+    }
+  },
+  "root": {
+    "name": "Root",
+    "mantra": "LAM",
+    "frequency": 396,
+    "color": "#FF0000",
+    "symbol": "symbols/root.png",
+    "meditation_en": "Bring attention to the Root Chakra. Feel the ground supporting you, soften unnecessary strain, and receive steadiness through clear boundaries, practical care, and dependable support.",
+    "meditation_ml": "മൂലാധാര ചക്രത്തിലേക്ക് ശ്രദ്ധ കൊണ്ടുവരൂ. ഭൂമി നിങ്ങളെ താങ്ങുന്നതായി അനുഭവിച്ച് അനാവശ്യമായ വലിവ് അയക്കൂ. വ്യക്തമായ അതിരുകളിലൂടെയും പ്രായോഗിക പരിചരണത്തിലൂടെയും വിശ്വസനീയമായ പിന്തുണയിലൂടെയും സ്ഥിരത സ്വീകരിക്കൂ.",
+    "affirmation_en": "You are worthy of support, stability, and belonging. One grounded step at a time is enough.",
+    "affirmation_ml": "പിന്തുണയും സ്ഥിരതയും സ്വന്തമായിടവും നിങ്ങൾ അർഹിക്കുന്നു. ഒരു സമയത്ത് ഉറച്ച ഒരു ചുവട് മതി."
+  },
+  "sacral": {
+    "name": "Sacral",
+    "mantra": "VAM",
+    "frequency": 417,
+    "color": "#FF7F00",
+    "symbol": "symbols/sacral.png",
+    "meditation_en": "Bring gentle awareness to the Sacral Chakra. Welcome creativity, honest feeling, and restorative joy without forcing anything. Let healthy boundaries make room for nourishing connection.",
+    "meditation_ml": "സ്വാധിഷ്ഠാന ചക്രത്തിലേക്ക് സൗമ്യമായി ശ്രദ്ധ കൊണ്ടുവരൂ. ഒന്നും നിർബന്ധിക്കാതെ സർഗ്ഗാത്മകതയെയും സത്യസന്ധമായ വികാരങ്ങളെയും പുനരുജ്ജീവിപ്പിക്കുന്ന സന്തോഷത്തെയും സ്വീകരിക്കൂ. ആരോഗ്യകരമായ അതിരുകൾ പോഷകമായ ബന്ധത്തിന് ഇടം നൽകട്ടെ.",
+    "affirmation_en": "Your feelings and creativity deserve space. You may welcome joy at a pace that honours your boundaries.",
+    "affirmation_ml": "നിങ്ങളുടെ വികാരങ്ങൾക്കും സർഗ്ഗാത്മകതയ്ക്കും ഇടമുണ്ട്. നിങ്ങളുടെ അതിരുകളെ മാനിക്കുന്ന വേഗത്തിൽ സന്തോഷത്തെ സ്വീകരിക്കാം."
+  },
+  "solar": {
+    "name": "Solar",
+    "mantra": "RAM",
+    "frequency": 528,
+    "color": "#FFFF00",
+    "symbol": "symbols/solar.png",
+    "meditation_en": "Bring attention to the Solar Plexus Chakra. Breathe in courage and breathe out hesitation. Choose one clear, realistic action without needing to control every outcome.",
+    "meditation_ml": "മണിപൂര ചക്രത്തിലേക്ക് ശ്രദ്ധ കൊണ്ടുവരൂ. ധൈര്യം ശ്വസിച്ചെടുക്കുകയും മടിപ്പ് പുറത്തുവിടുകയും ചെയ്യൂ. എല്ലാ ഫലവും നിയന്ത്രിക്കേണ്ടതില്ലാതെ വ്യക്തവും യാഥാർഥ്യബോധമുള്ളതുമായ ഒരു പ്രവർത്തനം തിരഞ്ഞെടുക്കൂ.",
+    "affirmation_en": "Your power belongs to you. Preparation, practice, and thoughtful choice can build confidence.",
+    "affirmation_ml": "നിങ്ങളുടെ ശക്തി നിങ്ങളുടേതാണ്. തയ്യാറെടുപ്പും പരിശീലനവും ചിന്താപൂർവ്വമായ തിരഞ്ഞെടുപ്പും ആത്മവിശ്വാസം വളർത്താം."
+  },
+  "heart": {
+    "name": "Heart",
+    "mantra": "YAM",
+    "frequency": 639,
+    "color": "#00FF00",
+    "symbol": "symbols/heart.png",
+    "meditation_en": "Open gently to the Heart Chakra. Make room for compassion, gratitude, and connection while keeping wise, caring boundaries around your tenderness.",
+    "meditation_ml": "അനാഹത ചക്രത്തിലേക്ക് സൗമ്യമായി തുറക്കൂ. നിങ്ങളുടെ ആർദ്രതയ്ക്ക് കരുതലുള്ളതും വിവേകമുള്ളതുമായ അതിരുകൾ സൂക്ഷിച്ച് കരുണയ്ക്കും നന്ദിക്കും ബന്ധത്തിനും ഇടം നൽകൂ.",
+    "affirmation_en": "You are worthy of care and respect. You may offer compassion without carrying another person's burden.",
+    "affirmation_ml": "കരുതലും ബഹുമാനവും നിങ്ങൾ അർഹിക്കുന്നു. മറ്റൊരാളുടെ ഭാരം ചുമക്കാതെ കരുണ നൽകാം."
+  },
+  "throat": {
+    "name": "Throat",
+    "mantra": "HAM",
+    "frequency": 741,
+    "color": "#00BFFF",
+    "symbol": "symbols/throat.png",
+    "meditation_en": "Bring awareness to the Throat Chakra. Let your breath become easy and your words become clear, sincere, and kind. You may choose speech or silence.",
+    "meditation_ml": "വിശുദ്ധ ചക്രത്തിലേക്ക് ശ്രദ്ധ കൊണ്ടുവരൂ. ശ്വാസം എളുപ്പമാകട്ടെ; നിങ്ങളുടെ വാക്കുകൾ വ്യക്തവും സത്യസന്ധവും സൗമ്യവുമാകട്ടെ. സംസാരമോ നിശ്ശബ്ദതയോ തിരഞ്ഞെടുക്കാം.",
+    "affirmation_en": "Your voice matters. You may ask to be understood and say no with respect.",
+    "affirmation_ml": "നിങ്ങളുടെ ശബ്ദത്തിന് പ്രാധാന്യമുണ്ട്. ബഹുമാനത്തോടെ മനസ്സിലാക്കപ്പെടാൻ ആവശ്യപ്പെടാനും വേണ്ടെന്ന് പറയാനും കഴിയും."
+  },
+  "thirdeye": {
+    "name": "Third Eye",
+    "mantra": "OM",
+    "frequency": 852,
+    "color": "#4B0082",
+    "symbol": "symbols/thirdeye.png",
+    "meditation_en": "Turn toward the Third Eye Chakra. Let quiet attention reveal clarity and insight without turning every impression into certainty. Let discernment guide what deserves attention.",
+    "meditation_ml": "ആജ്ഞാചക്രത്തിലേക്ക് ശ്രദ്ധ തിരിക്കൂ. ഓരോ അനുഭവത്തെയും ഉറപ്പായി കാണാതെ, ശാന്തമായ ശ്രദ്ധ വ്യക്തതയും ഉൾക്കാഴ്ചയും വെളിപ്പെടുത്തട്ടെ. ഏതാണ് ശ്രദ്ധ അർഹിക്കുന്നത് എന്ന് വിവേകം നയിക്കട്ടെ.",
+    "affirmation_en": "Your intuition invites listening. You may compare inner impressions with reliable information and lived experience.",
+    "affirmation_ml": "നിങ്ങളുടെ അവബോധം ശ്രദ്ധിക്കാൻ ക്ഷണിക്കുന്നു. ഉള്ളിലെ തോന്നലുകളെ വിശ്വസനീയമായ വിവരങ്ങളോടും ജീവിതാനുഭവങ്ങളോടും താരതമ്യം ചെയ്യാം."
+  },
+  "crown": {
+    "name": "Crown",
+    "mantra": "AUM",
+    "frequency": 963,
+    "color": "#9400D3",
+    "symbol": "symbols/crown.png",
+    "meditation_en": "Rest in the Crown Chakra. Receive perspective, meaning, and quiet spiritual support in the way that is authentic to you. Let stillness restore what effort cannot.",
+    "meditation_ml": "സഹസ്രാര ചക്രത്തിൽ വിശ്രമിക്കൂ. നിങ്ങളോട് യഥാർഥമായി തോന്നുന്ന രീതിയിൽ വിശാലദൃഷ്ടിയും അർഥവും ശാന്തമായ ആത്മീയ പിന്തുണയും സ്വീകരിക്കൂ. ശ്രമം കൊണ്ട് സാധിക്കാത്തതിനെ നിശ്ചലത പുനഃസ്ഥാപിക്കട്ടെ.",
+    "affirmation_en": "You belong to a life of meaning and conscious choice. You may remain spiritually open and practically grounded.",
+    "affirmation_ml": "അർഥവത്തായ ജീവിതത്തിലും ബോധപൂർവ്വമായ തിരഞ്ഞെടുപ്പുകളിലും നിങ്ങൾ ഉൾപ്പെട്ടിരിക്കുന്നു. ആത്മീയമായി തുറന്നും പ്രായോഗികമായി ഉറച്ചും നിൽക്കാം."
+  },
+  "closing": {
+    "en": "Your chakra journey is complete. Feel the support beneath you, let your breathing remain natural, and carry one nourishing quality—steadiness, courage, compassion, clarity, or connection—into what comes next.",
+    "ml": "നിങ്ങളുടെ ചക്രയാത്ര പൂർത്തിയായി. നിങ്ങളെ താങ്ങുന്ന പിന്തുണ അനുഭവിച്ച്, ശ്വാസം സ്വാഭാവികമായി തുടരട്ടെ. സ്ഥിരത, ധൈര്യം, കരുണ, വ്യക്തത, അല്ലെങ്കിൽ ബന്ധം എന്നിവയിൽ ഒരു പോഷകഗുണം അടുത്ത നിമിഷത്തിലേക്ക് കൂടെ കൊണ്ടുപോകൂ.",
+    "affirmation_en": "You are grounded, receptive, and ready to move forward with confidence and discernment.",
+    "affirmation_ml": "ഉറച്ചും സ്വീകരണശീലത്തോടെയും വിവേകത്തോടെയും മുന്നോട്ട് പോകാൻ നിങ്ങൾ തയ്യാറാണ്."
+  },
+  "high_energy": {
+    "name": "High Energy Journey",
+    "mantra": "HRIM",
+    "frequency": 528,
+    "color": "#FFD700",
+    "symbol": "symbols/hreem.png",
+    "meditation_en": "Gather focused energy around one realistic intention. There is no need to push through fatigue; courage, rest, and changing course can all support purposeful action.",
+    "meditation_ml": "യാഥാർഥ്യബോധമുള്ള ഒരു ഉദ്ദേശ്യത്തിന് ചുറ്റും ഏകാഗ്രമായ ഊർജ്ജം കൂട്ടിച്ചേർക്കൂ. ക്ഷീണം അവഗണിച്ച് മുന്നോട്ട് തള്ളേണ്ടതില്ല; ധൈര്യവും വിശ്രമവും ദിശമാറ്റവും ലക്ഷ്യബോധമുള്ള പ്രവർത്തനത്തെ പിന്തുണയ്ക്കാം.",
+    "intention_en": "Focus and courage for this Hreem mantra journey.",
+    "intention_ml": "ഈ ഹ്രീം മന്ത്രയാത്രയ്ക്ക് ഏകാഗ്രതയും ധൈര്യവും.",
+    "affirmation_en": "Direct the energy genuinely available to you toward one clear, realistic action while staying grounded in your body and surroundings.",
+    "affirmation_ml": "നിങ്ങൾക്കിപ്പോൾ യഥാർഥമായി ലഭ്യമായ ഊർജ്ജം ശരീരത്തിലും ചുറ്റുപാടുകളിലും ഉറച്ചുനിന്ന് വ്യക്തവും യാഥാർഥ്യബോധമുള്ളതുമായ ഒരു പ്രവർത്തനത്തിലേക്ക് നയിക്കൂ."
+  },
+  "corpse_pose": {
+    "intro": {
+      "en": "Settle into a supported resting position. Let the floor, bed, or chair carry your weight, allowing the jaw, shoulders, hands, and belly to soften without effort.",
+      "ml": "നന്നായി പിന്തുണയുള്ള വിശ്രമനിലയിലേക്ക് വരൂ. നിലമോ കിടക്കയോ കസേരയോ നിങ്ങളുടെ ഭാരം താങ്ങട്ടെ; താടിയും തോളുകളും കൈകളും വയറും ശ്രമമില്ലാതെ മൃദുവാകാൻ അനുവദിക്കൂ."
+    },
+    "transition": {
+      "en": "This rest is nearly complete. Notice whether your body feels ready, then return gradually and carry the calm forward.",
+      "ml": "ഈ വിശ്രമം പൂർത്തിയാകാറായി. ശരീരം തയ്യാറാണോ എന്ന് ശ്രദ്ധിച്ച്, സാവധാനം മടങ്ങിവന്ന് ഈ ശാന്തത കൂടെ കൊണ്ടുപോകൂ."
+    }
+  },
+  "bath_session": {
+    "title": { "en": "Bath Session", "ml": "സ്നാനസമയം" },
+    "intro": { "en": "Begin this bathing pause as an act of refreshment and care. Move at a comfortable pace and keep the experience simple.", "ml": "ഉന്മേഷത്തിനും പരിചരണത്തിനുമായുള്ള ഒരു ഇടവേളയായി ഈ സ്നാനസമയം ആരംഭിക്കൂ. സുഖകരമായ വേഗത്തിൽ നീങ്ങി അനുഭവം ലളിതമായി സൂക്ഷിക്കൂ." },
+    "instructions": { "en": "Allow the water to refresh you. Notice ease, warmth, and comfort, then continue only when you are ready.", "ml": "വെള്ളം നിങ്ങളെ ഉന്മേഷിപ്പിക്കാൻ അനുവദിക്കൂ. ലാളിത്യവും ചൂടും സുഖവും ശ്രദ്ധിച്ച്, തയ്യാറാകുമ്പോൾ മാത്രം തുടരൂ." },
+    "reminder": { "en": "This bathing pause is nearly complete. Take a moment to settle before the next guided stage.", "ml": "ഈ സ്നാന ഇടവേള പൂർത്തിയാകാറായി. അടുത്ത മാർഗനിർദ്ദേശ ഘട്ടത്തിന് മുമ്പ് ഒന്ന് ശാന്തമായി നിൽക്കൂ." }
+  },
+  "perineal_care": {
+    "title": { "en": "Perineal Care", "ml": "പെരിനിയൽ പരിചരണം" },
+    "intro": { "en": "Begin this private care stage gently and only at a pace that feels comfortable. Privacy, dignity, and personal choice remain central throughout.", "ml": "സുഖകരമായി തോന്നുന്ന വേഗത്തിൽ മാത്രം ഈ സ്വകാര്യ പരിചരണ ഘട്ടം സൗമ്യമായി ആരംഭിക്കൂ. സ്വകാര്യതയും അന്തസ്സും വ്യക്തിപരമായ തിരഞ്ഞെടുപ്പും മുഴുവൻ സമയവും പ്രധാനമാണ്." },
+    "instructions": { "en": "Use the care approach already agreed with the guide. Pause whenever needed and continue only when comfort is restored.", "ml": "മാർഗദർശിയുമായി മുമ്പേ സമ്മതിച്ച പരിചരണരീതി പിന്തുടരൂ. ആവശ്യമെങ്കിൽ ഇടവേള എടുത്ത്, സുഖം തിരിച്ചുകിട്ടുമ്പോൾ മാത്രം തുടരൂ." },
+    "reminder": { "en": "This private-care stage is nearly complete. Finish unhurriedly and let the guide know when you are ready.", "ml": "ഈ സ്വകാര്യ പരിചരണ ഘട്ടം പൂർത്തിയാകാറായി. തിരക്കില്ലാതെ പൂർത്തിയാക്കി, തയ്യാറാകുമ്പോൾ മാർഗദർശിയെ അറിയിക്കൂ." }
+  },
+  "assisted_bathing": {
+    "title": { "en": "Assisted Bathing", "ml": "സഹായത്തോടെയുള്ള കുളി" },
+    "intro": { "en": "Begin assisted bathing with clear consent and calm communication. The guide follows your pace; you may pause, adjust, or decline any step.", "ml": "വ്യക്തമായ സമ്മതത്തോടെയും ശാന്തമായ ആശയവിനിമയത്തോടെയും സഹായത്തോടെയുള്ള കുളി ആരംഭിക്കൂ. മാർഗദർശി നിങ്ങളുടെ വേഗം പിന്തുടരും; ഏത് ഘട്ടത്തിലും ഇടവേള എടുക്കാനും മാറ്റം വരുത്താനും വേണ്ടെന്ന് പറയാനും കഴിയും." },
+    "instructions": { "en": "Confirm comfort before each next step. Keep water and movement comfortable, and use simple words or signals whenever you need a change.", "ml": "ഓരോ അടുത്ത ഘട്ടത്തിനുമുമ്പ് സുഖകരമാണോ എന്ന് ഉറപ്പാക്കൂ. വെള്ളവും ചലനവും സുഖകരമായി സൂക്ഷിച്ച്, മാറ്റം വേണമെങ്കിൽ ലളിതമായ വാക്കുകളോ സൂചനകളോ ഉപയോഗിക്കൂ." },
+    "reminder": { "en": "This assisted bathing stage is nearly complete. Take a settling pause before the next session begins.", "ml": "ഈ സഹായകുളി ഘട്ടം പൂർത്തിയാകാറായി. അടുത്ത സെഷൻ തുടങ്ങുന്നതിന് മുമ്പ് ശാന്തമായൊരു ഇടവേള എടുക്കൂ." }
+  },
+  "massage": {
+    "title": { "en": "Gentle Massage", "ml": "സൗമ്യമായ മസാജ്" },
+    "intro": { "en": "Begin a gentle massage with clear consent. Let the crown-to-root journey be a quiet container while the guide follows the pressure and pace that feel right for you.", "ml": "വ്യക്തമായ സമ്മതത്തോടെ സൗമ്യമായ മസാജ് ആരംഭിക്കൂ. കിരീടം മുതൽ മൂലാധാരം വരെയുള്ള യാത്ര ഒരു ശാന്തമായ ചട്ടക്കൂടാകട്ടെ; നിങ്ങള്‍ക്ക് അനുയോജ്യമായ സമ്മർദ്ദവും വേഗവും അനുസരിച്ച് മാർഗദർശി മുന്നോട്ട് പോകട്ടെ." },
+    "instructions": { "en": "Use slow, comfortable movements. Speak up or use an agreed signal for more space, less pressure, a pause, or a change at any time.", "ml": "പതുക്കെയും സുഖകരമായും ചലിക്കൂ. കൂടുതൽ ഇടമോ കുറവ് സമ്മർദ്ദമോ ഇടവേളയോ മാറ്റമോ വേണമെങ്കിൽ എപ്പോഴും പറയുകയോ മുമ്പേ സമ്മതിച്ച സൂചന ഉപയോഗിക്കുകയോ ചെയ്യൂ." },
+    "reminder": { "en": "This massage stage is nearly complete. Finish gradually, notice how your body feels, and prepare comfortably for the next care stage.", "ml": "ഈ മസാജ് ഘട്ടം പൂർത്തിയാകാറായി. സാവധാനം പൂർത്തിയാക്കി ശരീരത്തിന് എങ്ങനെ തോന്നുന്നു എന്ന് ശ്രദ്ധിച്ച്, അടുത്ത പരിചരണ ഘട്ടത്തിനായി സുഖകരമായി തയ്യാറാകൂ." }
+  },
+  "yoga": {
+    "intro": { "en": "Move from stillness into an optional Yoga Bridge. Choose only movements that suit your body today; you may modify, rest, or skip any pose.", "ml": "നിശ്ചലതയിൽ നിന്ന് വേണമെങ്കിൽ ചെയ്യാവുന്ന യോഗ പാലത്തിലേക്ക് നീങ്ങൂ. ഇന്ന് നിങ്ങളുടെ ശരീരത്തിന് അനുയോജ്യമായ ചലനങ്ങൾ മാത്രം തിരഞ്ഞെടുക്കൂ; ഏത് ആസനവും മാറ്റിച്ചെയ്യാം, വിശ്രമിക്കാം, അല്ലെങ്കിൽ ഒഴിവാക്കാം." },
+    "preparation": { "en": "Prepare a stable, comfortable space. Begin with small movements, keep your breath natural, and use a wall, chair, or other support whenever helpful.", "ml": "ഉറപ്പുള്ളതും സുഖകരവുമായ സ്ഥലം ഒരുക്കൂ. ചെറിയ ചലനങ്ങളോടെ തുടങ്ങി ശ്വാസം സ്വാഭാവികമായി തുടരട്ടെ; സഹായകരമാകുമ്പോൾ ഭിത്തിയോ കസേരയോ മറ്റൊരു പിന്തുണയോ ഉപയോഗിക്കൂ." },
+    "poses": [
+      { "id": "vrikshasana", "name_en": "Tree Pose", "name_ml": "വൃക്ഷാസനം", "desc_en": "Stand near a wall or chair if support helps. Shift weight gradually, keep the gaze steady, and lower the foot whenever balance feels uncertain.", "desc_ml": "പിന്തുണ സഹായകരമാണെങ്കിൽ ഭിത്തിയുടെയോ കസേരയുടെയോ അരികിൽ നിൽക്കൂ. ഭാരം സാവധാനം മാറ്റി നോട്ടം സ്ഥിരമായി സൂക്ഷിക്കൂ; സമതുലിതാവസ്ഥ ഉറപ്പില്ലെങ്കിൽ പാദം താഴ്ത്തൂ." },
+      { "id": "adho_mukha_svanasana", "name_en": "Downward Dog", "name_ml": "അധോമുഖ ശ്വാനാസനം", "desc_en": "From hands and knees, lift the hips only as far as comfortable. Keep knees bent if useful, or choose a wall-supported version instead.", "desc_ml": "കൈകളും മുട്ടുകളും നിലത്ത് വച്ച്, സുഖകരമായ പരിധിവരെ മാത്രം ഇടുപ്പ് ഉയർത്തൂ. ആവശ്യമെങ്കിൽ മുട്ടുകൾ വളച്ചുവയ്ക്കുകയോ ഭിത്തിയുടെ പിന്തുണയുള്ള രൂപം തിരഞ്ഞെടുക്കുകയോ ചെയ്യൂ." },
+      { "id": "marjaryasana", "name_en": "Cat-Cow Stretch", "name_ml": "മാർജാര്യാസനം", "desc_en": "On hands and knees, move gently between a comfortable arch and curve. Let the breath stay easy and make the movement smaller whenever needed.", "desc_ml": "കൈകളും മുട്ടുകളും നിലത്ത് വച്ച്, സുഖകരമായ വളവിനും വില്ലിനുമിടയിൽ സൗമ്യമായി ചലിക്കൂ. ശ്വാസം എളുപ്പമായി തുടരട്ടെ; ആവശ്യമെങ്കിൽ ചലനപരിധി കുറയ്ക്കൂ." },
+      { "id": "balasana", "name_en": "Child's Pose", "name_ml": "ബാലാസനം", "desc_en": "Fold forward only if comfortable. Use space between the knees, a cushion, or a chair-supported rest so breathing remains easy.", "desc_ml": "സുഖകരമാണെങ്കിൽ മാത്രം മുന്നോട്ട് കുനിയൂ. എളുപ്പത്തിൽ ശ്വസിക്കാൻ മുട്ടുകൾക്കിടയിൽ ഇടമോ തലയിണയോ കസേരയുടെ പിന്തുണയുള്ള വിശ്രമമോ ഉപയോഗിക്കൂ." },
+      { "id": "ananda_balasana", "name_en": "Happy Baby", "name_ml": "ആനന്ദ ബാലാസനം", "desc_en": "Lie on your back only if comfortable. Hold behind the thighs or use a strap without pulling, keeping the head and lower back supported.", "desc_ml": "കിടക്കുന്നത് സുഖകരമാണെങ്കിൽ മാത്രം മലർന്നു കിടക്കൂ. വലിക്കാതെ തുടകളുടെ പിന്നിൽ പിടിക്കുകയോ പട്ട ഉപയോഗിക്കുകയോ ചെയ്ത്, തലക്കും നടുവിനും പിന്തുണ ഉറപ്പാക്കൂ." }
+    ],
+    "next_pose_prompt": { "en": "Pause, notice how you feel, and prepare for the next pose only if you are ready.", "ml": "ഒന്ന് നിർത്തി ശരീരത്തിന് എങ്ങനെ തോന്നുന്നു എന്ന് ശ്രദ്ധിക്കൂ; തയ്യാറാണെങ്കിൽ മാത്രം അടുത്ത ആസനത്തിലേക്ക് നീങ്ങൂ." },
+    "session_complete": { "en": "The Yoga Bridge is complete. Return to stillness and notice the quality of your breath, body, and attention.", "ml": "യോഗ പാലം പൂർത്തിയായി. നിശ്ചലതയിലേക്ക് മടങ്ങി, ശ്വാസത്തിന്റെയും ശരീരത്തിന്റെയും ശ്രദ്ധയുടെയും ഗുണം ശ്രദ്ധിക്കൂ." }
+  },
+  "hooponopono": {
+    "intro": { "en": "Use these four phrases as a gentle personal reflection. You may repeat them quietly, adapt them, or simply listen without forcing a particular feeling.", "ml": "ഈ നാല് വാക്യങ്ങൾ സൗമ്യമായ വ്യക്തിപരമായ ആത്മപരിശോധനയായി ഉപയോഗിക്കൂ. നിശ്ശബ്ദമായി ആവർത്തിക്കാം, സ്വന്തം രീതിയിൽ മാറ്റാം, അല്ലെങ്കിൽ പ്രത്യേക വികാരം നിർബന്ധിക്കാതെ കേൾക്കാം." },
+    "phrases": {
+      "en": ["I am sorry", "Please forgive me", "Thank you", "I love you"],
+      "ml": ["ക്ഷമിക്കൂ", "എന്നോട് ക്ഷമിക്കൂ", "നന്ദി", "ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു"]
+    },
+    "closing": { "en": "Let the words settle. Keep what feels meaningful, and return to a calm, respectful awareness of yourself and others.", "ml": "ഈ വാക്കുകൾ ഉള്ളിൽ പതിയാൻ അനുവദിക്കൂ. അർഥവത്തായി തോന്നുന്നതിനെ സൂക്ഷിച്ച്, നിങ്ങളോടും മറ്റുള്ളവരോടും ശാന്തവും ബഹുമാനപൂർവ്വവുമായ ബോധത്തിലേക്ക് മടങ്ങൂ." }
+  },
+  "sound_shots": {
+    "anesthetic": { "frequency": 174 },
+    "mood_relaxation": { "frequency": 221.23 }
+  },
+  "sleep_mode": {
+    "stages": [
+      { "key": "drowsiness", "frequency": 10, "band": "alpha" },
+      { "key": "lightSleep", "frequency": 6, "band": "theta" },
+      { "key": "trueSleep", "frequency": 5, "band": "theta" },
+      { "key": "deepSleep", "frequency": 2, "band": "delta" },
+      { "key": "remRest", "frequency": 6, "band": "theta" }
+    ],
+    "intervalSeconds": 2
+  },
+  "deities": {
+    "shakthi": {
+      "root": "presiding-deities/shakthi/root.png", "sacral": "presiding-deities/shakthi/sacral.png", "solar": "presiding-deities/shakthi/solar.png", "heart": "presiding-deities/shakthi/heart.png", "throat": "presiding-deities/shakthi/throat.png", "thirdeye": "presiding-deities/shakthi/thirdeye.png", "crown": "presiding-deities/shakthi/crown.png"
+    },
+    "shiva": {
+      "root": "presiding-deities/shiva/root.png", "sacral": "presiding-deities/shiva/sacral.png", "solar": "presiding-deities/shiva/solar.png", "heart": "presiding-deities/shiva/heart.png", "throat": "presiding-deities/shiva/throat.png", "thirdeye": "presiding-deities/shiva/thirdeye.png", "crown": "presiding-deities/shiva/crown.png"
+    }
+  }
+}
