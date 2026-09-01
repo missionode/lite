@@ -584,6 +584,7 @@ const timingFallbacks = {
     'transitions.finalSilence': 60,
     'narration.piperLeadIn': 1.2,
     'narration.sentenceGap': 1.5,
+    'narration.exitGap': 2,
     'narration.fadeOutPause': 2.5,
     'narration.browserSafetyPerCharacter': 200,
     'narration.browserSafetyBuffer': 3000,
@@ -4389,6 +4390,10 @@ class MeditationController {
             await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
+        } else if (transition !== 'mantra') {
+            // Give the final spoken phrase room to settle before the caller
+            // introduces another narration block or visual instruction.
+            await this.pauseAwareSleep(timing('narration', 'exitGap') * 1000);
         }
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + timing('narration', 'fadeOutPause'));
@@ -4830,7 +4835,7 @@ class MeditationController {
                 continue;
             }
 
-            await this.pauseAwareSleep(sentenceGap * 1000);
+            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
         }
 
         // Release Frequency Carving after narration ends
@@ -4842,6 +4847,10 @@ class MeditationController {
             await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
             this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
+        } else if (transition !== 'mantra') {
+            // Browser TTS cannot use Piper's output fade, but it follows the
+            // same shared final breathing space before the next stage.
+            await this.pauseAwareSleep(timing('narration', 'exitGap') * 1000);
         }
     }
 

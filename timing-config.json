@@ -47,6 +47,7 @@
   "narration": {
     "piperLeadIn": 1.2,
     "sentenceGap": 1.5,
+    "exitGap": 2,
     "hrimLeadIn": 0.4,
     "hrimSentenceGap": 0.5,
     "fadeOutPause": 2.5,
@@ -112,6 +113,7 @@
       "narration": {
         "piperLeadIn": 0,
         "sentenceGap": 0,
+        "exitGap": 0,
         "hrimLeadIn": 0,
         "hrimSentenceGap": 0,
         "fadeOutPause": 0,

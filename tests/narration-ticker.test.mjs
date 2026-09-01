@@ -7,6 +7,9 @@ const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8')
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const piperModels = JSON.parse(fs.readFileSync(new URL('../piper-models.json', import.meta.url), 'utf8'));
+const timing = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
+
+assert.equal(timing.narration.exitGap, 2, 'Every ordinary narration block should leave a two-second breathing space.');
 
 const englishPiperVoices = piperModels.voices.filter(voice => voice.language === 'en');
 assert.equal(englishPiperVoices.length, 1, 'the registry should currently expose one English Piper voice');
@@ -63,6 +66,8 @@ assert.match(app, /const buffer = await piperTTS\.decode\(blob\)[\s\S]*?narratio
 assert.match(app, /await piperTTS\.playBuffer\(buffer, volumeScale, \{[\s\S]*?fadeOutSeconds:[\s\S]*?\}\)/, 'Piper should play each ready sentence progressively with a transition-aware fade');
 assert.match(app, /const isFinalClip = i === sentences\.length - 1/, 'Piper should identify the final narration clip for a mantra handoff');
 assert.match(app, /NARRATION_MANTRA_FADE_SECONDS/, 'the final narration clip should use a centralized mantra transition fade');
+assert.match(app, /async narrateWithPiper[\s\S]*?else if \(transition !== 'mantra'\) \{[\s\S]*?timing\('narration', 'exitGap'\)/, 'Piper narration should use the shared exit gap except before mantra.');
+assert.match(app, /async narrateBrowser[\s\S]*?if \(i < sentences\.length - 1\) await this\.pauseAwareSleep\(sentenceGap \* 1000\);[\s\S]*?else if \(transition !== 'mantra'\) \{[\s\S]*?timing\('narration', 'exitGap'\)/, 'Browser TTS should match Piper’s final exit spacing without doubling its last sentence gap.');
 assert.match(app, /startNarrationTicker\(narrationDuration\)/, 'The marquee should start when the first Piper clip is ready');
 assert.match(app, /const updateNarrationTickerDuration = \(durationSeconds\)[\s\S]*?const position = Number\.isFinite\(currentTime\)[\s\S]*?currentTime \/ previousDuration[\s\S]*?nextAnimation\.currentTime = position \* duration \* 1000/, 'Updating to real Piper timing should preserve the marquee position');
 assert.match(app, /if \(!this\.isMeditationActive\) return;[\s\S]*?piperFailed = true[\s\S]*?piperTTS\.cancel\('sentence failed'\)/, 'A stopped journey should not trigger browser fallback after Piper cancellation');
