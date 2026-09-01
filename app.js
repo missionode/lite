@@ -3161,7 +3161,7 @@ class MeditationController {
 
         const hypnosisWrapperMinutes = !this.isHighEnergy && !focusedExperience && !state.sleepMode &&
             !state.bgMusicMode && !isDemoScriptSelected()
-            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60)
+            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
             : 0;
         const estimateMinutes = this.isHighEnergy
             ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
@@ -3352,6 +3352,9 @@ class MeditationController {
 
     async runArrivalInduction() {
         if (!this.shouldRunHypnosisWrapper()) return;
+        const text = contentT('system.arrivalInduction');
+        if (text) await this.narrate(text, false);
+        if (!this.isMeditationActive) return;
         const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
         const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
         await this.runGuidedTransitionTone(432, halfDuration, {
@@ -3362,6 +3365,9 @@ class MeditationController {
 
     async runArrivalReadiness() {
         if (!this.shouldRunHypnosisWrapper()) return;
+        const text = contentT('system.arrivalReadiness');
+        if (text) await this.narrate(text, false);
+        if (!this.isMeditationActive) return;
         const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
         const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
         await this.runGuidedTransitionTone(528, halfDuration, {
@@ -6121,7 +6127,7 @@ function attachEventListeners() {
         let overhead = timing('estimate', 'baseOverhead');
 
         const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
-            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60)
+            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
             : 0;
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))

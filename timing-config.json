@@ -62,7 +62,8 @@
     "boxBreathingOverhead": 4,
     "hooponoponoOverhead": 3,
     "yogaPoseTransitionEstimate": 15,
-    "hypnosisTransitionToneSeconds": 20
+    "hypnosisTransitionToneSeconds": 20,
+    "hypnosisNarrationSeconds": 40
   },
   "profiles": {
     "fast-test": {
@@ -128,7 +129,8 @@
         "boxBreathingOverhead": 0,
         "hooponoponoOverhead": 0,
         "yogaPoseTransitionEstimate": 0,
-        "hypnosisTransitionToneSeconds": 0
+        "hypnosisTransitionToneSeconds": 0,
+        "hypnosisNarrationSeconds": 0
       }
     }
   }
