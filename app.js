@@ -718,6 +718,7 @@ function applyTimingControls() {
         'time-per-chakra': 'timePerChakra',
         'time-high-energy': 'timeHighEnergy',
         'time-icebreaker': 'icebreaker',
+        'time-emergence': 'emergence',
         'time-breathing': 'breathingStep',
         'time-corpse': 'corpsePose',
         'time-interval': 'interval',
@@ -760,6 +761,7 @@ async function loadTimingConfig() {
             timeSleepStage: ['chakra_time_sleep_stage', 'sleepStageDuration', 5],
             timeShot: ['chakra_time_shot', 'shotDuration', 7],
             timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
+            timeEmergence: ['chakra_time_emergence', 'emergence', 60],
             timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
             timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
             timeInterval: ['chakra_time_interval', 'interval', 10],
@@ -2386,6 +2388,49 @@ class AudioEngine {
         this.shotGain = gain;
     }
 
+    startGuidedTransitionTone(frequency, durationMs) {
+        if (state.noFrequencyMode) return false;
+        const requested = Number(frequency);
+        if (!this.ctx || !Number.isFinite(requested) || requested <= 0 || requested > 20000) return false;
+
+        this.stopGuidedTransitionTone(0.05);
+        const now = this.ctx.currentTime;
+        const durationSeconds = Math.max(1, Number(durationMs) / 1000);
+        const fadeSeconds = Math.min(1.5, Math.max(0.35, durationSeconds * 0.25));
+        const steadyUntil = Math.max(now + fadeSeconds, now + durationSeconds - fadeSeconds);
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        // This is a brief guided transition cue, not the public Shot path.
+        // Keep it below the main drone ceiling even when the user raises that
+        // mixer control for ordinary mantra work.
+        const peak = Math.min(Math.max(0.003, state.volDrone * 0.5), 0.025);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(requested, now);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(peak, now + fadeSeconds);
+        gain.gain.setValueAtTime(peak, steadyUntil);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now);
+        osc.stop(now + durationSeconds + 0.05);
+        this.guidedTransitionTone = { osc, gain };
+        return true;
+    }
+
+    stopGuidedTransitionTone(fadeSeconds = 1) {
+        if (!this.ctx || !this.guidedTransitionTone) return;
+        const { osc, gain } = this.guidedTransitionTone;
+        this.guidedTransitionTone = null;
+        const now = this.ctx.currentTime;
+        try {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.05, fadeSeconds));
+            osc.stop(now + Math.max(0.1, fadeSeconds) + 0.05);
+        } catch (error) {}
+    }
+
     stopFrequencyShot() {
         if (!this.ctx || !this.shotOscillator || !this.shotGain) return;
         const now = this.ctx.currentTime;
@@ -3062,6 +3107,7 @@ class MeditationController {
         this.isStarting = false;
         this.isPaused = false;
         this.isHighEnergy = false;
+        this.isHypnosisJourney = false;
         this.isShotActive = false;
         this.isExperimentActive = false;
         this.experimentDuration = null;
@@ -3112,12 +3158,17 @@ class MeditationController {
             return Math.max(1, stageSeconds + intervalSeconds + 12) * 1000;
         }
 
+        const hypnosisWrapperMinutes = !this.isHighEnergy && !focusedExperience && !state.sleepMode &&
+            !state.bgMusicMode && !isDemoScriptSelected()
+            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60)
+            : 0;
         const estimateMinutes = this.isHighEnergy
             ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
             : this.chakraOrder.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
                 + (state.timeIcebreaker / 60)
                 + timing('estimate', 'baseOverhead')
-                + timing('estimate', 'normalExtra');
+                + timing('estimate', 'normalExtra')
+                + hypnosisWrapperMinutes;
         return Math.max(1, Math.round(estimateMinutes)) * 60 * 1000;
     }
 
@@ -3271,6 +3322,69 @@ class MeditationController {
         this.audio.stopDrone();
     }
 
+    shouldRunHypnosisWrapper() {
+        return this.isHypnosisJourney && this.isMeditationActive;
+    }
+
+    async runGuidedTransitionTone(frequency, durationMs, { beforeGap = 0, afterGap = 0 } = {}) {
+        if (!this.isMeditationActive) return;
+        if (beforeGap > 0) await this.pauseAwareSleep(beforeGap * 1000);
+        if (!this.isMeditationActive) return;
+        if (state.noFrequencyMode) {
+            // Preserve the same quiet breathing space when generated sound is
+            // intentionally disabled; only the tone itself is omitted.
+            if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
+            return;
+        }
+        // Make a small, explicit space for the tone, then return the music to
+        // its normal narration duck before the next spoken section.
+        this.audio.fadeInBackgroundMusic(1.2, 0.08);
+        const started = this.audio.startGuidedTransitionTone(frequency, durationMs);
+        if (!started) return;
+        await this.pauseAwareSleep(durationMs);
+        this.audio.stopGuidedTransitionTone(1.1);
+        await this.pauseAwareSleep(1100);
+        if (!this.isMeditationActive) return;
+        this.audio.fadeInBackgroundMusic(2.4, true);
+        if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
+    }
+
+    async runArrivalInduction() {
+        if (!this.shouldRunHypnosisWrapper()) return;
+        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
+        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
+        await this.runGuidedTransitionTone(432, halfDuration, {
+            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
+            afterGap: timing('transitions', 'arrivalToneExitGap')
+        });
+    }
+
+    async runArrivalReadiness() {
+        if (!this.shouldRunHypnosisWrapper()) return;
+        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
+        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
+        await this.runGuidedTransitionTone(528, halfDuration, {
+            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
+            afterGap: timing('transitions', 'arrivalReadinessGap')
+        });
+    }
+
+    async runEmergence() {
+        if (!this.shouldRunHypnosisWrapper()) return;
+        setText('mantra-display', '✦');
+        // No Frequency Mode removes sound generators, while preserving the
+        // guide's gentle reorientation narration below.
+        if (!state.noFrequencyMode) this.audio.playSingingBowl();
+        await this.pauseAwareSleep(timing('transitions', 'emergenceBellSettle') * 1000);
+        if (!this.isMeditationActive) return;
+        const text = contentT('system.emergence');
+        if (text) await this.narrate(text, false);
+        if (!this.isMeditationActive) return;
+        await this.pauseAwareSleep(state.timeEmergence * 1000);
+        if (!this.isMeditationActive) return;
+        await this.pauseAwareSleep(timing('transitions', 'emergenceFinalQuiet') * 1000);
+    }
+
     async runSleepJourney() {
         if (this.isStarting || this.isMeditationActive) return;
         alert("Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.");
@@ -3294,6 +3408,7 @@ class MeditationController {
         this.isMeditationActive = true;
         this.isPaused = false;
         this.isHighEnergy = false;
+        this.isHypnosisJourney = false;
         this.sessionStartedAt = Date.now();
         showScreen(meditationScreen);
         this.startSessionCountdown(this.getSessionDurationMs());
@@ -3551,6 +3666,7 @@ class MeditationController {
             this.isMeditationActive = true;
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
+            this.isHypnosisJourney = false;
             if (focusedExperience === 'intimate' && state.massageEnabled) {
                 // Massage is a full reverse chakra wrapper, never a separately
                 // timed care stage. Keep the user's normal selection intact.
@@ -3588,6 +3704,11 @@ class MeditationController {
                 if (this.isMeditationActive) this.finish();
                 return;
             }
+
+            // Only the ordinary chakra journey receives the optional Arrival
+            // and Emergence wrapper. Focused experiences above return before
+            // this point, so their established order remains untouched.
+            this.isHypnosisJourney = !this.isHighEnergy && !isDemoScriptSelected();
 
             // ── ICEBREAKER PHASE (60 Second Music Fade In) ─────────────────────
             // Localize Icebreaker UI
@@ -3738,6 +3859,9 @@ class MeditationController {
         await this.narrate(prePracticeSafety, false);
         if (!this.isMeditationActive) return;
 
+        await this.runArrivalInduction();
+        if (!this.isMeditationActive) return;
+
         // Moon-phase and returning sea openings belong to the reflective
         // journey. HRIM begins directly with its activation intention.
         if (!isHighEnergy) {
@@ -3774,8 +3898,7 @@ class MeditationController {
         } else {
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
-
-        // Removed redundant pause before breathing - transition is now immediate and musical
+        if (!isHighEnergy && this.isMeditationActive) await this.runArrivalReadiness();
     }
 
     async runBoxBreathing() {
@@ -4352,6 +4475,7 @@ class MeditationController {
         if (!complete) return;
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
+        if (this.isMeditationActive) { await this.runEmergence(); }
         if (this.isMeditationActive) { this.finish(); }
     }
 
@@ -4748,6 +4872,7 @@ class MeditationController {
     finish() {
         const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
+        this.isHypnosisJourney = false;
         this.sessionStartedAt = null;
         this.stopSessionCountdown();
         this.visual.stop(); 
@@ -4755,6 +4880,7 @@ class MeditationController {
         // The completion path must not restore music after the mantra fades.
         // Schedule one coordinated fade for both layers instead.
         this.audio.stopMantraTrack({ restoreMusic: false });
+        this.audio.stopGuidedTransitionTone();
         this.audio.fadeOutBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         this.audio.stopPleasureAmbience();
@@ -4763,7 +4889,6 @@ class MeditationController {
         piperTTS.cancel('journey finished', { immediate: true });
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
-        this.audio.playSingingBowl();
         state.stats.journeys += 1; state.stats.time += sessionMinutes;
         localStorage.setItem('chakra_stats_journeys', state.stats.journeys);
         localStorage.setItem('chakra_stats_time', state.stats.time);
@@ -4795,7 +4920,7 @@ class MeditationController {
 
     stop() {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
         this.isExperimentActive = false;
         cancelNarrationPlayback();
@@ -4880,7 +5005,7 @@ const state = {
     voices: [],
     volVoice: clampAudioLevel(storedNumber('chakra_vol_voice', 0.9), 0.2, 2, 0.9),
     volDrone: clampAudioLevel(storedNumber('chakra_vol_drone', 0.05), 0.02, 0.2, 0.05),
-    volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.05), 0.2, 1, 0.2),
+    volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.04), 0.02, 0.12, 0.04),
     volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.1, 1, 0.35),
     volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
@@ -4943,6 +5068,7 @@ const state = {
     timeSleepStage: parseFloat(localStorage.getItem('chakra_time_sleep_stage')) || 5.0,
     timeShot: parseInt(localStorage.getItem('chakra_time_shot')) || 7,
     timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
+    timeEmergence: parseInt(localStorage.getItem('chakra_time_emergence')) || 60,
     timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
     timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
     timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 10,
@@ -5357,6 +5483,8 @@ function loadPreferences() {
     // Sync Journey Timings Sliders
     syncValue('time-icebreaker', state.timeIcebreaker);
     setText('display-icebreaker', state.timeIcebreaker + 's');
+    syncValue('time-emergence', state.timeEmergence);
+    setText('display-emergence', state.timeEmergence + 's');
     
     syncValue('time-breathing', state.timeBreathing);
     setText('display-breathing', state.timeBreathing + 's');
@@ -5983,9 +6111,12 @@ function attachEventListeners() {
         const isHigh = getChecked('high-energy-toggle');
         let overhead = timing('estimate', 'baseOverhead');
 
+        const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
+            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60)
+            : 0;
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra'));
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes);
         setText('session-estimate', `~ ${estimate} min session`);
         updateJourneyRoadmap();
     }
@@ -5995,6 +6126,12 @@ function attachEventListeners() {
         state.timeIcebreaker = parseInt(e.target.value);
         setText('display-icebreaker', state.timeIcebreaker + 's');
         localStorage.setItem('chakra_time_icebreaker', state.timeIcebreaker);
+        updateSessionEstimate();
+    });
+    document.getElementById('time-emergence').addEventListener('input', (e) => {
+        state.timeEmergence = parseInt(e.target.value);
+        setText('display-emergence', state.timeEmergence + 's');
+        localStorage.setItem('chakra_time_emergence', state.timeEmergence);
         updateSessionEstimate();
     });
     document.getElementById('time-breathing').addEventListener('input', (e) => {
@@ -6227,6 +6364,7 @@ function attachEventListeners() {
             meditation.cancelDroneTimer();
             audio.stopDrone();
             audio.stopFrequencyShot();
+            audio.stopGuidedTransitionTone();
             audio.stopPleasureAmbience();
         } else if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
             void audio.startPleasureAmbience();

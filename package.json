@@ -10,6 +10,7 @@
     "test:russian-language": "node tests/russian-language.test.mjs",
     "test:hindi-language": "node tests/hindi-language.test.mjs",
     "test:demo-script": "node tests/demo-script.test.mjs",
+    "test:hypnosis-journey": "node tests/hypnosis-journey.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
     "test:spatial-audio": "node tests/spatial-audio.test.mjs",

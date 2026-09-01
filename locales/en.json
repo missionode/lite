@@ -199,6 +199,7 @@
     ,"music": "Music"
     ,"journeyTimings": "Journey Timings"
     ,"arriving": "Arriving"
+    ,"emergence": "Emergence"
     ,"breathing": "Breathing"
     ,"corpsePose": "Corpse Pose"
     ,"interval": "Interval"
@@ -277,6 +278,7 @@
     "prePracticeSafety": "Settle into a comfortable position. Your guide is here with you. Let your breathing remain natural, and allow yourself to arrive gently in this moment.",
     "arriving": "Arriving",
     "breatheAndSettle": "Breathe and settle into the space",
+    "emergence": "Take your time returning to the room. Notice the support beneath you, gently move your fingers and toes, and let your eyes open when you feel ready. Carry only what feels useful from this practice into the rest of your day.",
     "intention": "You are calling in: {{intention}}. Hold this in your heart — let it remain quietly with you through every moment of this journey.",
     "centeringBreath": "Sit comfortably. We will start with a centering breath.",
     "breathingComplete": "Breathing exercise is complete. Stay still for a moment.",
