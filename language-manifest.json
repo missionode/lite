@@ -32,6 +32,15 @@
       "browserPrefixes": ["ru"],
       "defaultPiperVoice": "ru_RU-irina-medium",
       "preview": "Дышите мягко. В этот момент вы в безопасности."
+    },
+    {
+      "id": "hi",
+      "locale": "hi-IN",
+      "label": "हिन्दी",
+      "contentSource": "scripts.json",
+      "localeSource": "locales/hi.json",
+      "browserPrefixes": ["hi"],
+      "preview": "धीरे से साँस लें। इस क्षण आप सुरक्षित हैं।"
     }
   ]
 }
