@@ -19,6 +19,12 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-02 (Slower narration duck and feeble mantra range)
+
+- Background music now takes 6 seconds, rather than 4, to settle to its narration bed in both Piper and Browser TTS routes. The mantra mixer keeps its existing 35% default but now permits a deliberately feeble 2% minimum in 1% steps; persisted values are clamped to the same range.
+- Delivery rotates to `app.js?v=2.21` and shell cache `chakra-v5.95`. No mantra default, music-to-mantra dissolve, frequency level, or narration wording changes are included.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, background-music/mantra, narration ticker, audio safety, and diff check. No Playwright or screenshots were run by owner direction; target-device listening remains the audible-quality gate.
+
 ### Local checkpoint — 2026-09-02 (Longer narration-to-mantra tail)
 
 - The single shared Piper narration-to-mantra tail is now 5 seconds (was 3), covering every chakra and HRIM before its mapped mantra. Browser TTS remains outside Web Audio and therefore retains its platform-owned voice ending; it still uses the same six-second background-music dissolve before mantra playback.

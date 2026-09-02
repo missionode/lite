@@ -4336,7 +4336,7 @@ class MeditationController {
         if (!text || !this.isMeditationActive && !fadeOut) return;
         setNarrationTickerAwaitingPlayback(true);
         setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
-        if (!keepSilence) this.audio.fadeInBackgroundMusic(4, true);
+        if (!keepSilence) this.audio.fadeInBackgroundMusic(6, true);
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
             this.audio.voiceCarveFilter.gain.setValueAtTime(this.audio.voiceCarveFilter.gain.value, this.audio.ctx.currentTime);
@@ -4780,7 +4780,7 @@ class MeditationController {
 
         // Ensure background music is active at ducked level
         if (!keepSilence) {
-            this.audio.fadeInBackgroundMusic(4, true);
+            this.audio.fadeInBackgroundMusic(6, true);
         }
 
         // Studio Timing: 1.2 second gap gives music time to 'duck' but keeps momentum
@@ -5056,7 +5056,7 @@ const state = {
     volVoice: clampAudioLevel(storedNumber('chakra_vol_voice', 0.9), 0.2, 2, 0.9),
     volDrone: clampAudioLevel(storedNumber('chakra_vol_drone', 0.05), 0.02, 0.2, 0.05),
     volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.04), 0.02, 0.12, 0.04),
-    volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.1, 1, 0.35),
+    volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.02, 1, 0.35),
     volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
     pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
