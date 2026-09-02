@@ -3204,6 +3204,7 @@ class JourneyVideoPrelude {
         this.overlay = document.getElementById('journey-video-prelude');
         this.media = document.getElementById('journey-video-prelude-media');
         this.playButton = document.getElementById('play-journey-video-prelude');
+        this.fullscreenTarget = document.getElementById('app');
         this.activePlayback = null;
     }
 
@@ -3212,8 +3213,8 @@ class JourneyVideoPrelude {
 
         // This call is intentionally made synchronously inside the explicit
         // Begin introduction tap so browsers may honor the fullscreen request.
-        if (typeof this.overlay?.requestFullscreen === 'function') {
-            Promise.resolve(this.overlay.requestFullscreen({ navigationUI: 'hide' })).catch(() => {});
+        if (typeof this.fullscreenTarget?.requestFullscreen === 'function') {
+            Promise.resolve(this.fullscreenTarget.requestFullscreen({ navigationUI: 'hide' })).catch(() => {});
             return;
         }
 
@@ -3223,7 +3224,7 @@ class JourneyVideoPrelude {
     }
 
     exitFullscreen() {
-        if (document.fullscreenElement === this.overlay && typeof document.exitFullscreen === 'function') {
+        if (document.fullscreenElement === this.fullscreenTarget && typeof document.exitFullscreen === 'function') {
             Promise.resolve(document.exitFullscreen()).catch(() => {});
             return;
         }
@@ -3263,7 +3264,6 @@ class JourneyVideoPrelude {
                 await beginExit(duration);
                 this.media.pause();
                 try { this.media.currentTime = 0; } catch (error) {}
-                this.exitFullscreen();
                 this.overlay.classList.remove('is-visible', 'is-leaving', 'is-playing');
                 this.overlay.classList.add('hidden');
                 resolve(reason);
@@ -5200,6 +5200,7 @@ class MeditationController {
             aura.style.opacity = '1';
         }
         showScreen(returnScreen);
+        journeyVideoPrelude.exitFullscreen();
     }
 }
 
@@ -6892,6 +6893,7 @@ function attachEventListeners() {
             aura.style.opacity = '1';
         }
         showScreen(lobbyScreen);
+        journeyVideoPrelude.exitFullscreen();
     });
 
     // Toggle text overlay on click of the image area for immersion

@@ -19,8 +19,10 @@ assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?this\.playButton = document\.getElementById\('play-journey-video-prelude'\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video and its audio should begin only from the explicit Play action, at the guide-selected music level');
-assert.match(app, /enterFullscreen\(\) \{[\s\S]*?this\.overlay\.requestFullscreen\(\{ navigationUI: 'hide' \}\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?this\.enterFullscreen\(\);[\s\S]*?this\.media\.play\(\)/, 'the explicit Play action should request full screen before it starts playback');
-assert.match(app, /this\.exitFullscreen\(\);[\s\S]*?this\.overlay\.classList\.remove/, 'the application should return to its normal viewport before the journey continues');
+assert.match(app, /this\.fullscreenTarget = document\.getElementById\('app'\)[\s\S]*?enterFullscreen\(\) \{[\s\S]*?this\.fullscreenTarget\.requestFullscreen\(\{ navigationUI: 'hide' \}\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?this\.enterFullscreen\(\);[\s\S]*?this\.media\.play\(\)/, 'the explicit Play action should make the persistent app container fullscreen before it starts playback');
+assert.doesNotMatch(app, /this\.media\.pause\(\);[\s\S]{0,250}this\.exitFullscreen\(\);[\s\S]{0,250}this\.overlay\.classList\.remove/, 'the prelude should not leave fullscreen during the video-to-journey handoff');
+assert.match(app, /showScreen\(returnScreen\);\s*journeyVideoPrelude\.exitFullscreen\(\);/, 'an explicit Stop should return the app to its normal viewport');
+assert.match(app, /document\.getElementById\('close-completion'\)\.addEventListener\('click', \(\) => \{[\s\S]*?showScreen\(lobbyScreen\);\s*journeyVideoPrelude\.exitFullscreen\(\);/, 'returning from completion should also leave fullscreen before the Lobby is shown');
 assert.match(app, /this\.media\.pause\(\);[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(0, 0\);/, 'the ready screen should leave the video paused and silent before Play');
 assert.match(app, /this\.journeyVideoPreludeSource = this\.ctx\.createMediaElementSource\(media\)/, 'video audio should enter the Web Audio graph');
 assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.journeyVideoPreludeGain\.connect\(this\.musicEchoSend\)/, 'video audio should use the established Spatial Sound and Music Space paths');
@@ -29,6 +31,8 @@ assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOUR
 assert.match(app, /meditation\.stop\(\);[\s\S]*?const preludeResult = await journeyVideoPrelude\.play\(\);[\s\S]*?if \(preludeResult === 'ended'\) meditation\.acknowledgeDndReminder\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'a completed prelude should acknowledge the Do Not Disturb reminder before it relaunches the journey');
 assert.match(app, /showDndReminderIfNeeded\(\) \{[\s\S]*?if \(this\.dndReminderAcknowledged\)[\s\S]*?this\.dndReminderAcknowledged = false;[\s\S]*?alert\(t\('ui\.journeyVideoPreludeReminder'\)\)/, 'the reminder should be consumed once after a completed video while normal starts retain it');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
+assert.match(css, /#app:fullscreen\s*\{[\s\S]*?max-width:\s*none[\s\S]*?min-height:\s*100dvh/, 'the persistent fullscreen app should not retain the normal narrow Lobby width');
+assert.match(css, /#app:fullscreen #controls:not\(\.hidden\),[\s\S]*?#app:fullscreen #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?#app:fullscreen:hover #controls:not\(\.hidden\)[\s\S]*?#app:fullscreen:hover #session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should reveal only on hover');
 
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');

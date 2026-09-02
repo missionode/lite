@@ -90,6 +90,18 @@ body {
     margin: 0 auto; /* kill auto centering */
 }
 
+/* The video hands fullscreen ownership to the persistent app container, so
+   its immersive state continues seamlessly into the guided journey. */
+#app:fullscreen {
+    width: 100vw;
+    max-width: none;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+}
+
 #meditation-screen {
     display: flex;
     flex-direction: column;
@@ -948,6 +960,32 @@ input[type="range"]::-moz-range-progress {
     justify-content: center;
     gap: 2.5rem;
     margin-top: 2rem;
+}
+
+/* Keep the guided image clear in fullscreen. A mouse hover or keyboard focus
+   reveals the controls and mirrored time rings; leaving lets both recede. */
+#app:fullscreen #controls:not(.hidden),
+#app:fullscreen #session-countdown-layer {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+#app:fullscreen #controls:not(.hidden) {
+    transform: translateY(1rem);
+}
+
+#app:fullscreen:hover #controls:not(.hidden),
+#app:fullscreen:focus-within #controls:not(.hidden),
+#app:fullscreen:hover #session-countdown-layer,
+#app:fullscreen:focus-within #session-countdown-layer {
+    opacity: 1;
+}
+
+#app:fullscreen:hover #controls:not(.hidden),
+#app:fullscreen:focus-within #controls:not(.hidden) {
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .icon-btn {
