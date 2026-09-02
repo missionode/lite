@@ -47,8 +47,12 @@ const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_AS
 // with an abrupt mute or a separate dead-silence delay.
 const MANTRA_MUSIC_FADE_SECONDS = 6;
 const MANTRA_FADE_SECONDS = 4;
-const MANTRA_REVERB_TAIL_SECONDS = 3.6;
-const MANTRA_REVERB_TAIL_DECAY = 1.8;
+const VOICE_REVERB_TAIL_SECONDS = 4.5;
+const VOICE_REVERB_TAIL_DECAY = 3.8;
+const MUSIC_REVERB_TAIL_SECONDS = 3.2;
+const MUSIC_REVERB_TAIL_DECAY = 4.8;
+const MANTRA_REVERB_TAIL_SECONDS = 5.5;
+const MANTRA_REVERB_TAIL_DECAY = 2.2;
 const MANTRA_REVERB_TAIL_WET = 0.26;
 const PIPER_CLIP_FADE_SECONDS = 0.05;
 // The final narration sentence receives a longer tail before every mantra.
@@ -1529,6 +1533,7 @@ class AudioEngine {
         this.musicEchoConvolver = null;
         this.musicEchoFilter = null;
         this.musicEchoWetGain = null;
+        this.musicEchoTailGate = null;
         this.pleasureSourceGain = null;
         this.pleasureGain = null;
         this.pleasureEnhancer = null;
@@ -1620,7 +1625,11 @@ class AudioEngine {
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
         this.voiceEchoDelay.delayTime.setValueAtTime(0.025, this.ctx.currentTime);
         this.voiceEchoConvolver = this.ctx.createConvolver();
-        this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(2.8, 3.2, 731);
+        this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(
+            VOICE_REVERB_TAIL_SECONDS,
+            VOICE_REVERB_TAIL_DECAY,
+            731
+        );
         this.voiceEchoFilter = this.ctx.createBiquadFilter();
         this.voiceEchoFilter.type = 'lowpass';
         this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
@@ -1694,20 +1703,28 @@ class AudioEngine {
         this.musicEchoDelay = this.ctx.createDelay(0.5);
         this.musicEchoDelay.delayTime.setValueAtTime(0.018, this.ctx.currentTime);
         this.musicEchoConvolver = this.ctx.createConvolver();
-        this.musicEchoConvolver.buffer = this.createDiffuseReverbImpulse(1.8, 4.2, 1777);
+        this.musicEchoConvolver.buffer = this.createDiffuseReverbImpulse(
+            MUSIC_REVERB_TAIL_SECONDS,
+            MUSIC_REVERB_TAIL_DECAY,
+            1777
+        );
         this.musicEchoFilter = this.ctx.createBiquadFilter();
         this.musicEchoFilter.type = 'lowpass';
         this.musicEchoFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
         this.musicEchoWetGain = this.ctx.createGain();
         this.musicEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        // Stop new music from entering reverb at a transition while allowing
+        // the already-created diffuse tail to settle naturally.
+        this.musicEchoTailGate = this.ctx.createGain();
+        this.musicEchoTailGate.gain.setValueAtTime(1, this.ctx.currentTime);
+        this.musicEchoTailGate.connect(this.musicEchoSend);
         this.musicEchoSend.connect(this.musicEchoDelay);
         this.musicEchoDelay.connect(this.musicEchoConvolver);
         this.musicEchoConvolver.connect(this.musicEchoFilter);
         this.musicEchoFilter.connect(this.musicEchoWetGain);
 
-        // One final music-only gate controls both dry music and its echo.
-        // This makes mantra muting complete and click-free without touching
-        // the drone master gain.
+        // The dry-music and reverb-tail gates are deliberately separate. A
+        // mantra handoff ends new music input but preserves its soft decay.
         this.bgMusicBusGain = this.ctx.createGain();
         this.bgMusicBusGain.gain.setValueAtTime(1, this.ctx.currentTime);
 
@@ -1721,8 +1738,8 @@ class AudioEngine {
         this.bgMusicLPF.connect(this.bgMusicHumFilter);
         this.bgMusicHumFilter.connect(this.bgMusicSmoothGain);
         this.bgMusicSmoothGain.connect(this.bgMusicBusGain);
-        this.bgMusicSmoothGain.connect(this.musicEchoSend);
-        this.musicEchoWetGain.connect(this.bgMusicBusGain);
+        this.bgMusicSmoothGain.connect(this.musicEchoTailGate);
+        this.musicEchoWetGain.connect(this.spatialMusicPanner);
         this.bgMusicBusGain.connect(this.spatialMusicPanner);
         this.spatialMusicPanner.connect(this.lowCutFilter);
 
@@ -2697,6 +2714,11 @@ class AudioEngine {
             this.bgMusicBusGain.gain.cancelScheduledValues(now);
             this.bgMusicBusGain.gain.setValueAtTime(1, now);
         }
+        if (this.musicEchoTailGate) {
+            const now = this.ctx.currentTime;
+            this.musicEchoTailGate.gain.cancelScheduledValues(now);
+            this.musicEchoTailGate.gain.setValueAtTime(1, now);
+        }
 
         // Match the source-loop startup envelope to the outer music gain.
         // Keeping both at the full entry duration prevents a restarted loop
@@ -3045,6 +3067,15 @@ class AudioEngine {
         }
         const fadeDuration = Math.max(0, duration);
         this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + fadeDuration);
+        if (this.musicEchoTailGate) {
+            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
+                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
+            } else {
+                this.musicEchoTailGate.gain.cancelScheduledValues(now);
+                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
+            }
+            this.musicEchoTailGate.gain.linearRampToValueAtTime(0, now + fadeDuration);
+        }
         return { startedAt: now, duration: fadeDuration };
     }
 
@@ -3060,6 +3091,15 @@ class AudioEngine {
             this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
         }
         this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
+        if (this.musicEchoTailGate) {
+            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
+                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
+            } else {
+                this.musicEchoTailGate.gain.cancelScheduledValues(now);
+                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
+            }
+            this.musicEchoTailGate.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
+        }
     }
 
     stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {

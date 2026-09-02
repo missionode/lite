@@ -19,6 +19,12 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-02 (Extended natural transition tails)
+
+- Existing diffuse, non-repeating reverb is extended: narration `2.8s → 4.5s`, background music `1.8s → 3.2s`, and mantra `3.6s → 5.5s`. Dry source fades and intelligibility settings remain unchanged.
+- Music now has a dedicated reverb-tail input gate. A music-to-mantra dissolve closes both dry music and new reverb input over the established six seconds, but the already-generated, low-passed tail returns beside the dry gate and settles naturally instead of being hard-cut. The tail is restored gradually with the music after mantra.
+- Delivery rotates to `app.js?v=2.23` and shell cache `chakra-v5.97`. Validation: `static/unit` PASS — syntax, background-music/mantra, spatial routing, narration timing, audio safety, and diff check. No Playwright or screenshots were run by owner direction; target-device listening remains the audible-quality gate.
+
 ### Local checkpoint — 2026-09-02 (Near-whisper mantra minimum)
 
 - The mantra mixer’s non-zero minimum is now 0.5% in 0.5% steps, replacing the prior 2% floor. Its 35% default is deliberately unchanged, so existing guides retain their normal balance unless they choose the new near-whisper range. The change affects the mantra track only, not spoken narration, music, drones, or bell.
