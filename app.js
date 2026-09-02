@@ -62,6 +62,7 @@ const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
+const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
 const PLEASURE_AMBIENCE_GAIN = 0.003;
@@ -3341,7 +3342,8 @@ class MeditationController {
             this.dndReminderAcknowledged = false;
             return;
         }
-        alert(t('ui.journeyVideoPreludeReminder'));
+        const reminder = t('ui.journeyVideoPreludeReminder');
+        alert(reminder === 'ui.journeyVideoPreludeReminder' ? DND_REMINDER_FALLBACK : reminder);
     }
 
     getSessionDurationMs(focusedExperience = null) {
