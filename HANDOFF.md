@@ -19,6 +19,13 @@
 
 ## NOW
 
+### Active feature — 2026-09-02 (Journey video prelude)
+
+- Branch: `journey-video-prelude`, created from `production` commit `8d63042`. Scope is intentionally limited to the supplied `video/nature-upgrade.mp4` restart prelude; no ordinary Begin Journey, Shot, Sleep, Music Only, Experiment, or completion flow is changed.
+- After the existing Restart Journey confirmation, the active session stops and the supplied video fills the app viewport. Its native audio enters the Web Audio graph at the guide-selected Music level, follows the existing Spatial Sound panner and Music Space diffuse reverb, fades in over 2.4 seconds, and fades out over 3 seconds. The visual uses matching opacity fades. The Skip control uses a shorter 1.2-second exit; missing/failed playback uses the same safe continuation.
+- The large video is deliberately not listed in the service-worker install precache, avoiding a 42 MB install/update burden. It remains a normal first-use media request. At the end or Skip, the established journey starts only after the prelude exit completes.
+- New static regression coverage checks supplied-media presence, full-viewport layout, video/audio fade contract, Web Audio routing, Skip/failure handoff, restart ordering, localization, and non-precache behavior. Validation: `static/unit` PASS — JavaScript/service-worker syntax, `test:journey-video-prelude`, background music, spatial audio, narration ticker, Hindi, Russian, No Frequency, focused practices, Yoga, demo script, language intention, audio safety, journey handoff, and diff check. No Playwright, screenshots, or device listening were run by owner direction.
+
 ### Local checkpoint — 2026-09-02 (Minimal test-script narration)
 
 - `test-script.json` remains a complete English/Malayalam schema fixture with its existing frequencies, mantras, assets, service modules, Yoga poses, sleep stages, and shot values intact. Every localized narrative leaf is now exactly one concise sentence, making it suitable for quick technical flow checks rather than stakeholder presentation.

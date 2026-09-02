@@ -277,6 +277,66 @@ body {
     display: none !important;
 }
 
+.journey-video-prelude {
+    position: fixed;
+    inset: 0;
+    z-index: 100100;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #000;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+}
+
+.journey-video-prelude.is-visible {
+    opacity: 1;
+}
+
+.journey-video-prelude video {
+    width: 100vw;
+    height: 100dvh;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 2.4s ease;
+}
+
+.journey-video-prelude.is-visible video {
+    opacity: 1;
+}
+
+.journey-video-prelude.is-leaving,
+.journey-video-prelude.is-leaving video {
+    opacity: 0;
+}
+
+.journey-video-prelude-shade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 28%, transparent 72%, rgba(0, 0, 0, 0.42));
+}
+
+.journey-video-prelude-skip {
+    position: absolute;
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.36);
+    border-radius: 999px;
+    padding: 0.6rem 0.9rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.34);
+    backdrop-filter: blur(12px);
+    font: inherit;
+    font-size: 0.8rem;
+}
+
+.journey-video-prelude-skip:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
 /* Author layout rules must not override the native hidden contract. */
 [hidden] {
     display: none !important;

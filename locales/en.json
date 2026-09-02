@@ -163,6 +163,7 @@
     ,"mixerFrequencyNote": "Changes apply from the next sound stage."
     ,"restartJourney": "Restart Journey"
     ,"restartConfirm": "Restart this journey from the beginning? Your settings will be preserved."
+    ,"skipJourneyVideoPrelude": "Skip introduction"
     ,"voiceTuning": "Voice Tuning"
     ,"voiceClarity": "Clarity"
     ,"voiceWarmth": "Warmth"

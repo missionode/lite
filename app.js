@@ -59,6 +59,9 @@ const PIPER_CLIP_FADE_SECONDS = 0.05;
 // This keeps Crown/AUM and all other chakra handoffs unhurried and seamless.
 const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
+const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
+const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3;
+const JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS = 1.2;
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
 const PLEASURE_AMBIENCE_GAIN = 0.003;
@@ -1534,6 +1537,9 @@ class AudioEngine {
         this.musicEchoFilter = null;
         this.musicEchoWetGain = null;
         this.musicEchoTailGate = null;
+        this.journeyVideoPreludeMedia = null;
+        this.journeyVideoPreludeSource = null;
+        this.journeyVideoPreludeGain = null;
         this.pleasureSourceGain = null;
         this.pleasureGain = null;
         this.pleasureEnhancer = null;
@@ -2563,7 +2569,8 @@ class AudioEngine {
             // Keep the already-ducked music bed alive while a first-use
             // mantra file is loading. Starting this mute before decoding could
             // create an avoidable silent gap on slower devices. The dedicated
-            // gate still silences both dry music and its echo tail.
+            // gates silence dry music and stop new tail input while allowing
+            // the already-created diffuse tail to settle naturally.
             const musicFade = this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
 
             // Cached mantra files can be ready immediately. Keep the same
@@ -3118,6 +3125,36 @@ class AudioEngine {
         }
     }
 
+    prepareJourneyVideoPrelude(media) {
+        if (!this.ctx || !this.spatialMusicPanner || !media) return false;
+        if (this.journeyVideoPreludeMedia === media && this.journeyVideoPreludeSource) return true;
+        if (this.journeyVideoPreludeSource) return false;
+        try {
+            this.journeyVideoPreludeMedia = media;
+            this.journeyVideoPreludeSource = this.ctx.createMediaElementSource(media);
+            this.journeyVideoPreludeGain = this.ctx.createGain();
+            this.journeyVideoPreludeGain.gain.setValueAtTime(0, this.ctx.currentTime);
+            this.journeyVideoPreludeSource.connect(this.journeyVideoPreludeGain);
+            // The prelude follows the guide's Music Space and Spatial Sound
+            // choices without entering any narration, drone, or mantra bus.
+            this.journeyVideoPreludeGain.connect(this.spatialMusicPanner);
+            this.journeyVideoPreludeGain.connect(this.musicEchoSend);
+            return true;
+        } catch (error) {
+            console.warn('Journey prelude audio routing unavailable:', error);
+            return false;
+        }
+    }
+
+    fadeJourneyVideoPrelude(target = 0, duration = 0) {
+        if (!this.ctx || !this.journeyVideoPreludeGain) return;
+        const now = this.ctx.currentTime;
+        const gain = this.journeyVideoPreludeGain.gain;
+        gain.cancelScheduledValues(now);
+        gain.setValueAtTime(Math.max(0, gain.value), now);
+        gain.linearRampToValueAtTime(Math.max(0, target), now + Math.max(0, duration));
+    }
+
     playSingingBowl() {
         // A muted bell is an intentional setting, not an audio error. Avoid
         // creating oscillators whose exponential envelope would target zero.
@@ -3158,6 +3195,81 @@ class VisualEngine {
     }
     stop() {
         if (this.glow) this.glow.style.background = 'transparent';
+    }
+}
+
+class JourneyVideoPrelude {
+    constructor(audioEngine) {
+        this.audio = audioEngine;
+        this.overlay = document.getElementById('journey-video-prelude');
+        this.media = document.getElementById('journey-video-prelude-media');
+        this.skipButton = document.getElementById('skip-journey-video-prelude');
+        this.activePlayback = null;
+    }
+
+    async play() {
+        if (this.activePlayback) return this.activePlayback;
+        if (!this.overlay || !this.media) return 'unavailable';
+
+        // Restart happens from an active journey, so the context is normally
+        // ready within the click gesture. Keep the fallback for recovery.
+        if (!this.audio.isInitialized) await this.audio.init();
+        if (!this.audio.prepareJourneyVideoPrelude(this.media)) return 'unavailable';
+
+        this.activePlayback = new Promise((resolve) => {
+            let settled = false;
+            let exitPromise = null;
+            const cleanup = () => {
+                this.media.removeEventListener('timeupdate', onTimeUpdate);
+                this.media.removeEventListener('ended', onEnded);
+                this.media.removeEventListener('error', onError);
+                this.skipButton?.removeEventListener('click', onSkip);
+            };
+            const beginExit = (duration) => {
+                if (exitPromise) return exitPromise;
+                this.overlay.classList.add('is-leaving');
+                this.audio.fadeJourneyVideoPrelude(0, duration);
+                exitPromise = new Promise(done => setTimeout(done, Math.max(0, duration) * 1000));
+                return exitPromise;
+            };
+            const complete = async (reason, duration) => {
+                if (settled) return;
+                settled = true;
+                cleanup();
+                await beginExit(duration);
+                this.media.pause();
+                try { this.media.currentTime = 0; } catch (error) {}
+                this.overlay.classList.remove('is-visible', 'is-leaving');
+                this.overlay.classList.add('hidden');
+                resolve(reason);
+            };
+            const onTimeUpdate = () => {
+                const remaining = this.media.duration - this.media.currentTime;
+                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS) {
+                    void beginExit(JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS);
+                }
+            };
+            const onEnded = () => { void complete('ended', JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS); };
+            const onError = () => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); };
+            const onSkip = () => { void complete('skipped', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); };
+
+            this.media.addEventListener('timeupdate', onTimeUpdate);
+            this.media.addEventListener('ended', onEnded);
+            this.media.addEventListener('error', onError);
+            this.skipButton?.addEventListener('click', onSkip, { once: true });
+            this.overlay.classList.remove('hidden', 'is-leaving');
+            requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
+            this.media.muted = false;
+            this.media.volume = 1;
+            try { this.media.currentTime = 0; } catch (error) {}
+            this.audio.fadeJourneyVideoPrelude(0, 0);
+            const playback = this.media.play();
+            Promise.resolve(playback).then(() => {
+                this.audio.fadeJourneyVideoPrelude(state.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
+            }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); });
+        }).finally(() => { this.activePlayback = null; });
+
+        return this.activePlayback;
     }
 }
 
@@ -5061,6 +5173,7 @@ class WakeLockManager {
 const wakeLock = new WakeLockManager();
 const audio = new AudioEngine();
 const visual = new VisualEngine();
+const journeyVideoPrelude = new JourneyVideoPrelude(audio);
 const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
@@ -6784,6 +6897,9 @@ function attachEventListeners() {
         if (!window.confirm(t('ui.restartConfirm'))) return;
         if (mixer) mixer.classList.add('hidden');
         meditation.stop();
+        // Start the video while this user gesture is still active so its
+        // native audio can play reliably on mobile browsers.
+        await journeyVideoPrelude.play();
         // A journey may still be unwinding its async start sequence. Wait for
         // the cancellation to release the start guard before launching again.
         const deadline = Date.now() + 5000;
