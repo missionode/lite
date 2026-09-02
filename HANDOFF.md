@@ -19,6 +19,11 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-02 (Near-whisper mantra minimum)
+
+- The mantra mixer’s non-zero minimum is now 0.5% in 0.5% steps, replacing the prior 2% floor. Its 35% default is deliberately unchanged, so existing guides retain their normal balance unless they choose the new near-whisper range. The change affects the mantra track only, not spoken narration, music, drones, or bell.
+- Delivery rotates to `app.js?v=2.22` and shell cache `chakra-v5.96`. Validation: `static/unit` PASS — JavaScript/service-worker syntax, background-music/mantra, narration ticker, audio safety, and diff check. No Playwright or screenshots were run by owner direction; target-device listening remains the audible-quality gate.
+
 ### Local checkpoint — 2026-09-02 (Slower narration duck and feeble mantra range)
 
 - Background music now takes 6 seconds, rather than 4, to settle to its narration bed in both Piper and Browser TTS routes. The mantra mixer keeps its existing 35% default but now permits a deliberately feeble 2% minimum in 1% steps; persisted values are clamped to the same range.

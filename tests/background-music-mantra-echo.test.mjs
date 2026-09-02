@@ -55,8 +55,8 @@ assert.match(app, /if \(section\) section\.hidden = false/, 'the ambience sectio
 assert.match(app, /if \(urlControl\) urlControl\.hidden = !state\.moodRelaxationIntentionEnabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
 assert.match(app, /t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable source message');
 assert.doesNotMatch(app, /pleasureAudioAvailable = false;\s*state\.moodRelaxationIntentionEnabled = false;/, 'a missing optional asset must not clear the selected ambience state');
-for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.02'], ['vol-mantra', '0\.02'], ['vol-music', '0\.02']]) {
-    assert.match(html, new RegExp(`id="${id}"[^>]*min="${min}"`), `${id} should skip the first non-zero step`);
+for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.02'], ['vol-mantra', '0\.005'], ['vol-music', '0\.02']]) {
+    assert.match(html, new RegExp(`id="${id}"[^>]*min="${min}"`), `${id} should retain a non-zero safety minimum`);
 }
 assert.match(css, /\.settings-help-content\s*\{[\s\S]*?max-height:\s*calc\(100vh - 2rem\);[\s\S]*?overflow:\s*hidden;/, 'the Help modal should remain within the viewport');
 assert.match(css, /\.settings-help-list\s*\{[\s\S]*?overflow-y:\s*auto;/, 'the Help content should scroll inside the modal');
