@@ -26,7 +26,8 @@ assert.match(app, /this\.journeyVideoPreludeSource = this\.ctx\.createMediaEleme
 assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.journeyVideoPreludeGain\.connect\(this\.musicEchoSend\)/, 'video audio should use the established Spatial Sound and Music Space paths');
 assert.doesNotMatch(app, /onSkip|skipButton|JOURNEY_VIDEO_PRELUDE_SKIP/, 'the implementation should not retain an automatic skip path');
 assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
-assert.match(app, /meditation\.stop\(\);[\s\S]*?await journeyVideoPrelude\.play\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'Restart should play the prelude before it waits to relaunch the journey');
+assert.match(app, /meditation\.stop\(\);[\s\S]*?const preludeResult = await journeyVideoPrelude\.play\(\);[\s\S]*?if \(preludeResult === 'ended'\) meditation\.acknowledgeDndReminder\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'a completed prelude should acknowledge the Do Not Disturb reminder before it relaunches the journey');
+assert.match(app, /showDndReminderIfNeeded\(\) \{[\s\S]*?if \(this\.dndReminderAcknowledged\)[\s\S]*?this\.dndReminderAcknowledged = false;[\s\S]*?alert\(t\('ui\.journeyVideoPreludeReminder'\)\)/, 'the reminder should be consumed once after a completed video while normal starts retain it');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 
 for (const locale of locales) {

@@ -3320,6 +3320,7 @@ class MeditationController {
         this.isShotActive = false;
         this.isExperimentActive = false;
         this.experimentDuration = null;
+        this.dndReminderAcknowledged = false;
         this.sessionStartedAt = null;
         this.sessionCountdownTotalMs = 0;
         this.sessionCountdownRemainingMs = 0;
@@ -3329,6 +3330,18 @@ class MeditationController {
         this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+    }
+
+    acknowledgeDndReminder() {
+        this.dndReminderAcknowledged = true;
+    }
+
+    showDndReminderIfNeeded() {
+        if (this.dndReminderAcknowledged) {
+            this.dndReminderAcknowledged = false;
+            return;
+        }
+        alert(t('ui.journeyVideoPreludeReminder'));
     }
 
     getSessionDurationMs(focusedExperience = null) {
@@ -3613,7 +3626,7 @@ class MeditationController {
 
     async runSleepJourney() {
         if (this.isStarting || this.isMeditationActive) return;
-        alert("Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.");
+        this.showDndReminderIfNeeded();
         if (!this.scripts || this.scriptsLanguage !== state.language) {
             if (state.scriptSource === 'custom' && state.customScript) {
                 this.scripts = state.customScript;
@@ -3819,8 +3832,7 @@ class MeditationController {
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
         
-        // DND Reminder
-        alert("Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.");
+        this.showDndReminderIfNeeded();
 
         try {
             const startBtn = document.getElementById('start-meditation');
@@ -6929,9 +6941,10 @@ function attachEventListeners() {
         if (!window.confirm(t('ui.restartConfirm'))) return;
         if (mixer) mixer.classList.add('hidden');
         meditation.stop();
-        // Start the video while this user gesture is still active so its
-        // native audio can play reliably on mobile browsers.
-        await journeyVideoPrelude.play();
+        // The guide explicitly starts the ready video; only a completed
+        // prelude counts as acknowledgement of its Do Not Disturb reminder.
+        const preludeResult = await journeyVideoPrelude.play();
+        if (preludeResult === 'ended') meditation.acknowledgeDndReminder();
         // A journey may still be unwinding its async start sequence. Wait for
         // the cancellation to release the start guard before launching again.
         const deadline = Date.now() + 5000;
