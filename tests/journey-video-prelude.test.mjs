@@ -19,6 +19,8 @@ assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?this\.playButton = document\.getElementById\('play-journey-video-prelude'\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video and its audio should begin only from the explicit Play action, at the guide-selected music level');
+assert.match(app, /enterFullscreen\(\) \{[\s\S]*?this\.overlay\.requestFullscreen\(\{ navigationUI: 'hide' \}\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?this\.enterFullscreen\(\);[\s\S]*?this\.media\.play\(\)/, 'the explicit Play action should request full screen before it starts playback');
+assert.match(app, /this\.exitFullscreen\(\);[\s\S]*?this\.overlay\.classList\.remove/, 'the application should return to its normal viewport before the journey continues');
 assert.match(app, /this\.media\.pause\(\);[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(0, 0\);/, 'the ready screen should leave the video paused and silent before Play');
 assert.match(app, /this\.journeyVideoPreludeSource = this\.ctx\.createMediaElementSource\(media\)/, 'video audio should enter the Web Audio graph');
 assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.journeyVideoPreludeGain\.connect\(this\.musicEchoSend\)/, 'video audio should use the established Spatial Sound and Music Space paths');
@@ -30,6 +32,7 @@ assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must no
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');
     assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
+    assert.ok(locale.ui.musicVideoVolume?.trim(), 'each shipped locale needs the shared Music / Video Volume label');
 }
 
 console.log('Journey video prelude contract passed.');

@@ -3207,6 +3207,29 @@ class JourneyVideoPrelude {
         this.activePlayback = null;
     }
 
+    enterFullscreen() {
+        if (document.fullscreenElement) return;
+
+        // This call is intentionally made synchronously inside the explicit
+        // Begin introduction tap so browsers may honor the fullscreen request.
+        if (typeof this.overlay?.requestFullscreen === 'function') {
+            Promise.resolve(this.overlay.requestFullscreen({ navigationUI: 'hide' })).catch(() => {});
+            return;
+        }
+
+        // iOS Safari does not expose document fullscreen consistently. Its
+        // video-specific fallback preserves the guide's deliberate action.
+        try { this.media?.webkitEnterFullscreen?.(); } catch (error) {}
+    }
+
+    exitFullscreen() {
+        if (document.fullscreenElement === this.overlay && typeof document.exitFullscreen === 'function') {
+            Promise.resolve(document.exitFullscreen()).catch(() => {});
+            return;
+        }
+        try { this.media?.webkitExitFullscreen?.(); } catch (error) {}
+    }
+
     async play() {
         if (this.activePlayback) return this.activePlayback;
         if (!this.overlay || !this.media) return 'unavailable';
@@ -3240,6 +3263,7 @@ class JourneyVideoPrelude {
                 await beginExit(duration);
                 this.media.pause();
                 try { this.media.currentTime = 0; } catch (error) {}
+                this.exitFullscreen();
                 this.overlay.classList.remove('is-visible', 'is-leaving', 'is-playing');
                 this.overlay.classList.add('hidden');
                 resolve(reason);
@@ -3257,6 +3281,7 @@ class JourneyVideoPrelude {
                 if (hasStarted || settled) return;
                 hasStarted = true;
                 this.overlay.classList.add('is-playing');
+                this.enterFullscreen();
                 const playback = this.media.play();
                 Promise.resolve(playback).then(() => {
                     this.audio.fadeJourneyVideoPrelude(state.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
