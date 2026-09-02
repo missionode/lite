@@ -76,6 +76,13 @@
 - Delivery rotates to `app.js?v=2.18` and shell `chakra-v5.92`; language cache stays `chakra-language-v22`. This checkpoint is local on `production` until the owner explicitly requests a push.
 - Validation: `static/unit` PASS — JavaScript syntax, facilitator JSON parsing, `test:hypnosis-journey`, `test:content-safety`, `test:demo-script`, `test:no-frequency`, `test:hindi-language`, `test:russian-language`, and `git diff --check`. No Playwright, screenshots, browser run, or human listening evidence was performed.
 
+### Local checkpoint — 2026-09-02 (Restart-safe background-music entry)
+
+- Background music now preserves its complete 10-second source entry fade. During that protected window, `fadeInBackgroundMusic()` no longer calls the loop helper’s short gain ramp, which previously cancelled the slow envelope and made startup sound too quick.
+- A stopped background loop now exposes a retirement promise. Starting another journey waits for the prior controlled fade to complete before a fresh source is created, preventing the brief old/new loop overlap that could make a second start louder or faster without a hard refresh.
+- The existing narration ducking, mantra handoff, explicit stop fade, and music-only behavior remain unchanged. Delivery rotates to `app.js?v=2.19` and shell `chakra-v5.93`; language cache remains `chakra-language-v22`.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, `test:background-music`, `test:narration-ticker`, `test:hypnosis-journey`, `test:no-frequency`, `test:hindi-language`, `test:audio-safety`, `test:spatial-audio`, and `git diff --check`. The local facilitator file is currently absent by owner action, so its content-specific test is not included in this audio checkpoint. No Playwright, screenshots, browser run, or human listening evidence was performed.
+
 ### Active snapshot — 2026-08-31 (Asia/Kolkata)
 
 - Production release scope: `add-hindi-language` was merged into `production` as `8e1dead` after confirming `origin/production` remained at `2a7f27b`. The merge and documentation checkpoint were pushed successfully to `origin/production` through `491e8c2`. It contains complete `hi-IN` UI/narration with browser TTS only; no Hindi Piper model is registered pending a separate licence-approved voice decision. Hindi meditation sessions do not expose or schedule the Earn handoff. `locales/hi.json` and all Hindi narration fields are registered atomically, avoiding the earlier partial `hi.json` request. Static Hindi locale/narration parity and handoff-suppression checks pass. Native Hindi review and target-device listening remain explicitly deferred manual release gates. See `TEMP-MULTILINGUAL-ARCHITECTURE.md` → “Hindi (`hi` / `hi-IN`)”.

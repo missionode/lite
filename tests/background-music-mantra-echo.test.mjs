@@ -179,6 +179,12 @@ assert.ok(backgroundStart >= 0 && backgroundEnd > backgroundStart, 'background m
 const backgroundBlock = app.slice(backgroundStart, backgroundEnd);
 assert.match(backgroundBlock, /this\.bgMusicGain\.gain\.setValueAtTime\(0, now\)/, 'background restarts should clear stale outer gain before fading in');
 assert.match(backgroundBlock, /this\.bgMusicLoop = new SeamlessLoop\([\s\S]*?BACKGROUND_MUSIC_ENTRY_FADE_SECONDS\n\s*\);/, 'background loop startup should use the full entry fade');
+assert.match(backgroundBlock, /if \(this\.bgMusicRetirePromise\) await this\.bgMusicRetirePromise;/, 'a new journey must wait for a retiring background loop instead of overlapping it');
+assert.match(backgroundBlock, /this\.bgMusicEntryEndsAt = this\.ctx\.currentTime \+ BACKGROUND_MUSIC_ENTRY_FADE_SECONDS;/, 'startup should mark the protected slow-entry window');
+const backgroundFadeStart = app.indexOf('    fadeInBackgroundMusic(duration = 4, isDucked = false)');
+const backgroundFadeEnd = app.indexOf('    fadeOutBackgroundMusic(duration = 4)', backgroundFadeStart);
+const backgroundFade = app.slice(backgroundFadeStart, backgroundFadeEnd);
+assert.match(backgroundFade, /if \(now >= this\.bgMusicEntryEndsAt\) this\.bgMusicLoop\.setGain\(1\.0\);/, 'ordinary gain adjustments must not cancel the protected slow-entry envelope');
 assert.match(app, /const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8/);
 assert.match(app, /const MANTRA_MUSIC_FADE_SECONDS = 6/, 'music should receive an extended, deliberate handoff fade before mantra playback');
 assert.match(app, /const MANTRA_FADE_SECONDS = 4/, 'mantra should use a deliberate fade when stopping');
@@ -202,7 +208,7 @@ assert.match(app, /fadeOutBackgroundMusic\(duration = 4\)[\s\S]*?this\.bgMusicTa
 assert.match(app, /setBackgroundMusicVolume\(level, previousLevel = level\)[\s\S]*?const roleFactor = Math\.max\(0, Math\.min\(1, currentTarget \/ previous\)\)/, 'music volume updates should preserve the active full, ducked, or silent role');
 assert.match(app, /const previousVolume = state\.volMusic;[\s\S]*?audio\.setBackgroundMusicVolume\(state\.volMusic, previousVolume\)/, 'the music slider should use the role-preserving update rather than forcing full gain');
 assert.doesNotMatch(app, /this\.bgMusicLoop\.stop\(0\)/, 'background music must never be restarted with an immediate cut');
-assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?this\.bgMusicLoop\.stop\(Math\.max\(0, fadeTime\)\)/, 'background music stops should use a controlled fade');
+assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?const retirementSeconds = Math\.max\(0, fadeTime\);[\s\S]*?this\.bgMusicLoop\.stop\(retirementSeconds\);[\s\S]*?this\.bgMusicRetirePromise = retirement;/, 'background music stops should use a controlled fade and retain its retirement until a later start can safely proceed');
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?fadeOutBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion should coordinate mantra and music fades without restoring music');
 assert.match(app, /musicEcho: localStorage\.getItem\('chakra_music_echo'\) \|\| 'light'/, 'music echo preference should have a safe default');
 assert.match(app, /syncValue\('music-echo', state\.musicEcho\)/, 'the music echo selector should restore its saved value');

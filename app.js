@@ -1498,6 +1498,8 @@ class AudioEngine {
         // Looping Managers
         this.mantraLoop = null;
         this.bgMusicLoop = null;
+        this.bgMusicEntryEndsAt = 0;
+        this.bgMusicRetirePromise = null;
         this.pleasureLoops = [];
 
         this.mantraBuffer = {};
@@ -2668,10 +2670,16 @@ class AudioEngine {
             return;
         }
 
-        // A previously stopped loop may still be completing its fade. Let it
-        // finish while the new loop fades in instead of cutting it abruptly.
+        // Do not overlap a freshly started journey with the previous
+        // journey's retiring loop. The prior stop is allowed to finish its
+        // own fade before a new slow entry begins.
+        if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
+
+        // A stopped loop that is still referenced has not entered the normal
+        // retirement path yet. Retire it before creating a replacement.
         if (this.bgMusicLoop) {
-            this.bgMusicLoop.stop(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+            this.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+            if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
         }
 
         this.cancelBackgroundMusicRestore();
@@ -2702,6 +2710,7 @@ class AudioEngine {
             BACKGROUND_MUSIC_ENTRY_FADE_SECONDS
         );
         this.bgMusicLoop.start();
+        this.bgMusicEntryEndsAt = this.ctx.currentTime + BACKGROUND_MUSIC_ENTRY_FADE_SECONDS;
     }
 
     async loadPleasureAmbienceBuffers() {
@@ -2959,7 +2968,10 @@ class AudioEngine {
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
-        this.bgMusicLoop.setGain(1.0);
+        // A new loop already owns a ten-second source envelope. Calling
+        // setGain() here would cancel that envelope and replace it with the
+        // loop helper's short gain ramp, making entry feel abrupt.
+        if (now >= this.bgMusicEntryEndsAt) this.bgMusicLoop.setGain(1.0);
 
         // A narration request during the mantra fade may update the desired
         // level, but must not reopen the music bus until the mantra is done.
@@ -3054,8 +3066,15 @@ class AudioEngine {
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = false;
         if (this.bgMusicLoop) {
-            this.bgMusicLoop.stop(Math.max(0, fadeTime));
+            const retirementSeconds = Math.max(0, fadeTime);
+            this.bgMusicLoop.stop(retirementSeconds);
             this.bgMusicLoop = null;
+            this.bgMusicEntryEndsAt = 0;
+            const retirement = new Promise(resolve => setTimeout(resolve, (retirementSeconds + 0.1) * 1000));
+            this.bgMusicRetirePromise = retirement;
+            void retirement.then(() => {
+                if (this.bgMusicRetirePromise === retirement) this.bgMusicRetirePromise = null;
+            });
         }
     }
 
