@@ -3193,7 +3193,7 @@ class VisualEngine {
         if (state.eyesCloseMode) return; // Absolute Blackout
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
-    stop({ preserveScreen = false } = {}) {
+    stop() {
         if (this.glow) this.glow.style.background = 'transparent';
     }
 }
@@ -5164,7 +5164,7 @@ class MeditationController {
         scheduleEarnHandoff();
     }
 
-    stop() {
+    stop({ preserveScreen = false } = {}) {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
@@ -5199,8 +5199,10 @@ class MeditationController {
             aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
             aura.style.opacity = '1';
         }
-        if (!preserveScreen) showScreen(returnScreen);
-        journeyVideoPrelude.exitFullscreen();
+        if (!preserveScreen) {
+            showScreen(returnScreen);
+            journeyVideoPrelude.exitFullscreen();
+        }
     }
 }
 
@@ -6869,7 +6871,7 @@ function attachEventListeners() {
     document.getElementById('stop-meditation').addEventListener('click', (e) => {
         console.log("Stop button clicked");
         e.stopImmediatePropagation();
-        meditation.stop({ preserveScreen: true });
+        meditation.stop();
     });
     const eyesCloseToggle = document.getElementById('eyes-close-mode-toggle');
     if (eyesCloseToggle) eyesCloseToggle.addEventListener('change', (e) => {
@@ -6942,7 +6944,7 @@ function attachEventListeners() {
     document.getElementById('restart-meditation')?.addEventListener('click', async () => {
         if (!window.confirm(t('ui.restartConfirm'))) return;
         if (mixer) mixer.classList.add('hidden');
-        meditation.stop();
+        meditation.stop({ preserveScreen: true });
         // The guide explicitly starts the ready video; only a completed
         // prelude counts as acknowledgement of its Do Not Disturb reminder.
         const preludeResult = await journeyVideoPrelude.play();
