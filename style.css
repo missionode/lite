@@ -296,7 +296,10 @@ body {
 .journey-video-prelude video {
     width: 100vw;
     height: 100dvh;
-    object-fit: cover;
+    /* Preserve the complete supplied frame in fullscreen. The black stage
+       deliberately becomes cinematic letterboxing on mismatched screens. */
+    object-fit: contain;
+    background: #000;
     opacity: 0;
     transition: opacity 2.4s ease;
 }
