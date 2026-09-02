@@ -60,7 +60,7 @@ const PIPER_CLIP_FADE_SECONDS = 0.05;
 const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
-const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3;
+const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 // Pleasure ambience is a separate, fixed-level support layer. It is not
@@ -832,6 +832,12 @@ function t(path, language = state.displayLanguage) {
     if (value != null) return value;
     const fallback = getLocalizedValue(localeBundles[fallbackLanguageId], path);
     return fallback == null ? path : fallback;
+}
+
+// In-session stage labels must follow the narrated Meditation Language. This
+// deliberately differs from Settings, which follows Display Language.
+function journeyT(path) {
+    return t(path, state.language);
 }
 
 // Narration/system copy follows the selected meditation language, while t()
@@ -3657,7 +3663,7 @@ class MeditationController {
         const controls = document.getElementById('controls');
         if (controls) controls.classList.remove('hidden');
         setText('pause-meditation', 'II');
-        setText('mantra-display', t('ui.sleepMode'));
+        setText('mantra-display', journeyT('ui.sleepMode'));
         // Sleep mode has no spoken narration; keep the narration-only ticker
         // hidden while the visual guidance, music, and sleep tones run.
         setText('narration-text', '');
@@ -3669,7 +3675,7 @@ class MeditationController {
         const stageDurationMs = state.timeSleepStage * 60 * 1000;
         for (const [index, stage] of sleepStages.entries()) {
             if (!this.isMeditationActive) return;
-            setText('mantra-display', t(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
+            setText('mantra-display', journeyT(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
             setText('narration-text', '');
             this.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
 
@@ -3725,7 +3731,7 @@ class MeditationController {
             this.sessionStartedAt = Date.now();
             showScreen(meditationScreen);
             document.getElementById('controls')?.classList.remove('hidden');
-            setText('mantra-display', t('ui.shotsMode'));
+            setText('mantra-display', journeyT('ui.shotsMode'));
             // Shots intentionally have no narration, so they must not leave
             // a looping narration marquee on screen.
             setText('narration-text', '');
@@ -3765,7 +3771,7 @@ class MeditationController {
                             : stage.key === 'custom'
                                 ? t('ui.customShot')
                                 : t(stageLabelPath);
-                setText('mantra-display', stageLabel === stageLabelPath ? stage.key : stageLabel);
+                setText('mantra-display', stageLabel === stageLabelPath ? stage.key : journeyT(stageLabelPath));
                 this.audio.startFrequencyShot(stage.frequency);
                 let remaining = activeMs;
                 while (remaining > 0 && this.isMeditationActive) {
@@ -4094,7 +4100,7 @@ class MeditationController {
         // Keep one short, app-owned preparation for every guided path,
         // including custom scripts and HRIM. Activity-specific guidance stays
         // with Yoga, bathing, massage, and assisted-care stages.
-        tutTitle.textContent = t('ui.preparation');
+        tutTitle.textContent = journeyT('ui.preparation');
         const prePracticeSafety = contentT('system.prePracticeSafety');
         await this.narrate(prePracticeSafety, false);
         if (!this.isMeditationActive) return;
@@ -4113,7 +4119,7 @@ class MeditationController {
                 ? localized(this.scripts.intro, 'returning')
                 : moonText;
             if (openingText && this.isMeditationActive) {
-                tutTitle.textContent = isReturningVisitor ? t('ui.returning') : t('ui.moon');
+                tutTitle.textContent = isReturningVisitor ? journeyT('ui.returning') : journeyT('ui.moon');
                 await this.narrate(openingText, false); // Keep music playing
                 await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
             }
@@ -4122,7 +4128,7 @@ class MeditationController {
         // Main gratitude + body scan. HRIM uses its own activation-oriented
         // intention framing while the normal journey keeps the existing text.
         if (!this.isMeditationActive) return;
-        tutTitle.textContent = isHighEnergy ? t('ui.intention') : t('ui.gratitude');
+        tutTitle.textContent = isHighEnergy ? journeyT('ui.intention') : journeyT('ui.gratitude');
         const text = isHighEnergy
             ? localized(this.scripts.high_energy, 'intention')
             : localized(this.scripts.intro, 'gratitude');
@@ -4133,7 +4139,7 @@ class MeditationController {
         } else if (personalIntention) {
             await this.narrate(text, false); // Still keep music playing for next part
             const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
-            tutTitle.textContent = t('ui.intention');
+            tutTitle.textContent = journeyT('ui.intention');
             await this.narrateIntentionWithFrequency(intentionText); // Keep music playing seamlessly into breathing
         } else {
             await this.narrate(text, false); // No intention? Still keep music playing.
@@ -4154,7 +4160,7 @@ class MeditationController {
         tutorial.style.opacity = "1";
 
         const tutTitle = document.getElementById('tutorial-title');
-        tutTitle.textContent = t('ui.preparation');
+        tutTitle.textContent = journeyT('ui.preparation');
         const text = contentT('system.centeringBreath');
         // Fade out music before box meditation
         this.audio.fadeOutBackgroundMusic(4);
@@ -4203,14 +4209,14 @@ class MeditationController {
 
         // Intimate Completion
         if (this.isMeditationActive) {
-            instruction.textContent = t('ui.breathingComplete');
+            instruction.textContent = journeyT('ui.breathingComplete');
             const completeText = contentT('system.breathingComplete');
             await this.narrate(completeText, false, true);
             
             // Fade music back in after box meditation
             this.audio.fadeInBackgroundMusic(4, false);
 
-            instruction.textContent = t('ui.prepare');
+            instruction.textContent = journeyT('ui.prepare');
             await this.pauseAwareSleep(timing('transitions', 'breathingCompletion') * 1000);
         }
     }
@@ -4225,8 +4231,8 @@ class MeditationController {
             const subtitle = document.getElementById('icebreaker-subtitle');
             const timer = document.getElementById('icebreaker-timer');
 
-            title.textContent = t('ui.corpsePose');
-            subtitle.textContent = t('ui.corpsePoseSubtitle');
+            title.textContent = journeyT('ui.corpsePose');
+            subtitle.textContent = journeyT('ui.corpsePoseSubtitle');
 
             // Narration: Intro to the pose
             if (!this.scripts.corpse_pose) {
@@ -4271,7 +4277,7 @@ class MeditationController {
             }
 
             // Final settle before Chakra Journey
-            subtitle.textContent = t('ui.prepare');
+            subtitle.textContent = journeyT('ui.prepare');
             await this.pauseAwareSleep(timing('transitions', 'corpseFinalSettle') * 1000);
         } catch (e) {
             console.error("Error in runCorpsePose:", e);
@@ -4289,7 +4295,7 @@ class MeditationController {
 
         const script = this.scripts[scriptKey];
         title.textContent = localized(script.title);
-        subtitle.textContent = t('ui.purification');
+        subtitle.textContent = journeyT('ui.purification');
 
         await this.narrate(localized(script.intro), false);
         await this.narrate(localized(script.instructions), false);
@@ -4314,10 +4320,10 @@ class MeditationController {
         return this.runGuideControlledTransition({
             durationSeconds: 0,
             showTimer: false,
-            title: t('ui.guideReadyForNextSession'),
-            subtitle: t('ui.guideReadyForNextSessionGuidance'),
-            readyText: t('ui.guideReadyForNextSessionGuidance'),
-            continueLabel: t('ui.proceedToNextSession')
+            title: journeyT('ui.guideReadyForNextSession'),
+            subtitle: journeyT('ui.guideReadyForNextSessionGuidance'),
+            readyText: journeyT('ui.guideReadyForNextSessionGuidance'),
+            continueLabel: journeyT('ui.proceedToNextSession')
         });
     }
 
@@ -4351,9 +4357,7 @@ class MeditationController {
         const mantraEl = document.getElementById('mantra-display');
         const narrationEl = document.getElementById('narration-text');
 
-        // This is visible interface copy, so follow Display Language rather
-        // than the selected meditation/narration language.
-        if (mantraEl) mantraEl.textContent = t('system.musicOnly');
+        if (mantraEl) mantraEl.textContent = journeyT('system.musicOnly');
         setText('narration-text', '');
         hideSessionCountdown();
         
@@ -4433,10 +4437,10 @@ class MeditationController {
 
             const shouldBeginYoga = await this.runGuideControlledTransition({
                 durationSeconds: timing('transitions', 'bathToYogaRest'),
-                title: t('ui.bathToYogaRestTitle'),
-                subtitle: t('ui.bathToYogaRestGuidance'),
-                readyText: t('ui.restReadyToContinue'),
-                continueLabel: t('ui.beginYogaAfterRest')
+                title: journeyT('ui.bathToYogaRestTitle'),
+                subtitle: journeyT('ui.bathToYogaRestGuidance'),
+                readyText: journeyT('ui.restReadyToContinue'),
+                continueLabel: journeyT('ui.beginYogaAfterRest')
             });
             if (!shouldBeginYoga) return;
         }
@@ -4447,8 +4451,8 @@ class MeditationController {
         const subtitle = document.getElementById('icebreaker-subtitle');
         const timer = document.getElementById('icebreaker-timer');
 
-        title.textContent = t('ui.yoga');
-        subtitle.textContent = t('ui.yogaSubtitle');
+        title.textContent = journeyT('ui.yoga');
+        subtitle.textContent = journeyT('ui.yogaSubtitle');
         
         // Grounding Drone for Yoga (136.1 Hz - OM frequency)
         // Use the shared fixed exposure window; Yoga must not leave a drone
@@ -4735,7 +4739,7 @@ class MeditationController {
         // Full-body health affirmation — head to toe
         const healthAffirmation = localized(this.scripts.closing, 'affirmation');
         if (healthAffirmation && this.isMeditationActive) {
-            setText('mantra-display', "✦ BODY ✦");
+            setText('mantra-display', `✦ ${journeyT('system.body')} ✦`);
             await this.narrate(healthAffirmation);
         }
         await this.pauseAwareSleep(timing('transitions', 'closingSecondPause') * 1000);

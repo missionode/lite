@@ -323,6 +323,7 @@ body {
 .journey-video-prelude.is-leaving,
 .journey-video-prelude.is-leaving video {
     opacity: 0;
+    transition-duration: 8s;
 }
 
 .journey-video-prelude-shade {

@@ -16,8 +16,9 @@ assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not 
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?position:\s*fixed[\s\S]*?inset:\s*0[\s\S]*?z-index:\s*100100/, 'the video prelude should fill the application viewport');
 assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*contain[\s\S]*?background:\s*#000[\s\S]*?transition:\s*opacity 2\.4s/, 'the video should preserve its entire frame with a cinematic black letterbox and gradual visual entry');
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
-assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3/);
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
+assert.match(css, /\.journey-video-prelude\.is-leaving,[\s\S]*?\.journey-video-prelude\.is-leaving video\s*\{[\s\S]*?transition-duration:\s*8s/, 'the video and its full-screen stage should dissolve together over an unhurried eight seconds');
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?this\.playButton = document\.getElementById\('play-journey-video-prelude'\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video and its audio should begin only from the explicit Play action, at the guide-selected music level');
 assert.match(app, /this\.fullscreenTarget = document\.getElementById\('app'\)[\s\S]*?enterFullscreen\(\) \{[\s\S]*?this\.fullscreenTarget\.requestFullscreen\(\{ navigationUI: 'hide' \}\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?this\.enterFullscreen\(\);[\s\S]*?this\.media\.play\(\)/, 'the explicit Play action should make the persistent app container fullscreen before it starts playback');
 assert.doesNotMatch(app, /this\.media\.pause\(\);[\s\S]{0,250}this\.exitFullscreen\(\);[\s\S]{0,250}this\.overlay\.classList\.remove/, 'the prelude should not leave fullscreen during the video-to-journey handoff');
@@ -41,5 +42,10 @@ for (const locale of locales) {
     assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
     assert.ok(locale.ui.musicVideoVolume?.trim(), 'each shipped locale needs the shared Music / Video Volume label');
 }
+
+assert.match(app, /function journeyT\(path\) \{\s*return t\(path, state\.language\);\s*\}/, 'journey labels should resolve against Meditation Language rather than Display Language');
+assert.match(app, /tutTitle\.textContent = journeyT\('ui\.preparation'\);/, 'the Preparation stage should use the narrated language');
+assert.match(app, /journeyT\('ui\.moon'\)[\s\S]*?journeyT\('ui\.gratitude'\)[\s\S]*?journeyT\('ui\.intention'\)/, 'all reflective journey headings should use the narrated language');
+assert.match(app, /journeyT\('ui\.corpsePose'\)[\s\S]*?journeyT\('ui\.purification'\)[\s\S]*?journeyT\('ui\.guideReadyForNextSession'\)[\s\S]*?journeyT\('ui\.yoga'\)/, 'focused in-journey titles should use the narrated language');
 
 console.log('Journey video prelude contract passed.');
