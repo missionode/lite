@@ -23,6 +23,7 @@
     "test:handoff": "node tests/journey-completion-handoff.test.mjs",
     "test:hrim-time": "node tests/hrim-time-window.test.mjs",
     "test:splash": "node tests/splash-screen.test.mjs",
+    "test:journey-video-prelude": "node tests/journey-video-prelude.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

@@ -464,6 +464,19 @@
             </div>
         </div>
 
+        <!-- Restart-only cinematic prelude. Its explicit Play action enters
+             fullscreen when the browser/device permits it. -->
+        <section id="journey-video-prelude" class="journey-video-prelude hidden" aria-label="Journey introduction" aria-live="polite">
+            <video id="journey-video-prelude-media" preload="auto" playsinline>
+                <source src="video/nature-upgrade.mp4" type="video/mp4">
+            </video>
+            <div class="journey-video-prelude-shade" aria-hidden="true"></div>
+            <div id="journey-video-prelude-ready" class="journey-video-prelude-ready">
+                <p data-i18n="ui.journeyVideoPreludeReminder">Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.</p>
+                <button id="play-journey-video-prelude" class="journey-video-prelude-play" type="button" data-i18n="ui.playJourneyVideoPrelude">Begin introduction</button>
+            </div>
+        </section>
+
         <!-- Full-screen in-session tuning panel -->
         <div id="volume-mixer" class="hidden" role="dialog" aria-modal="true" aria-labelledby="mixer-title">
             <div class="mixer-dialog">
@@ -479,7 +492,7 @@
                     <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0.02" max="0.2" step="0.01" value="0.05"></div>
                     <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0.02" max="0.12" step="0.01" value="0.04"></div>
                     <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0.005" max="1" step="0.005" value="0.35"></div>
-                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
+                    <div class="mixer-row"><label data-i18n="ui.musicVideoVolume">Music / Video Volume</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
                 </div>
 
                 <div id="mood-relaxation-ambience-section" class="mixer-section">
@@ -600,6 +613,9 @@
             </div>
         </div>
 
+        <!-- A fullscreen-only bottom edge reveals the otherwise quiet session chrome. -->
+        <div id="fullscreen-controls-reveal-zone" aria-hidden="true"></div>
+
         <!-- Global In-Session Controls (visible across all meditation screens) -->
         <div id="controls" class="hidden" style="position: fixed; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 10px; backdrop-filter: blur(10px); z-index: 1000;">
             <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
@@ -630,6 +646,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.23"></script>
+    <script src="app.js?v=2.34"></script>
 </body>
 </html>
