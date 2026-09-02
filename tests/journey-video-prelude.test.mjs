@@ -35,7 +35,9 @@ assert.match(app, /const DND_REMINDER_FALLBACK = "Before we begin:[\s\S]*?showDn
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?max-width:\s*none[\s\S]*?min-height:\s*100dvh/, 'the persistent fullscreen app should not retain the normal narrow Lobby width');
 assert.match(html, /id="fullscreen-controls-reveal-zone"/, 'fullscreen should provide a dedicated bottom-edge reveal zone');
-assert.match(css, /#app:fullscreen #controls:not\(\.hidden\),[\s\S]*?#app:fullscreen #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?#fullscreen-controls-reveal-zone:hover[\s\S]*?#session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should reveal only from the bottom edge or control focus');
+assert.match(app, /document\.addEventListener\('fullscreenchange', this\.syncFullscreenJourneyChrome\)[\s\S]*?syncFullscreenJourneyChrome\(\) \{[\s\S]*?document\.body\.classList\.toggle\('journey-fullscreen-active', isJourneyFullscreen\)/, 'the app should explicitly track whether its persistent container is fullscreen');
+assert.match(app, /this\.revealZone\?\.addEventListener\('pointerenter', \(\) => this\.setFullscreenChromeVisible\(true\)\)[\s\S]*?scheduleFullscreenChromeHide\(\)/, 'the bottom edge should explicitly reveal then hide fullscreen controls');
+assert.match(css, /body\.journey-fullscreen-active #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?body\.journey-fullscreen-active\.fullscreen-controls-visible #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active\.fullscreen-controls-visible #session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should remain hidden unless the explicit reveal state is active');
 
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');

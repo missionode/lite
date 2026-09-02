@@ -969,7 +969,7 @@ input[type="range"]::-moz-range-progress {
     display: none;
 }
 
-#app:fullscreen #fullscreen-controls-reveal-zone {
+body.journey-fullscreen-active #fullscreen-controls-reveal-zone {
     display: block;
     position: fixed;
     right: 0;
@@ -979,29 +979,23 @@ input[type="range"]::-moz-range-progress {
     z-index: 999;
 }
 
-#app:fullscreen #controls:not(.hidden),
-#app:fullscreen #session-countdown-layer {
+body.journey-fullscreen-active #controls:not(.hidden),
+body.journey-fullscreen-active #session-countdown-layer {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-#app:fullscreen #controls:not(.hidden) {
+body.journey-fullscreen-active #controls:not(.hidden) {
     transform: translateY(1rem);
 }
 
-#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #controls:not(.hidden),
-#app:fullscreen #controls:not(.hidden):hover,
-#app:fullscreen #controls:not(.hidden):focus-within,
-#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #session-countdown-layer,
-#app:fullscreen:has(#controls:not(.hidden):hover) #session-countdown-layer,
-#app:fullscreen:has(#controls:not(.hidden):focus-within) #session-countdown-layer {
+body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden),
+body.journey-fullscreen-active.fullscreen-controls-visible #session-countdown-layer {
     opacity: 1;
 }
 
-#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #controls:not(.hidden),
-#app:fullscreen #controls:not(.hidden):hover,
-#app:fullscreen #controls:not(.hidden):focus-within {
+body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden) {
     transform: translateY(0);
     pointer-events: auto;
 }

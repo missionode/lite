@@ -3212,7 +3212,41 @@ class JourneyVideoPrelude {
         this.media = document.getElementById('journey-video-prelude-media');
         this.playButton = document.getElementById('play-journey-video-prelude');
         this.fullscreenTarget = document.getElementById('app');
+        this.controls = document.getElementById('controls');
+        this.revealZone = document.getElementById('fullscreen-controls-reveal-zone');
+        this.fullscreenChromeHideTimer = null;
         this.activePlayback = null;
+        this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
+        document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
+        this.revealZone?.addEventListener('pointerenter', () => this.setFullscreenChromeVisible(true));
+        this.revealZone?.addEventListener('pointerleave', () => this.scheduleFullscreenChromeHide());
+        this.controls?.addEventListener('pointerenter', () => this.setFullscreenChromeVisible(true));
+        this.controls?.addEventListener('pointerleave', () => this.scheduleFullscreenChromeHide());
+        this.controls?.addEventListener('focusin', () => this.setFullscreenChromeVisible(true));
+        this.controls?.addEventListener('focusout', () => this.scheduleFullscreenChromeHide());
+    }
+
+    syncFullscreenJourneyChrome() {
+        const isJourneyFullscreen = document.fullscreenElement === this.fullscreenTarget;
+        document.body.classList.toggle('journey-fullscreen-active', isJourneyFullscreen);
+        if (!isJourneyFullscreen) this.setFullscreenChromeVisible(false);
+    }
+
+    setFullscreenChromeVisible(isVisible) {
+        if (this.fullscreenChromeHideTimer) {
+            clearTimeout(this.fullscreenChromeHideTimer);
+            this.fullscreenChromeHideTimer = null;
+        }
+        document.body.classList.toggle('fullscreen-controls-visible', Boolean(isVisible) && document.body.classList.contains('journey-fullscreen-active'));
+    }
+
+    scheduleFullscreenChromeHide() {
+        if (this.fullscreenChromeHideTimer) clearTimeout(this.fullscreenChromeHideTimer);
+        this.fullscreenChromeHideTimer = setTimeout(() => {
+            const controlsHovered = this.controls?.matches(':hover');
+            const controlsFocused = this.controls?.contains(document.activeElement);
+            if (!controlsHovered && !controlsFocused) this.setFullscreenChromeVisible(false);
+        }, 120);
     }
 
     enterFullscreen() {
@@ -3221,7 +3255,9 @@ class JourneyVideoPrelude {
         // This call is intentionally made synchronously inside the explicit
         // Begin introduction tap so browsers may honor the fullscreen request.
         if (typeof this.fullscreenTarget?.requestFullscreen === 'function') {
-            Promise.resolve(this.fullscreenTarget.requestFullscreen({ navigationUI: 'hide' })).catch(() => {});
+            Promise.resolve(this.fullscreenTarget.requestFullscreen({ navigationUI: 'hide' }))
+                .then(() => this.syncFullscreenJourneyChrome())
+                .catch(() => {});
             return;
         }
 
