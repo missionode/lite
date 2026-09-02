@@ -19,6 +19,11 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-02 (Minimal test-script narration)
+
+- `test-script.json` remains a complete English/Malayalam schema fixture with its existing frequencies, mantras, assets, service modules, Yoga poses, sleep stages, and shot values intact. Every localized narrative leaf is now exactly one concise sentence, making it suitable for quick technical flow checks rather than stakeholder presentation.
+- Validation: `static/unit` PASS — JSON parsing, `test:demo-script`, a direct one-sentence scan across all 118 localized fixture leaves, and diff check. `test:content-safety` remains unavailable because the owner-maintained local `docs/dot.json` is deleted in the working tree and was deliberately not restored. No Playwright or screenshots were run.
+
 ### Local checkpoint — 2026-09-02 (Extended natural transition tails)
 
 - Existing diffuse, non-repeating reverb is extended: narration `2.8s → 4.5s`, background music `1.8s → 3.2s`, and mantra `3.6s → 5.5s`. Dry source fades and intelligibility settings remain unchanged.

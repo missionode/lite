@@ -1,18 +1,18 @@
 {
   "intro": {
-    "gratitude_en": "Take one slow breath. You are safe. Begin now.",
-    "gratitude_ml": "ഒരു സാവധാന ശ്വാസം എടുക്കൂ. നിങ്ങൾ സുരക്ഷിതരാണ്. ഇപ്പോൾ ആരംഭിക്കാം.",
-    "returning_en": "Welcome back. Let the sea guide your breath.",
-    "returning_ml": "വീണ്ടും സ്വാഗതം. കടലിന്റെ താളത്തിൽ ശ്വസിക്കൂ.",
+    "gratitude_en": "Breathe slowly.",
+    "gratitude_ml": "സാവധാനമായി ശ്വസിക്കൂ.",
+    "returning_en": "Welcome back.",
+    "returning_ml": "വീണ്ടും സ്വാഗതം.",
     "moon": {
-      "new_en": "New moon. Begin gently.",
-      "new_ml": "പുതിയ ചന്ദ്രൻ. സാവധാനമായി ആരംഭിക്കാം.",
-      "waxing_en": "Waxing moon. Keep moving.",
-      "waxing_ml": "വളരുന്ന ചന്ദ്രൻ. മുന്നോട്ട് പോകാം.",
-      "full_en": "Full moon. Receive this moment.",
-      "full_ml": "പൂർണ്ണ ചന്ദ്രൻ. ഈ നിമിഷം സ്വീകരിക്കൂ.",
-      "waning_en": "Waning moon. Release gently.",
-      "waning_ml": "ക്ഷയിക്കുന്ന ചന്ദ്രൻ. സാവധാനമായി വിട്ടയക്കൂ."
+      "new_en": "Begin gently.",
+      "new_ml": "സാവധാനമായി ആരംഭിക്കൂ.",
+      "waxing_en": "Move gently.",
+      "waxing_ml": "സാവധാനമായി മുന്നോട്ട് പോകൂ.",
+      "full_en": "Receive this moment.",
+      "full_ml": "ഈ നിമിഷം സ്വീകരിക്കൂ.",
+      "waning_en": "Release gently.",
+      "waning_ml": "സാവധാനമായി വിട്ടയക്കൂ."
     }
   },
   "root": {
@@ -21,8 +21,8 @@
     "frequency": 396,
     "color": "#FF0000",
     "symbol": "symbols/root.png",
-    "meditation_en": "Feel grounded, steady, and safe enough to begin.",
-    "meditation_ml": "ആരംഭിക്കാൻ മതിയായ ശാന്തതയും സ്ഥിരതയും അനുഭവിക്കൂ.",
+    "meditation_en": "Feel grounded.",
+    "meditation_ml": "സ്ഥിരത അനുഭവിക്കൂ.",
     "affirmation_en": "You are safe.",
     "affirmation_ml": "നിങ്ങൾ സുരക്ഷിതരാണ്."
   },
@@ -32,8 +32,8 @@
     "frequency": 417,
     "color": "#FF7F00",
     "symbol": "symbols/sacral.png",
-    "meditation_en": "Welcome creativity, ease, and honest emotional flow.",
-    "meditation_ml": "സർഗ്ഗാത്മകതയും ലാളിത്യവും സത്യസന്ധമായ വികാരപ്രവാഹവും സ്വീകരിക്കൂ.",
+    "meditation_en": "Welcome ease.",
+    "meditation_ml": "ലാളിത്യം സ്വീകരിക്കൂ.",
     "affirmation_en": "Joy is welcome.",
     "affirmation_ml": "ആനന്ദത്തെ സ്വീകരിക്കൂ."
   },
@@ -43,8 +43,8 @@
     "frequency": 528,
     "color": "#FFFF00",
     "symbol": "symbols/solar.png",
-    "meditation_en": "Breathe in courage and clear, purposeful action.",
-    "meditation_ml": "ധൈര്യവും വ്യക്തമായ ലക്ഷ്യബോധമുള്ള പ്രവർത്തനവും ശ്വസിച്ചെടുക്കൂ.",
+    "meditation_en": "Breathe in courage.",
+    "meditation_ml": "ധൈര്യം ശ്വസിച്ചെടുക്കൂ.",
     "affirmation_en": "You are powerful.",
     "affirmation_ml": "നിങ്ങൾ ശക്തരാണ്."
   },
@@ -54,8 +54,8 @@
     "frequency": 639,
     "color": "#00FF00",
     "symbol": "symbols/heart.png",
-    "meditation_en": "Make room for compassion, gratitude, and connection.",
-    "meditation_ml": "കരുണയ്ക്കും നന്ദിക്കും ബന്ധത്തിനും ഇടം നൽകൂ.",
+    "meditation_en": "Make room for compassion.",
+    "meditation_ml": "കരുണയ്ക്ക് ഇടം നൽകൂ.",
     "affirmation_en": "Your heart is open.",
     "affirmation_ml": "നിങ്ങളുടെ ഹൃദയം തുറന്നിരിക്കുന്നു."
   },
@@ -65,8 +65,8 @@
     "frequency": 741,
     "color": "#00BFFF",
     "symbol": "symbols/throat.png",
-    "meditation_en": "Let your words become clear, sincere, and kind.",
-    "meditation_ml": "നിങ്ങളുടെ വാക്കുകൾ വ്യക്തവും സത്യസന്ധവും സൗമ്യവുമാകട്ടെ.",
+    "meditation_en": "Speak with clarity.",
+    "meditation_ml": "വ്യക്തമായി സംസാരിക്കൂ.",
     "affirmation_en": "Your voice is clear.",
     "affirmation_ml": "നിങ്ങളുടെ ശബ്ദം വ്യക്തമാണ്."
   },
@@ -76,8 +76,8 @@
     "frequency": 852,
     "color": "#4B0082",
     "symbol": "symbols/thirdeye.png",
-    "meditation_en": "Let quiet attention reveal clarity and insight.",
-    "meditation_ml": "ശാന്തമായ ശ്രദ്ധ വ്യക്തതയും ഉൾക്കാഴ്ചയും വെളിപ്പെടുത്തട്ടെ.",
+    "meditation_en": "Rest in clarity.",
+    "meditation_ml": "വ്യക്തതയിൽ വിശ്രമിക്കൂ.",
     "affirmation_en": "Your mind is clear.",
     "affirmation_ml": "നിങ്ങളുടെ മനസ്സ് വ്യക്തമാണ്."
   },
@@ -87,14 +87,14 @@
     "frequency": 963,
     "color": "#9400D3",
     "symbol": "symbols/crown.png",
-    "meditation_en": "Rest in stillness, perspective, and connection.",
-    "meditation_ml": "നിശ്ചലതയിലും വിശാലദൃഷ്ടിയിലും ബന്ധബോധത്തിലും വിശ്രമിക്കൂ.",
+    "meditation_en": "Rest in stillness.",
+    "meditation_ml": "നിശ്ചലതയിൽ വിശ്രമിക്കൂ.",
     "affirmation_en": "You are connected.",
     "affirmation_ml": "നിങ്ങൾ ബന്ധിക്കപ്പെട്ടിരിക്കുന്നു."
   },
   "closing": {
-    "en": "The journey is complete. Return slowly.",
-    "ml": "യാത്ര പൂർത്തിയായി. സാവധാനമായി മടങ്ങിവരൂ.",
+    "en": "Return slowly.",
+    "ml": "സാവധാനമായി മടങ്ങിവരൂ.",
     "affirmation_en": "Your whole body is at peace.",
     "affirmation_ml": "നിങ്ങളുടെ ശരീരം സമാധാനത്തിലാണ്."
   },
@@ -104,50 +104,50 @@
     "frequency": 528,
     "color": "#FFD700",
     "symbol": "symbols/hreem.png",
-    "meditation_en": "Gather focused energy, courage, and purposeful action.",
-    "meditation_ml": "ഏകാഗ്രമായ ഊർജ്ജവും ധൈര്യവും ലക്ഷ്യബോധമുള്ള പ്രവർത്തനവും ഉണർത്തൂ.",
-    "intention_en": "Focus and courage for this short Hreem mantra journey.",
-    "intention_ml": "ഈ ചെറിയ ഹ്രീം യാത്രയ്ക്ക് ഏകാഗ്രതയും ധൈര്യവും.",
+    "meditation_en": "Gather focused energy.",
+    "meditation_ml": "ഏകാഗ്ര ഊർജ്ജം ഉണർത്തൂ.",
+    "intention_en": "Focus with courage.",
+    "intention_ml": "ധൈര്യത്തോടെ ഏകാഗ്രമാകൂ.",
     "affirmation_en": "You are fully alive.",
     "affirmation_ml": "നിങ്ങൾ പൂർണ്ണമായി സജീവരാണ്."
   },
   "corpse_pose": {
     "intro": {
-      "en": "Lie down and release your weight.",
-      "ml": "കിടന്ന് നിങ്ങളുടെ ഭാരം വിട്ടുകൊടുക്കൂ."
+      "en": "Lie down softly.",
+      "ml": "സാവധാനമായി കിടക്കൂ."
     },
     "transition": {
-      "en": "One minute remains. Prepare to continue.",
-      "ml": "ഒരു മിനിറ്റ് ബാക്കി. തുടരാൻ തയ്യാറാകൂ."
+      "en": "Prepare to continue.",
+      "ml": "തുടരാൻ തയ്യാറാകൂ."
     }
   },
   "bath_session": {
     "title": { "en": "Test Bath", "ml": "പരീക്ഷണ സ്നാനം" },
-    "intro": { "en": "Begin the short bath stage.", "ml": "ചെറിയ സ്നാനഘട്ടം ആരംഭിക്കാം." },
-    "instructions": { "en": "Let the water refresh you.", "ml": "ജലം നിങ്ങളെ ഉന്മേഷിപ്പിക്കട്ടെ." },
-    "reminder": { "en": "One minute remains.", "ml": "ഒരു മിനിറ്റ് ബാക്കി." }
+    "intro": { "en": "Begin bathing.", "ml": "സ്നാനം ആരംഭിക്കൂ." },
+    "instructions": { "en": "Refresh gently.", "ml": "സാവധാനമായി ഉണരൂ." },
+    "reminder": { "en": "Continue gently.", "ml": "സാവധാനമായി തുടരൂ." }
   },
   "perineal_care": {
     "title": { "en": "Test Perineal Care", "ml": "പരീക്ഷണ പെരിനിയൽ പരിചരണം" },
-    "intro": { "en": "Begin private care gently.", "ml": "സ്വകാര്യ പരിചരണം സാവധാനമായി ആരംഭിക്കാം." },
-    "instructions": { "en": "Use warm water and pause when needed.", "ml": "ഇളം ചൂടുവെള്ളം ഉപയോഗിച്ച് ആവശ്യമെങ്കിൽ ഇടവേള എടുക്കൂ." },
-    "reminder": { "en": "One minute remains in private care.", "ml": "സ്വകാര്യ പരിചരണത്തിന് ഒരു മിനിറ്റ് ബാക്കി." }
+    "intro": { "en": "Begin private care.", "ml": "സ്വകാര്യ പരിചരണം ആരംഭിക്കൂ." },
+    "instructions": { "en": "Move gently.", "ml": "സാവധാനമായി ചലിക്കൂ." },
+    "reminder": { "en": "Continue gently.", "ml": "സാവധാനമായി തുടരൂ." }
   },
   "assisted_bathing": {
     "title": { "en": "Test Assisted Bathing", "ml": "പരീക്ഷണ സഹായത്തോടെയുള്ള കുളി" },
-    "intro": { "en": "Begin assisted bathing with consent.", "ml": "സമ്മതത്തോടെ സഹായത്തോടെയുള്ള കുളി ആരംഭിക്കാം." },
-    "instructions": { "en": "Check comfort and water temperature.", "ml": "സുഖവും വെള്ളത്തിന്റെ ചൂടും പരിശോധിക്കൂ." },
-    "reminder": { "en": "One minute remains. Prepare for Yoga.", "ml": "ഒരു മിനിറ്റ് ബാക്കി. യോഗയ്ക്കായി തയ്യാറാകൂ." }
+    "intro": { "en": "Begin assisted bathing.", "ml": "സഹായത്തോടെയുള്ള കുളി ആരംഭിക്കൂ." },
+    "instructions": { "en": "Check comfort.", "ml": "സുഖം പരിശോധിക്കൂ." },
+    "reminder": { "en": "Prepare for yoga.", "ml": "യോഗയ്ക്കായി തയ്യാറാകൂ." }
   },
   "massage": {
     "title": { "en": "Test Gentle Massage", "ml": "പരീക്ഷണ സൌമ്യമായ മസാജ്" },
-    "intro": { "en": "Begin a gentle massage with consent.", "ml": "സമ്മതത്തോടെ സൌമ്യമായ മസാജ് ആരംഭിക്കാം." },
-    "instructions": { "en": "Use slow, comfortable movements.", "ml": "പതുക്കെയും സുഖകരമായും ചലിക്കൂ." },
-    "reminder": { "en": "One minute remains. Prepare for bathing.", "ml": "ഒരു മിനിറ്റ് ബാക്കി. കുളിക്കായി തയ്യാറാകൂ." }
+    "intro": { "en": "Begin gentle massage.", "ml": "സൗമ്യ മസാജ് ആരംഭിക്കൂ." },
+    "instructions": { "en": "Move slowly.", "ml": "പതുക്കെ ചലിക്കൂ." },
+    "reminder": { "en": "Prepare for bathing.", "ml": "കുളിക്കായി തയ്യാറാകൂ." }
   },
   "yoga": {
-    "intro": { "en": "Begin the short Yoga Bridge.", "ml": "ചെറിയ യോഗ പാലം ആരംഭിക്കാം." },
-    "preparation": { "en": "Find a comfortable space.", "ml": "സൗകര്യപ്രദമായ സ്ഥലം കണ്ടെത്തൂ." },
+    "intro": { "en": "Begin yoga.", "ml": "യോഗ ആരംഭിക്കൂ." },
+    "preparation": { "en": "Find comfort.", "ml": "സൗകര്യം കണ്ടെത്തൂ." },
     "poses": [
       { "id": "vrikshasana", "name_en": "Tree Pose", "name_ml": "വൃക്ഷാസനം", "desc_en": "Stand and balance.", "desc_ml": "നിന്ന് സന്തുലനം കണ്ടെത്തൂ." },
       { "id": "adho_mukha_svanasana", "name_en": "Downward Dog", "name_ml": "അധോമുഖ ശ്വാനാസനം", "desc_en": "Stretch and breathe.", "desc_ml": "നീട്ടി ശ്വസിക്കൂ." },
@@ -156,10 +156,10 @@
       { "id": "ananda_balasana", "name_en": "Happy Baby", "name_ml": "ആനന്ദ ബാലാസനം", "desc_en": "Relax your hips.", "desc_ml": "ഇടുപ്പ് അയച്ചുവിടൂ." }
     ],
     "next_pose_prompt": { "en": "Prepare for the next pose.", "ml": "അടുത്ത ഭാവത്തിന് തയ്യാറാകൂ." },
-    "session_complete": { "en": "Yoga is complete. Be still.", "ml": "യോഗ പൂർത്തിയായി. നിശ്ചലമായിരിക്കൂ." }
+    "session_complete": { "en": "Rest now.", "ml": "ഇപ്പോൾ വിശ്രമിക്കൂ." }
   },
   "hooponopono": {
-    "intro": { "en": "Repeat these four short phrases.", "ml": "ഈ നാല് ചെറിയ വാക്യങ്ങൾ ആവർത്തിക്കൂ." },
+    "intro": { "en": "Repeat these phrases.", "ml": "ഈ വാക്യങ്ങൾ ആവർത്തിക്കൂ." },
     "phrases": {
       "en": ["I am sorry", "Please forgive me", "Thank you", "I love you"],
       "ml": ["ക്ഷമിക്കൂ", "എന്നോട് ക്ഷമിക്കൂ", "നന്ദി", "ഞാൻ നിന്നെ സ്നേഹിക്കുന്നു"]
