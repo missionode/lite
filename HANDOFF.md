@@ -19,6 +19,12 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-02 (Longer narration-to-mantra tail)
+
+- The single shared Piper narration-to-mantra tail is now 5 seconds (was 3), covering every chakra and HRIM before its mapped mantra. Browser TTS remains outside Web Audio and therefore retains its platform-owned voice ending; it still uses the same six-second background-music dissolve before mantra playback.
+- Delivery rotates to `app.js?v=2.20` and shell cache `chakra-v5.94`; language cache remains unchanged. This checkpoint deliberately does not alter music, drone, mantra, bell, guided-tone, ambience, or explicit journey-stop fades.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, `test:background-music`, `test:narration-ticker`, and `git diff --check`. No Playwright or screenshots were run by owner direction; target-device listening remains the audible-quality gate.
+
 ### Active snapshot — 2026-09-01 (Heart release and renewal narration)
 
 - The owner rejected karma terminology as unnecessarily complex. `scripts.json` now adds one approved short Heart Chakra passage immediately before the YAM mantra in English, Malayalam, Russian, and Hindi: old heaviness may soften; keep the learning, release the burden, and let compassion guide the next step. It explicitly avoids forced forgiveness, erasing the past, blame, or promised cleansing.

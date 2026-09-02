@@ -53,7 +53,7 @@ const MANTRA_REVERB_TAIL_WET = 0.26;
 const PIPER_CLIP_FADE_SECONDS = 0.05;
 // The final narration sentence receives a longer tail before every mantra.
 // This keeps Crown/AUM and all other chakra handoffs unhurried and seamless.
-const NARRATION_MANTRA_FADE_SECONDS = 3;
+const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
