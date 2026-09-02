@@ -61,7 +61,7 @@ const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3;
-const JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS = 1.2;
+const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
 const PLEASURE_AMBIENCE_GAIN = 0.003;
@@ -3203,7 +3203,7 @@ class JourneyVideoPrelude {
         this.audio = audioEngine;
         this.overlay = document.getElementById('journey-video-prelude');
         this.media = document.getElementById('journey-video-prelude-media');
-        this.skipButton = document.getElementById('skip-journey-video-prelude');
+        this.playButton = document.getElementById('play-journey-video-prelude');
         this.activePlayback = null;
     }
 
@@ -3219,11 +3219,12 @@ class JourneyVideoPrelude {
         this.activePlayback = new Promise((resolve) => {
             let settled = false;
             let exitPromise = null;
+            let hasStarted = false;
             const cleanup = () => {
                 this.media.removeEventListener('timeupdate', onTimeUpdate);
                 this.media.removeEventListener('ended', onEnded);
                 this.media.removeEventListener('error', onError);
-                this.skipButton?.removeEventListener('click', onSkip);
+                this.playButton?.removeEventListener('click', onPlay);
             };
             const beginExit = (duration) => {
                 if (exitPromise) return exitPromise;
@@ -3239,34 +3240,40 @@ class JourneyVideoPrelude {
                 await beginExit(duration);
                 this.media.pause();
                 try { this.media.currentTime = 0; } catch (error) {}
-                this.overlay.classList.remove('is-visible', 'is-leaving');
+                this.overlay.classList.remove('is-visible', 'is-leaving', 'is-playing');
                 this.overlay.classList.add('hidden');
                 resolve(reason);
             };
             const onTimeUpdate = () => {
+                if (!hasStarted) return;
                 const remaining = this.media.duration - this.media.currentTime;
                 if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS) {
                     void beginExit(JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS);
                 }
             };
             const onEnded = () => { void complete('ended', JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS); };
-            const onError = () => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); };
-            const onSkip = () => { void complete('skipped', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); };
+            const onError = () => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); };
+            const onPlay = () => {
+                if (hasStarted || settled) return;
+                hasStarted = true;
+                this.overlay.classList.add('is-playing');
+                const playback = this.media.play();
+                Promise.resolve(playback).then(() => {
+                    this.audio.fadeJourneyVideoPrelude(state.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
+                }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
+            };
 
             this.media.addEventListener('timeupdate', onTimeUpdate);
             this.media.addEventListener('ended', onEnded);
             this.media.addEventListener('error', onError);
-            this.skipButton?.addEventListener('click', onSkip, { once: true });
+            this.playButton?.addEventListener('click', onPlay, { once: true });
             this.overlay.classList.remove('hidden', 'is-leaving');
             requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
             this.media.muted = false;
             this.media.volume = 1;
+            this.media.pause();
             try { this.media.currentTime = 0; } catch (error) {}
             this.audio.fadeJourneyVideoPrelude(0, 0);
-            const playback = this.media.play();
-            Promise.resolve(playback).then(() => {
-                this.audio.fadeJourneyVideoPrelude(state.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
-            }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS); });
         }).finally(() => { this.activePlayback = null; });
 
         return this.activePlayback;

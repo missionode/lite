@@ -467,11 +467,14 @@
         <!-- Restart-only cinematic prelude. It fills the app viewport without
              requesting the device's disruptive native fullscreen mode. -->
         <section id="journey-video-prelude" class="journey-video-prelude hidden" aria-label="Journey introduction" aria-live="polite">
-            <video id="journey-video-prelude-media" preload="metadata" playsinline>
+            <video id="journey-video-prelude-media" preload="auto" playsinline>
                 <source src="video/nature-upgrade.mp4" type="video/mp4">
             </video>
             <div class="journey-video-prelude-shade" aria-hidden="true"></div>
-            <button id="skip-journey-video-prelude" class="journey-video-prelude-skip" type="button" data-i18n="ui.skipJourneyVideoPrelude">Skip introduction</button>
+            <div id="journey-video-prelude-ready" class="journey-video-prelude-ready">
+                <p data-i18n="ui.journeyVideoPreludeReminder">Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.</p>
+                <button id="play-journey-video-prelude" class="journey-video-prelude-play" type="button" data-i18n="ui.playJourneyVideoPrelude">Begin introduction</button>
+            </div>
         </section>
 
         <!-- Full-screen in-session tuning panel -->
@@ -640,6 +643,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.24"></script>
+    <script src="app.js?v=2.25"></script>
 </body>
 </html>

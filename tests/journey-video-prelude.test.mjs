@@ -10,23 +10,26 @@ const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
 );
 
 assert.ok(fs.statSync(new URL('../video/nature-upgrade.mp4', import.meta.url)).size > 0, 'the supplied prelude video should exist');
-assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*playsinline[\s\S]*?src="video\/nature-upgrade\.mp4"/, 'the prelude should use the supplied video in an inline mobile-safe player');
-assert.match(html, /id="skip-journey-video-prelude"[\s\S]*?data-i18n="ui\.skipJourneyVideoPrelude"/, 'the prelude should provide a localized Skip control');
+assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/nature-upgrade\.mp4"/, 'the prelude should use the supplied video in a preloaded, inline mobile-safe player');
+assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder and wait for an explicit localized Play control');
+assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?position:\s*fixed[\s\S]*?inset:\s*0[\s\S]*?z-index:\s*100100/, 'the video prelude should fill the application viewport');
 assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*cover[\s\S]*?transition:\s*opacity 2\.4s/, 'the video should receive a gradual visual entry');
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 3/);
-assert.match(app, /const JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS = 1\.2/);
-assert.match(app, /class JourneyVideoPrelude[\s\S]*?this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video audio should fade in at the guide-selected music level');
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
+assert.match(app, /class JourneyVideoPrelude[\s\S]*?this\.playButton = document\.getElementById\('play-journey-video-prelude'\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video and its audio should begin only from the explicit Play action, at the guide-selected music level');
+assert.match(app, /this\.media\.pause\(\);[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(0, 0\);/, 'the ready screen should leave the video paused and silent before Play');
 assert.match(app, /this\.journeyVideoPreludeSource = this\.ctx\.createMediaElementSource\(media\)/, 'video audio should enter the Web Audio graph');
 assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.journeyVideoPreludeGain\.connect\(this\.musicEchoSend\)/, 'video audio should use the established Spatial Sound and Music Space paths');
-assert.match(app, /const onSkip = \(\) => \{ void complete\('skipped', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS\); \}/, 'Skip should fade safely before continuing');
-assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_SKIP_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
+assert.doesNotMatch(app, /onSkip|skipButton|JOURNEY_VIDEO_PRELUDE_SKIP/, 'the implementation should not retain an automatic skip path');
+assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
 assert.match(app, /meditation\.stop\(\);[\s\S]*?await journeyVideoPrelude\.play\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'Restart should play the prelude before it waits to relaunch the journey');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 
 for (const locale of locales) {
-    assert.ok(locale.ui.skipJourneyVideoPrelude?.trim(), 'each shipped locale needs the Skip label');
+    assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');
+    assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
 }
 
 console.log('Journey video prelude contract passed.');

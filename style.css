@@ -317,24 +317,51 @@ body {
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 28%, transparent 72%, rgba(0, 0, 0, 0.42));
 }
 
-.journey-video-prelude-skip {
+.journey-video-prelude-ready {
     position: absolute;
-    top: max(1rem, env(safe-area-inset-top));
-    right: max(1rem, env(safe-area-inset-right));
-    z-index: 1;
-    border: 1px solid rgba(255, 255, 255, 0.36);
-    border-radius: 999px;
-    padding: 0.6rem 0.9rem;
+    z-index: 2;
+    display: grid;
+    gap: 1rem;
+    width: min(31rem, calc(100vw - 2.5rem));
+    padding: 1.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.25rem;
     color: #fff;
-    background: rgba(0, 0, 0, 0.34);
-    backdrop-filter: blur(12px);
-    font: inherit;
-    font-size: 0.8rem;
+    background: rgba(0, 0, 0, 0.42);
+    box-shadow: 0 1.2rem 3.5rem rgba(0, 0, 0, 0.36);
+    backdrop-filter: blur(16px);
+    text-align: center;
+    transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
-.journey-video-prelude-skip:focus-visible {
+.journey-video-prelude-ready p {
+    margin: 0;
+    font-size: clamp(1rem, 2.8vw, 1.2rem);
+    line-height: 1.55;
+}
+
+.journey-video-prelude-play {
+    justify-self: center;
+    min-width: min(15rem, 100%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    color: #101010;
+    background: rgba(255, 255, 255, 0.95);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.journey-video-prelude-play:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 3px;
+}
+
+.journey-video-prelude.is-playing .journey-video-prelude-ready {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    pointer-events: none;
 }
 
 /* Author layout rules must not override the native hidden contract. */
