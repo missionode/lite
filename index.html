@@ -613,6 +613,9 @@
             </div>
         </div>
 
+        <!-- A fullscreen-only bottom edge reveals the otherwise quiet session chrome. -->
+        <div id="fullscreen-controls-reveal-zone" aria-hidden="true"></div>
+
         <!-- Global In-Session Controls (visible across all meditation screens) -->
         <div id="controls" class="hidden" style="position: fixed; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 10px; backdrop-filter: blur(10px); z-index: 1000;">
             <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
@@ -643,6 +646,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.29"></script>
+    <script src="app.js?v=2.30"></script>
 </body>
 </html>

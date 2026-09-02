@@ -962,8 +962,22 @@ input[type="range"]::-moz-range-progress {
     margin-top: 2rem;
 }
 
-/* Keep the guided image clear in fullscreen. A mouse hover or keyboard focus
-   reveals the controls and mirrored time rings; leaving lets both recede. */
+/* Keep the guided image clear in fullscreen. Only the bottom-edge reveal zone
+   or control keyboard focus brings back the session chrome. */
+#fullscreen-controls-reveal-zone {
+    display: none;
+}
+
+#app:fullscreen #fullscreen-controls-reveal-zone {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: max(4.5rem, env(safe-area-inset-bottom));
+    z-index: 999;
+}
+
 #app:fullscreen #controls:not(.hidden),
 #app:fullscreen #session-countdown-layer {
     opacity: 0;
@@ -975,15 +989,18 @@ input[type="range"]::-moz-range-progress {
     transform: translateY(1rem);
 }
 
-#app:fullscreen:hover #controls:not(.hidden),
-#app:fullscreen:focus-within #controls:not(.hidden),
-#app:fullscreen:hover #session-countdown-layer,
-#app:fullscreen:focus-within #session-countdown-layer {
+#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #controls:not(.hidden),
+#app:fullscreen #controls:not(.hidden):hover,
+#app:fullscreen #controls:not(.hidden):focus-within,
+#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #session-countdown-layer,
+#app:fullscreen:has(#controls:not(.hidden):hover) #session-countdown-layer,
+#app:fullscreen:has(#controls:not(.hidden):focus-within) #session-countdown-layer {
     opacity: 1;
 }
 
-#app:fullscreen:hover #controls:not(.hidden),
-#app:fullscreen:focus-within #controls:not(.hidden) {
+#app:fullscreen:has(#fullscreen-controls-reveal-zone:hover) #controls:not(.hidden),
+#app:fullscreen #controls:not(.hidden):hover,
+#app:fullscreen #controls:not(.hidden):focus-within {
     transform: translateY(0);
     pointer-events: auto;
 }

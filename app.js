@@ -3193,7 +3193,7 @@ class VisualEngine {
         if (state.eyesCloseMode) return; // Absolute Blackout
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
-    stop() {
+    stop({ preserveScreen = false } = {}) {
         if (this.glow) this.glow.style.background = 'transparent';
     }
 }
@@ -5199,7 +5199,7 @@ class MeditationController {
             aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
             aura.style.opacity = '1';
         }
-        showScreen(returnScreen);
+        if (!preserveScreen) showScreen(returnScreen);
         journeyVideoPrelude.exitFullscreen();
     }
 }
@@ -6869,7 +6869,7 @@ function attachEventListeners() {
     document.getElementById('stop-meditation').addEventListener('click', (e) => {
         console.log("Stop button clicked");
         e.stopImmediatePropagation();
-        meditation.stop();
+        meditation.stop({ preserveScreen: true });
     });
     const eyesCloseToggle = document.getElementById('eyes-close-mode-toggle');
     if (eyesCloseToggle) eyesCloseToggle.addEventListener('change', (e) => {

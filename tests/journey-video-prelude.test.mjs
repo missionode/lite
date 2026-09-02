@@ -28,11 +28,13 @@ assert.match(app, /this\.journeyVideoPreludeSource = this\.ctx\.createMediaEleme
 assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.journeyVideoPreludeGain\.connect\(this\.musicEchoSend\)/, 'video audio should use the established Spatial Sound and Music Space paths');
 assert.doesNotMatch(app, /onSkip|skipButton|JOURNEY_VIDEO_PRELUDE_SKIP/, 'the implementation should not retain an automatic skip path');
 assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
-assert.match(app, /meditation\.stop\(\);[\s\S]*?const preludeResult = await journeyVideoPrelude\.play\(\);[\s\S]*?if \(preludeResult === 'ended'\) meditation\.acknowledgeDndReminder\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'a completed prelude should acknowledge the Do Not Disturb reminder before it relaunches the journey');
+assert.match(app, /meditation\.stop\(\{ preserveScreen: true \}\);[\s\S]*?const preludeResult = await journeyVideoPrelude\.play\(\);[\s\S]*?if \(preludeResult === 'ended'\) meditation\.acknowledgeDndReminder\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'restart should preserve the active screen behind the prelude and acknowledge the reminder before relaunching the journey');
+assert.match(app, /stop\(\{ preserveScreen = false \} = \{\}\)[\s\S]*?if \(!preserveScreen\) showScreen\(returnScreen\);/, 'the general stop path should be able to keep the active session screen in place during a restart');
 assert.match(app, /showDndReminderIfNeeded\(\) \{[\s\S]*?if \(this\.dndReminderAcknowledged\)[\s\S]*?this\.dndReminderAcknowledged = false;[\s\S]*?alert\(t\('ui\.journeyVideoPreludeReminder'\)\)/, 'the reminder should be consumed once after a completed video while normal starts retain it');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?max-width:\s*none[\s\S]*?min-height:\s*100dvh/, 'the persistent fullscreen app should not retain the normal narrow Lobby width');
-assert.match(css, /#app:fullscreen #controls:not\(\.hidden\),[\s\S]*?#app:fullscreen #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?#app:fullscreen:hover #controls:not\(\.hidden\)[\s\S]*?#app:fullscreen:hover #session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should reveal only on hover');
+assert.match(html, /id="fullscreen-controls-reveal-zone"/, 'fullscreen should provide a dedicated bottom-edge reveal zone');
+assert.match(css, /#app:fullscreen #controls:not\(\.hidden\),[\s\S]*?#app:fullscreen #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?#fullscreen-controls-reveal-zone:hover[\s\S]*?#session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should reveal only from the bottom edge or control focus');
 
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');
