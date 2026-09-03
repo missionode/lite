@@ -31,6 +31,13 @@
 - Preserve unrelated local state: `.DS_Store` and `audio/.DS_Store` are modified; `docs/dot.json` is deleted by owner action; `.codex/` and `audio/BACKUP/background_music.mp3` are untracked. They are not part of the video feature, were never staged, and must remain untouched unless the owner explicitly directs otherwise.
 - Next action: no new feature is active. On the next request, begin from `production` commit `4077d17`, keep the above local files isolated, and use the focused source/tests for the requested surface. If the user reports fullscreen UI behavior again, inspect the `JourneyVideoPrelude` lifecycle and `journey-fullscreen-active` / `fullscreen-controls-visible` classes before changing other journey code.
 
+### Active feature — 2026-09-03 (Video Volume Settings)
+
+- Branch: `video-volume-settings`, created from local production handoff checkpoint `2293465`; do not merge or push without owner approval.
+- Decoupled `state.volVideo` from `state.volMusic`. Video Volume is persisted as `chakra_vol_video`, has the same non-zero 0.02–0.5 safety range, and is used both for the restart prelude and a Settings-only preview. Background Music remains in Journey Tuning as `volMusic` and its existing live role-preserving fade behavior is unchanged.
+- Settings now provides Video Volume and Preview Video Audio. The preview uses the supplied prelude media and existing Web Audio Music/Spatial/Music Space route without starting a journey, fades in to Video Volume, plays for eight seconds, then fades and resets. It is user-gesture initiated and does not request fullscreen.
+- Delivery is rotated to `app.js?v=2.35` and `chakra-v5.109`. Validation: `static/unit` PASS — JavaScript syntax, `test:journey-video-prelude`, Hindi language contract, and diff check. No Playwright, screenshots, or device listening were run by owner direction.
+
 ### Active feature — 2026-09-02 (Journey video prelude)
 
 - Branch: `journey-video-prelude`, created from `production` commit `8d63042`. Scope is intentionally limited to the supplied `video/nature-upgrade.mp4` restart prelude; no ordinary Begin Journey, Shot, Sleep, Music Only, Experiment, or completion flow is changed.
