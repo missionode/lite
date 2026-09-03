@@ -39,6 +39,10 @@ assert.match(app, /isHypnosisJourney = !this\.isHighEnergy && !isDemoScriptSelec
 assert.match(app, /async runEmergence\(\)[\s\S]*?playSingingBowl\(\)[\s\S]*?getJourneySystemNarration\('emergence'\)[\s\S]*?state\.timeEmergence/, 'Emergence should progress from a feeble bell to custom-or-built-in narration and a configurable quiet return.');
 assert.doesNotMatch(app.slice(app.indexOf('    finish() {'), app.indexOf('    stop() {')), /playSingingBowl\(\)/, 'Completion must not add a second abrupt bell after Emergence.');
 assert.equal(timing.estimate.hypnosisNarrationSeconds, 40, 'The estimate should include the two Arrival narration blocks.');
+assert.match(app, /estimateStandardJourneySeconds\(\)[\s\S]*?estimateNarrationDurationSeconds\(text\)[\s\S]*?this\.getJourneySystemNarration\('arrivalInduction'\)[\s\S]*?localized\(chakra, 'meditation'\)[\s\S]*?localized\(chakra, 'affirmation'\)[\s\S]*?this\.getJourneySystemNarration\('emergence'\)/,
+    'The standard-session countdown should calculate from its actual opening, chakra narration, affirmations, and emergence copy.');
+assert.match(app, /const measuredStandardSeconds = !focusedExperience[\s\S]*?this\.estimateStandardJourneySeconds\(\)[\s\S]*?return measuredStandardSeconds \* 1000/,
+    'The measured content duration should take precedence over the legacy fixed-minute estimate when a standard script is loaded.');
 for (const locale of locales) {
     assert.ok(locale.system.arrivalInduction?.trim(), 'Every supported language needs Arrival induction guidance.');
     assert.ok(locale.system.arrivalReadiness?.trim(), 'Every supported language needs Arrival readiness guidance.');

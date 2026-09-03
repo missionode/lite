@@ -31,6 +31,16 @@
 - Preserve unrelated local state: `.DS_Store` and `audio/.DS_Store` are modified; `docs/dot.json` is deleted by owner action; `.codex/` and `audio/BACKUP/background_music.mp3` are untracked. They are not part of the video feature, were never staged, and must remain untouched unless the owner explicitly directs otherwise.
 - Next action: no new feature is active. On the next request, begin from `production` commit `4077d17`, keep the above local files isolated, and use the focused source/tests for the requested surface. If the user reports fullscreen UI behavior again, inspect the `JourneyVideoPrelude` lifecycle and `journey-fullscreen-active` / `fullscreen-controls-visible` classes before changing other journey code.
 
+### Active feature — 2026-09-04 (Premium Script Refinement)
+
+- Branch: `premium-script-refinement`, created from production baseline `8f32c0d`. This is an approved content-and-timing track; it must not alter the journey order, frequencies, mantras, runtime audio behavior, or owner-deleted `docs/dot.json`.
+- The opening and returning narration now use a more concise, ceremonial private-session tone in English, Malayalam, Russian, and Hindi: the meditator is received, invited to set down the day, guided into a white-gold aura, and prepared for renewal without making external guarantees.
+- Root, Sacral, and Solar Chakra narration is being refined in all four languages. Root now centres embodied trust and dependable support; Sacral treats sensitivity as strength, consent, emotional clarity, and creative freedom; Solar adds the approved theme of recognising timely opportunities and meeting good fortune through preparation, discernment, and grace.
+- Timing audit finding: the former countdown used fixed per-chakra/extra-minute constants even though the live path includes all narration, narration exit gaps, two Arrival cues, selected mantra durations, intervals, final silence, closing, and Emergence. `MeditationController.estimateStandardJourneySeconds()` now measures those actual selected script blocks and `getSessionDurationMs()` uses the measured result once the script is loaded. This preserves the configured pauses and gives the continuous session ring a much more honest duration.
+- A Loop reasoning-model editorial child was requested under route `premium-script-refinement-001`, but the local record remains `DISPATCHING` without output. Do not claim a successful routed result; supervisor source review and static validation remain the evidence for this checkpoint.
+- Current validation: `static/unit` PASS — `node --check app.js`, scripts JSON parsing, hypnosis journey, narration ticker, language-intention, Russian, Hindi, and diff whitespace contracts. `test:content-safety` remains blocked by the owner-managed deletion of `docs/dot.json`, which is intentionally untouched. No Playwright, screenshots, browser, or listening tests were run.
+- Next action: refine the remaining Heart, Throat, Third Eye, Crown, and closing passages; then repeat the content/timing audit, update only necessary contracts, and create a detailed local feature commit. Do not merge or push without owner approval.
+
 ### Active feature — 2026-09-03 (Video Volume Settings)
 
 - Branch: `video-volume-settings`, created from local production handoff checkpoint `2293465`; do not merge or push without owner approval.
