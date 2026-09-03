@@ -81,6 +81,12 @@
                 <p class="mixer-note" data-i18n="ui.spatialNote">Narration stays centered; spatial depth shapes music, drone and mantra.</p>
             </div>
 
+            <div class="config-group settings-panel">
+                <label for="settings-vol-video" data-i18n="ui.videoVolume">Video Volume</label>
+                <input type="range" id="settings-vol-video" min="0.02" max="0.5" step="0.01" value="0.2">
+                <button id="preview-video-audio" class="secondary-btn" type="button" data-i18n="ui.previewVideoAudio">Preview Video Audio</button>
+            </div>
+
             <div id="yoga-experience-setup" class="config-group settings-panel" hidden>
                 <label data-i18n="ui.yogaSection">Yoga Experience Setup</label>
                 <div class="yoga-config" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -492,7 +498,7 @@
                     <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0.02" max="0.2" step="0.01" value="0.05"></div>
                     <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0.02" max="0.12" step="0.01" value="0.04"></div>
                     <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0.005" max="1" step="0.005" value="0.35"></div>
-                    <div class="mixer-row"><label data-i18n="ui.musicVideoVolume">Music / Video Volume</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
+                    <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
                 </div>
 
                 <div id="mood-relaxation-ambience-section" class="mixer-section">
@@ -646,6 +652,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.34"></script>
+    <script src="app.js?v=2.35"></script>
 </body>
 </html>

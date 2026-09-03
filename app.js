@@ -3162,6 +3162,10 @@ class AudioEngine {
         gain.linearRampToValueAtTime(Math.max(0, target), now + Math.max(0, duration));
     }
 
+    setJourneyVideoPreludeVolume(level) {
+        this.fadeJourneyVideoPrelude(clampAudioLevel(Number(level), 0.02, 0.5, 0.2), 0.08);
+    }
+
     playSingingBowl() {
         // A muted bell is an intentional setting, not an audio error. Avoid
         // creating oscillators whose exponential envelope would target zero.
@@ -3215,6 +3219,7 @@ class JourneyVideoPrelude {
         this.controls = document.getElementById('controls');
         this.revealZone = document.getElementById('fullscreen-controls-reveal-zone');
         this.fullscreenChromeHideTimer = null;
+        this.previewTimer = null;
         this.activePlayback = null;
         this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
         document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
@@ -3274,6 +3279,26 @@ class JourneyVideoPrelude {
         try { this.media?.webkitExitFullscreen?.(); } catch (error) {}
     }
 
+    async previewAudio() {
+        if (!this.media) return;
+        if (!this.audio.isInitialized) await this.audio.init();
+        if (!this.audio.prepareJourneyVideoPrelude(this.media)) return;
+        if (this.previewTimer) clearTimeout(this.previewTimer);
+        this.media.pause();
+        try { this.media.currentTime = 0; } catch (error) {}
+        this.media.muted = false;
+        this.media.volume = 1;
+        this.audio.fadeJourneyVideoPrelude(0, 0);
+        try {
+            await this.media.play();
+            this.audio.fadeJourneyVideoPrelude(state.volVideo, 0.25);
+            this.previewTimer = setTimeout(() => {
+                this.audio.fadeJourneyVideoPrelude(0, 0.8);
+                setTimeout(() => { this.media.pause(); try { this.media.currentTime = 0; } catch (error) {} }, 850);
+            }, 8000);
+        } catch (error) { console.warn('Video audio preview unavailable:', error); }
+    }
+
     async play() {
         if (this.activePlayback) return this.activePlayback;
         if (!this.overlay || !this.media) return 'unavailable';
@@ -3327,7 +3352,7 @@ class JourneyVideoPrelude {
                 this.enterFullscreen();
                 const playback = this.media.play();
                 Promise.resolve(playback).then(() => {
-                    this.audio.fadeJourneyVideoPrelude(state.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
+                    this.audio.fadeJourneyVideoPrelude(state.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
                 }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
             };
 
@@ -5300,6 +5325,7 @@ const state = {
     volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.04), 0.02, 0.12, 0.04),
     volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.005, 1, 0.35),
     volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
+    volVideo: clampAudioLevel(storedNumber('chakra_vol_video', 0.20), 0.02, 0.5, 0.20),
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
     pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
     pleasureAmbienceBlurAmount: clampPleasureAmbienceBlurAmount(storedNumber('chakra_pleasure_ambience_blur_amount', PLEASURE_BLUR_DEFAULT_AMOUNT)),
@@ -5706,6 +5732,7 @@ function loadPreferences() {
     syncValue('vol-bell', state.volBell);
     syncValue('vol-mantra', state.volMantra);
     syncValue('vol-music', state.volMusic);
+    syncValue('settings-vol-video', state.volVideo);
     syncValue('voice-clarity', state.voiceClarity);
     syncValue('voice-warmth', state.voiceWarmth);
     syncValue('voice-pace', state.voicePace);
@@ -7110,6 +7137,12 @@ function attachEventListeners() {
         syncVolume('volMusic', e.target.value, volMusicEls);
         audio.setBackgroundMusicVolume(state.volMusic, previousVolume);
     }));
+    const volVideoEls = [document.getElementById('settings-vol-video')].filter(Boolean);
+    volVideoEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volVideo', e.target.value, volVideoEls);
+        audio.setJourneyVideoPreludeVolume(state.volVideo);
+    }));
+    document.getElementById('preview-video-audio')?.addEventListener('click', () => { void journeyVideoPrelude.previewAudio(); });
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: 'Chakra Meditation', artist: 'Mahakatha Vibe',
