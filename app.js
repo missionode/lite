@@ -3413,6 +3413,61 @@ class MeditationController {
         alert(reminder === 'ui.journeyVideoPreludeReminder' ? DND_REMINDER_FALLBACK : reminder);
     }
 
+    estimateStandardJourneySeconds() {
+        if (!this.scripts || this.isHighEnergy || isDemoScriptSelected()) return null;
+
+        const narration = (text, transition = 'none') => {
+            if (!text) return 0;
+            return estimateNarrationDurationSeconds(text) + (transition === 'mantra' ? 0 : timing('narration', 'exitGap'));
+        };
+        const tone = (afterGap) => {
+            const sharedDuration = Math.max(1000, Math.round(
+                getDroneDurationMs(state.timePerChakra, state.droneDurationMode) / 2
+            ));
+            const audibleToneSeconds = state.noFrequencyMode ? 0 : (sharedDuration / 1000) + 1.1;
+            return timing('transitions', 'arrivalToneLeadGap') + audibleToneSeconds + afterGap;
+        };
+        const selected = this.chakraOrder.map(key => [key, this.scripts[key]]).filter(([, chakra]) => chakra);
+        if (!selected.length) return null;
+
+        const phase = getMoonPhase();
+        const opening = state.returningJourney
+            ? localized(this.scripts.intro, 'returning')
+            : localized(this.scripts.intro?.moon?.[phase]) || this.scripts.intro?.moon?.[`${phase}_${state.language}`];
+        const intention = contentT('system.intention').replace('{{intention}}', state.intention?.trim() || defaultIntention(state.language));
+        let seconds = state.timeIcebreaker + timing('transitions', 'initialSettle');
+        seconds += narration(contentT('system.prePracticeSafety'));
+        seconds += narration(this.getJourneySystemNarration('arrivalInduction'));
+        seconds += tone(timing('transitions', 'arrivalToneExitGap'));
+        seconds += narration(opening) + timing('transitions', 'openingPause');
+        seconds += narration(localized(this.scripts.intro, 'gratitude'));
+        seconds += narration(intention);
+        seconds += narration(this.getJourneySystemNarration('arrivalReadiness'));
+        seconds += tone(timing('transitions', 'arrivalReadinessGap'));
+        seconds += timing('transitions', 'postBreathing');
+
+        selected.forEach(([key, chakra], index) => {
+            seconds += narration(localized(chakra, 'meditation'), 'mantra');
+            seconds += Math.max(0, state.timePerChakra * 60 - timing('transitions', 'chakraLeadOut'));
+            seconds += timing('transitions', 'chakraPostMantra');
+            seconds += narration(localized(chakra, 'affirmation'));
+            if (index < selected.length - 1) {
+                const intervalNarration = narration(contentT('system.breatheInterval'));
+                seconds += timing('transitions', 'intervalPreparation') + Math.max(state.timeInterval, intervalNarration);
+            }
+        });
+
+        seconds += timing('transitions', 'finalSilence');
+        seconds += narration(localized(this.scripts.closing));
+        seconds += timing('transitions', 'closingFirstPause');
+        seconds += narration(localized(this.scripts.closing, 'affirmation'));
+        seconds += timing('transitions', 'closingSecondPause');
+        seconds += timing('transitions', 'emergenceBellSettle');
+        seconds += narration(this.getJourneySystemNarration('emergence'));
+        seconds += state.timeEmergence + timing('transitions', 'emergenceFinalQuiet');
+        return Math.ceil(seconds);
+    }
+
     getSessionDurationMs(focusedExperience = null) {
         if (state.bgMusicMode) return 0;
 
@@ -3448,6 +3503,11 @@ class MeditationController {
             const intervalSeconds = Math.max(0, SLEEP_STAGE_COUNT - 1) * Number(this.scripts?.sleep_mode?.intervalSeconds || 3);
             return Math.max(1, stageSeconds + intervalSeconds + 12) * 1000;
         }
+
+        const measuredStandardSeconds = !focusedExperience && !state.sleepMode && !state.bgMusicMode
+            ? this.estimateStandardJourneySeconds()
+            : null;
+        if (Number.isFinite(measuredStandardSeconds)) return measuredStandardSeconds * 1000;
 
         const hypnosisWrapperMinutes = !this.isHighEnergy && !focusedExperience && !state.sleepMode &&
             !state.bgMusicMode && !isDemoScriptSelected()
