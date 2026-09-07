@@ -100,6 +100,14 @@
 - Delivery rotates to `app.js?v=2.42` and shell cache `chakra-v5.126`.
 - Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-08 (Performance review — 15-second prelude hold)
+
+- The 15-second `meditator.png` hold has negligible runtime cost: it is one static 1.5 MB image, displayed before video playback, with no animation or repeated decoding. Its only user-visible cost is the intentional 15-second wait before video playback.
+- The requested prelude WebM is FHD AV1 at 1920×1080/25 fps with Opus audio, approximately 70.4 MB and 344 seconds long. The browser is allowed to buffer it natively and Lite now waits for at least four seconds of future media data before revealing Begin, which reduces startup stutter without attempting to download the full asset.
+- Residual performance risk: AV1 hardware decode is not equally available on older phones, some browsers, or low-power devices; software decoding may increase CPU, battery use, or cause dropped frames. The 80–220-particle canvas field is bounded and rendered at a capped 1.5 device-pixel ratio, but its shadow blur should still be checked on low-end mobile hardware.
+- Recommendation: retain the current WebM for capable devices, then provide an H.264/AAC encode of the same universe video as a true compatibility fallback when available. The current MP4 fallback is a different video, so it preserves compatibility but not identical content.
+- Loop evidence: `static` — detected host `Darwin arm64`, measured asset metadata with `ffprobe`, inspected buffering and particle code, and refreshed relevant handoff records. No browser/runtime/device playback benchmark was run because Playwright/screenshots are opt-in and were not requested.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
