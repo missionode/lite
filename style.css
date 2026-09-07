@@ -404,6 +404,13 @@ body {
     transform: scale(1.025);
 }
 
+/* Keep the cinematic frame clean while the prelude is actively playing. The
+   pointer returns automatically when the prelude closes. */
+.journey-video-prelude.is-playing,
+.journey-video-prelude.is-playing * {
+    cursor: none;
+}
+
 .journey-video-prelude.is-leaving,
 .journey-video-prelude.is-leaving video,
 .journey-video-prelude.is-leaving .journey-video-prelude-meditator {

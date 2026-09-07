@@ -62,7 +62,7 @@ const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
-const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 5;
+const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 8;
 const JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS = 4;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 // Pleasure ambience is a separate, fixed-level support layer. It is not

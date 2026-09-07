@@ -20,10 +20,11 @@ assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*conta
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
-assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 5/);
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 8/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS = 4/);
 assert.match(app, /async bufferVideoToSafePoint\(\)[\s\S]*?readyState < HTMLMediaElement\.HAVE_FUTURE_DATA[\s\S]*?buffered\.end\(index\)[\s\S]*?requiredSeconds/, 'the prelude should wait for a measured safe initial buffer');
 assert.match(app, /this\.playButton\.hidden = true[\s\S]*?bufferVideoToSafePoint\(\)\.then[\s\S]*?this\.playButton\.hidden = false/, 'the Begin control should appear only after the safe buffer is ready');
+assert.match(css, /\.journey-video-prelude\.is-playing,[\s\S]*?cursor: none/, 'the pointer should be hidden during cinematic playback');
 assert.match(app, /is-meditator[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?is-video/, 'the meditator image should dissolve into the video after a short hold');
 assert.match(app, /this\.media\?\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering');
 assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: 1[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly');
