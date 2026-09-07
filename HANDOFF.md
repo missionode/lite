@@ -19,6 +19,12 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-07 (Chakra body-awareness narration)
+
+- Scope: `scripts.json` seven chakra `meditation_*` fields only, across English, Malayalam, Russian, and Hindi. Each chakra now includes one gentle body-awareness cue immediately before its mantra sentence: Root uses an optional pelvic-floor/base engage-and-release cue; Sacral uses lower belly/hips/pelvis softening; Solar uses navel/diaphragm/upper-abdomen breath; Heart uses chest/shoulder-blades/palms; Throat uses jaw/tongue/throat/neck; Third Eye uses forehead/eyes/brow; Crown uses crown/space-above/spine openness.
+- Tone/safety boundary: wording remains optional, slow, comfortable, and non-forceful. The direct anatomical phrase “contract the anus” is deliberately not used. No timing, code, frequency, mantra, locale UI, fixture, or `docs/dot.json` changes are part of this checkpoint.
+- Validation: `static/unit` PASS — scripts JSON parsing, all-language body-cue coverage scan, direct script-only safety scan, `test:hypnosis-journey`, `test:russian-language`, `test:hindi-language`, `test:language-intention`, and `git diff --check`. `test:content-safety` remains blocked before assertions because owner-managed `docs/dot.json` is absent.
+
 ### Local checkpoint — 2026-09-07 (Closing possible-update narration)
 
 - Branch/server baseline: `production` matches `origin/production` at `d2dfdcf` (`Merge branch 'premium-script-refinement'`). The owner also noted a server push before this checkpoint; fetch confirmed no local/remote divergence before editing.
