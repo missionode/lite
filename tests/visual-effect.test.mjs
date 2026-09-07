@@ -15,8 +15,12 @@ assert.match(app, /class AmbientParticleField[\s\S]*?requestAnimationFrame\(this
     'The particle field should use a lightweight animation loop.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');
-assert.match(app, /Math\.min\(150, Math\.max\(30, Math\.round\(area \/ 12500\)\)\)/,
+assert.match(app, /Math\.min\(220, Math\.max\(80, Math\.round\(area \/ 8500\)\)\)/,
     'Particle density should respond to the viewport area.');
+assert.match(app, /const layerFor = \(index\) => index < count \* 0\.52 \? 'background'[\s\S]*?'foreground'/,
+    'The particle field should use multiple depth layers.');
+assert.match(app, /isTwinkler: layer !== 'background' && Math\.random\(\) < 0\.32/,
+    'Only selected stars should receive stronger twinkle animation.');
 assert.match(app, /Four-point star[\s\S]*?ctx\.closePath\(\)/,
     'Particles should render as subtle star-like sparkles.');
 assert.match(app, /legLengths: Array\.from\(\{ length: 4 \}[\s\S]*?Math\.random\(\)/,

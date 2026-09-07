@@ -44,6 +44,12 @@
 - Delivery rotates to `style.css?v=1.72` and shell cache `chakra-v5.117`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-07 (Layered responsive sky)
+
+- Reworked the particle field into three depth layers: a fuller field of dim background pinpricks, visible middle stars, and sparse foreground sparkles. Density scales with viewport area (80–220 particles), with only selected middle/foreground stars receiving the stronger slow twinkle. Background stars remain steady so the effect feels like a sky rather than a flashing surface.
+- Delivery rotates to `style.css?v=1.73` and shell cache `chakra-v5.118`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

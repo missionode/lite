@@ -3234,12 +3234,17 @@ class AmbientParticleField {
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const area = window.innerWidth * window.innerHeight;
-        const count = Math.min(150, Math.max(30, Math.round(area / 12500)));
-        this.particles = Array.from({ length: count }, () => ({
+        const count = Math.min(220, Math.max(80, Math.round(area / 8500)));
+        const layerFor = (index) => index < count * 0.52 ? 'background' : index < count * 0.86 ? 'middle' : 'foreground';
+        this.particles = Array.from({ length: count }, (_, index) => {
+            const layer = layerFor(index);
+            const scale = layer === 'background' ? 0.55 : layer === 'middle' ? 0.9 : 1.25;
+            return {
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            radius: 0.55 + Math.random() * 1.25,
-            alpha: 0.28 + Math.random() * 0.38,
+            layer,
+            radius: (0.55 + Math.random() * 1.25) * scale,
+            alpha: layer === 'background' ? 0.24 + Math.random() * 0.2 : 0.34 + Math.random() * 0.4,
             phase: Math.random() * Math.PI * 2,
             drift: 0.3 + Math.random() * 0.7,
             rotation: Math.random() * Math.PI / 2,
@@ -3247,8 +3252,10 @@ class AmbientParticleField {
             legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
             brightness: 0.78 + Math.random() * 0.42,
             driftX: 0.22 + Math.random() * 0.42,
-            twinkleSpeed: 0.55 + Math.random() * 0.45
-        }));
+            twinkleSpeed: 0.55 + Math.random() * 0.45,
+            isTwinkler: layer !== 'background' && Math.random() < 0.32
+            };
+        });
         this.draw(performance.now(), false);
     }
 
@@ -3280,10 +3287,12 @@ class AmbientParticleField {
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
             const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
-            const twinkle = animate ? 0.82 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.18 : 1;
+            const twinkle = animate && particle.isTwinkler
+                ? 0.72 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.28
+                : 1;
             const alpha = Math.min(0.9, particle.alpha * twinkle * particle.brightness);
             this.ctx.beginPath();
-            this.ctx.shadowBlur = particle.radius > 1.1 ? 5 : 2.5;
+            this.ctx.shadowBlur = particle.layer === 'foreground' ? 8 : particle.layer === 'middle' ? 4.5 : 1.5;
             this.ctx.shadowColor = `rgba(190, 220, 255, ${alpha * 0.82})`;
             // A white core gives the brightest phase of each twinkle a clean
             // stellar glint while the cooler halo preserves the soft mood.
@@ -3294,6 +3303,12 @@ class AmbientParticleField {
             this.ctx.save();
             this.ctx.translate(x, y);
             this.ctx.rotate(particle.rotation);
+            if (particle.layer === 'background') {
+                this.ctx.arc(0, 0, particle.radius, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.restore();
+                return;
+            }
             // Four-point star: most particles remain pinpricks, while larger
             // ones catch the eye like distant stars without becoming icons.
             for (let point = 0; point < 8; point += 1) {
