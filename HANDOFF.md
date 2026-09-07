@@ -19,6 +19,14 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-07 (Closing possible-update narration)
+
+- Branch/server baseline: `production` matches `origin/production` at `d2dfdcf` (`Merge branch 'premium-script-refinement'`). The owner also noted a server push before this checkpoint; fetch confirmed no local/remote divergence before editing.
+- Scope: `scripts.json` closing narration and closing affirmation only. English, Malayalam, Russian, and Hindi now include the approved concepts that receiving/healing/protection/change are possible, and that the session can feel like a clean inner update received where scattered or misaligned experience begins to correct in the way currently possible.
+- Journey behavior unchanged: no code, timing, frequency, mantra, audio, locale UI, service-worker, fixture, or `docs/dot.json` changes are part of this checkpoint.
+- Validation: `static/unit` PASS — `scripts.json` parses, all four closing/affirmation language fields exist, `test:hypnosis-journey`, `test:russian-language`, `test:hindi-language`, `test:language-intention`, direct script-only concept/safety scan, and `git diff --check -- scripts.json`. `test:content-safety` is blocked before assertions because owner-managed `docs/dot.json` is currently absent; it was not restored or rewritten. No Playwright, screenshots, browser run, or listening evidence was performed.
+- Preserve unrelated local state: `.DS_Store`, `audio/.DS_Store`, deleted `docs/dot.json`, `.codex/`, and `audio/BACKUP/background_music.mp3` remain unrelated and must stay excluded from any script checkpoint commit unless the owner explicitly asks.
+
 ### Resume snapshot — 2026-09-03 (production, Journey video prelude complete)
 
 - Target application root: `/Users/lekshmisyam/Desktop/Ikigai/lite`. Reusable Loop instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`. The current Loop policy, delivery workflow, and Loop skill were reread for this handoff refresh; they are protected framework files and were not changed.
