@@ -3244,7 +3244,7 @@ class AmbientParticleField {
             y: Math.random() * window.innerHeight,
             layer,
             radius: (0.55 + Math.random() * 1.25) * scale,
-            alpha: layer === 'background' ? 0.24 + Math.random() * 0.2 : 0.34 + Math.random() * 0.4,
+            alpha: layer === 'background' ? 0.24 + Math.random() * 0.2 : layer === 'middle' ? 0.42 + Math.random() * 0.36 : 0.52 + Math.random() * 0.34,
             phase: Math.random() * Math.PI * 2,
             drift: 0.3 + Math.random() * 0.7,
             rotation: Math.random() * Math.PI / 2,
@@ -3252,8 +3252,8 @@ class AmbientParticleField {
             legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
             brightness: 0.78 + Math.random() * 0.42,
             driftX: 0.22 + Math.random() * 0.42,
-            twinkleSpeed: 0.55 + Math.random() * 0.45,
-            isTwinkler: layer !== 'background' && Math.random() < 0.32
+            twinkleSpeed: 0.16 + Math.random() * 0.18,
+            isTwinkler: layer !== 'background' && Math.random() < (layer === 'foreground' ? 0.7 : 0.46)
             };
         });
         this.draw(performance.now(), false);
@@ -3283,14 +3283,14 @@ class AmbientParticleField {
         const width = window.innerWidth;
         const height = window.innerHeight;
         this.ctx.clearRect(0, 0, width, height);
-        const time = timestamp * 0.00012;
+        const time = timestamp * 0.001;
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
             const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
             const twinkle = animate && particle.isTwinkler
-                ? 0.72 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.28
+                ? 0.62 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.38
                 : 1;
-            const alpha = Math.min(0.9, particle.alpha * twinkle * particle.brightness);
+            const alpha = Math.min(1, particle.alpha * twinkle * particle.brightness);
             this.ctx.beginPath();
             this.ctx.shadowBlur = particle.layer === 'foreground' ? 8 : particle.layer === 'middle' ? 4.5 : 1.5;
             this.ctx.shadowColor = `rgba(190, 220, 255, ${alpha * 0.82})`;
@@ -3323,6 +3323,12 @@ class AmbientParticleField {
             }
             this.ctx.closePath();
             this.ctx.fill();
+            if (particle.layer === 'foreground' || particle.isTwinkler) {
+                this.ctx.beginPath();
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.18)})`;
+                this.ctx.arc(0, 0, Math.max(0.7, particle.radius * 0.58), 0, Math.PI * 2);
+                this.ctx.fill();
+            }
             this.ctx.restore();
         });
         this.ctx.shadowBlur = 0;

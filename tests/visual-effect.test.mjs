@@ -19,8 +19,12 @@ assert.match(app, /Math\.min\(220, Math\.max\(80, Math\.round\(area \/ 8500\)\)\
     'Particle density should respond to the viewport area.');
 assert.match(app, /const layerFor = \(index\) => index < count \* 0\.52 \? 'background'[\s\S]*?'foreground'/,
     'The particle field should use multiple depth layers.');
-assert.match(app, /isTwinkler: layer !== 'background' && Math\.random\(\) < 0\.32/,
+assert.match(app, /isTwinkler: layer !== 'background' && Math\.random\(\) < \(layer === 'foreground' \? 0\.7 : 0\.46\)/,
     'Only selected stars should receive stronger twinkle animation.');
+assert.match(app, /twinkleSpeed: 0\.16 \+ Math\.random\(\) \* 0\.18/,
+    'Star twinkles should have a visible but gentle cycle.');
+assert.match(app, /fillStyle = `rgba\(255, 255, 255, \$\{Math\.min\(1, alpha \* 1\.18\)\}\)`/,
+    'Sparkling stars should receive a bright white core.');
 assert.match(app, /Four-point star[\s\S]*?ctx\.closePath\(\)/,
     'Particles should render as subtle star-like sparkles.');
 assert.match(app, /legLengths: Array\.from\(\{ length: 4 \}[\s\S]*?Math\.random\(\)/,
