@@ -845,6 +845,18 @@ input[type="range"]::-moz-range-progress {
     transition: opacity 1.2s ease, filter 1.4s ease, transform 1.6s ease;
 }
 
+/* A barely perceptible light-breath keeps symbols and deity images present
+   while giving them a living, holographic quality. The duration is randomized
+   per chakra by VisualEngine, so the effect never becomes a shared pulse. */
+#chakra-container.image-breathe-active #chakra-symbol {
+    animation: imageLightBreath var(--image-breathe-duration, 12s) ease-in-out var(--image-breathe-delay, 0s) infinite;
+}
+
+@keyframes imageLightBreath {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+}
+
 #chakra-container.visual-effect-active::before {
     opacity: 1;
 }
@@ -907,6 +919,10 @@ input[type="range"]::-moz-range-progress {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    #chakra-container.image-breathe-active #chakra-symbol {
+        animation: none;
+    }
+
     #chakra-container.visual-effect-holographic::after {
         animation: none;
     }

@@ -3362,7 +3362,14 @@ class VisualEngine {
             'visual-effect-active'
         );
         this.container.classList.add(`visual-effect-${effect}`);
+        const breatheActive = !state.eyesCloseMode;
         this.container.classList.toggle('visual-effect-active', active);
+        this.container.classList.toggle('image-breathe-active', breatheActive);
+        if (breatheActive) {
+            const cycleSeconds = 8 + Math.random() * 8;
+            this.container.style.setProperty('--image-breathe-duration', `${cycleSeconds.toFixed(2)}s`);
+            this.container.style.setProperty('--image-breathe-delay', `${(-Math.random() * cycleSeconds).toFixed(2)}s`);
+        }
         if (color) this.container.style.setProperty('--chakra-visual-color', color);
     }
     startPulsing(color) {
@@ -3371,7 +3378,7 @@ class VisualEngine {
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
-        if (this.container) this.container.classList.remove('visual-effect-active');
+        if (this.container) this.container.classList.remove('visual-effect-active', 'image-breathe-active');
         if (this.glow) this.glow.style.background = 'transparent';
     }
 }

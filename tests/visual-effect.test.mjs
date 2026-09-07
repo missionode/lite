@@ -61,6 +61,12 @@ assert.match(styles, /filter:\s*blur\(72px\) saturate\(0\.88\)/,
     'Ambient background volumes should remain soft and non-distracting.');
 assert.match(styles, /#app:fullscreen[\s\S]*?background:\s*transparent/,
     'The fullscreen app shell should not cover the ambient background.');
+assert.match(app, /const cycleSeconds = 8 \+ Math\.random\(\) \* 8/,
+    'Image breathing should use a slow randomized cycle per chakra.');
+assert.match(app, /classList\.toggle\('image-breathe-active', breatheActive\)/,
+    'The image breathing effect should cover symbols and deity images without relying on visual mode.');
+assert.match(styles, /@keyframes imageLightBreath[\s\S]*?opacity: 0\.9[\s\S]*?opacity: 1/,
+    'Image breathing should remain within a subtle visible opacity range.');
 
 for (const bundle of [en, ml, ru, hi]) {
     for (const key of ['visualEffect', 'visualEffectNatural', 'visualEffectAura', 'visualEffectHolographic', 'visualEffectDepth']) {

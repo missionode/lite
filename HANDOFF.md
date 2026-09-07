@@ -63,6 +63,12 @@
 - Delivery rotates to `style.css?v=1.75` and shell cache `chakra-v5.120`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-07 (Slow image breathing light)
+
+- Added a restrained slow fade cycle to the active chakra symbol or presiding-deity image. Each chakra receives a randomized 8–16 second phase and the image stays between 0.90 and 1.0 opacity, so it remains present rather than disappearing. Eyes Close Mode and `prefers-reduced-motion` disable the animation.
+- Delivery rotates to `style.css?v=1.76`, `app.js?v=2.37`, and shell cache `chakra-v5.121`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
