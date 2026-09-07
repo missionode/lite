@@ -20,6 +20,12 @@
 - No WebGL, external assets, audio changes, or meditation timing changes were introduced. Delivery rotates to `style.css?v=1.68` and shell cache `chakra-v5.113`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction; target-device visual comfort remains the final QA gate.
 
+### Local checkpoint — 2026-09-07 (Particle visibility tuning)
+
+- Increased the particle field's visibility after owner review: particles are now larger, brighter, and given a restrained blue-white halo. The field remains sparse, slowly moving, and capped for mobile performance; no audio or journey timing behavior changed.
+- Delivery rotates to `style.css?v=1.69` and shell cache `chakra-v5.114`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

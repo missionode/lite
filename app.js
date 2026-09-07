@@ -3237,8 +3237,8 @@ class AmbientParticleField {
         this.particles = Array.from({ length: count }, () => ({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            radius: 0.35 + Math.random() * 1.05,
-            alpha: 0.12 + Math.random() * 0.28,
+            radius: 0.65 + Math.random() * 1.35,
+            alpha: 0.28 + Math.random() * 0.38,
             phase: Math.random() * Math.PI * 2,
             drift: 0.3 + Math.random() * 0.7
         }));
@@ -3273,11 +3273,15 @@ class AmbientParticleField {
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
             const twinkle = animate ? 0.86 + Math.sin(time * 1.4 + particle.phase) * 0.14 : 1;
+            const alpha = particle.alpha * twinkle;
             this.ctx.beginPath();
-            this.ctx.fillStyle = `rgba(220, 226, 255, ${particle.alpha * twinkle})`;
+            this.ctx.shadowBlur = particle.radius > 1.25 ? 5 : 2.5;
+            this.ctx.shadowColor = `rgba(174, 205, 255, ${alpha * 0.8})`;
+            this.ctx.fillStyle = `rgba(226, 234, 255, ${alpha})`;
             this.ctx.arc(particle.x, particle.y + driftY, particle.radius, 0, Math.PI * 2);
             this.ctx.fill();
         });
+        this.ctx.shadowBlur = 0;
     }
 }
 
