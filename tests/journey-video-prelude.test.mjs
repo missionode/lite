@@ -20,7 +20,7 @@ assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*conta
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
-assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 8/);
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 15/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS = 4/);
 assert.match(app, /async bufferVideoToSafePoint\(\)[\s\S]*?readyState < HTMLMediaElement\.HAVE_FUTURE_DATA[\s\S]*?buffered\.end\(index\)[\s\S]*?requiredSeconds/, 'the prelude should wait for a measured safe initial buffer');
 assert.match(app, /this\.playButton\.hidden = true[\s\S]*?bufferVideoToSafePoint\(\)\.then[\s\S]*?this\.playButton\.hidden = false/, 'the Begin control should appear only after the safe buffer is ready');

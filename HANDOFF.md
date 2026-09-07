@@ -94,6 +94,12 @@
 - Delivery rotates to `style.css?v=1.80`, `app.js?v=2.41`, and shell cache `chakra-v5.125`.
 - Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-08 (Extended meditator image hold)
+
+- Extended the meditator image hold from eight to fifteen seconds before the Restart Journey video begins. Buffer gating, fullscreen behavior, pointer hiding, fades, and audio routing remain unchanged.
+- Delivery rotates to `app.js?v=2.42` and shell cache `chakra-v5.126`.
+- Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
