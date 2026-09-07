@@ -224,6 +224,11 @@ function normalizeSleepStages(scripts) {
 // Navigation remains a real user action so an installed PWA can capture it.
 const EARN_HANDOFF_DELAY_MS = 3000;
 let earnHandoffTimer = null;
+const MEDITATION_VISUAL_EFFECTS = new Set(['natural', 'aura', 'holographic', 'depth']);
+
+function normalizeMeditationVisualEffect(value) {
+    return MEDITATION_VISUAL_EFFECTS.has(value) ? value : 'natural';
+}
 
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
@@ -3197,14 +3202,32 @@ class AudioEngine {
 // Visual Engine
 class VisualEngine {
     constructor() {
+        this.container = document.getElementById('chakra-container');
         this.symbolImg = document.getElementById('chakra-symbol');
         this.glow = document.getElementById('glow-effect');
     }
+    applyImageEffect(color = null) {
+        if (!this.container) return;
+        const effect = normalizeMeditationVisualEffect(state.visualEffect);
+        const active = effect !== 'natural' && !state.eyesCloseMode;
+        this.container.classList.remove(
+            'visual-effect-natural',
+            'visual-effect-aura',
+            'visual-effect-holographic',
+            'visual-effect-depth',
+            'visual-effect-active'
+        );
+        this.container.classList.add(`visual-effect-${effect}`);
+        this.container.classList.toggle('visual-effect-active', active);
+        if (color) this.container.style.setProperty('--chakra-visual-color', color);
+    }
     startPulsing(color) {
+        this.applyImageEffect(color);
         if (state.eyesCloseMode) return; // Absolute Blackout
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
+        if (this.container) this.container.classList.remove('visual-effect-active');
         if (this.glow) this.glow.style.background = 'transparent';
     }
 }
@@ -5428,6 +5451,7 @@ const state = {
     moodRelaxationIntentionEnabled: false,
     pleasureAmbienceBlur: true,
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
+    visualEffect: normalizeMeditationVisualEffect(localStorage.getItem('chakra_visual_effect')),
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
     bgMusicMode: false,
@@ -5858,6 +5882,8 @@ function loadPreferences() {
             r.checked = (r.value === state.deityPath);
         });
     }, 0);
+    syncValue('visual-effect-select', state.visualEffect);
+    visual.applyImageEffect();
 
     // Sync Journey Timings Sliders
     syncValue('time-icebreaker', state.timeIcebreaker);
@@ -6006,12 +6032,14 @@ function attachEventListeners() {
         state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
+        state.visualEffect = normalizeMeditationVisualEffect(document.getElementById('visual-effect-select')?.value);
         
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.removeItem('chakra_box_meditation');
         localStorage.removeItem('chakra_hooponopono');
         localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
         localStorage.setItem('chakra_deity_path', state.deityPath);
+        localStorage.setItem('chakra_visual_effect', state.visualEffect);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
         localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.removeItem('chakra_yoga_bridge');
@@ -6021,6 +6049,7 @@ function attachEventListeners() {
 
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
         document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
+        visual.applyImageEffect();
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');

@@ -19,6 +19,14 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-07 (Meditation visual effects)
+
+- Scope: Settings now has a persisted `Meditation Visual Effect` selector with `Natural`, `Aura Glow`, `Holographic`, and `Sacred Depth`. It applies to the existing meditation image area for normal chakra symbols and presiding-deity images without changing image assets or adding WebGL/canvas/per-frame JavaScript.
+- Implementation: `VisualEngine.applyImageEffect()` owns the `#chakra-container` classes, binds the active chakra color into `--chakra-visual-color`, and suppresses decorative effects when Eyes Close Mode is active. CSS uses pseudo-elements, drop shadows, subtle glow, and a slow shimmer only for Holographic mode; `prefers-reduced-motion` disables animation.
+- Delivery: `index.html` now loads `style.css?v=1.65` and `app.js?v=2.36`; service-worker shell cache is `chakra-v5.110`.
+- Validation: `static/unit` PASS — `node --check app.js`, `node --check sw.js`, locale/package JSON parsing, `test:visual-effect`, `test:spatial-audio`, `test:russian-language`, `test:hindi-language`, `test:language-intention`, `test:narration-ticker`, `test:splash`, and `git diff --check`. No Playwright, screenshots, browser run, or real-device visual performance check was performed by owner direction.
+- Preserve unrelated local state: `.DS_Store`, `audio/.DS_Store`, deleted `docs/dot.json`, `.codex/`, and `audio/BACKUP/background_music.mp3` remain unrelated and must stay excluded.
+
 ### Local checkpoint — 2026-09-07 (Chakra body-awareness narration)
 
 - Scope: `scripts.json` seven chakra `meditation_*` fields only, across English, Malayalam, Russian, and Hindi. Each chakra now includes one gentle body-awareness cue immediately before its mantra sentence: Root uses an optional pelvic-floor/base engage-and-release cue; Sacral uses lower belly/hips/pelvis softening; Solar uses navel/diaphragm/upper-abdomen breath; Heart uses chest/shoulder-blades/palms; Throat uses jaw/tongue/throat/neck; Third Eye uses forehead/eyes/brow; Crown uses crown/space-above/spine openness.

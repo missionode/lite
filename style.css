@@ -738,7 +738,39 @@ input[type="range"]::-moz-range-progress {
 #chakra-container {
     width: 100%;
     position: relative;
+    isolation: isolate;
+    perspective: 900px;
+    --chakra-visual-color: var(--primary-color);
     /* Container style moved to inline html for flex control */
+}
+
+#chakra-container::before,
+#chakra-container::after {
+    content: "";
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateZ(0);
+    transition: opacity 1.6s ease, transform 1.8s ease;
+}
+
+#chakra-container::before {
+    z-index: 0;
+    background:
+        radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--chakra-visual-color) 30%, transparent) 0%, transparent 54%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14) 0%, transparent 48%);
+}
+
+#chakra-container::after {
+    z-index: 4;
+    inset: 14%;
+    border: 1px solid color-mix(in srgb, var(--chakra-visual-color) 28%, transparent);
+    background:
+        linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.16) 46%, transparent 72%),
+        conic-gradient(from 120deg, transparent, color-mix(in srgb, var(--chakra-visual-color) 18%, transparent), transparent, rgba(255, 255, 255, 0.1), transparent);
+    mix-blend-mode: screen;
 }
 
 #chakra-symbol {
@@ -746,8 +778,82 @@ input[type="range"]::-moz-range-progress {
     max-height: 55vh; /* Ensure plenty of room for controls at bottom */
     object-fit: contain;
     visibility: hidden;
+    position: relative;
     z-index: 2;
-    transition: opacity 1.2s ease;
+    transform: translateZ(0);
+    transition: opacity 1.2s ease, filter 1.4s ease, transform 1.6s ease;
+}
+
+#chakra-container.visual-effect-active::before {
+    opacity: 1;
+}
+
+#chakra-container.visual-effect-aura::before {
+    transform: scale(1.02);
+    filter: blur(10px);
+}
+
+#chakra-container.visual-effect-aura #chakra-symbol {
+    filter:
+        drop-shadow(0 0 14px color-mix(in srgb, var(--chakra-visual-color) 42%, transparent))
+        drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+}
+
+#chakra-container.visual-effect-holographic::before {
+    opacity: 0.92;
+    transform: scale(1.06);
+    filter: blur(12px) saturate(1.12);
+}
+
+#chakra-container.visual-effect-holographic::after {
+    opacity: 0.28;
+    animation: holographicShimmer 12s ease-in-out infinite alternate;
+}
+
+#chakra-container.visual-effect-holographic #chakra-symbol {
+    transform: translateY(-1px) rotateX(1.5deg);
+    filter:
+        drop-shadow(0 0 12px color-mix(in srgb, var(--chakra-visual-color) 38%, transparent))
+        drop-shadow(0 0 28px rgba(255, 255, 255, 0.08))
+        drop-shadow(0 24px 34px rgba(0, 0, 0, 0.3));
+}
+
+#chakra-container.visual-effect-depth::before {
+    opacity: 0.84;
+    transform: scale(0.98) translateY(2%);
+    filter: blur(8px);
+}
+
+#chakra-container.visual-effect-depth::after {
+    opacity: 0.18;
+    transform: scale(0.9);
+}
+
+#chakra-container.visual-effect-depth #chakra-symbol {
+    transform: translateY(-2px) rotateX(2deg);
+    filter:
+        drop-shadow(0 26px 34px rgba(0, 0, 0, 0.42))
+        drop-shadow(0 0 16px color-mix(in srgb, var(--chakra-visual-color) 32%, transparent));
+}
+
+@keyframes holographicShimmer {
+    0% {
+        transform: translateX(-2%) rotate(-2deg) scale(0.94);
+    }
+    100% {
+        transform: translateX(2%) rotate(2deg) scale(1.02);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #chakra-container.visual-effect-holographic::after {
+        animation: none;
+    }
+
+    #chakra-container.visual-effect-holographic #chakra-symbol,
+    #chakra-container.visual-effect-depth #chakra-symbol {
+        transform: translateZ(0);
+    }
 }
 
 .chakra-gold-ring {

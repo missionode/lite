@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.64">
+    <link rel="stylesheet" href="style.css?v=1.65">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -136,6 +136,16 @@
                     <label class="radio-label"><input type="radio" name="deity-path" value="shakthi"> Shakti (Feminine)</label>
                     <label class="radio-label"><input type="radio" name="deity-path" value="shiva"> Shiva (Masculine)</label>
                 </div>
+            </div>
+
+            <div class="config-group" style="margin-top: 1rem;">
+                <label for="visual-effect-select" data-i18n="ui.visualEffect">Meditation Visual Effect</label>
+                <select id="visual-effect-select">
+                    <option value="natural" data-i18n="ui.visualEffectNatural">Natural</option>
+                    <option value="aura" data-i18n="ui.visualEffectAura">Aura Glow</option>
+                    <option value="holographic" data-i18n="ui.visualEffectHolographic">Holographic</option>
+                    <option value="depth" data-i18n="ui.visualEffectDepth">Sacred Depth</option>
+                </select>
             </div>
 
             <p style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 1rem;">
@@ -652,6 +662,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.35"></script>
+    <script src="app.js?v=2.36"></script>
 </body>
 </html>
