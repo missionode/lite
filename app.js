@@ -62,7 +62,8 @@ const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
-const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 2.2;
+const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 5;
+const JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS = 4;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
@@ -3456,6 +3457,41 @@ class JourneyVideoPrelude {
         try { this.media?.webkitExitFullscreen?.(); } catch (error) {}
     }
 
+    async bufferVideoToSafePoint() {
+        if (!this.media) return false;
+        const requiredSeconds = Number.isFinite(this.media.duration)
+            ? Math.min(JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS, Math.max(2, this.media.duration * 0.1))
+            : JOURNEY_VIDEO_PRELUDE_BUFFER_SECONDS;
+        const hasSafeBuffer = () => {
+            if (this.media.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) return false;
+            for (let index = 0; index < this.media.buffered.length; index += 1) {
+                if (this.media.buffered.end(index) - this.media.currentTime >= requiredSeconds) return true;
+            }
+            return false;
+        };
+        if (hasSafeBuffer()) return true;
+        return new Promise(resolve => {
+            let settled = false;
+            let timeout = null;
+            const check = () => { if (hasSafeBuffer()) finish(true); };
+            const finish = (result) => {
+                if (settled) return;
+                settled = true;
+                if (timeout) clearTimeout(timeout);
+                ['progress', 'canplay', 'canplaythrough', 'loadeddata', 'durationchange'].forEach(event => {
+                    this.media.removeEventListener(event, check);
+                });
+                resolve(result);
+            };
+            timeout = setTimeout(() => finish(false), 30000);
+            ['progress', 'canplay', 'canplaythrough', 'loadeddata', 'durationchange'].forEach(event => {
+                this.media.addEventListener(event, check);
+            });
+            try { this.media.load(); } catch (error) { finish(false); }
+            check();
+        });
+    }
+
     async previewAudio() {
         if (!this.media) return;
         if (!this.audio.isInitialized) await this.audio.init();
@@ -3513,6 +3549,7 @@ class JourneyVideoPrelude {
                 try { this.media.currentTime = 0; } catch (error) {}
                 this.overlay.classList.remove('is-visible', 'is-leaving', 'is-playing');
                 this.overlay.classList.add('hidden');
+                if (this.playButton) this.playButton.hidden = true;
                 resolve(reason);
             };
             const onTimeUpdate = () => {
@@ -3544,12 +3581,25 @@ class JourneyVideoPrelude {
             this.media.addEventListener('error', onError);
             this.playButton?.addEventListener('click', onPlay, { once: true });
             this.overlay.classList.remove('hidden', 'is-leaving', 'is-playing', 'is-meditator', 'is-video');
+            this.overlay.classList.add('is-meditator');
+            if (this.playButton) this.playButton.hidden = true;
             requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
             this.media.muted = false;
             this.media.volume = 1;
             this.media.pause();
             try { this.media.currentTime = 0; } catch (error) {}
             this.audio.fadeJourneyVideoPrelude(0, 0);
+            void this.bufferVideoToSafePoint().then((isReady) => {
+                if (settled) return;
+                if (!isReady) {
+                    void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS);
+                    return;
+                }
+                if (this.playButton) {
+                    this.playButton.hidden = false;
+                    this.playButton.focus();
+                }
+            });
         }).finally(() => { this.activePlayback = null; });
 
         return this.activePlayback;

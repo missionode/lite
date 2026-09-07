@@ -82,6 +82,12 @@
 - Delivery rotates to `style.css?v=1.78`, `app.js?v=2.39`, and shell cache `chakra-v5.123`.
 - Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-08 (Buffer-gated video start)
+
+- The Restart Journey prelude now keeps the meditator image visible while the FHD WebM buffers. The Begin button stays hidden until the browser reports future media data and at least a measured four-second safe buffer; a failed/timeout buffer safely continues through the existing unavailable-video path. After Begin, the image holds for five seconds before crossfading into playback.
+- Delivery rotates to `style.css?v=1.79`, `app.js?v=2.40`, and shell cache `chakra-v5.124`.
+- Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
