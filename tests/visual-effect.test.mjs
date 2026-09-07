@@ -9,6 +9,14 @@ const ml = JSON.parse(readFileSync('locales/ml.json', 'utf8'));
 const ru = JSON.parse(readFileSync('locales/ru.json', 'utf8'));
 const hi = JSON.parse(readFileSync('locales/hi.json', 'utf8'));
 
+assert.match(html, /<canvas id="particle-canvas" aria-hidden="true"><\/canvas>/,
+    'The shared background should include the ambient particle canvas.');
+assert.match(app, /class AmbientParticleField[\s\S]*?requestAnimationFrame\(this\.render\)/,
+    'The particle field should use a lightweight animation loop.');
+assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
+    'Particle rendering should cap device-pixel density for mobile performance.');
+assert.match(app, /document\.hidden[\s\S]*?cancelAnimationFrame\(this\.frame\)/,
+    'The particle field should pause when the document is hidden.');
 assert.match(html, /id="visual-effect-select"[\s\S]*?value="natural"[\s\S]*?value="aura"[\s\S]*?value="holographic"[\s\S]*?value="depth"/,
     'Settings should expose the meditation visual effect choices.');
 assert.match(app, /const MEDITATION_VISUAL_EFFECTS = new Set\(\['natural', 'aura', 'holographic', 'depth'\]\)/,

@@ -3199,6 +3199,88 @@ class AudioEngine {
     }
 }
 
+// Lightweight ambient star field. This is intentionally a restrained 2D
+// canvas layer: it adds depth without the cost or visual intensity of WebGL.
+class AmbientParticleField {
+    constructor() {
+        this.canvas = document.getElementById('particle-canvas');
+        this.ctx = this.canvas?.getContext('2d', { alpha: true }) || null;
+        this.particles = [];
+        this.frame = 0;
+        this.lastFrameAt = 0;
+        this.resize = this.resize.bind(this);
+        this.render = this.render.bind(this);
+        this.handleVisibility = this.handleVisibility.bind(this);
+    }
+
+    start() {
+        if (!this.canvas || !this.ctx) return;
+        window.addEventListener('resize', this.resize, { passive: true });
+        document.addEventListener('visibilitychange', this.handleVisibility);
+        this.resize();
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            this.frame = requestAnimationFrame(this.render);
+        } else {
+            this.draw(performance.now(), false);
+        }
+    }
+
+    resize() {
+        if (!this.canvas || !this.ctx) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        this.canvas.width = Math.round(window.innerWidth * dpr);
+        this.canvas.height = Math.round(window.innerHeight * dpr);
+        this.canvas.style.width = `${window.innerWidth}px`;
+        this.canvas.style.height = `${window.innerHeight}px`;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.min(96, Math.max(34, Math.round((window.innerWidth * window.innerHeight) / 18000)));
+        this.particles = Array.from({ length: count }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            radius: 0.35 + Math.random() * 1.05,
+            alpha: 0.12 + Math.random() * 0.28,
+            phase: Math.random() * Math.PI * 2,
+            drift: 0.3 + Math.random() * 0.7
+        }));
+        this.draw(performance.now(), false);
+    }
+
+    handleVisibility() {
+        if (document.hidden) {
+            cancelAnimationFrame(this.frame);
+            this.frame = 0;
+        } else if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !this.frame) {
+            this.lastFrameAt = 0;
+            this.frame = requestAnimationFrame(this.render);
+        }
+    }
+
+    render(timestamp) {
+        if (document.hidden) return;
+        if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
+            this.draw(timestamp, true);
+            this.lastFrameAt = timestamp;
+        }
+        this.frame = requestAnimationFrame(this.render);
+    }
+
+    draw(timestamp, animate) {
+        if (!this.ctx) return;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        this.ctx.clearRect(0, 0, width, height);
+        const time = timestamp * 0.00012;
+        this.particles.forEach((particle) => {
+            const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
+            const twinkle = animate ? 0.86 + Math.sin(time * 1.4 + particle.phase) * 0.14 : 1;
+            this.ctx.beginPath();
+            this.ctx.fillStyle = `rgba(220, 226, 255, ${particle.alpha * twinkle})`;
+            this.ctx.arc(particle.x, particle.y + driftY, particle.radius, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+    }
+}
+
 // Visual Engine
 class VisualEngine {
     constructor() {
@@ -5369,6 +5451,7 @@ class WakeLockManager {
 
 const wakeLock = new WakeLockManager();
 const audio = new AudioEngine();
+const particleField = new AmbientParticleField();
 const visual = new VisualEngine();
 const journeyVideoPrelude = new JourneyVideoPrelude(audio);
 const piperTTS = new PiperTTS(audio);
@@ -5618,6 +5701,7 @@ async function loadPiperVoiceRegistry() {
 }
 
 async function init() {
+    particleField.start();
     // Migrate away from the former persisted ambience selection. The current
     // choice is deliberately session-only; the level itself may remain saved.
     localStorage.removeItem('chakra_mood_relaxation_intention');

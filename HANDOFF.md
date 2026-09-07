@@ -14,6 +14,12 @@
 - Delivery rotates to `style.css?v=1.67` and shell cache `chakra-v5.112`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-07 (Subtle ambient particle field)
+
+- Added the previously missing particle layer as a lightweight 2D canvas star field. It is globally available behind the app, uses a capped device-pixel ratio and responsive particle count, moves only a few pixels with restrained twinkle, pauses while the document is hidden, and renders a static frame when reduced motion is requested.
+- No WebGL, external assets, audio changes, or meditation timing changes were introduced. Delivery rotates to `style.css?v=1.68` and shell cache `chakra-v5.113`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction; target-device visual comfort remains the final QA gate.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
