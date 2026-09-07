@@ -75,6 +75,13 @@
 - Existing fullscreen behavior, explicit Play action, video-volume control, spatial routing, and fade treatment are unchanged. Delivery rotates to `style.css?v=1.77`, `app.js?v=2.38`, and shell cache `chakra-v5.122`.
 - Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-08 (Meditator image lead-in)
+
+- Added the supplied `video/meditator.png` as a short visual lead-in to the Restart Journey prelude. After the explicit Play action, it holds for 2.2 seconds while fullscreen is requested, then crossfades into the primary FHD WebM. The video remains natively `preload="auto"` and is explicitly prepared with `load()`; the existing MP4 fallback remains available.
+- No end-of-session video was added. The browser's native fullscreen exit notification remains browser-controlled and cannot be hidden by Lite; Lite does not add a duplicate popup.
+- Delivery rotates to `style.css?v=1.78`, `app.js?v=2.39`, and shell cache `chakra-v5.123`.
+- Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

@@ -10,6 +10,8 @@ const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
 );
 
 assert.ok(fs.statSync(new URL('../video/Stunning%20New%20Universe%20Fly-Through%20Really%20Puts%20Things%20Into%20Perspective%20%5BnGnX6GkrOgk%5D.webm', import.meta.url)).size > 0, 'the supplied WebM prelude video should exist');
+assert.ok(fs.statSync(new URL('../video/meditator.png', import.meta.url)).size > 0, 'the supplied meditator image should exist');
+assert.match(html, /id="journey-video-prelude"[\s\S]*?class="journey-video-prelude-meditator"[^>]*src="video\/meditator\.png"/, 'the meditator image should lead the prelude');
 assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/Stunning%20New%20Universe%20Fly-Through%20Really%20Puts%20Things%20Into%20Perspective%20%5BnGnX6GkrOgk%5D\.webm"[^>]*type="video\/webm"[\s\S]*?src="video\/nature-upgrade\.mp4"/, 'the uploaded WebM should be the primary prelude with MP4 compatibility fallback');
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder and wait for an explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
@@ -18,7 +20,11 @@ assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*conta
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
-assert.match(css, /\.journey-video-prelude\.is-leaving,[\s\S]*?\.journey-video-prelude\.is-leaving video\s*\{[\s\S]*?transition-duration:\s*8s/, 'the video and its full-screen stage should dissolve together over an unhurried eight seconds');
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 2\.2/);
+assert.match(app, /is-meditator[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?is-video/, 'the meditator image should dissolve into the video after a short hold');
+assert.match(app, /this\.media\?\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering');
+assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: 1[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly');
+assert.match(css, /\.journey-video-prelude\.is-leaving[\s\S]*?transition-duration:\s*8s/, 'the video, image, and full-screen stage should dissolve together over an unhurried eight seconds');
 assert.match(html, /id="settings-vol-video"[^>]*min="0\.02"[^>]*max="0\.5"[\s\S]*?id="preview-video-audio"/, 'Settings should provide a safe dedicated Video Volume control and preview action');
 assert.match(app, /volVideo: clampAudioLevel\(storedNumber\('chakra_vol_video', 0\.20\), 0\.02, 0\.5, 0\.20\)/, 'Video Volume should persist independently in local storage');
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?async previewAudio\(\)[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(state\.volVideo, 0\.25\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'preview and actual video playback should use the independent Video Volume');

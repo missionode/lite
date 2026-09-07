@@ -62,6 +62,7 @@ const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
+const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 2.2;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
@@ -3388,6 +3389,7 @@ class JourneyVideoPrelude {
         this.audio = audioEngine;
         this.overlay = document.getElementById('journey-video-prelude');
         this.media = document.getElementById('journey-video-prelude-media');
+        this.meditatorImage = this.overlay?.querySelector('.journey-video-prelude-meditator');
         this.playButton = document.getElementById('play-journey-video-prelude');
         this.fullscreenTarget = document.getElementById('app');
         this.controls = document.getElementById('controls');
@@ -3395,6 +3397,7 @@ class JourneyVideoPrelude {
         this.fullscreenChromeHideTimer = null;
         this.previewTimer = null;
         this.activePlayback = null;
+        try { this.media?.load(); } catch (error) {}
         this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
         document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
         this.revealZone?.addEventListener('pointerenter', () => this.setFullscreenChromeVisible(true));
@@ -3486,11 +3489,13 @@ class JourneyVideoPrelude {
             let settled = false;
             let exitPromise = null;
             let hasStarted = false;
+            let playDelayTimer = null;
             const cleanup = () => {
                 this.media.removeEventListener('timeupdate', onTimeUpdate);
                 this.media.removeEventListener('ended', onEnded);
                 this.media.removeEventListener('error', onError);
                 this.playButton?.removeEventListener('click', onPlay);
+                if (playDelayTimer) clearTimeout(playDelayTimer);
             };
             const beginExit = (duration) => {
                 if (exitPromise) return exitPromise;
@@ -3522,19 +3527,23 @@ class JourneyVideoPrelude {
             const onPlay = () => {
                 if (hasStarted || settled) return;
                 hasStarted = true;
-                this.overlay.classList.add('is-playing');
+                this.overlay.classList.add('is-playing', 'is-meditator');
                 this.enterFullscreen();
-                const playback = this.media.play();
-                Promise.resolve(playback).then(() => {
-                    this.audio.fadeJourneyVideoPrelude(state.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
-                }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
+                playDelayTimer = setTimeout(() => {
+                    this.overlay.classList.remove('is-meditator');
+                    this.overlay.classList.add('is-video');
+                    const playback = this.media.play();
+                    Promise.resolve(playback).then(() => {
+                        this.audio.fadeJourneyVideoPrelude(state.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
+                    }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
+                }, JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS * 1000);
             };
 
             this.media.addEventListener('timeupdate', onTimeUpdate);
             this.media.addEventListener('ended', onEnded);
             this.media.addEventListener('error', onError);
             this.playButton?.addEventListener('click', onPlay, { once: true });
-            this.overlay.classList.remove('hidden', 'is-leaving');
+            this.overlay.classList.remove('hidden', 'is-leaving', 'is-playing', 'is-meditator', 'is-video');
             requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
             this.media.muted = false;
             this.media.volume = 1;
