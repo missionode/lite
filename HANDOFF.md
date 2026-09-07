@@ -2,6 +2,12 @@
 
 ## START
 
+### Local checkpoint — 2026-09-07 (Cinematic ambient background)
+
+- Added a CSS-only, full-viewport ambient background behind the meditation surface: two oversized blurred colour volumes drift slowly over a near-black field, with the active chakra colour supplied through the existing `--primary-color` variable. This gives the 3D image treatment more depth while preserving readability and avoiding image/WebGL/per-frame rendering cost.
+- The background is intentionally low-contrast and uses `prefers-reduced-motion` support. It does not alter audio, narration timing, image assets, or the existing visual-effect selector. Delivery rotates to `style.css?v=1.66` and shell cache `chakra-v5.111`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction; target-device visual comfort remains the final QA gate.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

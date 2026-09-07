@@ -25,6 +25,12 @@ assert.match(styles, /#chakra-container\.visual-effect-holographic::after[\s\S]*
     'Holographic mode should use a slow CSS-only shimmer.');
 assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation:\s*none/,
     'The visual effect should respect reduced-motion preferences.');
+assert.match(styles, /#nebula-bg::before,[\s\S]*?#nebula-bg::after/,
+    'The shared background should provide layered ambient colour volumes.');
+assert.match(styles, /@keyframes nebulaDriftA[\s\S]*?@keyframes nebulaDriftB/,
+    'Ambient background volumes should drift slowly for a subtle sense of depth.');
+assert.match(styles, /filter:\s*blur\(72px\) saturate\(0\.88\)/,
+    'Ambient background volumes should remain soft and non-distracting.');
 
 for (const bundle of [en, ml, ru, hi]) {
     for (const key of ['visualEffect', 'visualEffectNatural', 'visualEffectAura', 'visualEffectHolographic', 'visualEffectDepth']) {

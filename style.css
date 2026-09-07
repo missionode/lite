@@ -133,12 +133,69 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
     background:
-        radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.25) 0%, transparent 55%),
-        radial-gradient(ellipse at 20% 70%, rgba(109,40,217,0.15) 0%, transparent 45%),
-        radial-gradient(ellipse at 80% 60%, rgba(167,139,250,0.10) 0%, transparent 40%);
+        radial-gradient(ellipse 85% 70% at 50% 28%, color-mix(in srgb, var(--primary-color) 15%, transparent) 0%, transparent 68%),
+        radial-gradient(ellipse 70% 65% at 12% 78%, rgba(25, 145, 210, 0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 75% 60% at 90% 72%, rgba(195, 74, 176, 0.08) 0%, transparent 70%),
+        #030307;
     z-index: 0;
     pointer-events: none;
+}
+
+/* Soft, wide colour volumes inspired by the reference's cinematic background.
+   They stay behind the meditation surface, use no bitmap/WebGL, and move slowly
+   enough to read as depth without becoming visually stimulating. */
+#nebula-bg::before,
+#nebula-bg::after {
+    content: "";
+    position: absolute;
+    width: 78vw;
+    height: 68vh;
+    min-width: 34rem;
+    min-height: 22rem;
+    border-radius: 48% 52% 63% 37% / 42% 38% 62% 58%;
+    filter: blur(72px) saturate(0.88);
+    opacity: 0.16;
+    mix-blend-mode: screen;
+    will-change: transform;
+}
+
+#nebula-bg::before {
+    top: -24%;
+    left: -18%;
+    background:
+        radial-gradient(ellipse at 34% 44%, color-mix(in srgb, var(--primary-color) 72%, white 8%) 0%, transparent 58%),
+        radial-gradient(ellipse at 72% 58%, rgba(75, 195, 255, 0.42) 0%, transparent 62%);
+    animation: nebulaDriftA 38s ease-in-out infinite alternate;
+}
+
+#nebula-bg::after {
+    right: -22%;
+    bottom: -26%;
+    background:
+        radial-gradient(ellipse at 60% 38%, rgba(255, 92, 194, 0.34) 0%, transparent 60%),
+        radial-gradient(ellipse at 34% 68%, color-mix(in srgb, var(--primary-color) 58%, #ffd166 12%) 0%, transparent 64%);
+    animation: nebulaDriftB 46s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes nebulaDriftA {
+    0% { transform: translate3d(-4%, -2%, 0) rotate(-9deg) scale(1); }
+    50% { transform: translate3d(11%, 8%, 0) rotate(4deg) scale(1.08); }
+    100% { transform: translate3d(4%, 16%, 0) rotate(12deg) scale(0.98); }
+}
+
+@keyframes nebulaDriftB {
+    0% { transform: translate3d(5%, 3%, 0) rotate(10deg) scale(1.04); }
+    50% { transform: translate3d(-10%, -8%, 0) rotate(-4deg) scale(1.1); }
+    100% { transform: translate3d(-2%, 5%, 0) rotate(-14deg) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #nebula-bg::before,
+    #nebula-bg::after {
+        animation: none;
+    }
 }
 
 #particle-canvas {
