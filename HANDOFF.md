@@ -38,6 +38,12 @@
 - Delivery rotates to `style.css?v=1.71` and shell cache `chakra-v5.116`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-07 (Bright stellar twinkle core)
+
+- Changed the star sparkle core to clean white while retaining a cool blue-white halo. The existing slow, unsynchronized twinkle and low-amplitude drift remain unchanged, so the stars gain clarity without becoming a flashing or high-contrast effect.
+- Delivery rotates to `style.css?v=1.72` and shell cache `chakra-v5.117`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

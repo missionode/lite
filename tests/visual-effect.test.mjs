@@ -23,6 +23,8 @@ assert.match(app, /legLengths: Array\.from\(\{ length: 4 \}[\s\S]*?Math\.random\
     'Star rays should have varied lengths rather than identical spikes.');
 assert.match(app, /const driftY = animate[\s\S]*?const driftX = animate/,
     'Stars should use subtle independent drift on both axes.');
+assert.match(app, /fillStyle = `rgba\(255, 255, 255, \$\{alpha\}\)`/,
+    'Star twinkles should have a bright white luminous core.');
 assert.match(app, /document\.hidden[\s\S]*?cancelAnimationFrame\(this\.frame\)/,
     'The particle field should pause when the document is hidden.');
 assert.match(html, /id="visual-effect-select"[\s\S]*?value="natural"[\s\S]*?value="aura"[\s\S]*?value="holographic"[\s\S]*?value="depth"/,

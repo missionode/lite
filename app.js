@@ -3284,8 +3284,10 @@ class AmbientParticleField {
             const alpha = Math.min(0.9, particle.alpha * twinkle * particle.brightness);
             this.ctx.beginPath();
             this.ctx.shadowBlur = particle.radius > 1.1 ? 5 : 2.5;
-            this.ctx.shadowColor = `rgba(174, 205, 255, ${alpha * 0.8})`;
-            this.ctx.fillStyle = `rgba(226, 234, 255, ${alpha})`;
+            this.ctx.shadowColor = `rgba(190, 220, 255, ${alpha * 0.82})`;
+            // A white core gives the brightest phase of each twinkle a clean
+            // stellar glint while the cooler halo preserves the soft mood.
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
             const x = particle.x + driftX;
             const y = particle.y + driftY;
             const inner = particle.radius * 0.52;
