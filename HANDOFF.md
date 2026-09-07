@@ -69,6 +69,12 @@
 - Delivery rotates to `style.css?v=1.76`, `app.js?v=2.37`, and shell cache `chakra-v5.121`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-08 (Universe fly-through prelude)
+
+- The uploaded `Stunning New Universe Fly-Through Really Puts Things Into Perspective [nGnX6GkrOgk].webm` is now the primary Restart Journey prelude video. The existing `nature-upgrade.mp4` remains only as a compatibility fallback; the end-of-session video idea was not implemented.
+- Existing fullscreen behavior, explicit Play action, video-volume control, spatial routing, and fade treatment are unchanged. Delivery rotates to `style.css?v=1.77`, `app.js?v=2.38`, and shell cache `chakra-v5.122`.
+- Validation: `static/unit` PASS — `test:journey-video-prelude`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

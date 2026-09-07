@@ -9,8 +9,8 @@ const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
     JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))
 );
 
-assert.ok(fs.statSync(new URL('../video/nature-upgrade.mp4', import.meta.url)).size > 0, 'the supplied prelude video should exist');
-assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/nature-upgrade\.mp4"/, 'the prelude should use the supplied video in a preloaded, inline mobile-safe player');
+assert.ok(fs.statSync(new URL('../video/Stunning%20New%20Universe%20Fly-Through%20Really%20Puts%20Things%20Into%20Perspective%20%5BnGnX6GkrOgk%5D.webm', import.meta.url)).size > 0, 'the supplied WebM prelude video should exist');
+assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/Stunning%20New%20Universe%20Fly-Through%20Really%20Puts%20Things%20Into%20Perspective%20%5BnGnX6GkrOgk%5D\.webm"[^>]*type="video\/webm"[\s\S]*?src="video\/nature-upgrade\.mp4"/, 'the uploaded WebM should be the primary prelude with MP4 compatibility fallback');
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder and wait for an explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?position:\s*fixed[\s\S]*?inset:\s*0[\s\S]*?z-index:\s*100100/, 'the video prelude should fill the application viewport');
