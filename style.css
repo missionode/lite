@@ -99,7 +99,10 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: #000;
+    /* Keep the fullscreen shell transparent so the shared nebula can remain
+       visible behind the meditation surface. Video prelude owns its own
+       opaque black stage below. */
+    background: transparent;
 }
 
 #meditation-screen {

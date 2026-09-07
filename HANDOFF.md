@@ -8,6 +8,12 @@
 - The background is intentionally low-contrast and uses `prefers-reduced-motion` support. It does not alter audio, narration timing, image assets, or the existing visual-effect selector. Delivery rotates to `style.css?v=1.66` and shell cache `chakra-v5.111`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction; target-device visual comfort remains the final QA gate.
 
+### Local checkpoint — 2026-09-07 (Reveal ambient background in fullscreen)
+
+- Fixed the cinematic background being hidden during the fullscreen journey: `#app:fullscreen` no longer paints an opaque black layer over the shared `#nebula-bg`. The video prelude keeps its own opaque black stage, so this change does not affect video presentation.
+- Delivery rotates to `style.css?v=1.67` and shell cache `chakra-v5.112`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.

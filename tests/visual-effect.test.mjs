@@ -31,6 +31,8 @@ assert.match(styles, /@keyframes nebulaDriftA[\s\S]*?@keyframes nebulaDriftB/,
     'Ambient background volumes should drift slowly for a subtle sense of depth.');
 assert.match(styles, /filter:\s*blur\(72px\) saturate\(0\.88\)/,
     'Ambient background volumes should remain soft and non-distracting.');
+assert.match(styles, /#app:fullscreen[\s\S]*?background:\s*transparent/,
+    'The fullscreen app shell should not cover the ambient background.');
 
 for (const bundle of [en, ml, ru, hi]) {
     for (const key of ['visualEffect', 'visualEffectNatural', 'visualEffectAura', 'visualEffectHolographic', 'visualEffectDepth']) {
