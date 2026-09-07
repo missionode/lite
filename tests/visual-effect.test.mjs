@@ -15,6 +15,10 @@ assert.match(app, /class AmbientParticleField[\s\S]*?requestAnimationFrame\(this
     'The particle field should use a lightweight animation loop.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');
+assert.match(app, /Math\.min\(150, Math\.max\(30, Math\.round\(area \/ 12500\)\)\)/,
+    'Particle density should respond to the viewport area.');
+assert.match(app, /Four-point star[\s\S]*?ctx\.closePath\(\)/,
+    'Particles should render as subtle star-like sparkles.');
 assert.match(app, /document\.hidden[\s\S]*?cancelAnimationFrame\(this\.frame\)/,
     'The particle field should pause when the document is hidden.');
 assert.match(html, /id="visual-effect-select"[\s\S]*?value="natural"[\s\S]*?value="aura"[\s\S]*?value="holographic"[\s\S]*?value="depth"/,

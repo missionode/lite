@@ -3233,14 +3233,18 @@ class AmbientParticleField {
         this.canvas.style.width = `${window.innerWidth}px`;
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const count = Math.min(96, Math.max(34, Math.round((window.innerWidth * window.innerHeight) / 18000)));
+        const area = window.innerWidth * window.innerHeight;
+        const count = Math.min(150, Math.max(30, Math.round(area / 12500)));
         this.particles = Array.from({ length: count }, () => ({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            radius: 0.65 + Math.random() * 1.35,
+            radius: 0.55 + Math.random() * 1.25,
             alpha: 0.28 + Math.random() * 0.38,
             phase: Math.random() * Math.PI * 2,
-            drift: 0.3 + Math.random() * 0.7
+            drift: 0.3 + Math.random() * 0.7,
+            rotation: Math.random() * Math.PI / 2,
+            spike: 1.8 + Math.random() * 2.8,
+            twinkleSpeed: 0.55 + Math.random() * 0.45
         }));
         this.draw(performance.now(), false);
     }
@@ -3272,14 +3276,32 @@ class AmbientParticleField {
         const time = timestamp * 0.00012;
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
-            const twinkle = animate ? 0.86 + Math.sin(time * 1.4 + particle.phase) * 0.14 : 1;
+            const twinkle = animate ? 0.82 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.18 : 1;
             const alpha = particle.alpha * twinkle;
             this.ctx.beginPath();
-            this.ctx.shadowBlur = particle.radius > 1.25 ? 5 : 2.5;
+            this.ctx.shadowBlur = particle.radius > 1.1 ? 5 : 2.5;
             this.ctx.shadowColor = `rgba(174, 205, 255, ${alpha * 0.8})`;
             this.ctx.fillStyle = `rgba(226, 234, 255, ${alpha})`;
-            this.ctx.arc(particle.x, particle.y + driftY, particle.radius, 0, Math.PI * 2);
+            const x = particle.x;
+            const y = particle.y + driftY;
+            const outer = particle.radius * particle.spike * (0.86 + twinkle * 0.14);
+            const inner = particle.radius * 0.52;
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(particle.rotation);
+            // Four-point star: most particles remain pinpricks, while larger
+            // ones catch the eye like distant stars without becoming icons.
+            for (let point = 0; point < 8; point += 1) {
+                const angle = (Math.PI / 4) * point - Math.PI / 2;
+                const radius = point % 2 === 0 ? outer : inner;
+                const pointX = Math.cos(angle) * radius;
+                const pointY = Math.sin(angle) * radius;
+                if (point === 0) this.ctx.moveTo(pointX, pointY);
+                else this.ctx.lineTo(pointX, pointY);
+            }
+            this.ctx.closePath();
             this.ctx.fill();
+            this.ctx.restore();
         });
         this.ctx.shadowBlur = 0;
     }
