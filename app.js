@@ -3252,7 +3252,7 @@ class AmbientParticleField {
             legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
             brightness: 0.78 + Math.random() * 0.42,
             driftX: 0.22 + Math.random() * 0.42,
-            twinkleSpeed: 0.16 + Math.random() * 0.18,
+            twinkleSpeed: 0.28 + Math.random() * 0.16,
             isTwinkler: layer !== 'background' && Math.random() < (layer === 'foreground' ? 0.7 : 0.46)
             };
         });
@@ -3287,8 +3287,16 @@ class AmbientParticleField {
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
             const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
+            const twinklePhase = (time * particle.twinkleSpeed + particle.phase) % (Math.PI * 2);
+            const twinkleProgress = twinklePhase / (Math.PI * 2);
+            // Quick glint, longer bright hold, then a patient fade. The
+            // unsynchronized phases keep the field organic and non-flashing.
             const twinkle = animate && particle.isTwinkler
-                ? 0.62 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.38
+                ? twinkleProgress < 0.18
+                    ? 0.62 + (twinkleProgress / 0.18) * 0.38
+                    : twinkleProgress < 0.58
+                        ? 1
+                        : 1 - ((twinkleProgress - 0.58) / 0.42) * 0.38
                 : 1;
             const alpha = Math.min(1, particle.alpha * twinkle * particle.brightness);
             this.ctx.beginPath();

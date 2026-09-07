@@ -21,8 +21,10 @@ assert.match(app, /const layerFor = \(index\) => index < count \* 0\.52 \? 'back
     'The particle field should use multiple depth layers.');
 assert.match(app, /isTwinkler: layer !== 'background' && Math\.random\(\) < \(layer === 'foreground' \? 0\.7 : 0\.46\)/,
     'Only selected stars should receive stronger twinkle animation.');
-assert.match(app, /twinkleSpeed: 0\.16 \+ Math\.random\(\) \* 0\.18/,
-    'Star twinkles should have a visible but gentle cycle.');
+assert.match(app, /twinkleSpeed: 0\.28 \+ Math\.random\(\) \* 0\.16/,
+    'Star twinkles should have a faster visible cycle.');
+assert.match(app, /twinkleProgress < 0\.18[\s\S]*?twinkleProgress < 0\.58[\s\S]*?twinkleProgress - 0\.58/,
+    'Star twinkles should rise quickly, hold brightness, and fade gradually.');
 assert.match(app, /fillStyle = `rgba\(255, 255, 255, \$\{Math\.min\(1, alpha \* 1\.18\)\}\)`/,
     'Sparkling stars should receive a bright white core.');
 assert.match(app, /Four-point star[\s\S]*?ctx\.closePath\(\)/,
