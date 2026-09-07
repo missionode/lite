@@ -3244,6 +3244,9 @@ class AmbientParticleField {
             drift: 0.3 + Math.random() * 0.7,
             rotation: Math.random() * Math.PI / 2,
             spike: 1.8 + Math.random() * 2.8,
+            legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
+            brightness: 0.78 + Math.random() * 0.42,
+            driftX: 0.22 + Math.random() * 0.42,
             twinkleSpeed: 0.55 + Math.random() * 0.45
         }));
         this.draw(performance.now(), false);
@@ -3276,15 +3279,15 @@ class AmbientParticleField {
         const time = timestamp * 0.00012;
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
+            const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
             const twinkle = animate ? 0.82 + Math.sin(time * particle.twinkleSpeed + particle.phase) * 0.18 : 1;
-            const alpha = particle.alpha * twinkle;
+            const alpha = Math.min(0.9, particle.alpha * twinkle * particle.brightness);
             this.ctx.beginPath();
             this.ctx.shadowBlur = particle.radius > 1.1 ? 5 : 2.5;
             this.ctx.shadowColor = `rgba(174, 205, 255, ${alpha * 0.8})`;
             this.ctx.fillStyle = `rgba(226, 234, 255, ${alpha})`;
-            const x = particle.x;
+            const x = particle.x + driftX;
             const y = particle.y + driftY;
-            const outer = particle.radius * particle.spike * (0.86 + twinkle * 0.14);
             const inner = particle.radius * 0.52;
             this.ctx.save();
             this.ctx.translate(x, y);
@@ -3293,6 +3296,8 @@ class AmbientParticleField {
             // ones catch the eye like distant stars without becoming icons.
             for (let point = 0; point < 8; point += 1) {
                 const angle = (Math.PI / 4) * point - Math.PI / 2;
+                const arm = Math.floor(point / 2);
+                const outer = particle.radius * particle.spike * particle.legLengths[arm] * (0.86 + twinkle * 0.14);
                 const radius = point % 2 === 0 ? outer : inner;
                 const pointX = Math.cos(angle) * radius;
                 const pointY = Math.sin(angle) * radius;

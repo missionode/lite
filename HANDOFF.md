@@ -32,6 +32,12 @@
 - Delivery rotates to `style.css?v=1.70` and shell cache `chakra-v5.115`.
 - Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
 
+### Local checkpoint — 2026-09-07 (Natural star variation)
+
+- Varied each star's four ray lengths independently, added small per-star brightness differences, and introduced very gentle two-axis drift. Each star fades and brightens on its own slow phase, avoiding synchronized flashing while making the field feel less mechanically generated.
+- Delivery rotates to `style.css?v=1.71` and shell cache `chakra-v5.116`.
+- Validation: `static/unit` PASS — `test:visual-effect`, app/service-worker syntax, and `git diff --check`. No Playwright or screenshots were run, per owner direction.
+
 - Current objective: keep `production` stable while refining Yoga and decoupling Intimate Service into its own Lobby experience.
 - Target root: `/Users/lekshmisyam/Desktop/Ikigai/lite`.
 - Reusable instructions root: `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; `Loop/loop.md` is the protected collaboration policy and must not be changed during routine application work.
