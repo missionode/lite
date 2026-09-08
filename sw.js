@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.136';
+const CACHE_NAME = 'chakra-v5.144';
 const PIPER_CACHE_NAME = 'chakra-piper-v8';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v22';
 const ASSETS = [
@@ -12,7 +12,7 @@ const ASSETS = [
   './style.css',
   './app.js',
   './manifest.json',
-  './Splash.png',
+  './Splash-v2.png',
   './scripts.json',
   './android-chrome-192x192.png',
   './android-chrome-512x512.png',

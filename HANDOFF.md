@@ -904,6 +904,92 @@
 - Rotated delivery identifiers to `app.js?v=2.52` and shell cache `chakra-v5.136`.
 - Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, locale JSON parsing, and `git diff --check` PASS. Full decode scan and browser/device playback evidence remain recommended before release.
 
+### CP-VIDEO-091 — Match prelude fade to ten-second generate.mp4
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Fixed the short-clip presentation: the previous eight-second exit fade began around two seconds into the 10.005-second `generate.mp4`, making the video appear to end early. The exit fade is now 1.5 seconds and begins only during the final portion of the clip.
+- Rotated delivery identifiers to `app.js?v=2.53` and shell cache `chakra-v5.137` so installed clients receive the timing correction.
+- Validation required: focused journey-video-prelude test, JavaScript/service-worker syntax, and `git diff --check`. Browser/device playback remains the final visual evidence gate.
+
+### CP-VISUAL-092 — Restore visible live star-field depth
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Improved the shared sky without WebGL or bitmap dependencies: the background now uses deeper midnight/obsidian blue gradients with more restrained nebula colour volumes, while the canvas uses a capped two-dimensional field with mostly tiny stars and a small bright foreground population.
+- Stars now use blue-white, warm-white, orange, and soft-white colour temperatures. Bright stars receive independent blended sine-wave scintillation and subtle drift, so twinkles are unsynchronized and visibly alive rather than a static white field. Canvas rendering remains capped at 1.5 device-pixel density and pauses when the document is hidden.
+- Rotated the stylesheet delivery identifier to `style.css?v=1.81`; no new external assets or service dependencies were added.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Browser/device visual smoothness remains open for manual confirmation.
+
+### CP-VISUAL-093 — Increase perceptible sky motion
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- The first twinkle revision was too subtle in practice. Increased the bounded independent scintillation depth, raised the canvas presentation slightly, and added a very faint diagonal Milky Way-style dust band to the CSS sky.
+- Added a capped two-meteor effect: one short, soft-tail shooting star appears at an 8–15 second randomized interval, with at most two active meteor objects. This remains in the existing canvas loop and inherits hidden-tab and reduced-motion protections.
+- Rotated the stylesheet identifier to `style.css?v=1.82`; no external image, WebGL, service worker, or continuous particle allocation was added.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device visual smoothness remains open for manual confirmation.
+
+### CP-VISUAL-094 — Add location-aware Moon and bright celestial objects
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Added an offline location-aware celestial layer to the existing canvas. With browser permission, the current observer latitude/longitude and UTC time position the Moon, Venus, Jupiter, Mars, Saturn, Polaris, Sirius, Vega, Arcturus, Altair, and Betelgeuse above the horizon.
+- The Moon is rendered as a softly glowing phase-shaped disc; planets and bright stars use separate apparent size and colour-temperature treatments. If location is unavailable or declined, the atmospheric star field remains available without a permission error.
+- This is a lightweight visual ephemeris intended for presentation, not an observatory-grade almanac. Exact sky accuracy still depends on the device’s location/time quality and should be manually checked against a planetarium for any educational or ceremonial claim.
+- Rotated delivery identifiers to `app.js?v=2.54` and shell cache `chakra-v5.138`; no network request or external astronomy asset was added.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device visual and location-permission behavior remains open for manual confirmation.
+
+### CP-VISUAL-095 — Remove opaque Moon phase overlay
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Replaced the Moon’s opaque dark offset disc with a `destination-out` cutout on the transparent celestial canvas. The unlit side now reveals the actual nebula and star field instead of appearing as a pasted black overlay, while the lit crescent retains its glow.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device Moon rendering remains open for manual confirmation.
+
+### CP-VISUAL-099 — Localized subtle celestial labels
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Added very small, low-contrast labels for the Moon, Venus, Jupiter, Mars, Saturn, Polaris, Sirius, Vega, Arcturus, Altair, and Betelgeuse. Labels use matching object colour/glow, stay near the calculated body, and avoid the edge where possible.
+- Labels resolve through the selected Display Language (`en`, `ml`, `ru`, or `hi`) at draw time, so changing the interface language updates the sky without a reload or a second label layer.
+- Rotated delivery identifiers to `app.js?v=2.58` and shell cache `chakra-v5.142`.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device readability remains open for manual confirmation.
+
+### CP-DESIGN-100 — Cosmic sacred splash redesign
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Generated a new portrait splash artwork, `Splash-v2.png`, using the imagegen skill. It matches the live theme with deep navy/obsidian space, violet-blue nebula depth, sacred-gold chakra geometry, luminous star dust, and a small meditating silhouette. The artwork contains no text so localized overlay copy remains available.
+- Updated the launch image, Apple startup image, softened wide-screen backdrop, and service-worker precache to use `Splash-v2.png`. The original `Splash.png` remains preserved for rollback.
+- Rotated delivery identifiers to `style.css?v=1.83` and shell cache `chakra-v5.143`.
+- Validation: splash contract, visual-effect contract, journey-video-prelude contract, JavaScript/service-worker syntax, and `git diff --check` required before release. No commit or push was performed for this design change.
+
+### CP-VISUAL-101 — Keep the celestial layer populated without location
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Fixed the Moon’s orbital-node conversion before RA/Dec projection and added an immediate approximate equatorial fallback observer. Granted device location now replaces that fallback when available, so a denied, unavailable, or insecure-context geolocation request no longer leaves the celestial layer empty.
+- The altitude gate remains physically honest: the Moon and named objects are hidden when genuinely below the visible horizon. The fallback is continuity presentation only and is marked internally as approximate.
+- Rotated delivery identifiers to `app.js?v=2.59` and shell cache `chakra-v5.144`.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Device location permission and Moon visibility remain open for manual confirmation.
+
+### CP-VISUAL-096 — Correct Moon transparency and planetary scale
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Corrected the Moon phase renderer so the transparent cutout is slightly larger than the lit disc and has shadow disabled during erasure. The unlit side now reveals the underlying sky without a visible dark lower rim or overlay disc.
+- Reworked planet sizing around apparent angular diameters as seen from Earth: the Moon is the 26px reference disc, Jupiter is the largest planet point, and Venus/Mars/Saturn remain appropriately small. Added soft radial highlight-to-limb gradients and a subtle Saturn ring.
+- Rotated delivery identifiers to `app.js?v=2.55` and shell cache `chakra-v5.139`.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device rendering remains open for manual confirmation.
+
+### CP-VISUAL-097 — Correct Moon phase visibility and celestial glow
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Corrected Moon illumination to use the 29.530588853-day synodic cycle from a known new-moon reference instead of deriving phase from right ascension. The transparent cutout is now geometrically bounded so it cannot erase the entire lit disc from rounding or coordinate errors.
+- Added soft radial halos for the Moon, planets, and named bright stars. The halos use each object’s colour temperature and remain small enough to identify the body without turning it into a flat overlay.
+- Rotated delivery identifiers to `app.js?v=2.56` and shell cache `chakra-v5.140`.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device Moon/planet appearance remains open for manual confirmation.
+
+### CP-VISUAL-098 — Composite the Moon through an offscreen boolean mask
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Replaced visible-canvas Moon subtraction with an offscreen boolean operation: render a whitish shaded lunar disc (A), subtract the unlit shadow disc (B) using `destination-out`, then composite only `A minus B` onto the transparent sky. This prevents the Moon’s glow or surrounding stars from being mistaken for a dark overlay disc.
+- The Moon halo remains a separate soft radial glow, and the lunar surface now uses a pale white-to-warm-grey gradient. Planet halos and Earth-relative apparent sizing remain unchanged.
+- Rotated delivery identifiers to `app.js?v=2.57` and shell cache `chakra-v5.141`.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Target-device Moon rendering remains open for manual confirmation.
+
 ### CP-AUDIT-090 — Read-only resource and requirements audit
 
 - Date: 2026-09-08 (Asia/Kolkata).

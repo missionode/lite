@@ -60,7 +60,9 @@ const PIPER_CLIP_FADE_SECONDS = 0.05;
 const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
-const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 8;
+// The supplied generate.mp4 is only about ten seconds long. Keep nearly the
+// entire clip visible and dissolve only across its final 1.5 seconds.
+const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 1.5;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
 const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 15;
 const JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS = 20;
@@ -69,6 +71,128 @@ const JOURNEY_VIDEO_PRELUDE_BUFFER_STABILITY_MS = 2000;
 const JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS = 4;
 const JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS = 15;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
+
+const CELESTIAL_DEG = Math.PI / 180;
+const CELESTIAL_RAD = 180 / Math.PI;
+const CELESTIAL_LABEL_KEYS = Object.freeze({
+    Moon: 'ui.celestialMoon', Venus: 'ui.celestialVenus', Jupiter: 'ui.celestialJupiter',
+    Mars: 'ui.celestialMars', Saturn: 'ui.celestialSaturn', Polaris: 'ui.celestialPolaris',
+    Sirius: 'ui.celestialSirius', Vega: 'ui.celestialVega', Arcturus: 'ui.celestialArcturus',
+    Altair: 'ui.celestialAltair', Betelgeuse: 'ui.celestialBetelgeuse'
+});
+
+function celestialJulianDay(date = new Date()) {
+    return date.getTime() / 86400000 + 2440587.5;
+}
+
+function celestialNormalizeDegrees(value) {
+    return ((value % 360) + 360) % 360;
+}
+
+function celestialSolveEccentricAnomaly(meanAnomaly, eccentricity) {
+    let eccentricAnomaly = meanAnomaly + eccentricity * Math.sin(meanAnomaly) * (1 + eccentricity * Math.cos(meanAnomaly));
+    for (let iteration = 0; iteration < 5; iteration += 1) {
+        eccentricAnomaly -= (eccentricAnomaly - eccentricity * Math.sin(eccentricAnomaly) - meanAnomaly) /
+            (1 - eccentricity * Math.cos(eccentricAnomaly));
+    }
+    return eccentricAnomaly;
+}
+
+function celestialEclipticToEquatorial(longitude, latitude = 0) {
+    const obliquity = (23.4393 - 3.563e-7 * (celestialJulianDay() - 2451543.5)) * CELESTIAL_DEG;
+    const lambda = longitude * CELESTIAL_DEG;
+    const beta = latitude * CELESTIAL_DEG;
+    return {
+        ra: Math.atan2(Math.sin(lambda) * Math.cos(obliquity) - Math.tan(beta) * Math.sin(obliquity), Math.cos(lambda)) * CELESTIAL_RAD,
+        dec: Math.asin(Math.sin(beta) * Math.cos(obliquity) + Math.cos(beta) * Math.sin(obliquity) * Math.sin(lambda)) * CELESTIAL_RAD
+    };
+}
+
+function celestialSunLongitude(days) {
+    const w = 282.9404 + 4.70935e-5 * days;
+    const meanAnomaly = (356.0470 + 0.9856002585 * days) * CELESTIAL_DEG;
+    const eccentricity = 0.016709 - 1.151e-9 * days;
+    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
+    const x = Math.cos(eccentricAnomaly) - eccentricity;
+    const y = Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
+    return celestialNormalizeDegrees(Math.atan2(y, x) * CELESTIAL_RAD + w);
+}
+
+function celestialMoonPhase(days) {
+    // 2000-01-06 18:14 UTC was a known new-moon reference. The synodic
+    // period gives a stable visual phase without confusing sky coordinates
+    // with illumination geometry.
+    return celestialNormalizeDegrees(((days - 5.259) / 29.530588853) * 360) / 360;
+}
+
+function celestialPlanetEquatorial(days, planet) {
+    const orbitalElements = {
+        venus: [76.6799 + 2.46590e-5 * days, 3.3946 + 2.75e-8 * days, 54.8910 + 1.38374e-5 * days, 0.72333, 0.006773 - 1.302e-9 * days, 48.0052 + 1.6021302244 * days],
+        mars: [49.5574 + 2.11081e-5 * days, 1.8497 - 1.78e-8 * days, 286.5016 + 2.92961e-5 * days, 1.523688, 0.093405 + 2.516e-9 * days, 18.6021 + 0.5240207766 * days],
+        jupiter: [100.4542 + 2.76854e-5 * days, 1.3030 - 1.557e-7 * days, 273.8777 + 1.64505e-5 * days, 5.20256, 0.048498 + 4.469e-9 * days, 19.8950 + 0.0830853001 * days],
+        saturn: [113.6634 + 2.38980e-5 * days, 2.4886 - 1.081e-7 * days, 339.3939 + 2.97661e-5 * days, 9.55475, 0.055546 - 9.499e-9 * days, 316.9670 + 0.0334442282 * days]
+    }[planet];
+    if (!orbitalElements) return null;
+    const [node, inclination, argument, semiMajorAxis, eccentricity, meanAnomalyDegrees] = orbitalElements;
+    const meanAnomaly = celestialNormalizeDegrees(meanAnomalyDegrees) * CELESTIAL_DEG;
+    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
+    const xv = semiMajorAxis * (Math.cos(eccentricAnomaly) - eccentricity);
+    const yv = semiMajorAxis * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
+    const trueAnomaly = Math.atan2(yv, xv);
+    const radius = Math.sqrt(xv * xv + yv * yv);
+    const nodeRad = node * CELESTIAL_DEG;
+    const inclinationRad = inclination * CELESTIAL_DEG;
+    const argumentRad = (argument + trueAnomaly * CELESTIAL_RAD) * CELESTIAL_DEG;
+    const heliocentric = {
+        x: radius * (Math.cos(nodeRad) * Math.cos(argumentRad) - Math.sin(nodeRad) * Math.sin(argumentRad) * Math.cos(inclinationRad)),
+        y: radius * (Math.sin(nodeRad) * Math.cos(argumentRad) + Math.cos(nodeRad) * Math.sin(argumentRad) * Math.cos(inclinationRad)),
+        z: radius * Math.sin(argumentRad) * Math.sin(inclinationRad)
+    };
+    const earthLongitude = celestialSunLongitude(days) + 180;
+    const earthRadius = 1 - 0.0167 * Math.cos((357.529 + 0.98560028 * days) * CELESTIAL_DEG);
+    const earth = { x: earthRadius * Math.cos(earthLongitude * CELESTIAL_DEG), y: earthRadius * Math.sin(earthLongitude * CELESTIAL_DEG), z: 0 };
+    const geocentric = { x: heliocentric.x - earth.x, y: heliocentric.y - earth.y, z: heliocentric.z };
+    const longitude = Math.atan2(geocentric.y, geocentric.x) * CELESTIAL_RAD;
+    const latitude = Math.atan2(geocentric.z, Math.sqrt(geocentric.x ** 2 + geocentric.y ** 2)) * CELESTIAL_RAD;
+    return celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude);
+}
+
+function celestialMoonEquatorial(days) {
+    const node = (125.1228 - 0.0529538083 * days) * CELESTIAL_DEG;
+    const argument = (318.0634 + 0.1643573223 * days) * CELESTIAL_DEG;
+    const eccentricity = 0.0549;
+    const meanAnomaly = (115.3654 + 13.0649929509 * days) * CELESTIAL_DEG;
+    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
+    const x = 60.2666 * (Math.cos(eccentricAnomaly) - eccentricity);
+    const y = 60.2666 * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
+    const trueAnomaly = Math.atan2(y, x);
+    const radius = Math.sqrt(x * x + y * y);
+    // Convert the lunar orbital elements into ecliptic coordinates before
+    // converting to RA/Dec. Keeping the node in both axes avoids the Moon
+    // being assigned an incorrect hour angle and disappearing from the sky.
+    const orbitalAngle = trueAnomaly + argument;
+    const longitude = Math.atan2(
+        Math.sin(node) * Math.cos(orbitalAngle) + Math.cos(node) * Math.sin(orbitalAngle) * Math.cos(5.1454 * CELESTIAL_DEG),
+        Math.cos(node) * Math.cos(orbitalAngle) - Math.sin(node) * Math.sin(orbitalAngle) * Math.cos(5.1454 * CELESTIAL_DEG)
+    ) * CELESTIAL_RAD;
+    const latitude = Math.asin(Math.sin(orbitalAngle) * Math.sin(5.1454 * CELESTIAL_DEG)) * CELESTIAL_RAD;
+    return { ...celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude)), longitude: celestialNormalizeDegrees(longitude), latitude, radius };
+}
+
+function celestialHorizontal(raDegrees, decDegrees, latitude, longitude, date = new Date()) {
+    const julianDay = celestialJulianDay(date);
+    const centuries = (julianDay - 2451545.0) / 36525;
+    const greenwichSidereal = celestialNormalizeDegrees(280.46061837 + 360.98564736629 * (julianDay - 2451545.0) + 0.000387933 * centuries ** 2);
+    const hourAngle = (celestialNormalizeDegrees(greenwichSidereal + longitude - raDegrees)) * CELESTIAL_DEG;
+    const lat = latitude * CELESTIAL_DEG;
+    const dec = decDegrees * CELESTIAL_DEG;
+    const altitude = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hourAngle)) * CELESTIAL_RAD;
+    const azimuth = celestialNormalizeDegrees(Math.atan2(
+        Math.sin(hourAngle),
+        Math.cos(hourAngle) * Math.sin(lat) - Math.tan(dec) * Math.cos(lat)
+    ) * CELESTIAL_RAD + 180);
+    return { altitude, azimuth };
+}
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
 const PLEASURE_AMBIENCE_GAIN = 0.003;
@@ -3205,13 +3329,25 @@ class AudioEngine {
     }
 }
 
-// Lightweight ambient star field. This is intentionally a restrained 2D
-// canvas layer: it adds depth without the cost or visual intensity of WebGL.
+// Lightweight ambient star field. Most stars are tiny and cheap to redraw;
+// only the brighter foreground stars receive independent scintillation so the
+// sky feels alive without turning the meditation background into a spectacle.
 class AmbientParticleField {
     constructor() {
         this.canvas = document.getElementById('particle-canvas');
         this.ctx = this.canvas?.getContext('2d', { alpha: true }) || null;
         this.particles = [];
+        this.meteors = [];
+        this.nextMeteorAt = 0;
+        this.observer = null;
+        this.celestialBodies = [];
+        this.moonBuffer = document.createElement('canvas');
+        this.moonBuffer.width = 128;
+        this.moonBuffer.height = 128;
+        this.moonBufferContext = this.moonBuffer.getContext('2d');
+        // Populate an approximate sky immediately; a successful location
+        // permission replaces this with the real observer position.
+        this.setFallbackObserver();
         this.frame = 0;
         this.lastFrameAt = 0;
         this.resize = this.resize.bind(this);
@@ -3224,11 +3360,56 @@ class AmbientParticleField {
         window.addEventListener('resize', this.resize, { passive: true });
         document.addEventListener('visibilitychange', this.handleVisibility);
         this.resize();
+        this.requestObserverLocation();
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             this.frame = requestAnimationFrame(this.render);
         } else {
             this.draw(performance.now(), false);
         }
+    }
+
+    setFallbackObserver() {
+        this.observer = { latitude: 0, longitude: 0, approximate: true };
+        this.refreshCelestialBodies();
+    }
+
+    requestObserverLocation() {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                if (!Number.isFinite(coords.latitude) || !Number.isFinite(coords.longitude)) return;
+                this.observer = { latitude: coords.latitude, longitude: coords.longitude, approximate: false };
+                this.refreshCelestialBodies();
+            },
+            () => { /* Keep the approximate fallback sky when declined. */ },
+            { enableHighAccuracy: false, maximumAge: 900000, timeout: 8000 }
+        );
+    }
+
+    refreshCelestialBodies(date = new Date()) {
+        const observer = this.observer;
+        if (!observer) return;
+        const days = celestialJulianDay(date) - 2451543.5;
+        const namedStars = [
+            ['Polaris', 37.9546, 89.2641, 1.98, [205, 225, 255]],
+            ['Sirius', 101.2872, -16.7161, 1.46, [220, 232, 255]],
+            ['Vega', 279.2347, 38.7837, 0.03, [205, 225, 255]],
+            ['Arcturus', 213.9154, 19.1825, -0.05, [255, 210, 160]],
+            ['Altair', 297.6958, 8.8683, 0.77, [240, 242, 255]],
+            ['Betelgeuse', 88.7929, 7.4071, 0.5, [255, 184, 145]]
+        ];
+        const bodies = namedStars.map(([name, ra, dec, magnitude, color]) => ({ name, magnitude, color, ...celestialHorizontal(ra, dec, observer.latitude, observer.longitude, date), kind: 'star' }));
+        const sunLongitude = celestialSunLongitude(days);
+        const moon = celestialMoonEquatorial(days);
+        bodies.push({ name: 'Moon', kind: 'moon', magnitude: -12, color: [255, 246, 210], angularDiameter: 0.52, ...celestialHorizontal(moon.ra, moon.dec, observer.latitude, observer.longitude, date), phase: celestialMoonPhase(days) });
+        // Approximate apparent diameters as seen from Earth. The Moon is the
+        // reference disc; planets remain points of light, not oversized icons.
+        for (const [name, color, magnitude, angularDiameter] of [['Venus', [255, 238, 202], -4, 0.025], ['Jupiter', [255, 229, 185], -2, 0.085], ['Mars', [255, 170, 130], 1, 0.012], ['Saturn', [235, 216, 180], 1, 0.018]]) {
+            const equatorial = celestialPlanetEquatorial(days, name.toLowerCase());
+            if (!equatorial) continue;
+            bodies.push({ name, kind: 'planet', color, magnitude, angularDiameter, ...celestialHorizontal(equatorial.ra, equatorial.dec, observer.latitude, observer.longitude, date) });
+        }
+        this.celestialBodies = bodies;
     }
 
     resize() {
@@ -3240,17 +3421,25 @@ class AmbientParticleField {
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const area = window.innerWidth * window.innerHeight;
-        const count = Math.min(220, Math.max(80, Math.round(area / 8500)));
+        const count = Math.min(240, Math.max(100, Math.round(area / 7600)));
         const layerFor = (index) => index < count * 0.52 ? 'background' : index < count * 0.86 ? 'middle' : 'foreground';
+        const starColors = [
+            [198, 224, 255], // hot blue-white
+            [255, 247, 220], // sun-like warm white
+            [255, 211, 175], // cool red/orange giant
+            [226, 239, 255]  // soft white-blue
+        ];
         this.particles = Array.from({ length: count }, (_, index) => {
             const layer = layerFor(index);
             const scale = layer === 'background' ? 0.55 : layer === 'middle' ? 0.9 : 1.25;
+            const magnitude = Math.random() ** 2.4;
             return {
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
             layer,
-            radius: (0.55 + Math.random() * 1.25) * scale,
-            alpha: layer === 'background' ? 0.24 + Math.random() * 0.2 : layer === 'middle' ? 0.42 + Math.random() * 0.36 : 0.52 + Math.random() * 0.34,
+            radius: (0.34 + magnitude * 1.35) * scale,
+            alpha: layer === 'background' ? 0.16 + Math.random() * 0.2 : layer === 'middle' ? 0.3 + Math.random() * 0.34 : 0.42 + Math.random() * 0.38,
+            color: starColors[Math.floor(Math.random() * starColors.length)],
             phase: Math.random() * Math.PI * 2,
             drift: 0.3 + Math.random() * 0.7,
             rotation: Math.random() * Math.PI / 2,
@@ -3258,8 +3447,9 @@ class AmbientParticleField {
             legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
             brightness: 0.78 + Math.random() * 0.42,
             driftX: 0.22 + Math.random() * 0.42,
-            twinkleSpeed: 0.28 + Math.random() * 0.16,
-            isTwinkler: layer !== 'background' && Math.random() < (layer === 'foreground' ? 0.7 : 0.46)
+            twinkleSpeed: 0.65 + Math.random() * 1.2,
+            twinkleDepth: 0.3 + Math.random() * 0.42,
+            isTwinkler: layer !== 'background' && Math.random() < (layer === 'foreground' ? 0.86 : 0.55)
             };
         });
         this.draw(performance.now(), false);
@@ -3288,29 +3478,27 @@ class AmbientParticleField {
         if (!this.ctx) return;
         const width = window.innerWidth;
         const height = window.innerHeight;
+        if (animate && this.observer && Math.floor(timestamp / 60000) !== Math.floor((timestamp - 33) / 60000)) this.refreshCelestialBodies();
         this.ctx.clearRect(0, 0, width, height);
         const time = timestamp * 0.001;
         this.particles.forEach((particle) => {
             const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
             const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
-            const twinklePhase = (time * particle.twinkleSpeed + particle.phase) % (Math.PI * 2);
-            const twinkleProgress = twinklePhase / (Math.PI * 2);
-            // Quick glint, longer bright hold, then a patient fade. The
-            // unsynchronized phases keep the field organic and non-flashing.
+            // Two incommensurate sine waves imitate atmospheric scintillation:
+            // each bright star breathes on its own phase rather than looping in
+            // lockstep with the rest of the field.
             const twinkle = animate && particle.isTwinkler
-                ? twinkleProgress < 0.18
-                    ? 0.62 + (twinkleProgress / 0.18) * 0.38
-                    : twinkleProgress < 0.58
-                        ? 1
-                        : 1 - ((twinkleProgress - 0.58) / 0.42) * 0.38
+                ? 1 - particle.twinkleDepth * (0.5 - 0.5 * (
+                    0.72 * Math.sin(time * particle.twinkleSpeed + particle.phase) +
+                    0.28 * Math.sin(time * particle.twinkleSpeed * 2.37 + particle.phase * 1.71)
+                ))
                 : 1;
             const alpha = Math.min(1, particle.alpha * twinkle * particle.brightness);
+            const color = particle.color.join(', ');
             this.ctx.beginPath();
             this.ctx.shadowBlur = particle.layer === 'foreground' ? 8 : particle.layer === 'middle' ? 4.5 : 1.5;
-            this.ctx.shadowColor = `rgba(190, 220, 255, ${alpha * 0.82})`;
-            // A white core gives the brightest phase of each twinkle a clean
-            // stellar glint while the cooler halo preserves the soft mood.
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            this.ctx.shadowColor = `rgba(${color}, ${alpha * 0.82})`;
+            this.ctx.fillStyle = `rgba(${color}, ${alpha})`;
             const x = particle.x + driftX;
             const y = particle.y + driftY;
             const inner = particle.radius * 0.52;
@@ -3345,7 +3533,153 @@ class AmbientParticleField {
             }
             this.ctx.restore();
         });
+        if (animate) this.drawMeteors(time, width, height);
+        this.drawCelestialBodies(width, height);
         this.ctx.shadowBlur = 0;
+    }
+
+    drawCelestialBodies(width, height) {
+        this.celestialBodies.forEach((body) => {
+            if (body.altitude < 4) return;
+            const x = (body.azimuth / 360) * width;
+            const y = Math.max(28, height * (0.88 - Math.min(body.altitude, 88) / 100));
+            const moonPixelDiameter = 26;
+            const size = body.kind === 'moon'
+                ? moonPixelDiameter
+                : body.kind === 'planet'
+                    ? Math.max(0.9, moonPixelDiameter * (body.angularDiameter / 0.52) * (body.name === 'Jupiter' ? 1.15 : 1))
+                    : Math.max(1.2, 3.4 - body.magnitude * 0.55);
+            const [red, green, blue] = body.color;
+            this.ctx.save();
+            const haloRadius = body.kind === 'moon' ? size * 2.1 : body.kind === 'planet' ? size * 3.8 : size * 2.4;
+            const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.28 : 0.2})`);
+            halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
+            this.ctx.fillStyle = halo;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.shadowBlur = body.kind === 'moon' ? 16 : body.kind === 'planet' ? 8 : 4;
+            this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.52 : 0.72})`;
+            if (body.kind === 'moon') {
+                this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
+            } else {
+                const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
+                planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
+                planetGradient.addColorStop(0.24, `rgba(${red}, ${green}, ${blue}, 0.96)`);
+                planetGradient.addColorStop(1, `rgba(${Math.round(red * 0.52)}, ${Math.round(green * 0.52)}, ${Math.round(blue * 0.52)}, 0.82)`);
+                this.ctx.fillStyle = planetGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                this.ctx.fill();
+                if (body.name === 'Saturn') {
+                    this.ctx.strokeStyle = `rgba(238, 220, 185, 0.72)`;
+                    this.ctx.lineWidth = Math.max(0.45, size * 0.28);
+                    this.ctx.beginPath();
+                    this.ctx.ellipse(x, y, size * 2.1, size * 0.72, -0.22, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+            }
+            const labelKey = CELESTIAL_LABEL_KEYS[body.name];
+            const label = labelKey ? t(labelKey, state.displayLanguage) : body.name;
+            if (label && body.kind !== 'star' || (label && body.kind === 'star' && body.magnitude < 1)) {
+                this.ctx.font = '500 9px Inter, Manjari, sans-serif';
+                this.ctx.letterSpacing = '0.04em';
+                this.ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'star' ? 0.52 : 0.7})`;
+                this.ctx.shadowBlur = 4;
+                this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, 0.38)`;
+                this.ctx.textAlign = x > width * 0.82 ? 'right' : 'left';
+                const labelX = x > width * 0.82 ? x - size - 5 : x + size + 5;
+                this.ctx.fillText(label, labelX, y + 3);
+            }
+            this.ctx.restore();
+        });
+    }
+
+    drawMoonWithBooleanMask(x, y, size, phase) {
+        const buffer = this.moonBuffer;
+        const bufferContext = this.moonBufferContext;
+        if (!bufferContext) return;
+        const center = 64;
+        const radius = 47;
+        bufferContext.setTransform(1, 0, 0, 1, 0, 0);
+        bufferContext.clearRect(0, 0, buffer.width, buffer.height);
+
+        // Boolean algorithm: A = pale lunar disc, B = unlit shadow disc;
+        // render A, then keep A minus B in the offscreen buffer. Only that
+        // result is composited onto the sky, so no dark overlay can survive.
+        const moonGradient = bufferContext.createRadialGradient(center - 13, center - 15, 4, center, center, radius);
+        moonGradient.addColorStop(0, 'rgba(255, 255, 250, 1)');
+        moonGradient.addColorStop(0.55, 'rgba(248, 246, 227, 0.98)');
+        moonGradient.addColorStop(0.88, 'rgba(225, 222, 196, 0.95)');
+        moonGradient.addColorStop(1, 'rgba(184, 181, 160, 0.9)');
+        bufferContext.fillStyle = moonGradient;
+        bufferContext.beginPath();
+        bufferContext.arc(center, center, radius, 0, Math.PI * 2);
+        bufferContext.fill();
+
+        const illumination = (1 - Math.cos(phase * Math.PI * 2)) / 2;
+        if (illumination < 0.985) {
+            const shadowOffset = phase < 0.5
+                ? radius * (1 - illumination * 2)
+                : -radius * (1 - (1 - illumination) * 2);
+            bufferContext.save();
+            bufferContext.globalCompositeOperation = 'destination-out';
+            bufferContext.beginPath();
+            bufferContext.arc(center + shadowOffset, center, radius * 1.025, 0, Math.PI * 2);
+            bufferContext.fill();
+            bufferContext.restore();
+        }
+        this.ctx.save();
+        this.ctx.shadowBlur = 0;
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.drawImage(buffer, x - size, y - size, size * 2, size * 2);
+        this.ctx.restore();
+    }
+
+    drawMeteors(time, width, height) {
+        if (time >= this.nextMeteorAt && this.meteors.length < 2) {
+            const startX = width * (0.18 + Math.random() * 0.72);
+            const startY = height * (0.08 + Math.random() * 0.34);
+            this.meteors.push({
+                startX,
+                startY,
+                angle: Math.PI * (0.62 + Math.random() * 0.1),
+                length: 70 + Math.random() * 90,
+                speed: 420 + Math.random() * 180,
+                bornAt: time,
+                lifetime: 0.85 + Math.random() * 0.45,
+                color: Math.random() < 0.6 ? [205, 231, 255] : [255, 231, 192]
+            });
+            this.nextMeteorAt = time + 8 + Math.random() * 7;
+        }
+        this.meteors = this.meteors.filter((meteor) => {
+            const age = time - meteor.bornAt;
+            if (age >= meteor.lifetime) return false;
+            const progress = age / meteor.lifetime;
+            const distance = age * meteor.speed;
+            const headX = meteor.startX + Math.cos(meteor.angle) * distance;
+            const headY = meteor.startY + Math.sin(meteor.angle) * distance;
+            const tailX = headX - Math.cos(meteor.angle) * meteor.length;
+            const tailY = headY - Math.sin(meteor.angle) * meteor.length;
+            const alpha = Math.sin(Math.PI * progress) * 0.72;
+            const [red, green, blue] = meteor.color;
+            const gradient = this.ctx.createLinearGradient(tailX, tailY, headX, headY);
+            gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
+            gradient.addColorStop(0.72, `rgba(${red}, ${green}, ${blue}, ${alpha * 0.45})`);
+            gradient.addColorStop(1, `rgba(255, 255, 255, ${alpha})`);
+            this.ctx.save();
+            this.ctx.lineWidth = 1.2;
+            this.ctx.strokeStyle = gradient;
+            this.ctx.shadowBlur = 8;
+            this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+            this.ctx.beginPath();
+            this.ctx.moveTo(tailX, tailY);
+            this.ctx.lineTo(headX, headY);
+            this.ctx.stroke();
+            this.ctx.restore();
+            return true;
+        });
     }
 }
 
