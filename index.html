@@ -481,17 +481,16 @@
             </div>
         </div>
 
-        <!-- Restart-only cinematic prelude. Its explicit Play action enters
-             fullscreen when the browser/device permits it. -->
+        <!-- Restart-only cinematic prelude. Fullscreen is user-controlled. -->
         <section id="journey-video-prelude" class="journey-video-prelude hidden" aria-label="Journey introduction" aria-live="polite">
             <img class="journey-video-prelude-meditator" src="video/meditator.png" alt="Meditator preparing for the journey" aria-hidden="true">
             <video id="journey-video-prelude-media" preload="auto" playsinline>
-                <source src="video/Stunning%20New%20Universe%20Fly-Through%20Really%20Puts%20Things%20Into%20Perspective%20%5BnGnX6GkrOgk%5D.webm" type="video/webm">
-                <source src="video/nature-upgrade.mp4" type="video/mp4">
+                <source src="video/generate.mp4" type="video/mp4">
             </video>
             <div class="journey-video-prelude-shade" aria-hidden="true"></div>
             <div id="journey-video-prelude-ready" class="journey-video-prelude-ready">
                 <p data-i18n="ui.journeyVideoPreludeReminder">Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.</p>
+                <p id="journey-video-prelude-loading" class="journey-video-prelude-loading" aria-live="polite" data-i18n="ui.journeyVideoPreludeLoading">Loading the video—please be patient. Begin introduction will appear when playback is ready. <span id="journey-video-prelude-buffer-countdown"></span></p>
                 <button id="play-journey-video-prelude" class="journey-video-prelude-play" type="button" data-i18n="ui.playJourneyVideoPrelude">Begin introduction</button>
             </div>
         </section>
@@ -665,6 +664,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=2.42"></script>
+    <script src="app.js?v=2.52"></script>
 </body>
 </html>

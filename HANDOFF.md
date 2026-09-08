@@ -769,3 +769,147 @@
 - The mantra tail follows the same spatial panner as the dry mantra. It does not enter the background-music or narration buses, so mantra handoff muting and volume controls remain independent.
 - Corrected Music `+`/`−` handling: it now preserves whether the background is full, ducked below narration, or intentionally faded to silence. In particular, it cannot restart music during Box Breathing just by changing the level.
 - Validation: JavaScript/service-worker syntax, background-music, spatial-audio, audio-safety, and no-frequency static contracts, plus `git diff --check`, PASS. No Playwright, screenshots, or browser/manual evidence were used.
+
+### CP-VIDEO-075 — Conversion paused after duplicate encoder load
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Branch: `production`; no commit or push made for this conversion attempt.
+- Objective: create a performance-oriented H.264/AAC MP4 derivative of the original universe fly-through WebM while preserving the original WebM as the primary source of truth/fallback.
+- Environment evidence: local FFmpeg exposes Apple `h264_videotoolbox`, so hardware-assisted H.264 encoding is available after the system restart. No browser or device playback benchmark has been run.
+- Incident: two FFmpeg processes were started concurrently and targeted `video/universe-fly-through-fhd.mp4`. This caused unnecessary sustained system load and left the generated MP4 invalid/incomplete. Both processes were stopped. The source WebM was not modified.
+- Current artifact state: `video/universe-fly-through-fhd.mp4` is an untrusted generated artifact and must not be published or used until it is replaced and validated. Do not start another encoder until no previous FFmpeg process is running.
+- Safety/performance decision: after restart, run one process only, prefer `h264_videotoolbox` with a bounded bitrate and `-movflags +faststart`, validate the finished file, and retain the WebM. Part-by-part conversion is optional for recovery but does not inherently reduce total decode work or heat; it must never run in parallel.
+- Buffering decision: the browser’s safe-start gate should remain separate from encoding. Prebuffering a bounded initial window is useful; attempting to preload the entire FHD file is not required and may increase memory/network pressure.
+- Validation required before release: confirm no active FFmpeg process; replace the invalid derivative; verify complete duration against the source, 1920×1080 (or an explicitly approved lower profile), H.264 video, AAC audio, playable MP4 metadata, and `git diff --check`; run the relevant static video-prelude contract. No Playwright/screenshots unless explicitly requested.
+- Pickup note: after the user restarts/reopens the system, inspect `git status`, `ps -Ao pid=,command= | grep '[f]fmpeg'`, the source WebM, and the generated MP4. If the generated MP4 is still invalid, replace it only through a single controlled hardware-accelerated encode. Update this checkpoint with the final command, file metadata, and validation result before committing or pushing.
+- Unrelated working-tree changes to preserve: `.DS_Store` modifications, deleted `docs/dot.json`, `.codex/`, and `audio/BACKUP/background_music.mp3`. Do not rewrite or restore `docs/dot.json`.
+
+### CP-VIDEO-076 — Validated MP4 activated and Loop project refresh
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Branch: `production`, currently 15 commits ahead of `origin/production`; no commit or push was made during this refresh.
+- Loop activation: reusable instructions root is `Loop/`; target application root is `/Users/lekshmisyam/Desktop/Ikigai/lite`. This is an existing static HTML/CSS/JavaScript PWA with local JSON content, Web Audio, narration, service-worker caching, and npm-based static regression tests. No backend, database, authentication layer, or production build step is present.
+- Environment profile: Darwin 24.1.0, Apple arm64 (`T8103`), Node v25.9.0, npm 11.12.1, FFmpeg/FFprobe from `/opt/homebrew/bin`, approximately 56 GiB free on the project volume. Local listeners include the host control service on ports 5000/7000 and Ollama on 127.0.0.1:11434; no project application server was identified.
+- Documentation reconciliation: `HANDOFF.md` is the compact project context source. `PROJECT-BRIEF.md`, root `TECH-STACK.md`, `DEVELOPMENT-SAFETY.md`, `.codex/context-index.md`, and `.codex/project-map.md` are absent; for this small static project, the existing handoff remains sufficient. Historical `.codex/loop-routing/*.json` records are local routing evidence, not application runtime state.
+- Media result: the original `video/Stunning New Universe Fly-Through Really Puts Things Into Perspective [nGnX6GkrOgk].webm` remains unchanged. The validated `video/universe-fly-through-fhd.mp4` is 1920×1080 H.264 High + AAC stereo, 344.084917 seconds, 183,194,587 bytes, and passed a full decode scan. The prior invalid artifact is retained as `video/universe-fly-through-fhd.mp4.corrupt-backup`.
+- Hardware note: `h264_videotoolbox` and `-allow_sw 1` both failed to create a VideoToolbox compression session (`-12908`). With owner approval, the final derivative was created using bounded two-thread `libx264` software encoding; this is not hardware-accelerated evidence.
+- Runtime wiring: `index.html` now uses `video/universe-fly-through-fhd.mp4` as the primary Restart Journey prelude and retains `video/nature-upgrade.mp4` as the MP4 fallback. The focused journey-video-prelude test was updated to require the converted MP4 and passed.
+- Validation: `static/unit` PASS — journey video prelude contract, `node --check app.js`, `node --check sw.js`, `git diff --check`, `ffprobe` metadata validation, and full FFmpeg decode scan. No Playwright, screenshots, browser, or device playback evidence was run; those remain opt-in and open.
+- Current working-tree changes to preserve: `.DS_Store` modifications, this handoff refresh, the MP4 source/fallback wiring and focused test update, deleted `docs/dot.json`, `.codex/`, `audio/BACKUP/background_music.mp3`, and the validated MP4 plus corrupt backup. Do not restore or rewrite `docs/dot.json`.
+- Next action: owner review of the new MP4 on target devices/browser surfaces; after approval, decide separately whether to stage/commit the intended code, handoff, and media artifacts and whether to push. Do not merge, deploy, or push automatically.
+
+### CP-VIDEO-077 — Lower-bitrate delivery encode
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Re-encoded directly from the original WebM using one bounded two-thread `libx264` process with `-preset fast`, `-crf 26`, `-maxrate 3M`, `-bufsize 6M`, AAC 128 kbps, and `-movflags +faststart`. No parallel encoders or chunk concatenation were used.
+- The active `video/universe-fly-through-fhd.mp4` is now approximately 99 MiB / 103,360,947 bytes, compared with the previous valid 175 MiB derivative, while retaining 1920×1080, H.264 High, AAC stereo, 25 fps, and 344.084917 seconds.
+- Validation: `ffprobe` metadata PASS and full FFmpeg decode scan PASS. The original WebM remains unchanged. The previous valid MP4 is retained as `video/universe-fly-through-fhd.mp4.previous-valid`; the earlier corrupt artifact remains separately retained.
+- Runtime wiring is unchanged: `index.html` already points to the stable filename `video/universe-fly-through-fhd.mp4`. No code change was needed for this media-only optimization.
+- Open risk: actual smoothness still requires browser/device playback evidence. If stutter continues, investigate runtime buffering/network throughput and target-device decode performance before reducing resolution further; Playwright/manual playback remains opt-in.
+
+### CP-VIDEO-078 — Adaptive stable prebuffer gate
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Updated `JourneyVideoPrelude` to wait for a measured, stable buffer before revealing Begin: 20 seconds on healthy connections, 30 seconds below 8 Mbps, 45 seconds below 3 Mbps, and up to 60 seconds for Save-Data/2G conditions. The threshold is based on buffered playback seconds, not a percentage of the file or assumed RAM, and must remain satisfied for two seconds.
+- Added a playback safety guard: if buffered-ahead time falls below eight seconds during the active video, playback pauses and resumes after at least 20 seconds are available. The existing 15-second meditator hold remains, providing additional time for buffering after the guide begins.
+- Rotated delivery identifiers to `app.js?v=2.43` and shell cache `chakra-v5.127` so installed clients receive the buffering logic. Service-worker precaching remains unchanged; it is not used as the first-play buffering mechanism.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. No browser/device playback evidence was run; real smoothness remains an open runtime/manual validation item.
+- Next action: test on target network/device combinations. If stalls persist, add a 720p lower-bitrate rendition and select it for constrained devices/connections rather than increasing the initial buffer indefinitely.
+
+### CP-VIDEO-079 — Prevent slow-buffer timeout from skipping prelude
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Fixed the Begin introduction invisibility/automatic-skip path. A 90-second buffering timeout is no longer treated as `unavailable`; it now reveals Begin and leaves actual media failure handling to the video `error` event.
+- The adaptive stable-buffer gate remains active, so normal playback still waits for the measured 20–60 second target and two-second stability window. The change only prevents slow delivery from silently closing the prelude.
+- Rotated delivery identifiers to `app.js?v=2.44` and shell cache `chakra-v5.128`.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device playback evidence remains open and opt-in.
+
+### CP-VIDEO-080 — Fullscreen playback jerk mitigation
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Changed the prelude video from dynamic `100vw`/`100dvh` sizing to an absolute `inset: 0` layer sized at `100%` of the stable prelude container. Added compositor hints (`translateZ(0)` and `backface-visibility: hidden`) to reduce fullscreen resize/rasterization hitches.
+- Softened the playback rebuffer guard: it now pauses only below four seconds of buffered-ahead media and resumes after fifteen seconds, reducing false pause/resume jerks while retaining protection against a genuine stall.
+- The source remains 25 fps and the validated 1920×1080 MP4 remains unchanged; no unnecessary frame-rate conversion or re-encode was introduced.
+- Rotated delivery identifiers to `app.js?v=2.45` and shell cache `chakra-v5.129`.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device playback evidence remains open; test fullscreen playback on the target device before release.
+
+### CP-VIDEO-081 — Fullscreen requested at Restart gesture
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Moved the persistent `#app` fullscreen request from the delayed Begin introduction action to the confirmed Restart Journey click. The viewport now enters fullscreen before prelude buffering and before the 15-second meditator hold, allowing layout and video sizing to settle before playback.
+- Begin now only starts the cinematic sequence; it no longer triggers a late fullscreen transition. Existing fullscreen exit behavior and fallback handling remain unchanged.
+- Rotated delivery identifiers to `app.js?v=2.46` and shell cache `chakra-v5.130`.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device fullscreen playback evidence remains open.
+
+### CP-VIDEO-082 — Stable crop frame and visible buffer countdown
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Changed the prelude video presentation from `object-fit: contain` to a stable cropped `object-fit: cover` frame sized relative to the fixed prelude container. This preserves the 16:9 proportion while cropping excess edges, reducing fullscreen fit/resizing work.
+- Added localized loading guidance and a live seconds-remaining indicator while the adaptive buffer gate is filling. Begin remains hidden until the stable buffer gate succeeds; the status is hidden when Begin becomes available.
+- Rotated delivery identifiers to `app.js?v=2.47` and shell cache `chakra-v5.131`.
+- Validation: `npm run test:journey-video-prelude`, locale JSON parsing through the focused test, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device evidence remains open.
+
+### CP-VIDEO-084 — Fullscreen compositor stabilization
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Stabilized the fullscreen rendering path by locking `#app:fullscreen` to `100vh`, sizing the prelude to `100%` of that container, and applying layout/paint containment to the prelude and video layers.
+- Removed the loading card’s backdrop blur and shadow while playback is active, reducing unnecessary fullscreen compositor work. The video remains cropped with `object-fit: cover` and its aspect ratio is preserved.
+- Rotated delivery identifiers to `app.js?v=2.48` and shell cache `chakra-v5.132`.
+- Validation: `npm run test:journey-video-prelude`, locale JSON parsing, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device fullscreen evidence remains open.
+
+### CP-VIDEO-085 — Remove automatic fullscreen transitions
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Removed automatic fullscreen entry from Restart Journey and automatic fullscreen exit from Stop/completion paths. Fullscreen is now entirely guide-controlled through the browser/device, so the prelude does not trigger a viewport transition during preparation or playback and does not undo a manually entered fullscreen state.
+- Retained the existing fullscreen lifecycle CSS/class support for user-controlled app fullscreen, but the application no longer calls `requestFullscreen()` or video-specific fullscreen APIs.
+- Rotated delivery identifiers to `app.js?v=2.49` and shell cache `chakra-v5.133`.
+- Validation: `npm run test:journey-video-prelude`, locale JSON parsing, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device playback evidence remains open.
+
+### CP-VIDEO-083 — Correct loading label for Begin introduction
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Corrected the loading guidance so it names the actual action, “Begin introduction,” rather than shortening it to “Begin.” Updated the English, Malayalam, Russian, Hindi, and HTML fallback copy.
+- Validation: `npm run test:journey-video-prelude`, all shipped locale JSON parsing, and `git diff --check` PASS.
+
+### CP-VIDEO-089 — Video folder cleanup
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Removed all other files from `video/`, preserving only `video/generate.mp4` and `video/meditator.png` as requested. The original WebM, previous MP4 renditions, corrupt backup, valid backup, and nature fallback were removed.
+- Removed stale fallback `<source>` entries from `index.html`; `generate.mp4` is now the sole prelude video source. Updated the focused test to enforce the cleaned media contract.
+- Validation: `npm run test:journey-video-prelude` and `git diff --check` PASS. No commit or push was performed.
+
+### CP-VIDEO-086 — Restore full-frame proportioned video
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Restored the prelude video to `object-fit: contain` with an explicit `16 / 9` aspect ratio. The complete original frame is now visible; mismatched screens show black letterboxing instead of cropping or stretching.
+- Manual fullscreen remains available, but the application does not enter or exit fullscreen automatically.
+- Rotated delivery identifiers to `app.js?v=2.50` and shell cache `chakra-v5.134`.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device evidence remains open.
+
+### CP-VIDEO-087 — 720p smoothness test rendition activated
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Created a separate 720p rendition directly from the untouched source WebM using one sequential, bounded two-thread encode: 1280×720, fixed 25 fps, H.264 Main, `-tune fastdecode`, keyframes every 2 seconds, CRF 27, 1.8 Mbps maximum bitrate, AAC stereo 96 kbps, and `+faststart`.
+- The validated rendition is 63,165,171 bytes / approximately 60 MiB, 344.084917 seconds, 1280×720, H.264 Main, AAC stereo, and passed a full decode scan. It is approximately 40% smaller than the 67 MiB WebM and substantially smaller than the 99 MiB 1080p MP4.
+- `index.html` now selects `video/universe-fly-through-720p.mp4` first, followed by the preserved 1080p MP4 and the existing nature fallback. The original WebM remains untouched for later reference.
+- Rotated delivery identifiers to `app.js?v=2.51` and shell cache `chakra-v5.135`.
+- Validation: `ffprobe` metadata, full FFmpeg decode scan, `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, locale JSON parsing, and `git diff --check` PASS. Browser/device smoothness testing remains the next evidence gate.
+
+### CP-VIDEO-088 — Use updated generate.mp4 prelude
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Inspected the owner-provided `video/generate.mp4`: valid 1280×720 H.264 High + AAC stereo, 24 fps, 10.005 seconds, 8,386,322 bytes, approximately 6.7 Mbps. It is a compressed 10-second version of the same visual content and passed metadata inspection.
+- `index.html` now selects `video/generate.mp4` first, followed by the preserved 1080p and 720p universe renditions and the existing nature fallback. Existing longer videos remain intact for later testing.
+- Adjusted buffer countdown and recovery thresholds to cap against the actual clip duration, preventing impossible 15–60 second targets for the 10-second asset.
+- Rotated delivery identifiers to `app.js?v=2.52` and shell cache `chakra-v5.136`.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, locale JSON parsing, and `git diff --check` PASS. Full decode scan and browser/device playback evidence remain recommended before release.
+
+### CP-AUDIT-090 — Read-only resource and requirements audit
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- No files were deleted, restored, committed, or pushed. Current live video assets are intentionally limited to `video/generate.mp4` and `video/meditator.png`; `index.html` and the focused test reference `generate.mp4` as the sole prelude source.
+- Strong cleanup candidates requiring owner confirmation: `symbols/Paschimottanasana.png` (no live reference found), `cloud-planner-sample.csv` (no live reference found), and generated `playwright-report/` plus `test-results/` (ignored, non-runtime artifacts). `.DS_Store` files are OS metadata, but existing modifications remain unrelated state and must not be removed automatically.
+- Protected context: `HANDOFF.md`, `INITIAL-HANDOFF.md`, `Loop/`, `.loop/tracks/premium-script-refinement/`, `.codex/loop-routing/`, `docs/superpowers/`, and the temporary consultation/multilingual architecture notes contain active continuity, requirements, or historical decisions. `audio/BACKUP/` is recovery material; preserve it, including the explicitly noted untracked `audio/BACKUP/background_music.mp3`.
+- `docs/dot.json` remains owner-deleted and must not be restored or rewritten. The consultation architecture remains planning-only; couple support, recording/sharing infrastructure, authenticated access, retention automation, and server-side storage are future scope.
+- Handoff ordering note: the recent video entries are not strictly chronological (`CP-VIDEO-089` appears before `CP-VIDEO-086`–`088`); preserve the entries and use the latest live source/test state as authoritative until a separate documentation-reordering request is approved.
+- Cleanup decision remains pending owner approval. Any deletion should be a separately scoped, reversible pass followed by static tests and `git diff --check`; no merge, deploy, commit, or push is automatic.

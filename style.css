@@ -95,7 +95,8 @@ body {
 #app:fullscreen {
     width: 100vw;
     max-width: none;
-    min-height: 100dvh;
+    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -360,6 +361,7 @@ body {
     background: #000;
     opacity: 0;
     transition: opacity 1.8s ease;
+    contain: layout paint;
 }
 
 .journey-video-prelude.is-visible {
@@ -367,15 +369,20 @@ body {
 }
 
 .journey-video-prelude video {
-    width: 100vw;
-    height: 100dvh;
-    /* Preserve the complete supplied frame in fullscreen. The black stage
-       deliberately becomes cinematic letterboxing on mismatched screens. */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Keep the complete original 16:9 frame. Different screen proportions
+       receive black letterboxing instead of cropping or stretching the video. */
     object-fit: contain;
+    aspect-ratio: 16 / 9;
     background: #000;
-    position: relative;
     z-index: 1;
     opacity: 0;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: strict;
     transition: opacity 2.4s ease;
 }
 
@@ -448,6 +455,11 @@ body {
     line-height: 1.55;
 }
 
+.journey-video-prelude-loading {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem !important;
+}
+
 .journey-video-prelude-play {
     justify-self: center;
     min-width: min(15rem, 100%);
@@ -470,6 +482,13 @@ body {
     opacity: 0;
     transform: translateY(0.75rem);
     pointer-events: none;
+    backdrop-filter: none;
+    box-shadow: none;
+}
+
+#app:fullscreen .journey-video-prelude {
+    width: 100%;
+    height: 100%;
 }
 
 /* Author layout rules must not override the native hidden contract. */
