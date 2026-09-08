@@ -87,6 +87,8 @@
     ,"yogaExperience": "Yoga Experience"
     ,"beginYogaExperience": "Begin Yoga Experience"
     ,"intimateService": "Intimate Service"
+    ,"intimateServiceUnlock": "Tap 4 times to reveal"
+    ,"intimateServiceUnlockProgress": "{{remaining}} more taps to reveal"
     ,"intimateServiceNote": "Select the care stages needed for this guided service. Their order is always Perineal Care, Massage, then Assisted Bathing."
     ,"beginIntimateService": "Begin Intimate Service"
     ,"massageReverseJourneyNote": "Massage wraps a complete Crown-to-Root journey. All seven chakras are included and there is no separate massage timer."

@@ -87,6 +87,8 @@
     "yogaExperience": "Йога-практика",
     "beginYogaExperience": "Начать йога-практику",
     "intimateService": "Интимный уход",
+    "intimateServiceUnlock": "Нажмите 4 раза, чтобы открыть",
+    "intimateServiceUnlockProgress": "Осталось нажатий: {{remaining}}",
     "intimateServiceNote": "Выберите нужные этапы ухода. Их порядок всегда такой: уход за промежностью, массаж, затем помощь при купании.",
     "beginIntimateService": "Начать интимный уход",
     "massageReverseJourneyNote": "Массаж сопровождает полный путь от Коронной до Корневой чакры. Включены все семь чакр; отдельного таймера массажа нет.",

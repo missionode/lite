@@ -43,8 +43,8 @@ assert.match(app, /drawCelestialBodies\(width, height\)/,
     'Calculated celestial bodies should be rendered in the ambient sky.');
 assert.match(app, /CELESTIAL_LABEL_KEYS[\s\S]*?ui\.celestialMoon[\s\S]*?ui\.celestialJupiter[\s\S]*?ui\.celestialSirius/,
     'Prominent celestial bodies should have localized display labels.');
-assert.match(app, /t\(labelKey, state\.displayLanguage\)[\s\S]*?fillText\(label/,
-    'Celestial labels should follow the selected display language and remain subtle.');
+assert.match(app, /t\(labelKey, state\.language\)[\s\S]*?fillText\(label/,
+    'Celestial labels should follow the selected meditation language and remain subtle.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');
 assert.match(app, /Math\.min\(240, Math\.max\(100, Math\.round\(area \/ 7600\)\)\)/,

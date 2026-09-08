@@ -424,7 +424,7 @@ body {
 .journey-video-prelude.is-leaving video,
 .journey-video-prelude.is-leaving .journey-video-prelude-meditator {
     opacity: 0;
-    transition-duration: 1.5s;
+    transition-duration: 0.75s;
 }
 
 .journey-video-prelude-shade {
@@ -1866,6 +1866,21 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
     justify-content: center;
     gap: 0.45rem 0.75rem;
     width: 100%;
+}
+
+.lobby-intimate-service {
+    position: relative;
+    overflow: hidden;
+}
+
+.lobby-intimate-service.is-locked {
+    filter: blur(7px);
+    opacity: 0.62;
+}
+
+.lobby-intimate-service.is-locked > * {
+    pointer-events: none;
+    user-select: none;
 }
 
 .high-energy-duration-control {

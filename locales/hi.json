@@ -87,6 +87,8 @@
     "yogaExperience": "योग अनुभव",
     "beginYogaExperience": "योग अनुभव शुरू करें",
     "intimateService": "अंतरंग सेवा",
+    "intimateServiceUnlock": "दिखाने के लिए 4 बार टैप करें",
+    "intimateServiceUnlockProgress": "दिखाने के लिए {{remaining}} टैप और",
     "intimateServiceNote": "इस निर्देशित सेवा के लिए आवश्यक देखभाल चरण चुनें। क्रम हमेशा पेरिनियल देखभाल, मालिश और फिर सहायता-युक्त स्नान रहेगा।",
     "beginIntimateService": "अंतरंग सेवा शुरू करें",
     "massageReverseJourneyNote": "मालिश में सहस्रार से मूलाधार तक की पूरी यात्रा शामिल है। सभी सात चक्र शामिल होते हैं और मालिश के लिए अलग टाइमर नहीं है।",

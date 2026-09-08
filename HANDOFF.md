@@ -1,5 +1,38 @@
 # Chakra Meditation — Active Handoff
 
+### CP-VIDEO-107 — Meditation-language celestial labels and shorter exit fade
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Celestial labels for the Moon, planets, and named stars now resolve through `state.language`, the selected Meditation Language, instead of `state.displayLanguage`. Settings/UI labels continue to follow Display Language.
+- Reduced the `generate.mp4` final visual/audio fade from 1.5 seconds to 0.75 seconds so the short clip remains fully visible longer before handoff.
+- Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Evidence level is `static`/`unit`; browser/device playback remains open.
+
+### CP-VIDEO-106 — Prevent short-video end-of-clip stall
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Fixed a real prelude edge case: the 10-second `generate.mp4` could pause when roughly 2 seconds remained because recovery required 4 seconds of future buffer, which could never be satisfied near the end of the clip.
+- The rebuffer guard now avoids entering recovery during the final fade window, and native `waiting`/`stalled` events now enter the recovery path explicitly. Resume targets are bounded by the actual remaining duration.
+- The reported `chext_loader.js` `unload` permissions-policy warning and asynchronous message-channel errors are browser-extension messages, not Lite source errors. They should be retested with the extension disabled or in a clean browser profile if console verification is needed.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, and `git diff --check` PASS. Evidence level is `static`/`unit`; browser/device playback remains open.
+
+### CP-VIDEO-105 — Responsive short-prelude buffering
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Reduced the `generate.mp4` startup gate from effectively the full 10-second clip to a measured 4-second buffer, with a 750 ms stability confirmation. Slow-link targets are now capped at 6–8 seconds rather than 30–60 seconds.
+- Retained playback protection: if buffered-ahead time falls below 2 seconds, playback pauses and resumes after 4 seconds are available. Reduced the post-button meditator image hold from 15 seconds to 3 seconds.
+- The MP4 was already valid and fast-start indexed; the delay was caused by the conservative buffer policy and intentional image hold, not file corruption.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Evidence level is `static`/`unit`; browser/device playback remains open.
+
+### Loop refresh — 2026-09-08 (Inner-presence narration and active requirements)
+
+- Existing-project activation completed from `/Users/lekshmisyam/Desktop/Ikigai/lite`. Reusable Loop instructions remain under `/Users/lekshmisyam/Desktop/Ikigai/lite/Loop`; the protected Loop policy and routing documents were read and were not changed.
+- Runtime baseline: static HTML/CSS/JavaScript PWA with Web Audio, Piper/Web Speech narration, local JSON content, service-worker caching, and npm-based unit/contract tests. Host detected as Darwin arm64 with Node v25.9.0.
+- Latest approved delivery is commit `7622c2a` on `production`, and `origin/production` matches it. The four-language inner-presence passage is merged into the existing `intro.gratitude_en`, `intro.gratitude_hi`, `intro.gratitude_ru`, and `intro.gratitude_ml` narration blocks. The temporary `system.innerPresence` field was removed, so no new narration stage or runtime code path exists.
+- Active content requirements: preserve the existing journey order and narration behavior; keep English, Malayalam, Russian, and Hindi aligned; retain trauma-aware, optional, non-forceful language; avoid claims that a divine outcome is guaranteed; preserve all unrelated script fields and facilitator content.
+- Validation for this checkpoint: `scripts.json` JSON parsing and `git diff --check -- scripts.json` PASS. Evidence level is `static`; no browser playback, listening, or Playwright evidence was run.
+- Existing local state remains intentionally isolated: modified application files, `.DS_Store` files, deleted owner-managed `docs/dot.json`, `.codex/`, and untracked `audio/BACKUP/background_music.mp3` were not included in the narration commit and must not be cleaned up or restored without explicit approval.
+- Current Loop next action: treat `production`/`origin/production` at `7622c2a` as the content baseline. For future work, inspect the relevant source/tests first, preserve unrelated edits, run proportionate static/unit validation, update this handoff, and request approval before any merge, push, deployment, deletion, or history rewrite.
+
 ## START
 
 ### Local checkpoint — 2026-09-07 (Cinematic ambient background)
@@ -965,6 +998,22 @@
 - The altitude gate remains physically honest: the Moon and named objects are hidden when genuinely below the visible horizon. The fallback is continuity presentation only and is marked internally as approximate.
 - Rotated delivery identifiers to `app.js?v=2.59` and shell cache `chakra-v5.144`.
 - Validation: `npm run test:visual-effect`, `npm run test:journey-video-prelude`, JavaScript/service-worker syntax, and `git diff --check` PASS. Device location permission and Moon visibility remain open for manual confirmation.
+
+### CP-UX-102 — Four-tap reveal for Intimate Service in Lobby
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- The Lobby’s Intimate Service section is blurred and its controls are disabled on each page load. A visible section-local reveal control requires four deliberate taps; progress text appears after each tap and the section then becomes usable.
+- Existing stored Intimate Service selections are cleared at initialization so stale localStorage cannot bypass the reveal gate. Other Lobby experience controls are unchanged.
+- Added localized reveal/progress copy for English, Malayalam, Russian, and Hindi. Rotated delivery identifiers to `app.js?v=2.60` and shell cache `chakra-v5.145`.
+- Validation required: focused Yoga/Intimate Service contract, visual/video/splash contracts, JavaScript/service-worker syntax, and `git diff --check`. No commit or push was performed for this UX change.
+
+### CP-UX-104 — Hide the Intimate Service reveal affordance
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Removed the visible four-tap reveal button and progress copy. The blurred Intimate Service section in the Lobby is now itself the mystery tap target; four taps on the section unlock its controls.
+- Applied the blur to the complete section container so its border/corners are softened as well as its contents. Inner controls remain pointer-disabled while locked, allowing taps to land on the section without accidental activation.
+- Removed the stale button reference from the unlock handler. Rotated delivery identifiers to `app.js?v=2.62` and shell cache `chakra-v5.147`; no commit or push was performed.
+- Validation required: focused Yoga/Intimate Service contract, visual/video/splash contracts, JavaScript/service-worker syntax, and `git diff --check`.
 
 ### CP-VISUAL-096 — Correct Moon transparency and planetary scale
 

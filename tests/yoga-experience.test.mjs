@@ -36,6 +36,10 @@ assert.match(intimate, /showScreen\(meditationScreen\);[\s\S]*?runSequence\(/, '
 assert.match(intimate, /runSequence\(\{ complete: !state\.assistedBathingEnabled \}\)/, 'Massage should wrap the reverse chakra sequence without a separate timer');
 assert.match(intimate, /runAssistedBathing\(\)/, 'Intimate Service should finish with optional Assisted Bathing');
 assert.match(html, /id="intimate-service-panel"/, 'Intimate Service should be a dedicated Lobby section');
+assert.doesNotMatch(html, /intimate-service-unlock/, 'Intimate Service should not expose a visible reveal control');
+assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.lobby-intimate-service\.is-locked\s*\{[\s\S]*?filter: blur\(7px\)/, 'The complete Intimate Service panel, including corners, should be blurred while locked');
+assert.match(app, /intimateServicePanel\?\.addEventListener\('click', handleIntimateServiceUnlockTap\)/, 'The blurred Lobby section should be the hidden reveal target');
+assert.match(app, /intimateServiceTapCount \+= 1[\s\S]*?remaining = 4 - intimateServiceTapCount[\s\S]*?setIntimateServiceLocked\(false\)/, 'Intimate Service should unlock after four taps');
 assert.doesNotMatch(html, /id="reverse-journey-toggle"/, 'normal Settings must not offer Reverse Journey');
 assert.doesNotMatch(html, /id="time-massage"/, 'Massage must not expose a standalone duration');
 assert.match(app, /\['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'\]/, 'Massage should force all chakras in Crown-to-Root order');
@@ -56,7 +60,7 @@ for (const locale of [english, malayalam]) {
     for (const key of ['roadmapRestBeforeYoga', 'bathToYogaRestTitle', 'bathToYogaRestGuidance', 'restReadyToContinue', 'beginYogaAfterRest', 'guideReadyForNextSession', 'guideReadyForNextSessionGuidance', 'proceedToNextSession']) {
         assert.ok(locale.ui[key], `missing guide-rest locale key: ${key}`);
     }
-    for (const key of ['intimateService', 'intimateServiceNote', 'beginIntimateService', 'massageReverseJourneyNote', 'roadmapMassageReverse']) {
+    for (const key of ['intimateService', 'intimateServiceNote', 'intimateServiceUnlock', 'intimateServiceUnlockProgress', 'beginIntimateService', 'massageReverseJourneyNote', 'roadmapMassageReverse']) {
         assert.ok(locale.ui[key], `missing Intimate Service locale key: ${key}`);
     }
 }

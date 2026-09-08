@@ -61,15 +61,19 @@ const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 // The supplied generate.mp4 is only about ten seconds long. Keep nearly the
-// entire clip visible and dissolve only across its final 1.5 seconds.
-const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 1.5;
+// entire clip visible and dissolve only across its final 0.75 seconds.
+const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0.75;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
-const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 15;
-const JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS = 20;
-const JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS = 60;
-const JOURNEY_VIDEO_PRELUDE_BUFFER_STABILITY_MS = 2000;
-const JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS = 4;
-const JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS = 15;
+// Keep the short generated prelude responsive: a few seconds of measured
+// reserve is enough to reveal the guide control without waiting for the full
+// clip, while playback still pauses and recovers if the connection falls
+// behind later.
+const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 3;
+const JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS = 4;
+const JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS = 8;
+const JOURNEY_VIDEO_PRELUDE_BUFFER_STABILITY_MS = 750;
+const JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS = 2;
+const JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS = 4;
 const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.";
 
 const CELESTIAL_DEG = Math.PI / 180;
@@ -3581,7 +3585,7 @@ class AmbientParticleField {
                 }
             }
             const labelKey = CELESTIAL_LABEL_KEYS[body.name];
-            const label = labelKey ? t(labelKey, state.displayLanguage) : body.name;
+            const label = labelKey ? t(labelKey, state.language) : body.name;
             if (label && body.kind !== 'star' || (label && body.kind === 'star' && body.magnitude < 1)) {
                 this.ctx.font = '500 9px Inter, Manjari, sans-serif';
                 this.ctx.letterSpacing = '0.04em';
@@ -3778,8 +3782,8 @@ class JourneyVideoPrelude {
             return JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS;
         }
         if (Number.isFinite(connection?.downlink)) {
-            if (connection.downlink < 3) return 45;
-            if (connection.downlink < 8) return 30;
+            if (connection.downlink < 3) return 8;
+            if (connection.downlink < 8) return 6;
         }
         return JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS;
     }
@@ -3882,6 +3886,8 @@ class JourneyVideoPrelude {
                 this.media.removeEventListener('timeupdate', onTimeUpdate);
                 this.media.removeEventListener('progress', onProgress);
                 this.media.removeEventListener('canplay', onProgress);
+                this.media.removeEventListener('waiting', onWaiting);
+                this.media.removeEventListener('stalled', onWaiting);
                 this.media.removeEventListener('ended', onEnded);
                 this.media.removeEventListener('error', onError);
                 this.playButton?.removeEventListener('click', onPlay);
@@ -3915,6 +3921,11 @@ class JourneyVideoPrelude {
                     void beginExit(JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS);
                     return;
                 }
+                // Do not enter recovery during the final rebuffer window. A
+                // short clip cannot ever accumulate a four-second reserve
+                // when less than two seconds remain, which would otherwise
+                // leave the media paused forever near the end.
+                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS) return;
                 if (!isWaitingForBuffer && this.getBufferedAheadSeconds() < JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS) {
                     isWaitingForBuffer = true;
                     this.media.pause();
@@ -3922,10 +3933,18 @@ class JourneyVideoPrelude {
             };
             const onEnded = () => { void complete('ended', JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS); };
             const onError = () => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); };
+            const onWaiting = () => {
+                if (!hasStarted || settled) return;
+                const remaining = this.media.duration - this.media.currentTime;
+                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS) return;
+                isWaitingForBuffer = true;
+            };
             const onProgress = () => {
                 const resumeTarget = Math.min(
                     JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS,
-                    Number.isFinite(this.media.duration) ? Math.max(2, this.media.duration) : JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS
+                    Number.isFinite(this.media.duration)
+                        ? Math.max(0.5, this.media.duration - this.media.currentTime)
+                        : JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS
                 );
                 if (!isWaitingForBuffer || this.getBufferedAheadSeconds() < resumeTarget) return;
                 isWaitingForBuffer = false;
@@ -3948,6 +3967,8 @@ class JourneyVideoPrelude {
             this.media.addEventListener('timeupdate', onTimeUpdate);
             this.media.addEventListener('progress', onProgress);
             this.media.addEventListener('canplay', onProgress);
+            this.media.addEventListener('waiting', onWaiting);
+            this.media.addEventListener('stalled', onWaiting);
             this.media.addEventListener('ended', onEnded);
             this.media.addEventListener('error', onError);
             this.playButton?.addEventListener('click', onPlay, { once: true });
@@ -6751,6 +6772,9 @@ function attachEventListeners() {
         document.getElementById('massage-toggle'),
         document.getElementById('assisted-bathing-toggle')
     ].filter(Boolean);
+    const intimateServicePanel = document.getElementById('intimate-service-panel');
+    let intimateServiceUnlocked = false;
+    let intimateServiceTapCount = 0;
 
     function clearIntimateService() {
         intimateServiceToggles.forEach(toggle => { toggle.checked = false; });
@@ -6761,6 +6785,32 @@ function attachEventListeners() {
         localStorage.setItem('chakra_intimate_massage', 'false');
         localStorage.setItem('chakra_intimate_assisted_bathing', 'false');
     }
+
+    function setIntimateServiceLocked(isLocked) {
+        intimateServiceUnlocked = !isLocked;
+        if (intimateServicePanel) intimateServicePanel.classList.toggle('is-locked', isLocked);
+        intimateServiceToggles.forEach(toggle => {
+            toggle.disabled = isLocked;
+            toggle.setAttribute('aria-disabled', String(isLocked));
+        });
+    }
+
+    function handleIntimateServiceUnlockTap() {
+        if (intimateServiceUnlocked) return;
+        intimateServiceTapCount += 1;
+        const remaining = 4 - intimateServiceTapCount;
+        if (remaining <= 0) {
+            setIntimateServiceLocked(false);
+            return;
+        }
+        intimateServicePanel?.setAttribute('data-unlock-progress', String(remaining));
+    }
+
+    // Sensitive Lobby controls are opt-in per page load and cannot be
+    // activated by stale localStorage state alone.
+    clearIntimateService();
+    setIntimateServiceLocked(true);
+    intimateServicePanel?.addEventListener('click', handleIntimateServiceUnlockTap);
 
     function isIntimateServiceToggle(target) {
         return intimateServiceToggles.includes(target);
