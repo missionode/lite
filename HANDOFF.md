@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### CP-VIDEO-108 — Ultra-short prelude exit fade
+
+- Date: 2026-09-08 (Asia/Kolkata).
+- Reduced the `generate.mp4` final visual/audio fade from 0.75 seconds to 0.25 seconds, keeping the 10-second clip visible until its final quarter-second before the journey handoff.
+- Validation: `npm run test:journey-video-prelude`, `node --check app.js`, `node --check sw.js`, and `git diff --check` PASS. Browser/device playback remains the final visual check.
+
 ### CP-VIDEO-107 — Meditation-language celestial labels and shorter exit fade
 
 - Date: 2026-09-08 (Asia/Kolkata).

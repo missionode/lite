@@ -61,8 +61,8 @@ const NARRATION_MANTRA_FADE_SECONDS = 5;
 const PIPER_CANCEL_FADE_SECONDS = 0.12;
 const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2.4;
 // The supplied generate.mp4 is only about ten seconds long. Keep nearly the
-// entire clip visible and dissolve only across its final 0.75 seconds.
-const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0.75;
+// entire clip visible and dissolve only across its final 0.25 seconds.
+const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0.25;
 const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1.2;
 // Keep the short generated prelude responsive: a few seconds of measured
 // reserve is enough to reveal the guide control without waiting for the full

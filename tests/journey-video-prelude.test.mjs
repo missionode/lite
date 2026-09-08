@@ -21,7 +21,7 @@ assert.match(css, /#app:fullscreen\s*\{[\s\S]*?height:\s*100vh[\s\S]*?min-height
 assert.match(css, /#app:fullscreen \.journey-video-prelude\s*\{[\s\S]*?width:\s*100%[\s\S]*?height:\s*100%/, 'the prelude should fill the stable fullscreen container');
 assert.match(css, /\.journey-video-prelude\.is-playing \.journey-video-prelude-ready[\s\S]*?backdrop-filter:\s*none[\s\S]*?box-shadow:\s*none/, 'playback should remove expensive loading-card compositing');
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
-assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0\.75/);
+assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0\.25/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS = 3/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS = 4/);
@@ -42,7 +42,7 @@ assert.match(css, /\.journey-video-prelude\.is-playing,[\s\S]*?cursor: none/, 't
 assert.match(app, /is-meditator[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?is-video/, 'the meditator image should dissolve into the video after a short hold');
 assert.match(app, /this\.media\?\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering');
 assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: 1[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly');
-assert.match(css, /\.journey-video-prelude\.is-leaving[\s\S]*?transition-duration:\s*0\.75s/, 'the short prelude should dissolve only across its final 0.75 seconds');
+assert.match(css, /\.journey-video-prelude\.is-leaving[\s\S]*?transition-duration:\s*0\.25s/, 'the short prelude should dissolve only across its final 0.25 seconds');
 assert.match(html, /id="settings-vol-video"[^>]*min="0\.02"[^>]*max="0\.5"[\s\S]*?id="preview-video-audio"/, 'Settings should provide a safe dedicated Video Volume control and preview action');
 assert.match(app, /volVideo: clampAudioLevel\(storedNumber\('chakra_vol_video', 0\.20\), 0\.02, 0\.5, 0\.20\)/, 'Video Volume should persist independently in local storage');
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?async previewAudio\(\)[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(state\.volVideo, 0\.25\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'preview and actual video playback should use the independent Video Volume');

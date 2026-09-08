@@ -424,7 +424,7 @@ body {
 .journey-video-prelude.is-leaving video,
 .journey-video-prelude.is-leaving .journey-video-prelude-meditator {
     opacity: 0;
-    transition-duration: 0.75s;
+    transition-duration: 0.25s;
 }
 
 .journey-video-prelude-shade {
