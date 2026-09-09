@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.86">
+    <link rel="stylesheet" href="style.css?v=1.89">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -147,6 +147,10 @@
                     <option value="holographic" data-i18n="ui.visualEffectHolographic">Holographic</option>
                     <option value="depth" data-i18n="ui.visualEffectDepth">Sacred Depth</option>
                 </select>
+                <label class="checkbox-label" for="narration-scroll-toggle">
+                    <input type="checkbox" id="narration-scroll-toggle" checked>
+                    <span data-i18n="ui.showNarrationText">Show scrolling narration text</span>
+                </label>
             </div>
 
             <p style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 1rem;">
@@ -203,6 +207,16 @@
                 </div>
             </div>
 
+            <div class="config-group settings-about">
+                <h2 data-i18n="ui.aboutApp">About</h2>
+                <button id="app-version-unlock" type="button" class="secondary-btn">
+                    <span data-i18n="ui.appVersion">App version</span> <span>2.81</span>
+                </button>
+                <label id="advanced-features-control" class="checkbox-label" hidden>
+                    <input id="advanced-features-toggle" type="checkbox">
+                    <span data-i18n="ui.advancedFeatures">Advanced features</span>
+                </label>
+            </div>
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
             <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
         </section>
@@ -214,7 +228,7 @@
                 <label for="experiment-activity" data-i18n="ui.experimentActivity">Activity</label>
                 <select id="experiment-activity">
                     <optgroup id="experiment-guided-group" label="Guided practice"><option value="chakra:root" data-i18n="ui.root">Root</option><option value="chakra:sacral" data-i18n="ui.sacral">Sacral</option><option value="chakra:solar" data-i18n="ui.solar">Solar</option><option value="chakra:heart" data-i18n="ui.heart">Heart</option><option value="chakra:throat" data-i18n="ui.throat">Throat</option><option value="chakra:thirdeye" data-i18n="ui.thirdEye">Third Eye</option><option value="chakra:crown" data-i18n="ui.crown">Crown</option><option value="hrim">HRIM</option><option value="box" data-i18n="ui.boxBreathingExperience">Box Breathing</option><option value="hooponopono" data-i18n="ui.hooponoponoExperience">Ho’oponopono</option><option value="corpse" data-i18n="ui.corpsePose">Savasana</option></optgroup>
-                    <optgroup id="experiment-care-group" label="Care"><option value="perineal" data-i18n="ui.perinealCare">Perineal Care</option><option value="bath" data-i18n="ui.bathSession">Bath Session</option><option value="assisted-bath" data-i18n="ui.assistedBathing">Assisted Bathing</option></optgroup>
+                    <optgroup id="experiment-care-group" label="Care" hidden disabled><option value="perineal" data-i18n="ui.perinealCare">Perineal Care</option><option value="bath" data-i18n="ui.bathSession">Bath Session</option><option value="assisted-bath" data-i18n="ui.assistedBathing">Assisted Bathing</option></optgroup>
                 </select>
             </div>
             <div id="experiment-core-duration-group" class="config-group settings-panel">
@@ -368,7 +382,7 @@
             </div>
             <div id="yoga-experience-panel-host" aria-live="polite"></div>
 
-            <section id="intimate-service-panel" class="config-group lobby-intimate-service" aria-live="polite">
+            <section id="intimate-service-panel" class="config-group lobby-intimate-service" aria-live="polite" hidden>
                 <label data-i18n="ui.intimateService">Intimate Service</label>
                 <p class="mixer-note" data-i18n="ui.intimateServiceNote">Select the care stages needed for this guided service. Their order is always Perineal Care, Massage, then Assisted Bathing.</p>
                 <div class="experience-mode-options">
@@ -665,7 +679,7 @@
         </div>
     </div>
     <script src="night-sky.js?v=1.0"></script>
-    <script src="celestial-presence.js?v=1.0"></script>
-    <script src="app.js?v=2.71"></script>
+    <script src="celestial-presence.js?v=1.1"></script>
+    <script src="app.js?v=2.81"></script>
 </body>
 </html>

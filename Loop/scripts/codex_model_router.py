@@ -35,10 +35,24 @@ GLOBAL_FAILURE_MARKERS = (
     "purchase more credits",
     "upgrade to pro",
 )
+TASK_CLASSES = {
+    "simple",
+    "focused",
+    "standard",
+    "reasoning",
+    "high-risk",
+    "large-context",
+    "browser",
+}
+AUTO_TASK_CLASS = "auto"
 
 
 class RoutingError(RuntimeError):
     pass
+
+
+def _contains_any(text: str, needles: Iterable[str]) -> bool:
+    return any(needle in text for needle in needles)
 
 
 def load_policy(path: Path) -> Dict[str, Any]:
@@ -62,6 +76,117 @@ def candidates_for(policy: Dict[str, Any], task_class: str) -> List[Dict[str, st
         if not candidate.get("model") or candidate.get("effort") not in allowed_efforts:
             raise RoutingError(f"Invalid candidate in route: {task_class}")
     return candidates
+
+
+def classify_task(prompt: str) -> str:
+    """Infer the smallest capable routing lane from a bounded task prompt."""
+    text = " ".join(prompt.lower().split())
+    if not text:
+        raise RoutingError("Cannot auto-classify an empty bounded task prompt")
+
+    high_risk_terms = (
+        "production",
+        "deploy",
+        "push",
+        "release",
+        "security",
+        "privacy",
+        "auth",
+        "permission",
+        "token",
+        "secret",
+        "payment",
+        "billing",
+        "migration",
+        "rollback",
+        "recovery",
+        "delete",
+        "destructive",
+        "data loss",
+        "legal",
+        "medical",
+        "financial",
+    )
+    large_context_terms = (
+        "whole app",
+        "entire app",
+        "full project",
+        "all files",
+        "every flow",
+        "complete review",
+        "audit everything",
+        "repository map",
+        "architecture map",
+    )
+    browser_terms = (
+        "browser",
+        "playwright",
+        "screenshot",
+        "responsive",
+        "mobile",
+        "desktop",
+        "visual",
+        "ui",
+        "layout",
+        "canvas",
+        "webgl",
+        "animation",
+    )
+    reasoning_terms = (
+        "architecture",
+        "algorithm",
+        "root cause",
+        "diagnose",
+        "debug",
+        "complex",
+        "race",
+        "concurrency",
+        "performance",
+        "refactor",
+        "research",
+        "compare",
+        "design",
+        "strategy",
+    )
+    focused_terms = (
+        "small",
+        "tiny",
+        "copy",
+        "wording",
+        "label",
+        "opacity",
+        "color",
+        "rename",
+        "one file",
+        "single file",
+        "minor",
+    )
+    simple_terms = (
+        "format",
+        "extract",
+        "summarize",
+        "count",
+        "list",
+        "find",
+        "grep",
+        "search",
+        "status",
+        "diff",
+    )
+
+    if _contains_any(text, high_risk_terms):
+        return "high-risk"
+    if _contains_any(text, large_context_terms) or len(prompt) > 12000:
+        return "large-context"
+    if _contains_any(text, browser_terms):
+        return "browser"
+    if _contains_any(text, reasoning_terms):
+        return "reasoning"
+    if _contains_any(text, focused_terms):
+        return "focused"
+    if _contains_any(text, simple_terms) and len(prompt) < 2000:
+        return "simple"
+    return "standard"
 
 
 def build_command(
@@ -194,7 +319,12 @@ def public_plan(
 
 def execute_route(args: argparse.Namespace, policy: Dict[str, Any]) -> int:
     project_root = args.project_root.resolve()
-    candidates = candidates_for(policy, args.task_class)
+    prompt: Optional[str] = None
+    task_class = args.task_class
+    if task_class == AUTO_TASK_CLASS:
+        prompt = read_prompt(args.prompt_file)
+        task_class = classify_task(prompt)
+    candidates = candidates_for(policy, task_class)
     route_id = args.route_id or f"route-{time.strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:8]}"
     first_command = build_command(
         args.codex_bin, args.mode, candidates[0], project_root, args.session_id
@@ -204,7 +334,7 @@ def execute_route(args: argparse.Namespace, policy: Dict[str, Any]) -> int:
             json.dumps(
                 public_plan(
                     route_id,
-                    args.task_class,
+                    task_class,
                     args.mode,
                     candidates,
                     first_command,
@@ -218,14 +348,16 @@ def execute_route(args: argparse.Namespace, policy: Dict[str, Any]) -> int:
     if shutil.which(args.codex_bin) is None:
         raise RoutingError(f"Codex executable not found: {args.codex_bin}")
 
-    prompt = read_prompt(args.prompt_file)
+    if prompt is None:
+        prompt = read_prompt(args.prompt_file)
     if not prompt.strip():
         raise RoutingError("The bounded task prompt is empty")
-    child_prompt = routed_prompt(prompt, route_id, args.task_class)
+    child_prompt = routed_prompt(prompt, route_id, task_class)
     record: Dict[str, Any] = {
         "routeId": route_id,
         "routeState": "DISPATCHING",
-        "taskClass": args.task_class,
+        "taskClass": task_class,
+        "autoClassified": args.task_class == AUTO_TASK_CLASS,
         "mode": args.mode,
         "session": args.session_id,
         "promptSha256": prompt_digest(prompt),
@@ -331,7 +463,12 @@ def execute_route(args: argparse.Namespace, policy: Dict[str, Any]) -> int:
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description="Internal Loop Codex model adapter")
-    result.add_argument("--task-class", required=True)
+    result.add_argument(
+        "--task-class",
+        choices=sorted(TASK_CLASSES | {AUTO_TASK_CLASS}),
+        default=AUTO_TASK_CLASS,
+        help="Use auto to infer task intensity from the bounded prompt.",
+    )
     result.add_argument("--mode", choices=("new", "fork", "resume"), default="new")
     result.add_argument("--session-id")
     result.add_argument("--project-root", type=Path, default=Path.cwd())

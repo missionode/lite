@@ -37,9 +37,9 @@ assert.match(intimate, /runSequence\(\{ complete: !state\.assistedBathingEnabled
 assert.match(intimate, /runAssistedBathing\(\)/, 'Intimate Service should finish with optional Assisted Bathing');
 assert.match(html, /id="intimate-service-panel"/, 'Intimate Service should be a dedicated Lobby section');
 assert.doesNotMatch(html, /intimate-service-unlock/, 'Intimate Service should not expose a visible reveal control');
-assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.lobby-intimate-service\.is-locked\s*\{[\s\S]*?filter: blur\(7px\)/, 'The complete Intimate Service panel, including corners, should be blurred while locked');
-assert.match(app, /intimateServicePanel\?\.addEventListener\('click', handleIntimateServiceUnlockTap\)/, 'The blurred Lobby section should be the hidden reveal target');
-assert.match(app, /intimateServiceTapCount \+= 1[\s\S]*?remaining = 4 - intimateServiceTapCount[\s\S]*?setIntimateServiceLocked\(false\)/, 'Intimate Service should unlock after four taps');
+assert.match(html, /id="intimate-service-panel"[^>]*hidden/, 'Intimate Service is hidden before initialization');
+assert.match(app, /versionUnlockButton\?\.addEventListener\('click', handleIntimateServiceUnlockTap\)/, 'App version is the reveal target');
+assert.match(app, /intimateServiceTapCount \+= 1[\s\S]*?remaining = 7 - intimateServiceTapCount[\s\S]*?setIntimateServiceLocked\(false\)/, 'Intimate Service should unlock after seven taps');
 assert.doesNotMatch(html, /id="reverse-journey-toggle"/, 'normal Settings must not offer Reverse Journey');
 assert.doesNotMatch(html, /id="time-massage"/, 'Massage must not expose a standalone duration');
 assert.match(app, /\['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'\]/, 'Massage should force all chakras in Crown-to-Root order');

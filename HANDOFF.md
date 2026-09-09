@@ -1,22 +1,90 @@
 # Chakra Meditation — Active Handoff
 
+### Production release preparation — 2026-09-09
+
+- User authorized merge/push of accumulated workspace changes. Origin production fetched; HEAD and origin/production both at 988af6c before this release, so no divergent branch merge required.
+- All non-browser test commands run: all pass except the established missing `docs/dot.json` fixture in content-safety/drone-duration and the Hindi test's obsolete hard-coded delivery versions. Syntax and diff checks pass; atlas generated. Browser/device verification remains unavailable/unperformed as recorded below.
+- Release includes local routing, performance/audio/narration/sky refinements, optional narration text, seven-tap shared care unlock, translations and synchronized atlas. Exclude `.codex/` and `audio/BACKUP/background_music.mp3`. Earlier “not pushed” notes describe implementation checkpoints; this entry records release preparation, with push outcome reported in the conversation.
+
+### Drone signal quality — local, 2026-09-09
+
+- Removed main-pitch LFO and modulation gain: approved frequencies now remain unmodulated, saving two nodes per ordinary drone. Main sine low-pass cutoff moved from 1.1× to 4× pitch, capped at 45% sample rate, reducing unnecessary fundamental attenuation; six-second entry and existing levels retained. No new harmonics or frequency presets.
+- Added end cleanup for ordinary/sleep main tones, stereo support pairs and their filters/panners/gains, Shot and guided cue nodes. Main-drone stop holds an active gain ramp where supported (MDN AudioParam.cancelAndHoldAtTime; explicit compatibility fallback retained). Shots honor zero volume; muted guided cues skip; nonfinite duration rejected.
+- New mock test checks exact pitches, 50 repeated cleanup cycles, Sleep and true-mute behavior. No Frequency, zero-volume and transition checks pass. `audio` map updated. Full drone-duration suite still depends on missing owner-managed docs/dot.json; not recreated. No device listening/CPU measurement. App 2.81 / shell 5.167; not pushed.
+
+### Spatial refinement — local, 2026-09-09
+
+- Primary drone/music/mantra positions now stay in front in all modes; headphone and room layouts avoid previous rear placement. Drone sway slowed from 0.03 to 0.018 Hz and reduced to Stereo 0.18 / Headphones 0.06 / Room 0.08; Off stays zero. Music spatial bus also carries prelude video and Music Space. Narration/bells remain centered; no new processing nodes, timers or loops.
+- Spatial parameters hold current automation when supported, then ramp. Fallback stereo pan derives from source bearing rather than raw x. Reapplying the same mode does not restart positioning; active ambience approaches from its current depth instead of jumping back, including a 1.2-second return for Off. First ambience starts retain their intended approach.
+- Updated audio map; effect matrix, front-placement, repeated-setting and fallback-bearing checks pass. Actual speaker/headphone listening remains unverified. App 2.80 / shell 5.166; not pushed.
+
+### Narration Voice Space refinement — local, 2026-09-09
+
+- Reduced voice reverb impulse from 4.5 to 3.2 seconds (about 29% fewer stored impulse samples; no measured CPU claim). Added a 180 Hz high-pass on the wet send only; preserved dry voice. Fixed 35 ms pre-delay avoids delay pitch sweeps on preset changes. Light uses 12% return with 3 kHz damping, Spacious 18% with 3.6 kHz damping. Existing Off and Spatial independence retained.
+- Warmth/Clarity inputs now clamp to 0–100 with neutral invalid-input fallback. Tone and reverb parameter changes hold current automation where supported before 250 ms ramps. No polling/analyser or additional convolver added. Applies to Piper only; browser speech remains outside Web Audio.
+- Audio effects matrix, input bounds, fixed-delay, zero-volume, transition and spatial contracts checked. Updated `audio` map. Listening comparison and device performance unverified. Delivery app 2.79 / shell 5.165; local, not pushed.
+
+### Meteor visibility adjustment — local, 2026-09-09
+
+- User screenshot confirms visible sky, but a still image cannot verify animation. First meteor now appears after 5–9 visible seconds; wide-screen paths start beside central controls. Slightly brighter 1.8 px cached trail and 0.75–1.05 second flight improve visibility. Subsequent cadence remains 25–70 seconds, one meteor maximum; reduced motion still respected. No new loop or per-frame gradient. Updated `visuals` map; unit checks passed, no device visual confirmation. App 2.78, shell 5.164; not pushed.
+
+### Experiment care unlock consistency — local fix, 2026-09-09
+
+- Experiment Mode now shares the session-only Advanced features unlock. Care optgroup starts hidden/disabled and is detached while locked, then reattached with current translations on seven-tap unlock. Re-lock removes it, resets care selection to Root and refreshes duration controls. `startExperiment` rejects locked perineal/bath/assisted-bath requests before side effects. Regular experiments remain available.
+- Expanded unlock tests cover picker removal/restoration, stale selection reset and direct execution rejection. Updated `experiments` map. Delivery: app 2.77, shell cache 5.163. Local/uncommitted, not pushed; no browser/device verification.
+
+### Seven-tap unlock and restrained meteors — local update, 2026-09-09
+
+- Settings → About → App version now accepts seven rapid clicks/keyboard activations, with a 1.5-second inter-tap reset; taps 1–4 silent, 5–6 countdown toasts, 7 confirmation. Intimate Service is hidden and disabled on each reload. After unlocking, the Advanced features switch is visible; OFF clears care selections and relocks. Mode/Shot visibility updates cannot reveal a locked panel. No authentication or persistent unlock added. Four-language labels included; held-key repeats suppressed.
+- Meteors now first appear after 15–40 seconds and repeat every 25–70 seconds, at most one active. Tail length/speed scale down for small viewports; quick emergence and restrained variable brightness fade into a 180 ms residual. A 256×12 cached glow sprite avoids per-frame gradients/shadow blur; no idle meteor array filtering. Existing hidden-page/reduced-motion cancellation remains.
+- Updated `modes` and `visuals` atlas descriptions. Unlock timeout/countdown/relock/reload and Yoga contract tests passed. No browser/device visual verification; prior atlas browser launch remains sandbox-blocked. Local/uncommitted, not pushed. Delivery: app 2.76, stylesheet 1.89, shell 5.162, language v25.
+
+### Optional narration text — local update, 2026-09-09
+
+- Settings under Meditation Visual Effect now offers “Show scrolling narration text”, default ON. Save persists `chakra_show_narration_text`; startup restores it. OFF hides all three narration surfaces and skips their layout/animation scheduling, without muting speech or changing timing. Translated in English, Malayalam, Russian and Hindi.
+- Updated `narration` map. Delivery: app 2.74, stylesheet 1.88, shell cache 5.160, language cache v24. Local/uncommitted, not pushed. Narration contract and syntax checks pass; atlas regenerated. Device/browser verification remains unperformed.
+
+### Long audio and narration — local fixes, 2026-09-09
+
+- Fixed timer-dependent repeat underruns by baking the existing equal-power overlap into reusable PCM and using one native looping source per layer. First entry preserves original head audio; loopStart skips the head already blended into the tail. No recurring loop scheduling timers or accumulating paused sources. Independent volume and explicit stop fades remain; prepared PCM adds one reusable buffer per original/overlap variant and is weakly keyed by the original buffer.
+- Elemental stage stop now stops its LFO as well as noise. Noise end disconnects the filter, gain and both modulation gains. Piper now decodes and normalizes ahead in its bounded sentence queue; cancellation generation and activity/pause checks prevent stale prepared clips starting. Narration scroll remains: it was not the repeated phonemizer initialization identified in review. Deliberate sentence and exit pauses remain.
+- Added BoundedPhonemizer: real CLI WASM reuse capped at eight calls or 8,192 cumulative characters, then retirement; retire on failure. Indefinite reuse is unsafe because this bundled callMain allocates stack without exporting restoration. Real local WASM tests verified stable English/Malayalam/Russian phonemes across 64 calls, eight initializations, and retirement after large input. This is not an end-to-end ONNX or device listening benchmark. Inference input/output tensors are disposed in finally after WAV conversion.
+- Tests passed: native PCM/crossfade boundaries, timer independence, one-source tracking, cached reuse, elemental LFO stop, decode-ahead and cancellation; existing narrator ticker, audio safety, spatial/effect controls, background music and prelude checks. Atlas `audio` and `narration` descriptions updated and visual source references refreshed. Browser atlas validation remains unavailable due to the previously recorded sandbox launch failure.
+- Delivery: app 2.73, shell cache 5.159, Piper cache v9 (runtime import update). Local/uncommitted, not pushed. Actual heat reduction, full neural synthesis, and long-session listening still require target-device verification. OS audio suspension and silence inside recordings are outside the timer fix.
+- Extra language checks: Russian and language-intention pass. Hindi assertions reach a pre-existing hard-coded delivery-version check expecting app 2.62 / shell 5.147 / language v22; current versions already exceeded those before this pass. That unrelated stale version contract remains unfixed; do not report the entire suite as passing.
+
+### Performance optimization — local update
+
+- Date: 2026-09-09. Investigated the reported device heat through source review. Found repeated celestial gradients/text/blur per frame, display-rate callbacks in both capped renderers, per-frame Sacred Depth layout reads, and temporary audio connections without explicit end cleanup. These are avoidable work, not measured proof of the device's thermal cause.
+- Sky now caches celestial artwork until observer positions, language, font status or canvas dimensions change; identical resize events skip backdrop regeneration and repeated start calls cannot duplicate the loop. Both visual renderers sleep 33 ms before requesting another display-aligned frame. Pending timers/frames cancel on hide; CSS animations pause in hidden tabs. Sacred Depth reuses measured dimensions until ResizeObserver invalidation and detaches its analyser when inactive, hidden, paused, reduced-motion or in fallback.
+- Piper clip source/gain and bell oscillator/filter/gain connections disconnect after playback ends. No forced garbage collection, audio fade changes, unrelated process termination, or removal of recovery assets. The celestial cache trades one reusable canvas for less repeated drawing/allocation.
+- Updated the `visuals` atlas map with work-budget and background cleanup paths. Delivery versions: app 2.72, stylesheet 1.87, Sacred Depth 1.1, shell cache 5.158. Uncommitted/local; not deployed.
+- Atlas generation passed (24 maps, 221 nodes, 253 edges). The browser-based atlas verifier could not launch Chromium because the sandbox denied its macOS bootstrap port; no escalation or substitute browser run was attempted. Diagram interaction/appearance remains unverified.
+- Validation: executable mock tests for sky cache invalidation, 100-frame reuse, hide/resume/reduced-motion scheduling and Sacred Depth lifecycle; existing visual, audio transition, zero-volume, spatial, mixer, background music and prelude checks passed. Syntax checks passed. Browser/device profiling and listening remain unperformed; no measured CPU, battery or temperature reduction is claimed. Next device check: compare the same scene, brightness and audio settings for 10 minutes, including Pause, tab hide/return, Stop and restart.
+
+### Workspace auto model routing — local update
+
+- Date: 2026-09-09. Added intelligent per-task Codex model routing to the local Loop workspace. `Loop/scripts/codex_model_router.py` now defaults to `--task-class auto`, reads the bounded task prompt, infers task intensity, and selects the matching route from `Loop/config/model-routing.json`. Explicit task classes remain supported when a supervising workflow has already classified the bounded task.
+- Refreshed the routing table to the current Codex model family guidance: Luna for light/simple work, Terra for everyday standard work, Sol for deeper reasoning/implementation, and Astra for large-context or high-risk production/security/release lanes. The adapter still uses per-run model and reasoning overrides only; it must not rewrite global Codex settings.
+- Added regression coverage for automatic classification, current route choices and prompt-safe decision logging via `npm run test:model-routing`. This is workspace orchestration only; no website user flow changed, so the app atlas remains accurate without a graph topology update. Local change is not committed or deployed.
+
 ### Audio control/routing corrections — local update
 
 - Voice Space now independently honors Off/Light/Spacious in all spatial modes. Removed the forced ethereal override and updated spatial guidance in all four UI languages. Spatial Off fades added drone pan modulation to zero; initialization also starts it at zero. Original recording stereo and deliberate binaural channels are not collapsed to mono.
 - Removed the shared filtered-duplicate path, its nodes and transition swell calls; dedicated Voice Space, Music Space and mantra convolution returns remain. Background music EQ is now peaking with a neutral starting gain, a gentle -3 dB ducked target and 0 dB full target. Saved settings, volumes, comfort controls and existing reverb presets remain otherwise unchanged. No compensating loudness boost was added.
-- Added executable 12-combination Voice Space/spatial control tests, unknown-value fallbacks and routing checks. Device listening and measured output loudness remain unverified. Audio/narration atlas updated. App v2.71; shell v5.157; language cache v23. Not committed or deployed.
+- Added executable 12-combination Voice Space/spatial control tests, unknown-value fallbacks and routing checks. Device listening and measured output loudness remain unverified. Audio/narration atlas updated. App v2.71; shell v5.157; language cache v23. Committed and pushed to `production` in `988af6c`.
 
 ### Night-sky label backing blur — local update
 
 - Label backing now uses a 3 px canvas blur, isolated by save/restore so text and outline stay sharp. Text remains 30%, backing/outline 15%; Moon stays unlabeled. This softens the backing itself, not the stars behind it. Browsers without canvas filter support retain the plain backing.
-- Visual contract and syntax checks cover the change; browser appearance remains unverified. App v2.70; shell v5.156. Not deployed.
+- Visual contract and syntax checks cover the change; browser appearance remains unverified. App v2.70; shell v5.156. Committed and pushed to `production` in `988af6c`.
 
 ### Sacred Depth GPU treatment — local prototype
 
 - Date: 2026-09-09. Select Settings → Meditation visual effect → Sacred Depth. Existing saved preferences are not overwritten. `celestial-presence.js` adds WebGL 1 relief displacement, selective moving moonlight highlights, procedural atmosphere on transparent margins and a smoothed read-only mantra response. All existing source art remains unchanged. This is illustrative 2.5D: the relief envelope is authored mathematically and highlights derive from luminance, not an anatomical depth map or a reconstructed statue.
 - GPU drawing is bounded to 30 fps, 960 px longest edge and 1.25 DPR. Original image remains the fallback on unsupported WebGL, load/texture errors or context loss. Session pause freezes frames; hidden pages cancel them; reduced motion produces a static frame; stop/Eyes Close deactivate the renderer. No microphone, network rendering library, gain change or new source image.
 - The breathing-like atmospheric rhythm is decorative; Box Breathing runs on a separate screen and is not synchronized with this treatment. One reusable renderer covers the selected chakra/deity image rather than duplicating GPU contexts per image.
-- Visual atlas updated; renderer lifecycle tests use a mock GPU, and existing visual/prelude checks pass. Shader compilation, actual rendered appearance, and phone performance still need browser verification; do not describe the prototype as visually approved. CSS v1.86, app v2.69, renderer v1.0, shell v5.155. Not committed or deployed.
+- Visual atlas updated; renderer lifecycle tests use a mock GPU, and existing visual/prelude checks pass. Shader compilation, actual rendered appearance, and phone performance still need browser verification; do not describe the prototype as visually approved. CSS v1.86, app v2.69, renderer v1.0, shell v5.155. Committed and pushed to `production` in `988af6c`.
 
 ### Meditation imagery — local, uncommitted update
 

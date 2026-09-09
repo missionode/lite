@@ -995,6 +995,10 @@ input[type="range"]::-moz-range-progress {
     text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
+.narration-scroll-container[hidden] {
+    display: none !important;
+}
+
 .narration-scroll-container {
     width: 100%;
     max-width: 920px;
@@ -1860,15 +1864,28 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
     overflow: hidden;
 }
 
-.lobby-intimate-service.is-locked {
-    filter: blur(7px);
-    opacity: 0.62;
-}
+.lobby-intimate-service[hidden],
+#advanced-features-control[hidden] { display: none !important; }
 
-.lobby-intimate-service.is-locked > * {
+#app-version-unlock { touch-action: manipulation; user-select: none; }
+.settings-about h2 { font-size: 0.9rem; }
+.advanced-unlock-toast {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 12px 18px;
+    border-radius: 20px;
+    background: #22232b;
+    color: #fff;
+    font-size: 0.85rem;
+    text-align: center;
     pointer-events: none;
-    user-select: none;
 }
+.advanced-unlock-toast:empty { display: none; }
 
 .high-energy-duration-control {
     display: none;
@@ -1997,6 +2014,16 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
 }
 
 /* Box Breathing */
+/* Suspend decorative CSS work alongside the canvas loops in background tabs. */
+.page-hidden #chakra-container,
+.page-hidden #chakra-container::before,
+.page-hidden #chakra-container::after,
+.page-hidden #chakra-symbol,
+.page-hidden .tutorial-overlay::before,
+.page-hidden .tutorial-overlay::after {
+    animation-play-state: paused !important;
+}
+
 .tutorial-overlay {
     position: fixed;
     inset: 0;

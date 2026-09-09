@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 6a0ee84 + uncommitted natural-sky and audio-transition updates · 2026-09-09.
+Source snapshot: 988af6c + uncommitted performance optimizations · 2026-09-09.
 
-Current working-tree behavior. Sky and audio changes have static/unit evidence only; no device listening verification. Browser preview was declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Current working-tree behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -173,7 +173,7 @@ flowchart TD
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
 | Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
-| Intimate Service | Four clicks unlock the panel per page load. Any combination of three care options is allowed; choosing care clears other modes. |
+| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care selections and locks/hides the panel and switch. Reload locks again. Shots and mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
 | Enable Shots? | No Frequency blocks it. Otherwise a confirmation is required; cancel restores normal mode. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
@@ -592,9 +592,9 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Settings | Open Experiment Mode. |
-| Pick one activity | Seven individual chakras, HRIM, Box, Ho’oponopono, Corpse Pose, Perineal Care, Bath, Assisted Bath. |
+| Pick one activity | Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap Advanced features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked. |
 | Configure duration | Chakra/HRIM use minutes; Box uses seconds per step; care and Corpse routines consume seconds. |
-| Start experiment | Load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown. |
+| Start experiment | Reject care activities while Advanced features is locked, before loading content or starting audio. Otherwise load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown. |
 | Chakra / HRIM | Run one meditateOnChakra with duration override. |
 | Box / Ho’oponopono | Call corresponding focused routine directly. |
 | Corpse / bath / care | Call isolated routine; bath/care includes guide-controlled Continue. |
@@ -784,7 +784,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [app.js:1430](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1430), [app.js:5226](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5226), [app.js:5660](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5660), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1).
+Sources: [app.js:1430](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1430), [app.js:5285](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5285), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
 
 ```mermaid
 flowchart TD
@@ -792,7 +792,7 @@ flowchart TD
   route["Voice engine choice"]
   piper["Piper worker"]
   browser["Browser speech"]
-  decode["Decode + normalize"]
+  decode["Decode + normalize ahead"]
   play["Play through Web Audio"]
   fallback["Piper sentence failure"]
   browserend["End / error / timeout"]
@@ -815,11 +815,11 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Localized text | Begin narration generation; populate ticker and duck music unless silence requested. |
+| Localized text | Begin narration generation; duck music unless silence requested. Settings → Show scrolling narration text defaults ON and persists on Save. OFF hides all three ticker surfaces (journey, breathing, arrival) and skips ticker measurement/animation scheduling; spoken audio and deliberate pauses continue unchanged. Re-enable and Save to restore text. |
 | Voice engine choice | Use Piper only when selected, supported and configured. |
-| Piper worker | Warm model; serial worker requests; synthesize first two sentences and keep one ahead. |
+| Piper worker | Warm model; serial worker requests; prepare the first two sentences and replenish ahead of playback. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
 | Browser speech | Select matching voice and locale; apply pace/pitch/volume; speak each sentence. |
-| Decode + normalize | Decode WAV/blob; update estimated ticker duration with real clip duration. |
+| Decode + normalize ahead | Decode and calculate normalization in the bounded preparation queue while the preceding speech plays. Reuse normalization per buffer via WeakMap; update estimated ticker duration with real clip duration. After preparation, recheck pause, session activity and Piper cancellation generation before playback. |
 | Play through Web Audio | Start ticker at actual playback; route to voice gain, tone controls and effects. |
 | Piper sentence failure | Cancel Piper jobs; report fallback; use browser speech for failed and remaining sentences. |
 | End / error / timeout | Browser events resolve sentence; timeout avoids waiting forever. Pause can replay interrupted sentence. |
@@ -834,7 +834,7 @@ flowchart TD
 
 Logical buses; shared filters are expanded in selected-node details.
 
-Sources: [app.js:1539](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1539), [app.js:1636](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1636), [app.js:2154](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2154), [app.js:2686](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2686), [app.js:2789](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2789).
+Sources: [app.js:1547](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1547), [app.js:1645](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1645), [app.js:2700](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2700).
 
 ```mermaid
 flowchart TD
@@ -858,17 +858,17 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Piper voice | Decoded clips → voice gain → warmth and clarity filters; parallel Voice Space reverb. |
+| Piper voice | Decoded clips → voice gain → warmth and clarity filters; centered dry voice stays intact. Parallel Voice Space: 180 Hz high-pass → fixed 35 ms pre-delay → 3.2-second diffuse impulse → low-pass → wet return. Light: 12% return / 3 kHz; Spacious: 18% / 3.6 kHz; Off silences send and return. Preset changes never sweep delay time. Tone inputs clamp to 0–100, invalid values use neutral 50; 250 ms parameter ramps hold current automation where supported. |
 | Mantra MP3 | SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner. |
-| Generated tones | Chakra/sleep drones, elemental layers and transition/Shot tones use their respective generator routes. |
-| Background music | Equal-power repeat overlaps → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner. |
+| Generated tones | Chakra/sleep drones retain configured main frequencies; ordinary main pitch modulation removed. Main sine filter opens to 4× pitch, capped at 45% sample rate. Original six-second drone entry retained; stop holds current gain automation where supported. Tone/filter/panner/gain nodes disconnect on source end. Shots honor zero volume; muted guided cues skip and nonfinite durations reject. Elemental layers retain their own modulation. No new harmonic layers. |
+| Background music | Cached PCM equal-power overlap → one native looping source → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner. First playback preserves the original beginning; subsequent cycles enter just after the overlapped head. |
 | Video audio | MediaElementSource → dedicated Video gain → music spatial panner and Music Space send. |
-| Optional ambience | Local manifest or user URL → equal-power layered loops → blur and spatial depth/panner. |
-| Shared processing | Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; Spatial Off ramps added pan modulation to zero. |
+| Optional ambience | Local manifest or user URL → native equal-power layered loops → blur and spatial depth/panner. |
+| Shared processing | Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; narration and bells stay centered. Primary drone/music/mantra positions remain in front, with restrained separation for speakers and HRTF headphones. Drone sway is 0.018 Hz with reduced depth; Off ramps it to zero. Music positioning also applies to prelude video and Music Space. Position changes hold current automation and ramp for 1.2 seconds; fallback stereo uses source bearing. Reapplying the same mode does not restart movement. Active ambience approaches from current depth instead of resetting; switching Off returns depth over 1.2 seconds. |
 | Limiter → device | Shared chain ends in limiter and AudioContext destination. Bell gain connects directly to limiter. |
 | Browser speech | Separate speechSynthesis output; not processed by the shared Web Audio graph. |
 
-- Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Loop volume is separate from repeat crossfades; overlap is bounded to half the buffer, and source cleanup follows audio time through pause. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. Browser/device output and audibility need listening verification; timer throttling and silence inside recordings are not ruled out.
+- Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Native loops do not depend on JavaScript timers and keep one source per layer; prepared overlap PCM is reused by original buffer and overlap length via WeakMap. Overlap remains bounded to half the buffer. Source cleanup follows audio time through pause and explicit exit fades. Elemental exit stops both noise and its modulator; source end disconnects filters and modulation gains. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. PCM/mock tests do not establish device audibility, lack of silence inside recordings, or uninterrupted playback if the OS suspends audio.
 
 <a id="sound-options"></a>
 
@@ -919,7 +919,7 @@ flowchart TD
 
 Natural sky, chakra imagery, immersion and optional capabilities.
 
-Sources: [app.js:3648](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3648), [app.js:3654](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3654), [style.css:796](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:796), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1).
+Sources: [app.js:3315](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3315), [app.js:3675](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3675), [app.js:6004](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6004), [style.css:2001](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:2001), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
 
 ```mermaid
 flowchart TD
@@ -932,6 +932,8 @@ flowchart TD
   comfort["Eyes Close + brightness"]
   fullscreen["Fullscreen lifecycle"]
   wake["Screen wake lock"]
+  efficiency["Visual work budget"]
+  background["Background / inactive cleanup"]
   init -->|"Request"| geo
   init -->|"Check"| motion
   geo -->|"Observer"| sky
@@ -940,6 +942,10 @@ flowchart TD
   scene -->|"Selected"| comfort
   scene -->|"User fullscreen"| fullscreen
   scene -->|"Session"| wake
+  sky -->|"Cached drawing"| efficiency
+  effect -->|"Bounded drawing"| efficiency
+  efficiency -->|"Hide / pause / stop"| background
+  background -->|"Visible / active again"| efficiency
 ```
 
 | Step | Current behavior |
@@ -948,13 +954,15 @@ flowchart TD
 | Location permission | Success updates observer and named celestial bodies; denied/unavailable retains approximate sky. Fine background stars are procedural, not a location-calibrated star catalog. |
 | Motion preference | Reduced motion renders a static frame; changes to the OS preference immediately stop/restart animation. At most 110 stars shimmer; positions remain fixed. |
 | Journey scene | Chakra color, aura, deity/symbol selection, progress dots and narration ticker. |
-| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly after a delayed start, then every 45–120 seconds. Hidden pages cancel animation and clear meteors. |
+| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
 | Image effect | Natural/Aura/Holographic retain CSS effects. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. A read-only mantra analyser gently modulates highlights with two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
 | Eyes Close + brightness | Explicit user brightness, Sleep dimming and Eyes Close remain honored. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; app-container fullscreen controls have pointer/focus reveal. |
 | Screen wake lock | Best-effort request in supported routes; failure is swallowed; release on stop/completion. |
+| Visual work budget | Sky and Sacred Depth wait 33 ms between display-aligned frame requests (at most 30 fps). Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
+| Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return resumes visible effects. Sacred Depth releases its analyser on pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
 
-- The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws and lunar illumination. Browser/device appearance remains unverified because the preview request was declined.
+- The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined.
 
 <a id="storage"></a>
 

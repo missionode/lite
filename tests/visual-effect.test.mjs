@@ -52,7 +52,7 @@ assert.match(html, /night-sky\.js\?v=[^\"]+[\s\S]*?app\.js\?v=/,
     'The cached sky renderer must load before the app controller.');
 assert.match(sky, /this\.twinklingStars\.length < 110/,
     'Only a bounded subset of bright stars should be animated.');
-assert.match(app, /nextMeteorAt = time \+ 45 \+ Math\.random\(\) \* 75/,
+assert.match(app, /nextMeteorAt = time \+ 25 \+ Math\.random\(\) \* 45/,
     'Meteors should be occasional rather than a continuous shower.');
 assert.match(app, /document\.hidden[\s\S]*?cancelAnimationFrame\(this\.frame\)/,
     'The particle field should pause when the document is hidden.');

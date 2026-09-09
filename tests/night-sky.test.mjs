@@ -68,3 +68,64 @@ const beforeCache=builds;
 field.drawMoonWithBooleanMask(0,0,14,0.75);
 assert.equal(builds,beforeCache,'Same lunar phase must reuse cached pixels');
 console.log('Lunar rendering passed: transparent new Moon, opposed quarters, phase coverage and texture caching.');
+
+// Stable celestial layers must not repeat font/blur/gradient work per frame.
+sandbox.state = {language:'en'};
+field.canvas = {width:1200,height:800};
+field.celestialLayer = {getContext:()=>({setTransform(){}})};
+field.celestialBodies = [];
+let celestialBuilds = 0;
+field.drawCelestialBodies = () => {celestialBuilds++;};
+field.drawCachedCelestialBodies(800,533);
+for (let i=0;i<100;i++) field.drawCachedCelestialBodies(800,533);
+assert.equal(celestialBuilds,1,'100 unchanged frames reuse the cached celestial layer');
+sandbox.state.language='ml'; field.drawCachedCelestialBodies(800,533);
+assert.equal(celestialBuilds,2,'Language changes invalidate translated labels');
+field.celestialBodies=[]; field.drawCachedCelestialBodies(800,533);
+assert.equal(celestialBuilds,3,'Updated positions invalidate the layer');
+field.canvas.width=1000; field.drawCachedCelestialBodies(667,533);
+assert.equal(celestialBuilds,4,'Resizing invalidates the layer');
+
+const scheduled = new Map(), frames = new Map(); let id=0;
+sandbox.setTimeout=fn=>{scheduled.set(++id,fn);return id;};
+sandbox.clearTimeout=key=>scheduled.delete(key);
+sandbox.requestAnimationFrame=fn=>{frames.set(++id,fn);return id;};
+sandbox.cancelAnimationFrame=key=>frames.delete(key);
+field.motionPreference={matches:false}; field.draw=()=>{};
+field.render(100);
+assert.equal(frames.size,0,'Sky sleeps rather than polling every display refresh');
+assert.equal(scheduled.size,1);
+sandbox.document.hidden=true; field.handleVisibility();
+assert.equal(scheduled.size,0,'Hiding cancels pending sky work');
+assert.equal(frames.size,0);
+sandbox.document.hidden=false; field.handleVisibility();
+assert.equal(frames.size,1,'Returning starts exactly one frame loop');
+field.handleVisibility(); assert.equal(frames.size,1);
+field.motionPreference.matches=true; sandbox.performance={now:()=>200};
+field.handleMotionChange();
+assert.equal(frames.size,0,'Reduced motion cancels the resumed frame');
+console.log('Sky cache and scheduling passed: invalidation, idle waiting, hide/resume and reduced motion.');
+
+let spriteBuilds=0,meteorDraws=0;
+sandbox.document.createElement=()=>{spriteBuilds++;return {getContext:()=>({
+    createLinearGradient:()=>({addColorStop(){}}),beginPath(){},moveTo(){},lineTo(){},stroke(){}
+})};};
+field.ctx={save(){},restore(){},translate(){},rotate(){},drawImage(){meteorDraws++;}};
+field.meteors=[];field.nextMeteorAt=0;
+const sameArray=field.meteors;
+field.drawMeteors(0,390,844);
+assert.ok(field.nextMeteorAt>=5 && field.nextMeteorAt<=9);
+assert.equal(spriteBuilds,0,'Idle sky does not build a meteor sprite');
+assert.equal(meteorDraws,0);
+const spawnAt=field.nextMeteorAt;
+field.drawMeteors(spawnAt,390,844);
+assert.equal(field.meteors.length,1);
+assert.ok(field.nextMeteorAt-spawnAt>=25 && field.nextMeteorAt-spawnAt<=70);
+assert.ok(field.meteors[0].length<=390*.24);
+field.drawMeteors(spawnAt+.2,390,844);
+assert.equal(spriteBuilds,1,'Active frames reuse a single small sprite');
+assert.ok(field.ctx.globalAlpha>0 && field.ctx.globalAlpha<=.75);
+field.drawMeteors(spawnAt+field.meteors[0].lifetime+.19,390,844);
+assert.equal(field.meteors.length,0,'Residual trail expires and releases the meteor');
+assert.equal(field.meteors,sameArray,'No per-frame filtered array allocation');
+console.log('Meteor pacing, single-event bound, sprite reuse and trail expiry passed.');

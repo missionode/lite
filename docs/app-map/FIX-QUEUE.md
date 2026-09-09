@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Long playback follow-up — implemented locally, 2026-09-09
+
+Removed JavaScript repeat scheduling, repaired elemental LFO cleanup, moved decoding/normalization ahead of speech, added cancellation guards, bounded phonemizer reuse and inference tensor disposal. `audio` and `narration` maps reflect the implementation. Native PCM/mock and real phonemizer checks pass; full synthesis, thermal profiling and device listening remain open. Narration scroll and intentional pauses remain.
+
+## Performance pass — implemented locally, 2026-09-09
+
+The `visuals` map now includes cached celestial rendering, sleeping frame schedulers, hidden-page animation cancellation and transient audio-node cleanup. Automated cache/lifecycle and existing audio/visual checks pass. Device thermal profiling is still open; this does not establish that every source of heating has been removed. See the active performance entry in `HANDOFF.md` for the matched-scene device check.
+
 Baseline: `production` at `6a0ee84`, inspected 2026-09-08. These are proposed sequential changes, not changes already made. The atlas records the current behavior before fixes.
 
 ## 1. Restore a useful test baseline

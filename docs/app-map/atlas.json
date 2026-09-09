@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-09",
-    "commit": "6a0ee84 + uncommitted natural-sky and audio-transition updates",
-    "scope": "Current working-tree behavior. Sky and audio changes have static/unit evidence only; no device listening verification. Browser preview was declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "988af6c + uncommitted performance optimizations",
+    "scope": "Current working-tree behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -306,7 +306,7 @@
           [
             "care",
             "Intimate Service",
-            "Four clicks unlock the panel per page load. Any combination of three care options is allowed; choosing care clears other modes."
+            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care selections and locks/hides the panel and switch. Reload locks again. Shots and mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes."
           ],
           [
             "shots",
@@ -1499,7 +1499,7 @@
           [
             "pick",
             "Pick one activity",
-            "Seven individual chakras, HRIM, Box, Ho’oponopono, Corpse Pose, Perineal Care, Bath, Assisted Bath."
+            "Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap Advanced features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked."
           ]
         ],
         [
@@ -1513,7 +1513,7 @@
           [
             "start",
             "Start experiment",
-            "Load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown."
+            "Reject care activities while Advanced features is locked, before loading content or starting audio. Otherwise load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown."
           ]
         ],
         [
@@ -2074,13 +2074,13 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "app.js:1430; app.js:5226; app.js:5660; piper-worker.js:1",
+      "source": "app.js:1430; app.js:5285; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
       "rows": [
         [
           [
             "text",
             "Localized text",
-            "Begin narration generation; populate ticker and duck music unless silence requested."
+            "Begin narration generation; duck music unless silence requested. Settings → Show scrolling narration text defaults ON and persists on Save. OFF hides all three ticker surfaces (journey, breathing, arrival) and skips ticker measurement/animation scheduling; spoken audio and deliberate pauses continue unchanged. Re-enable and Save to restore text."
           ]
         ],
         [
@@ -2094,7 +2094,7 @@
           [
             "piper",
             "Piper worker",
-            "Warm model; serial worker requests; synthesize first two sentences and keep one ahead."
+            "Warm model; serial worker requests; prepare the first two sentences and replenish ahead of playback. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup."
           ],
           [
             "browser",
@@ -2105,8 +2105,8 @@
         [
           [
             "decode",
-            "Decode + normalize",
-            "Decode WAV/blob; update estimated ticker duration with real clip duration."
+            "Decode + normalize ahead",
+            "Decode and calculate normalization in the bounded preparation queue while the preceding speech plays. Reuse normalization per buffer via WeakMap; update estimated ticker duration with real clip duration. After preparation, recheck pause, session activity and Piper cancellation generation before playback."
           ]
         ],
         [
@@ -2217,13 +2217,13 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "app.js:1539; app.js:1636; app.js:2154; app.js:2686; app.js:2789",
+      "source": "app.js:1547; app.js:1645; app.js:2700",
       "rows": [
         [
           [
             "piper",
             "Piper voice",
-            "Decoded clips → voice gain → warmth and clarity filters; parallel Voice Space reverb."
+            "Decoded clips → voice gain → warmth and clarity filters; centered dry voice stays intact. Parallel Voice Space: 180 Hz high-pass → fixed 35 ms pre-delay → 3.2-second diffuse impulse → low-pass → wet return. Light: 12% return / 3 kHz; Spacious: 18% / 3.6 kHz; Off silences send and return. Preset changes never sweep delay time. Tone inputs clamp to 0–100, invalid values use neutral 50; 250 ms parameter ramps hold current automation where supported."
           ],
           [
             "mantra",
@@ -2233,14 +2233,14 @@
           [
             "generated",
             "Generated tones",
-            "Chakra/sleep drones, elemental layers and transition/Shot tones use their respective generator routes."
+            "Chakra/sleep drones retain configured main frequencies; ordinary main pitch modulation removed. Main sine filter opens to 4× pitch, capped at 45% sample rate. Original six-second drone entry retained; stop holds current gain automation where supported. Tone/filter/panner/gain nodes disconnect on source end. Shots honor zero volume; muted guided cues skip and nonfinite durations reject. Elemental layers retain their own modulation. No new harmonic layers."
           ]
         ],
         [
           [
             "music",
             "Background music",
-            "Equal-power repeat overlaps → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner."
+            "Cached PCM equal-power overlap → one native looping source → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner. First playback preserves the original beginning; subsequent cycles enter just after the overlapped head."
           ],
           [
             "video",
@@ -2250,14 +2250,14 @@
           [
             "ambience",
             "Optional ambience",
-            "Local manifest or user URL → equal-power layered loops → blur and spatial depth/panner."
+            "Local manifest or user URL → native equal-power layered loops → blur and spatial depth/panner."
           ]
         ],
         [
           [
             "shared",
             "Shared processing",
-            "Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; Spatial Off ramps added pan modulation to zero."
+            "Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; narration and bells stay centered. Primary drone/music/mantra positions remain in front, with restrained separation for speakers and HRTF headphones. Drone sway is 0.018 Hz with reduced depth; Off ramps it to zero. Music positioning also applies to prelude video and Music Space. Position changes hold current automation and ramp for 1.2 seconds; fallback stereo uses source bearing. Reapplying the same mode does not restart movement. Active ambience approaches from current depth instead of resetting; switching Off returns depth over 1.2 seconds."
           ]
         ],
         [
@@ -2311,7 +2311,7 @@
         ]
       ],
       "notes": [
-        "Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Loop volume is separate from repeat crossfades; overlap is bounded to half the buffer, and source cleanup follows audio time through pause. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. Browser/device output and audibility need listening verification; timer throttling and silence inside recordings are not ruled out."
+        "Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Native loops do not depend on JavaScript timers and keep one source per layer; prepared overlap PCM is reused by original buffer and overlap length via WeakMap. Overlap remains bounded to half the buffer. Source cleanup follows audio time through pause and explicit exit fades. Elemental exit stops both noise and its modulator; source end disconnects filters and modulation gains. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. PCM/mock tests do not establish device audibility, lack of silence inside recordings, or uninterrupted playback if the OS suspends audio."
       ]
     },
     {
@@ -2430,7 +2430,7 @@
       "group": "Systems",
       "title": "Visuals and browser lifecycle",
       "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
-      "source": "app.js:3648; app.js:3654; style.css:796; night-sky.js:1",
+      "source": "app.js:3315; app.js:3675; app.js:6004; style.css:2001; night-sky.js:1; celestial-presence.js:1",
       "rows": [
         [
           [
@@ -2460,7 +2460,7 @@
           [
             "sky",
             "Sky lifecycle",
-            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly after a delayed start, then every 45–120 seconds. Hidden pages cancel animation and clear meteors."
+            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
           ]
         ],
         [
@@ -2485,6 +2485,18 @@
             "wake",
             "Screen wake lock",
             "Best-effort request in supported routes; failure is swallowed; release on stop/completion."
+          ]
+        ],
+        [
+          [
+            "efficiency",
+            "Visual work budget",
+            "Sky and Sacred Depth wait 33 ms between display-aligned frame requests (at most 30 fps). Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change."
+          ],
+          [
+            "background",
+            "Background / inactive cleanup",
+            "Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return resumes visible effects. Sacred Depth releases its analyser on pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback."
           ]
         ]
       ],
@@ -2528,10 +2540,30 @@
           "scene",
           "wake",
           "Session"
+        ],
+        [
+          "sky",
+          "efficiency",
+          "Cached drawing"
+        ],
+        [
+          "effect",
+          "efficiency",
+          "Bounded drawing"
+        ],
+        [
+          "efficiency",
+          "background",
+          "Hide / pause / stop"
+        ],
+        [
+          "background",
+          "efficiency",
+          "Visible / active again"
         ]
       ],
       "notes": [
-        "The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws and lunar illumination. Browser/device appearance remains unverified because the preview request was declined."
+        "The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined."
       ]
     },
     {

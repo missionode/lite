@@ -79,7 +79,7 @@ assert.match(app, /this\.musicEchoTailGate\.gain\.linearRampToValueAtTime\(0, no
 assert.match(app, /this\.musicEchoWetGain\.connect\(this\.spatialMusicPanner\)/, 'music echo should return beside the dry-music gate so an existing tail can settle naturally');
 assert.match(app, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/, 'the complete music bus must enter the shared output chain through spatial routing');
 assert.match(app, /this\.voiceClarityFilter\.connect\(this\.voiceEchoSend\)/, 'narration echo should remain on the voice-only path');
-assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 4\.5/, 'narration space should use an extended deterministic diffuse reverb tail');
+assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 3\.2/, 'narration space should use a bounded deterministic diffuse reverb tail');
 assert.match(app, /const MUSIC_REVERB_TAIL_SECONDS = 3\.2/, 'music space should use an extended deterministic diffuse reverb tail');
 assert.doesNotMatch(app, /voiceEchoFeedback|musicEchoFeedback/, 'voice and music space must not contain a repeating feedback loop');
 assert.match(app, /const BACKGROUND_MUSIC_ASSET_VERSION = '20260831\.1'/, 'a committed background-music replacement should have an explicit release version');

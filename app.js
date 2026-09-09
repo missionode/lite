@@ -47,7 +47,7 @@ const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_AS
 // with an abrupt mute or a separate dead-silence delay.
 const MANTRA_MUSIC_FADE_SECONDS = 6;
 const MANTRA_FADE_SECONDS = 4;
-const VOICE_REVERB_TAIL_SECONDS = 4.5;
+const VOICE_REVERB_TAIL_SECONDS = 3.2;
 const VOICE_REVERB_TAIL_DECAY = 3.8;
 const MUSIC_REVERB_TAIL_SECONDS = 3.2;
 const MUSIC_REVERB_TAIL_DECAY = 4.8;
@@ -414,9 +414,18 @@ const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
     return 1.2 + (text.length / (charactersPerSecond * pacingFactor * piperPaceMultiplier)) + sentenceGaps;
 };
 let narrationTickerAwaitingPlayback = false;
+const applyNarrationScrollPreference = () => {
+    document.querySelectorAll('[data-narration-ticker]').forEach(container => {
+        container.hidden = !state.showNarrationText;
+        const text = container.querySelector('[data-narration-text]');
+        if (!text) return;
+        text.classList.remove('is-scrolling');
+        if (!container.hidden) refreshNarrationTicker(text);
+    });
+};
 const refreshNarrationTicker = (el) => {
     const container = el?.closest('[data-narration-ticker]');
-    if (!el || !container) return;
+    if (!el || !container || container.hidden) return;
 
     el.classList.remove('is-scrolling');
     el.style.removeProperty('--narration-duration');
@@ -471,6 +480,7 @@ const updateNarrationTickerDuration = (durationSeconds) => {
     if (!Number.isFinite(duration) || duration <= 0) return;
 
     document.querySelectorAll('[data-narration-text]').forEach((el) => {
+        if (el.closest('[data-narration-ticker]')?.hidden) return;
         const animation = el.getAnimations?.().find(item => item.animationName === 'narrationTickerReadOrder');
         const currentTime = animation && Number(animation.currentTime);
         const previousDuration = animation?.effect?.getComputedTiming?.().duration;
@@ -511,7 +521,7 @@ const setNarrationText = (txt, narrationDurationSeconds = null) => {
                 delete container.dataset.narrationDurationHint;
             }
         }
-        if (!text || !container) return;
+        if (!text || !container || container.hidden) return;
 
         // Measure after the new narration is painted so every visible screen
         // receives the same responsive LTR reading marquee.
@@ -1295,6 +1305,8 @@ class PiperTTS {
         this.currentResolve = null;
         this.isCancelling = false;
         this.paused = false;
+        this.generation = 0;
+        this.normalizationGains = new WeakMap();
     }
 
     isSupported() {
@@ -1392,6 +1404,7 @@ class PiperTTS {
     }
 
     getNormalizationGain(buffer) {
+        if (this.normalizationGains.has(buffer)) return this.normalizationGains.get(buffer);
         let peak = 0;
         let sumSquares = 0;
         let sampleCount = 0;
@@ -1412,7 +1425,9 @@ class PiperTTS {
         const rms = Math.sqrt(sumSquares / sampleCount);
         let gain = rms > 0 ? 0.16 / rms : 1;
         gain = Math.min(gain, 0.85 / peak);
-        return Math.max(0.7, Math.min(1.5, gain));
+        const normalized = Math.max(0.7, Math.min(1.5, gain));
+        this.normalizationGains.set(buffer, normalized);
+        return normalized;
     }
 
     async decode(blob) {
@@ -1440,6 +1455,8 @@ class PiperTTS {
             this.currentClipGain = clipGain;
             this.currentResolve = resolve;
             source.onended = () => {
+                source.disconnect();
+                clipGain.disconnect();
                 if (this.currentSource === source) {
                     this.currentSource = null;
                     this.currentClipGain = null;
@@ -1496,6 +1513,7 @@ class PiperTTS {
     }
 
     cancel(reason = 'cancelled', { immediate = false } = {}) {
+        this.generation++;
         this.isCancelling = true;
         if (this.activeJob && this.worker) {
             this.worker.postMessage({ type: 'cancel', requestId: this.activeJob.requestId });
@@ -1537,6 +1555,8 @@ class PiperTTS {
 
 // Audio Engine
 class SeamlessLoop {
+    static preparedBuffers = new WeakMap();
+
     constructor(ctx, buffer, destination, targetGain = 1.0, crossfadeDuration = 5) {
         this.ctx = ctx;
         this.buffer = buffer;
@@ -1547,67 +1567,67 @@ class SeamlessLoop {
         this.output.gain.setValueAtTime(targetGain, ctx.currentTime);
         this.output.connect(destination);
         this.activeSources = [];
-        this.nextStartTimer = null;
         this.isRunning = false;
-        this.scheduleAheadTime = 1.5;
-        this.fadeInCurve = Float32Array.from({ length: 65 }, (_, i) => Math.sin(i / 64 * Math.PI / 2));
-        this.fadeOutCurve = Float32Array.from({ length: 65 }, (_, i) => Math.cos(i / 64 * Math.PI / 2));
     }
 
     start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        this._scheduleInstance(this.ctx.currentTime + 0.01);
+        try { this._startSource(this.ctx.currentTime + 0.01); }
+        catch (error) { this.isRunning = false; this.output.disconnect(); throw error; }
     }
 
-    _scheduleInstance(startTime) {
+    prepareBuffer() {
+        const input = this.buffer;
+        const overlap = Math.min(Math.floor(input.length / 2), Math.round(this.crossfadeDuration * input.sampleRate));
+        if (!overlap) return input;
+        let variants = SeamlessLoop.preparedBuffers.get(input);
+        if (!variants) { variants = new Map(); SeamlessLoop.preparedBuffers.set(input, variants); }
+        if (variants.has(overlap)) return variants.get(overlap);
+        const length = input.length - overlap;
+        const output = this.ctx.createBuffer(input.numberOfChannels, input.length, input.sampleRate);
+        // Bake one circular overlap once. The audio thread can then repeat
+        // indefinitely even when JavaScript timers are throttled or suspended.
+        for (let channel = 0; channel < input.numberOfChannels; channel++) {
+            const source = input.getChannelData(channel), target = output.getChannelData(channel);
+            target.set(source);
+            for (let i = 0; i < overlap; i++) {
+                const angle = i / overlap * Math.PI / 2;
+                target[length + i] = source[length + i] * Math.cos(angle) + source[i] * Math.sin(angle);
+            }
+        }
+        variants.set(overlap, output);
+        return output;
+    }
+
+    _startSource(startTime) {
         if (!this.isRunning) return;
 
         const now = Math.max(startTime, this.ctx.currentTime + 0.01);
+        const prepared = this.prepareBuffer();
         const source = this.ctx.createBufferSource();
         const gain = this.ctx.createGain();
 
-        source.buffer = this.buffer;
+        source.buffer = prepared;
+        source.loop = true;
+        source.loopStart = Math.min(Math.floor(this.buffer.length / 2), Math.round(this.crossfadeDuration * this.buffer.sampleRate)) / this.buffer.sampleRate;
+        source.loopEnd = source.buffer.duration;
         source.connect(gain);
         gain.connect(this.output);
 
-        // Initial Fade In
-        // Only the owning bus controls entry volume; overlaps keep unit gain.
-        if (this.activeSources.length) {
-            gain.gain.setValueCurveAtTime(this.fadeInCurve, now, this.crossfadeDuration);
-        } else {
-            gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(1, now + Math.min(0.03, this.crossfadeDuration));
-        }
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(1, now + Math.min(0.03, this.crossfadeDuration));
 
         source.start(now);
         this.activeSources.push({ source, gain });
 
-        // Schedule next instance and current fade out
-        const duration = this.buffer.duration;
-        const nextStartTime = now + duration - this.crossfadeDuration;
-
-        // Schedule fade out for this instance
-        // Equal-power overlap avoids the midpoint energy dip of linear fades.
-        gain.gain.setValueCurveAtTime(this.fadeOutCurve, nextStartTime, this.crossfadeDuration);
-
-        // Remove from tracking and stop after fade out
+        // One native source per loop; cleanup follows the explicit exit fade.
         source.onended = () => {
             source.disconnect();
             gain.disconnect();
             this.activeSources = this.activeSources.filter(s => s.source !== source);
             if (!this.isRunning && !this.activeSources.length) this.output.disconnect();
         };
-        source.stop(now + duration);
-
-        // Use the JavaScript timer only to enqueue the next source early. The
-        // actual start time is placed on the AudioContext timeline, so normal
-        // mobile timer jitter does not move the crossfade itself.
-        const delayMs = Math.max(25, (nextStartTime - this.ctx.currentTime - this.scheduleAheadTime) * 1000);
-        this.nextStartTimer = setTimeout(() => {
-            this.nextStartTimer = null;
-            this._scheduleInstance(nextStartTime);
-        }, delayMs);
     }
 
     setGain(value) {
@@ -1622,7 +1642,6 @@ class SeamlessLoop {
 
     stop(fadeTime = 4) {
         this.isRunning = false;
-        if (this.nextStartTimer) clearTimeout(this.nextStartTimer);
 
         const now = this.ctx.currentTime;
         const param = this.output.gain;
@@ -1787,7 +1806,13 @@ class AudioEngine {
         this.voiceEchoSend = this.ctx.createGain();
         this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
-        this.voiceEchoDelay.delayTime.setValueAtTime(0.025, this.ctx.currentTime);
+        // Fixed pre-delay separates consonants from ambience without pitch
+        // modulation when switching presets during a spoken phrase.
+        this.voiceEchoDelay.delayTime.setValueAtTime(0.035, this.ctx.currentTime);
+        this.voiceEchoLowCut = this.ctx.createBiquadFilter();
+        this.voiceEchoLowCut.type = 'highpass';
+        this.voiceEchoLowCut.frequency.setValueAtTime(180, this.ctx.currentTime);
+        this.voiceEchoLowCut.Q.setValueAtTime(0.707, this.ctx.currentTime);
         this.voiceEchoConvolver = this.ctx.createConvolver();
         this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(
             VOICE_REVERB_TAIL_SECONDS,
@@ -1799,7 +1824,8 @@ class AudioEngine {
         this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
         this.voiceEchoWetGain = this.ctx.createGain();
         this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.voiceEchoSend.connect(this.voiceEchoDelay);
+        this.voiceEchoSend.connect(this.voiceEchoLowCut);
+        this.voiceEchoLowCut.connect(this.voiceEchoDelay);
         this.voiceEchoDelay.connect(this.voiceEchoConvolver);
         this.voiceEchoConvolver.connect(this.voiceEchoFilter);
         this.voiceEchoFilter.connect(this.voiceEchoWetGain);
@@ -1972,7 +1998,7 @@ class AudioEngine {
         const pannerLfo = this.ctx.createOscillator();
         const pannerLfoGain = this.ctx.createGain();
         pannerLfo.type = 'sine';
-        pannerLfo.frequency.setValueAtTime(0.03, this.ctx.currentTime);
+        pannerLfo.frequency.setValueAtTime(0.018, this.ctx.currentTime);
         pannerLfoGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.spatialPanLfoGain = pannerLfoGain;
         pannerLfo.connect(pannerLfoGain);
@@ -2106,20 +2132,21 @@ class AudioEngine {
         if (!node) return;
         if (node.positionX && node.positionY && node.positionZ) {
             [['x', node.positionX], ['y', node.positionY], ['z', node.positionZ]].forEach(([axis, param]) => {
-                param.cancelScheduledValues(now);
-                param.setValueAtTime(param.value, now);
+                if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+                else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
                 param.linearRampToValueAtTime(position[axis], now + 1.2);
             });
         } else if (node.pan) {
-            node.pan.cancelScheduledValues(now);
-            node.pan.setValueAtTime(node.pan.value, now);
-            node.pan.linearRampToValueAtTime(Math.max(-1, Math.min(1, position.x)), now + 1.2);
+            if (node.pan.cancelAndHoldAtTime) node.pan.cancelAndHoldAtTime(now);
+            else { node.pan.cancelScheduledValues(now); node.pan.setValueAtTime(node.pan.value, now); }
+            const pan = Math.atan2(position.x, Math.max(0.1, Math.abs(position.z))) / (Math.PI / 2);
+            node.pan.linearRampToValueAtTime(Math.max(-1, Math.min(1, pan)), now + 1.2);
         } else if (typeof node.setPosition === 'function') {
             node.setPosition(position.x, position.y, position.z);
         }
     }
 
-    schedulePleasureSpatialApproach() {
+    schedulePleasureSpatialApproach(fromCurrent = false) {
         if (!this.ctx || !this.spatialPleasurePanner || !this.pleasureSpatialPosition) return;
         const now = this.ctx.currentTime;
         const position = this.pleasureSpatialPosition;
@@ -2129,24 +2156,23 @@ class AudioEngine {
 
         if (this.spatialPleasurePanner.positionZ) {
             const nearZ = Number(position.nearZ ?? position.z) * profile.nearDistanceMultiplier;
-            this.spatialPleasurePanner.positionZ.cancelScheduledValues(now);
-            this.spatialPleasurePanner.positionZ.setValueAtTime(Number(position.z), now);
+            const param = this.spatialPleasurePanner.positionZ;
+            if (fromCurrent && param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+            else { param.cancelScheduledValues(now); param.setValueAtTime(fromCurrent ? param.value : Number(position.z), now); }
             this.spatialPleasurePanner.positionZ.linearRampToValueAtTime(
                 isSpatial ? nearZ : -1,
-                now + (isSpatial ? approachSeconds : 0)
+                now + (isSpatial ? approachSeconds : 1.2)
             );
         } else if (this.pleasureSpatialDepthGain) {
             // StereoPanner fallback: approximate distance with a gentle gain
             // approach when true 3D distance positioning is unavailable.
             const target = isSpatial ? profile.fallbackNearGain : 1;
-            this.pleasureSpatialDepthGain.gain.cancelScheduledValues(now);
-            this.pleasureSpatialDepthGain.gain.setValueAtTime(
-                isSpatial ? PLEASURE_SPATIAL_FALLBACK_FAR_GAIN : 1,
-                now
-            );
+            const param = this.pleasureSpatialDepthGain.gain;
+            if (fromCurrent && param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+            else { param.cancelScheduledValues(now); param.setValueAtTime(fromCurrent ? param.value : (isSpatial ? PLEASURE_SPATIAL_FALLBACK_FAR_GAIN : 1), now); }
             this.pleasureSpatialDepthGain.gain.linearRampToValueAtTime(
                 target,
-                now + (isSpatial ? approachSeconds : 0)
+                now + (isSpatial ? approachSeconds : 1.2)
             );
         }
     }
@@ -2155,6 +2181,8 @@ class AudioEngine {
         const normalized = normalizeSpatialMode(mode);
         this.spatialMode = normalized;
         if (!this.ctx || !this.spatialDronePanner || !this.spatialMusicPanner || !this.spatialMantraPanner || !this.spatialPleasurePanner) return;
+        if (this.appliedSpatialMode === normalized) return;
+        this.appliedSpatialMode = normalized;
 
         const configurations = {
             off: {
@@ -2162,16 +2190,16 @@ class AudioEngine {
                 drone: { x: 0, y: 0, z: -1 }, music: { x: 0, y: 0, z: -1 }, mantra: { x: 0, y: 0, z: -1 }, pleasure: { x: 0, y: 0, z: -1, nearZ: -1 }
             },
             stereo: {
-                model: 'equalpower', lfo: 0.38,
+                model: 'equalpower', lfo: 0.18,
                 drone: { x: 0, y: -0.05, z: -1 }, music: { x: -0.28, y: 0, z: -1 }, mantra: { x: 0.28, y: 0, z: -1 }, pleasure: { x: 0, y: 0.15, z: -6, nearZ: -2.4 }
             },
             headphones: {
-                model: 'HRTF', lfo: 0.08,
-                drone: { x: 0, y: -0.45, z: 0.65 }, music: { x: -0.65, y: 0.12, z: -0.75 }, mantra: { x: 0.65, y: 0.16, z: 0.25 }, pleasure: { x: 0, y: 0.2, z: -7, nearZ: -2.8 }
+                model: 'HRTF', lfo: 0.06,
+                drone: { x: 0, y: -0.15, z: -1.2 }, music: { x: -0.5, y: 0.08, z: -1 }, mantra: { x: 0.35, y: 0.08, z: -1.1 }, pleasure: { x: 0, y: 0.2, z: -7, nearZ: -2.8 }
             },
             room: {
-                model: 'equalpower', lfo: 0.14,
-                drone: { x: 0, y: -0.20, z: 0.35 }, music: { x: -0.22, y: 0, z: -0.85 }, mantra: { x: 0.22, y: 0.16, z: 0.30 }, pleasure: { x: 0, y: 0.25, z: -6.5, nearZ: -2.5 }
+                model: 'equalpower', lfo: 0.08,
+                drone: { x: 0, y: -0.1, z: -1 }, music: { x: -0.18, y: 0, z: -1 }, mantra: { x: 0.18, y: 0.08, z: -1 }, pleasure: { x: 0, y: 0.25, z: -6.5, nearZ: -2.5 }
             }
         }[normalized];
         const now = this.ctx.currentTime;
@@ -2183,10 +2211,11 @@ class AudioEngine {
         this.setSpatialPosition(this.spatialMantraPanner, configurations.mantra, now);
         this.pleasureSpatialPosition = configurations.pleasure;
         this.setSpatialPosition(this.spatialPleasurePanner, configurations.pleasure, now);
-        if (this.pleasureLoops.some(loop => loop.isRunning)) this.schedulePleasureSpatialApproach();
+        if (this.pleasureLoops.some(loop => loop.isRunning)) this.schedulePleasureSpatialApproach(true);
         if (this.spatialPanLfoGain) {
-            this.spatialPanLfoGain.gain.cancelScheduledValues(now);
-            this.spatialPanLfoGain.gain.setValueAtTime(this.spatialPanLfoGain.gain.value, now);
+            const param = this.spatialPanLfoGain.gain;
+            if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+            else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
             this.spatialPanLfoGain.gain.linearRampToValueAtTime(configurations.lfo, now + 1.2);
         }
         // Voice Space is independent; spatial changes never alter its return.
@@ -2195,29 +2224,30 @@ class AudioEngine {
     setVoiceTuning(warmth = 50, clarity = 50) {
         if (!this.ctx || !this.voiceWarmthFilter || !this.voiceClarityFilter) return;
         const now = this.ctx.currentTime;
-        const warmthGain = ((Number(warmth) - 50) / 50) * 3;
-        const clarityGain = ((Number(clarity) - 50) / 50) * 4;
-        this.voiceWarmthFilter.gain.cancelScheduledValues(now);
-        this.voiceWarmthFilter.gain.linearRampToValueAtTime(warmthGain, now + 0.25);
-        this.voiceClarityFilter.gain.cancelScheduledValues(now);
-        this.voiceClarityFilter.gain.linearRampToValueAtTime(clarityGain, now + 0.25);
+        const bounded = value => Number.isFinite(Number(value)) ? Math.max(0, Math.min(100, Number(value))) : 50;
+        const warmthGain = ((bounded(warmth) - 50) / 50) * 3;
+        const clarityGain = ((bounded(clarity) - 50) / 50) * 4;
+        for (const [param, target] of [[this.voiceWarmthFilter.gain, warmthGain], [this.voiceClarityFilter.gain, clarityGain]]) {
+            if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+            else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
+            param.linearRampToValueAtTime(target, now + 0.25);
+        }
     }
 
     setVoiceEcho(mode = 'off') {
         if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
         const voiceEchoSettings = {
-            off: { delay: 0.025, wet: 0, filter: 3200 },
-            light: { delay: 0.025, wet: 0.14, filter: 3200 },
-            spacious: { delay: 0.04, wet: 0.20, filter: 3600 }
+            off: { wet: 0, filter: 3200 },
+            light: { wet: 0.12, filter: 3000 },
+            spacious: { wet: 0.18, filter: 3600 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const settings = voiceEchoSettings[requestedMode];
         const now = this.ctx.currentTime;
-        [this.voiceEchoDelay.delayTime, this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
-            param.cancelScheduledValues(now);
-            param.setValueAtTime(param.value, now);
+        [this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
+            if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+            else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
         });
-        this.voiceEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
         this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
         this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
         this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
@@ -2406,13 +2436,17 @@ class AudioEngine {
         gain.connect(this.masterGain);
         noiseSrc.start();
         
+        noiseSrc.onended = () => {
+            try { breezeLfo.stop(); } catch (error) {}
+            for (const node of [noiseSrc, filter, gain, breezeLfo, breezeGainMod, breezeFreqMod]) node.disconnect();
+        };
         this.elementalNodes.push({ src: noiseSrc, gain: gain, lfo: breezeLfo });
     }
 
     startDrone(baseFreq, index = 0) {
         this.stopDrone();
-        this.stopBinaural();
         if (state.noFrequencyMode) return;
+        if (!this.ctx) return;
         
         this.startElementalLayer(index);
 
@@ -2427,25 +2461,15 @@ class AudioEngine {
         // is the authoritative main-drone pitch.
         const droneFreq = safeBaseFrequency;
         
-        const lfo = this.ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.04, this.ctx.currentTime); 
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.setValueAtTime(droneFreq * 0.001, this.ctx.currentTime);
-        lfo.connect(lfoGain);
-        lfo.start();
-        this.vibrationLFO = lfo;
-
         // Keep one restrained main tone. The previous half-frequency lower
         // oscillator was intentionally removed so the drone stays clean.
         const mainOscillator = this.ctx.createOscillator();
         const mainDroneGain = this.ctx.createGain();
         mainOscillator.type = 'sine';
         mainOscillator.frequency.setValueAtTime(droneFreq, this.ctx.currentTime);
-        lfoGain.connect(mainOscillator.frequency);
         const mainDroneFilter = this.ctx.createBiquadFilter();
         mainDroneFilter.type = 'lowpass';
-        mainDroneFilter.frequency.setValueAtTime(droneFreq * 1.1, this.ctx.currentTime);
+        mainDroneFilter.frequency.setValueAtTime(Math.min(droneFreq * 4, this.ctx.sampleRate * 0.45), this.ctx.currentTime);
         mainDroneFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
         mainDroneGain.gain.setValueAtTime(0, this.ctx.currentTime);
         mainDroneGain.gain.linearRampToValueAtTime(0.06, this.ctx.currentTime + 6);
@@ -2453,6 +2477,9 @@ class AudioEngine {
         mainDroneFilter.connect(mainDroneGain);
         mainDroneGain.connect(this.masterGain);
         mainOscillator.start();
+        mainOscillator.onended = () => {
+            mainOscillator.disconnect(); mainDroneFilter.disconnect(); mainDroneGain.disconnect();
+        };
         this.droneOscillators.push({ osc: mainOscillator, gain: mainDroneGain });
 
         // Fixed: Lowered carrier to 80Hz for deep comfort
@@ -2484,12 +2511,20 @@ class AudioEngine {
 
         leftOsc.start();
         rightOsc.start();
+        let remaining = 2;
+        const finishSupport = osc => () => {
+            osc.disconnect();
+            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
+        };
+        leftOsc.onended = finishSupport(leftOsc);
+        rightOsc.onended = finishSupport(rightOsc);
         this.binauralNodes = [leftOsc, rightOsc, binauralGain];
     }
 
     startSleepDrone(beatFrequency) {
         this.stopDrone();
         if (state.noFrequencyMode) return;
+        if (!this.ctx) return;
 
         const requestedBeat = Number(beatFrequency);
         const beat = Number.isFinite(requestedBeat) ? Math.min(20000, Math.max(0.1, requestedBeat)) : 6;
@@ -2513,6 +2548,9 @@ class AudioEngine {
         mainFilter.connect(mainGain);
         mainGain.connect(this.masterGain);
         mainOscillator.start(now);
+        mainOscillator.onended = () => {
+            mainOscillator.disconnect(); mainFilter.disconnect(); mainGain.disconnect();
+        };
         this.droneOscillators.push({ osc: mainOscillator, gain: mainGain });
 
         const leftOsc = this.ctx.createOscillator();
@@ -2533,6 +2571,13 @@ class AudioEngine {
         binauralGain.connect(this.masterGain);
         leftOsc.start(now);
         rightOsc.start(now);
+        let remaining = 2;
+        const finishSupport = osc => () => {
+            osc.disconnect();
+            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
+        };
+        leftOsc.onended = finishSupport(leftOsc);
+        rightOsc.onended = finishSupport(rightOsc);
         this.binauralNodes = [leftOsc, rightOsc, binauralGain];
     }
 
@@ -2551,10 +2596,11 @@ class AudioEngine {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(requested, now);
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(Math.max(0.001, state.volDrone), now + 0.08);
+        gain.gain.linearRampToValueAtTime(Math.max(0, Math.min(0.2, Number(state.volDrone) || 0)), now + 0.08);
         osc.connect(gain);
         gain.connect(this.masterGain);
         osc.start(now);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
         this.shotOscillator = osc;
         this.shotGain = gain;
     }
@@ -2566,6 +2612,7 @@ class AudioEngine {
 
         this.stopGuidedTransitionTone(0.05);
         const now = this.ctx.currentTime;
+        if (!Number.isFinite(Number(durationMs)) || Number(durationMs) <= 0) return false;
         const durationSeconds = Math.max(1, Number(durationMs) / 1000);
         const fadeSeconds = Math.min(1.5, Math.max(0.35, durationSeconds * 0.25));
         const steadyUntil = Math.max(now + fadeSeconds, now + durationSeconds - fadeSeconds);
@@ -2574,7 +2621,8 @@ class AudioEngine {
         // This is a brief guided transition cue, not the public Shot path.
         // Keep it below the main drone ceiling even when the user raises that
         // mixer control for ordinary mantra work.
-        const peak = Math.min(Math.max(0.003, state.volDrone * 0.5), 0.025);
+        const peak = Math.min(Math.max(0, (Number(state.volDrone) || 0) * 0.5), 0.025);
+        if (peak === 0) return false;
         osc.type = 'sine';
         osc.frequency.setValueAtTime(requested, now);
         gain.gain.setValueAtTime(0.0001, now);
@@ -2585,6 +2633,10 @@ class AudioEngine {
         gain.connect(this.masterGain);
         osc.start(now);
         osc.stop(now + durationSeconds + 0.05);
+        osc.onended = () => {
+            osc.disconnect(); gain.disconnect();
+            if (this.guidedTransitionTone?.osc === osc) this.guidedTransitionTone = null;
+        };
         this.guidedTransitionTone = { osc, gain };
         return true;
     }
@@ -2656,8 +2708,8 @@ class AudioEngine {
         }
         this.droneOscillators.forEach(({ osc, gain }) => {
             const currentVal = gain.gain.value;
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(currentVal, now);
+            if (gain.gain.cancelAndHoldAtTime) gain.gain.cancelAndHoldAtTime(now);
+            else { gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(currentVal, now); }
             gain.gain.linearRampToValueAtTime(0, now + 5);
             try { osc.stop(now + 5.1); } catch(e) {}
         });
@@ -2673,12 +2725,13 @@ class AudioEngine {
             this.groundingAnchor = null;
         }
 
-        this.elementalNodes.forEach(({ src, gain }) => {
+        this.elementalNodes.forEach(({ src, gain, lfo }) => {
             const currentVal = gain.gain.value;
             gain.gain.cancelScheduledValues(now);
             gain.gain.setValueAtTime(currentVal, now);
             gain.gain.linearRampToValueAtTime(0, now + 5);
             try { src.stop(now + 5.1); } catch(e) {}
+            try { lfo.stop(now + 5.1); } catch(e) {}
         });
         this.elementalNodes = [];
     }
@@ -3286,6 +3339,11 @@ class AudioEngine {
             gain.connect(this.bellGain); // Use dedicated bell gain
             osc.start(now);
             osc.stop(now + 8.1);
+            osc.onended = () => {
+                osc.disconnect();
+                filter.disconnect();
+                gain.disconnect();
+            };
         });
     }
 }
@@ -3301,6 +3359,9 @@ class AmbientParticleField {
         this.meteors = [];
         this.nextMeteorAt = 0;
         this.sky = new NaturalNightSky();
+        this.celestialLayer = document.createElement('canvas');
+        this.celestialLayerKey = null;
+        this.renderTimer = null;
         this.lastCelestialRefresh = 0;
         this.cachedMoonPhase = null;
         this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -3322,7 +3383,8 @@ class AmbientParticleField {
     }
 
     start() {
-        if (!this.canvas || !this.ctx) return;
+        if (!this.canvas || !this.ctx || this.started) return;
+        this.started = true;
         window.addEventListener('resize', this.resize, { passive: true });
         document.addEventListener('visibilitychange', this.handleVisibility);
         this.motionPreference.addEventListener('change', this.handleMotionChange);
@@ -3382,6 +3444,9 @@ class AmbientParticleField {
     resize() {
         if (!this.canvas || !this.ctx) return;
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const sizeKey = `${window.innerWidth}:${window.innerHeight}:${dpr}`;
+        if (this.sizeKey === sizeKey) return;
+        this.sizeKey = sizeKey;
         this.canvas.width = Math.round(window.innerWidth * dpr);
         this.canvas.height = Math.round(window.innerHeight * dpr);
         this.canvas.style.width = `${window.innerWidth}px`;
@@ -3393,6 +3458,8 @@ class AmbientParticleField {
     }
 
     handleMotionChange() {
+        clearTimeout(this.renderTimer);
+        this.renderTimer = null;
         cancelAnimationFrame(this.frame);
         this.frame = 0;
         this.meteors = [];
@@ -3406,11 +3473,13 @@ class AmbientParticleField {
 
     handleVisibility() {
         if (document.hidden) {
+            clearTimeout(this.renderTimer);
+            this.renderTimer = null;
             cancelAnimationFrame(this.frame);
             this.frame = 0;
             this.meteors = [];
             this.nextMeteorAt = 0;
-        } else if (!this.motionPreference.matches && !this.frame) {
+        } else if (!this.motionPreference.matches && !this.frame && !this.renderTimer) {
             this.lastFrameAt = 0;
             this.frame = requestAnimationFrame(this.render);
         } else if (this.motionPreference.matches) {
@@ -3420,12 +3489,19 @@ class AmbientParticleField {
     }
 
     render(timestamp) {
+        this.frame = 0;
         if (document.hidden || this.motionPreference.matches) { this.frame = 0; return; }
         if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
             this.draw(timestamp, true);
             this.lastFrameAt = timestamp;
         }
-        this.frame = requestAnimationFrame(this.render);
+        // Sleep between draws instead of waking on every 60/120 Hz refresh.
+        this.renderTimer = setTimeout(() => {
+            this.renderTimer = null;
+            if (!document.hidden && !this.motionPreference.matches) {
+                this.frame = requestAnimationFrame(this.render);
+            }
+        }, 33);
     }
 
     draw(timestamp, animate) {
@@ -3440,8 +3516,30 @@ class AmbientParticleField {
         const time = timestamp * 0.001;
         this.sky.draw(this.ctx, timestamp, animate);
         if (animate) this.drawMeteors(time, width, height);
-        this.drawCelestialBodies(width, height);
+        this.drawCachedCelestialBodies(width, height);
         this.ctx.shadowBlur = 0;
+    }
+
+    drawCachedCelestialBodies(width, height) {
+        // Positions change once per minute. Reuse the expensive gradients,
+        // text measurement and blurred backings between those updates.
+        const key = `${this.canvas.width}:${this.canvas.height}:${state.language}:${document.fonts?.status}`;
+        if (this.celestialLayerKey !== key || this.cachedBodies !== this.celestialBodies) {
+            const layer = this.celestialLayer;
+            layer.width = this.canvas.width;
+            layer.height = this.canvas.height;
+            const target = this.ctx;
+            const cached = layer.getContext('2d');
+            if (!cached) { this.drawCelestialBodies(width, height); return; }
+            cached.setTransform(layer.width / width, 0, 0, layer.height / height, 0, 0);
+            try {
+                this.ctx = cached;
+                this.drawCelestialBodies(width, height);
+            } finally { this.ctx = target; }
+            this.celestialLayerKey = key;
+            this.cachedBodies = this.celestialBodies;
+        }
+        this.ctx.drawImage(this.celestialLayer, 0, 0, width, height);
     }
 
     drawCelestialBodies(width, height) {
@@ -3566,49 +3664,59 @@ class AmbientParticleField {
     }
 
     drawMeteors(time, width, height) {
-        if (!this.nextMeteorAt) this.nextMeteorAt = time + 35 + Math.random() * 55;
+        if (!this.nextMeteorAt) this.nextMeteorAt = time + 5 + Math.random() * 4;
         if (time >= this.nextMeteorAt && this.meteors.length < 1) {
-            const startX = width * (0.18 + Math.random() * 0.72);
-            const startY = height * (0.08 + Math.random() * 0.34);
+            // On wide screens use exposed sky beside the central controls.
+            const leftSide = Math.random() < 0.5;
+            const startX = width > 900
+                ? width * (leftSide ? 0.12 : 0.86)
+                : width * (0.55 + Math.random() * 0.3);
+            const startY = height * (0.05 + Math.random() * 0.12);
             this.meteors.push({
                 startX,
                 startY,
-                angle: Math.PI * (0.62 + Math.random() * 0.1),
-                length: 45 + Math.random() * 55,
-                speed: 420 + Math.random() * 180,
+                angle: Math.PI * (width > 900 && leftSide ? 0.28 + Math.random() * 0.1 : 0.62 + Math.random() * 0.1),
+                length: Math.min(width * 0.24, 65 + Math.random() * 65),
+                speed: Math.min(width * 0.75, 360 + Math.random() * 160),
                 bornAt: time,
-                lifetime: 0.45 + Math.random() * 0.35,
-                color: Math.random() < 0.6 ? [205, 231, 255] : [255, 231, 192]
+                lifetime: 0.75 + Math.random() * 0.3,
+                brightness: 0.55 + Math.random() * 0.2
             });
-            this.nextMeteorAt = time + 45 + Math.random() * 75;
+            this.nextMeteorAt = time + 25 + Math.random() * 45;
         }
-        this.meteors = this.meteors.filter((meteor) => {
+        // No allocation or drawing at all between these occasional events.
+        const meteor = this.meteors[0];
+        if (!meteor) return;
+        if (!this.meteorSprite) {
+            this.meteorSprite = document.createElement('canvas');
+            this.meteorSprite.width = 256;
+            this.meteorSprite.height = 12;
+            const ctx = this.meteorSprite.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 256, 0);
+            gradient.addColorStop(0, 'rgba(205,225,255,0)');
+            gradient.addColorStop(0.65, 'rgba(220,234,255,0.3)');
+            gradient.addColorStop(1, 'rgba(255,255,255,1)');
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 1.8;
+            ctx.shadowBlur = 2;
+            ctx.shadowColor = 'rgba(205,225,255,0.5)';
+            ctx.beginPath(); ctx.moveTo(0,6); ctx.lineTo(256,6); ctx.stroke();
+        }
             const age = time - meteor.bornAt;
-            if (age >= meteor.lifetime) return false;
+            if (age >= meteor.lifetime + 0.18) { this.meteors.length = 0; return; }
             const progress = age / meteor.lifetime;
-            const distance = age * meteor.speed;
+            const distance = Math.min(age, meteor.lifetime) * meteor.speed;
             const headX = meteor.startX + Math.cos(meteor.angle) * distance;
             const headY = meteor.startY + Math.sin(meteor.angle) * distance;
-            const tailX = headX - Math.cos(meteor.angle) * meteor.length;
-            const tailY = headY - Math.sin(meteor.angle) * meteor.length;
-            const alpha = Math.sin(Math.PI * progress) * 0.4;
-            const [red, green, blue] = meteor.color;
-            const gradient = this.ctx.createLinearGradient(tailX, tailY, headX, headY);
-            gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
-            gradient.addColorStop(0.72, `rgba(${red}, ${green}, ${blue}, ${alpha * 0.45})`);
-            gradient.addColorStop(1, `rgba(255, 255, 255, ${alpha})`);
+            const tailLength = Math.min(meteor.length, distance);
+            // Quick emergence, restrained peak, then a faint 180 ms residual trail.
+            const alpha = Math.min(1, progress / 0.12) * Math.pow(Math.max(0, 1 - age / (meteor.lifetime + 0.18)), 0.65) * meteor.brightness;
             this.ctx.save();
-            this.ctx.lineWidth = 0.75;
-            this.ctx.strokeStyle = gradient;
-            this.ctx.shadowBlur = 3;
-            this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-            this.ctx.beginPath();
-            this.ctx.moveTo(tailX, tailY);
-            this.ctx.lineTo(headX, headY);
-            this.ctx.stroke();
+            this.ctx.translate(headX, headY);
+            this.ctx.rotate(meteor.angle);
+            this.ctx.globalAlpha = alpha;
+            this.ctx.drawImage(this.meteorSprite, -tailLength, -6, tailLength, 12);
             this.ctx.restore();
-            return true;
-        });
     }
 }
 
@@ -4698,6 +4806,7 @@ class MeditationController {
     }
 
     async startExperiment(activity) {
+        if (['perineal', 'bath', 'assisted-bath'].includes(activity) && !state.advancedFeaturesUnlocked) return;
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
         try {
@@ -5250,8 +5359,16 @@ class MeditationController {
         // sentence plays. Piper's worker is serial, so waiting for the whole
         // passage here would leave the user with music and silence for a long
         // time before the first voice clip can start.
+        const generation = piperTTS.generation;
         const queueSynthesis = (sentence) => {
-            const job = piperTTS.synthesize(sentence);
+            const job = piperTTS.synthesize(sentence).then(async blob => {
+                if (generation !== piperTTS.generation) throw new Error('Narration cancelled');
+                const buffer = await piperTTS.decode(blob);
+                if (generation !== piperTTS.generation) throw new Error('Narration cancelled');
+                if (!buffer) throw new Error('Piper returned an empty audio clip.');
+                piperTTS.getNormalizationGain(buffer);
+                return buffer;
+            });
             // A Stop action may cancel jobs that have not reached the active
             // await yet. Attach a sink immediately so intentional cancellation
             // cannot create unhandled promise errors.
@@ -5280,10 +5397,11 @@ class MeditationController {
             }
 
             try {
-                const blob = await pending.shift();
+                const buffer = await pending.shift();
+                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
+                while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
+                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
                 if (i + 2 < sentences.length) pending.push(queueSynthesis(sentences[i + 2]));
-                const buffer = await piperTTS.decode(blob);
-                if (!buffer) throw new Error('Piper returned an empty audio clip.');
                 // Replace the estimate for this clip as soon as its real
                 // decoded duration is available. The ticker keeps its current
                 // elapsed position while its total timing becomes more exact.
@@ -5308,7 +5426,7 @@ class MeditationController {
             } catch (error) {
                 // Stopping a journey intentionally cancels Piper. Do not turn
                 // that cancellation into a new browser-speech utterance.
-                if (!this.isMeditationActive) return;
+                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
                 piperFailed = true;
                 piperTTS.cancel('sentence failed');
                 setVoiceStatus(t('ui.piperFallback'), 'error');
@@ -5933,8 +6051,10 @@ function storedBooleanWithLegacy(key, legacyKey) {
 }
 
 document.addEventListener('visibilitychange', async () => {
+    document.documentElement.classList.toggle('page-hidden', document.hidden);
     if (wakeLock.wakeLock !== null && document.visibilityState === 'visible') await wakeLock.request();
 });
+document.documentElement.classList.toggle('page-hidden', document.hidden);
 
 const state = {
     language: localStorage.getItem('chakra_lang') || 'ml',
@@ -5997,6 +6117,8 @@ const state = {
     pleasureAmbienceBlur: true,
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     visualEffect: normalizeMeditationVisualEffect(localStorage.getItem('chakra_visual_effect')),
+    showNarrationText: localStorage.getItem('chakra_show_narration_text') !== 'false',
+    advancedFeaturesUnlocked: false,
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
     bgMusicMode: false,
@@ -6429,6 +6551,8 @@ function loadPreferences() {
         });
     }, 0);
     syncValue('visual-effect-select', state.visualEffect);
+    syncChecked('narration-scroll-toggle', state.showNarrationText);
+    applyNarrationScrollPreference();
     visual.applyImageEffect();
 
     // Sync Journey Timings Sliders
@@ -6579,6 +6703,9 @@ function attachEventListeners() {
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         state.visualEffect = normalizeMeditationVisualEffect(document.getElementById('visual-effect-select')?.value);
+        state.showNarrationText = getChecked('narration-scroll-toggle');
+        localStorage.setItem('chakra_show_narration_text', state.showNarrationText);
+        applyNarrationScrollPreference();
         
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.removeItem('chakra_box_meditation');
@@ -6703,8 +6830,34 @@ function attachEventListeners() {
         document.getElementById('assisted-bathing-toggle')
     ].filter(Boolean);
     const intimateServicePanel = document.getElementById('intimate-service-panel');
+    const experimentCareOptions = document.getElementById('experiment-care-group');
+    const experimentActivitySelect = document.getElementById('experiment-activity');
     let intimateServiceUnlocked = false;
     let intimateServiceTapCount = 0;
+    let intimateServiceLastTap = null;
+    let intimateServiceTapTimer = null;
+    let unlockToastTimer = null;
+    const versionUnlockButton = document.getElementById('app-version-unlock');
+    const advancedFeaturesControl = document.getElementById('advanced-features-control');
+    const advancedFeaturesToggle = document.getElementById('advanced-features-toggle');
+    const unlockToast = document.createElement('div');
+    unlockToast.className = 'advanced-unlock-toast';
+    unlockToast.setAttribute('role', 'status');
+    unlockToast.setAttribute('aria-live', 'polite');
+    document.body.appendChild(unlockToast);
+
+    function showUnlockToast(message) {
+        clearTimeout(unlockToastTimer);
+        unlockToast.textContent = message;
+        unlockToastTimer = setTimeout(() => { unlockToast.textContent = ''; unlockToastTimer = null; }, 2500);
+    }
+
+    function resetUnlockTaps() {
+        clearTimeout(intimateServiceTapTimer);
+        intimateServiceTapTimer = null;
+        intimateServiceTapCount = 0;
+        intimateServiceLastTap = null;
+    }
 
     function clearIntimateService() {
         intimateServiceToggles.forEach(toggle => { toggle.checked = false; });
@@ -6718,7 +6871,30 @@ function attachEventListeners() {
 
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
-        if (intimateServicePanel) intimateServicePanel.classList.toggle('is-locked', isLocked);
+        state.advancedFeaturesUnlocked = !isLocked;
+        if (experimentCareOptions && experimentActivitySelect) {
+            experimentCareOptions.disabled = isLocked;
+            experimentCareOptions.hidden = isLocked;
+            if (isLocked) {
+                const resetActivity = ['perineal', 'bath', 'assisted-bath'].includes(experimentActivitySelect.value);
+                // Remove from the native picker, including browsers that do
+                // not consistently hide optgroups via the hidden attribute.
+                experimentCareOptions.remove();
+                if (resetActivity) {
+                    experimentActivitySelect.value = 'chakra:root';
+                    experimentActivitySelect.dispatchEvent(new Event('change'));
+                }
+            } else {
+                experimentCareOptions.label = t('ui.experimentCare');
+                experimentCareOptions.querySelectorAll('[data-i18n]').forEach(option => {
+                    option.textContent = t(option.dataset.i18n);
+                });
+                experimentActivitySelect.appendChild(experimentCareOptions);
+            }
+        }
+        if (intimateServicePanel) intimateServicePanel.hidden = isLocked || getChecked('shots-toggle');
+        if (advancedFeaturesControl) advancedFeaturesControl.hidden = isLocked;
+        if (advancedFeaturesToggle) advancedFeaturesToggle.checked = !isLocked;
         intimateServiceToggles.forEach(toggle => {
             toggle.disabled = isLocked;
             toggle.setAttribute('aria-disabled', String(isLocked));
@@ -6727,20 +6903,47 @@ function attachEventListeners() {
 
     function handleIntimateServiceUnlockTap() {
         if (intimateServiceUnlocked) return;
+        const now = performance.now();
+        if (intimateServiceLastTap === null || now - intimateServiceLastTap > 1500) resetUnlockTaps();
+        intimateServiceLastTap = now;
+        clearTimeout(intimateServiceTapTimer);
         intimateServiceTapCount += 1;
-        const remaining = 4 - intimateServiceTapCount;
+        const remaining = 7 - intimateServiceTapCount;
         if (remaining <= 0) {
+            resetUnlockTaps();
             setIntimateServiceLocked(false);
+            showUnlockToast(t('ui.advancedFeaturesEnabled'));
             return;
         }
-        intimateServicePanel?.setAttribute('data-unlock-progress', String(remaining));
+        if (intimateServiceTapCount >= 5) showUnlockToast(t('ui.advancedUnlockRemaining').replace('{{remaining}}', String(remaining)));
+        intimateServiceTapTimer = setTimeout(() => {
+            resetUnlockTaps();
+            clearTimeout(unlockToastTimer);
+            unlockToast.textContent = '';
+        }, 1500);
     }
 
     // Sensitive Lobby controls are opt-in per page load and cannot be
     // activated by stale localStorage state alone.
     clearIntimateService();
     setIntimateServiceLocked(true);
-    intimateServicePanel?.addEventListener('click', handleIntimateServiceUnlockTap);
+    versionUnlockButton?.addEventListener('click', handleIntimateServiceUnlockTap);
+    // Ignore held-key auto-repeat while keeping deliberate keyboard activation.
+    versionUnlockButton?.addEventListener('keydown', event => {
+        if (event.repeat && (event.key === 'Enter' || event.key === ' ')) event.preventDefault();
+    });
+    saveConfigBtn.addEventListener('click', resetUnlockTaps);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) resetUnlockTaps(); });
+    advancedFeaturesToggle?.addEventListener('change', () => {
+        if (advancedFeaturesToggle.checked) return;
+        resetUnlockTaps();
+        clearIntimateService();
+        setIntimateServiceLocked(true);
+        updateExperienceModeVisibility();
+        updateSessionEstimate();
+        updateJourneyRoadmap();
+        showUnlockToast(t('ui.advancedFeaturesDisabled'));
+    });
 
     function isIntimateServiceToggle(target) {
         return intimateServiceToggles.includes(target);
@@ -6963,7 +7166,7 @@ function attachEventListeners() {
         const hideForShots = ['chakra-selection-panel', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
         hideForShots.forEach(id => {
             const element = document.getElementById(id);
-            if (element) element.hidden = shots;
+            if (element) element.hidden = shots || (id === 'intimate-service-panel' && !intimateServiceUnlocked);
         });
         ['intention-config-group', 'journey-preferences-group'].forEach(id => {
             const element = document.getElementById(id);

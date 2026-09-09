@@ -1,3 +1,4 @@
+import { BoundedPhonemizer } from './bounded-phonemizer.js';
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -320,30 +321,9 @@ const _TtsSession = class _TtsSession {
   }
   async predict(text, settings = {}) {
     await this.waitReady;
-    const input = JSON.stringify([{ text: text.trim() }]);
-    const phonemeIds = await new Promise(async (resolve) => {
-      const module = await __privateGet(this, _createPiperPhonemize).call(this, {
-        print: (data) => {
-          resolve(JSON.parse(data).phoneme_ids);
-        },
-        printErr: (message) => {
-          throw new Error(message);
-        },
-        locateFile: (url) => {
-          if (url.endsWith(".wasm")) return __privateGet(this, _wasmPaths).piperWasm;
-          if (url.endsWith(".data")) return __privateGet(this, _wasmPaths).piperData;
-          return url;
-        }
-      });
-      module.callMain([
-        "-l",
-        __privateGet(this, _phonemizerVoice) || __privateGet(this, _modelConfig).espeak.voice,
-        "--input",
-        input,
-        "--espeak_data",
-        "/espeak-ng-data"
-      ]);
-    });
+    this.phonemizer ||= new BoundedPhonemizer(__privateGet(this, _createPiperPhonemize), __privateGet(this, _wasmPaths));
+    const phonemeIds = await this.phonemizer.phonemize(text,
+      __privateGet(this, _phonemizerVoice) || __privateGet(this, _modelConfig).espeak.voice);
     const speakerId = 0;
     const sampleRate = __privateGet(this, _modelConfig).audio.sample_rate;
     const inference = __privateGet(this, _modelConfig).inference;
@@ -374,12 +354,15 @@ const _TtsSession = class _TtsSession {
         sid: new (__privateGet(this, _ort)).Tensor("int64", [speakerId])
       });
     }
-    const {
-      output: { data: pcm }
-    } = await session.run(feeds);
-    return new Blob([pcm2wav(pcm, 1, sampleRate)], {
-      type: "audio/x-wav"
-    });
+    let outputs;
+    try {
+      outputs = await session.run(feeds);
+      return new Blob([pcm2wav(outputs.output.data, 1, sampleRate)], {
+        type: "audio/x-wav"
+      });
+    } finally {
+      for (const tensor of [...Object.values(feeds), ...Object.values(outputs || {})]) tensor.dispose?.();
+    }
   }
 };
 _createPiperPhonemize = new WeakMap();

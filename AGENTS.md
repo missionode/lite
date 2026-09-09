@@ -13,3 +13,18 @@ The owner has designated `docs/app-map/index.html` as the project's shared visua
 - In the final handoff, identify the affected maps and distinguish source review, automated tests, and device/playback evidence.
 
 For a change that does not affect flows, confirm that the atlas remains accurate; do not invent a flow change merely to edit a diagram. Feature work is not complete while its corresponding map is stale. If source and map disagree, inspect the implementation and reconcile them explicitly.
+
+## Route model intensity automatically
+
+Use the local Loop model router for meaningful project work. The default route is `--task-class auto`, which classifies the bounded task from the actual prompt and selects the least-cost capable Codex model and reasoning effort from `Loop/config/model-routing.json`.
+
+- Preserve an explicit user-selected model or reasoning level.
+- Route small searches, formatting, and status checks to the light lane.
+- Route isolated wording, label, opacity, color, and one-file edits to the focused lane.
+- Route normal implementation, debugging, tests, and project analysis to the standard lane.
+- Route architecture, root-cause diagnosis, research synthesis, complex refactors, and performance work to the reasoning lane.
+- Route whole-app mapping, broad audits, and near-context-limit reviews to the large-context lane.
+- Route browser, responsive, visual layout, canvas, WebGL, and animation verification to the browser lane; browser testing still remains opt-in under Loop policy.
+- Route production pushes, releases, security, privacy, auth, migrations, destructive recovery, payment, legal, medical, or financial-impact work to the high-risk lane.
+
+The router may launch model-specific child Codex runs only through `Loop/scripts/codex_model_router.py`; it must not rewrite global Codex settings. Record routing outcomes under `.codex/loop-routing/` when automatic dispatch actually runs. If automatic switching is unavailable, report the recommended model and effort instead of claiming the active model changed.

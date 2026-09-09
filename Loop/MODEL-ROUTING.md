@@ -121,7 +121,7 @@ A gateway such as OpenRouter may implement the remote adapter and route among re
 
 ## Bundled Codex launch adapter
 
-Loop ships a dependency-free internal adapter at `scripts/codex_model_router.py` and its capability mapping at `config/model-routing.json`. The user does not manually choose a task class or run this script: the Loop skill classifies a bounded task and invokes the adapter when a separate model run is justified.
+Loop ships a dependency-free internal adapter at `scripts/codex_model_router.py` and its capability mapping at `config/model-routing.json`. The user does not manually choose a task class or run this script. The workspace default is `--task-class auto`: the adapter reads the bounded task prompt, infers the smallest capable task class, and then applies the configured model and reasoning effort. A supervising Loop session may still pass an explicit task class when it has already decomposed and classified a bounded task.
 
 The adapter uses the Codex CLI's per-run configuration surface:
 
@@ -131,13 +131,14 @@ codex exec fork --model <model> -c model_reasoning_effort="<effort>" <session>
 codex exec resume --model <model> -c model_reasoning_effort="<effort>" <session>
 ```
 
+- Use `--task-class auto` unless the supervising workflow has an explicit, evidence-backed class for the bounded task.
 - Prefer `fork` for automatic task delegation from an active supervisor session. It preserves source context while preventing two processes from mutating the same active session.
 - Use `resume` only after the source interactive session has stopped or when the host guarantees exclusive session ownership.
 - Use `new` for a self-contained task whose bounded local context packet is sufficient.
 - Send the task over stdin so private prompt content is absent from process arguments.
 - Prefix child work with `[LOOP_ROUTED_CHILD]` to prevent recursive routing.
 - Keep the global `~/.codex/config.toml` unchanged. Per-run `--model` and `-c` values override its defaults only for the child invocation.
-- Store compact decisions under `<target>/.codex/loop-routing/`. Records contain a prompt hash, route, model, effort, attempts, and resume reference—not prompt text or model output.
+- Store compact decisions under `<target>/.codex/loop-routing/`. Records contain a prompt hash, inferred or explicit route, model, effort, attempts, and resume reference—not prompt text or model output.
 - Treat a zero exit status as child dispatch success, not final feature validation. The supervisor still validates and integrates the result.
 
 The default mapping is versioned and dated because model availability changes. Refresh `config/model-routing.json` against the current host-selectable catalog before relying on stale entries. Optional profile templates under `config/codex-profiles/` support human-launched sessions; they are not the live automatic router and must not be copied into `$CODEX_HOME` without approval.

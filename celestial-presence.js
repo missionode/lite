@@ -70,7 +70,7 @@
                 if (this.uploaded !== image.src) { this.uploaded = null; this.fallback(); this.refresh(); }
             });
             this.observer.observe(image, { attributes: true, attributeFilter: ['src'] });
-            this.resizeObserver = new ResizeObserver(() => this.refresh());
+            this.resizeObserver = new ResizeObserver(() => { this.rect = null; this.refresh(); });
             this.resizeObserver.observe(container);
             this.canvas.addEventListener('webglcontextlost', event => {
                 event.preventDefault(); this.lost = true; this.fallback();
@@ -111,11 +111,22 @@
         setActive(active, color) {
             this.active = active;
             if (/^#[0-9a-f]{6}$/i.test(color || '')) this.tint = [1,3,5].map(i => parseInt(color.slice(i,i+2),16)/255);
-            if (!active) { this.breath = 0; this.breathTarget = 0; this.paused = false; }
+            if (!active) {
+                this.breath = 0; this.breathTarget = 0; this.paused = false;
+                this.releaseAnalyser();
+            }
             this.refresh();
         }
         setPaused(paused) { this.paused = paused; this.refresh(); }
         setAudio(audio) { this.audio = audio; }
+        releaseAnalyser() {
+            if (!this.analyser) return;
+            this.audio.mantraGain.disconnect(this.analyser);
+            this.analyser.disconnect();
+            this.analyser = null;
+            this.samples = null;
+            this.resonance = 0;
+        }
         sampleAudio(dt) {
             if (!this.analyser && this.audio?.ctx && this.audio.mantraGain) {
                 this.analyser = this.audio.ctx.createAnalyser();
@@ -136,12 +147,16 @@
             this.breathSeconds = Math.max(.1, Number(seconds) || 4);
         }
         fallback() {
+            clearTimeout(this.timer); this.timer = null;
             cancelAnimationFrame(this.frame); this.frame = null;
+            this.releaseAnalyser();
             this.container.classList.remove('presence-ready');
         }
         refresh() {
+            clearTimeout(this.timer); this.timer = null;
             cancelAnimationFrame(this.frame); this.frame = null; this.last = null;
             if (!this.active || this.lost) { this.fallback(); return; }
+            if (document.hidden || this.paused || this.preference.matches) this.releaseAnalyser();
             if (document.hidden) return;
             this.tick(performance.now());
         }
@@ -149,7 +164,6 @@
             this.frame = null;
             if (!this.active || document.hidden || this.lost) return;
             const dt = this.last == null ? 0 : Math.min(.1,(now-this.last)/1000);
-            if (this.last != null && dt < 1/30) { this.frame = requestAnimationFrame(this.tick); return; }
             this.last = now;
             try {
                 if (!this.image.complete || !this.image.naturalWidth || !this.initialize()) { this.fallback(); return; }
@@ -159,7 +173,7 @@
                     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,this.image);
                     this.uploaded = this.image.src;
                 }
-                const rect = this.canvas.getBoundingClientRect();
+                const rect = this.rect || (this.rect = this.canvas.getBoundingClientRect());
                 const ratio = Math.min(devicePixelRatio || 1,1.25,960/Math.max(rect.width,rect.height,1));
                 const width = Math.max(1,Math.round(rect.width*ratio)), height = Math.max(1,Math.round(rect.height*ratio));
                 if (this.canvas.width !== width || this.canvas.height !== height) { this.canvas.width=width; this.canvas.height=height; }
@@ -177,7 +191,12 @@
                 gl.uniform3fv(u.tint,this.tint);
                 gl.drawArrays(gl.TRIANGLES,0,6);
                 this.container.classList.add('presence-ready');
-                if (moving) this.frame = requestAnimationFrame(this.tick);
+                if (moving) this.timer = setTimeout(() => {
+                    this.timer = null;
+                    if (this.active && !document.hidden && !this.paused && !this.preference.matches && !this.lost) {
+                        this.frame = requestAnimationFrame(this.tick);
+                    }
+                }, 33);
             } catch (error) { this.fallback(); }
         }
     }
