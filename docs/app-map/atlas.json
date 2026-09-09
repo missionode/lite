@@ -1,0 +1,2994 @@
+{
+  "meta": {
+    "title": "Chakra Meditation · Flow Atlas",
+    "date": "2026-09-09",
+    "commit": "6a0ee84 + uncommitted natural-sky and audio-transition updates",
+    "scope": "Current working-tree behavior. Sky and audio changes have static/unit evidence only; no device listening verification. Browser preview was declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+  },
+  "graphs": [
+    {
+      "id": "overview",
+      "group": "Start here",
+      "title": "The whole application",
+      "subtitle": "Navigation, journey families, supporting systems, and exits.",
+      "source": "app.js:6184; app.js:7553; index.html:248",
+      "rows": [
+        [
+          [
+            "launch",
+            "Open app",
+            "Browser or installed PWA; local preferences and cached assets influence startup."
+          ]
+        ],
+        [
+          [
+            "settings",
+            "Settings",
+            "First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts."
+          ],
+          [
+            "lobby",
+            "Meditation Room",
+            "Main mode selection, chakra choices, intention, duration and consultation."
+          ]
+        ],
+        [
+          [
+            "experiments",
+            "Experiments",
+            "Settings → isolated activity → return to Experiment screen. See Experiments map."
+          ],
+          [
+            "journeys",
+            "Journey dispatcher",
+            "Shots → Music Only → Sleep → focused or standard guided start. See mode map."
+          ],
+          [
+            "consult",
+            "Consultation / repertory",
+            "Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot."
+          ]
+        ],
+        [
+          [
+            "runtime",
+            "Active experience",
+            "Shared timer, audio, narration, visuals, mixer, pause and stop."
+          ],
+          [
+            "support",
+            "Supporting systems",
+            "JSON scripts, language bundles, Web Audio, Piper worker, localStorage and service worker."
+          ]
+        ],
+        [
+          [
+            "complete",
+            "Completion",
+            "Guided and Sleep flows update local stats; return to room or eligible Earn link."
+          ],
+          [
+            "other",
+            "Other exits",
+            "Shot completion reloads; Music Only stops manually; experiments return to their screen."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "launch",
+          "settings",
+          "First visit"
+        ],
+        [
+          "launch",
+          "lobby",
+          "Configured"
+        ],
+        [
+          "settings",
+          "lobby",
+          "Save"
+        ],
+        [
+          "lobby",
+          "settings",
+          "Settings"
+        ],
+        [
+          "settings",
+          "experiments",
+          "Experiment Mode"
+        ],
+        [
+          "lobby",
+          "journeys",
+          "Begin"
+        ],
+        [
+          "lobby",
+          "consult",
+          "Open page"
+        ],
+        [
+          "journeys",
+          "runtime",
+          "Selected path"
+        ],
+        [
+          "support",
+          "runtime",
+          "Provides services"
+        ],
+        [
+          "runtime",
+          "complete",
+          "finish()"
+        ],
+        [
+          "runtime",
+          "other",
+          "Stop / special finish"
+        ],
+        [
+          "experiments",
+          "runtime",
+          "Run activity"
+        ],
+        [
+          "complete",
+          "lobby",
+          "Return"
+        ],
+        [
+          "consult",
+          "lobby",
+          "Return / prepare Shot"
+        ]
+      ],
+      "notes": [
+        "Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries."
+      ]
+    },
+    {
+      "id": "startup",
+      "group": "Start here",
+      "title": "Startup and first visit",
+      "subtitle": "Loading order and optional browser capabilities.",
+      "source": "app.js:895; app.js:1160; app.js:6184; app.js:6505",
+      "rows": [
+        [
+          [
+            "open",
+            "Open / reload",
+            "Objects and state are constructed; splash is visible."
+          ]
+        ],
+        [
+          [
+            "sky",
+            "Start sky",
+            "Approximate sky is immediately available; location permission can refine it."
+          ],
+          [
+            "timing",
+            "Load timing JSON",
+            "Built-in defaults on failure; timingProfile query can apply fast-test overrides."
+          ]
+        ],
+        [
+          [
+            "language",
+            "Load language registry",
+            "Restore meditation language or Malayalam default; restore display language or English fallback. Load all four locale bundles."
+          ]
+        ],
+        [
+          [
+            "voices",
+            "Load voice registry",
+            "Load Piper definitions; enumerate browser voices; restore preferences and attach UI handlers."
+          ]
+        ],
+        [
+          [
+            "configured",
+            "Configured flag?",
+            "chakra_configured determines initial screen."
+          ],
+          [
+            "repertory",
+            "Repertory query?",
+            "Attachment consumes shotSource / shotFrequency and prompts for a Shot before checkFirstTime runs."
+          ]
+        ],
+        [
+          [
+            "settings",
+            "Settings",
+            "Unconfigured visitor. Save sets chakra_configured and opens Lobby."
+          ],
+          [
+            "lobby",
+            "Lobby",
+            "Configured visitor. Session-only modes start cleared."
+          ]
+        ],
+        [
+          [
+            "sw",
+            "Register service worker",
+            "Registration is inside a window load listener added after awaited startup work. Registration timing deserves verification."
+          ],
+          [
+            "splash",
+            "Hide splash",
+            "2.5-second delay begins after async initialization reaches its end."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "open",
+          "sky",
+          "Parallel visual work"
+        ],
+        [
+          "open",
+          "timing",
+          "init()"
+        ],
+        [
+          "timing",
+          "language",
+          "Then"
+        ],
+        [
+          "language",
+          "voices",
+          "Then"
+        ],
+        [
+          "voices",
+          "configured",
+          "checkFirstTime"
+        ],
+        [
+          "voices",
+          "repertory",
+          "During listeners"
+        ],
+        [
+          "configured",
+          "settings",
+          "No"
+        ],
+        [
+          "configured",
+          "lobby",
+          "Yes"
+        ],
+        [
+          "configured",
+          "sw",
+          "After screen choice"
+        ],
+        [
+          "sw",
+          "splash",
+          "Schedule hide"
+        ]
+      ],
+      "notes": [
+        "Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. This does not establish complete offline readiness."
+      ]
+    },
+    {
+      "id": "modes",
+      "group": "Journeys",
+      "title": "Mode selection and start routing",
+      "subtitle": "Mutual exclusion, validation, and dispatch priority.",
+      "source": "app.js:6791; app.js:6879; app.js:7553",
+      "rows": [
+        [
+          [
+            "lobby",
+            "Choose an experience",
+            "Ordinary mode uses selected chakras; choose at least one."
+          ]
+        ],
+        [
+          [
+            "exclusive",
+            "Exclusive modes",
+            "HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices."
+          ],
+          [
+            "care",
+            "Intimate Service",
+            "Four clicks unlock the panel per page load. Any combination of three care options is allowed; choosing care clears other modes."
+          ],
+          [
+            "shots",
+            "Enable Shots?",
+            "No Frequency blocks it. Otherwise a confirmation is required; cancel restores normal mode."
+          ]
+        ],
+        [
+          [
+            "begin",
+            "Press Begin",
+            "Actual dispatcher tests Shots first; then derives Sleep and focused experience."
+          ]
+        ],
+        [
+          [
+            "shot",
+            "Shots",
+            "Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot."
+          ],
+          [
+            "music",
+            "Music Only",
+            "Start indefinite music with common controls."
+          ],
+          [
+            "sleep",
+            "Sleep",
+            "Load and validate five stages; start silent narration-free journey."
+          ]
+        ],
+        [
+          [
+            "focused",
+            "Focused practice",
+            "Priority if inconsistent state: Box → Ho’oponopono → Yoga → Intimate. Yoga requires a selected pose."
+          ],
+          [
+            "guided",
+            "Guided meditation",
+            "HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras."
+          ]
+        ],
+        [
+          [
+            "start",
+            "Shared guided start",
+            "DND reminder, scripts, validation, audio, Piper warmup, wake lock, timers, selected routine."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "lobby",
+          "exclusive",
+          "Select"
+        ],
+        [
+          "lobby",
+          "care",
+          "Unlock"
+        ],
+        [
+          "lobby",
+          "shots",
+          "Confirm"
+        ],
+        [
+          "exclusive",
+          "begin",
+          "Ready"
+        ],
+        [
+          "care",
+          "begin",
+          "Ready"
+        ],
+        [
+          "shots",
+          "begin",
+          "Accepted"
+        ],
+        [
+          "begin",
+          "shot",
+          "1 · Shots"
+        ],
+        [
+          "begin",
+          "music",
+          "2 · Music"
+        ],
+        [
+          "begin",
+          "sleep",
+          "3 · Sleep"
+        ],
+        [
+          "begin",
+          "focused",
+          "4 · Focused"
+        ],
+        [
+          "begin",
+          "guided",
+          "5 · Standard / HRIM"
+        ],
+        [
+          "focused",
+          "start",
+          "Valid"
+        ],
+        [
+          "guided",
+          "start",
+          "Valid"
+        ]
+      ],
+      "notes": [
+        "Shots hide incompatible Lobby controls. Focused practices hide intention and returning-opening controls. Checking Music Only, Sleep or a focused mode can clear Corpse Pose."
+      ]
+    },
+    {
+      "id": "standard",
+      "group": "Journeys",
+      "title": "Standard chakra journey",
+      "subtitle": "Selected chakras in Root → Crown order; returning and demo branches included.",
+      "source": "app.js:4537; app.js:4788; app.js:5428",
+      "rows": [
+        [
+          [
+            "begin",
+            "Begin + DND reminder",
+            "Guard duplicate starts; show Arriving and load / validate selected content."
+          ]
+        ],
+        [
+          [
+            "setup",
+            "Audio + warmup",
+            "Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested."
+          ]
+        ],
+        [
+          [
+            "arrive",
+            "Arriving countdown",
+            "Configured 10–300 seconds, default 60; music fades in over this period."
+          ]
+        ],
+        [
+          [
+            "prepare",
+            "Preparation",
+            "Initial settle → pre-practice guidance."
+          ],
+          [
+            "wrapper",
+            "Arrival induction",
+            "Ordinary non-demo only: narration → 432 Hz transition tone for half the selected drone window."
+          ]
+        ],
+        [
+          [
+            "moon",
+            "Moon opening",
+            "When Returning is off, use current moon-phase script."
+          ],
+          [
+            "return",
+            "Returning opening",
+            "When enabled, use intro.returning; independent of journey statistics."
+          ]
+        ],
+        [
+          [
+            "gratitude",
+            "Gratitude + intention",
+            "Gratitude narration; if personal intention is nonempty, speak intention with optional timed tone."
+          ]
+        ],
+        [
+          [
+            "ready",
+            "Arrival readiness",
+            "Ordinary non-demo only: narration → 528 Hz transition tone → post-preparation gap."
+          ]
+        ],
+        [
+          [
+            "loop",
+            "Selected chakra loop",
+            "Each chakra: narration → mantra and bounded drone → affirmation. Between chakras: breathing interval."
+          ]
+        ],
+        [
+          [
+            "end",
+            "Silence + closing",
+            "Final silence → closing narration → full-body affirmation with configured gaps."
+          ]
+        ],
+        [
+          [
+            "emerge",
+            "Emergence",
+            "Non-demo only: bowl unless No Frequency → guidance → emergence countdown → final quiet."
+          ]
+        ],
+        [
+          [
+            "finish",
+            "Completion",
+            "Stop audio / visuals, update stats and show completion choices."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "begin",
+          "setup",
+          "Valid content"
+        ],
+        [
+          "setup",
+          "arrive",
+          "Ready"
+        ],
+        [
+          "arrive",
+          "prepare",
+          "Warmup awaited"
+        ],
+        [
+          "prepare",
+          "wrapper",
+          "Non-demo"
+        ],
+        [
+          "prepare",
+          "moon",
+          "Demo + new opening"
+        ],
+        [
+          "prepare",
+          "return",
+          "Demo + returning"
+        ],
+        [
+          "wrapper",
+          "moon",
+          "Returning off"
+        ],
+        [
+          "wrapper",
+          "return",
+          "Returning on"
+        ],
+        [
+          "moon",
+          "gratitude",
+          "Opening pause"
+        ],
+        [
+          "return",
+          "gratitude",
+          "Opening pause"
+        ],
+        [
+          "gratitude",
+          "ready",
+          "Non-demo"
+        ],
+        [
+          "gratitude",
+          "loop",
+          "Demo"
+        ],
+        [
+          "ready",
+          "loop",
+          "Ready"
+        ],
+        [
+          "loop",
+          "end",
+          "Last chakra"
+        ],
+        [
+          "end",
+          "emerge",
+          "Non-demo"
+        ],
+        [
+          "end",
+          "finish",
+          "Demo"
+        ],
+        [
+          "emerge",
+          "finish",
+          "Done"
+        ]
+      ],
+      "notes": [
+        "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps."
+      ]
+    },
+    {
+      "id": "chakra",
+      "group": "Journeys",
+      "title": "Inside one chakra",
+      "subtitle": "Narration, audio handoff, bounded exposure, and loop transitions.",
+      "source": "app.js:5550; app.js:2712; app.js:4242; app.js:20",
+      "rows": [
+        [
+          [
+            "visual",
+            "Set chakra scene",
+            "Choose deity image if available, otherwise symbol; set mantra label, color, aura and progress dot."
+          ]
+        ],
+        [
+          [
+            "voice",
+            "Speak meditation",
+            "Selected language, Piper or browser speech. No chakra drone under this narration."
+          ]
+        ],
+        [
+          [
+            "load",
+            "Load mantra asset",
+            "Cached decoded buffer or fetch and decode the matching MP3."
+          ]
+        ],
+        [
+          [
+            "mantra",
+            "Crossfade music → mantra",
+            "After decoding and cancellation guard, simultaneously fade music out and mantra in over 6 seconds. User mantra volume is applied once."
+          ],
+          [
+            "skip",
+            "No mantra / load failure",
+            "No Mantra skips playback. Asset failure logs error and restores music; stage continues."
+          ]
+        ],
+        [
+          [
+            "drone",
+            "Bounded drone",
+            "Only if mantra exists and both suppression modes permit: Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s."
+          ]
+        ],
+        [
+          [
+            "hold",
+            "Practice window",
+            "Core minutes ×60 minus 15-second lead-out, bounded at zero. Pauses suspend elapsed stage time."
+          ]
+        ],
+        [
+          [
+            "affirm",
+            "Affirmation",
+            "Crossfade mantra out and music back in together over 4 seconds; default 4-second spoken gap, then affirmation."
+          ]
+        ],
+        [
+          [
+            "interval",
+            "Between chakras",
+            "Stop drone; 2-second preparation; wait for BOTH configured interval and breathing narration."
+          ],
+          [
+            "close",
+            "Last chakra",
+            "Caller chooses closing/completion, or next care stage."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "visual",
+          "voice",
+          "Ready"
+        ],
+        [
+          "voice",
+          "load",
+          "Narration ended"
+        ],
+        [
+          "load",
+          "mantra",
+          "Available"
+        ],
+        [
+          "load",
+          "skip",
+          "Disabled / failed"
+        ],
+        [
+          "mantra",
+          "drone",
+          "Playback active"
+        ],
+        [
+          "drone",
+          "hold",
+          "Exposure runs separately"
+        ],
+        [
+          "skip",
+          "hold",
+          "Preserve stage"
+        ],
+        [
+          "hold",
+          "affirm",
+          "Window ended"
+        ],
+        [
+          "affirm",
+          "interval",
+          "More chakras"
+        ],
+        [
+          "interval",
+          "visual",
+          "Next selected chakra"
+        ],
+        [
+          "affirm",
+          "close",
+          "Last"
+        ]
+      ],
+      "notes": [
+        "Core practice duration does not extend the fixed drone exposure window. HRIM reuses this routine with high_energy content and its own duration."
+      ]
+    },
+    {
+      "id": "hrim",
+      "group": "Journeys",
+      "title": "HRIM activation",
+      "subtitle": "A dedicated high-energy journey using one stage.",
+      "source": "app.js:4620; app.js:4788; app.js:5531",
+      "rows": [
+        [
+          [
+            "choose",
+            "Select HRIM",
+            "Clears competing experiences; uses its own practice duration and drone setting."
+          ]
+        ],
+        [
+          [
+            "start",
+            "Shared guided startup",
+            "DND, validation, audio, Piper warmup and Arriving countdown."
+          ]
+        ],
+        [
+          [
+            "prepare",
+            "Preparation guidance",
+            "No Arrival wrapper, Moon opening or Returning opening."
+          ]
+        ],
+        [
+          [
+            "intention",
+            "HRIM intention",
+            "Activation-oriented text inserts personal intention; optional timed intention tone; HRIM pacing."
+          ]
+        ],
+        [
+          [
+            "stage",
+            "High-energy stage",
+            "Meditation narration → HREEM mantra → bounded drone → affirmation."
+          ]
+        ],
+        [
+          [
+            "closing",
+            "Silence + closing",
+            "Shared closing and full-body affirmation; no Emergence wrapper."
+          ]
+        ],
+        [
+          [
+            "finish",
+            "Completion",
+            "Stats and completion modal."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "choose",
+          "start",
+          "Begin"
+        ],
+        [
+          "start",
+          "prepare",
+          "Arriving ends"
+        ],
+        [
+          "prepare",
+          "intention",
+          "Continue"
+        ],
+        [
+          "intention",
+          "stage",
+          "Post-preparation gap"
+        ],
+        [
+          "stage",
+          "closing",
+          "Done"
+        ],
+        [
+          "closing",
+          "finish",
+          "Done"
+        ]
+      ],
+      "notes": [
+        "No local-time restriction appears in this route. HRIM is separate from the seven selected chakras."
+      ]
+    },
+    {
+      "id": "sleep",
+      "group": "Journeys",
+      "title": "Sleep and Music Only",
+      "subtitle": "Two independent narration-free experiences.",
+      "source": "app.js:4344; app.js:5057; app.js:2496; scripts.json:1",
+      "rows": [
+        [
+          [
+            "choose",
+            "Choose mode",
+            "Both bypass normal guided preparation and chakra narration."
+          ]
+        ],
+        [
+          [
+            "sleep",
+            "Sleep start",
+            "DND reminder; load content; exactly five valid stage frequencies required."
+          ],
+          [
+            "music",
+            "Music Only start",
+            "Show background symbol; no session countdown; request wake lock."
+          ]
+        ],
+        [
+          [
+            "stages",
+            "Five Sleep stages",
+            "Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone."
+          ],
+          [
+            "loop",
+            "Continuous music",
+            "Background loop and visual pulse continue until user stops. No ordinary completion."
+          ]
+        ],
+        [
+          [
+            "gap",
+            "Sleep stage gaps",
+            "Stop drone after each stage; actual journey waits 3 seconds between stages."
+          ]
+        ],
+        [
+          [
+            "fade",
+            "Sleep ending",
+            "Fade background music for 12 seconds, then finish if still active."
+          ],
+          [
+            "stop",
+            "Manual stop",
+            "Shared stop cleanup → Lobby; no completed-journey increment."
+          ]
+        ],
+        [
+          [
+            "complete",
+            "Sleep completion",
+            "Stats and completion modal; sleep dimming removed."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "choose",
+          "sleep",
+          "Sleep"
+        ],
+        [
+          "choose",
+          "music",
+          "Music Only"
+        ],
+        [
+          "sleep",
+          "stages",
+          "Valid"
+        ],
+        [
+          "stages",
+          "gap",
+          "More stages"
+        ],
+        [
+          "gap",
+          "stages",
+          "Next"
+        ],
+        [
+          "stages",
+          "fade",
+          "Last stage"
+        ],
+        [
+          "fade",
+          "complete",
+          "Done"
+        ],
+        [
+          "music",
+          "loop",
+          "Ready"
+        ],
+        [
+          "loop",
+          "stop",
+          "Stop"
+        ],
+        [
+          "stages",
+          "stop",
+          "Stop"
+        ]
+      ],
+      "notes": [
+        "Sleep does not narrate. Its actual gap is hardcoded to 3 seconds, while its estimate reads script intervalSeconds. Music Only does not start the optional ambience through its normal route."
+      ]
+    },
+    {
+      "id": "focused",
+      "group": "Journeys",
+      "title": "Box breathing and Ho’oponopono",
+      "subtitle": "Standalone practices launched through shared guided startup.",
+      "source": "app.js:4626; app.js:4844; app.js:5459",
+      "rows": [
+        [
+          [
+            "start",
+            "Focused startup",
+            "DND, load/validate scripts, audio, Piper warmup; bypass ordinary Arriving / chakra wrapper."
+          ]
+        ],
+        [
+          [
+            "box",
+            "Box preparation",
+            "Breathing screen; fade music out; centering guidance and preparation gap."
+          ],
+          [
+            "hoo",
+            "Ho’oponopono intro",
+            "Meditation screen; intro narration and short pause."
+          ]
+        ],
+        [
+          [
+            "cycles",
+            "Four breathing cycles",
+            "Each cycle uses four localized steps: inhale, hold, exhale, hold; visual circle and step timer."
+          ],
+          [
+            "phrases",
+            "Three phrase cycles",
+            "Narrate all four phrases, with pauses, three times."
+          ]
+        ],
+        [
+          [
+            "boxdone",
+            "Breathing completion",
+            "Completion guidance; restore music; completion settle."
+          ],
+          [
+            "hoodone",
+            "Closing breath + rest",
+            "Closing narration fades music; final rest default 15 seconds."
+          ]
+        ],
+        [
+          [
+            "finish",
+            "Completion",
+            "Common stats and completion modal."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "start",
+          "box",
+          "Box selected"
+        ],
+        [
+          "start",
+          "hoo",
+          "Ho’oponopono selected"
+        ],
+        [
+          "box",
+          "cycles",
+          "Prepared"
+        ],
+        [
+          "cycles",
+          "cycles",
+          "Next step / cycle"
+        ],
+        [
+          "cycles",
+          "boxdone",
+          "Four cycles done"
+        ],
+        [
+          "hoo",
+          "phrases",
+          "Intro ends"
+        ],
+        [
+          "phrases",
+          "phrases",
+          "Next phrase / cycle"
+        ],
+        [
+          "phrases",
+          "hoodone",
+          "Three cycles done"
+        ],
+        [
+          "boxdone",
+          "finish",
+          "Done"
+        ],
+        [
+          "hoodone",
+          "finish",
+          "Done"
+        ]
+      ],
+      "notes": [
+        "Neither route automatically appends a chakra journey. Box step length comes from timeBreathing; its ordinary Settings timing row is hidden in the current UI."
+      ]
+    },
+    {
+      "id": "yoga",
+      "group": "Journeys",
+      "title": "Yoga experience",
+      "subtitle": "Optional rest and bathing before selected poses.",
+      "source": "app.js:5129; app.js:7558; timing-config.json:1",
+      "rows": [
+        [
+          [
+            "begin",
+            "Select Yoga + poses",
+            "At least one selected pose required at Begin. Shared focused startup."
+          ]
+        ],
+        [
+          [
+            "corpse",
+            "Optional Corpse Pose",
+            "Intro → stillness countdown → transition narration at configured point → settle."
+          ]
+        ],
+        [
+          [
+            "bath",
+            "Optional Bath Session",
+            "Intro → instructions → countdown with reminder at 60 seconds."
+          ]
+        ],
+        [
+          [
+            "gate1",
+            "Guide: proceed",
+            "Bath completion waits for explicit Continue; does not advance automatically."
+          ]
+        ],
+        [
+          [
+            "rest",
+            "Rest before Yoga",
+            "Default 900 seconds (15 minutes), followed by another guide confirmation."
+          ]
+        ],
+        [
+          [
+            "gate2",
+            "Guide: begin Yoga",
+            "Button becomes available after rest; paused session cannot advance."
+          ]
+        ],
+        [
+          [
+            "prep",
+            "Yoga preparation",
+            "136.1 Hz bounded drone if permitted; intro + preparation narration; prep countdown."
+          ]
+        ],
+        [
+          [
+            "poses",
+            "Selected pose loop",
+            "Pose name/image → explanation → hold countdown → next-pose prompt and gap."
+          ]
+        ],
+        [
+          [
+            "finish",
+            "Completion",
+            "Session-complete narration → settle → common completion."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "begin",
+          "corpse",
+          "Corpse enabled"
+        ],
+        [
+          "begin",
+          "bath",
+          "Only Bath enabled"
+        ],
+        [
+          "begin",
+          "prep",
+          "Neither enabled"
+        ],
+        [
+          "corpse",
+          "bath",
+          "Bath enabled"
+        ],
+        [
+          "corpse",
+          "prep",
+          "No Bath"
+        ],
+        [
+          "bath",
+          "gate1",
+          "Countdown ends"
+        ],
+        [
+          "gate1",
+          "rest",
+          "Guide continues"
+        ],
+        [
+          "rest",
+          "gate2",
+          "Rest ends"
+        ],
+        [
+          "gate2",
+          "prep",
+          "Guide continues"
+        ],
+        [
+          "prep",
+          "poses",
+          "Prepared"
+        ],
+        [
+          "poses",
+          "poses",
+          "Next selected pose"
+        ],
+        [
+          "poses",
+          "finish",
+          "All done"
+        ]
+      ],
+      "notes": [
+        "Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by the selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate."
+      ]
+    },
+    {
+      "id": "care",
+      "group": "Journeys",
+      "title": "Intimate Service and massage",
+      "subtitle": "All seven nonempty combinations follow this ordered composition.",
+      "source": "app.js:6759; app.js:4976; app.js:5507",
+      "rows": [
+        [
+          [
+            "unlock",
+            "Four-click unlock",
+            "Panel is locked and choices reset each page load. Select any nonempty subset of care options."
+          ]
+        ],
+        [
+          [
+            "start",
+            "Focused startup",
+            "No ordinary Arrival, gratitude, personal intention or Emergence wrapper."
+          ]
+        ],
+        [
+          [
+            "perineal",
+            "Optional perineal care",
+            "Narrate intro/instructions → timed stage → 60-second reminder if reached."
+          ]
+        ],
+        [
+          [
+            "gate1",
+            "Guide: proceed",
+            "Wait for explicit Continue."
+          ]
+        ],
+        [
+          [
+            "massage",
+            "Optional massage",
+            "Full seven-chakra sequence in reverse: Crown → Third Eye → Throat → Heart → Solar → Sacral → Root."
+          ]
+        ],
+        [
+          [
+            "closing",
+            "Massage closing",
+            "If no assisted bathing follows: final silence and closing, then finish inside runSequence."
+          ],
+          [
+            "assisted",
+            "Optional assisted bathing",
+            "Intro/instructions → timed stage → reminder; massage sequence used complete:false if this follows."
+          ]
+        ],
+        [
+          [
+            "gate2",
+            "Guide: proceed",
+            "Assisted-bath ending waits for explicit Continue."
+          ]
+        ],
+        [
+          [
+            "finish",
+            "Completion",
+            "Outer focused route calls finish if session remains active."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "unlock",
+          "start",
+          "Begin"
+        ],
+        [
+          "start",
+          "perineal",
+          "Enabled"
+        ],
+        [
+          "start",
+          "massage",
+          "Skip perineal"
+        ],
+        [
+          "start",
+          "assisted",
+          "Assisted only"
+        ],
+        [
+          "perineal",
+          "gate1",
+          "Timed stage ends"
+        ],
+        [
+          "gate1",
+          "massage",
+          "Massage enabled"
+        ],
+        [
+          "gate1",
+          "assisted",
+          "Assisted without massage"
+        ],
+        [
+          "gate1",
+          "finish",
+          "Perineal only"
+        ],
+        [
+          "massage",
+          "closing",
+          "No assisted bathing"
+        ],
+        [
+          "massage",
+          "assisted",
+          "Assisted enabled"
+        ],
+        [
+          "closing",
+          "finish",
+          "Already completed inside sequence"
+        ],
+        [
+          "assisted",
+          "gate2",
+          "Timed stage ends"
+        ],
+        [
+          "gate2",
+          "finish",
+          "Guide continues"
+        ]
+      ],
+      "notes": [
+        "Current behavior: when assisted bathing follows massage, shared silence/closing is skipped and is not called after the bath. A nearby comment says closing is deferred, but the executable path does not perform it. This is recorded for a later fix decision."
+      ]
+    },
+    {
+      "id": "shots",
+      "group": "Journeys",
+      "title": "Sound Shots",
+      "subtitle": "Six types, confirmation, frequency validation, and distinct finish behavior.",
+      "source": "app.js:4416; app.js:6879; app.js:6939; index.html:257",
+      "rows": [
+        [
+          [
+            "enable",
+            "Enable Shots",
+            "No Frequency → blocked; otherwise confirm. Cancel leaves Shots off."
+          ]
+        ],
+        [
+          [
+            "type",
+            "Choose type",
+            "Meditation, HRIM, Anesthetic, Mood & Relaxation, Sleep, or Custom. Labels here describe app modes."
+          ]
+        ],
+        [
+          [
+            "med",
+            "Meditation Shot",
+            "Root 396 → Sacral 417 → Solar 528 → Heart 639 → Throat 741 → Third Eye 852 → Crown 963 Hz. Ignores selected chakra subset."
+          ],
+          [
+            "sleep",
+            "Sleep Shot",
+            "Script sequence: 10 → 6 → 5 → 2 → 6 Hz."
+          ],
+          [
+            "single",
+            "Single-frequency Shot",
+            "HRIM 528 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values."
+          ]
+        ],
+        [
+          [
+            "run",
+            "Run tone stages",
+            "No music or narration; divide selected total active seconds equally across stages."
+          ]
+        ],
+        [
+          [
+            "gaps",
+            "Between stages",
+            "Meditation: 2 seconds; Sleep: script intervalSeconds, falling back to 2."
+          ]
+        ],
+        [
+          [
+            "reload",
+            "Natural completion",
+            "Stop sound, hide controls, release wake lock, show Lobby then reload page."
+          ],
+          [
+            "abort",
+            "Manual stop / failure",
+            "Manual Stop uses shared stop; activation failure alerts and uses stopShot. No stats increment."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "enable",
+          "type",
+          "Confirmed"
+        ],
+        [
+          "type",
+          "med",
+          "Meditation"
+        ],
+        [
+          "type",
+          "sleep",
+          "Sleep"
+        ],
+        [
+          "type",
+          "single",
+          "Other"
+        ],
+        [
+          "med",
+          "run",
+          "Valid"
+        ],
+        [
+          "sleep",
+          "run",
+          "Valid"
+        ],
+        [
+          "single",
+          "run",
+          "Valid"
+        ],
+        [
+          "run",
+          "gaps",
+          "More stages"
+        ],
+        [
+          "gaps",
+          "run",
+          "Next"
+        ],
+        [
+          "run",
+          "reload",
+          "Last stage done"
+        ],
+        [
+          "run",
+          "abort",
+          "Stop / error"
+        ]
+      ],
+      "notes": [
+        "Single-frequency default is 1 second; multi-stage default 7 seconds; selected duration range 1–20 seconds. Displayed total active seconds excludes inter-stage gaps; countdown includes them."
+      ]
+    },
+    {
+      "id": "experiments",
+      "group": "Journeys",
+      "title": "Experiment activities",
+      "subtitle": "Isolated activities and return behavior.",
+      "source": "app.js:4716; app.js:7481; index.html:210",
+      "rows": [
+        [
+          [
+            "settings",
+            "Settings",
+            "Open Experiment Mode."
+          ]
+        ],
+        [
+          [
+            "pick",
+            "Pick one activity",
+            "Seven individual chakras, HRIM, Box, Ho’oponopono, Corpse Pose, Perineal Care, Bath, Assisted Bath."
+          ]
+        ],
+        [
+          [
+            "duration",
+            "Configure duration",
+            "Chakra/HRIM use minutes; Box uses seconds per step; care and Corpse routines consume seconds."
+          ]
+        ],
+        [
+          [
+            "start",
+            "Start experiment",
+            "Load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown."
+          ]
+        ],
+        [
+          [
+            "chakra",
+            "Chakra / HRIM",
+            "Run one meditateOnChakra with duration override."
+          ],
+          [
+            "practice",
+            "Box / Ho’oponopono",
+            "Call corresponding focused routine directly."
+          ],
+          [
+            "care",
+            "Corpse / bath / care",
+            "Call isolated routine; bath/care includes guide-controlled Continue."
+          ]
+        ],
+        [
+          [
+            "return",
+            "Experiment screen",
+            "Natural end and caught failure use stopExperiment; visible Stop uses shared stop which also returns here."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "settings",
+          "pick",
+          "Open"
+        ],
+        [
+          "pick",
+          "duration",
+          "Selection"
+        ],
+        [
+          "duration",
+          "start",
+          "Run"
+        ],
+        [
+          "start",
+          "chakra",
+          "Selected"
+        ],
+        [
+          "start",
+          "practice",
+          "Selected"
+        ],
+        [
+          "start",
+          "care",
+          "Selected"
+        ],
+        [
+          "chakra",
+          "return",
+          "Done"
+        ],
+        [
+          "practice",
+          "return",
+          "Done"
+        ],
+        [
+          "care",
+          "return",
+          "Done / Continue"
+        ],
+        [
+          "return",
+          "settings",
+          "Back to Settings"
+        ]
+      ],
+      "notes": [
+        "Current inconsistency: UI assigns sec or min, while startExperiment tests for seconds. Countdown therefore treats sec as minutes; care UI also labels raw seconds as min. Ho’oponopono has no duration control, but startExperiment still reads the hidden value. No ordinary completion modal or stats update is used."
+      ]
+    },
+    {
+      "id": "controls",
+      "group": "Live session",
+      "title": "Pause, stop and live controls",
+      "subtitle": "Shared interaction and cancellation behavior.",
+      "source": "app.js:5407; app.js:5891; app.js:7358; app.js:7679",
+      "rows": [
+        [
+          [
+            "active",
+            "Active session",
+            "Common controls appear during an experience."
+          ]
+        ],
+        [
+          [
+            "pause",
+            "Pause",
+            "Set isPaused; freeze ticker and stage countdowns; cancel browser speech; pause Piper; suspend AudioContext."
+          ],
+          [
+            "mixer",
+            "Open Journey Tuning",
+            "Opening mixer does not pause. Volume, voice, space, ambience, brightness and suppression controls apply live."
+          ],
+          [
+            "stop",
+            "Stop",
+            "Cancel narration and timers, stop audio/visuals, resolve guide wait false and hide controls/mixer."
+          ]
+        ],
+        [
+          [
+            "resume",
+            "Resume",
+            "Resume Piper/context. Ordinary browser narration replays the interrupted sentence if pause was observed."
+          ],
+          [
+            "image",
+            "Tap chakra image",
+            "Toggle session text overlay; session continues."
+          ],
+          [
+            "return",
+            "Return screen",
+            "Experiment → Experiment screen; other modes → Lobby. No completion statistics."
+          ]
+        ],
+        [
+          [
+            "wait",
+            "Guide waiting",
+            "Continue is accepted only when active and not paused; Stop releases the pending wait."
+          ],
+          [
+            "fullscreen",
+            "User fullscreen",
+            "Track fullscreen on app container; pointer/focus reveal bottom controls, then hide after 120 ms."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "active",
+          "pause",
+          "Pause"
+        ],
+        [
+          "pause",
+          "resume",
+          "Play"
+        ],
+        [
+          "resume",
+          "active",
+          "Continue"
+        ],
+        [
+          "active",
+          "mixer",
+          "Mixer"
+        ],
+        [
+          "mixer",
+          "active",
+          "Close"
+        ],
+        [
+          "active",
+          "stop",
+          "Stop"
+        ],
+        [
+          "stop",
+          "return",
+          "Cleanup"
+        ],
+        [
+          "active",
+          "image",
+          "Image tap"
+        ],
+        [
+          "image",
+          "active",
+          "Keep playing"
+        ],
+        [
+          "active",
+          "wait",
+          "Care / Yoga gate"
+        ],
+        [
+          "wait",
+          "active",
+          "Guide continues"
+        ],
+        [
+          "wait",
+          "stop",
+          "Stop"
+        ],
+        [
+          "active",
+          "fullscreen",
+          "Fullscreen change"
+        ]
+      ],
+      "notes": [
+        "The app no longer requests or exits fullscreen automatically. Browser-speech cancellation and Piper buffer suspension are different pause mechanisms. Re-enable No Mantra does not immediately restart a previously skipped mantra stage."
+      ]
+    },
+    {
+      "id": "restart",
+      "group": "Live session",
+      "title": "Restart and cinematic prelude",
+      "subtitle": "Restart re-enters the normal Begin dispatcher after video.",
+      "source": "app.js:3679; app.js:7695; app.js:62",
+      "rows": [
+        [
+          [
+            "restart",
+            "Mixer → Restart",
+            "Confirmation: cancel leaves the current journey running."
+          ]
+        ],
+        [
+          [
+            "stop",
+            "Stop, retain scene",
+            "Stop current journey with preserveScreen:true; open prelude overlay."
+          ]
+        ],
+        [
+          [
+            "buffer",
+            "Prepare and buffer",
+            "Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check."
+          ]
+        ],
+        [
+          [
+            "ready",
+            "Begin introduction",
+            "Reveal button when ready OR after the 90-second bounded wait. Explicit user action required."
+          ]
+        ],
+        [
+          [
+            "hold",
+            "Image hold → playback",
+            "Hold image 3 seconds, then video; audio fades in over 2.4 seconds using separate video volume."
+          ]
+        ],
+        [
+          [
+            "recover",
+            "Buffer recovery",
+            "Below 2 seconds ahead pauses except near end; waiting/stalled enters recovery. Resume at up to 4 seconds, bounded by remaining clip."
+          ]
+        ],
+        [
+          [
+            "end",
+            "Normal video ending",
+            "Final 0.25-second audiovisual fade; acknowledge DND reminder."
+          ],
+          [
+            "error",
+            "Unavailable video",
+            "Missing media, preparation failure, media error or rejected play: unavailable result; error path fades 1.2 seconds."
+          ]
+        ],
+        [
+          [
+            "dispatch",
+            "Begin again",
+            "Wait up to 5 seconds for prior start guard to unwind; click main Begin button using current mode selection."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "restart",
+          "stop",
+          "Confirmed"
+        ],
+        [
+          "stop",
+          "buffer",
+          "Prepare"
+        ],
+        [
+          "buffer",
+          "ready",
+          "Ready / timeout"
+        ],
+        [
+          "ready",
+          "hold",
+          "User clicks"
+        ],
+        [
+          "hold",
+          "recover",
+          "Buffer low"
+        ],
+        [
+          "recover",
+          "hold",
+          "Recovered"
+        ],
+        [
+          "hold",
+          "end",
+          "Ended"
+        ],
+        [
+          "buffer",
+          "error",
+          "Failure"
+        ],
+        [
+          "hold",
+          "error",
+          "Failure"
+        ],
+        [
+          "end",
+          "dispatch",
+          "Reminder acknowledged"
+        ],
+        [
+          "error",
+          "dispatch",
+          "Normal reminder remains"
+        ]
+      ],
+      "notes": [
+        "No skip control and no automatic fullscreen. A buffer countdown reports seconds of media still needed, not a measured wall-clock download ETA. Settings audio preview is separate: play 8 seconds, fade and reset without starting a journey."
+      ]
+    },
+    {
+      "id": "completion",
+      "group": "Live session",
+      "title": "Completion, statistics and external handoff",
+      "subtitle": "Different end states are intentionally visible here.",
+      "source": "app.js:5840; app.js:550; index.html:659",
+      "rows": [
+        [
+          [
+            "natural",
+            "Guided / Sleep finishes",
+            "Shared finish() for standard, HRIM, focused practices and Sleep."
+          ]
+        ],
+        [
+          [
+            "cleanup",
+            "Coordinated ending",
+            "Cancel narration and drones; stop mantra without restoring music; fade music; hide controls and clear visuals."
+          ]
+        ],
+        [
+          [
+            "stats",
+            "Save local statistics",
+            "Increment journey count and add rounded wall-clock minutes since start, minimum one. Pause time is included."
+          ]
+        ],
+        [
+          [
+            "modal",
+            "Completion modal",
+            "Show completion message, totals, session time and Return to Room."
+          ]
+        ],
+        [
+          [
+            "return",
+            "Return to Room",
+            "Cancel pending Earn reveal; hide modal; open Lobby."
+          ],
+          [
+            "hi",
+            "Hindi meditation",
+            "No Earn link. Eligibility uses meditation language, not display language."
+          ],
+          [
+            "earn",
+            "Other languages",
+            "After 3 seconds reveal native Continue to Earn link; user click navigates externally."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "natural",
+          "cleanup",
+          "finish()"
+        ],
+        [
+          "cleanup",
+          "stats",
+          "Update"
+        ],
+        [
+          "stats",
+          "modal",
+          "Show"
+        ],
+        [
+          "modal",
+          "return",
+          "Return"
+        ],
+        [
+          "modal",
+          "hi",
+          "Language hi"
+        ],
+        [
+          "modal",
+          "earn",
+          "Other language"
+        ]
+      ],
+      "notes": [
+        "Earn destination is https://missionode.github.io/earn-app/receive.html?Source=Lite. No automatic navigation. Shots, manual stops, and experiments do not use this stats/completion path."
+      ]
+    },
+    {
+      "id": "content",
+      "group": "Systems",
+      "title": "Scripts, language and timing",
+      "subtitle": "Content selection, validation, fallback and demo behavior.",
+      "source": "app.js:641; app.js:944; app.js:1160; app.js:7176; language-manifest.json:1",
+      "rows": [
+        [
+          [
+            "settings",
+            "Content settings",
+            "Choose meditation language, display language, voice and default/custom script source."
+          ]
+        ],
+        [
+          [
+            "default",
+            "Default content",
+            "All four languages currently point to scripts.json. Journey fetch appends a timestamp query."
+          ],
+          [
+            "custom",
+            "Custom JSON",
+            "Upload file or fetch URL; validate required schema; store bundle in localStorage. Invalid input shows error."
+          ]
+        ],
+        [
+          [
+            "demo",
+            "Demo metadata?",
+            "Recognized demo bundle applies demo timing preset; switching away restores earlier core duration."
+          ],
+          [
+            "validate",
+            "Start-time validation",
+            "Shared guided start validates sections needed for selected practice; custom allows language fallback."
+          ]
+        ],
+        [
+          [
+            "resolve",
+            "Resolve narration",
+            "Meditation language → configured fallback language → English / available localized value. Custom system overrides are optional."
+          ]
+        ],
+        [
+          [
+            "ui",
+            "Resolve UI labels",
+            "Settings/Lobby use display language; journey labels and sky names use meditation language."
+          ],
+          [
+            "voice",
+            "Resolve voice",
+            "Matching browser voice or supported configured Piper voice; Hindi has no default Piper voice."
+          ]
+        ],
+        [
+          [
+            "timing",
+            "Timing layers",
+            "Built-in defaults → timing-config → optional named query profile → saved preferences; demo changes selected core duration."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "settings",
+          "default",
+          "Default"
+        ],
+        [
+          "settings",
+          "custom",
+          "Custom"
+        ],
+        [
+          "custom",
+          "demo",
+          "Valid bundle"
+        ],
+        [
+          "default",
+          "validate",
+          "Begin"
+        ],
+        [
+          "demo",
+          "validate",
+          "Begin"
+        ],
+        [
+          "validate",
+          "resolve",
+          "Valid"
+        ],
+        [
+          "resolve",
+          "voice",
+          "Speak"
+        ],
+        [
+          "settings",
+          "ui",
+          "Language choice"
+        ],
+        [
+          "timing",
+          "validate",
+          "Durations"
+        ],
+        [
+          "validate",
+          "settings",
+          "Invalid → error / stop"
+        ]
+      ],
+      "notes": [
+        "Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation."
+      ]
+    },
+    {
+      "id": "narration",
+      "group": "Systems",
+      "title": "Narration and fallback",
+      "subtitle": "Piper synthesis pipeline versus browser speech.",
+      "source": "app.js:1430; app.js:5226; app.js:5660; piper-worker.js:1",
+      "rows": [
+        [
+          [
+            "text",
+            "Localized text",
+            "Begin narration generation; populate ticker and duck music unless silence requested."
+          ]
+        ],
+        [
+          [
+            "route",
+            "Voice engine choice",
+            "Use Piper only when selected, supported and configured."
+          ]
+        ],
+        [
+          [
+            "piper",
+            "Piper worker",
+            "Warm model; serial worker requests; synthesize first two sentences and keep one ahead."
+          ],
+          [
+            "browser",
+            "Browser speech",
+            "Select matching voice and locale; apply pace/pitch/volume; speak each sentence."
+          ]
+        ],
+        [
+          [
+            "decode",
+            "Decode + normalize",
+            "Decode WAV/blob; update estimated ticker duration with real clip duration."
+          ]
+        ],
+        [
+          [
+            "play",
+            "Play through Web Audio",
+            "Start ticker at actual playback; route to voice gain, tone controls and effects."
+          ]
+        ],
+        [
+          [
+            "fallback",
+            "Piper sentence failure",
+            "Cancel Piper jobs; report fallback; use browser speech for failed and remaining sentences."
+          ],
+          [
+            "browserend",
+            "End / error / timeout",
+            "Browser events resolve sentence; timeout avoids waiting forever. Pause can replay interrupted sentence."
+          ]
+        ],
+        [
+          [
+            "handoff",
+            "Finish narration",
+            "Sentence gaps; exit gap except mantra handoff; Piper clip fade-out capped at 50 ms to retain final words. Explicit music fade remains; duplicate-path swell removed."
+          ],
+          [
+            "cancel",
+            "Stop / cancellation",
+            "Invalidate narration; cancel worker jobs and speech. Intentional stop must not launch fallback speech."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "text",
+          "route",
+          "Narrate"
+        ],
+        [
+          "route",
+          "piper",
+          "Available"
+        ],
+        [
+          "route",
+          "browser",
+          "Else"
+        ],
+        [
+          "piper",
+          "decode",
+          "Blob"
+        ],
+        [
+          "decode",
+          "play",
+          "Audio buffer"
+        ],
+        [
+          "piper",
+          "fallback",
+          "Failure"
+        ],
+        [
+          "play",
+          "fallback",
+          "Failure"
+        ],
+        [
+          "fallback",
+          "browser",
+          "Remaining text"
+        ],
+        [
+          "browser",
+          "browserend",
+          "Speech events"
+        ],
+        [
+          "play",
+          "handoff",
+          "Last clip"
+        ],
+        [
+          "browserend",
+          "handoff",
+          "Last sentence"
+        ],
+        [
+          "play",
+          "cancel",
+          "Stop"
+        ],
+        [
+          "browser",
+          "cancel",
+          "Stop"
+        ]
+      ],
+      "notes": [
+        "Browser speech is outside the Web Audio effects chain. Voice Space/Warmth/Clarity processing applies to Piper audio; browser voice capabilities differ. Soft and interval prompts use related wrappers."
+      ]
+    },
+    {
+      "id": "audio",
+      "group": "Systems",
+      "title": "Audio signal architecture",
+      "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
+      "source": "app.js:1539; app.js:1636; app.js:2154; app.js:2686; app.js:2789",
+      "rows": [
+        [
+          [
+            "piper",
+            "Piper voice",
+            "Decoded clips → voice gain → warmth and clarity filters; parallel Voice Space reverb."
+          ],
+          [
+            "mantra",
+            "Mantra MP3",
+            "SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner."
+          ],
+          [
+            "generated",
+            "Generated tones",
+            "Chakra/sleep drones, elemental layers and transition/Shot tones use their respective generator routes."
+          ]
+        ],
+        [
+          [
+            "music",
+            "Background music",
+            "Equal-power repeat overlaps → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner."
+          ],
+          [
+            "video",
+            "Video audio",
+            "MediaElementSource → dedicated Video gain → music spatial panner and Music Space send."
+          ],
+          [
+            "ambience",
+            "Optional ambience",
+            "Local manifest or user URL → equal-power layered loops → blur and spatial depth/panner."
+          ]
+        ],
+        [
+          [
+            "shared",
+            "Shared processing",
+            "Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; Spatial Off ramps added pan modulation to zero."
+          ]
+        ],
+        [
+          [
+            "limiter",
+            "Limiter → device",
+            "Shared chain ends in limiter and AudioContext destination. Bell gain connects directly to limiter."
+          ],
+          [
+            "speech",
+            "Browser speech",
+            "Separate speechSynthesis output; not processed by the shared Web Audio graph."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "piper",
+          "shared",
+          "Voice bus"
+        ],
+        [
+          "mantra",
+          "shared",
+          "Mantra bus"
+        ],
+        [
+          "generated",
+          "shared",
+          "Tone bus"
+        ],
+        [
+          "music",
+          "shared",
+          "Music bus"
+        ],
+        [
+          "video",
+          "shared",
+          "Video bus"
+        ],
+        [
+          "ambience",
+          "shared",
+          "Ambience bus"
+        ],
+        [
+          "shared",
+          "limiter",
+          "Output"
+        ]
+      ],
+      "notes": [
+        "Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Loop volume is separate from repeat crossfades; overlap is bounded to half the buffer, and source cleanup follows audio time through pause. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. Browser/device output and audibility need listening verification; timer throttling and silence inside recordings are not ruled out."
+      ]
+    },
+    {
+      "id": "sound-options",
+      "group": "Systems",
+      "title": "Sound options and live suppression",
+      "subtitle": "What changes when sound settings are toggled.",
+      "source": "app.js:7358; app.js:2891; app.js:3008; app.js:2253",
+      "rows": [
+        [
+          [
+            "mixer",
+            "Settings / Journey Tuning",
+            "Shared suppression settings, volume controls and optional ambience."
+          ]
+        ],
+        [
+          [
+            "nofreq",
+            "No Frequency ON",
+            "Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls."
+          ],
+          [
+            "nomantra",
+            "No Mantra ON",
+            "Cancel drone timer; stop drone and mantra; retain spoken guidance and music."
+          ],
+          [
+            "ambient",
+            "Mood ambience ON",
+            "Session-only enablement; starts if active and not Music Only; forces soft blur on."
+          ]
+        ],
+        [
+          [
+            "source",
+            "Ambience source",
+            "Saved custom URL if present; otherwise manifest/local audio buffers. Empty URL restores default selection."
+          ]
+        ],
+        [
+          [
+            "tune",
+            "Ambience tuning",
+            "Intensity, gain, blur and spatial movement. Crossing above 5% gain asks confirmation; cancel restores prior display."
+          ]
+        ],
+        [
+          [
+            "fail",
+            "Optional source failure",
+            "Report status or warning; optional ambience may be unavailable."
+          ],
+          [
+            "off",
+            "Disable / stop",
+            "Fade ambience out; state and playback are separate. Re-enabling No Frequency only restarts eligible ambience automatically."
+          ]
+        ],
+        [
+          [
+            "comfort",
+            "Comfort + volumes",
+            "Eyes Close dims app and changes filters; brightness, voice pace, space, music/video levels act on their buses."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "mixer",
+          "nofreq",
+          "Toggle"
+        ],
+        [
+          "mixer",
+          "nomantra",
+          "Toggle"
+        ],
+        [
+          "mixer",
+          "ambient",
+          "Enable"
+        ],
+        [
+          "ambient",
+          "source",
+          "Load"
+        ],
+        [
+          "source",
+          "tune",
+          "Ready"
+        ],
+        [
+          "source",
+          "fail",
+          "Invalid / fetch failure"
+        ],
+        [
+          "tune",
+          "off",
+          "Disable / finish / stop"
+        ],
+        [
+          "mixer",
+          "comfort",
+          "Tune"
+        ]
+      ],
+      "notes": [
+        "No Frequency also suppresses generated bowl/anchor through audio-engine guards. No Mantra affects standard chakra/yoga drone starts, but is not a blanket prohibition on every generated sound route."
+      ]
+    },
+    {
+      "id": "visuals",
+      "group": "Systems",
+      "title": "Visuals and browser lifecycle",
+      "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
+      "source": "app.js:3648; app.js:3654; style.css:796; night-sky.js:1",
+      "rows": [
+        [
+          [
+            "init",
+            "Natural sky startup",
+            "Load NaturalNightSky before app; cache a seeded 700–2,400-star backdrop with faint procedural galactic luminance and dark dust lanes. Neutral night gradient replaces drifting colored CSS clouds."
+          ]
+        ],
+        [
+          [
+            "geo",
+            "Location permission",
+            "Success updates observer and named celestial bodies; denied/unavailable retains approximate sky. Fine background stars are procedural, not a location-calibrated star catalog."
+          ],
+          [
+            "motion",
+            "Motion preference",
+            "Reduced motion renders a static frame; changes to the OS preference immediately stop/restart animation. At most 110 stars shimmer; positions remain fixed."
+          ]
+        ],
+        [
+          [
+            "scene",
+            "Journey scene",
+            "Chakra color, aura, deity/symbol selection, progress dots and narration ticker."
+          ],
+          [
+            "sky",
+            "Sky lifecycle",
+            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly after a delayed start, then every 45–120 seconds. Hidden pages cancel animation and clear meteors."
+          ]
+        ],
+        [
+          [
+            "effect",
+            "Image effect",
+            "Natural/Aura/Holographic retain CSS effects. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. A read-only mantra analyser gently modulates highlights with two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions."
+          ],
+          [
+            "comfort",
+            "Eyes Close + brightness",
+            "Explicit user brightness, Sleep dimming and Eyes Close remain honored. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged."
+          ]
+        ],
+        [
+          [
+            "fullscreen",
+            "Fullscreen lifecycle",
+            "Only responds to user/browser fullscreen; app-container fullscreen controls have pointer/focus reveal."
+          ],
+          [
+            "wake",
+            "Screen wake lock",
+            "Best-effort request in supported routes; failure is swallowed; release on stop/completion."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "init",
+          "geo",
+          "Request"
+        ],
+        [
+          "init",
+          "motion",
+          "Check"
+        ],
+        [
+          "geo",
+          "sky",
+          "Observer"
+        ],
+        [
+          "motion",
+          "sky",
+          "Animate / static"
+        ],
+        [
+          "scene",
+          "effect",
+          "Selected"
+        ],
+        [
+          "scene",
+          "comfort",
+          "Selected"
+        ],
+        [
+          "scene",
+          "fullscreen",
+          "User fullscreen"
+        ],
+        [
+          "scene",
+          "wake",
+          "Session"
+        ]
+      ],
+      "notes": [
+        "The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws and lunar illumination. Browser/device appearance remains unverified because the preview request was declined."
+      ]
+    },
+    {
+      "id": "storage",
+      "group": "Systems",
+      "title": "Persistence, caching and network",
+      "subtitle": "Local state and the actual service-worker request routing.",
+      "source": "sw.js:1; app.js:5958; app.js:6184; piper-models.json:1",
+      "rows": [
+        [
+          [
+            "page",
+            "Page / experience requests",
+            "HTML/CSS/JS, JSON, audio/video and Piper assets."
+          ]
+        ],
+        [
+          [
+            "prefs",
+            "localStorage",
+            "Languages, voices, durations, chakra choices, intention, custom script, mixer settings and stats; consultation stores answers separately."
+          ],
+          [
+            "session",
+            "Session-only choices",
+            "Experience modes, intimate unlock and mood ambience enablement reset on page load. No full in-progress journey restore."
+          ]
+        ],
+        [
+          [
+            "install",
+            "Service worker install",
+            "cache.addAll shell/content/audio assets; one rejected required asset rejects precache installation. skipWaiting requested."
+          ]
+        ],
+        [
+          [
+            "activate",
+            "Activate cache generation",
+            "Claim clients; delete every cache except three exact current shell/Piper/language names."
+          ]
+        ],
+        [
+          [
+            "optional",
+            "Optional ambience",
+            "Manifest and matching pleasure files use network no-store, despite manifest appearing in precache."
+          ],
+          [
+            "special",
+            "Piper / language",
+            "Cache-first, fetch on miss, cache successful response. Piper recognizes local assets and Hugging Face voice URLs."
+          ],
+          [
+            "general",
+            "Other requests",
+            "Exact caches.match(request), otherwise network; ordinary misses are not added to cache."
+          ]
+        ],
+        [
+          [
+            "offline",
+            "Offline outcome",
+            "Only matching cached requests can work offline. Timestamped content and versioned shell requests may miss unversioned precache entries."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "page",
+          "prefs",
+          "Read / save"
+        ],
+        [
+          "page",
+          "session",
+          "Runtime"
+        ],
+        [
+          "page",
+          "install",
+          "Register / install"
+        ],
+        [
+          "install",
+          "activate",
+          "Installed"
+        ],
+        [
+          "activate",
+          "optional",
+          "Request class"
+        ],
+        [
+          "activate",
+          "special",
+          "Request class"
+        ],
+        [
+          "activate",
+          "general",
+          "Else"
+        ],
+        [
+          "optional",
+          "offline",
+          "Network-dependent"
+        ],
+        [
+          "special",
+          "offline",
+          "Hit / miss"
+        ],
+        [
+          "general",
+          "offline",
+          "Hit / miss"
+        ]
+      ],
+      "notes": [
+        "Video is not precached. Browsing tests disable service workers. Offline startup and upgrades are verification priorities; the PWA label alone does not prove offline journey operation."
+      ]
+    },
+    {
+      "id": "recovery",
+      "group": "Systems",
+      "title": "Failure and recovery map",
+      "subtitle": "Implemented fallback destinations and open verification areas.",
+      "source": "app.js:1; app.js:4537; app.js:4416; app.js:5241; sw.js:1",
+      "rows": [
+        [
+          [
+            "failure",
+            "Failure / interruption",
+            "Classify by owning subsystem."
+          ]
+        ],
+        [
+          [
+            "config",
+            "Configuration fetch",
+            "Timing → defaults; language registry → built-in language choices; Piper registry → empty registry."
+          ],
+          [
+            "content",
+            "Journey content invalid",
+            "Shared guided start alerts and stops; Sleep caller catches and stops; Shot catch uses stopShot; Experiment catch returns to experiment."
+          ],
+          [
+            "audio",
+            "Audio / narration failure",
+            "Mantra soft-fails and restores music; Piper falls back to browser; browser speech error/timeout releases wait."
+          ]
+        ],
+        [
+          [
+            "video",
+            "Prelude unavailable",
+            "Media error/rejected play → fade / unavailable → Begin dispatcher; stalled media enters buffer recovery."
+          ],
+          [
+            "optional",
+            "Optional capability denied",
+            "Geolocation → approximate sky; wake lock/output selection unsupported → continue."
+          ],
+          [
+            "storage",
+            "Storage / cache failure",
+            "Some reads have guards; many localStorage writes are direct. Precache addAll has no partial-install fallback."
+          ]
+        ],
+        [
+          [
+            "cancel",
+            "Intentional stop",
+            "Cancel pending narration/generation and guide waits; stop playback; return screen."
+          ],
+          [
+            "verify",
+            "Runtime verification needed",
+            "Slow network, page hidden, mobile audio interruption, rapid double Begin/Restart, cache upgrades and storage denial."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "failure",
+          "config",
+          "Config"
+        ],
+        [
+          "failure",
+          "content",
+          "Content"
+        ],
+        [
+          "failure",
+          "audio",
+          "Playback"
+        ],
+        [
+          "failure",
+          "video",
+          "Prelude"
+        ],
+        [
+          "failure",
+          "optional",
+          "Permission / support"
+        ],
+        [
+          "failure",
+          "storage",
+          "Persistence"
+        ],
+        [
+          "audio",
+          "cancel",
+          "User stops"
+        ],
+        [
+          "content",
+          "verify",
+          "Recovery quality"
+        ],
+        [
+          "video",
+          "verify",
+          "Stall / retry"
+        ],
+        [
+          "storage",
+          "verify",
+          "No global recovery"
+        ]
+      ],
+      "notes": [
+        "Not every async failure is caught by the top-level window.onerror handler. Missing boundaries are shown as verification work rather than invented successful recovery."
+      ]
+    },
+    {
+      "id": "consultation",
+      "group": "Supporting pages",
+      "title": "Consultation flow",
+      "subtitle": "Seven cards, 35 responses, local notes and consultant review.",
+      "source": "docs/assesment.html:503; docs/assesment.html:611; docs/assesment.html:726",
+      "rows": [
+        [
+          [
+            "lobby",
+            "Begin Session Consultation",
+            "Navigate to docs/assesment.html."
+          ]
+        ],
+        [
+          [
+            "restore",
+            "Restore local responses",
+            "chakraAnswers and chakraAssessmentNotes; malformed stored object falls back to empty."
+          ]
+        ],
+        [
+          [
+            "answer",
+            "Seven chakra cards",
+            "Five questions each; choose aligned, unsure or a concern direction. Optional per-card notes."
+          ]
+        ],
+        [
+          [
+            "save",
+            "Save and update",
+            "Every response/note change saves locally and updates evaluations."
+          ]
+        ],
+        [
+          [
+            "card",
+            "Completed card insight",
+            "After all questions in a card: strengths, patterns, uncertainties, follow-up and meditation consideration."
+          ]
+        ],
+        [
+          [
+            "review",
+            "All 35 answered",
+            "Show combined consultant review, recurring themes and follow-up prompts. Partial answers show progress."
+          ]
+        ],
+        [
+          [
+            "manual",
+            "Manual session planning",
+            "Review with client; navigate back to Lite and choose session settings manually. No automatic prescription handoff."
+          ],
+          [
+            "clear",
+            "Clear for New Client",
+            "Confirmation required; accepted → delete answers/notes and reload. Cancel preserves current record."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "lobby",
+          "restore",
+          "Open"
+        ],
+        [
+          "restore",
+          "answer",
+          "Continue"
+        ],
+        [
+          "answer",
+          "save",
+          "Input"
+        ],
+        [
+          "save",
+          "card",
+          "Card complete"
+        ],
+        [
+          "save",
+          "answer",
+          "More responses"
+        ],
+        [
+          "card",
+          "review",
+          "All complete"
+        ],
+        [
+          "review",
+          "manual",
+          "Consultant reviews"
+        ],
+        [
+          "answer",
+          "clear",
+          "New client"
+        ],
+        [
+          "clear",
+          "restore",
+          "Confirmed reset"
+        ]
+      ],
+      "notes": [
+        "Font-size controls persist a separate scale. EN/Malayalam translation uses an external Google Translate widget, unlike the app’s native locale bundles. Answers and notes persist on the same browser until cleared."
+      ]
+    },
+    {
+      "id": "repertory",
+      "group": "Supporting pages",
+      "title": "Frequency repertory handoff",
+      "subtitle": "Searchable reference → prepared custom Shot → explicit activation.",
+      "source": "docs/repertory.html:153; app.js:6939",
+      "rows": [
+        [
+          [
+            "open",
+            "Open repertory",
+            "From custom-Shot controls or direct docs/repertory.html navigation."
+          ]
+        ],
+        [
+          [
+            "load",
+            "Load two JSON sources",
+            "scripts.json provides configured frequencies; frequency-repertory.json provides reference entries. Validate each Shot frequency."
+          ]
+        ],
+        [
+          [
+            "browse",
+            "Browse and search",
+            "English/Malayalam toggle; search names, focus, frequency and metadata; clear query; show empty-results state."
+          ]
+        ],
+        [
+          [
+            "prepare",
+            "Prepare Shot link",
+            "Navigate to index.html with shotSource=repertory and shotFrequency query."
+          ]
+        ],
+        [
+          [
+            "consume",
+            "Consume query",
+            "Remove parameters using history.replaceState before validation/confirmation."
+          ]
+        ],
+        [
+          [
+            "confirm",
+            "Normal Shot confirmation",
+            "Invalid frequency or No Frequency blocks preparation. Cancel leaves Shot off."
+          ]
+        ],
+        [
+          [
+            "ready",
+            "Prepared custom Shot",
+            "Set custom type and frequency, reset duration, show Lobby and focus frequency field."
+          ]
+        ],
+        [
+          [
+            "begin",
+            "User presses Begin",
+            "Only now run Shot; completion reload cannot replay consumed URL request."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "open",
+          "load",
+          "Fetch"
+        ],
+        [
+          "load",
+          "browse",
+          "Valid"
+        ],
+        [
+          "browse",
+          "prepare",
+          "Choose entry"
+        ],
+        [
+          "prepare",
+          "consume",
+          "Navigate"
+        ],
+        [
+          "consume",
+          "confirm",
+          "Valid parameters"
+        ],
+        [
+          "confirm",
+          "ready",
+          "Accepted"
+        ],
+        [
+          "ready",
+          "begin",
+          "Explicit action"
+        ]
+      ],
+      "notes": [
+        "Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. checkFirstTime runs afterward, so an unconfigured visitor can still be routed to Settings."
+      ]
+    }
+  ]
+}

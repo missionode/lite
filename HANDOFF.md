@@ -1,5 +1,46 @@
 # Chakra Meditation — Active Handoff
 
+### Audio control/routing corrections — local update
+
+- Voice Space now independently honors Off/Light/Spacious in all spatial modes. Removed the forced ethereal override and updated spatial guidance in all four UI languages. Spatial Off fades added drone pan modulation to zero; initialization also starts it at zero. Original recording stereo and deliberate binaural channels are not collapsed to mono.
+- Removed the shared filtered-duplicate path, its nodes and transition swell calls; dedicated Voice Space, Music Space and mantra convolution returns remain. Background music EQ is now peaking with a neutral starting gain, a gentle -3 dB ducked target and 0 dB full target. Saved settings, volumes, comfort controls and existing reverb presets remain otherwise unchanged. No compensating loudness boost was added.
+- Added executable 12-combination Voice Space/spatial control tests, unknown-value fallbacks and routing checks. Device listening and measured output loudness remain unverified. Audio/narration atlas updated. App v2.71; shell v5.157; language cache v23. Not committed or deployed.
+
+### Night-sky label backing blur — local update
+
+- Label backing now uses a 3 px canvas blur, isolated by save/restore so text and outline stay sharp. Text remains 30%, backing/outline 15%; Moon stays unlabeled. This softens the backing itself, not the stars behind it. Browsers without canvas filter support retain the plain backing.
+- Visual contract and syntax checks cover the change; browser appearance remains unverified. App v2.70; shell v5.156. Not deployed.
+
+### Sacred Depth GPU treatment — local prototype
+
+- Date: 2026-09-09. Select Settings → Meditation visual effect → Sacred Depth. Existing saved preferences are not overwritten. `celestial-presence.js` adds WebGL 1 relief displacement, selective moving moonlight highlights, procedural atmosphere on transparent margins and a smoothed read-only mantra response. All existing source art remains unchanged. This is illustrative 2.5D: the relief envelope is authored mathematically and highlights derive from luminance, not an anatomical depth map or a reconstructed statue.
+- GPU drawing is bounded to 30 fps, 960 px longest edge and 1.25 DPR. Original image remains the fallback on unsupported WebGL, load/texture errors or context loss. Session pause freezes frames; hidden pages cancel them; reduced motion produces a static frame; stop/Eyes Close deactivate the renderer. No microphone, network rendering library, gain change or new source image.
+- The breathing-like atmospheric rhythm is decorative; Box Breathing runs on a separate screen and is not synchronized with this treatment. One reusable renderer covers the selected chakra/deity image rather than duplicating GPU contexts per image.
+- Visual atlas updated; renderer lifecycle tests use a mock GPU, and existing visual/prelude checks pass. Shader compilation, actual rendered appearance, and phone performance still need browser verification; do not describe the prototype as visually approved. CSS v1.86, app v2.69, renderer v1.0, shell v5.155. Not committed or deployed.
+
+### Meditation imagery — local, uncommitted update
+
+- Date: 2026-09-09. Chakra/deity artwork now remains fully opaque; breathing uses a subtle 1.8% scale and 2 px lift instead of opacity changes. Aura, Holographic and Depth use restrained layered starlight behind the artwork, with slow 12–26 s light motion; removed the foreground screen wash and visible ring border. Original image assets are unchanged.
+- Fixed a premature reduced-motion media-query closing brace that disabled image/shimmer animation globally. Reduced motion still disables all effect motion; inactive/Eyes Close decorations stay hidden. Explicit brightness and Sleep dimming are preserved.
+- Visuals atlas updated without topology changes. Visual and night-sky contracts pass; browser appearance and device performance have not been verified. CSS v1.85, shell cache chakra-v5.154. Not committed or deployed.
+
+### Audio transition repair — local, uncommitted update
+
+- Date: 2026-09-09. Music/mantra now crossfade concurrently (6 s entry, 4 s return); cancellation is checked before touching the music gates after decoding. Removed doubled mantra volume and exit fading. Music entry uses a linear bus ramp without another long source fade; completion uses one exit envelope.
+- Shared loops isolate volume from equal-power repeat envelopes, bound overlap for short recordings, and stop sources on the AudioContext clock rather than wall-clock cleanup timers. Drone, anchor and elemental source retirement also follows audio time. Piper clip endings use at most 50 ms fading so final words remain audible.
+- Read-only FFmpeg scan of all nine active MP3s found no stretches below -50 dB lasting at least 0.5 s. A -35 dB scan found quiet entrances of 0.54–1.08 s in five mantras; recordings were not destructively trimmed. This does not establish perceived loudness or browser playback quality.
+- Verification: 23 runnable non-browser contracts pass, including new simulated loop-envelope tests. Hindi contract still hardcodes pre-sky app/cache versions 2.62/v5.147 and fails that assertion; language behavior assertions before it pass. Content-safety and drone-duration checks remain excluded because their owner-managed docs/dot.json fixture is absent. No browser checks performed.
+- Chakra, narration and audio maps updated. Shell: app.js v2.68, cache chakra-v5.153. No commit or deployment performed. Automated fake-clock envelope and existing audio contract checks cover scheduling, mute and handoff behavior; no device listening evidence. Embedded recording silence, mobile background timer throttling and every journey timing combination remain unverified. Intentional breath/stillness gaps and safety/suppression settings remain unchanged.
+
+### Natural night sky — local, uncommitted update
+
+- Date: 2026-09-08. Base: production `6a0ee84`; this change is not committed or deployed.
+- Added `night-sky.js`: deterministic 700–2,400-point background, faint procedural Milky Way luminance/dust lanes, cached star sprites/backdrop, and at most 110 stationary stars with restrained scintillation. Replaced the moving colored CSS clouds with a neutral dark atmosphere.
+- Existing observer-aware celestial overlay remains approximate. Moon now uses a cached textured sphere/transparent illumination mask; planets remain small points without decorative Saturn rings. The Moon is intentionally unlabeled. Other localized celestial names remain compact at 11 px, with 30% text and 15% dark backing/outline opacity so they stay within the night sky rather than reading as interface elements. Meteors start after 35–90 seconds, then occur individually every 45–120 seconds.
+- Reduced-motion preference changes stop/restart the animation live; hidden pages clear meteor state. Rendering retains the 1.5 DPR cap. No external sky imagery or data downloads were added. Journey and audio paths were not changed.
+- Shell references: `style.css?v=1.84`, `night-sky.js?v=1.0`, `app.js?v=2.63`; shell cache `chakra-v5.148`. New renderer is in precache.
+- Visual flow atlas updated alongside implementation and labeled as uncommitted; source references regenerated. Static/unit evidence: renderer determinism, bounded draw count, stationary stars, static reduced-motion drawing, lunar phase transparency/orientation and phase caching; existing visual/prelude contracts and syntax checks pass. Browser preview was declined, so no desktop/mobile appearance, frame-rate or device playback verification is claimed. A scoped `tests/night-sky-browser.mjs` check is available for later preview authorization.
+
 ### CP-VIDEO-108 — Ultra-short prelude exit fade
 
 - Date: 2026-09-08 (Asia/Kolkata).

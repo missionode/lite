@@ -53,8 +53,8 @@ assert.match(app, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spatial mode should
 assert.match(app, /localStorage\.setItem\('chakra_spatial_mode', state\.spatialMode\)/, 'Spatial mode changes should persist');
 assert.match(app, /getElementById\('spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(app, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);
-assert.match(app, /ethereal: \{ delay: 0\.06, wet: 0\.24, filter: 4600 \}/, 'Spatial Sound should use a diffuse, non-repeating ethereal narration reverb');
-assert.match(app, /const effectiveMode = this\.spatialMode !== 'off' \? 'ethereal' : requestedMode/, 'Spatial Sound should apply ethereal ambience only while enabled');
+assert.match(app, /const settings = voiceEchoSettings\[requestedMode\]/, 'Voice Space honors its own setting');
+assert.match(app, /off: \{\s*model: 'equalpower', lfo: 0,/, 'Off disables added pan motion');
 assert.match(html, /id="session-countdown"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a circular session countdown');
 assert.match(html, /id="session-countdown-right"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a mirrored circular session countdown');
 assert.match(html, /id="session-countdown-layer"[\s\S]*?id="session-countdown-right"/, 'The countdown should live in a shared layer outside individual screens');
@@ -74,8 +74,8 @@ assert.match(styles, /#breathing-screen\s*\{[\s\S]*?position:\s*fixed[\s\S]*?hei
 assert.match(styles, /\.tutorial-overlay\s*\{[\s\S]*?position:\s*fixed[\s\S]*?overflow-y:\s*auto/, 'The breathing tutorial should be a full-screen responsive layer');
 assert.match(styles, /\.tutorial-overlay::before[\s\S]*?conic-gradient[\s\S]*?animation:\s*liveChakraGradientA/, 'The breathing tutorial should use a live layered gradient');
 assert.match(styles, /color-mix\(in srgb, var\(--primary-color\)/, 'The live gradient should follow the active chakra color');
-assert.match(en.ui.spatialNote, /ethereal/i, 'English spatial guidance should explain the ethereal narration presence');
-assert.match(ml.ui.spatialNote, /അശരീരി/u, 'Malayalam spatial guidance should explain the ethereal narration presence');
+assert.match(en.ui.spatialNote, /independently/i, 'English guidance explains independent controls');
+assert.match(ml.ui.spatialNote, /സ്വതന്ത്രമായി/u, 'Malayalam guidance explains independent controls');
 assert.ok(en.ui.sessionCountdown?.trim() && en.ui.sessionCountdownLabel?.trim(), 'English countdown labels are required');
 assert.ok(ml.ui.sessionCountdown?.trim() && ml.ui.sessionCountdownLabel?.trim(), 'Malayalam countdown labels are required');
 

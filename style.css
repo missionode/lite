@@ -139,69 +139,14 @@ body {
     height: 100vh;
     overflow: hidden;
     background:
-        linear-gradient(116deg, transparent 23%, rgba(126, 151, 208, 0.035) 40%, rgba(188, 164, 220, 0.06) 49%, rgba(86, 112, 184, 0.028) 58%, transparent 76%),
-        radial-gradient(ellipse 95% 76% at 50% 18%, color-mix(in srgb, var(--primary-color) 18%, transparent) 0%, transparent 66%),
-        radial-gradient(ellipse 70% 62% at 10% 76%, rgba(36, 157, 224, 0.12) 0%, transparent 72%),
-        radial-gradient(ellipse 74% 60% at 92% 70%, rgba(210, 74, 184, 0.1) 0%, transparent 72%),
-        radial-gradient(ellipse 120% 100% at 50% 50%, #050510 0%, #020208 68%, #010106 100%);
+        radial-gradient(ellipse 110% 52% at 50% 118%, rgba(43, 52, 62, 0.18), transparent 76%),
+        radial-gradient(ellipse 120% 105% at 52% 34%, #080d17 0%, #040811 56%, #020409 100%);
     z-index: 0;
     pointer-events: none;
 }
 
-/* Soft, wide colour volumes inspired by the reference's cinematic background.
-   They stay behind the meditation surface, use no bitmap/WebGL, and move slowly
-   enough to read as depth without becoming visually stimulating. */
-#nebula-bg::before,
-#nebula-bg::after {
-    content: "";
-    position: absolute;
-    width: 78vw;
-    height: 68vh;
-    min-width: 34rem;
-    min-height: 22rem;
-    border-radius: 48% 52% 63% 37% / 42% 38% 62% 58%;
-    filter: blur(72px) saturate(0.88);
-    opacity: 0.16;
-    mix-blend-mode: screen;
-    will-change: transform;
-}
-
-#nebula-bg::before {
-    top: -24%;
-    left: -18%;
-    background:
-        radial-gradient(ellipse at 34% 44%, color-mix(in srgb, var(--primary-color) 72%, white 8%) 0%, transparent 58%),
-        radial-gradient(ellipse at 72% 58%, rgba(75, 195, 255, 0.42) 0%, transparent 62%);
-    animation: nebulaDriftA 38s ease-in-out infinite alternate;
-}
-
-#nebula-bg::after {
-    right: -22%;
-    bottom: -26%;
-    background:
-        radial-gradient(ellipse at 60% 38%, rgba(255, 92, 194, 0.34) 0%, transparent 60%),
-        radial-gradient(ellipse at 34% 68%, color-mix(in srgb, var(--primary-color) 58%, #ffd166 12%) 0%, transparent 64%);
-    animation: nebulaDriftB 46s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes nebulaDriftA {
-    0% { transform: translate3d(-4%, -2%, 0) rotate(-9deg) scale(1); }
-    50% { transform: translate3d(11%, 8%, 0) rotate(4deg) scale(1.08); }
-    100% { transform: translate3d(4%, 16%, 0) rotate(12deg) scale(0.98); }
-}
-
-@keyframes nebulaDriftB {
-    0% { transform: translate3d(5%, 3%, 0) rotate(10deg) scale(1.04); }
-    50% { transform: translate3d(-10%, -8%, 0) rotate(-4deg) scale(1.1); }
-    100% { transform: translate3d(-2%, 5%, 0) rotate(-14deg) scale(0.98); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #nebula-bg::before,
-    #nebula-bg::after {
-        animation: none;
-    }
-}
+/* The sky stays neutral as chakra colors change. Fine galactic luminance and
+   dust structure are cached by NaturalNightSky instead of animated CSS clouds. */
 
 #particle-canvas {
     position: fixed;
@@ -211,7 +156,7 @@ body {
     height: 100vh;
     z-index: 2;
     pointer-events: none;
-    opacity: 0.9;
+    opacity: 1;
     mix-blend-mode: screen;
     contain: strict;
 }
@@ -877,12 +822,13 @@ input[type="range"]::-moz-range-progress {
 }
 
 #chakra-container::after {
-    z-index: 4;
-    inset: 14%;
-    border: 1px solid color-mix(in srgb, var(--chakra-visual-color) 28%, transparent);
+    z-index: 1;
+    inset: 2%;
+    border: none;
     background:
-        linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.16) 46%, transparent 72%),
-        conic-gradient(from 120deg, transparent, color-mix(in srgb, var(--chakra-visual-color) 18%, transparent), transparent, rgba(255, 255, 255, 0.1), transparent);
+        radial-gradient(ellipse at 25% 32%, rgba(216, 232, 255, 0.18), transparent 35%),
+        radial-gradient(ellipse at 76% 68%, color-mix(in srgb, var(--chakra-visual-color) 22%, transparent), transparent 42%),
+        radial-gradient(ellipse at center, transparent 52%, rgba(211, 225, 247, 0.1) 59%, transparent 66%);
     mix-blend-mode: screen;
 }
 
@@ -893,29 +839,35 @@ input[type="range"]::-moz-range-progress {
     visibility: hidden;
     position: relative;
     z-index: 2;
+    opacity: 1;
     transform: translateZ(0);
     transition: opacity 1.2s ease, filter 1.4s ease, transform 1.6s ease;
 }
 
-/* A barely perceptible light-breath keeps symbols and deity images present
-   while giving them a living, holographic quality. The duration is randomized
-   per chakra by VisualEngine, so the effect never becomes a shared pulse. */
+/* Keep artwork solid. Animate depth, never its opacity; all atmosphere sits
+   behind the image so its detail is not washed out by a screen overlay. */
 #chakra-container.image-breathe-active #chakra-symbol {
     animation: imageLightBreath var(--image-breathe-duration, 12s) ease-in-out var(--image-breathe-delay, 0s) infinite;
 }
 
 @keyframes imageLightBreath {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
+    0%, 100% { scale: 1; translate: 0 0; }
+    50% { scale: 1.018; translate: 0 -2px; }
 }
 
 #chakra-container.visual-effect-active::before {
-    opacity: 1;
+    opacity: 0.65;
+    animation: celestialLightBreath 16s ease-in-out infinite;
 }
 
 #chakra-container.visual-effect-aura::before {
     transform: scale(1.02);
     filter: blur(10px);
+}
+
+#chakra-container.visual-effect-aura::after {
+    opacity: 0.22;
+    animation: holographicShimmer 22s ease-in-out infinite alternate;
 }
 
 #chakra-container.visual-effect-aura #chakra-symbol {
@@ -925,13 +877,13 @@ input[type="range"]::-moz-range-progress {
 }
 
 #chakra-container.visual-effect-holographic::before {
-    opacity: 0.92;
+    opacity: 0.65;
     transform: scale(1.06);
     filter: blur(12px) saturate(1.12);
 }
 
 #chakra-container.visual-effect-holographic::after {
-    opacity: 0.28;
+    opacity: 0.38;
     animation: holographicShimmer 12s ease-in-out infinite alternate;
 }
 
@@ -944,14 +896,15 @@ input[type="range"]::-moz-range-progress {
 }
 
 #chakra-container.visual-effect-depth::before {
-    opacity: 0.84;
+    opacity: 0.55;
     transform: scale(0.98) translateY(2%);
     filter: blur(8px);
 }
 
 #chakra-container.visual-effect-depth::after {
-    opacity: 0.18;
+    opacity: 0.3;
     transform: scale(0.9);
+    animation: holographicShimmer 26s ease-in-out infinite alternate-reverse;
 }
 
 #chakra-container.visual-effect-depth #chakra-symbol {
@@ -970,18 +923,31 @@ input[type="range"]::-moz-range-progress {
     }
 }
 
+@keyframes celestialLightBreath {
+    0%, 100% { scale: 0.98; }
+    50% { scale: 1.05; }
+}
+
+/* Stop removes the active class; inactive and Eyes Close scenes stay still. */
+#chakra-container:not(.visual-effect-active)::before,
+#chakra-container:not(.visual-effect-active)::after {
+    opacity: 0;
+    animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .journey-video-prelude-meditator {
         transition: opacity 0.4s ease;
         transform: none;
     }
-}
     #chakra-container.image-breathe-active #chakra-symbol {
         animation: none;
     }
 
-    #chakra-container.visual-effect-holographic::after {
-        animation: none;
+    #chakra-container::before,
+    #chakra-container::after {
+        animation: none !important;
+        transition: none;
     }
 
     #chakra-container.visual-effect-holographic #chakra-symbol,
@@ -993,6 +959,27 @@ input[type="range"]::-moz-range-progress {
 .chakra-gold-ring {
     display: none; /* Removed as requested */
 }
+
+/* Sacred Depth has its own bounded GPU scene. CSS artwork is the fallback. */
+.celestial-presence {
+    display: none;
+    position: absolute;
+    inset: 50% auto auto 0;
+    translate: 0 -50%;
+    width: 100%;
+    height: 100%;
+    max-height: 55vh;
+    pointer-events: none;
+    z-index: 3;
+}
+#chakra-container.visual-effect-depth .celestial-presence { display: block; }
+#chakra-container.presence-ready #chakra-symbol {
+    visibility: hidden !important;
+    animation: none;
+}
+#chakra-container.presence-ready::before,
+#chakra-container.presence-ready::after { opacity: 0; animation: none; }
+#chakra-container:not(.presence-ready) .celestial-presence { visibility: hidden; }
 
 #glow-effect {
     display: none;

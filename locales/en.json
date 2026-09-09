@@ -203,7 +203,7 @@
     ,"spatialStereo": "Stereo Wide"
     ,"spatialHeadphones": "Headphone 3D"
     ,"spatialRoom": "Room Spatial"
-    ,"spatialNote": "Narration stays centered; Spatial Sound adds a subtle ethereal presence while shaping music, drone and mantra."
+    ,"spatialNote": "Narration stays centered. Spatial Sound positions music, drone and mantra; Voice Space independently controls narration reverb. Off stops added spatial movement."
     ,"sessionCountdown": "Time remaining"
     ,"sessionCountdownLabel": "remaining"
     ,"voicePresets": "Voice presets"

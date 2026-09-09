@@ -12,6 +12,8 @@
     "test:demo-script": "node tests/demo-script.test.mjs",
     "test:hypnosis-journey": "node tests/hypnosis-journey.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
+    "test:audio-transitions": "node tests/audio-transitions.test.mjs",
+    "test:audio-effects-controls": "node tests/audio-effects-controls.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
     "test:spatial-audio": "node tests/spatial-audio.test.mjs",
     "test:no-frequency": "node tests/no-frequency-mode.test.mjs",
@@ -25,6 +27,8 @@
     "test:splash": "node tests/splash-screen.test.mjs",
     "test:journey-video-prelude": "node tests/journey-video-prelude.test.mjs",
     "test:visual-effect": "node tests/visual-effect.test.mjs",
+    "test:celestial-presence": "node tests/celestial-presence.test.mjs",
+    "test:night-sky": "node tests/night-sky.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

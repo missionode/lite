@@ -1461,6 +1461,7 @@ class PiperTTS {
             );
             const fadeOutTime = Math.min(
                 Number.isFinite(requestedFadeOut) ? Math.max(0, requestedFadeOut) : PIPER_CLIP_FADE_SECONDS,
+                PIPER_CLIP_FADE_SECONDS, // Preserve final spoken words; tails live on the reverb bus.
                 buffer.duration / 4
             );
             const normalizedGain = this.getNormalizationGain(buffer);
@@ -1541,11 +1542,16 @@ class SeamlessLoop {
         this.buffer = buffer;
         this.destination = destination;
         this.targetGainValue = targetGain;
-        this.crossfadeDuration = crossfadeDuration;
+        this.crossfadeDuration = Math.min(crossfadeDuration, buffer.duration / 2);
+        this.output = ctx.createGain();
+        this.output.gain.setValueAtTime(targetGain, ctx.currentTime);
+        this.output.connect(destination);
         this.activeSources = [];
         this.nextStartTimer = null;
         this.isRunning = false;
         this.scheduleAheadTime = 1.5;
+        this.fadeInCurve = Float32Array.from({ length: 65 }, (_, i) => Math.sin(i / 64 * Math.PI / 2));
+        this.fadeOutCurve = Float32Array.from({ length: 65 }, (_, i) => Math.cos(i / 64 * Math.PI / 2));
     }
 
     start() {
@@ -1563,11 +1569,16 @@ class SeamlessLoop {
 
         source.buffer = this.buffer;
         source.connect(gain);
-        gain.connect(this.destination);
+        gain.connect(this.output);
 
         // Initial Fade In
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(this.targetGainValue, now + this.crossfadeDuration);
+        // Only the owning bus controls entry volume; overlaps keep unit gain.
+        if (this.activeSources.length) {
+            gain.gain.setValueCurveAtTime(this.fadeInCurve, now, this.crossfadeDuration);
+        } else {
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(1, now + Math.min(0.03, this.crossfadeDuration));
+        }
 
         source.start(now);
         this.activeSources.push({ source, gain });
@@ -1577,14 +1588,17 @@ class SeamlessLoop {
         const nextStartTime = now + duration - this.crossfadeDuration;
 
         // Schedule fade out for this instance
-        gain.gain.setValueAtTime(this.targetGainValue, nextStartTime);
-        gain.gain.linearRampToValueAtTime(0, nextStartTime + this.crossfadeDuration);
+        // Equal-power overlap avoids the midpoint energy dip of linear fades.
+        gain.gain.setValueCurveAtTime(this.fadeOutCurve, nextStartTime, this.crossfadeDuration);
 
         // Remove from tracking and stop after fade out
-        setTimeout(() => {
-            try { source.stop(); } catch(e) {}
+        source.onended = () => {
+            source.disconnect();
+            gain.disconnect();
             this.activeSources = this.activeSources.filter(s => s.source !== source);
-        }, (duration + 1) * 1000);
+            if (!this.isRunning && !this.activeSources.length) this.output.disconnect();
+        };
+        source.stop(now + duration);
 
         // Use the JavaScript timer only to enqueue the next source early. The
         // actual start time is placed on the AudioContext timeline, so normal
@@ -1598,12 +1612,12 @@ class SeamlessLoop {
 
     setGain(value) {
         this.targetGainValue = value;
-        this.activeSources.forEach(s => {
-            const now = this.ctx.currentTime;
-            s.gain.gain.cancelScheduledValues(now);
-            // Increased to 2.0s for a more organic volume transition
-            s.gain.gain.linearRampToValueAtTime(value, now + 2.0);
-        });
+        const now = this.ctx.currentTime;
+        const param = this.output.gain;
+        const current = param.value;
+        if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+        else { param.cancelScheduledValues(now); param.setValueAtTime(current, now); }
+        param.linearRampToValueAtTime(value, now + 2);
     }
 
     stop(fadeTime = 4) {
@@ -1611,13 +1625,12 @@ class SeamlessLoop {
         if (this.nextStartTimer) clearTimeout(this.nextStartTimer);
 
         const now = this.ctx.currentTime;
-        this.activeSources.forEach(s => {
-            s.gain.gain.cancelScheduledValues(now);
-            s.gain.gain.setValueAtTime(s.gain.gain.value, now);
-            s.gain.gain.linearRampToValueAtTime(0, now + fadeTime);
-            setTimeout(() => { try { s.source.stop(); } catch(e) {} }, (fadeTime + 1.0) * 1000);
-        });
-        this.activeSources = [];
+        const param = this.output.gain;
+        const current = param.value;
+        if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+        else { param.cancelScheduledValues(now); param.setValueAtTime(current, now); }
+        param.linearRampToValueAtTime(0, now + fadeTime);
+        this.activeSources.forEach(s => s.source.stop(now + fadeTime + 0.02));
     }
     }
 class AudioEngine {
@@ -1630,7 +1643,6 @@ class AudioEngine {
         this.shotGain = null;
         this.masterGain = null;
         this.voiceGain = null;
-        this.reverbWet = null; // New: Reverb Swell control
         this.pannerNode = null;
         this.spatialPanLfoGain = null;
         this.spatialDronePanner = null;
@@ -1831,7 +1843,8 @@ class AudioEngine {
         
         // Deep Spectrum Carving
         this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'notch';
+        this.bgMusicEQ.type = 'peaking';
+        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime);
         this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
         this.bgMusicEQ.Q.setValueAtTime(1.5, this.ctx.currentTime);
 
@@ -1960,7 +1973,7 @@ class AudioEngine {
         const pannerLfoGain = this.ctx.createGain();
         pannerLfo.type = 'sine';
         pannerLfo.frequency.setValueAtTime(0.03, this.ctx.currentTime);
-        pannerLfoGain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        pannerLfoGain.gain.setValueAtTime(0, this.ctx.currentTime);
         this.spatialPanLfoGain = pannerLfoGain;
         pannerLfo.connect(pannerLfoGain);
         pannerLfoGain.connect(this.pannerNode.pan);
@@ -1971,14 +1984,6 @@ class AudioEngine {
         // speakers receive a safe stereo/equal-power fallback.
         this.spatialDronePanner = this.createSpatialPanner();
         this.spatialMantraPanner = this.createSpatialPanner();
-
-        this.reverbGain = this.ctx.createGain();
-        this.reverbGain.gain.value = 0.35; 
-        this.reverbWet = this.reverbGain; 
-        
-        this.reverbFilter = this.ctx.createBiquadFilter();
-        this.reverbFilter.type = 'lowpass';
-        this.reverbFilter.frequency.setValueAtTime(state.audioFilters ? 1500 : 20000, this.ctx.currentTime);
 
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.8;
@@ -2013,15 +2018,12 @@ class AudioEngine {
         }
         lastNode.connect(this.exciter);
         
-        this.exciter.connect(this.reverbGain);
-        this.reverbGain.connect(this.reverbFilter);
-        
+        // One shared output path. Space comes only from the dedicated
+        // voice, music and mantra convolution returns, not a filtered duplicate.
         if (this.presenceFilter) {
-            this.reverbFilter.connect(this.presenceFilter);
             this.exciter.connect(this.presenceFilter);
             this.presenceFilter.connect(this.masterCompressor);
         } else {
-            this.reverbFilter.connect(this.masterCompressor);
             this.exciter.connect(this.masterCompressor);
         }
         
@@ -2156,7 +2158,7 @@ class AudioEngine {
 
         const configurations = {
             off: {
-                model: 'equalpower', lfo: 0.30,
+                model: 'equalpower', lfo: 0,
                 drone: { x: 0, y: 0, z: -1 }, music: { x: 0, y: 0, z: -1 }, mantra: { x: 0, y: 0, z: -1 }, pleasure: { x: 0, y: 0, z: -1, nearZ: -1 }
             },
             stereo: {
@@ -2187,9 +2189,7 @@ class AudioEngine {
             this.spatialPanLfoGain.gain.setValueAtTime(this.spatialPanLfoGain.gain.value, now);
             this.spatialPanLfoGain.gain.linearRampToValueAtTime(configurations.lfo, now + 1.2);
         }
-        // Spatial sound adds an ethereal presence to narration through the
-        // voice-only ambience bus while keeping the dry voice centered.
-        this.setVoiceEcho(state.voiceEcho);
+        // Voice Space is independent; spatial changes never alter its return.
     }
 
     setVoiceTuning(warmth = 50, clarity = 50) {
@@ -2208,15 +2208,10 @@ class AudioEngine {
         const voiceEchoSettings = {
             off: { delay: 0.025, wet: 0, filter: 3200 },
             light: { delay: 0.025, wet: 0.14, filter: 3200 },
-            spacious: { delay: 0.04, wet: 0.20, filter: 3600 },
-            // A stronger, centered heavenly ambience for Spatial Sound. The
-            // dry narration remains untouched; only the stereo wet return
-            // widens, so the words remain clear at the centre.
-            ethereal: { delay: 0.06, wet: 0.24, filter: 4600 }
+            spacious: { delay: 0.04, wet: 0.20, filter: 3600 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
-        const effectiveMode = this.spatialMode !== 'off' ? 'ethereal' : requestedMode;
-        const settings = voiceEchoSettings[effectiveMode];
+        const settings = voiceEchoSettings[requestedMode];
         const now = this.ctx.currentTime;
         [this.voiceEchoDelay.delayTime, this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
             param.cancelScheduledValues(now);
@@ -2299,7 +2294,6 @@ class AudioEngine {
         const presenceGain = state.eyesCloseMode ? -6 : -3;
         if (this.presenceFilter) this.presenceFilter.gain.linearRampToValueAtTime(enabled ? presenceGain : 0, now + 1.5);
         if (this.bgMusicLPF) this.bgMusicLPF.frequency.linearRampToValueAtTime(enabled ? 1200 : 20000, now + 1.5);
-        if (this.reverbFilter) this.reverbFilter.frequency.linearRampToValueAtTime(enabled ? 1500 : 20000, now + 1.5);
         if (this.mantraFilter) this.mantraFilter.frequency.linearRampToValueAtTime(enabled ? 2200 : 20000, now + 1.5);
     }
 
@@ -2656,13 +2650,6 @@ class AudioEngine {
         this.stopBinaural();
         const now = this.ctx.currentTime;
         
-        // Reset reverb wetness during stop to clear any active swells
-        if (this.reverbWet) {
-            this.reverbWet.gain.cancelScheduledValues(now);
-            this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
-            this.reverbWet.gain.linearRampToValueAtTime(0.3, now + 4);
-        }
-
         if (this.vibrationLFO) {
             try { this.vibrationLFO.stop(now + 5); } catch(e) {}
             this.vibrationLFO = null;
@@ -2672,7 +2659,7 @@ class AudioEngine {
             gain.gain.cancelScheduledValues(now);
             gain.gain.setValueAtTime(currentVal, now);
             gain.gain.linearRampToValueAtTime(0, now + 5);
-            setTimeout(() => { try { osc.stop(); } catch(e) {} }, 5100);
+            try { osc.stop(now + 5.1); } catch(e) {}
         });
         this.droneOscillators = [];
 
@@ -2682,7 +2669,7 @@ class AudioEngine {
             this.groundingAnchor.gain.gain.setValueAtTime(currentVal, now);
             this.groundingAnchor.gain.gain.linearRampToValueAtTime(0, now + 5);
             const anchorOsc = this.groundingAnchor.osc;
-            setTimeout(() => { try { anchorOsc.stop(); } catch(e) {} }, 5100);
+            try { anchorOsc.stop(now + 5.1); } catch(e) {}
             this.groundingAnchor = null;
         }
 
@@ -2691,7 +2678,7 @@ class AudioEngine {
             gain.gain.cancelScheduledValues(now);
             gain.gain.setValueAtTime(currentVal, now);
             gain.gain.linearRampToValueAtTime(0, now + 5);
-            setTimeout(() => { try { src.stop(); } catch(e) {} }, 5100);
+            try { src.stop(now + 5.1); } catch(e) {}
         });
         this.elementalNodes = [];
     }
@@ -2717,20 +2704,11 @@ class AudioEngine {
             // create an avoidable silent gap on slower devices. The dedicated
             // gates silence dry music and stop new tail input while allowing
             // the already-created diffuse tail to settle naturally.
-            const musicFade = this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
-
-            // Cached mantra files can be ready immediately. Keep the same
-            // deliberate handoff in that case: music must finish fading before
-            // the mantra source starts.
-            if (musicFade) {
-                const elapsedMs = (this.ctx.currentTime - musicFade.startedAt) * 1000;
-                const remainingMs = Math.max(0, musicFade.duration * 1000 - elapsedMs);
-                if (remainingMs > 0) await new Promise(resolve => setTimeout(resolve, remainingMs));
-            }
             if (requestId !== this.mantraRequestId || state.noMantraMode) return;
+            this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
 
             // Standardized to 3.0s crossfade
-            this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 0, 3.0);
+            this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 1, 3.0);
             this.mantraLoop.start();
 
             // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
@@ -2747,9 +2725,8 @@ class AudioEngine {
             const now = this.ctx.currentTime;
             this.mantraGain.gain.cancelScheduledValues(now);
             this.mantraGain.gain.setValueAtTime(0, now);
-            // Ghostly 10s fade-in for maximum relaxation
-            this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + 10);
-            this.mantraLoop.setGain(state.volMantra);
+            // Complement the outgoing music fade; apply user volume only once.
+            this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + MANTRA_MUSIC_FADE_SECONDS);
 
             if (this.masterGain) {
                 this.masterGain.gain.cancelScheduledValues(now);
@@ -2785,9 +2762,7 @@ class AudioEngine {
             this.mantraPresenceLFO = null;
         }
 
-        this.mantraGain.gain.cancelScheduledValues(now);
-        this.mantraGain.gain.setValueAtTime(this.mantraGain.gain.value, now);
-        this.mantraGain.gain.linearRampToValueAtTime(0, now + MANTRA_FADE_SECONDS);
+        // The retiring loop owns the exit envelope (no second bus fade).
 
         if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
@@ -2805,26 +2780,10 @@ class AudioEngine {
         this.mantraLoop.stop(MANTRA_FADE_SECONDS);
         this.mantraLoop = null;
 
-        // Keep music muted until the mantra fade is complete. Restoring it
-        // immediately would create an avoidable overlap at every chakra.
+        // Bring the bed back during the outgoing mantra, not after silence.
         if (restoreMusic) {
-            this.cancelBackgroundMusicRestore();
-            this.bgMusicRestoreTimer = setTimeout(() => {
-                this.bgMusicRestoreTimer = null;
-                this.restoreBackgroundMusicAfterMantra();
-            }, MANTRA_FADE_SECONDS * 1000);
+            this.restoreBackgroundMusicAfterMantra(MANTRA_FADE_SECONDS);
         }
-    }
-
-    // New: Studio Reverb Swell for Transitions
-    triggerReverbSwell(duration = 4) {
-        const now = this.ctx.currentTime;
-        this.reverbWet.gain.cancelScheduledValues(now);
-        this.reverbWet.gain.setValueAtTime(this.reverbWet.gain.value, now);
-        
-        // Swell up to 0.8 wetness then back down
-        this.reverbWet.gain.linearRampToValueAtTime(0.8, now + (duration * 0.5));
-        this.reverbWet.gain.linearRampToValueAtTime(0.3, now + duration);
     }
 
     async startBackgroundMusic() {
@@ -2873,10 +2832,7 @@ class AudioEngine {
             this.musicEchoTailGate.gain.setValueAtTime(1, now);
         }
 
-        // Match the source-loop startup envelope to the outer music gain.
-        // Keeping both at the full entry duration prevents a restarted loop
-        // from becoming audible through its inner 3-second fade while the
-        // outer gain still carries a previous session's level.
+        // The bus owns entry fading; the loop duration controls repeats only.
         this.bgMusicLoop = new SeamlessLoop(
             this.ctx,
             this.bgMusicBuffer,
@@ -3121,31 +3077,32 @@ class AudioEngine {
         else if (typeof isDucked === 'number') factor = isDucked;
 
         const targetVol = state.volMusic * factor;
-        const targetEQ = factor < 1.0 ? -12 : 0; // Deeper -12dB cut clears space for voice
+        const targetEQ = factor < 1.0 ? -3 : 0; // Gentle, effective midrange cut under guidance
         this.bgMusicTargetVolume = targetVol;
         this.bgMusicTargetEQ = targetEQ;
         
         const now = this.ctx.currentTime;
         
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
+        const liveGain = this.bgMusicGain.gain.value;
+        if (this.bgMusicGain.gain.cancelAndHoldAtTime) this.bgMusicGain.gain.cancelAndHoldAtTime(now);
+        else {
+            this.bgMusicGain.gain.cancelScheduledValues(now);
+            this.bgMusicGain.gain.setValueAtTime(liveGain, now);
+        }
         if (targetVol <= 0) {
             // Zero is a supported user setting. Linear ramps may end at zero,
             // keeping playback muted without aborting the journey.
             this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
         } else {
-            const startVol = Math.max(0.0001, this.bgMusicGain.gain.value);
-            this.bgMusicGain.gain.setValueAtTime(startVol, now);
-            this.bgMusicGain.gain.exponentialRampToValueAtTime(targetVol, now + duration);
+            // Linear entry avoids spending most of a long fade near silence.
+            this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration);
         }
         
         this.bgMusicEQ.gain.cancelScheduledValues(now);
         this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
         this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
         
-        // A new loop already owns a ten-second source envelope. Calling
-        // setGain() here would cancel that envelope and replace it with the
-        // loop helper's short gain ramp, making entry feel abrupt.
+        // Loop level is independent of the immutable overlap envelopes.
         if (now >= this.bgMusicEntryEndsAt) this.bgMusicLoop.setGain(1.0);
 
         // A narration request during the mantra fade may update the desired
@@ -3343,6 +3300,10 @@ class AmbientParticleField {
         this.particles = [];
         this.meteors = [];
         this.nextMeteorAt = 0;
+        this.sky = new NaturalNightSky();
+        this.lastCelestialRefresh = 0;
+        this.cachedMoonPhase = null;
+        this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
         this.observer = null;
         this.celestialBodies = [];
         this.moonBuffer = document.createElement('canvas');
@@ -3357,15 +3318,17 @@ class AmbientParticleField {
         this.resize = this.resize.bind(this);
         this.render = this.render.bind(this);
         this.handleVisibility = this.handleVisibility.bind(this);
+        this.handleMotionChange = this.handleMotionChange.bind(this);
     }
 
     start() {
         if (!this.canvas || !this.ctx) return;
         window.addEventListener('resize', this.resize, { passive: true });
         document.addEventListener('visibilitychange', this.handleVisibility);
+        this.motionPreference.addEventListener('change', this.handleMotionChange);
         this.resize();
         this.requestObserverLocation();
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (!this.motionPreference.matches && !document.hidden) {
             this.frame = requestAnimationFrame(this.render);
         } else {
             this.draw(performance.now(), false);
@@ -3384,6 +3347,7 @@ class AmbientParticleField {
                 if (!Number.isFinite(coords.latitude) || !Number.isFinite(coords.longitude)) return;
                 this.observer = { latitude: coords.latitude, longitude: coords.longitude, approximate: false };
                 this.refreshCelestialBodies();
+                if (this.motionPreference.matches) this.draw(performance.now(), false);
             },
             () => { /* Keep the approximate fallback sky when declined. */ },
             { enableHighAccuracy: false, maximumAge: 900000, timeout: 8000 }
@@ -3403,7 +3367,6 @@ class AmbientParticleField {
             ['Betelgeuse', 88.7929, 7.4071, 0.5, [255, 184, 145]]
         ];
         const bodies = namedStars.map(([name, ra, dec, magnitude, color]) => ({ name, magnitude, color, ...celestialHorizontal(ra, dec, observer.latitude, observer.longitude, date), kind: 'star' }));
-        const sunLongitude = celestialSunLongitude(days);
         const moon = celestialMoonEquatorial(days);
         bodies.push({ name: 'Moon', kind: 'moon', magnitude: -12, color: [255, 246, 210], angularDiameter: 0.52, ...celestialHorizontal(moon.ra, moon.dec, observer.latitude, observer.longitude, date), phase: celestialMoonPhase(days) });
         // Approximate apparent diameters as seen from Earth. The Moon is the
@@ -3424,53 +3387,40 @@ class AmbientParticleField {
         this.canvas.style.width = `${window.innerWidth}px`;
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const area = window.innerWidth * window.innerHeight;
-        const count = Math.min(240, Math.max(100, Math.round(area / 7600)));
-        const layerFor = (index) => index < count * 0.52 ? 'background' : index < count * 0.86 ? 'middle' : 'foreground';
-        const starColors = [
-            [198, 224, 255], // hot blue-white
-            [255, 247, 220], // sun-like warm white
-            [255, 211, 175], // cool red/orange giant
-            [226, 239, 255]  // soft white-blue
-        ];
-        this.particles = Array.from({ length: count }, (_, index) => {
-            const layer = layerFor(index);
-            const scale = layer === 'background' ? 0.55 : layer === 'middle' ? 0.9 : 1.25;
-            const magnitude = Math.random() ** 2.4;
-            return {
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            layer,
-            radius: (0.34 + magnitude * 1.35) * scale,
-            alpha: layer === 'background' ? 0.16 + Math.random() * 0.2 : layer === 'middle' ? 0.3 + Math.random() * 0.34 : 0.42 + Math.random() * 0.38,
-            color: starColors[Math.floor(Math.random() * starColors.length)],
-            phase: Math.random() * Math.PI * 2,
-            drift: 0.3 + Math.random() * 0.7,
-            rotation: Math.random() * Math.PI / 2,
-            spike: 1.8 + Math.random() * 2.8,
-            legLengths: Array.from({ length: 4 }, () => 0.72 + Math.random() * 0.58),
-            brightness: 0.78 + Math.random() * 0.42,
-            driftX: 0.22 + Math.random() * 0.42,
-            twinkleSpeed: 0.65 + Math.random() * 1.2,
-            twinkleDepth: 0.3 + Math.random() * 0.42,
-            isTwinkler: layer !== 'background' && Math.random() < (layer === 'foreground' ? 0.86 : 0.55)
-            };
-        });
+        this.sky.resize(window.innerWidth, window.innerHeight, dpr);
+        this.particles = this.sky.stars;
         this.draw(performance.now(), false);
+    }
+
+    handleMotionChange() {
+        cancelAnimationFrame(this.frame);
+        this.frame = 0;
+        this.meteors = [];
+        this.nextMeteorAt = 0;
+        this.lastFrameAt = 0;
+        if (!document.hidden) {
+            if (this.motionPreference.matches) this.draw(performance.now(), false);
+            else this.frame = requestAnimationFrame(this.render);
+        }
     }
 
     handleVisibility() {
         if (document.hidden) {
             cancelAnimationFrame(this.frame);
             this.frame = 0;
-        } else if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !this.frame) {
+            this.meteors = [];
+            this.nextMeteorAt = 0;
+        } else if (!this.motionPreference.matches && !this.frame) {
             this.lastFrameAt = 0;
             this.frame = requestAnimationFrame(this.render);
+        } else if (this.motionPreference.matches) {
+            this.refreshCelestialBodies();
+            this.draw(performance.now(), false);
         }
     }
 
     render(timestamp) {
-        if (document.hidden) return;
+        if (document.hidden || this.motionPreference.matches) { this.frame = 0; return; }
         if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
             this.draw(timestamp, true);
             this.lastFrameAt = timestamp;
@@ -3482,61 +3432,13 @@ class AmbientParticleField {
         if (!this.ctx) return;
         const width = window.innerWidth;
         const height = window.innerHeight;
-        if (animate && this.observer && Math.floor(timestamp / 60000) !== Math.floor((timestamp - 33) / 60000)) this.refreshCelestialBodies();
+        if (this.observer && timestamp - this.lastCelestialRefresh >= 60000) {
+            this.refreshCelestialBodies();
+            this.lastCelestialRefresh = timestamp;
+        }
         this.ctx.clearRect(0, 0, width, height);
         const time = timestamp * 0.001;
-        this.particles.forEach((particle) => {
-            const driftY = animate ? Math.sin(time * particle.drift + particle.phase) * 1.8 : 0;
-            const driftX = animate ? Math.cos(time * particle.driftX + particle.phase) * 1.2 : 0;
-            // Two incommensurate sine waves imitate atmospheric scintillation:
-            // each bright star breathes on its own phase rather than looping in
-            // lockstep with the rest of the field.
-            const twinkle = animate && particle.isTwinkler
-                ? 1 - particle.twinkleDepth * (0.5 - 0.5 * (
-                    0.72 * Math.sin(time * particle.twinkleSpeed + particle.phase) +
-                    0.28 * Math.sin(time * particle.twinkleSpeed * 2.37 + particle.phase * 1.71)
-                ))
-                : 1;
-            const alpha = Math.min(1, particle.alpha * twinkle * particle.brightness);
-            const color = particle.color.join(', ');
-            this.ctx.beginPath();
-            this.ctx.shadowBlur = particle.layer === 'foreground' ? 8 : particle.layer === 'middle' ? 4.5 : 1.5;
-            this.ctx.shadowColor = `rgba(${color}, ${alpha * 0.82})`;
-            this.ctx.fillStyle = `rgba(${color}, ${alpha})`;
-            const x = particle.x + driftX;
-            const y = particle.y + driftY;
-            const inner = particle.radius * 0.52;
-            this.ctx.save();
-            this.ctx.translate(x, y);
-            this.ctx.rotate(particle.rotation);
-            if (particle.layer === 'background') {
-                this.ctx.arc(0, 0, particle.radius, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.restore();
-                return;
-            }
-            // Four-point star: most particles remain pinpricks, while larger
-            // ones catch the eye like distant stars without becoming icons.
-            for (let point = 0; point < 8; point += 1) {
-                const angle = (Math.PI / 4) * point - Math.PI / 2;
-                const arm = Math.floor(point / 2);
-                const outer = particle.radius * particle.spike * particle.legLengths[arm] * (0.86 + twinkle * 0.14);
-                const radius = point % 2 === 0 ? outer : inner;
-                const pointX = Math.cos(angle) * radius;
-                const pointY = Math.sin(angle) * radius;
-                if (point === 0) this.ctx.moveTo(pointX, pointY);
-                else this.ctx.lineTo(pointX, pointY);
-            }
-            this.ctx.closePath();
-            this.ctx.fill();
-            if (particle.layer === 'foreground' || particle.isTwinkler) {
-                this.ctx.beginPath();
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.18)})`;
-                this.ctx.arc(0, 0, Math.max(0.7, particle.radius * 0.58), 0, Math.PI * 2);
-                this.ctx.fill();
-            }
-            this.ctx.restore();
-        });
+        this.sky.draw(this.ctx, timestamp, animate);
         if (animate) this.drawMeteors(time, width, height);
         this.drawCelestialBodies(width, height);
         this.ctx.shadowBlur = 0;
@@ -3547,23 +3449,24 @@ class AmbientParticleField {
             if (body.altitude < 4) return;
             const x = (body.azimuth / 360) * width;
             const y = Math.max(28, height * (0.88 - Math.min(body.altitude, 88) / 100));
-            const moonPixelDiameter = 26;
+            const moonPixelDiameter = 28;
             const size = body.kind === 'moon'
-                ? moonPixelDiameter
+                ? moonPixelDiameter / 2
                 : body.kind === 'planet'
-                    ? Math.max(0.9, moonPixelDiameter * (body.angularDiameter / 0.52) * (body.name === 'Jupiter' ? 1.15 : 1))
-                    : Math.max(1.2, 3.4 - body.magnitude * 0.55);
+                    ? Math.min(1.65, Math.max(0.8, moonPixelDiameter * (body.angularDiameter / 0.52) * 0.4))
+                    : Math.max(0.75, 1.65 - body.magnitude * 0.22);
             const [red, green, blue] = body.color;
             this.ctx.save();
-            const haloRadius = body.kind === 'moon' ? size * 2.1 : body.kind === 'planet' ? size * 3.8 : size * 2.4;
+            const illumination = body.kind === 'moon' ? (1 - Math.cos((body.phase ?? 0.5) * Math.PI * 2)) / 2 : 1;
+            const haloRadius = body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.28 : 0.2})`);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
             halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
             this.ctx.fillStyle = halo;
             this.ctx.beginPath();
             this.ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
             this.ctx.fill();
-            this.ctx.shadowBlur = body.kind === 'moon' ? 16 : body.kind === 'planet' ? 8 : 4;
+            this.ctx.shadowBlur = body.kind === 'moon' ? 0 : 3;
             this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.52 : 0.72})`;
             if (body.kind === 'moon') {
                 this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
@@ -3576,25 +3479,36 @@ class AmbientParticleField {
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, size, 0, Math.PI * 2);
                 this.ctx.fill();
-                if (body.name === 'Saturn') {
-                    this.ctx.strokeStyle = `rgba(238, 220, 185, 0.72)`;
-                    this.ctx.lineWidth = Math.max(0.45, size * 0.28);
-                    this.ctx.beginPath();
-                    this.ctx.ellipse(x, y, size * 2.1, size * 0.72, -0.22, 0, Math.PI * 2);
-                    this.ctx.stroke();
-                }
             }
             const labelKey = CELESTIAL_LABEL_KEYS[body.name];
             const label = labelKey ? t(labelKey, state.language) : body.name;
-            if (label && body.kind !== 'star' || (label && body.kind === 'star' && body.magnitude < 1)) {
-                this.ctx.font = '500 9px Inter, Manjari, sans-serif';
-                this.ctx.letterSpacing = '0.04em';
-                this.ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'star' ? 0.52 : 0.7})`;
-                this.ctx.shadowBlur = 4;
-                this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, 0.38)`;
+            const shouldShowLabel = body.kind !== 'moon' && (
+                body.kind !== 'star' || body.magnitude < 1
+            );
+            if (label && shouldShowLabel) {
                 this.ctx.textAlign = x > width * 0.82 ? 'right' : 'left';
-                const labelX = x > width * 0.82 ? x - size - 5 : x + size + 5;
-                this.ctx.fillText(label, labelX, y + 3);
+                // Labels remain compact and deliberately translucent. The
+                // light backing only lifts them from busy star fields instead
+                // of reading as an interface layer over the night sky.
+                this.ctx.font = '500 11px Inter, Manjari, sans-serif';
+                const labelX = x > width * 0.82 ? x - size - 8 : x + size + 8;
+                const labelY = y + 4;
+                const metrics = this.ctx.measureText(label);
+                const paddingX = 4;
+                const labelWidth = metrics.width + paddingX * 2;
+                const labelLeft = this.ctx.textAlign === 'right' ? labelX - labelWidth : labelX - paddingX;
+                // Soften only the backing; restore before drawing crisp text.
+                this.ctx.save();
+                this.ctx.shadowBlur = 0;
+                this.ctx.filter = 'blur(3px)';
+                this.ctx.fillStyle = 'rgba(2, 4, 9, 0.15)';
+                this.ctx.fillRect(labelLeft, labelY - 12, labelWidth, 16);
+                this.ctx.restore();
+                this.ctx.lineWidth = 1.4;
+                this.ctx.strokeStyle = 'rgba(2, 4, 9, 0.15)';
+                this.ctx.strokeText(label, labelX, labelY);
+                this.ctx.fillStyle = `rgba(${Math.max(red, 220)}, ${Math.max(green, 220)}, ${Math.max(blue, 220)}, 0.30)`;
+                this.ctx.fillText(label, labelX, labelY);
             }
             this.ctx.restore();
         });
@@ -3604,35 +3518,45 @@ class AmbientParticleField {
         const buffer = this.moonBuffer;
         const bufferContext = this.moonBufferContext;
         if (!bufferContext) return;
-        const center = 64;
-        const radius = 47;
-        bufferContext.setTransform(1, 0, 0, 1, 0, 0);
-        bufferContext.clearRect(0, 0, buffer.width, buffer.height);
-
-        // Boolean algorithm: A = pale lunar disc, B = unlit shadow disc;
-        // render A, then keep A minus B in the offscreen buffer. Only that
-        // result is composited onto the sky, so no dark overlay can survive.
-        const moonGradient = bufferContext.createRadialGradient(center - 13, center - 15, 4, center, center, radius);
-        moonGradient.addColorStop(0, 'rgba(255, 255, 250, 1)');
-        moonGradient.addColorStop(0.55, 'rgba(248, 246, 227, 0.98)');
-        moonGradient.addColorStop(0.88, 'rgba(225, 222, 196, 0.95)');
-        moonGradient.addColorStop(1, 'rgba(184, 181, 160, 0.9)');
-        bufferContext.fillStyle = moonGradient;
-        bufferContext.beginPath();
-        bufferContext.arc(center, center, radius, 0, Math.PI * 2);
-        bufferContext.fill();
-
-        const illumination = (1 - Math.cos(phase * Math.PI * 2)) / 2;
-        if (illumination < 0.985) {
-            const shadowOffset = phase < 0.5
-                ? radius * (1 - illumination * 2)
-                : -radius * (1 - (1 - illumination) * 2);
-            bufferContext.save();
-            bufferContext.globalCompositeOperation = 'destination-out';
-            bufferContext.beginPath();
-            bufferContext.arc(center + shadowOffset, center, radius * 1.025, 0, Math.PI * 2);
-            bufferContext.fill();
-            bufferContext.restore();
+        // Cache a lit sphere, including the curved terminator. Pixel alpha is
+        // the illumination mask, so the unlit side never paints a dark disc.
+        // Surface features are procedural texture, not a surveyed lunar map.
+        const phaseKey = Math.round(phase * 10000);
+        if (phaseKey !== this.cachedMoonPhase) {
+            const pixels = bufferContext.createImageData(128, 128);
+            const lightX = Math.sin(phase * Math.PI * 2);
+            const lightZ = -Math.cos(phase * Math.PI * 2);
+            const maria = [[-0.26,-0.24,0.27,0.32],[0.18,-0.38,0.29,0.18],
+                [0.38,-0.02,0.23,0.29],[-0.47,0.08,0.15,0.3],[0.01,0.16,0.2,0.16]];
+            const random = this.sky.random(93827);
+            const craters = Array.from({length:48}, () => ({x:random()*1.7-0.85,y:random()*1.7-0.85,r:0.016+random()*0.062}));
+            for (let py=0;py<128;py++) {
+                for (let px=0;px<128;px++) {
+                    const nx=(px-63.5)/61, ny=(py-63.5)/61;
+                    const squared=nx*nx+ny*ny;
+                    if (squared>=1) continue;
+                    const nz=Math.sqrt(1-squared);
+                    const incidence=nx*lightX+nz*lightZ;
+                    if (incidence<=0) continue;
+                    let surface=0.84+this.sky.noise(nx*32+8,ny*32+8)*0.14;
+                    for (const [mx,my,rx,ry] of maria) {
+                        surface-=Math.exp(-((nx-mx)**2/rx**2+(ny-my)**2/ry**2)*1.5)*0.22;
+                    }
+                    for (const crater of craters) {
+                        const distance=Math.hypot(nx-crater.x,ny-crater.y)/crater.r;
+                        if (distance<1.3) surface+=distance<0.75?-0.065:0.07;
+                    }
+                    const lighting=0.24+0.76*Math.pow(incidence,0.42);
+                    const value=Math.min(255,Math.max(0,255*surface*lighting));
+                    const i=(py*128+px)*4;
+                    pixels.data[i]=value;
+                    pixels.data[i+1]=value*0.985;
+                    pixels.data[i+2]=value*0.95;
+                    pixels.data[i+3]=255*Math.min(1,incidence*28)*Math.min(1,(1-squared)*65);
+                }
+            }
+            bufferContext.putImageData(pixels,0,0);
+            this.cachedMoonPhase=phaseKey;
         }
         this.ctx.save();
         this.ctx.shadowBlur = 0;
@@ -3642,20 +3566,21 @@ class AmbientParticleField {
     }
 
     drawMeteors(time, width, height) {
-        if (time >= this.nextMeteorAt && this.meteors.length < 2) {
+        if (!this.nextMeteorAt) this.nextMeteorAt = time + 35 + Math.random() * 55;
+        if (time >= this.nextMeteorAt && this.meteors.length < 1) {
             const startX = width * (0.18 + Math.random() * 0.72);
             const startY = height * (0.08 + Math.random() * 0.34);
             this.meteors.push({
                 startX,
                 startY,
                 angle: Math.PI * (0.62 + Math.random() * 0.1),
-                length: 70 + Math.random() * 90,
+                length: 45 + Math.random() * 55,
                 speed: 420 + Math.random() * 180,
                 bornAt: time,
-                lifetime: 0.85 + Math.random() * 0.45,
+                lifetime: 0.45 + Math.random() * 0.35,
                 color: Math.random() < 0.6 ? [205, 231, 255] : [255, 231, 192]
             });
-            this.nextMeteorAt = time + 8 + Math.random() * 7;
+            this.nextMeteorAt = time + 45 + Math.random() * 75;
         }
         this.meteors = this.meteors.filter((meteor) => {
             const age = time - meteor.bornAt;
@@ -3666,16 +3591,16 @@ class AmbientParticleField {
             const headY = meteor.startY + Math.sin(meteor.angle) * distance;
             const tailX = headX - Math.cos(meteor.angle) * meteor.length;
             const tailY = headY - Math.sin(meteor.angle) * meteor.length;
-            const alpha = Math.sin(Math.PI * progress) * 0.72;
+            const alpha = Math.sin(Math.PI * progress) * 0.4;
             const [red, green, blue] = meteor.color;
             const gradient = this.ctx.createLinearGradient(tailX, tailY, headX, headY);
             gradient.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0)`);
             gradient.addColorStop(0.72, `rgba(${red}, ${green}, ${blue}, ${alpha * 0.45})`);
             gradient.addColorStop(1, `rgba(255, 255, 255, ${alpha})`);
             this.ctx.save();
-            this.ctx.lineWidth = 1.2;
+            this.ctx.lineWidth = 0.75;
             this.ctx.strokeStyle = gradient;
-            this.ctx.shadowBlur = 8;
+            this.ctx.shadowBlur = 3;
             this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             this.ctx.beginPath();
             this.ctx.moveTo(tailX, tailY);
@@ -3689,10 +3614,13 @@ class AmbientParticleField {
 
 // Visual Engine
 class VisualEngine {
-    constructor() {
+    constructor(audioEngine) {
         this.container = document.getElementById('chakra-container');
         this.symbolImg = document.getElementById('chakra-symbol');
         this.glow = document.getElementById('glow-effect');
+        this.presence = this.container && this.symbolImg && window.CelestialPresence
+            ? new window.CelestialPresence(this.container, this.symbolImg) : null;
+        this.presence?.setAudio(audioEngine);
     }
     applyImageEffect(color = null) {
         if (!this.container) return;
@@ -3715,6 +3643,7 @@ class VisualEngine {
             this.container.style.setProperty('--image-breathe-delay', `${(-Math.random() * cycleSeconds).toFixed(2)}s`);
         }
         if (color) this.container.style.setProperty('--chakra-visual-color', color);
+        this.presence?.setActive(effect === 'depth' && active, color);
     }
     startPulsing(color) {
         this.applyImageEffect(color);
@@ -3722,6 +3651,7 @@ class VisualEngine {
         this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
     }
     stop() {
+        this.presence?.setActive(false);
         if (this.container) this.container.classList.remove('visual-effect-active', 'image-breathe-active');
         if (this.glow) this.glow.style.background = 'transparent';
     }
@@ -5390,7 +5320,6 @@ class MeditationController {
 
         if (fadeOut) {
             await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
-            this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         } else if (transition !== 'mantra') {
             // Give the final spoken phrase room to settle before the caller
@@ -5447,6 +5376,7 @@ class MeditationController {
     togglePause() {
         console.log("DEBUG: togglePause called. Prev state isPaused:", this.isPaused);
         this.isPaused = !this.isPaused;
+        this.visual.presence?.setPaused(this.isPaused);
         console.log("DEBUG: togglePause updated isPaused to:", this.isPaused);
         const btn = document.getElementById('pause-meditation');
         if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
@@ -5847,7 +5777,6 @@ class MeditationController {
 
         if (fadeOut) {            // Only fade out if explicitly requested (e.g. right before mantra)
             await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
-            this.audio.triggerReverbSwell(5);
             this.audio.fadeOutBackgroundMusic(4);
         } else if (transition !== 'mantra') {
             // Browser TTS cannot use Piper's output fade, but it follows the
@@ -5892,7 +5821,8 @@ class MeditationController {
         // Schedule one coordinated fade for both layers instead.
         this.audio.stopMantraTrack({ restoreMusic: false });
         this.audio.stopGuidedTransitionTone();
-        this.audio.fadeOutBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+        this.audio.bgMusicTargetVolume = 0;
+        this.audio.bgMusicTargetEQ = 0;
         this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
         this.audio.stopPleasureAmbience();
         cancelNarrationPlayback();
@@ -5984,7 +5914,7 @@ class WakeLockManager {
 const wakeLock = new WakeLockManager();
 const audio = new AudioEngine();
 const particleField = new AmbientParticleField();
-const visual = new VisualEngine();
+const visual = new VisualEngine(audio);
 const journeyVideoPrelude = new JourneyVideoPrelude(audio);
 const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
