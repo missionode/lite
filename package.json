@@ -16,6 +16,7 @@
     "test:long-narration": "node tests/long-narration.test.mjs",
     "test:thermal-budget": "node tests/thermal-budget.test.mjs",
     "test:stage-fades": "node tests/stage-fades.test.mjs",
+    "test:journey-chrome": "node tests/journey-chrome.test.mjs",
     "test:audio-effects-controls": "node tests/audio-effects-controls.test.mjs",
     "test:background-music": "node tests/background-music-mantra-echo.test.mjs",
     "test:spatial-audio": "node tests/spatial-audio.test.mjs",

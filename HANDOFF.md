@@ -1,5 +1,22 @@
 # Chakra Meditation — Active Handoff
 
+### Version 2.87 release preparation — 2026-09-10
+
+- User authorized production push of cursor/control hiding and Sleep/Eyes Close positioning fixes. Thirty applicable automated tests passed in the implementation pass; targeted controls/video/visual checks and syntax/diff checks repeated before release. No device geometry verification claimed.
+- Atlas release snapshot updated. Private `.codex/` and backup audio excluded. Earlier local/not-pushed entries record checkpoints; final push result is reported in the conversation.
+
+### Sleep control positioning — local, 2026-09-10
+
+- Source diagnosis: Sleep filtered the narrow, positioned #app ancestor. A CSS filter establishes the containing block for fixed descendants, so controls and the bottom reveal zone could be positioned/clipped relative to app content rather than the viewport. Eyes Close had the same risk on body.
+- Replaced ancestor filters with composed opacity factors (user brightness × Sleep 0.4 × Eyes Close 0.85). Brightness writes now set a CSS variable. Eyes Close warmth is confined to the sky canvas and chakra artwork, not ancestors of fixed controls. No new render loop. Hover/touch/keyboard rules remain unchanged.
+- Controls/Sleep/visuals descriptions synchronized. Static regression checks cover ancestor-filter removal and brightness composition; mock interaction checks pass. No browser/device geometry verification; user should retest Sleep and Sleep + Eyes Close. App 2.87 / CSS 1.93 / shell 5.173, local and not pushed.
+
+### Journey cursor and control hiding — local, 2026-09-10
+
+- All active in-session control surfaces (not only fullscreen) now hide the bottom controls and mixer toggle until bottom-edge/control-area hover. Leaving hides after 180 ms; moving elsewhere reveals only the cursor. Cursor hides after three idle seconds; keyboard focus and open mixer preserve access/visibility.
+- Touch/pen can reveal controls by tapping the bottom area, with three-second auto-hide that ignores sticky touch hover. Keyboard focus reveals buttons without removing them from the tab order. Controls stay available while mixer is open; Stop/completion and page hiding clear timers/cursor hiding. Lifecycle uses listeners, class observation and one-shot timers, no animation loop. Existing fullscreen-only countdown hiding remains unchanged.
+- Controls/restart maps updated. Mock tests cover cursor, hover, focus, touch focus, mixer and cleanup; no browser/device appearance evidence. App 2.86 / CSS 1.92 / shell 5.172, local and not pushed.
+
 ### Version 2.85 release preparation — 2026-09-10
 
 - User authorized production push after reviewing extension message-channel errors. No Chrome runtime messaging calls found in application sources; those console messages alone do not identify an app failure. Device interruption/thermal evidence remains unresolved, not claimed fixed by this release.

@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Sleep controls clipping — fixed locally, device check pending
+
+Sleep/Eyes Close dimming no longer filters ancestors of viewport-fixed controls. Brightness composes through opacity; warmth remains on artwork/sky only. This removes the identified containing-block cause of drifting/clipped controls. Source/mocked regression checks pass; actual Sleep layout still requires user verification.
+
+## Journey cursor and controls — implemented locally
+
+Cursor idles out after 3s. Bottom controls including mixer toggle reveal on hover, touch or keyboard focus in normal/fullscreen journeys, with open-mixer and exit cleanup guards. Mock interaction tests pass; device verification remains open.
+
 ## Stage-aware fades — implemented locally, listening check pending
 
 Arrival/Interval/Emergence music transitions use 20% of the stage setting capped at 3s. The default post-mantra pause remains 4s, now containing a 2s chant fade and 2s wet-tail fade before affirmation. Long final-session tails remain. Stage timing and failure-cleanup tests pass; device listening remains open.

@@ -81,6 +81,7 @@ body {
 }
 
 #app {
+    opacity: calc(var(--app-brightness, 1) * var(--sleep-dimming, 1) * var(--eyes-close-dimming, 1));
     width: 100%;
     max-width: 500px;
     padding: 2rem 1.5rem;
@@ -1108,13 +1109,14 @@ input[type="range"]::-moz-range-progress {
     margin-top: 2rem;
 }
 
-/* Keep the guided image clear in fullscreen. Only the bottom-edge reveal zone
-   or control keyboard focus brings back the session chrome. */
+/* All journeys reveal controls at the bottom edge, or with keyboard focus. */
+body.journey-cursor-hidden,
+body.journey-cursor-hidden * { cursor: none !important; }
 #fullscreen-controls-reveal-zone {
     display: none;
 }
 
-body.journey-fullscreen-active #fullscreen-controls-reveal-zone {
+body.journey-controls-active #fullscreen-controls-reveal-zone {
     display: block;
     position: fixed;
     right: 0;
@@ -1124,23 +1126,23 @@ body.journey-fullscreen-active #fullscreen-controls-reveal-zone {
     z-index: 999;
 }
 
-body.journey-fullscreen-active #controls:not(.hidden),
+body.journey-controls-active #controls:not(.hidden),
 body.journey-fullscreen-active #session-countdown-layer {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-body.journey-fullscreen-active #controls:not(.hidden) {
+body.journey-controls-active #controls:not(.hidden) {
     transform: translateY(1rem);
 }
 
-body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden),
+body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden),
 body.journey-fullscreen-active.fullscreen-controls-visible #session-countdown-layer {
     opacity: 1;
 }
 
-body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden) {
+body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden) {
     transform: translateY(0);
     pointer-events: auto;
 }
@@ -2218,12 +2220,14 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
 }
 
 /* ── Eyes Close Mode ────────────────────────────────────────────────────────── */
-body.eyes-close-mode {
-    filter: sepia(0.3) brightness(0.85); /* Warm tone, lower brightness */
-    transition: filter 1s ease;
+body.eyes-close-mode #particle-canvas {
+    filter: sepia(0.3) brightness(0.85);
 }
 
+body.eyes-close-mode #chakra-symbol { filter: sepia(0.3); }
+
 body.eyes-close-mode #app {
+    --eyes-close-dimming: 0.85;
     /* Soften text and remove complex shadows */
     text-shadow: none;
 }
@@ -2235,8 +2239,8 @@ body.eyes-close-mode .timer {
 
 /* ── Sleep Mode Optimization ────────────────────────────────────────────────── */
 body.sleep-mode-active #app {
-    filter: brightness(0.4);
-    transition: filter 3s ease;
+    /* Opacity dims without rebasing fixed controls onto the narrow app box. */
+    --sleep-dimming: 0.4;
 }
 
 body.sleep-mode-active #aura-bg,

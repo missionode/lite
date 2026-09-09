@@ -3791,23 +3791,73 @@ class JourneyVideoPrelude {
         this.controls = document.getElementById('controls');
         this.revealZone = document.getElementById('fullscreen-controls-reveal-zone');
         this.fullscreenChromeHideTimer = null;
+        this.cursorHideTimer = null;
+        this.journeyChromeActive = false;
+        this.mixer = document.getElementById('volume-mixer');
         this.previewTimer = null;
         this.activePlayback = null;
         try { this.media?.load(); } catch (error) {}
         this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
         document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
-        this.revealZone?.addEventListener('pointerenter', () => this.setFullscreenChromeVisible(true));
-        this.revealZone?.addEventListener('pointerleave', () => this.scheduleFullscreenChromeHide());
-        this.controls?.addEventListener('pointerenter', () => this.setFullscreenChromeVisible(true));
-        this.controls?.addEventListener('pointerleave', () => this.scheduleFullscreenChromeHide());
-        this.controls?.addEventListener('focusin', () => this.setFullscreenChromeVisible(true));
+        this.chromeObserver = new MutationObserver(this.syncFullscreenJourneyChrome);
+        if (this.controls) this.chromeObserver.observe(this.controls, { attributes: true, attributeFilter: ['class'] });
+        if (this.mixer) this.chromeObserver.observe(this.mixer, { attributes: true, attributeFilter: ['class'] });
+        document.addEventListener('pointermove', event => {
+            if (event.pointerType !== 'touch') this.wakeJourneyCursor();
+        }, { passive: true });
+        document.addEventListener('keydown', () => {
+            clearTimeout(this.cursorHideTimer);
+            document.body.classList.remove('journey-cursor-hidden');
+        });
+        document.addEventListener('visibilitychange', () => this.syncFullscreenJourneyChrome());
+        this.revealZone?.addEventListener('pointerdown', event => {
+            if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+                event.preventDefault();
+                this.setFullscreenChromeVisible(true);
+                this.scheduleFullscreenChromeHide(3000);
+            }
+        });
+        this.revealZone?.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') this.setFullscreenChromeVisible(true); });
+        this.revealZone?.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') this.scheduleFullscreenChromeHide(); });
+        this.controls?.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') this.setFullscreenChromeVisible(true); });
+        this.controls?.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') this.scheduleFullscreenChromeHide(); });
+        this.controls?.addEventListener('pointerdown', event => { if (event.pointerType !== 'mouse') this.scheduleFullscreenChromeHide(3000); });
+        this.controls?.addEventListener('focusin', () => {
+            if (this.controls.querySelector(':focus-visible')) this.setFullscreenChromeVisible(true);
+        });
         this.controls?.addEventListener('focusout', () => this.scheduleFullscreenChromeHide());
     }
 
     syncFullscreenJourneyChrome() {
         const isJourneyFullscreen = document.fullscreenElement === this.fullscreenTarget;
         document.body.classList.toggle('journey-fullscreen-active', isJourneyFullscreen);
-        if (!isJourneyFullscreen) this.setFullscreenChromeVisible(false);
+        const active = Boolean(this.controls && !this.controls.classList.contains('hidden'));
+        const changed = active !== this.journeyChromeActive;
+        this.journeyChromeActive = active;
+        document.body.classList.toggle('journey-controls-active', active);
+        if (!active || document.hidden) {
+            clearTimeout(this.cursorHideTimer);
+            clearTimeout(this.fullscreenChromeHideTimer);
+            document.body.classList.remove('journey-cursor-hidden', 'fullscreen-controls-visible');
+            return;
+        }
+        if (changed) this.setFullscreenChromeVisible(false);
+        if (this.mixer && !this.mixer.classList.contains('hidden')) this.setFullscreenChromeVisible(true);
+        else this.scheduleFullscreenChromeHide();
+        this.wakeJourneyCursor();
+    }
+
+    wakeJourneyCursor() {
+        if (!this.journeyChromeActive || document.hidden) return;
+        document.body.classList.remove('journey-cursor-hidden');
+        clearTimeout(this.cursorHideTimer);
+        this.cursorHideTimer = setTimeout(() => {
+            if (this.journeyChromeActive && !document.hidden &&
+                (!this.mixer || this.mixer.classList.contains('hidden')) &&
+                !this.controls?.querySelector(':focus-visible')) {
+                document.body.classList.add('journey-cursor-hidden');
+            }
+        }, 3000);
     }
 
     setFullscreenChromeVisible(isVisible) {
@@ -3815,16 +3865,18 @@ class JourneyVideoPrelude {
             clearTimeout(this.fullscreenChromeHideTimer);
             this.fullscreenChromeHideTimer = null;
         }
-        document.body.classList.toggle('fullscreen-controls-visible', Boolean(isVisible) && document.body.classList.contains('journey-fullscreen-active'));
+        document.body.classList.toggle('fullscreen-controls-visible', Boolean(isVisible) && this.journeyChromeActive);
     }
 
-    scheduleFullscreenChromeHide() {
+    scheduleFullscreenChromeHide(delay = 180) {
         if (this.fullscreenChromeHideTimer) clearTimeout(this.fullscreenChromeHideTimer);
         this.fullscreenChromeHideTimer = setTimeout(() => {
-            const controlsHovered = this.controls?.matches(':hover');
-            const controlsFocused = this.controls?.contains(document.activeElement);
-            if (!controlsHovered && !controlsFocused) this.setFullscreenChromeVisible(false);
-        }, 120);
+            const controlsHovered = delay < 3000 && this.controls?.matches(':hover');
+            const controlsFocused = this.controls?.querySelector(':focus-visible');
+            const mixerOpen = this.mixer && !this.mixer.classList.contains('hidden');
+            const revealHovered = delay < 3000 && this.revealZone?.matches(':hover');
+            if (!controlsHovered && !controlsFocused && !mixerOpen && !revealHovered) this.setFullscreenChromeVisible(false);
+        }, delay);
     }
 
     getVideoBufferTargetSeconds() {
@@ -5911,7 +5963,7 @@ class MeditationController {
         // Lift sleep mode dimming once session ends
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
-        if (app) app.style.opacity = "1";
+        if (app) app.style.setProperty('--app-brightness', '1');
         const controls = document.getElementById('controls');
         if (controls) controls.classList.add('hidden');
         const mixer = document.getElementById('volume-mixer');
@@ -5952,7 +6004,7 @@ class MeditationController {
         piperTTS.cancel('journey stopped', { fadeSeconds: 2 });
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
-        if (app) app.style.opacity = "1";
+        if (app) app.style.setProperty('--app-brightness', '1');
         const finishAura = document.getElementById('aura-bg');
         if (finishAura) finishAura.style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
@@ -6534,7 +6586,7 @@ function loadPreferences() {
     setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
     
     syncValue('brightness-slider', state.brightness);
-    document.getElementById('app').style.opacity = state.brightness;
+    document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));
 
     // Sync Script Selection
     syncValue('script-source-select', state.scriptSource);
@@ -7677,7 +7729,7 @@ function attachEventListeners() {
         brightnessSlider.addEventListener('input', (e) => {
             state.brightness = parseFloat(e.target.value);
             localStorage.setItem('chakra_brightness', state.brightness);
-            document.getElementById('app').style.opacity = state.brightness;
+            document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));
         });
     }
 
@@ -7709,7 +7761,7 @@ function attachEventListeners() {
             if (state.eyesCloseMode) {
                 const app = document.getElementById('app');
                 const targetOpacity = Math.min(state.brightness, 0.7);
-                if (app) app.style.opacity = targetOpacity;
+                if (app) app.style.setProperty('--app-brightness', String(targetOpacity));
             }
             await meditation.runBackgroundMusicOnly();
         } else if (state.sleepMode) {
@@ -7736,7 +7788,7 @@ function attachEventListeners() {
             if (state.eyesCloseMode) {
                 const app = document.getElementById('app');
                 const targetOpacity = Math.min(state.brightness, 0.7);
-                if (app) app.style.opacity = targetOpacity;
+                if (app) app.style.setProperty('--app-brightness', String(targetOpacity));
             }
             meditation.start().catch(err => {
                 console.error("Failed to start meditation:", err);

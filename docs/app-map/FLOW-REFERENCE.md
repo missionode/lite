@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: Version 2.85 release snapshot, based on c97ca3d · 2026-09-10.
+Source snapshot: Version 2.87 release snapshot, based on 58769f0 · 2026-09-10.
 
-Version 2.85 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.87 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -364,7 +364,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Choose mode | Both bypass normal guided preparation and chakra narration. |
-| Sleep start | DND reminder; load content; exactly five valid stage frequencies required. |
+| Sleep start | DND reminder; load content; exactly five valid stage frequencies required. Sleep dimming multiplies user brightness by 0.4 without filtering the app ancestor; fixed controls retain viewport positioning. |
 | Music Only start | Show background symbol; no session countdown; request wake lock. |
 | Five Sleep stages | Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone. |
 | Continuous music | Background loop and visual pulse continue until user stops. No ordinary completion. |
@@ -608,7 +608,7 @@ flowchart TD
 
 Shared interaction and cancellation behavior.
 
-Sources: [app.js:5437](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5437), [app.js:5905](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5905), [app.js:6549](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6549).
+Sources: [app.js:3778](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3778), [app.js:3831](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3831), [app.js:3850](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3850).
 
 ```mermaid
 flowchart TD
@@ -638,7 +638,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Active session | Common controls appear during an experience. |
+| Active session | Active journeys hide bottom controls including the mixer toggle in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop. |
 | Pause | Non-Lobby/Settings screens already have static sky and decorative effects. Set isPaused; freeze stage countdowns; cancel browser speech; pause Piper; suspend AudioContext. |
 | Open Journey Tuning | Opening mixer does not pause. Volume, voice, space, ambience, brightness and suppression controls apply live. |
 | Stop | Cancel narration jobs/timers; Piper fades over two seconds, mantra/music/ambience over eight seconds with effect tails. Do not restore music during Stop. Browser speech cancellation remains immediate. Stop visuals, resolve guide wait false and hide controls/mixer. |
@@ -646,7 +646,7 @@ flowchart TD
 | Tap chakra image | Toggle session text overlay; session continues. |
 | Return screen | Experiment → Experiment screen; other modes → Lobby. No completion statistics. |
 | Guide waiting | Continue is accepted only when active and not paused; Stop releases the pending wait. |
-| User fullscreen | Track fullscreen on app container; pointer/focus reveal bottom controls, then hide after 120 ms. |
+| User fullscreen | Track fullscreen on app container. Bottom controls share normal-journey hover/touch/keyboard behavior; fullscreen top timers still follow the reveal state. |
 
 - The app no longer requests or exits fullscreen automatically. Browser-speech cancellation and Piper buffer suspension are different pause mechanisms. Re-enable No Mantra does not immediately restart a previously skipped mantra stage.
 
@@ -656,7 +656,7 @@ flowchart TD
 
 Restart re-enters the normal Begin dispatcher after video.
 
-Sources: [app.js:3679](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3679), [app.js:7695](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7695), [app.js:62](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:62).
+Sources: [app.js:3778](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3778), [app.js:3831](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3831), [app.js:62](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:62).
 
 ```mermaid
 flowchart TD
@@ -956,8 +956,8 @@ flowchart TD
 | Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
 | Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
 | Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
-| Eyes Close + brightness | Explicit user brightness, Sleep dimming and Eyes Close remain honored. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
-| Fullscreen lifecycle | Only responds to user/browser fullscreen; app-container fullscreen controls have pointer/focus reveal. |
+| Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors. No filter on body/app ancestors that would rebase fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
+| Fullscreen lifecycle | Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding. |
 | Screen wake lock | Best-effort request in supported routes; failure is swallowed; release on stop/completion. |
 | Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
 | Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |

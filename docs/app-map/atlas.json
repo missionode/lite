@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-10",
-    "commit": "Version 2.85 release snapshot, based on c97ca3d",
-    "scope": "Version 2.85 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "Version 2.87 release snapshot, based on 58769f0",
+    "scope": "Version 2.87 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -861,7 +861,7 @@
           [
             "sleep",
             "Sleep start",
-            "DND reminder; load content; exactly five valid stage frequencies required."
+            "DND reminder; load content; exactly five valid stage frequencies required. Sleep dimming multiplies user brightness by 0.4 without filtering the app ancestor; fixed controls retain viewport positioning."
           ],
           [
             "music",
@@ -1602,13 +1602,13 @@
       "group": "Live session",
       "title": "Pause, stop and live controls",
       "subtitle": "Shared interaction and cancellation behavior.",
-      "source": "app.js:5437; app.js:5905; app.js:6549",
+      "source": "app.js:3778; app.js:3831; app.js:3850",
       "rows": [
         [
           [
             "active",
             "Active session",
-            "Common controls appear during an experience."
+            "Active journeys hide bottom controls including the mixer toggle in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop."
           ]
         ],
         [
@@ -1654,7 +1654,7 @@
           [
             "fullscreen",
             "User fullscreen",
-            "Track fullscreen on app container; pointer/focus reveal bottom controls, then hide after 120 ms."
+            "Track fullscreen on app container. Bottom controls share normal-journey hover/touch/keyboard behavior; fullscreen top timers still follow the reveal state."
           ]
         ]
       ],
@@ -1734,7 +1734,7 @@
       "group": "Live session",
       "title": "Restart and cinematic prelude",
       "subtitle": "Restart re-enters the normal Begin dispatcher after video.",
-      "source": "app.js:3679; app.js:7695; app.js:62",
+      "source": "app.js:3778; app.js:3831; app.js:62",
       "rows": [
         [
           [
@@ -2472,14 +2472,14 @@
           [
             "comfort",
             "Eyes Close + brightness",
-            "Explicit user brightness, Sleep dimming and Eyes Close remain honored. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged."
+            "User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors. No filter on body/app ancestors that would rebase fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged."
           ]
         ],
         [
           [
             "fullscreen",
             "Fullscreen lifecycle",
-            "Only responds to user/browser fullscreen; app-container fullscreen controls have pointer/focus reveal."
+            "Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding."
           ],
           [
             "wake",
