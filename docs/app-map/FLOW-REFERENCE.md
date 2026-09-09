@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 988af6c + uncommitted performance optimizations · 2026-09-09.
+Source snapshot: Version 2.85 release snapshot, based on c97ca3d · 2026-09-10.
 
-Current working-tree behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.85 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -191,7 +191,7 @@ flowchart TD
 
 Selected chakras in Root → Crown order; returning and demo branches included.
 
-Sources: [app.js:4537](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4537), [app.js:4788](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4788), [app.js:5428](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5428).
+Sources: [app.js:4429](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4429), [app.js:4769](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4769), [app.js:5585](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5585).
 
 ```mermaid
 flowchart TD
@@ -231,7 +231,7 @@ flowchart TD
 | --- | --- |
 | Begin + DND reminder | Guard duplicate starts; show Arriving and load / validate selected content. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
-| Arriving countdown | Configured 10–300 seconds, default 60; music fades in over this period. |
+| Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
 | Preparation | Initial settle → pre-practice guidance. |
 | Arrival induction | Ordinary non-demo only: narration → 432 Hz transition tone for half the selected drone window. |
 | Moon opening | When Returning is off, use current moon-phase script. |
@@ -240,7 +240,7 @@ flowchart TD
 | Arrival readiness | Ordinary non-demo only: narration → 528 Hz transition tone → post-preparation gap. |
 | Selected chakra loop | Each chakra: narration → mantra and bounded drone → affirmation. Between chakras: breathing interval. |
 | Silence + closing | Final silence → closing narration → full-body affirmation with configured gaps. |
-| Emergence | Non-demo only: bowl unless No Frequency → guidance → emergence countdown → final quiet. |
+| Emergence | Non-demo only: bowl unless No Frequency → complete guidance → emergence countdown (minimum 30s) → final quiet. Narration music transitions use 20% of the setting capped at 3s; long session exit follows completion. |
 | Completion | Stop audio / visuals, update stats and show completion choices. |
 
 - Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps.
@@ -287,8 +287,8 @@ flowchart TD
 | No mantra / load failure | No Mantra skips playback. Asset failure logs error and restores music; stage continues. |
 | Bounded drone | Only if mantra exists and both suppression modes permit: Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s. |
 | Practice window | Core minutes ×60 minus 15-second lead-out, bounded at zero. Pauses suspend elapsed stage time. |
-| Affirmation | Crossfade mantra out and music back in together over 4 seconds; default 4-second spoken gap, then affirmation. |
-| Between chakras | Stop drone; 2-second preparation; wait for BOTH configured interval and breathing narration. |
+| Affirmation | Fit the mantra exit into the configured post-mantra window: default 4s means 2s dry fade/music restoration plus 2s wet-tail fade, reaching zero before affirmation. Wait only the existing window; zero-duration test profiles remain zero. |
+| Between chakras | Stop drone; 2-second preparation; wait for BOTH configured interval and complete breathing narration. Music transitions during this narration use 20% of the interval capped at 3s (10s → 2s). Restore the temporary cap on success/failure. |
 | Last chakra | Caller chooses closing/completion, or next care stage. |
 
 - Core practice duration does not extend the fixed drone exposure window. HRIM reuses this routine with high_energy content and its own duration.
@@ -608,7 +608,7 @@ flowchart TD
 
 Shared interaction and cancellation behavior.
 
-Sources: [app.js:5407](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5407), [app.js:5891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5891), [app.js:7358](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7358), [app.js:7679](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7679).
+Sources: [app.js:5437](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5437), [app.js:5905](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5905), [app.js:6549](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6549).
 
 ```mermaid
 flowchart TD
@@ -639,9 +639,9 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Active session | Common controls appear during an experience. |
-| Pause | Set isPaused; freeze ticker and stage countdowns; cancel browser speech; pause Piper; suspend AudioContext. |
+| Pause | Non-Lobby/Settings screens already have static sky and decorative effects. Set isPaused; freeze stage countdowns; cancel browser speech; pause Piper; suspend AudioContext. |
 | Open Journey Tuning | Opening mixer does not pause. Volume, voice, space, ambience, brightness and suppression controls apply live. |
-| Stop | Cancel narration and timers, stop audio/visuals, resolve guide wait false and hide controls/mixer. |
+| Stop | Cancel narration jobs/timers; Piper fades over two seconds, mantra/music/ambience over eight seconds with effect tails. Do not restore music during Stop. Browser speech cancellation remains immediate. Stop visuals, resolve guide wait false and hide controls/mixer. |
 | Resume | Resume Piper/context. Ordinary browser narration replays the interrupted sentence if pause was observed. |
 | Tap chakra image | Toggle session text overlay; session continues. |
 | Return screen | Experiment → Experiment screen; other modes → Lobby. No completion statistics. |
@@ -784,7 +784,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [app.js:1430](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1430), [app.js:5285](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5285), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
+Sources: [app.js:1155](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1155), [app.js:5311](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5311), [app.js:5706](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5706), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
 
 ```mermaid
 flowchart TD
@@ -815,16 +815,16 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Localized text | Begin narration generation; duck music unless silence requested. Settings → Show scrolling narration text defaults ON and persists on Save. OFF hides all three ticker surfaces (journey, breathing, arrival) and skips ticker measurement/animation scheduling; spoken audio and deliberate pauses continue unchanged. Re-enable and Save to restore text. |
+| Localized text | Narration is audio-only: no scrolling text surfaces or Settings toggle. Duck music unless silence requested; spoken audio and deliberate pauses continue unchanged. |
 | Voice engine choice | Use Piper only when selected, supported and configured. |
-| Piper worker | Warm model; serial worker requests; prepare the first two sentences and replenish ahead of playback. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
+| Piper worker | Warm model; serial worker requests. Split text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
 | Browser speech | Select matching voice and locale; apply pace/pitch/volume; speak each sentence. |
-| Decode + normalize ahead | Decode and calculate normalization in the bounded preparation queue while the preceding speech plays. Reuse normalization per buffer via WeakMap; update estimated ticker duration with real clip duration. After preparation, recheck pause, session activity and Piper cancellation generation before playback. |
-| Play through Web Audio | Start ticker at actual playback; route to voice gain, tone controls and effects. |
+| Decode + normalize ahead | In-memory LRU cache keyed by text, voice definition and synthesis settings: at most 16 MiB and 48 decoded clips. Hits skip synthesis, decoding and normalization; misses prepare ahead. Evict oldest clips; oversized clips play uncached; cancelled preparation is never cached. No disk persistence. Reuse normalization per buffer via WeakMap. After preparation, recheck pause, session activity and Piper cancellation generation before playback. |
+| Play through Web Audio | Play prepared speech through voice gain, tone controls and effects. |
 | Piper sentence failure | Cancel Piper jobs; report fallback; use browser speech for failed and remaining sentences. |
 | End / error / timeout | Browser events resolve sentence; timeout avoids waiting forever. Pause can replay interrupted sentence. |
 | Finish narration | Sentence gaps; exit gap except mantra handoff; Piper clip fade-out capped at 50 ms to retain final words. Explicit music fade remains; duplicate-path swell removed. |
-| Stop / cancellation | Invalidate narration; cancel worker jobs and speech. Intentional stop must not launch fallback speech. |
+| Stop / cancellation | Invalidate narration and cancel worker jobs. Session Stop/completion ramps active Piper audio down over two seconds; its five-second Space response remains connected through the fade plus tail. Natural clip endings preserve final words. Browser speech cannot use this gain envelope and explicit Stop cancels it immediately. Intentional stop must not launch fallback speech. |
 
 - Browser speech is outside the Web Audio effects chain. Voice Space/Warmth/Clarity processing applies to Piper audio; browser voice capabilities differ. Soft and interval prompts use related wrappers.
 
@@ -834,7 +834,7 @@ flowchart TD
 
 Logical buses; shared filters are expanded in selected-node details.
 
-Sources: [app.js:1547](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1547), [app.js:1645](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1645), [app.js:2700](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2700).
+Sources: [app.js:50](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:50), [app.js:2790](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2790), [app.js:3142](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3142), [app.js:5681](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5681).
 
 ```mermaid
 flowchart TD
@@ -858,12 +858,12 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Piper voice | Decoded clips → voice gain → warmth and clarity filters; centered dry voice stays intact. Parallel Voice Space: 180 Hz high-pass → fixed 35 ms pre-delay → 3.2-second diffuse impulse → low-pass → wet return. Light: 12% return / 3 kHz; Spacious: 18% / 3.6 kHz; Off silences send and return. Preset changes never sweep delay time. Tone inputs clamp to 0–100, invalid values use neutral 50; 250 ms parameter ramps hold current automation where supported. |
-| Mantra MP3 | SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner. |
+| Piper voice | Decoded clips → voice gain → warmth and clarity filters; centered dry voice stays intact. Parallel Voice Space: 180 Hz high-pass → fixed 35 ms pre-delay → 5-second diffuse impulse → low-pass → wet return. Light: 12% return / 3 kHz; Spacious: 18% / 3.6 kHz; Off silences send and return; Off or idle voice disconnects the convolution branch after its tail, reconnecting before Piper playback. Preset changes never sweep delay time. Tone inputs clamp to 0–100, invalid values use neutral 50; 250 ms parameter ramps hold current automation where supported. |
+| Mantra MP3 | SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner. Six-second entry belongs to each loop, never zeroing the shared bus. Final Stop/completion uses an eight-second exit plus seven-second response. Stage handoffs instead split the existing post-mantra window into equal dry and wet-tail fades (default 2s + 2s), so affirmation cannot overlap the chant. New mantra entry restores the wet return. Filter modulation fades with the dry exit. Repeated loop Stop does not restart the envelope; restart cancels route retirement and reconnects. |
 | Generated tones | Chakra/sleep drones retain configured main frequencies; ordinary main pitch modulation removed. Main sine filter opens to 4× pitch, capped at 45% sample rate. Original six-second drone entry retained; stop holds current gain automation where supported. Tone/filter/panner/gain nodes disconnect on source end. Shots honor zero volume; muted guided cues skip and nonfinite durations reject. Elemental layers retain their own modulation. No new harmonic layers. |
-| Background music | Cached PCM equal-power overlap → one native looping source → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner. First playback preserves the original beginning; subsequent cycles enter just after the overlapped head. |
+| Background music | Cached PCM equal-power overlap → one native looping source → independent loop level → linear music entry gain; dry gate and Music Space send; music spatial panner. Eight-second Stop fade plus five-second reverb response; Off/Stop disconnects convolution after tail/exit; music or video preparation restores the selected route. First playback preserves the original beginning; subsequent cycles enter just after the overlapped head. |
 | Video audio | MediaElementSource → dedicated Video gain → music spatial panner and Music Space send. |
-| Optional ambience | Local manifest or user URL → native equal-power layered loops → blur and spatial depth/panner. |
+| Optional ambience | Local manifest or user URL → native equal-power layered loops → blur and spatial depth/panner. Blur Off/unused and ambience Stop retire convolution after fade/tail. Audio-clock deadlines freeze during suspension, disconnect on end, and are cancelled on reactivation; no polling. |
 | Shared processing | Low-cut → Eyes Close filter → voice-carve filter → exciter → presence → compressor through one path. Filtered duplicate and transition swell removed; dedicated reverb tails remain. Music peaking EQ applies -3 dB when ducked and 0 dB at full level. Voice Space is independent of Spatial Sound; narration and bells stay centered. Primary drone/music/mantra positions remain in front, with restrained separation for speakers and HRTF headphones. Drone sway is 0.018 Hz with reduced depth; Off ramps it to zero. Music positioning also applies to prelude video and Music Space. Position changes hold current automation and ramp for 1.2 seconds; fallback stereo uses source bearing. Reapplying the same mode does not restart movement. Active ambience approaches from current depth instead of resetting; switching Off returns depth over 1.2 seconds. |
 | Limiter → device | Shared chain ends in limiter and AudioContext destination. Bell gain connects directly to limiter. |
 | Browser speech | Separate speechSynthesis output; not processed by the shared Web Audio graph. |
@@ -919,7 +919,7 @@ flowchart TD
 
 Natural sky, chakra imagery, immersion and optional capabilities.
 
-Sources: [app.js:3315](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3315), [app.js:3675](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3675), [app.js:6004](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6004), [style.css:2001](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:2001), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
+Sources: [app.js:3322](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3322), [app.js:3695](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3695), [app.js:6534](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6534), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
 
 ```mermaid
 flowchart TD
@@ -952,15 +952,15 @@ flowchart TD
 | --- | --- |
 | Natural sky startup | Load NaturalNightSky before app; cache a seeded 700–2,400-star backdrop with faint procedural galactic luminance and dark dust lanes. Neutral night gradient replaces drifting colored CSS clouds. |
 | Location permission | Success updates observer and named celestial bodies; denied/unavailable retains approximate sky. Fine background stars are procedural, not a location-calibrated star catalog. |
-| Motion preference | Reduced motion renders a static frame; changes to the OS preference immediately stop/restart animation. At most 110 stars shimmer; positions remain fixed. |
-| Journey scene | Chakra color, aura, deity/symbol selection, progress dots and narration ticker. |
+| Motion preference | Only Lobby and Settings may animate. Every other app screen renders static sky, clears meteors and cancels frame/timer work. CSS animations and transitions are disabled there. Reduced motion also makes Lobby/Settings static; preference/screen changes re-evaluate the guard. At most 110 stars shimmer; positions remain fixed. |
+| Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
 | Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
-| Image effect | Natural/Aura/Holographic retain CSS effects. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. A read-only mantra analyser gently modulates highlights with two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
+| Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
 | Eyes Close + brightness | Explicit user brightness, Sleep dimming and Eyes Close remain honored. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; app-container fullscreen controls have pointer/focus reveal. |
 | Screen wake lock | Best-effort request in supported routes; failure is swallowed; release on stop/completion. |
-| Visual work budget | Sky and Sacred Depth wait 33 ms between display-aligned frame requests (at most 30 fps). Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
-| Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return resumes visible effects. Sacred Depth releases its analyser on pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
+| Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
+| Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
 
 - The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined.
 

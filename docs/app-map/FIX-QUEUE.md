@@ -1,5 +1,17 @@
 # Fix queue derived from the flow atlas
 
+## Stage-aware fades — implemented locally, listening check pending
+
+Arrival/Interval/Emergence music transitions use 20% of the stage setting capped at 3s. The default post-mantra pause remains 4s, now containing a 2s chant fade and 2s wet-tail fade before affirmation. Long final-session tails remain. Stage timing and failure-cleanup tests pass; device listening remains open.
+
+## Longer audio exits — implemented locally, listening check pending
+
+Mantra entry no longer zeros the retiring chant bus; loop entry/exit envelopes are independent and repeated Stop is idempotent. Mantra/music exits are eight seconds with longer reverb responses; session Piper cancellation fades for two seconds plus its tail. Browser speech cannot use the Web Audio fade chain and retains immediate explicit cancellation. Source/mock checks pass; reported device audibility remains to be checked.
+
+## Thermal workload reduction — implemented locally, device check pending
+
+Static sky and decorative effects outside Lobby/Settings; bounded 180-code-point Piper chunks, one future clip with duration-triggered preparation, a 16 MiB/48-entry memory cache and idle/Off reverb disconnection are implemented. Source and automated checks cover these paths. Device heat/CPU and the reported early journey exit remain unverified. Earlier narration-scroll notes below are historical; scrolling narration is now removed.
+
 ## Long playback follow-up — implemented locally, 2026-09-09
 
 Removed JavaScript repeat scheduling, repaired elemental LFO cleanup, moved decoding/normalization ahead of speech, added cancellation guards, bounded phonemizer reuse and inference tensor disposal. `audio` and `narration` maps reflect the implementation. Native PCM/mock and real phonemizer checks pass; full synthesis, thermal profiling and device listening remain open. Narration scroll and intentional pauses remain.

@@ -4,11 +4,12 @@ import assert from 'node:assert/strict';
 const app = fs.readFileSync('app.js','utf8');
 const modes = ['off','stereo','headphones','room'];
 const method = (name,next) => vm.runInNewContext(`({${app.slice(app.indexOf(`    ${name}(`),app.indexOf(`    ${next}(`))}})`, {
-    DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off'
+    VOICE_REVERB_TAIL_SECONDS:3.2, DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off'
 })[name];
 const parameter = () => ({value:0, cancelScheduledValues(){}, setValueAtTime(v){this.value=v;}, linearRampToValueAtTime(v){this.value=v;}});
 const node = () => ({gain:parameter(),delayTime:parameter(),frequency:parameter(),panningModel:'equalpower'});
 const engine = {
+    setConvolverActive(){},
     ctx:{currentTime:10}, spatialDronePanner:node(),spatialMusicPanner:node(),spatialMantraPanner:node(),spatialPleasurePanner:node(),
     spatialPanLfoGain:node(), pleasureLoops:[], setSpatialPosition(n,p){n.position=p;},
     voiceEchoSend:node(),voiceEchoDelay:node(),voiceEchoConvolver:node(),voiceEchoWetGain:node(),voiceEchoFilter:node(),
@@ -29,7 +30,7 @@ for (const [voice,wet] of Object.entries({off:0,light:.12,spacious:.18})) {
 engine.setVoiceEcho('invalid'); assert.equal(engine.voiceEchoWetGain.gain.value,0);
 assert.equal(engine.voiceEchoDelay.delayTime.value,0,'Preset switching must never automate pre-delay');
 engine.voiceWarmthFilter=node(); engine.voiceClarityFilter=node();
-const tune=method('setVoiceTuning','setVoiceEcho');
+const tune=method('setVoiceTuning','setConvolverActive');
 tune.call(engine,500,-500);
 assert.equal(engine.voiceWarmthFilter.gain.value,3);
 assert.equal(engine.voiceClarityFilter.gain.value,-4);

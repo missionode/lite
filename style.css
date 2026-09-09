@@ -995,92 +995,6 @@ input[type="range"]::-moz-range-progress {
     text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
-.narration-scroll-container[hidden] {
-    display: none !important;
-}
-
-.narration-scroll-container {
-    width: 100%;
-    max-width: 920px;
-    min-height: 3.6rem;
-    margin: 0 auto 1.15rem;
-    padding: 0.85rem 1.25rem;
-    overflow: hidden;
-    border: 1px solid rgba(251, 191, 36, 0.2);
-    border-radius: 14px;
-    background: rgba(0, 0, 0, 0.28);
-    box-shadow: inset 0 0 24px rgba(124, 58, 237, 0.12);
-    text-align: center;
-    direction: ltr;
-}
-
-.narration-scroll-container.is-empty {
-    display: none;
-}
-
-.narration-scroll-text {
-    display: inline-block;
-    min-width: 100%;
-    max-width: none;
-    font-size: clamp(1.08rem, 2.8vw, 1.45rem);
-    font-weight: 300;
-    line-height: 1.5;
-    letter-spacing: 0.02em;
-    color: #ffffff;
-    opacity: 0.92;
-    margin: 0 auto;
-    white-space: nowrap;
-    will-change: transform;
-    text-align: left;
-}
-
-.narration-scroll-text.is-scrolling {
-    /* One narration gets one pass. Repeating would jump back to the first
-       word at the exact moment the spoken clip is finishing. */
-    animation: narrationTickerReadOrder var(--narration-duration, 24s) linear 1 both;
-}
-
-.narration-scroll-text.is-awaiting-playback {
-    opacity: 0;
-}
-
-.narration-scroll-text {
-    transition: opacity 0.7s ease;
-}
-
-.narration-scroll-text.is-paused {
-    animation-play-state: paused;
-}
-
-#breathing-narration-scroll-container {
-    margin-top: 1.25rem;
-}
-
-#icebreaker-narration-scroll-container {
-    margin-top: 1.25rem;
-}
-
-@keyframes narrationTickerReadOrder {
-    /* The content remains LTR; the line moves left so the first word is
-       presented near the reader before later words arrive in order. The
-       final word finishes at the center reading point instead of clipping
-       beyond the left edge. */
-    0% {
-        transform: translateX(var(--narration-start, 68%));
-        opacity: 0;
-    }
-    7% {
-        opacity: 0.92;
-    }
-    93% {
-        opacity: 0.92;
-    }
-    100% {
-        transform: translateX(calc(var(--narration-end, 50%) - var(--narration-width, 100%)));
-        opacity: 0;
-    }
-}
-
 .session-countdown {
     width: clamp(2.65rem, 5.5vw, 3.4rem);
     aspect-ratio: 1;
@@ -2286,7 +2200,6 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
         animation: none;
     }
     #mantra-display { animation: none; }
-    .narration-scroll-text.is-scrolling { animation: none; }
     .chakra-gold-ring { animation: none; }
     .tutorial-overlay { backdrop-filter: none; }
     .cosmic-entrance { animation: none; }
@@ -2302,11 +2215,6 @@ body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden
     .screen { gap: 1.5rem; }
     h1 { font-size: 1.5rem; }
     #mantra-display { font-size: 2.5rem; }
-    .narration-scroll-container {
-        min-height: 3.4rem;
-        margin-bottom: 0.9rem;
-        padding-inline: 1rem;
-    }
 }
 
 /* ── Eyes Close Mode ────────────────────────────────────────────────────────── */
@@ -2383,4 +2291,12 @@ body.sleep-mode-active #glow-effect {
     font-size: 0.78rem;
     line-height: 1.55;
     text-align: left;
+}
+/* Keep session artwork and sky still; functional labels/countdowns still update. */
+body.static-decorations *,
+body.static-decorations *::before,
+body.static-decorations *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
 }

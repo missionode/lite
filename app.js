@@ -34,7 +34,7 @@ const SHOT_CHAKRA_ORDER = Object.freeze(['root', 'sacral', 'solar', 'heart', 'th
 const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
 const SPATIAL_MODES = Object.freeze(['off', 'stereo', 'headphones', 'room']);
 const DEFAULT_SPATIAL_MODE = 'off';
-const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 5;
+const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 8;
 const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
 const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 // Change this alongside any committed replacement of background_music.mp3.
@@ -46,12 +46,26 @@ const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_AS
 // bed is the calm interval between narration and chant; do not replace it
 // with an abrupt mute or a separate dead-silence delay.
 const MANTRA_MUSIC_FADE_SECONDS = 6;
-const MANTRA_FADE_SECONDS = 4;
-const VOICE_REVERB_TAIL_SECONDS = 3.2;
+const MANTRA_FADE_SECONDS = 8;
+function stageFadeSeconds(durationSeconds) {
+    const seconds = Number(durationSeconds);
+    return Number.isFinite(seconds) ? Math.min(3, Math.max(0, seconds) * 0.2) : 0;
+}
+
+async function withAudioStageFade(audioEngine, seconds, action) {
+    const previous = audioEngine.stageFadeWindow;
+    const window = { limit: stageFadeSeconds(seconds) };
+    audioEngine.stageFadeWindow = window;
+    try { return await action(); }
+    finally {
+        if (audioEngine.stageFadeWindow === window) audioEngine.stageFadeWindow = previous;
+    }
+}
+const VOICE_REVERB_TAIL_SECONDS = 5;
 const VOICE_REVERB_TAIL_DECAY = 3.8;
-const MUSIC_REVERB_TAIL_SECONDS = 3.2;
+const MUSIC_REVERB_TAIL_SECONDS = 5;
 const MUSIC_REVERB_TAIL_DECAY = 4.8;
-const MANTRA_REVERB_TAIL_SECONDS = 5.5;
+const MANTRA_REVERB_TAIL_SECONDS = 7;
 const MANTRA_REVERB_TAIL_DECAY = 2.2;
 const MANTRA_REVERB_TAIL_WET = 0.26;
 const PIPER_CLIP_FADE_SECONDS = 0.05;
@@ -413,146 +427,7 @@ const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
     const sentenceGaps = Math.max(0, sentenceCount - 1) * 1.5;
     return 1.2 + (text.length / (charactersPerSecond * pacingFactor * piperPaceMultiplier)) + sentenceGaps;
 };
-let narrationTickerAwaitingPlayback = false;
-const applyNarrationScrollPreference = () => {
-    document.querySelectorAll('[data-narration-ticker]').forEach(container => {
-        container.hidden = !state.showNarrationText;
-        const text = container.querySelector('[data-narration-text]');
-        if (!text) return;
-        text.classList.remove('is-scrolling');
-        if (!container.hidden) refreshNarrationTicker(text);
-    });
-};
-const refreshNarrationTicker = (el) => {
-    const container = el?.closest('[data-narration-ticker]');
-    if (!el || !container || container.hidden) return;
-
-    el.classList.remove('is-scrolling');
-    el.style.removeProperty('--narration-duration');
-    if (narrationTickerAwaitingPlayback) {
-        el.classList.add('is-awaiting-playback');
-        return;
-    }
-    el.classList.remove('is-awaiting-playback');
-    if (!el.textContent.trim() || container.clientWidth === 0) return;
-
-    // Keep the behavior marquee-like even for short prompts. The first word
-    // starts near the reader and later words arrive in normal LTR order.
-    const textWidth = el.scrollWidth;
-    const startOffset = container.clientWidth * 0.68;
-    const endOffset = container.clientWidth * 0.5;
-    el.style.setProperty('--narration-width', `${textWidth}px`);
-    el.style.setProperty('--narration-start', `${startOffset}px`);
-    el.style.setProperty('--narration-end', `${endOffset}px`);
-    const speechDuration = Number(container.dataset.narrationDurationHint);
-    // The voice timing is the only timing authority. Width still determines
-    // the geometric travel distance, but never changes the ticker duration;
-    // otherwise identical narration drifts on different devices.
-    const duration = Number.isFinite(speechDuration)
-        ? Math.max(1, speechDuration)
-        : Math.max(1, estimateNarrationDurationSeconds(el.textContent));
-    el.style.setProperty('--narration-duration', `${duration}s`);
-    el.classList.add('is-scrolling');
-};
-const setNarrationTickerAwaitingPlayback = (awaiting) => {
-    narrationTickerAwaitingPlayback = Boolean(awaiting);
-    if (narrationTickerAwaitingPlayback) {
-        document.querySelectorAll('[data-narration-text]').forEach((el) => {
-            el.classList.remove('is-scrolling');
-            el.classList.add('is-awaiting-playback');
-        });
-    }
-};
-const startNarrationTicker = (durationSeconds) => {
-    setNarrationTickerAwaitingPlayback(false);
-    document.querySelectorAll('[data-narration-text]').forEach((el) => {
-        const container = el.closest('[data-narration-ticker]');
-        if (!container || !el.textContent.trim()) return;
-        const duration = Number(durationSeconds);
-        if (Number.isFinite(duration) && duration > 0) {
-            container.dataset.narrationDurationHint = String(duration);
-        }
-        refreshNarrationTicker(el);
-    });
-};
-const updateNarrationTickerDuration = (durationSeconds) => {
-    const duration = Number(durationSeconds);
-    if (!Number.isFinite(duration) || duration <= 0) return;
-
-    document.querySelectorAll('[data-narration-text]').forEach((el) => {
-        if (el.closest('[data-narration-ticker]')?.hidden) return;
-        const animation = el.getAnimations?.().find(item => item.animationName === 'narrationTickerReadOrder');
-        const currentTime = animation && Number(animation.currentTime);
-        const previousDuration = animation?.effect?.getComputedTiming?.().duration;
-        const position = Number.isFinite(currentTime) && Number.isFinite(previousDuration) && previousDuration > 0
-            ? Math.max(0, Math.min(1, currentTime / previousDuration))
-            : null;
-        el.style.setProperty('--narration-duration', `${duration}s`);
-
-        // Changing a CSS animation variable can recreate the animation in
-        // some browsers. Preserve its visible position so replacing an
-        // estimate with Piper's decoded duration never causes a visible jump.
-        // The remaining speed may change, but the words already on screen do
-        // not move backward or forward when a later clip is measured.
-        if (animation && position !== null) {
-            const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
-            schedule(() => {
-                const nextAnimation = el.getAnimations?.().find(item => item.animationName === 'narrationTickerReadOrder');
-                if (nextAnimation) nextAnimation.currentTime = position * duration * 1000;
-            });
-        }
-    });
-};
-const setNarrationText = (txt, narrationDurationSeconds = null) => {
-    const text = String(txt ?? '').trim();
-    document.querySelectorAll('[data-narration-text]').forEach((el) => {
-        const renderId = String(Number(el.dataset.renderId || 0) + 1);
-        el.dataset.renderId = renderId;
-        el.textContent = text;
-        el.classList.remove('is-scrolling', 'is-paused');
-        el.classList.toggle('is-awaiting-playback', narrationTickerAwaitingPlayback && Boolean(text));
-        el.style.removeProperty('--narration-duration');
-        const container = el.closest('[data-narration-ticker]');
-        if (container) {
-            container.classList.toggle('is-empty', !text);
-            if (text && Number.isFinite(Number(narrationDurationSeconds))) {
-                container.dataset.narrationDurationHint = String(narrationDurationSeconds);
-            } else if (!text) {
-                delete container.dataset.narrationDurationHint;
-            }
-        }
-        if (!text || !container || container.hidden) return;
-
-        // Measure after the new narration is painted so every visible screen
-        // receives the same responsive LTR reading marquee.
-        const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
-        schedule(() => {
-            if (el.dataset.renderId !== renderId || !container.isConnected) return;
-            refreshNarrationTicker(el);
-        });
-    });
-};
-const setNarrationTickerPaused = (paused) => {
-    document.querySelectorAll('[data-narration-text]').forEach((el) => {
-        el.classList.toggle('is-paused', Boolean(paused));
-    });
-};
-let narrationPlaybackGeneration = 0;
-const beginNarrationPlayback = () => ++narrationPlaybackGeneration;
-const finishNarrationPlayback = (generation) => {
-    // A soft reminder can overlap a regular narration. Only the narration
-    // that is still current may clear the shared ticker when it finishes.
-    if (generation === narrationPlaybackGeneration) setNarrationText('');
-};
-const cancelNarrationPlayback = () => {
-    narrationPlaybackGeneration += 1;
-    setNarrationText('');
-};
-const setText = (id, txt, narrationDurationSeconds = null) => {
-    if (id === 'narration-text') {
-        setNarrationText(txt, narrationDurationSeconds);
-        return;
-    }
+const setText = (id, txt) => {
     const el = document.getElementById(id);
     if (el) el.textContent = txt;
 };
@@ -1291,6 +1166,22 @@ function getBrowserVoiceForContent() {
     return selected || state.voices.find(voice => voiceMatchesLanguage(voice)) || null;
 }
 
+// Bound each inference, including scripts without sentence punctuation.
+function splitNarrationText(text, limit = 180) {
+    const chunks = [];
+    for (const sentence of String(text).split(/[.!?।]/)) {
+        let rest = Array.from(sentence.trim());
+        while (rest.length > limit) {
+            let cut = rest.slice(0, limit + 1).lastIndexOf(' ');
+            if (cut < limit / 2) cut = limit;
+            chunks.push(rest.splice(0, cut).join('').trim());
+            while (rest[0] === ' ') rest.shift();
+        }
+        if (rest.length) chunks.push(rest.join(''));
+    }
+    return chunks;
+}
+
 class PiperTTS {
     constructor(audioEngine) {
         this.audio = audioEngine;
@@ -1307,6 +1198,8 @@ class PiperTTS {
         this.paused = false;
         this.generation = 0;
         this.normalizationGains = new WeakMap();
+        this.clipCache = new Map();
+        this.clipCacheBytes = 0;
     }
 
     isSupported() {
@@ -1437,6 +1330,35 @@ class PiperTTS {
         return buffer || null;
     }
 
+    async prepare(text) {
+        const generation = this.generation;
+        const key = JSON.stringify([this.voiceId, this.voiceDefinition, getPiperMeditationSettings(), text]);
+        if (this.clipCache.has(key)) {
+            const hit = this.clipCache.get(key);
+            this.clipCache.delete(key);
+            this.clipCache.set(key, hit);
+            return hit.buffer;
+        }
+        const blob = await this.synthesize(text);
+        if (generation !== this.generation) throw new Error('Narration cancelled');
+        const buffer = await this.decode(blob);
+        if (generation !== this.generation) throw new Error('Narration cancelled');
+        if (!buffer) throw new Error('Piper returned an empty audio clip.');
+        this.getNormalizationGain(buffer);
+        const bytes = buffer.length * buffer.numberOfChannels * 4;
+        const budget = 16 * 1024 * 1024;
+        if (bytes <= budget) {
+            while (this.clipCache.size && (this.clipCacheBytes + bytes > budget || this.clipCache.size >= 48)) {
+                const oldest = this.clipCache.keys().next().value;
+                this.clipCacheBytes -= this.clipCache.get(oldest).bytes;
+                this.clipCache.delete(oldest);
+            }
+            this.clipCache.set(key, { buffer, bytes });
+            this.clipCacheBytes += bytes;
+        }
+        return buffer;
+    }
+
     async play(blob, volumeScale = 1, callbacks = {}) {
         const buffer = await this.decode(blob);
         return this.playBuffer(buffer, volumeScale, callbacks);
@@ -1454,10 +1376,12 @@ class PiperTTS {
             this.currentSource = source;
             this.currentClipGain = clipGain;
             this.currentResolve = resolve;
+            this.audio.setVoicePlaybackActive?.(true);
             source.onended = () => {
                 source.disconnect();
                 clipGain.disconnect();
                 if (this.currentSource === source) {
+                    this.audio.setVoicePlaybackActive?.(false);
                     this.currentSource = null;
                     this.currentClipGain = null;
                     this.currentResolve = null;
@@ -1512,7 +1436,8 @@ class PiperTTS {
         if (!paused) this.pump();
     }
 
-    cancel(reason = 'cancelled', { immediate = false } = {}) {
+    cancel(reason = 'cancelled', { immediate = false, fadeSeconds = PIPER_CANCEL_FADE_SECONDS } = {}) {
+        this.audio.setVoicePlaybackActive?.(false, immediate ? 0 : fadeSeconds);
         this.generation++;
         this.isCancelling = true;
         if (this.activeJob && this.worker) {
@@ -1523,10 +1448,10 @@ class PiperTTS {
             const clipGain = this.currentClipGain;
             if (!immediate && clipGain && this.audio?.ctx) {
                 const now = this.audio.ctx.currentTime;
-                const fadeSeconds = PIPER_CANCEL_FADE_SECONDS;
                 try {
-                    clipGain.gain.cancelScheduledValues(now);
-                    clipGain.gain.setValueAtTime(Math.max(0, clipGain.gain.value), now);
+                    const held = Math.max(0, clipGain.gain.value);
+                    if (clipGain.gain.cancelAndHoldAtTime) clipGain.gain.cancelAndHoldAtTime(now);
+                    else { clipGain.gain.cancelScheduledValues(now); clipGain.gain.setValueAtTime(held, now); }
                     clipGain.gain.linearRampToValueAtTime(0, now + fadeSeconds);
                     source.stop(now + fadeSeconds + 0.02);
                 } catch (error) {
@@ -1570,9 +1495,13 @@ class SeamlessLoop {
         this.isRunning = false;
     }
 
-    start() {
+    start(fadeInSeconds = 0) {
         if (this.isRunning) return;
         this.isRunning = true;
+        if (fadeInSeconds > 0) {
+            this.output.gain.setValueAtTime(0, this.ctx.currentTime);
+            this.output.gain.linearRampToValueAtTime(this.targetGainValue, this.ctx.currentTime + fadeInSeconds);
+        }
         try { this._startSource(this.ctx.currentTime + 0.01); }
         catch (error) { this.isRunning = false; this.output.disconnect(); throw error; }
     }
@@ -1641,6 +1570,7 @@ class SeamlessLoop {
     }
 
     stop(fadeTime = 4) {
+        if (!this.isRunning) return; // Do not reset an already-retiring envelope.
         this.isRunning = false;
 
         const now = this.ctx.currentTime;
@@ -2234,6 +2164,54 @@ class AudioEngine {
         }
     }
 
+    setConvolverActive(key, input, convolver, output, active, tailSeconds = 0) {
+        if (!this.ctx || !input || !convolver || !output) return;
+        this.effectRoutes ||= new Map();
+        let route = this.effectRoutes.get(key);
+        if (!route) {
+            route = { connected: true, retirement: null };
+            this.effectRoutes.set(key, route);
+        }
+        if (route.retirement) {
+            route.retirement.onended = null;
+            try { route.retirement.stop(); } catch (error) {}
+            route.retirement.disconnect();
+            route.retirement = null;
+        }
+        if (active) {
+            if (!route.connected) { input.connect(convolver); convolver.connect(output); route.connected = true; }
+            return;
+        }
+        if (!route.connected) return;
+        const disconnect = () => {
+            input.disconnect(convolver);
+            convolver.disconnect(output);
+            route.connected = false;
+        };
+        if (tailSeconds <= 0) { disconnect(); return; }
+        // A silent native audio-clock deadline freezes on pause, unlike a wall
+        // timer. No polling loop; restarting cancels the pending disconnection.
+        const deadline = this.ctx.createBufferSource();
+        deadline.buffer = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+        deadline.loop = true;
+        deadline.connect(this.ctx.destination);
+        route.retirement = deadline;
+        deadline.onended = () => {
+            deadline.disconnect();
+            if (route.retirement !== deadline) return;
+            route.retirement = null;
+            disconnect();
+        };
+        deadline.start();
+        deadline.stop(this.ctx.currentTime + tailSeconds);
+    }
+
+    setVoicePlaybackActive(active, exitFade = 0) {
+        this.voicePlaybackActive = active;
+        this.voiceExitFade = exitFade;
+        this.setVoiceEcho(state.voiceEcho);
+    }
+
     setVoiceEcho(mode = 'off') {
         if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
         const voiceEchoSettings = {
@@ -2243,6 +2221,7 @@ class AudioEngine {
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const settings = voiceEchoSettings[requestedMode];
+        this.setConvolverActive('voice', this.voiceEchoDelay, this.voiceEchoConvolver, this.voiceEchoFilter, settings.wet > 0 && this.voicePlaybackActive === true, VOICE_REVERB_TAIL_SECONDS + (this.voiceExitFade || 0) + 0.3);
         const now = this.ctx.currentTime;
         [this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
             if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
@@ -2260,6 +2239,7 @@ class AudioEngine {
             light: { delay: 0.018, wet: 0.12, filter: 2800 },
             spacious: { delay: 0.035, wet: 0.18, filter: 3400 }
         }[mode] || { delay: 0.018, wet: 0.12, filter: 2800 };
+        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, settings.wet > 0, MUSIC_REVERB_TAIL_SECONDS + 0.3);
         const now = this.ctx.currentTime;
         this.musicEchoDelay.delayTime.cancelScheduledValues(now);
         this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
@@ -2761,8 +2741,11 @@ class AudioEngine {
             this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
 
             // Standardized to 3.0s crossfade
+            this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, true);
+            this.mantraTailWetGain.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.mantraTailWetGain.gain.setValueAtTime(MANTRA_REVERB_TAIL_WET, this.ctx.currentTime);
             this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 1, 3.0);
-            this.mantraLoop.start();
+            this.mantraLoop.start(MANTRA_MUSIC_FADE_SECONDS);
 
             // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
             const lfo = this.ctx.createOscillator();
@@ -2774,12 +2757,14 @@ class AudioEngine {
             lfoGain.connect(this.mantraFilter.frequency);
             lfo.start();
             this.mantraPresenceLFO = lfo;
+            this.mantraPresenceLFOGain = lfoGain;
+            lfo.onended = () => { lfo.disconnect(); lfoGain.disconnect(); };
 
             const now = this.ctx.currentTime;
             this.mantraGain.gain.cancelScheduledValues(now);
-            this.mantraGain.gain.setValueAtTime(0, now);
-            // Complement the outgoing music fade; apply user volume only once.
-            this.mantraGain.gain.linearRampToValueAtTime(state.volMantra, now + MANTRA_MUSIC_FADE_SECONDS);
+            // Entry belongs to the new loop, never zero the shared bus: an
+            // outgoing mantra may still be fading through it.
+            this.mantraGain.gain.setValueAtTime(state.volMantra, now);
 
             if (this.masterGain) {
                 this.masterGain.gain.cancelScheduledValues(now);
@@ -2802,7 +2787,10 @@ class AudioEngine {
         }
     }
 
-    stopMantraTrack({ restoreMusic = true, invalidate = true } = {}) {
+    stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {}) {
+        const fadeSeconds = stageWindow === null ? MANTRA_FADE_SECONDS : Math.min(MANTRA_FADE_SECONDS, Math.max(0, Number(stageWindow) || 0) / 2);
+        const tailSeconds = stageWindow === null ? MANTRA_REVERB_TAIL_SECONDS : Math.min(MANTRA_REVERB_TAIL_SECONDS, fadeSeconds);
+        this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, false, fadeSeconds + tailSeconds + 0.1);
         if (invalidate) this.mantraRequestId += 1;
         if (!this.mantraLoop) {
             if (restoreMusic) this.restoreBackgroundMusicAfterMantra();
@@ -2810,9 +2798,24 @@ class AudioEngine {
         }
         const now = this.ctx.currentTime;
 
+        if (stageWindow !== null && this.mantraTailWetGain) {
+            const wet = this.mantraTailWetGain.gain;
+            if (wet.cancelAndHoldAtTime) wet.cancelAndHoldAtTime(now);
+            else { wet.cancelScheduledValues(now); wet.setValueAtTime(wet.value, now); }
+            wet.setValueAtTime(wet.value, now + fadeSeconds);
+            wet.linearRampToValueAtTime(0, now + fadeSeconds + tailSeconds);
+        }
+
         if (this.mantraPresenceLFO) {
-            try { this.mantraPresenceLFO.stop(); } catch(e) {}
+            const modulation = this.mantraPresenceLFOGain?.gain;
+            if (modulation) {
+                if (modulation.cancelAndHoldAtTime) modulation.cancelAndHoldAtTime(now);
+                else { modulation.cancelScheduledValues(now); modulation.setValueAtTime(modulation.value, now); }
+                modulation.linearRampToValueAtTime(0, now + fadeSeconds);
+            }
+            try { this.mantraPresenceLFO.stop(now + fadeSeconds + 0.02); } catch(e) {}
             this.mantraPresenceLFO = null;
+            this.mantraPresenceLFOGain = null;
         }
 
         // The retiring loop owns the exit envelope (no second bus fade).
@@ -2830,16 +2833,17 @@ class AudioEngine {
             gain.gain.linearRampToValueAtTime(0.015, now + 4);
         });
 
-        this.mantraLoop.stop(MANTRA_FADE_SECONDS);
+        this.mantraLoop.stop(fadeSeconds);
         this.mantraLoop = null;
 
         // Bring the bed back during the outgoing mantra, not after silence.
         if (restoreMusic) {
-            this.restoreBackgroundMusicAfterMantra(MANTRA_FADE_SECONDS);
+            this.restoreBackgroundMusicAfterMantra(fadeSeconds);
         }
     }
 
     async startBackgroundMusic() {
+        this.setMusicEcho(state.musicEcho);
         if (!this.bgMusicBuffer) {
             const response = await fetch(BACKGROUND_MUSIC_URL, { cache: 'reload' });
             const arrayBuffer = await response.arrayBuffer();
@@ -2886,6 +2890,7 @@ class AudioEngine {
         }
 
         // The bus owns entry fading; the loop duration controls repeats only.
+        this.setMusicEcho(state.musicEcho);
         this.bgMusicLoop = new SeamlessLoop(
             this.ctx,
             this.bgMusicBuffer,
@@ -3057,6 +3062,7 @@ class AudioEngine {
     }
 
     stopPleasureAmbience(fadeTime = PLEASURE_AMBIENCE_FADE_SECONDS) {
+        this.setConvolverActive('pleasure', this.pleasureBlurFilter, this.pleasureBlurConvolver, this.pleasureBlurWetGain, false, Math.max(0, fadeTime) + 1);
         this.pleasureGeneration += 1;
         this.pleasureLoops.forEach(loop => loop.stop(Math.max(0, fadeTime)));
         this.pleasureLoops = [];
@@ -3091,6 +3097,7 @@ class AudioEngine {
         const profile = getPleasureAmbienceIntensityProfile();
         const blurMix = getPleasureBlurMix(blurEnabled);
         const now = this.ctx.currentTime;
+        this.setConvolverActive('pleasure', this.pleasureBlurFilter, this.pleasureBlurConvolver, this.pleasureBlurWetGain, blurMix.wet > 0 && this.pleasureLoops.some(loop => loop.isRunning), 2.2);
         if (this.pleasureBlurFilter) {
             this.pleasureBlurFilter.frequency.cancelScheduledValues(now);
             this.pleasureBlurFilter.frequency.setValueAtTime(this.pleasureBlurFilter.frequency.value, now);
@@ -3121,6 +3128,7 @@ class AudioEngine {
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
         if (!this.bgMusicLoop || !this.ctx) return;
+        if (this.stageFadeWindow) duration = Math.min(duration, this.stageFadeWindow.limit);
         
         // Support for boolean (legacy) and numeric (fine-tuned) volume levels
         // Whisper Quality: Keep narration clearly in front of a very quiet
@@ -3266,6 +3274,7 @@ class AudioEngine {
     }
 
     stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {
+        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, false, Math.max(0, fadeTime) + MUSIC_REVERB_TAIL_SECONDS + 0.1);
         this.cancelBackgroundMusicRestore();
         this.bgMusicSuppressedByMantra = false;
         if (this.bgMusicLoop) {
@@ -3282,6 +3291,7 @@ class AudioEngine {
     }
 
     prepareJourneyVideoPrelude(media) {
+        this.setMusicEcho(state.musicEcho);
         if (!this.ctx || !this.spatialMusicPanner || !media) return false;
         if (this.journeyVideoPreludeMedia === media && this.journeyVideoPreludeSource) return true;
         if (this.journeyVideoPreludeSource) return false;
@@ -3387,6 +3397,7 @@ class AmbientParticleField {
         this.started = true;
         window.addEventListener('resize', this.resize, { passive: true });
         document.addEventListener('visibilitychange', this.handleVisibility);
+        document.addEventListener('decorationchange', this.handleMotionChange);
         this.motionPreference.addEventListener('change', this.handleMotionChange);
         this.resize();
         this.requestObserverLocation();
@@ -3466,7 +3477,7 @@ class AmbientParticleField {
         this.nextMeteorAt = 0;
         this.lastFrameAt = 0;
         if (!document.hidden) {
-            if (this.motionPreference.matches) this.draw(performance.now(), false);
+            if (this.motionPreference.matches || document.body.classList.contains('static-decorations')) this.draw(performance.now(), false);
             else this.frame = requestAnimationFrame(this.render);
         }
     }
@@ -3479,6 +3490,8 @@ class AmbientParticleField {
             this.frame = 0;
             this.meteors = [];
             this.nextMeteorAt = 0;
+        } else if (document.body.classList.contains('static-decorations')) {
+            this.draw(performance.now(), false);
         } else if (!this.motionPreference.matches && !this.frame && !this.renderTimer) {
             this.lastFrameAt = 0;
             this.frame = requestAnimationFrame(this.render);
@@ -3490,7 +3503,7 @@ class AmbientParticleField {
 
     render(timestamp) {
         this.frame = 0;
-        if (document.hidden || this.motionPreference.matches) { this.frame = 0; return; }
+        if (document.hidden || this.motionPreference.matches || document.body.classList.contains('static-decorations')) { this.frame = 0; return; }
         if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
             this.draw(timestamp, true);
             this.lastFrameAt = timestamp;
@@ -4422,7 +4435,7 @@ class MeditationController {
         await this.pauseAwareSleep(timing('transitions', 'emergenceBellSettle') * 1000);
         if (!this.isMeditationActive) return;
         const text = this.getJourneySystemNarration('emergence');
-        if (text) await this.narrate(text, false);
+        if (text) await withAudioStageFade(this.audio, state.timeEmergence, () => this.narrate(text, false));
         if (!this.isMeditationActive) return;
         await this.pauseAwareSleep(state.timeEmergence * 1000);
         if (!this.isMeditationActive) return;
@@ -4463,7 +4476,6 @@ class MeditationController {
         setText('mantra-display', journeyT('ui.sleepMode'));
         // Sleep mode has no spoken narration; keep the narration-only ticker
         // hidden while the visual guidance, music, and sleep tones run.
-        setText('narration-text', '');
         this.visual.startPulsing('#355c7d');
         await this.audio.startBackgroundMusic();
         void this.audio.startPleasureAmbience();
@@ -4473,7 +4485,6 @@ class MeditationController {
         for (const [index, stage] of sleepStages.entries()) {
             if (!this.isMeditationActive) return;
             setText('mantra-display', journeyT(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
-            setText('narration-text', '');
             this.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
 
             let remaining = stageDurationMs;
@@ -4531,7 +4542,6 @@ class MeditationController {
             setText('mantra-display', journeyT('ui.shotsMode'));
             // Shots intentionally have no narration, so they must not leave
             // a looping narration marquee on screen.
-            setText('narration-text', '');
             this.visual.startPulsing('#7c3aed');
 
             let stages;
@@ -4606,7 +4616,6 @@ class MeditationController {
         this.audio.stopMantraTrack();
         this.stopSessionCountdown();
         wakeLock.release();
-        cancelNarrationPlayback();
         document.body.classList.remove('sleep-mode-active');
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(lobbyScreen);
@@ -4626,7 +4635,6 @@ class MeditationController {
         this.audio.stopMantraTrack();
         this.stopSessionCountdown();
         wakeLock.release();
-        cancelNarrationPlayback();
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(lobbyScreen);
         const startBtn = document.getElementById('start-meditation');
@@ -4758,7 +4766,7 @@ class MeditationController {
             setText('icebreaker-title', contentT('system.arriving'));
             setText('icebreaker-subtitle', contentT('system.breatheAndSettle'));
 
-            this.audio.fadeInBackgroundMusic(state.timeIcebreaker); 
+            this.audio.fadeInBackgroundMusic(stageFadeSeconds(state.timeIcebreaker));
             for (let i = state.timeIcebreaker; i > 0; i--) {
                 if (!this.isMeditationActive) return;
                 await this.pauseAwareSleep(1000);
@@ -4867,9 +4875,8 @@ class MeditationController {
         this.isMeditationActive = false;
         this.isExperimentActive = false;
         this.experimentDuration = null;
-        cancelNarrationPlayback();
         window.speechSynthesis.cancel();
-        piperTTS.cancel('experiment stopped', { immediate: true });
+        piperTTS.cancel('experiment stopped', { fadeSeconds: 2 });
         this.stopIntentionFrequency();
         this.stopStageDrone();
         this.audio.stopMantraTrack();
@@ -5153,10 +5160,8 @@ class MeditationController {
         }
         
         const mantraEl = document.getElementById('mantra-display');
-        const narrationEl = document.getElementById('narration-text');
 
         if (mantraEl) mantraEl.textContent = journeyT('system.musicOnly');
-        setText('narration-text', '');
         hideSessionCountdown();
         
         // Start background music loop
@@ -5187,7 +5192,6 @@ class MeditationController {
         showScreen(icebreakerScreen);
         // Icebreaker is also used for guide-controlled waiting. Clear the
         // previous narration so an empty marquee never appears as stale UI.
-        setText('narration-text', '');
         restButton.hidden = true;
         restButton.disabled = true;
         titleEl.textContent = title;
@@ -5274,7 +5278,6 @@ class MeditationController {
         showScreen(meditationScreen);
         const symbolEl = document.getElementById('chakra-symbol');
         const mantraEl = document.getElementById('mantra-display');
-        const narrationEl = document.getElementById('narration-text');
         
         // Aura for Yoga
         const aura = document.getElementById('aura-bg');
@@ -5334,8 +5337,6 @@ class MeditationController {
 
     async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal', transition = 'none') {
         if (!text || !this.isMeditationActive && !fadeOut) return;
-        setNarrationTickerAwaitingPlayback(true);
-        setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
         if (!keepSilence) this.audio.fadeInBackgroundMusic(6, true);
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
@@ -5353,39 +5354,20 @@ class MeditationController {
             : timing('narration', 'sentenceGap');
         await this.pauseAwareSleep(leadIn * 1000);
 
-        const sentences = String(text).split(/[.!?।]/).map(sentence => sentence.trim()).filter(Boolean);
-        // Keep the first two sentences ready so narration begins promptly,
-        // then continue synthesizing one sentence ahead while the current
-        // sentence plays. Piper's worker is serial, so waiting for the whole
-        // passage here would leave the user with music and silence for a long
-        // time before the first voice clip can start.
+        const sentences = splitNarrationText(text);
+        // One current clip plus one future clip. Generate the next clip only
+        // within twelve seconds of the current clip ending, using audio duration.
         const generation = piperTTS.generation;
         const queueSynthesis = (sentence) => {
-            const job = piperTTS.synthesize(sentence).then(async blob => {
-                if (generation !== piperTTS.generation) throw new Error('Narration cancelled');
-                const buffer = await piperTTS.decode(blob);
-                if (generation !== piperTTS.generation) throw new Error('Narration cancelled');
-                if (!buffer) throw new Error('Piper returned an empty audio clip.');
-                piperTTS.getNormalizationGain(buffer);
-                return buffer;
-            });
+            const job = piperTTS.prepare(sentence);
             // A Stop action may cancel jobs that have not reached the active
             // await yet. Attach a sink immediately so intentional cancellation
             // cannot create unhandled promise errors.
             job.catch(() => {});
             return job;
         };
-        const pending = sentences.slice(0, 2).map(queueSynthesis);
-        // The estimate helper includes a lead-in for a complete narration.
-        // The ticker begins at the first audio clip, so remove that lead-in
-        // from each sentence estimate before composing the rolling total.
-        const estimatedDurations = sentences.map(sentence =>
-            Math.max(0.1, estimateNarrationDurationSeconds(sentence, pacing) - timing('narration', 'piperLeadIn'))
-        );
-        let narrationDuration = estimatedDurations.reduce((total, duration) => total + duration, 0) +
-            Math.max(0, sentences.length - 1) * sentenceGap;
+        let pending = sentences.length ? queueSynthesis(sentences[0]) : null;
         let piperFailed = false;
-        let tickerStarted = false;
 
         for (let i = 0; i < sentences.length; i++) {
             if (!this.isMeditationActive) break;
@@ -5397,22 +5379,17 @@ class MeditationController {
             }
 
             try {
-                const buffer = await pending.shift();
+                const buffer = await pending;
                 if (!this.isMeditationActive || generation !== piperTTS.generation) return;
                 while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
                 if (!this.isMeditationActive || generation !== piperTTS.generation) return;
-                if (i + 2 < sentences.length) pending.push(queueSynthesis(sentences[i + 2]));
-                // Replace the estimate for this clip as soon as its real
-                // decoded duration is available. The ticker keeps its current
-                // elapsed position while its total timing becomes more exact.
-                narrationDuration += buffer.duration - estimatedDurations[i];
-                updateNarrationTickerDuration(narrationDuration);
-                if (!tickerStarted) {
-                    tickerStarted = true;
-                    // The complete text is already visible, but the marquee
-                    // must wait for real voice playback. The rolling estimate
-                    // is progressively replaced by decoded Piper durations.
-                    startNarrationTicker(narrationDuration);
+                if (i + 1 < sentences.length) {
+                    pending = (async () => {
+                        await this.pauseAwareSleep(Math.max(0, buffer.duration - 12) * 1000);
+                        if (!this.isMeditationActive || generation !== piperTTS.generation) throw new Error('Narration cancelled');
+                        return queueSynthesis(sentences[i + 1]);
+                    })();
+                    pending.catch(() => {});
                 }
                 const isFinalClip = i === sentences.length - 1;
                 await piperTTS.playBuffer(buffer, volumeScale, {
@@ -5450,25 +5427,18 @@ class MeditationController {
     }
 
     async narrateSoft(text) {
-        const generation = beginNarrationPlayback();
-        try {
-            if (this.shouldUsePiper()) {
-                try { return await this.narrateWithPiper(text, false, false, 1); }
-                catch (error) {
-                    console.error('[Piper] soft narration failed:', error);
-                    if (!this.isMeditationActive) return;
-                    setVoiceStatus(t('ui.piperFallback'), 'error');
-                }
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, false, false, 1); }
+            catch (error) {
+                console.error('[Piper] soft narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
-            return await this.narrateSoftBrowser(text);
-        } finally {
-            finishNarrationPlayback(generation);
         }
+        return await this.narrateSoftBrowser(text);
     }
 
     async narrateSoftBrowser(text) {
-        setText('narration-text', text, estimateNarrationDurationSeconds(text, 'soft'));
-        setNarrationTickerAwaitingPlayback(false);
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -5498,7 +5468,6 @@ class MeditationController {
         console.log("DEBUG: togglePause updated isPaused to:", this.isPaused);
         const btn = document.getElementById('pause-meditation');
         if (btn) btn.textContent = this.isPaused ? '▶' : 'II';
-        setNarrationTickerPaused(this.isPaused);
         
         if (this.isPaused) {
             console.log("Action: Pausing session...");
@@ -5562,7 +5531,6 @@ class MeditationController {
         if (symbolEl) symbolEl.style.opacity = '0.1';
         
         setText('mantra-display', '✦');
-        setText('narration-text', '');
 
         // Intro: "Repeat each phrase gently in your heart" - Keep music playing
         await this.narrate(localized(this.scripts.hooponopono.intro), false);
@@ -5584,7 +5552,6 @@ class MeditationController {
         }
 
         // Closing breath - Final fade out
-        setText('narration-text', '');
         await this.narrate(localized(this.scripts.hooponopono.closing), true);
 
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
@@ -5625,7 +5592,8 @@ class MeditationController {
         const breatheText = contentT('system.breatheInterval');
         // Keep the minimum interval short for testing, but never advance to the
         // next chakra while the break narration is still speaking.
-        const narrationPromise = this.narrateFeeble(breatheText);
+        const narrationPromise = withAudioStageFade(this.audio, state.timeInterval, () => this.narrateFeeble(breatheText));
+        narrationPromise.catch(() => {}); // The timer may outlast a failed preparation; await below still reports it.
         const intervalMs = state.timeInterval * 1000;
         let elapsed = 0;
         while (elapsed < intervalMs) {
@@ -5710,32 +5678,26 @@ class MeditationController {
         }
 
         // Fade out mantra, restore drone before affirmation
-        this.audio.stopMantraTrack();
-        await this.pauseAwareSleep(timing('transitions', 'chakraPostMantra') * 1000);
+        const transitionSeconds = Math.max(0, timing('transitions', 'chakraPostMantra'));
+        this.audio.stopMantraTrack({ stageWindow: transitionSeconds });
+        await this.pauseAwareSleep(transitionSeconds * 1000);
 
         if (this.isMeditationActive) await this.narrate(localized(chakra, 'affirmation'));
     }
 
     async narrateFeeble(text) {
-        const generation = beginNarrationPlayback();
-        try {
-            if (this.shouldUsePiper()) {
-                try { return await this.narrateWithPiper(text, false, false, 0.9); }
-                catch (error) {
-                    console.error('[Piper] feeble narration failed:', error);
-                    if (!this.isMeditationActive) return;
-                    setVoiceStatus(t('ui.piperFallback'), 'error');
-                }
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, false, false, 0.9); }
+            catch (error) {
+                console.error('[Piper] feeble narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
-            return await this.narrateFeebleBrowser(text);
-        } finally {
-            finishNarrationPlayback(generation);
         }
+        return await this.narrateFeebleBrowser(text);
     }
 
     async narrateFeebleBrowser(text) {
-        setText('narration-text', text, estimateNarrationDurationSeconds(text, 'feeble'));
-        setNarrationTickerAwaitingPlayback(false);
         return new Promise(resolve => {
             const utterance = new SpeechSynthesisUtterance(text);
             const selectedVoice = getBrowserVoiceForContent();
@@ -5759,25 +5721,18 @@ class MeditationController {
     }
 
     async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal', transition = 'none') {
-        const generation = beginNarrationPlayback();
-        try {
-            if (this.shouldUsePiper()) {
-                try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing, transition); }
-                catch (error) {
-                    console.error('[Piper] narration failed:', error);
-                    if (!this.isMeditationActive) return;
-                    setVoiceStatus(t('ui.piperFallback'), 'error');
-                }
+        if (this.shouldUsePiper()) {
+            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing, transition); }
+            catch (error) {
+                console.error('[Piper] narration failed:', error);
+                if (!this.isMeditationActive) return;
+                setVoiceStatus(t('ui.piperFallback'), 'error');
             }
-            return await this.narrateBrowser(text, fadeOut, keepSilence, pacing, true, transition);
-        } finally {
-            finishNarrationPlayback(generation);
         }
+        return await this.narrateBrowser(text, fadeOut, keepSilence, pacing, true, transition);
     }
 
-    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal', updateTicker = true, transition = 'none') {
-        if (updateTicker) setText('narration-text', text, estimateNarrationDurationSeconds(text, pacing));
-        setNarrationTickerAwaitingPlayback(false);
+    async narrateBrowser(text, fadeOut = false, keepSilence = false, pacing = 'normal', _legacyTextFlag = true, transition = 'none') {
         if (!window.speechSynthesis) return;
 
         // Browser speech is outside the Web Audio graph, so it cannot receive
@@ -5942,10 +5897,9 @@ class MeditationController {
         this.audio.bgMusicTargetVolume = 0;
         this.audio.bgMusicTargetEQ = 0;
         this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
-        this.audio.stopPleasureAmbience();
-        cancelNarrationPlayback();
+        this.audio.stopPleasureAmbience(8);
         wakeLock.release();
-        piperTTS.cancel('journey finished', { immediate: true });
+        piperTTS.cancel('journey finished', { fadeSeconds: 2 });
         document.getElementById('aura-bg').style.opacity = "0";
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
         state.stats.journeys += 1; state.stats.time += sessionMinutes;
@@ -5979,10 +5933,9 @@ class MeditationController {
 
     stop({ preserveScreen = false } = {}) {
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack(); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
         this.isExperimentActive = false;
-        cancelNarrationPlayback();
         if (this.guideControlledResolve) this.guideControlledResolve(false);
         const guideRestButton = document.getElementById('guide-controlled-continue');
         if (guideRestButton) {
@@ -5996,7 +5949,7 @@ class MeditationController {
             startBtn.style.opacity = "1";
         }
         window.speechSynthesis.cancel();
-        piperTTS.cancel('journey stopped', { immediate: true });
+        piperTTS.cancel('journey stopped', { fadeSeconds: 2 });
         document.body.classList.remove('sleep-mode-active');
         const app = document.getElementById('app');
         if (app) app.style.opacity = "1";
@@ -6117,7 +6070,6 @@ const state = {
     pleasureAmbienceBlur: true,
     deityPath: localStorage.getItem('chakra_deity_path') || 'none',
     visualEffect: normalizeMeditationVisualEffect(localStorage.getItem('chakra_visual_effect')),
-    showNarrationText: localStorage.getItem('chakra_show_narration_text') !== 'false',
     advancedFeaturesUnlocked: false,
     // Experience Mode selections are intentionally session-only. They should
     // never be restored from or written to localStorage.
@@ -6551,8 +6503,6 @@ function loadPreferences() {
         });
     }, 0);
     syncValue('visual-effect-select', state.visualEffect);
-    syncChecked('narration-scroll-toggle', state.showNarrationText);
-    applyNarrationScrollPreference();
     visual.applyImageEffect();
 
     // Sync Journey Timings Sliders
@@ -6626,6 +6576,8 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
+    document.body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
+    document.dispatchEvent(new Event('decorationchange'));
     [configScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
@@ -6637,8 +6589,6 @@ function showScreen(screen) {
         screen.scrollTop = 0;
         if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
         if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
-        const schedule = window.requestAnimationFrame || ((callback) => window.setTimeout(callback, 0));
-        schedule(() => document.querySelectorAll('[data-narration-text]').forEach(refreshNarrationTicker));
     }
 }
 
@@ -6703,9 +6653,6 @@ function attachEventListeners() {
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         state.visualEffect = normalizeMeditationVisualEffect(document.getElementById('visual-effect-select')?.value);
-        state.showNarrationText = getChecked('narration-scroll-toggle');
-        localStorage.setItem('chakra_show_narration_text', state.showNarrationText);
-        applyNarrationScrollPreference();
         
         localStorage.setItem('chakra_audio_filters', state.audioFilters);
         localStorage.removeItem('chakra_box_meditation');

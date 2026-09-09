@@ -8,7 +8,7 @@ const preference = { matches: false, addEventListener() {} };
 const canvas = { setAttribute() {}, addEventListener(name, fn) { listeners[name]=fn; }, getBoundingClientRect() { return {width:1200,height:900}; }, getContext() { return null; } };
 const image = { src:'root.png', complete:true, naturalWidth:512, naturalHeight:512, addEventListener() {} };
 const container = { appendChild() {}, classList: { add(x) {classes.add(x);}, remove(x) {classes.delete(x);} } };
-const document = { hidden:false, createElement() {return canvas;}, addEventListener() {} };
+const document = { body:{classList:{contains:()=>false}}, hidden:false, createElement() {return canvas;}, addEventListener() {} };
 const context = { window:{}, document, matchMedia:()=>preference, MutationObserver:class {observe() {}}, ResizeObserver:class {observe() {}},
     setTimeout(fn) {timers.set(++sequence,fn);return sequence;}, clearTimeout(id) {timers.delete(id);},
     requestAnimationFrame(fn) {frames.set(++sequence,fn);return sequence;}, cancelAnimationFrame(id) {frames.delete(id);}, performance:{now:()=>0}, devicePixelRatio:3, Uint8Array };
@@ -44,6 +44,10 @@ preference.matches=false; document.hidden=true; scene.refresh();
 assert.equal(frames.size,0,'Hidden pages release the animation loop');
 assert.equal(timers.size,0);
 document.hidden=false; scene.refresh();
+document.body.classList.contains=()=>true; scene.refresh();
+assert.equal(timers.size,0,'Static session decorations have no GPU animation timer');
+assert.equal(frames.size,0);
+document.body.classList.contains=()=>false; scene.refresh();
 listeners.webglcontextlost({preventDefault() {}});
 assert.equal(classes.has('presence-ready'),false,'Context loss restores the image');
 assert.equal(frames.size,0);

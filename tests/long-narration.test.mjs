@@ -39,6 +39,7 @@ assert.deepEqual(await recovery.phonemize('Test','en-us'),[1,2]);
 assert.equal(attempts,2,'Bad output retires the instance and the next request can recover');
 
 const app=fs.readFileSync('app.js','utf8');
+const splitNarrationText = vm.runInNewContext(app.slice(app.indexOf('function splitNarrationText('),app.indexOf('class PiperTTS')) + '; splitNarrationText');
 const method=app.slice(app.indexOf('    async narrateWithPiper('),app.indexOf('    async narrateSoft('));
 const decoded=[],played=[];
 let cancelDuringDecode=false;
@@ -47,10 +48,12 @@ const piper={generation:0,synthesize:async text=>text,decode:async text=>{
     if(cancelDuringDecode) piper.generation++;
     return {text,duration:2};
 },getNormalizationGain(){return 1;},playBuffer:async buffer=>{
-    if(played.length===0) assert.ok(decoded.includes('Two'),'The next sentence is decoded before first playback completes');
+    await new Promise(resolve => setTimeout(resolve, 0));
+    if(played.length===0) assert.ok(decoded.includes('Two'),'The next sentence is decoded during first playback');
     played.push(buffer.text);
 }};
-const sandbox={piperTTS:piper,state:{eyesCloseMode:false},timing:()=>0,
+piper.prepare = async text => { const result = await piper.decode(await piper.synthesize(text)); return result; };
+const sandbox={splitNarrationText,piperTTS:piper,state:{eyesCloseMode:false},timing:()=>0,
     PIPER_CLIP_FADE_SECONDS:.05,NARRATION_MANTRA_FADE_SECONDS:.05,
     setNarrationTickerAwaitingPlayback(){},setText(){},estimateNarrationDurationSeconds:()=>2,
     updateNarrationTickerDuration(){},startNarrationTicker(){},setTimeout};

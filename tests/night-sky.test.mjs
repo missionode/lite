@@ -9,7 +9,7 @@ const context = () => ({
     createImageData: (w,h) => ({data:new Uint8ClampedArray(w*h*4)}),
     drawImage(...args){this.draws.push({args,alpha:this.globalAlpha});}
 });
-const sandbox = vm.createContext({document:{createElement(){const ctx=context();return {getContext:()=>ctx};}}});
+const sandbox = vm.createContext({document:{body:{classList:{contains:()=>false}},createElement(){const ctx=context();return {getContext:()=>ctx};}}});
 vm.runInContext(readFileSync('night-sky.js','utf8')+'\nglobalThis.sky = new NaturalNightSky();',sandbox);
 const sky=sandbox.sky;
 sky.resize(1440,900,1.5);
@@ -105,6 +105,16 @@ field.motionPreference.matches=true; sandbox.performance={now:()=>200};
 field.handleMotionChange();
 assert.equal(frames.size,0,'Reduced motion cancels the resumed frame');
 console.log('Sky cache and scheduling passed: invalidation, idle waiting, hide/resume and reduced motion.');
+field.motionPreference.matches=false;
+sandbox.document.body.classList.contains=()=>true;
+field.handleMotionChange(); field.render(250);
+assert.equal(frames.size,0); assert.equal(scheduled.size,0,'Static screens schedule no sky work');
+sandbox.document.hidden=true; field.handleVisibility();
+sandbox.document.hidden=false; field.handleVisibility();
+assert.equal(frames.size,0,'Returning to a static screen does not restart motion');
+sandbox.document.body.classList.contains=()=>false;
+field.handleMotionChange(); assert.equal(frames.size,1,'Lobby/Settings restore animation');
+field.motionPreference.matches=true; field.handleMotionChange();
 
 let spriteBuilds=0,meteorDraws=0;
 sandbox.document.createElement=()=>{spriteBuilds++;return {getContext:()=>({

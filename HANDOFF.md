@@ -1,5 +1,39 @@
 # Chakra Meditation — Active Handoff
 
+### Version 2.85 release preparation — 2026-09-10
+
+- User authorized production push after reviewing extension message-channel errors. No Chrome runtime messaging calls found in application sources; those console messages alone do not identify an app failure. Device interruption/thermal evidence remains unresolved, not claimed fixed by this release.
+- Release includes scrolling narration removal, static session decorations, bounded/cached Piper preparation, idle reverb bypass, longer session exits and stage-aware fades. All 29 applicable non-browser test files pass; established missing-fixture tests and stale Hindi delivery-version assertions remain excluded. Atlas regenerated; syntax/diff checks pass.
+- Remote production fetched and aligned with c97ca3d before this release. Exclude private `.codex/` and untracked backup audio. Earlier local/not-pushed notes record implementation checkpoints; push outcome is reported in the conversation.
+
+### Stage-aware fades — local, 2026-09-10
+
+- Arrival music entry uses 20% of the selected settling period, capped at three seconds (10s → 2s). Interval and Emergence narration music transitions have the same scoped cap; it is restored on success/failure. Narration still finishes before advancing. Emergence retains its minimum 30s settling period after narration; Interval remains preparation + max(selected duration, narration).
+- The existing post-mantra transition window now budgets the dry fade and shortened wet tail equally: default 4s → 2s chant fade + 2s tail, reaching silence before affirmation. No extra waiting time added; zero-duration test profiles stay zero. New mantra start restores the wet return. Final Stop/completion still uses the long eight-second mantra/music exit with full response tails.
+- Source-reviewed standard/chakra/audio maps updated. Stage tests cover minima, zero duration, scope cleanup on failure and wet-tail deadline; narration/audio regressions checked. No browser/device listening evidence. App 2.85 / shell 5.171, local, not pushed.
+
+### Longer audio exits — local, 2026-09-10
+
+- Source review found new mantra entry zeroed the shared bus, potentially cutting an outgoing chant. Entry now uses the new loop output (six seconds); repeated loop Stop cannot reset an existing exit. Mantra modulation retires gradually and disconnects with its gain instead of stopping abruptly.
+- Mantra and background-music exits now last eight seconds, plus seven-/five-second reverb responses. Voice Space uses a five-second response. Session Stop/completion fade active Piper over two seconds instead of immediate source cancellation, retaining its convolution route through the fade plus tail. Final words keep their short anti-click envelopes; no long fade is applied over natural spoken endings. Space Off stays dry. Browser speech remains outside Web Audio and cannot be smoothly gain-ramped; explicit Stop still cancels it immediately.
+- Session Stop no longer restores music while stopping mantra; ambience exits over eight seconds. Existing drone/cue envelopes remain. Tests cover loop entry, idempotent exit, shared-bus protection, routing and retirement. No device listening evidence; user must verify the reported cut. Longer convolution responses can add some active DSP cost; idle bypass remains.
+- Atlas audio/narration/controls descriptions synchronized. App 2.84 / shell 5.170, local and not pushed.
+
+### Thermal workload reduction — local, 2026-09-10
+
+- Only Lobby and Settings animate the night sky. All other app screens render a static sky; screen changes cancel sky scheduling/meteors, CSS animations/transitions stop, and Sacred Depth draws once without an audio analyser. Functional stage labels/countdowns and media playback remain intact.
+- Piper splits text into at most 180 Unicode code points (word boundaries where possible), prepares the first clip, and schedules only one future clip when the current clip has at most twelve seconds remaining. Pause-aware scheduling and cancellation checks remain. Speech gaps remain deliberate; subdivided long sentences also use the existing gap.
+- Decoded speech uses an in-memory LRU keyed by text, voice definition and synthesis settings, capped at 16 MiB and 48 entries. No persistent narration cache. Cancelled preparations do not populate it. A cache hit avoids inference/decoding/normalization.
+- Reverb routes disconnect on Off or idle lifecycle paths: voice after playback, music after Stop, mantra and ambience after Stop; blur also bypasses when unused. Native silent audio-clock deadlines retain exit fades/tails and freeze with AudioContext suspension. Restart cancels stale disconnection. This does not bypass every common tone filter or active spatial panner.
+- Source-reviewed controls/narration/audio/visuals maps updated. Automated thermal/cache, actual phonemizer and mock lifecycle/audio regression checks pass. No browser, listening, device CPU or thermal evidence; the reported premature exit remains unconfirmed. Existing fixture-dependent content-safety/drone-duration tests and stale Hindi delivery-version assertions remain excluded.
+- Router recommends Sol/high; no active-model switch claimed. App 2.83 / CSS 1.91 / Sacred Depth 1.2 / shell 5.169. Local, not pushed; user will test.
+
+### Scrolling narration removed — local, 2026-09-09
+
+- Removed scrolling text from arrival, breathing and journey screens, its Settings toggle, translations, animation scheduling and playback hooks. Spoken narration, pause/stop and session countdowns remain.
+- Replaced the obsolete ticker test with an audio-only contract. Narration, long-narration, No Frequency, journey completion and lobby-scroll checks pass. Atlas narration, controls and visuals maps updated. No browser/device listening evidence.
+- App 2.82 / CSS 1.90 / shell 5.168 / language cache v26. This removal is local and not pushed.
+
 ### Production release preparation — 2026-09-09
 
 - User authorized merge/push of accumulated workspace changes. Origin production fetched; HEAD and origin/production both at 988af6c before this release, so no divergent branch merge required.

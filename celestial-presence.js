@@ -64,6 +64,7 @@
             this.tick = this.tick.bind(this);
             this.preference.addEventListener('change', () => this.refresh());
             document.addEventListener('visibilitychange', () => this.refresh());
+            document.addEventListener('decorationchange', () => this.refresh());
             image.addEventListener('load', () => { this.uploaded = null; this.refresh(); });
             image.addEventListener('error', () => this.fallback());
             this.observer = new MutationObserver(() => {
@@ -156,7 +157,7 @@
             clearTimeout(this.timer); this.timer = null;
             cancelAnimationFrame(this.frame); this.frame = null; this.last = null;
             if (!this.active || this.lost) { this.fallback(); return; }
-            if (document.hidden || this.paused || this.preference.matches) this.releaseAnalyser();
+            if (document.hidden || this.paused || this.preference.matches || document.body.classList.contains('static-decorations')) this.releaseAnalyser();
             if (document.hidden) return;
             this.tick(performance.now());
         }
@@ -177,7 +178,8 @@
                 const ratio = Math.min(devicePixelRatio || 1,1.25,960/Math.max(rect.width,rect.height,1));
                 const width = Math.max(1,Math.round(rect.width*ratio)), height = Math.max(1,Math.round(rect.height*ratio));
                 if (this.canvas.width !== width || this.canvas.height !== height) { this.canvas.width=width; this.canvas.height=height; }
-                const moving = !this.preference.matches && !this.paused;
+                const moving = !this.preference.matches && !this.paused && !document.body.classList.contains('static-decorations');
+                if (!moving) this.releaseAnalyser();
                 if (moving) {
                     this.time += dt;
                     this.sampleAudio(dt);
