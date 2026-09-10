@@ -1,5 +1,14 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-SHOTS-001: Shots shares the Advanced features unlock
+
+- COMPLETE locally, app 2.88 / shell 5.174, based on 94914a8. Approved scope: hide Shots and its heading until the same seven rapid App version taps as Intimate Care; Advanced features OFF clears and hides both, reload locks again. Existing confirmation, No Frequency guard and mutual exclusion remain. Repertory URL waits for unlock, then normal confirmation; no autoplay. Direct locked runShot returns without audio.
+- Routing: standard recommendation Terra / medium; executionMode direct under the efficiency companion (no useful child split). No model switch or measured savings claimed. Target is this project; reusable policy is project-local Loop. Preflight Node 25.9.0 / Python 3.9.6 / Darwin arm64; 49 GiB available, hardware sysctl permission-limited; no new dependencies/services/browser required.
+- Spec/plan: extend the existing lock only, add hidden HTML defaults and direct-entry guards, preserve repertory intent, test and regenerate atlas. Spec-compliance then quality/risk review completed; this is a UI opt-in gate, not authentication. No added polling/audio processing.
+- Fresh evidence: 30 app test files pass (static/unit/mock), including advanced-unlock, frequency-repertory and no-frequency-mode. Hindi-language was accidentally included in the broad run and fails its pre-existing hardcoded app.js?v=2.62 assertion (line 219); not a new regression. Content-safety/drone-duration excluded for missing owner-managed docs/dot.json. Initial unlock mock needed the real false No Frequency default; corrected and rerun. No untriaged app errors. No browser/device/playback evidence.
+- Atlas: startup, modes, care, shots, repertory and persistence updated and generated (24 maps, 221 nodes, 253 edges); stale care four-click wording reconciled to executable seven taps. No graph topology/interface changes; browser-based verify-atlas not invoked under opt-in policy.
+- Local check: from /Users/lekshmisyam/Desktop/Ikigai/lite run `node tests/advanced-unlock.test.mjs` and `node docs/app-map/build-atlas.mjs`. Use the existing local preview to test Settings → About → App version seven taps, then return to Lobby. Existing serving setup unchanged. Next: user visual check; push requires authorization. Private .codex/ and backup audio preserved unstaged.
+
 ### NOW — CP-WF-001: project-local Loop efficiency workflow
 
 - User requested the efficiency recommendations be encoded into Loop. Added `Loop/EFFICIENT-WORKFLOW.md` and links from AGENTS, root policy, delivery, routing and local skill. One combined track records scope/review at `.loop/tracks/workflow-efficiency/spec-plan-review.md`.

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: Version 2.87 release snapshot, based on 58769f0 · 2026-09-10.
+Source snapshot: 94914a8 + uncommitted Shots shared-unlock changes (2.88) · 2026-09-10.
 
-Version 2.87 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.88 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -125,7 +125,7 @@ flowchart TD
 | Load language registry | Restore meditation language or Malayalam default; restore display language or English fallback. Load all four locale bundles. |
 | Load voice registry | Load Piper definitions; enumerate browser voices; restore preferences and attach UI handlers. |
 | Configured flag? | chakra_configured determines initial screen. |
-| Repertory query? | Attachment consumes shotSource / shotFrequency and prompts for a Shot before checkFirstTime runs. |
+| Repertory query? | Keep shotSource / shotFrequency pending while locked. Seven-tap unlock consumes the query and offers normal Shot confirmation; initial screen choice remains unchanged. |
 | Settings | Unconfigured visitor. Save sets chakra_configured and opens Lobby. |
 | Lobby | Configured visitor. Session-only modes start cleared. |
 | Register service worker | Registration is inside a window load listener added after awaited startup work. Registration timing deserves verification. |
@@ -139,7 +139,7 @@ flowchart TD
 
 Mutual exclusion, validation, and dispatch priority.
 
-Sources: [app.js:6791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6791), [app.js:6879](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6879), [app.js:7553](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7553).
+Sources: [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app.js:7160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7160), [app.js:4561](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4561).
 
 ```mermaid
 flowchart TD
@@ -173,8 +173,8 @@ flowchart TD
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
 | Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
-| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care selections and locks/hides the panel and switch. Reload locks again. Shots and mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
-| Enable Shots? | No Frequency blocks it. Otherwise a confirmation is required; cancel restores normal mode. |
+| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care and Shots selections and locks/hides both panels, the Sound Shot heading and the switch. Reload locks again. Shots shares this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
+| Enable Shots? | Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
@@ -471,11 +471,11 @@ flowchart TD
 
 All seven nonempty combinations follow this ordered composition.
 
-Sources: [app.js:6759](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6759), [app.js:4976](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4976), [app.js:5507](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5507).
+Sources: [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app.js:5615](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5615).
 
 ```mermaid
 flowchart TD
-  unlock["Four-click unlock"]
+  unlock["Shared seven-tap unlock"]
   start["Focused startup"]
   perineal["Optional perineal care"]
   gate1["Guide: proceed"]
@@ -501,7 +501,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Four-click unlock | Panel is locked and choices reset each page load. Select any nonempty subset of care options. |
+| Shared seven-tap unlock | Settings → About → App version: seven rapid taps reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options. |
 | Focused startup | No ordinary Arrival, gratitude, personal intention or Emergence wrapper. |
 | Optional perineal care | Narrate intro/instructions → timed stage → 60-second reminder if reached. |
 | Guide: proceed | Wait for explicit Continue. |
@@ -519,7 +519,7 @@ flowchart TD
 
 Six types, confirmation, frequency validation, and distinct finish behavior.
 
-Sources: [app.js:4416](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4416), [app.js:6879](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6879), [app.js:6939](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6939), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
+Sources: [app.js:4561](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4561), [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app.js:7117](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7117), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
 
 ```mermaid
 flowchart TD
@@ -547,7 +547,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Enable Shots | No Frequency → blocked; otherwise confirm. Cancel leaves Shots off. |
+| Enable Shots | Heading and controls start hidden/disabled. Shared seven-tap Advanced features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off. |
 | Choose type | Meditation, HRIM, Anesthetic, Mood & Relaxation, Sleep, or Custom. Labels here describe app modes. |
 | Meditation Shot | Root 396 → Sacral 417 → Solar 528 → Heart 639 → Throat 741 → Third Eye 852 → Crown 963 Hz. Ignores selected chakra subset. |
 | Sleep Shot | Script sequence: 10 → 6 → 5 → 2 → 6 Hz. |
@@ -999,7 +999,7 @@ flowchart TD
 | --- | --- |
 | Page / experience requests | HTML/CSS/JS, JSON, audio/video and Piper assets. |
 | localStorage | Languages, voices, durations, chakra choices, intention, custom script, mixer settings and stats; consultation stores answers separately. |
-| Session-only choices | Experience modes, intimate unlock and mood ambience enablement reset on page load. No full in-progress journey restore. |
+| Session-only choices | Experience modes, shared care/Shots unlock and mood ambience enablement reset on page load. No full in-progress journey restore. |
 | Service worker install | cache.addAll shell/content/audio assets; one rejected required asset rejects precache installation. skipWaiting requested. |
 | Activate cache generation | Claim clients; delete every cache except three exact current shell/Piper/language names. |
 | Optional ambience | Manifest and matching pleasure files use network no-store, despite manifest appearing in precache. |
@@ -1102,7 +1102,7 @@ flowchart TD
 
 Searchable reference → prepared custom Shot → explicit activation.
 
-Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:6939](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6939).
+Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:7117](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7117).
 
 ```mermaid
 flowchart TD
@@ -1110,7 +1110,7 @@ flowchart TD
   load["Load two JSON sources"]
   browse["Browse and search"]
   prepare["Prepare Shot link"]
-  consume["Consume query"]
+  consume["Unlock, then consume query"]
   confirm["Normal Shot confirmation"]
   ready["Prepared custom Shot"]
   begin["User presses Begin"]
@@ -1129,12 +1129,12 @@ flowchart TD
 | Load two JSON sources | scripts.json provides configured frequencies; frequency-repertory.json provides reference entries. Validate each Shot frequency. |
 | Browse and search | English/Malayalam toggle; search names, focus, frequency and metadata; clear query; show empty-results state. |
 | Prepare Shot link | Navigate to index.html with shotSource=repertory and shotFrequency query. |
-| Consume query | Remove parameters using history.replaceState before validation/confirmation. |
+| Unlock, then consume query | While locked, keep parameters pending. Seven rapid App version taps unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation. |
 | Normal Shot confirmation | Invalid frequency or No Frequency blocks preparation. Cancel leaves Shot off. |
 | Prepared custom Shot | Set custom type and frequency, reset duration, show Lobby and focus frequency field. |
 | User presses Begin | Only now run Shot; completion reload cannot replay consumed URL request. |
 
-- Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. checkFirstTime runs afterward, so an unconfigured visitor can still be routed to Settings.
+- Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. Initial checkFirstTime still routes new visitors to Settings. The pending handoff is offered only after the shared unlock, then acceptance shows the Lobby.
 
 ## Coverage and limitations
 

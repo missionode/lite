@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: Version 2.87 release snapshot, based on 58769f0 · 2026-09-10.
+Source snapshot: 94914a8 + uncommitted Shots shared-unlock changes (2.88) · 2026-09-10.
 
 This inventories static UI declarations in all three HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Shots shared unlock — implemented locally, CP-SHOTS-001
+
+Shots heading/controls now share the seven-rapid-tap App version unlock with Intimate Care. Relock clears both selections; reload starts locked. No Frequency and confirmation remain. Repertory URLs wait for unlock before preparation; direct locked Shot execution is rejected. Static/mock tests pass; user visual check pending. Corrected obsolete four-click wording in the care map.
+
 ## Sleep controls clipping — fixed locally, device check pending
 
 Sleep/Eyes Close dimming no longer filters ancestors of viewport-fixed controls. Brightness composes through opacity; warmth remains on artwork/sky only. This removes the identified containing-block cause of drifting/clipped controls. Source/mocked regression checks pass; actual Sleep layout still requires user verification.

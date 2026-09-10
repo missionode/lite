@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-10",
-    "commit": "Version 2.87 release snapshot, based on 58769f0",
-    "scope": "Version 2.87 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "94914a8 + uncommitted Shots shared-unlock changes (2.88)",
+    "scope": "Version 2.88 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -199,7 +199,7 @@
           [
             "repertory",
             "Repertory query?",
-            "Attachment consumes shotSource / shotFrequency and prompts for a Shot before checkFirstTime runs."
+            "Keep shotSource / shotFrequency pending while locked. Seven-tap unlock consumes the query and offers normal Shot confirmation; initial screen choice remains unchanged."
           ]
         ],
         [
@@ -288,7 +288,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, and dispatch priority.",
-      "source": "app.js:6791; app.js:6879; app.js:7553",
+      "source": "app.js:6872; app.js:7160; app.js:4561",
       "rows": [
         [
           [
@@ -306,12 +306,12 @@
           [
             "care",
             "Intimate Service",
-            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care selections and locks/hides the panel and switch. Reload locks again. Shots and mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes."
+            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care and Shots selections and locks/hides both panels, the Sound Shot heading and the switch. Reload locks again. Shots shares this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes."
           ],
           [
             "shots",
             "Enable Shots?",
-            "No Frequency blocks it. Otherwise a confirmation is required; cancel restores normal mode."
+            "Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode."
           ]
         ],
         [
@@ -1220,13 +1220,13 @@
       "group": "Journeys",
       "title": "Intimate Service and massage",
       "subtitle": "All seven nonempty combinations follow this ordered composition.",
-      "source": "app.js:6759; app.js:4976; app.js:5507",
+      "source": "app.js:6872; app.js:5615",
       "rows": [
         [
           [
             "unlock",
-            "Four-click unlock",
-            "Panel is locked and choices reset each page load. Select any nonempty subset of care options."
+            "Shared seven-tap unlock",
+            "Settings → About → App version: seven rapid taps reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options."
           ]
         ],
         [
@@ -1360,13 +1360,13 @@
       "group": "Journeys",
       "title": "Sound Shots",
       "subtitle": "Six types, confirmation, frequency validation, and distinct finish behavior.",
-      "source": "app.js:4416; app.js:6879; app.js:6939; index.html:257",
+      "source": "app.js:4561; app.js:6872; app.js:7117; index.html:257",
       "rows": [
         [
           [
             "enable",
             "Enable Shots",
-            "No Frequency → blocked; otherwise confirm. Cancel leaves Shots off."
+            "Heading and controls start hidden/disabled. Shared seven-tap Advanced features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off."
           ]
         ],
         [
@@ -2589,7 +2589,7 @@
           [
             "session",
             "Session-only choices",
-            "Experience modes, intimate unlock and mood ambience enablement reset on page load. No full in-progress journey restore."
+            "Experience modes, shared care/Shots unlock and mood ambience enablement reset on page load. No full in-progress journey restore."
           ]
         ],
         [
@@ -2922,7 +2922,7 @@
       "group": "Supporting pages",
       "title": "Frequency repertory handoff",
       "subtitle": "Searchable reference → prepared custom Shot → explicit activation.",
-      "source": "docs/repertory.html:153; app.js:6939",
+      "source": "docs/repertory.html:153; app.js:7117",
       "rows": [
         [
           [
@@ -2955,8 +2955,8 @@
         [
           [
             "consume",
-            "Consume query",
-            "Remove parameters using history.replaceState before validation/confirmation."
+            "Unlock, then consume query",
+            "While locked, keep parameters pending. Seven rapid App version taps unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation."
           ]
         ],
         [
@@ -3019,7 +3019,7 @@
         ]
       ],
       "notes": [
-        "Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. checkFirstTime runs afterward, so an unconfigured visitor can still be routed to Settings."
+        "Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. Initial checkFirstTime still routes new visitors to Settings. The pending handoff is offered only after the shared unlock, then acceptance shows the Lobby."
       ]
     }
   ]

@@ -4559,6 +4559,7 @@ class MeditationController {
     }
 
     async runShot(type, customFrequency) {
+        if (!state.advancedFeaturesUnlocked) return;
         if (this.isStarting || this.isMeditationActive || this.isShotActive) return;
         if (state.noFrequencyMode) {
             alert(t('ui.noFrequencyShotsUnavailable'));
@@ -6871,6 +6872,12 @@ function attachEventListeners() {
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
         state.advancedFeaturesUnlocked = !isLocked;
+        document.getElementById('shots-control').hidden = isLocked;
+        document.getElementById('sound-healing-title').hidden = isLocked;
+        if (shotsToggle) {
+            if (isLocked) shotsToggle.checked = false;
+            shotsToggle.disabled = isLocked || state.noFrequencyMode;
+        }
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
             experimentCareOptions.hidden = isLocked;
@@ -6912,6 +6919,7 @@ function attachEventListeners() {
             resetUnlockTaps();
             setIntimateServiceLocked(false);
             showUnlockToast(t('ui.advancedFeaturesEnabled'));
+            prepareRepertoryShotFromUrl();
             return;
         }
         if (intimateServiceTapCount >= 5) showUnlockToast(t('ui.advancedUnlockRemaining').replace('{{remaining}}', String(remaining)));
@@ -7069,6 +7077,12 @@ function attachEventListeners() {
 
     if (shotsToggle) {
         shotsToggle.addEventListener('change', (event) => {
+            if (!state.advancedFeaturesUnlocked) {
+                event.target.checked = false;
+                updateExperienceModeVisibility();
+                updateSessionEstimate();
+                return;
+            }
             if (event.target.checked) {
                 if (state.noFrequencyMode) {
                     event.target.checked = false;
@@ -7101,6 +7115,8 @@ function attachEventListeners() {
     });
 
     function prepareRepertoryShotFromUrl() {
+        // Keep the handoff pending until the shared, session-only unlock.
+        if (!state.advancedFeaturesUnlocked) return;
         const url = new URL(window.location.href);
         const source = url.searchParams.get('shotSource');
         const frequency = Number(url.searchParams.get('shotFrequency'));
@@ -7156,8 +7172,8 @@ function attachEventListeners() {
         const timeInput = document.getElementById('time-per-chakra');
         const meditationRoomTitle = document.getElementById('lobby-title');
         if (shotsToggle) {
-            if (noFrequencyMode) shotsToggle.checked = false;
-            shotsToggle.disabled = noFrequencyMode;
+            if (noFrequencyMode || !state.advancedFeaturesUnlocked) shotsToggle.checked = false;
+            shotsToggle.disabled = noFrequencyMode || !state.advancedFeaturesUnlocked;
             shotsToggle.title = noFrequencyMode ? t('ui.noFrequencyShotsUnavailable') : '';
         }
         const shots = getChecked('shots-toggle');
