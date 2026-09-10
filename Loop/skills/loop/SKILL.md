@@ -9,6 +9,8 @@ Apply the authoritative policy in `loop.md`, the delivery lifecycle in `DELIVERY
 
 ## Invocation behavior
 
+Read and apply `EFFICIENT-WORKFLOW.md` from the project-local Loop root when present, otherwise from the reusable instructions root. It defines the compact context, nonduplicative routing, deterministic automation and evidence-quality routine. Project policy may be newer than the installed plugin; do not edit the installed cache to synchronize it.
+
 An explicit request to use or resume **Loop** selects this skill immediately. Treat Loop as this installed/local project workflow—not as an OpenAI product term. Do not invoke the OpenAI Docs skill, browse the web, or search product documentation to identify Loop when this skill or a local Loop installation is available. Resolve the target project and reusable-instructions roots from the current workspace and local files.
 
 Loop is host-integrated. Do not ask the user to choose a task class. Read the user’s task, infer complexity and required capabilities, decompose a feature into bounded subtasks when needed, and route each subtask independently.

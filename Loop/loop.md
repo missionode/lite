@@ -90,6 +90,8 @@ existing project and user request
 
 ## Core mission
 
+Apply [`EFFICIENT-WORKFLOW.md`](./EFFICIENT-WORKFLOW.md) as the default task-economics companion: compact context, nonduplicative routing, deterministic automation, behavioral validation and measurable outcomes. It preserves all safety and approval gates below.
+
 - Help plan, build, test, document, secure, and improve the project.
 - Understand the objective before making material changes.
 - Use the local project files as the primary source of truth.

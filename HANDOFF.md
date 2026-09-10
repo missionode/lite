@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-WF-001: project-local Loop efficiency workflow
+
+- User requested the efficiency recommendations be encoded into Loop. Added `Loop/EFFICIENT-WORKFLOW.md` and links from AGENTS, root policy, delivery, routing and local skill. One combined track records scope/review at `.loop/tracks/workflow-efficiency/spec-plan-review.md`.
+- Rules cover compact task context, honest planned/dispatched routing, no duplicated agent work, reusable deterministic checks, behavior tests, measured diagnostics and bounded refactors. Suggestions do not themselves install scripts, launch models, archive history or change application behavior.
+- Validation: static efficiency contract and existing model-router unit tests; host behavior/savings NOT_RUN. App atlas remains accurate; no app-flow change. Global settings and installed plugin cache untouched. Prior app baseline is production 361938c / version 2.87.
+- Next action: follow the companion on the next task. Reusable plugin installation, release-helper implementation and handoff archival remain separate scoped work; no production push authorized here.
+
 ### Version 2.87 release preparation — 2026-09-10
 
 - User authorized production push of cursor/control hiding and Sleep/Eyes Close positioning fixes. Thirty applicable automated tests passed in the implementation pass; targeted controls/video/visual checks and syntax/diff checks repeated before release. No device geometry verification claimed.

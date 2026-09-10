@@ -16,6 +16,8 @@ Human-in-the-loop selection is the required final fallback when automatic switch
 
 ## Routing objectives
 
+Apply [`EFFICIENT-WORKFLOW.md`](./EFFICIENT-WORKFLOW.md) for dispatch economics and reporting. `PLANNED` is not execution. When the current model is capable and child overhead adds no value, direct execution is valid; classify once and do not rerun the advisory adapter for every small tool call. Preserve human fallback when a necessary capability is unavailable. Prefer a bounded new child over copying unrelated history; use fork when history is actually required. This companion does not change adapter result schemas or override explicit model choices.
+
 Choose the least expensive and lowest-latency model that can reliably satisfy the task. Escalate when reasoning, context, tools, safety, or validation requirements exceed the selected model’s capability.
 
 Do not hard-code a model name as a permanent default. Model names, availability, context windows, capabilities, pricing, and deprecation status can change. Use stable capability classes and refresh the model registry from the available official catalog or provider integration.

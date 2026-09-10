@@ -1,5 +1,9 @@
 # Project working agreement
 
+## Follow the efficient Loop workflow
+
+For meaningful project work, follow `Loop/EFFICIENT-WORKFLOW.md`: bounded context, honest routing evidence, deterministic repeatable checks, behavior-focused tests and concise continuity. Keep required atlas updates and approval gates. This project-local companion applies even when the installed Loop plugin is older. Recommendations/`PLANNED` routing results do not switch the active model; use direct execution when a separate run adds no value.
+
 ## Keep the flow atlas synchronized
 
 The owner has designated `docs/app-map/index.html` as the project's shared visual reference. Every feature addition, removal, or behavior-changing fix must update the affected flow maps in the same change. This applies to user navigation, journey stages, options, audio/narration, persistence, supporting pages, and failure or cancellation paths.

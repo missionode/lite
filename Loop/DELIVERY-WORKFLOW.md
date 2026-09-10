@@ -4,6 +4,8 @@ This document defines the durable specification, implementation, review, debuggi
 
 ## Durable work tracks
 
+Use [`EFFICIENT-WORKFLOW.md`](./EFFICIENT-WORKFLOW.md) throughout this lifecycle. A policy-only change can use one combined spec/plan/review record; do not create redundant artifacts. Automation mentioned in a plan is not delivered until implemented and tested.
+
 Every feature, bug, migration, or meaningful review may use a track. Tiny one-step changes may remain a handoff checkpoint when a separate track would add no value.
 
 ```text
