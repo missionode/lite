@@ -194,6 +194,12 @@ body {
 .newcomer-tutorial-content { width: min(100%, 48rem); text-align: center; }
 .newcomer-kicker { color: rgba(251, 191, 36, 0.82); font-size: 0.7rem; letter-spacing: 0.2em; margin: 0 0 0.65rem; }
 .newcomer-tutorial-content > .subtitle { max-width: 40rem; margin: 0 auto 1rem; }
+.newcomer-body-map { display: grid; justify-items: center; margin: 0.4rem auto 0.8rem; color: rgba(255,255,255,0.72); font-size: 0.76rem; }
+.newcomer-body-map svg { width: 92px; height: 155px; filter: drop-shadow(0 0 12px rgba(125, 88, 210, 0.28)); }
+.newcomer-silhouette { fill: rgba(225, 221, 255, 0.15); stroke: rgba(235, 228, 255, 0.52); stroke-width: 2; }
+.newcomer-centre-dots circle:nth-child(1) { fill: #a855f7; }.newcomer-centre-dots circle:nth-child(2) { fill: #6366f1; }.newcomer-centre-dots circle:nth-child(3) { fill: #38bdf8; }.newcomer-centre-dots circle:nth-child(4) { fill: #22c55e; }.newcomer-centre-dots circle:nth-child(5) { fill: #facc15; }.newcomer-centre-dots circle:nth-child(6) { fill: #f97316; }.newcomer-centre-dots circle:nth-child(7) { fill: #ef4444; }
+.newcomer-body-map p { max-width: 22rem; margin: 0.35rem 0 0; }
+.newcomer-guided-status { margin: 0.85rem 0 0; color: rgba(251, 191, 36, 0.9); font-size: 0.82rem; }
 .newcomer-reassurance, .newcomer-section { border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(12, 10, 28, 0.56); border-radius: 16px; padding: 1rem; margin-top: 0.9rem; line-height: 1.55; }
 .newcomer-reassurance { color: rgba(255,255,255,0.86); }
 .newcomer-section h2 { font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(251,191,36,0.9); margin: 0 0 0.55rem; }

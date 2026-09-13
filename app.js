@@ -4754,13 +4754,23 @@ class MeditationController {
                 leaveButton?.removeEventListener('click', leave);
                 resolve(continueJourney);
             };
-            const begin = () => finish(true);
-            const skip = () => finish(true);
+            const begin = () => finish('guided');
+            const skip = () => finish('skip');
             const leave = () => finish(false);
             beginButton?.addEventListener('click', begin, { once: true });
             skipButton?.addEventListener('click', skip, { once: true });
             leaveButton?.addEventListener('click', leave, { once: true });
         });
+    }
+
+    async runNewcomerGuidedOrientation() {
+        const status = document.getElementById('newcomer-guided-status');
+        if (status) {
+            status.hidden = false;
+            status.textContent = contentT('ui.newcomerGuidedStatus');
+        }
+        await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
+        if (status) status.hidden = true;
     }
 
     async start() {
@@ -4774,7 +4784,10 @@ class MeditationController {
                 startBtn.style.opacity = "0.5";
             }
 
-            if (this.shouldShowNewcomerTutorial() && !await this.showNewcomerTutorial()) {
+            const newcomerChoice = this.shouldShowNewcomerTutorial()
+                ? await this.showNewcomerTutorial()
+                : 'skip';
+            if (!newcomerChoice) {
                 showScreen(lobbyScreen);
                 return;
             }
@@ -4860,6 +4873,13 @@ class MeditationController {
             setText('pause-meditation', 'II');
             const controls = document.getElementById('controls');
             if (controls) controls.classList.remove('hidden');
+
+            if (newcomerChoice === 'guided') {
+                if (piperWarmup) await piperWarmup;
+                if (!this.isMeditationActive) return;
+                await this.runNewcomerGuidedOrientation();
+                if (!this.isMeditationActive) return;
+            }
 
             // Focused practices are complete, standalone experiences. They
             // deliberately bypass the arrival, gratitude, chakra, and closing

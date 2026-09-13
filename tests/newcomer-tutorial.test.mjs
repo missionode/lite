@@ -9,13 +9,16 @@ const requiredKeys = [
   'newcomerCentresTitle', 'newcomerCentresNote', 'newcomerRoot', 'newcomerSacral',
   'newcomerSolar', 'newcomerHeart', 'newcomerThroat', 'newcomerThirdEye',
   'newcomerCrown', 'newcomerControlsTitle', 'newcomerControls', 'newcomerBegin',
-  'newcomerSkip', 'newcomerNotNow'
+  'newcomerSkip', 'newcomerNotNow', 'newcomerBodyMap', 'newcomerGuidedStatus',
+  'newcomerGuidedNarration'
 ];
 
 assert.match(html, /id="newcomer-tutorial-screen"/);
 assert.match(html, /id="begin-newcomer-tutorial"/);
 assert.match(html, /id="skip-newcomer-tutorial"/);
 assert.match(html, /id="leave-newcomer-tutorial"/);
+assert.match(html, /class="newcomer-body-map"/);
+assert.match(html, /id="newcomer-guided-status"/);
 assert.match(html, /traditional map for reflection\. These are prompts for attention, not medical facts/i);
 
 for (const path of localePaths) {
@@ -31,11 +34,13 @@ for (const id of ['high-energy-toggle', 'music-only-toggle', 'sleep-mode-toggle'
 assert.match(eligibility, /!this\.getFocusedExperience\(\)/);
 
 const start = app.slice(app.indexOf('    async start()'), app.indexOf('    async runGratitude()'));
-assert.match(start, /shouldShowNewcomerTutorial\(\) && !await this\.showNewcomerTutorial\(\)/);
+assert.match(start, /const newcomerChoice = this\.shouldShowNewcomerTutorial\(\)\s*\? await this\.showNewcomerTutorial\(\)/);
 assert.match(start, /showScreen\(lobbyScreen\);\s*return;/);
 assert.ok(
   start.indexOf('showNewcomerTutorial') < start.indexOf('this.showDndReminderIfNeeded()'),
   'newcomer choice must happen before DND reminder, audio setup and Arriving'
 );
+assert.match(app, /async runNewcomerGuidedOrientation\(\)[\s\S]*?contentT\('ui\.newcomerGuidedNarration'\)[\s\S]*?'soft'/);
+assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);
 
 console.log('newcomer tutorial contracts passed');

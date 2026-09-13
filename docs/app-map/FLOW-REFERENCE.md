@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: c921d57 + uncommitted newcomer tutorial changes (2.91) · 2026-09-13.
+Source snapshot: 8d59247 + uncommitted guided newcomer orientation changes (2.92) · 2026-09-13.
 
-Version 2.91 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.92 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -220,7 +220,7 @@ flowchart TD
   emerge["Emergence"]
   finish["Completion"]
   begin -->|"Returning off · normal standard"| newcomer
-  newcomer -->|"Start / Skip"| setup
+  newcomer -->|"Guided Start / Skip"| setup
   newcomer -->|"Not now"| lobby
   begin -->|"Returning on / demo / Sleep / Music Only / focused"| setup
   setup -->|"Ready"| arrive
@@ -245,7 +245,7 @@ flowchart TD
 | --- | --- |
 | Press Begin | Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving. |
 | Meditation Room | Safe no-session exit when a newcomer chooses Not now. |
-| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. It explains the seven centres as a traditional reflection map, reminds the user they stay in control, and adds no audio or animation. Start or Skip continues; Not now returns to Lobby without starting a session. |
+| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. A static body map identifies the seven locations. Start plays one concise guided narration before Arriving; Skip continues silently; Not now returns to Lobby without starting a session. No new animation loop is added. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
 | Preparation | Initial settle → pre-practice guidance. |

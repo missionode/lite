@@ -206,7 +206,7 @@
             <div class="config-group settings-about">
                 <h2 data-i18n="ui.aboutApp">About</h2>
                 <button id="app-version-unlock" type="button" class="secondary-btn">
-                    <span data-i18n="ui.appVersion">App version</span> <span>2.91</span>
+                    <span data-i18n="ui.appVersion">App version</span> <span>2.92</span>
                 </button>
                 <label id="advanced-features-control" class="checkbox-label" hidden>
                     <input id="advanced-features-toggle" type="checkbox">
@@ -450,6 +450,13 @@
                 <p class="newcomer-kicker" data-i18n="ui.newcomerKicker">YOUR FIRST CHAKRA JOURNEY</p>
                 <h1 id="newcomer-tutorial-title" data-i18n="ui.newcomerTitle">A gentle introduction</h1>
                 <p class="subtitle" data-i18n="ui.newcomerLead">You do not need prior knowledge or a special feeling. This is a calm practice of noticing your body, breath and attention.</p>
+                <div class="newcomer-body-map" role="img" aria-label="A simple body map showing seven chakra locations from the base of the spine to the top of the head">
+                    <svg viewBox="0 0 180 310" aria-hidden="true">
+                        <path class="newcomer-silhouette" d="M90 18c-18 0-28 14-28 30 0 12 6 21 13 25l-4 35-23 27 10 12 19-17 3 54-20 69 14 5 16-51 16 51 14-5-20-69 3-54 19 17 10-12-23-27-4-35c7-4 13-13 13-25 0-16-10-30-28-30Z"/>
+                        <g class="newcomer-centre-dots"><circle cx="90" cy="22" r="7"/><circle cx="90" cy="65" r="7"/><circle cx="90" cy="105" r="7"/><circle cx="90" cy="140" r="7"/><circle cx="90" cy="170" r="7"/><circle cx="90" cy="198" r="7"/><circle cx="90" cy="224" r="7"/></g>
+                    </svg>
+                    <p data-i18n="ui.newcomerBodyMap">A simple attention map: from the base of the spine to the crown of the head.</p>
+                </div>
                 <div class="newcomer-reassurance" data-i18n="ui.newcomerReassurance">There is no right way to experience this. Keep what feels useful, and let the rest pass by.</div>
                 <section class="newcomer-section" aria-labelledby="newcomer-centres-title">
                     <h2 id="newcomer-centres-title" data-i18n="ui.newcomerCentresTitle">The seven centres, in simple words</h2>
@@ -473,6 +480,7 @@
                     <button id="skip-newcomer-tutorial" class="secondary-btn" type="button" data-i18n="ui.newcomerSkip">Skip introduction</button>
                     <button id="leave-newcomer-tutorial" class="link-btn" type="button" data-i18n="ui.newcomerNotNow">Not now</button>
                 </div>
+                <p id="newcomer-guided-status" class="newcomer-guided-status" aria-live="polite" hidden></p>
             </div>
         </section>
 
@@ -715,6 +723,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=2.91"></script>
+    <script src="app.js?v=2.92"></script>
 </body>
 </html>

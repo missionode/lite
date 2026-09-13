@@ -1,9 +1,9 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-NEWCOMER-001: first-time chakra orientation
+### NOW — CP-NEWCOMER-001: guided first-time chakra orientation
 
-- IMPLEMENTED locally, app 2.91 / shell 5.177, based on c921d57. For a normal standard journey with Returning Journey unchecked, Begin opens a silent, static, novice-friendly orientation before DND, content loading, audio, timers, wake lock or Arriving. It describes chakras as a traditional reflection map rather than medical facts, explains user controls, and avoids requiring any belief or sensation. Start and Skip proceed to the unchanged journey; Not now returns to the Lobby without starting a session.
-- Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh evidence: 32 applicable app checks, the targeted newcomer browser flow and atlas build/verification pass. User device readability and actual journey playback remain open. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
+- EXTENDED locally, app 2.92 / shell 5.178, based on 8d59247. For a normal standard journey with Returning Journey unchecked, Begin opens a novice-friendly orientation before DND, content loading, audio, timers, wake lock or Arriving. A static body-map shows the seven locations. Start plays one concise localized orientation narration, then enters existing Arriving; Skip proceeds without narration; Not now returns to the Lobby without starting a session. The narration presents chakras as a traditional reflection map rather than medical facts and avoids promised outcomes.
+- Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh source/locale contracts and atlas build pass; browser, full app regression and device readability/listening validation are pending this extension. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
 
 ### NOW — CP-SLEEP-UNLOCK-001: Sleep Mode joins Advanced Features
 
