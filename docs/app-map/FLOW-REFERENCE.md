@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 557a02a + uncommitted direct newcomer body-map changes (2.94) · 2026-09-13.
+Source snapshot: 3b2c534 + uncommitted display-language orientation changes (2.95) · 2026-09-13.
 
-Version 2.94 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.95 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -241,7 +241,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Press Begin | Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving. |
-| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized on screen. One expanded guided narration explains the traditional attention map before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added. |
+| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language and positioned beside its corresponding marker. The expanded orientation text follows the same language before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
 | Preparation | Initial settle → pre-practice guidance. |

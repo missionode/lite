@@ -194,10 +194,15 @@ body {
 .newcomer-tutorial-content { width: min(100%, 48rem); text-align: center; }
 .newcomer-kicker { color: rgba(251, 191, 36, 0.82); font-size: 0.7rem; letter-spacing: 0.2em; margin: 0 0 0.65rem; }
 .newcomer-tutorial-content > .subtitle { max-width: 40rem; margin: 0 auto 1rem; }
-.newcomer-body-map { display: grid; justify-items: center; margin: 0.4rem auto 0.8rem; color: rgba(255,255,255,0.72); font-size: 0.76rem; }
-.newcomer-body-map img { width: min(52vw, 260px); max-height: 58dvh; object-fit: contain; filter: drop-shadow(0 0 14px rgba(125, 88, 210, 0.28)); }
-.newcomer-guided-labels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem 0.75rem; width: min(100%, 31rem); margin: -1.2rem 0 0; padding: 0; list-style: none; color: rgba(255,255,255,0.84); font-size: 0.7rem; }
-.newcomer-guided-labels li { display: grid; line-height: 1.2; }
+.newcomer-body-map { display: grid; justify-items: center; margin: 0 auto; color: rgba(255,255,255,0.72); font-size: 0.76rem; }
+.newcomer-body-map-stage { position: relative; width: clamp(245px, 62vw, 390px); max-width: 100%; }
+.newcomer-body-map img { display: block; width: 100%; max-height: 68dvh; object-fit: contain; filter: drop-shadow(0 0 14px rgba(125, 88, 210, 0.28)); }
+.newcomer-guided-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; color: rgba(255,255,255,0.9); font-size: clamp(0.58rem, 1.8vw, 0.74rem); pointer-events: none; }
+.newcomer-guided-labels li { position: absolute; display: grid; width: 34%; line-height: 1.15; text-align: left; text-shadow: 0 1px 5px #06030e; }
+.newcomer-guided-labels li::after { content: ''; position: absolute; top: 50%; width: 17%; border-top: 1px solid rgba(230, 222, 255, 0.55); }
+.newcomer-guided-labels li:nth-child(odd) { right: -22%; text-align: left; }.newcomer-guided-labels li:nth-child(odd)::after { right: 100%; }
+.newcomer-guided-labels li:nth-child(even) { left: -22%; text-align: right; }.newcomer-guided-labels li:nth-child(even)::after { left: 100%; }
+.newcomer-label-crown { top: 7%; }.newcomer-label-third-eye { top: 17%; }.newcomer-label-throat { top: 28%; }.newcomer-label-heart { top: 39%; }.newcomer-label-solar { top: 49%; }.newcomer-label-sacral { top: 60%; }.newcomer-label-root { top: 70%; }
 .newcomer-guided-labels strong { color: rgba(255,255,255,0.94); font-weight: 600; }
 .newcomer-guided-labels span { color: rgba(255,255,255,0.6); font-size: 0.63rem; }
 .newcomer-body-map p { max-width: 22rem; margin: 0.35rem 0 0; }
@@ -215,6 +220,10 @@ body {
 @media (max-width: 600px) {
     .newcomer-centres { grid-template-columns: 1fr; }
     .newcomer-actions { flex-direction: column; }
+    .newcomer-body-map-stage { width: min(70vw, 330px); }
+    .newcomer-guided-labels li { width: 38%; font-size: clamp(0.54rem, 2.4vw, 0.68rem); }
+    .newcomer-guided-labels li:nth-child(odd) { right: -20%; }
+    .newcomer-guided-labels li:nth-child(even) { left: -20%; }
 }
 
 /* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */

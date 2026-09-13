@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "557a02a + uncommitted direct newcomer body-map changes (2.94)",
-    "scope": "Version 2.94 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "3b2c534 + uncommitted display-language orientation changes (2.95)",
+    "scope": "Version 2.95 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -477,7 +477,7 @@
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized on screen. One expanded guided narration explains the traditional attention map before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added."
+            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language and positioned beside its corresponding marker. The expanded orientation text follows the same language before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added."
           ]
         ],
         [

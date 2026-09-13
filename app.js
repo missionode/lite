@@ -4748,9 +4748,9 @@ class MeditationController {
         newcomerTutorialScreen?.classList.add('is-guided');
         if (status) {
             status.hidden = false;
-            status.textContent = contentT('ui.newcomerGuidedStatus');
+            status.textContent = t('ui.newcomerGuidedStatus');
         }
-        await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
+        await this.narrate(t('ui.newcomerGuidedNarration'), false, true, 'soft');
         if (status) status.hidden = true;
         newcomerTutorialScreen?.classList.remove('is-guided');
         showScreen(icebreakerScreen);
