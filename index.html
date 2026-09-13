@@ -206,7 +206,7 @@
             <div class="config-group settings-about">
                 <h2 data-i18n="ui.aboutApp">About</h2>
                 <button id="app-version-unlock" type="button" class="secondary-btn">
-                    <span data-i18n="ui.appVersion">App version</span> <span>2.93</span>
+                    <span data-i18n="ui.appVersion">App version</span> <span>2.94</span>
                 </button>
                 <label id="advanced-features-control" class="checkbox-label" hidden>
                     <input id="advanced-features-toggle" type="checkbox">
@@ -447,38 +447,12 @@
 
         <section id="newcomer-tutorial-screen" class="screen newcomer-tutorial-screen hidden" aria-labelledby="newcomer-tutorial-title">
             <div class="newcomer-tutorial-content">
-                <p class="newcomer-kicker" data-i18n="ui.newcomerKicker">YOUR FIRST CHAKRA JOURNEY</p>
-                <h1 id="newcomer-tutorial-title" data-i18n="ui.newcomerTitle">A gentle introduction</h1>
-                <p class="subtitle" data-i18n="ui.newcomerLead">You do not need prior knowledge or a special feeling. This is a calm practice of noticing your body, breath and attention.</p>
-                <div id="newcomer-body-map" class="newcomer-body-map" hidden>
+                <h1 id="newcomer-tutorial-title" class="sr-only">Chakra orientation</h1>
+                <div id="newcomer-body-map" class="newcomer-body-map">
                     <img src="symbols/newcomer-chakra-body-map.png" alt="Standing figure with seven illuminated chakra locations from the base of the spine to the crown of the head">
                     <ol id="newcomer-guided-labels" class="newcomer-guided-labels" aria-label="The seven chakra locations">
-                        <li data-i18n="ui.crown">Crown</li><li data-i18n="ui.thirdEye">Third Eye</li><li data-i18n="ui.throat">Throat</li><li data-i18n="ui.heart">Heart</li><li data-i18n="ui.solar">Solar</li><li data-i18n="ui.sacral">Sacral</li><li data-i18n="ui.root">Root</li>
+                        <li><strong data-i18n="ui.crown">Crown</strong><span data-i18n="ui.newcomerCrownLocation">top of head</span></li><li><strong data-i18n="ui.thirdEye">Third Eye</strong><span data-i18n="ui.newcomerThirdEyeLocation">centre of forehead</span></li><li><strong data-i18n="ui.throat">Throat</strong><span data-i18n="ui.newcomerThroatLocation">throat area</span></li><li><strong data-i18n="ui.heart">Heart</strong><span data-i18n="ui.newcomerHeartLocation">centre of chest</span></li><li><strong data-i18n="ui.solar">Solar</strong><span data-i18n="ui.newcomerSolarLocation">upper abdomen</span></li><li><strong data-i18n="ui.sacral">Sacral</strong><span data-i18n="ui.newcomerSacralLocation">lower abdomen</span></li><li><strong data-i18n="ui.root">Root</strong><span data-i18n="ui.newcomerRootLocation">base of spine</span></li>
                     </ol>
-                    <p data-i18n="ui.newcomerBodyMap">A simple attention map: from the base of the spine to the crown of the head.</p>
-                </div>
-                <div class="newcomer-reassurance" data-i18n="ui.newcomerReassurance">There is no right way to experience this. Keep what feels useful, and let the rest pass by.</div>
-                <section class="newcomer-section" aria-labelledby="newcomer-centres-title">
-                    <h2 id="newcomer-centres-title" data-i18n="ui.newcomerCentresTitle">The seven centres, in simple words</h2>
-                    <p data-i18n="ui.newcomerCentresNote">“Chakra” is a traditional map for reflection. These are prompts for attention, not medical facts or something you must feel.</p>
-                    <ol class="newcomer-centres">
-                        <li><strong data-i18n="ui.root">Root</strong><span data-i18n="ui.newcomerRoot">body, steadiness and feeling supported</span></li>
-                        <li><strong data-i18n="ui.sacral">Sacral</strong><span data-i18n="ui.newcomerSacral">feelings, ease and creativity</span></li>
-                        <li><strong data-i18n="ui.solar">Solar</strong><span data-i18n="ui.newcomerSolar">confidence, choice and inner strength</span></li>
-                        <li><strong data-i18n="ui.heart">Heart</strong><span data-i18n="ui.newcomerHeart">care, connection and kindness</span></li>
-                        <li><strong data-i18n="ui.throat">Throat</strong><span data-i18n="ui.newcomerThroat">expression and honest communication</span></li>
-                        <li><strong data-i18n="ui.thirdEye">Third Eye</strong><span data-i18n="ui.newcomerThirdEye">attention, reflection and perspective</span></li>
-                        <li><strong data-i18n="ui.crown">Crown</strong><span data-i18n="ui.newcomerCrown">meaning, openness and the wider picture</span></li>
-                    </ol>
-                </section>
-                <section class="newcomer-section newcomer-controls-note">
-                    <h2 data-i18n="ui.newcomerControlsTitle">You stay in control</h2>
-                    <p data-i18n="ui.newcomerControls">The guide will speak, music may play, and there can be quiet pauses. You can pause, adjust Journey Tuning, or stop at any time. Sit or lie down comfortably and breathe naturally.</p>
-                </section>
-                <div class="newcomer-actions">
-                    <button id="begin-newcomer-tutorial" class="primary-btn" type="button" data-i18n="ui.newcomerBegin">Start gentle introduction</button>
-                    <button id="skip-newcomer-tutorial" class="secondary-btn" type="button" data-i18n="ui.newcomerSkip">Skip introduction</button>
-                    <button id="leave-newcomer-tutorial" class="link-btn" type="button" data-i18n="ui.newcomerNotNow">Not now</button>
                 </div>
                 <p id="newcomer-guided-status" class="newcomer-guided-status" aria-live="polite" hidden></p>
             </div>
@@ -723,6 +697,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=2.93"></script>
+    <script src="app.js?v=2.94"></script>
 </body>
 </html>

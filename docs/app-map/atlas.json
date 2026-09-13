@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "f05062a + uncommitted newcomer body-map changes (2.93)",
-    "scope": "Version 2.93 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "557a02a + uncommitted direct newcomer body-map changes (2.94)",
+    "scope": "Version 2.94 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -471,18 +471,13 @@
             "begin",
             "Press Begin",
             "Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving."
-          ],
-          [
-            "lobby",
-            "Meditation Room",
-            "Safe no-session exit when a newcomer chooses Not now."
           ]
         ],
         [
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. Start replaces the setup copy with a static standing seven-location body-map illustration plus localised chakra labels, then plays one concise guided narration before Arriving. Skip continues silently; Not now returns to Lobby without starting a session. No new animation loop is added."
+            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized on screen. One expanded guided narration explains the traditional attention map before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added."
           ]
         ],
         [
@@ -575,12 +570,7 @@
         [
           "newcomer",
           "setup",
-          "Guided Start / Skip"
-        ],
-        [
-          "newcomer",
-          "lobby",
-          "Not now"
+          "Narration complete"
         ],
         [
           "begin",
@@ -629,10 +619,6 @@
         ],
         [
           "return",
-          "gratitude",
-          "Opening pause"
-        ],
-        [
           "gratitude",
           "ready",
           "Non-demo"

@@ -4742,41 +4742,18 @@ class MeditationController {
             !this.getFocusedExperience();
     }
 
-    async showNewcomerTutorial() {
-        showScreen(newcomerTutorialScreen);
-        return new Promise(resolve => {
-            const beginButton = document.getElementById('begin-newcomer-tutorial');
-            const skipButton = document.getElementById('skip-newcomer-tutorial');
-            const leaveButton = document.getElementById('leave-newcomer-tutorial');
-            const finish = (continueJourney) => {
-                beginButton?.removeEventListener('click', begin);
-                skipButton?.removeEventListener('click', skip);
-                leaveButton?.removeEventListener('click', leave);
-                resolve(continueJourney);
-            };
-            const begin = () => finish('guided');
-            const skip = () => finish('skip');
-            const leave = () => finish(false);
-            beginButton?.addEventListener('click', begin, { once: true });
-            skipButton?.addEventListener('click', skip, { once: true });
-            leaveButton?.addEventListener('click', leave, { once: true });
-        });
-    }
-
     async runNewcomerGuidedOrientation() {
-        const bodyMap = document.getElementById('newcomer-body-map');
         const status = document.getElementById('newcomer-guided-status');
         showScreen(newcomerTutorialScreen);
         newcomerTutorialScreen?.classList.add('is-guided');
-        if (bodyMap) bodyMap.hidden = false;
         if (status) {
             status.hidden = false;
             status.textContent = contentT('ui.newcomerGuidedStatus');
         }
         await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
         if (status) status.hidden = true;
-        if (bodyMap) bodyMap.hidden = true;
         newcomerTutorialScreen?.classList.remove('is-guided');
+        showScreen(icebreakerScreen);
     }
 
     async start() {
@@ -4790,13 +4767,7 @@ class MeditationController {
                 startBtn.style.opacity = "0.5";
             }
 
-            const newcomerChoice = this.shouldShowNewcomerTutorial()
-                ? await this.showNewcomerTutorial()
-                : 'skip';
-            if (!newcomerChoice) {
-                showScreen(lobbyScreen);
-                return;
-            }
+            const newcomerChoice = this.shouldShowNewcomerTutorial() ? 'guided' : 'skip';
 
             this.showDndReminderIfNeeded();
 

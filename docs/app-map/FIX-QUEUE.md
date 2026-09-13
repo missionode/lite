@@ -2,7 +2,7 @@
 
 ## Newcomer chakra orientation — implemented locally, device check pending
 
-When Returning Journey is unchecked on a normal chakra journey, Begin opens a short orientation before DND, audio, countdowns or Arriving. During Start-guided narration, setup copy is replaced by a static night-sky standing body-map illustration with the seven localized chakra names. Skip continues without the narration; Not now returns to the Meditation Room without starting a session. The content presents chakras as a traditional reflection map, keeps language non-medical, and makes controls explicit. Returning Journey, demo, Sleep, Music Only and focused practices bypass this screen. Automated source contracts and a targeted browser flow cover the branches; a user device readability and listening check remains open.
+When Returning Journey is unchecked on a normal chakra journey, Begin proceeds directly to a short orientation before Arriving. A static night-sky standing body-map illustration marks each localized chakra name and body location while expanded narration explains the traditional attention map. The app switches explicitly to Arriving afterward, removing the previously visible welcome-screen flicker. Returning Journey, demo, Sleep, Music Only and focused practices bypass this screen. Automated source contracts and a targeted browser flow cover the branches; a user device readability and listening check remains open.
 
 ## Sleep Mode shared unlock — implemented locally, device check pending
 
