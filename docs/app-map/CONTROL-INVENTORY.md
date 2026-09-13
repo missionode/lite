@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: c1ac5c6 + uncommitted geometry-mapped newcomer arrows (2.97) · 2026-09-13.
+Source snapshot: 757e97b + uncommitted newcomer language-cache refresh (2.98) · 2026-09-13.
 
 This inventories static UI declarations in all three HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

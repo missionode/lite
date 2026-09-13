@@ -2,7 +2,7 @@
 
 ### NOW — CP-NEWCOMER-001: guided first-time chakra orientation
 
-- EXTENDED locally, app 2.96 / shell 5.182, based on 342b556. For a normal standard journey with Returning Journey unchecked, Begin now proceeds directly to the illustrated orientation before Arriving. The prior title, lead copy, setup controls and blank return screen are removed. Chakra names, locations and orientation text follow Display Language; calibrated responsive arrows terminate at their corresponding body-map markers. One expanded narration explains the map, then the app explicitly switches to Arriving. No SVG or animation loop remains.
+- EXTENDED locally, app 2.98 / shell 5.184 / language cache v27, based on 757e97b. For a normal standard journey with Returning Journey unchecked, Begin now proceeds directly to the illustrated orientation before Arriving. The prior title, lead copy, setup controls and blank return screen are removed. Chakra names, locations and orientation text follow Display Language; calibrated responsive arrows terminate at their corresponding body-map markers. The language cache version is refreshed so older Malayalam bundles cannot fall back to English orientation keys. One expanded narration explains the map, then the app explicitly switches to Arriving. No SVG or animation loop remains.
 - Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh source/asset contracts, targeted browser loading, 32 applicable app checks and atlas build/verification pass. Device readability and listening validation remain open. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
 
 ### NOW — CP-SLEEP-UNLOCK-001: Sleep Mode joins Advanced Features
