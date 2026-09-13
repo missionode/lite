@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Advanced Settings backup — implemented locally, device check pending
+
+The shared seven-tap Advanced Features unlock now reveals a Manage Settings CTA in Settings → About. Its page exports only this app’s `chakra_` saved preferences as a versioned JSON backup. Import accepts a bounded, validated backup, asks for confirmation, replaces only those app keys and reloads; it never uploads settings or changes unrelated browser storage. Focused tests and atlas verification pass; visual/device import/download confirmation remains open.
+
 ## Shots shared unlock — implemented locally, CP-SHOTS-001
 
 Shots heading/controls now share the seven-rapid-tap App version unlock with Intimate Care. Relock clears both selections; reload starts locked. No Frequency and confirmation remain. Repertory URLs wait for unlock before preparation; direct locked Shot execution is rejected. Static/mock tests pass; user visual check pending. Corrected obsolete four-click wording in the care map.

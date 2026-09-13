@@ -380,6 +380,7 @@ function normalizeMeditationVisualEffect(value) {
 
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
 const configScreen = document.getElementById('config-screen');
+const settingsManagerScreen = document.getElementById('settings-manager-screen');
 const experimentScreen = document.getElementById('experiment-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
@@ -396,6 +397,43 @@ const timeDisplay = document.getElementById('time-display');
 const startMeditationBtn = document.getElementById('start-meditation');
 const openSettingsBtn = document.getElementById('open-settings');
 const beginConsultationBtn = document.getElementById('begin-consultation');
+
+const SETTINGS_BACKUP_FORMAT = 'chakra-meditation-settings';
+const SETTINGS_BACKUP_VERSION = 1;
+const SETTINGS_BACKUP_MAX_BYTES = 2 * 1024 * 1024;
+const isManagedSettingKey = (key) => /^chakra_[a-z0-9_]+$/i.test(key);
+
+function collectManagedSettings(storage = localStorage) {
+    const settings = {};
+    for (let index = 0; index < storage.length; index += 1) {
+        const key = storage.key(index);
+        if (key && isManagedSettingKey(key)) settings[key] = storage.getItem(key);
+    }
+    return settings;
+}
+
+function parseSettingsBackup(text) {
+    if (typeof text !== 'string' || new Blob([text]).size > SETTINGS_BACKUP_MAX_BYTES) {
+        throw new Error('The settings backup is too large.');
+    }
+    const backup = JSON.parse(text);
+    if (!backup || backup.format !== SETTINGS_BACKUP_FORMAT || backup.version !== SETTINGS_BACKUP_VERSION || !backup.settings || Array.isArray(backup.settings)) {
+        throw new Error('This is not a compatible settings backup.');
+    }
+    const entries = Object.entries(backup.settings);
+    if (entries.length > 200 || entries.some(([key, value]) => !isManagedSettingKey(key) || typeof value !== 'string' || value.length > 512 * 1024)) {
+        throw new Error('The settings backup contains invalid values.');
+    }
+    return Object.fromEntries(entries);
+}
+
+function replaceManagedSettings(settings, storage = localStorage) {
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+        const key = storage.key(index);
+        if (key && isManagedSettingKey(key)) storage.removeItem(key);
+    }
+    Object.entries(settings).forEach(([key, value]) => storage.setItem(key, value));
+}
 
 // ── UTILS (Defensive Element Access) ──────────────────────────────────────────
 const getChecked = (id) => {
@@ -6631,7 +6669,7 @@ function checkFirstTime() {
 function showScreen(screen) {
     document.body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
     document.dispatchEvent(new Event('decorationchange'));
-    [configScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
+    [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
     if (screen) {
@@ -6901,6 +6939,8 @@ function attachEventListeners() {
         if (intimateServicePanel) intimateServicePanel.hidden = isLocked || getChecked('shots-toggle');
         if (advancedFeaturesControl) advancedFeaturesControl.hidden = isLocked;
         if (advancedFeaturesToggle) advancedFeaturesToggle.checked = !isLocked;
+        const settingsManagerButton = document.getElementById('open-settings-manager');
+        if (settingsManagerButton) settingsManagerButton.hidden = isLocked;
         intimateServiceToggles.forEach(toggle => {
             toggle.disabled = isLocked;
             toggle.setAttribute('aria-disabled', String(isLocked));
@@ -6950,6 +6990,47 @@ function attachEventListeners() {
         updateSessionEstimate();
         updateJourneyRoadmap();
         showUnlockToast(t('ui.advancedFeaturesDisabled'));
+    });
+
+    const settingsManagerButton = document.getElementById('open-settings-manager');
+    const settingsManagerStatus = document.getElementById('settings-manager-status');
+    const showSettingsManagerStatus = (message) => { if (settingsManagerStatus) settingsManagerStatus.textContent = message; };
+    settingsManagerButton?.addEventListener('click', () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        showSettingsManagerStatus('');
+        showScreen(settingsManagerScreen);
+    });
+    document.getElementById('close-settings-manager')?.addEventListener('click', () => showScreen(configScreen));
+    document.getElementById('export-settings')?.addEventListener('click', () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        const backup = JSON.stringify({
+            format: SETTINGS_BACKUP_FORMAT,
+            version: SETTINGS_BACKUP_VERSION,
+            exportedAt: new Date().toISOString(),
+            settings: collectManagedSettings()
+        }, null, 2);
+        const url = URL.createObjectURL(new Blob([backup], { type: 'application/json' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'chakra-meditation-settings.json';
+        link.click();
+        URL.revokeObjectURL(url);
+        showSettingsManagerStatus(t('ui.settingsExported'));
+    });
+    document.getElementById('import-settings')?.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        const input = document.getElementById('import-settings-file');
+        const file = input?.files?.[0];
+        if (!file) { showSettingsManagerStatus(t('ui.settingsImportChooseFile')); return; }
+        try {
+            const settings = parseSettingsBackup(await file.text());
+            if (!window.confirm(t('ui.settingsImportConfirm'))) return;
+            replaceManagedSettings(settings);
+            showSettingsManagerStatus(t('ui.settingsImported'));
+            window.location.reload();
+        } catch (error) {
+            showSettingsManagerStatus(error.message || t('ui.settingsImportInvalid'));
+        }
     });
 
     function isIntimateServiceToggle(target) {

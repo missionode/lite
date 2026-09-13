@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-10",
-    "commit": "94914a8 + uncommitted Shots shared-unlock changes (2.88)",
-    "scope": "Version 2.88 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "date": "2026-09-13",
+    "commit": "86cda47 + uncommitted Advanced Settings backup changes (2.89)",
+    "scope": "Version 2.89 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -33,6 +33,11 @@
           ]
         ],
         [
+          [
+            "manage",
+            "Manage Settings",
+            "Developer-only backup and restore after the shared seven-tap Advanced Features unlock."
+          ],
           [
             "experiments",
             "Experiments",
@@ -94,6 +99,16 @@
           "lobby",
           "settings",
           "Settings"
+        ],
+        [
+          "settings",
+          "manage",
+          "Advanced Features unlocked"
+        ],
+        [
+          "manage",
+          "settings",
+          "Back"
         ],
         [
           "settings",
@@ -2802,6 +2817,119 @@
       ],
       "notes": [
         "Not every async failure is caught by the top-level window.onerror handler. Missing boundaries are shown as verification work rather than invented successful recovery."
+      ]
+    },
+    {
+      "id": "settings-backup",
+      "group": "Supporting pages",
+      "title": "Advanced Settings backup and restore",
+      "subtitle": "Developer-only portable backup of this app’s persisted preferences.",
+      "source": "app.js:401; app.js:6942; app.js:6995; index.html:215",
+      "rows": [
+        [
+          [
+            "locked",
+            "Settings / About",
+            "Manage Settings CTA starts hidden. Seven rapid App version taps reveal Advanced Features and this CTA for the current page load. Relock or reload hides it."
+          ]
+        ],
+        [
+          [
+            "open",
+            "Manage Settings",
+            "Direct click is rejected unless the shared Advanced Features state is unlocked."
+          ]
+        ],
+        [
+          [
+            "export",
+            "Export all saved app settings",
+            "Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request."
+          ]
+        ],
+        [
+          [
+            "pick",
+            "Choose backup file",
+            "Import accepts JSON files up to 2 MiB."
+          ]
+        ],
+        [
+          [
+            "validate",
+            "Validate backup",
+            "Require format chakra-meditation-settings, version 1, up to 200 chakra_ string settings and bounded individual values."
+          ]
+        ],
+        [
+          [
+            "confirm",
+            "Confirm replacement",
+            "Cancellation preserves existing settings."
+          ]
+        ],
+        [
+          [
+            "replace",
+            "Replace saved app settings",
+            "Remove existing chakra_ keys only, write validated backup settings, then reload. Other site/extension storage is untouched."
+          ],
+          [
+            "invalid",
+            "Show error",
+            "Invalid/missing/oversized file preserves existing settings."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "locked",
+          "open",
+          "Unlocked"
+        ],
+        [
+          "open",
+          "export",
+          "Export"
+        ],
+        [
+          "open",
+          "pick",
+          "Import"
+        ],
+        [
+          "pick",
+          "validate",
+          "Read"
+        ],
+        [
+          "validate",
+          "confirm",
+          "Valid"
+        ],
+        [
+          "validate",
+          "invalid",
+          "Invalid"
+        ],
+        [
+          "confirm",
+          "replace",
+          "Accepted"
+        ],
+        [
+          "confirm",
+          "open",
+          "Cancelled"
+        ],
+        [
+          "replace",
+          "locked",
+          "Reload"
+        ]
+      ],
+      "notes": [
+        "This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state."
       ]
     },
     {

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 94914a8 + uncommitted Shots shared-unlock changes (2.88) · 2026-09-10.
+Source snapshot: 86cda47 + uncommitted Advanced Settings backup changes (2.89) · 2026-09-13.
 
-Version 2.88 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Browser preview was previously declined. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.89 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -30,8 +30,9 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 20. [Visuals and browser lifecycle](#visuals)
 21. [Persistence, caching and network](#storage)
 22. [Failure and recovery map](#recovery)
-23. [Consultation flow](#consultation)
-24. [Frequency repertory handoff](#repertory)
+23. [Advanced Settings backup and restore](#settings-backup)
+24. [Consultation flow](#consultation)
+25. [Frequency repertory handoff](#repertory)
 
 <a id="overview"></a>
 
@@ -46,6 +47,7 @@ flowchart TD
   launch["Open app"]
   settings["Settings"]
   lobby["Meditation Room"]
+  manage["Manage Settings"]
   experiments["Experiments"]
   journeys["Journey dispatcher"]
   consult["Consultation / repertory"]
@@ -57,6 +59,8 @@ flowchart TD
   launch -->|"Configured"| lobby
   settings -->|"Save"| lobby
   lobby -->|"Settings"| settings
+  settings -->|"Advanced Features unlocked"| manage
+  manage -->|"Back"| settings
   settings -->|"Experiment Mode"| experiments
   lobby -->|"Begin"| journeys
   lobby -->|"Open page"| consult
@@ -74,6 +78,7 @@ flowchart TD
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
 | Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts. |
 | Meditation Room | Main mode selection, chakra choices, intention, duration and consultation. |
+| Manage Settings | Developer-only backup and restore after the shared seven-tap Advanced Features unlock. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
 | Consultation / repertory | Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot. |
@@ -1053,6 +1058,48 @@ flowchart TD
 | Runtime verification needed | Slow network, page hidden, mobile audio interruption, rapid double Begin/Restart, cache upgrades and storage denial. |
 
 - Not every async failure is caught by the top-level window.onerror handler. Missing boundaries are shown as verification work rather than invented successful recovery.
+
+<a id="settings-backup"></a>
+
+## Advanced Settings backup and restore
+
+Developer-only portable backup of this app’s persisted preferences.
+
+Sources: [app.js:401](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:401), [app.js:6942](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6942), [app.js:6995](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6995), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+
+```mermaid
+flowchart TD
+  locked["Settings / About"]
+  open["Manage Settings"]
+  export["Export all saved app settings"]
+  pick["Choose backup file"]
+  validate["Validate backup"]
+  confirm["Confirm replacement"]
+  replace["Replace saved app settings"]
+  invalid["Show error"]
+  locked -->|"Unlocked"| open
+  open -->|"Export"| export
+  open -->|"Import"| pick
+  pick -->|"Read"| validate
+  validate -->|"Valid"| confirm
+  validate -->|"Invalid"| invalid
+  confirm -->|"Accepted"| replace
+  confirm -->|"Cancelled"| open
+  replace -->|"Reload"| locked
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Settings / About | Manage Settings CTA starts hidden. Seven rapid App version taps reveal Advanced Features and this CTA for the current page load. Relock or reload hides it. |
+| Manage Settings | Direct click is rejected unless the shared Advanced Features state is unlocked. |
+| Export all saved app settings | Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request. |
+| Choose backup file | Import accepts JSON files up to 2 MiB. |
+| Validate backup | Require format chakra-meditation-settings, version 1, up to 200 chakra_ string settings and bounded individual values. |
+| Confirm replacement | Cancellation preserves existing settings. |
+| Replace saved app settings | Remove existing chakra_ keys only, write validated backup settings, then reload. Other site/extension storage is untouched. |
+| Show error | Invalid/missing/oversized file preserves existing settings. |
+
+- This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.
 
 <a id="consultation"></a>
 

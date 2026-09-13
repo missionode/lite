@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-SETTINGS-001: Advanced Settings backup and restore
+
+- COMPLETE locally, app 2.89 / shell 5.175, based on production 86cda47. Settings → About shows Manage Settings only after the existing shared seven-tap Advanced Features unlock. The separate screen exports only this app’s persisted `chakra_` localStorage keys in a versioned JSON file. Import is Advanced-only, size/schema/key/value bounded, confirmed before replacing only those app keys, then reloads. It does not upload data, affect unrelated browser/extension storage, or restore session-only journey/Advanced state.
+- Routing: standard recommendation Terra / medium; executionMode direct, no model dispatch. Added focused behavior test for scoped export, invalid backup rejection, replacement and locked UI/direct-entry guard. Targeted tests pass; 25-map atlas build and local headless atlas verification pass. No device download/import, playback or thermal evidence. Existing private `.DS_Store`, `.codex/` and backup audio remain untouched.
+- Atlas: overview gained the Settings → Manage Settings branch; new `settings-backup` map documents lock, export, validation, confirmation, replacement/reload and invalid-file exits. Atlas data/generated reference/JSON/inventory regenerated. Next action: user visual test; commit/push requires authorization.
+
 ### NOW — CP-SHOTS-001: Shots shares the Advanced features unlock
 
 - COMPLETE locally, app 2.88 / shell 5.174, based on 94914a8. Approved scope: hide Shots and its heading until the same seven rapid App version taps as Intimate Care; Advanced features OFF clears and hides both, reload locks again. Existing confirmation, No Frequency guard and mutual exclusion remain. Repertory URL waits for unlock, then normal confirmation; no autoplay. Direct locked runShot returns without audio.
