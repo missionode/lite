@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Sleep Mode shared unlock — implemented locally, device check pending
+
+Sleep Mode now shares the seven-rapid-tap App version Advanced Features unlock with Intimate Care, Shots and Manage Settings. It starts hidden/disabled, relock clears it, reload starts locked, and both UI and direct journey entry reject it while locked. Automated lock and atlas checks pass; user visual/device journey check remains open.
+
 ## Advanced Settings backup — implemented locally, device check pending
 
 The shared seven-tap Advanced Features unlock now reveals a Manage Settings CTA in Settings → About. Its page exports only this app’s `chakra_` saved preferences as a versioned JSON backup. Import accepts a bounded, validated backup, asks for confirmation, replaces only those app keys and reloads; it never uploads settings or changes unrelated browser storage. Focused tests and atlas verification pass; visual/device import/download confirmation remains open.

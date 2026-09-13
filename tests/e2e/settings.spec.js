@@ -246,11 +246,15 @@ test('switches the generated intention for HRIM and preserves custom text', asyn
   await expect(intention).toHaveValue('A short custom intention.');
 });
 
-test('offers Sleep Mode as a Lobby experience with a shared ten-minute stage maximum', async ({ page }) => {
+test('keeps Sleep Mode behind the shared Advanced Features unlock', async ({ page }) => {
   await page.locator('#save-config').click();
+  await expect(page.locator('#sleep-mode-control')).toBeHidden();
+  await page.locator('#open-settings').click();
+  for (let tap = 0; tap < 7; tap += 1) await page.locator('#app-version-unlock').click();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#sleep-mode-control')).toBeVisible();
   await page.locator('#sleep-mode-toggle').check();
   await expect(page.locator('#sleep-mode-toggle')).toBeChecked();
-  await expect(page.locator('#time-per-chakra')).toHaveAttribute('max', '10');
   await expect(page.locator('#journey-roadmap')).toContainText('Sleep Mode');
   await expect(page.locator('#journey-roadmap')).toContainText('Drowsiness');
 });

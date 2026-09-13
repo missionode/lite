@@ -206,7 +206,7 @@
             <div class="config-group settings-about">
                 <h2 data-i18n="ui.aboutApp">About</h2>
                 <button id="app-version-unlock" type="button" class="secondary-btn">
-                    <span data-i18n="ui.appVersion">App version</span> <span>2.89</span>
+                    <span data-i18n="ui.appVersion">App version</span> <span>2.90</span>
                 </button>
                 <label id="advanced-features-control" class="checkbox-label" hidden>
                     <input id="advanced-features-toggle" type="checkbox">
@@ -371,8 +371,8 @@
                         <input type="checkbox" id="high-energy-toggle">
                         <span data-i18n="ui.highEnergy">High Energy (HRIM)</span>
                     </label>
-                    <label class="checkbox-label experience-mode-toggle">
-                        <input type="checkbox" id="sleep-mode-toggle">
+                    <label id="sleep-mode-control" class="checkbox-label experience-mode-toggle" hidden>
+                        <input type="checkbox" id="sleep-mode-toggle" disabled>
                         <span data-i18n="ui.sleepMode">🌙 Sleep Mode</span>
                     </label>
                     <label class="checkbox-label experience-mode-toggle">
@@ -684,6 +684,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=2.89"></script>
+    <script src="app.js?v=2.90"></script>
 </body>
 </html>

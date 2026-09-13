@@ -12,7 +12,8 @@ function setup(noFrequencyMode=false) {
     const document={hidden:false,getElementById:get,createElement:()=>toast,body:{appendChild(){}},addEventListener(){}};
     const state={noFrequencyMode};
     vm.runInNewContext(block,{document,state,Event,performance:{now:()=>now},getChecked:name=>get(name).checked,
-        localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),prepareRepertoryShotFromUrl(){},
+        localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),prepareRepertoryShotFromUrl(){},
+        clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
         setTimeout(fn,delay){timers.set(++id,{fn,at:now+delay});return id;},clearTimeout:key=>timers.delete(key),
         t:key=>key==='ui.advancedUnlockRemaining'?'{{remaining}} remaining':key,
         updateExperienceModeVisibility(){},updateSessionEstimate(){},updateJourneyRoadmap(){}});
@@ -24,6 +25,8 @@ assert.equal(app.get('intimate-service-panel').hidden,true);
 assert.equal(app.get('shots-control').hidden,true);
 assert.equal(app.get('sound-healing-title').hidden,true);
 assert.equal(app.get('shots-toggle').disabled,true);
+assert.equal(app.get('sleep-mode-control').hidden,true);
+assert.equal(app.get('sleep-mode-toggle').disabled,true);
 assert.equal(app.get('advanced-features-control').hidden,true);
 assert.equal(app.get('experiment-care-group').attached,false,'Locked care is absent from native activity picker');
 assert.equal(app.state.advancedFeaturesUnlocked,false);
@@ -35,6 +38,9 @@ assert.equal(app.get('intimate-service-panel').hidden,false);
 assert.equal(app.get('shots-control').hidden,false);
 assert.equal(app.get('sound-healing-title').hidden,false);
 assert.equal(app.get('shots-toggle').disabled,false);
+assert.equal(app.get('sleep-mode-control').hidden,false);
+assert.equal(app.get('sleep-mode-toggle').disabled,false);
+app.get('sleep-mode-toggle').checked=true; app.state.sleepExperienceEnabled=true; app.state.sleepMode=true;
 app.get('shots-toggle').checked=true;
 assert.equal(app.get('advanced-features-toggle').checked,true);
 assert.equal(app.get('massage-toggle').disabled,false);
@@ -49,6 +55,11 @@ assert.equal(app.state.massageEnabled,false);
 assert.equal(app.get('shots-control').hidden,true);
 assert.equal(app.get('shots-toggle').checked,false);
 assert.equal(app.get('shots-toggle').disabled,true);
+assert.equal(app.get('sleep-mode-control').hidden,true);
+assert.equal(app.get('sleep-mode-toggle').checked,false);
+assert.equal(app.get('sleep-mode-toggle').disabled,true);
+assert.equal(app.state.sleepExperienceEnabled,false);
+assert.equal(app.state.sleepMode,false);
 assert.equal(app.get('massage-toggle').disabled,true);
 assert.equal(app.get('experiment-care-group').attached,false);
 assert.equal(app.get('experiment-activity').value,'chakra:root','Re-lock clears stale care selection');
@@ -62,6 +73,7 @@ for(let i=0;i<6;i++){app.advance(100);app.tap();}
 assert.equal(app.get('intimate-service-panel').hidden,false);
 assert.equal(setup().get('intimate-service-panel').hidden,true,'New page locks again');
 assert.equal(setup().get('shots-control').hidden,true,'New page locks Shots again');
+assert.equal(setup().get('sleep-mode-control').hidden,true,'New page locks Sleep Mode again');
 assert.equal(app.get('intimate-service-panel').listeners.click,undefined,'Panel itself is no longer an unlock target');
 assert.match(source,/element.hidden = shots \|\| \(id === 'intimate-service-panel' && !intimateServiceUnlocked\)/,'Mode changes preserve the lock');
 for(const locale of ['en','ml','ru','hi']) {
@@ -81,6 +93,12 @@ assert.equal(lockedShot.isShotActive,undefined,'Locked direct Shot call does not
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html, /id="shots-control"[^>]* hidden/);
 assert.match(html, /id="sound-healing-title"[^>]* hidden/);
+assert.match(html, /id="sleep-mode-control"[^>]* hidden/);
+assert.match(source, /getChecked\('sleep-mode-toggle'\) && !state\.advancedFeaturesUnlocked/, 'Locked direct Sleep start must be rejected');
+const sleepJourney=source.slice(source.indexOf('    async runSleepJourney()'),source.indexOf('    async runShot('));
+const lockedSleep=vm.runInNewContext('({'+sleepJourney+'})',{state:{advancedFeaturesUnlocked:false}});
+await lockedSleep.runSleepJourney();
+assert.equal(lockedSleep.isStarting,undefined,'Locked direct Sleep journey cannot start');
 console.log('Shots shares visibility, reset and direct execution guard.');
 const noFrequency=setup(true);
 for(let i=0;i<7;i++) noFrequency.tap();

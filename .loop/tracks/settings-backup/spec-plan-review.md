@@ -22,3 +22,9 @@
 - `node docs/app-map/build-atlas.mjs` — 25 graphs, 230 nodes, 264 edges.
 - `node docs/app-map/verify-atlas.mjs` — pass with local headless browser after sandbox permission escalation.
 - No device download/import verification or playback evidence.
+
+## Extension — CP-SLEEP-UNLOCK-001
+
+- Scope: add Sleep Mode to the existing seven-tap Advanced Features boundary without changing its timing, audio, or completion behavior.
+- Result: Sleep control starts hidden/disabled, is cleared on relock/reload, and is guarded in its change, Begin and controller entry paths.
+- Evidence: 31 applicable app tests and the targeted local headless Sleep unlock test pass; atlas build and verification pass. No device Sleep playback/timing evidence.

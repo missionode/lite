@@ -4533,6 +4533,7 @@ class MeditationController {
     }
 
     async runSleepJourney() {
+        if (!state.advancedFeaturesUnlocked) return;
         if (this.isStarting || this.isMeditationActive) return;
         this.showDndReminderIfNeeded();
         if (!this.scripts || this.scriptsLanguage !== state.language) {
@@ -6825,6 +6826,7 @@ function attachEventListeners() {
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
+    const sleepModeToggle = document.getElementById('sleep-mode-toggle');
     const shotsToggle = document.getElementById('shots-toggle');
     const shotTypeSelect = document.getElementById('shot-type-select');
 
@@ -6915,6 +6917,12 @@ function attachEventListeners() {
         if (shotsToggle) {
             if (isLocked) shotsToggle.checked = false;
             shotsToggle.disabled = isLocked || state.noFrequencyMode;
+        }
+        const sleepModeControl = document.getElementById('sleep-mode-control');
+        if (sleepModeControl) sleepModeControl.hidden = isLocked;
+        if (sleepModeToggle) {
+            if (isLocked) clearSleepMode();
+            sleepModeToggle.disabled = isLocked;
         }
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
@@ -7147,9 +7155,14 @@ function attachEventListeners() {
         });
     });
 
-    const sleepModeToggle = document.getElementById('sleep-mode-toggle');
     if (sleepModeToggle) {
         sleepModeToggle.addEventListener('change', (e) => {
+            if (!state.advancedFeaturesUnlocked) {
+                clearSleepMode();
+                updateExperienceModeVisibility();
+                updateSessionEstimate();
+                return;
+            }
             state.sleepExperienceEnabled = e.target.checked;
             enforceMasterToggle(e.target);
             updateExperienceModeVisibility();
@@ -7836,6 +7849,12 @@ function attachEventListeners() {
             const customFrequency = Number(document.getElementById('shot-frequency-input')?.value);
             if (!audio.isInitialized) await audio.init();
             meditation.runShot(shotType, customFrequency);
+            return;
+        }
+        if (getChecked('sleep-mode-toggle') && !state.advancedFeaturesUnlocked) {
+            clearSleepMode();
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
             return;
         }
         state.sleepMode = getChecked('sleep-mode-toggle');

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 86cda47 + uncommitted Advanced Settings backup changes (2.89) · 2026-09-13.
+Source snapshot: a744820 + uncommitted Advanced Sleep unlock changes (2.90) · 2026-09-13.
 
-Version 2.89 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 2.90 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -152,6 +152,7 @@ flowchart TD
   exclusive["Exclusive modes"]
   care["Intimate Service"]
   shots["Enable Shots?"]
+  sleepgate["Enable Sleep?"]
   begin["Press Begin"]
   shot["Shots"]
   music["Music Only"]
@@ -162,9 +163,11 @@ flowchart TD
   lobby -->|"Select"| exclusive
   lobby -->|"Unlock"| care
   lobby -->|"Confirm"| shots
+  lobby -->|"Unlock"| sleepgate
   exclusive -->|"Ready"| begin
   care -->|"Ready"| begin
   shots -->|"Accepted"| begin
+  sleepgate -->|"Enabled"| begin
   begin -->|"1 · Shots"| shot
   begin -->|"2 · Music"| music
   begin -->|"3 · Sleep"| sleep
@@ -178,8 +181,9 @@ flowchart TD
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
 | Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
-| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care and Shots selections and locks/hides both panels, the Sound Shot heading and the switch. Reload locks again. Shots shares this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
+| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care, Shots and Sleep selections and locks/hides their controls. Reload locks again. Shots, Sleep and Manage Settings share this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
 | Enable Shots? | Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
+| Enable Sleep? | Hidden and disabled until the shared seven-tap unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
@@ -368,7 +372,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Choose mode | Both bypass normal guided preparation and chakra narration. |
+| Choose mode | Music Only is public. Sleep is visible only after the shared seven-tap Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration. |
 | Sleep start | DND reminder; load content; exactly five valid stage frequencies required. Sleep dimming multiplies user brightness by 0.4 without filtering the app ancestor; fixed controls retain viewport positioning. |
 | Music Only start | Show background symbol; no session countdown; request wake lock. |
 | Five Sleep stages | Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone. |

@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "86cda47 + uncommitted Advanced Settings backup changes (2.89)",
-    "scope": "Version 2.89 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "a744820 + uncommitted Advanced Sleep unlock changes (2.90)",
+    "scope": "Version 2.90 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -321,12 +321,17 @@
           [
             "care",
             "Intimate Service",
-            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care and Shots selections and locks/hides both panels, the Sound Shot heading and the switch. Reload locks again. Shots shares this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes."
+            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care, Shots and Sleep selections and locks/hides their controls. Reload locks again. Shots, Sleep and Manage Settings share this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes."
           ],
           [
             "shots",
             "Enable Shots?",
             "Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode."
+          ],
+          [
+            "sleepgate",
+            "Enable Sleep?",
+            "Hidden and disabled until the shared seven-tap unlock. Relock clears it; direct locked start is rejected."
           ]
         ],
         [
@@ -390,6 +395,11 @@
           "Confirm"
         ],
         [
+          "lobby",
+          "sleepgate",
+          "Unlock"
+        ],
+        [
           "exclusive",
           "begin",
           "Ready"
@@ -403,6 +413,11 @@
           "shots",
           "begin",
           "Accepted"
+        ],
+        [
+          "sleepgate",
+          "begin",
+          "Enabled"
         ],
         [
           "begin",
@@ -869,7 +884,7 @@
           [
             "choose",
             "Choose mode",
-            "Both bypass normal guided preparation and chakra narration."
+            "Music Only is public. Sleep is visible only after the shared seven-tap Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration."
           ]
         ],
         [

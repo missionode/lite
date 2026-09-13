@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-SLEEP-UNLOCK-001: Sleep Mode joins Advanced Features
+
+- COMPLETE locally, app 2.90 / shell 5.176, based on a744820. Sleep Mode now starts hidden/disabled and is revealed by the existing seven rapid Settings → About → App version taps alongside Intimate Care, Shots and Manage Settings. Advanced Features OFF/reload clears and relocks Sleep. The event handler, Begin path and `runSleepJourney()` each reject locked activation.
+- Fresh evidence: 31 applicable app tests pass; focused headless browser test confirms Sleep starts hidden, appears after unlock and can be selected. Atlas build (25 graphs, 231 nodes, 266 edges) and headless atlas verification pass. The full Settings browser suite retains unrelated legacy failures; an obsolete 10-minute assertion was narrowed to the fast-profile-safe unlock behavior. No device Sleep timing/layout/audio evidence.
+- Local checkpoint pending; no push authorized. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
+
 ### NOW — CP-SETTINGS-001: Advanced Settings backup and restore
 
 - COMPLETE locally, app 2.89 / shell 5.175, based on production 86cda47. Settings → About shows Manage Settings only after the existing shared seven-tap Advanced Features unlock. The separate screen exports only this app’s persisted `chakra_` localStorage keys in a versioned JSON file. Import is Advanced-only, size/schema/key/value bounded, confirmed before replacing only those app keys, then reloads. It does not upload data, affect unrelated browser/extension storage, or restore session-only journey/Advanced state.
