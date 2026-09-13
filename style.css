@@ -198,11 +198,14 @@ body {
 .newcomer-body-map-stage { position: relative; width: clamp(245px, 62vw, 390px); max-width: 100%; }
 .newcomer-body-map img { display: block; width: 100%; max-height: 68dvh; object-fit: contain; filter: drop-shadow(0 0 14px rgba(125, 88, 210, 0.28)); }
 .newcomer-guided-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; color: rgba(255,255,255,0.9); font-size: clamp(0.58rem, 1.8vw, 0.74rem); pointer-events: none; }
-.newcomer-guided-labels li { position: absolute; display: grid; width: 34%; line-height: 1.15; text-align: left; text-shadow: 0 1px 5px #06030e; }
-.newcomer-guided-labels li::after { content: ''; position: absolute; top: 50%; width: 17%; border-top: 1px solid rgba(230, 222, 255, 0.55); }
-.newcomer-guided-labels li:nth-child(odd) { right: -22%; text-align: left; }.newcomer-guided-labels li:nth-child(odd)::after { right: 100%; }
-.newcomer-guided-labels li:nth-child(even) { left: -22%; text-align: right; }.newcomer-guided-labels li:nth-child(even)::after { left: 100%; }
-.newcomer-label-crown { top: 7%; }.newcomer-label-third-eye { top: 17%; }.newcomer-label-throat { top: 28%; }.newcomer-label-heart { top: 39%; }.newcomer-label-solar { top: 49%; }.newcomer-label-sacral { top: 60%; }.newcomer-label-root { top: 70%; }
+.newcomer-guided-labels li { position: absolute; display: grid; top: var(--marker-y); width: 34%; line-height: 1.15; text-align: left; text-shadow: 0 1px 5px #06030e; transform: translateY(-50%); }
+/* Each connector is calibrated to the actual marker centre in the standing
+   illustration (the figure uses a stable 2:3 aspect ratio). */
+.newcomer-guided-labels li::after { content: ''; position: absolute; top: var(--arrow-y, 50%); width: var(--arrow-width); border-top: 1px solid rgba(230, 222, 255, 0.72); transform: rotate(var(--arrow-angle, 0deg)); transform-origin: var(--arrow-origin, 0) center; }
+.newcomer-guided-labels li::before { content: ''; position: absolute; top: calc(var(--arrow-y, 50%) - 3px); width: 0; height: 0; border-top: 3px solid transparent; border-bottom: 3px solid transparent; z-index: 1; }
+.newcomer-guided-labels li:nth-child(odd) { right: -22%; text-align: left; --arrow-origin: 100%; }.newcomer-guided-labels li:nth-child(odd)::after { right: 100%; }.newcomer-guided-labels li:nth-child(odd)::before { right: calc(100% + var(--arrow-width) - 4px); border-right: 5px solid rgba(230, 222, 255, 0.82); }
+.newcomer-guided-labels li:nth-child(even) { left: -22%; text-align: right; --arrow-origin: 0; }.newcomer-guided-labels li:nth-child(even)::after { left: 100%; }.newcomer-guided-labels li:nth-child(even)::before { left: calc(100% + var(--arrow-width) - 4px); border-left: 5px solid rgba(230, 222, 255, 0.82); }
+.newcomer-label-crown { --marker-y: 7%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-third-eye { --marker-y: 16%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-throat { --marker-y: 27%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-heart { --marker-y: 38%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-solar { --marker-y: 49%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-sacral { --marker-y: 60%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-root { --marker-y: 70%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }
 .newcomer-guided-labels strong { color: rgba(255,255,255,0.94); font-weight: 600; }
 .newcomer-guided-labels span { color: rgba(255,255,255,0.6); font-size: 0.63rem; }
 .newcomer-body-map p { max-width: 22rem; margin: 0.35rem 0 0; }
@@ -224,6 +227,7 @@ body {
     .newcomer-guided-labels li { width: 38%; font-size: clamp(0.54rem, 2.4vw, 0.68rem); }
     .newcomer-guided-labels li:nth-child(odd) { right: -20%; }
     .newcomer-guided-labels li:nth-child(even) { left: -20%; }
+    .newcomer-guided-labels li { --arrow-width: 135% !important; }
 }
 
 /* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */

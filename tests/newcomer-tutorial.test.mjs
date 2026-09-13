@@ -38,6 +38,9 @@ assert.ok(
 assert.match(app, /async runNewcomerGuidedOrientation\(\)[\s\S]*?t\('ui\.newcomerGuidedNarration'\)[\s\S]*?'soft'/);
 assert.match(app, /runNewcomerGuidedOrientation\(\)[\s\S]*?showScreen\(newcomerTutorialScreen\)[\s\S]*?showScreen\(icebreakerScreen\)/);
 assert.match(html, /newcomer-body-map-stage[\s\S]*?newcomer-label-crown[\s\S]*?newcomer-label-root/);
+const css = readFileSync('style.css', 'utf8');
+assert.match(css, /newcomer-guided-labels li \{[\s\S]*?top: var\(--marker-y\)[\s\S]*?translateY\(-50%\)/);
+assert.match(css, /newcomer-label-crown \{ --marker-y: 7%[\s\S]*?newcomer-label-root \{ --marker-y: 70%/);
 assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);
 
 console.log('newcomer tutorial contracts passed');
