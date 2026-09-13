@@ -206,7 +206,7 @@
             <div class="config-group settings-about">
                 <h2 data-i18n="ui.aboutApp">About</h2>
                 <button id="app-version-unlock" type="button" class="secondary-btn">
-                    <span data-i18n="ui.appVersion">App version</span> <span>2.96</span>
+                    <span data-i18n="ui.appVersion">App version</span> <span>2.97</span>
                 </button>
                 <label id="advanced-features-control" class="checkbox-label" hidden>
                     <input id="advanced-features-toggle" type="checkbox">
@@ -451,8 +451,12 @@
                 <div id="newcomer-body-map" class="newcomer-body-map">
                     <div class="newcomer-body-map-stage">
                         <img src="symbols/newcomer-chakra-body-map.png" alt="Standing figure with seven illuminated chakra locations from the base of the spine to the crown of the head">
+                        <svg id="newcomer-marker-connectors" class="newcomer-marker-connectors" aria-hidden="true" preserveAspectRatio="none">
+                            <defs><marker id="newcomer-marker-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z"/></marker></defs>
+                            <path data-marker="crown"/><path data-marker="thirdeye"/><path data-marker="throat"/><path data-marker="heart"/><path data-marker="solar"/><path data-marker="sacral"/><path data-marker="root"/>
+                        </svg>
                         <ol id="newcomer-guided-labels" class="newcomer-guided-labels" aria-label="The seven chakra locations">
-                            <li class="newcomer-label-crown"><strong data-i18n="ui.crown">Crown</strong><span data-i18n="ui.newcomerCrownLocation">top of head</span></li><li class="newcomer-label-third-eye"><strong data-i18n="ui.thirdEye">Third Eye</strong><span data-i18n="ui.newcomerThirdEyeLocation">centre of forehead</span></li><li class="newcomer-label-throat"><strong data-i18n="ui.throat">Throat</strong><span data-i18n="ui.newcomerThroatLocation">throat area</span></li><li class="newcomer-label-heart"><strong data-i18n="ui.heart">Heart</strong><span data-i18n="ui.newcomerHeartLocation">centre of chest</span></li><li class="newcomer-label-solar"><strong data-i18n="ui.solar">Solar</strong><span data-i18n="ui.newcomerSolarLocation">upper abdomen</span></li><li class="newcomer-label-sacral"><strong data-i18n="ui.sacral">Sacral</strong><span data-i18n="ui.newcomerSacralLocation">lower abdomen</span></li><li class="newcomer-label-root"><strong data-i18n="ui.root">Root</strong><span data-i18n="ui.newcomerRootLocation">base of spine</span></li>
+                            <li data-marker="crown" class="newcomer-label-crown"><strong data-i18n="ui.crown">Crown</strong><span data-i18n="ui.newcomerCrownLocation">top of head</span></li><li data-marker="thirdeye" class="newcomer-label-third-eye"><strong data-i18n="ui.thirdEye">Third Eye</strong><span data-i18n="ui.newcomerThirdEyeLocation">centre of forehead</span></li><li data-marker="throat" class="newcomer-label-throat"><strong data-i18n="ui.throat">Throat</strong><span data-i18n="ui.newcomerThroatLocation">throat area</span></li><li data-marker="heart" class="newcomer-label-heart"><strong data-i18n="ui.heart">Heart</strong><span data-i18n="ui.newcomerHeartLocation">centre of chest</span></li><li data-marker="solar" class="newcomer-label-solar"><strong data-i18n="ui.solar">Solar</strong><span data-i18n="ui.newcomerSolarLocation">upper abdomen</span></li><li data-marker="sacral" class="newcomer-label-sacral"><strong data-i18n="ui.sacral">Sacral</strong><span data-i18n="ui.newcomerSacralLocation">lower abdomen</span></li><li data-marker="root" class="newcomer-label-root"><strong data-i18n="ui.root">Root</strong><span data-i18n="ui.newcomerRootLocation">base of spine</span></li>
                         </ol>
                     </div>
                 </div>
@@ -699,6 +703,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=2.96"></script>
+    <script src="app.js?v=2.97"></script>
 </body>
 </html>

@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "342b556 + uncommitted calibrated newcomer markers (2.96)",
-    "scope": "Version 2.96 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "c1ac5c6 + uncommitted geometry-mapped newcomer arrows (2.97)",
+    "scope": "Version 2.97 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -477,7 +477,7 @@
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language. Calibrated arrowheads terminate at each matching marker and preserve their relative positions responsively. The expanded orientation text follows the same language before Arriving. No welcome copy, confirmation screen, animation loop or additional asset loading is added."
+            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws curved arrowheads from each label to normalized coordinates for the matching marker after image load and resize. The expanded orientation text follows the same language before Arriving."
           ]
         ],
         [
