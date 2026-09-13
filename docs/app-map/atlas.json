@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "a744820 + uncommitted Advanced Sleep unlock changes (2.90)",
-    "scope": "Version 2.90 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. Atlas browser verification passed locally; no app device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "c921d57 + uncommitted newcomer tutorial changes (2.91)",
+    "scope": "Version 2.91 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -463,14 +463,26 @@
       "id": "standard",
       "group": "Journeys",
       "title": "Standard chakra journey",
-      "subtitle": "Selected chakras in Root → Crown order; returning and demo branches included.",
-      "source": "app.js:4429; app.js:4769; app.js:5585",
+      "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
+      "source": "app.js:4429; app.js:4740; app.js:4769; app.js:5585; index.html:448",
       "rows": [
         [
           [
             "begin",
-            "Begin + DND reminder",
-            "Guard duplicate starts; show Arriving and load / validate selected content."
+            "Press Begin",
+            "Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving."
+          ],
+          [
+            "lobby",
+            "Meditation Room",
+            "Safe no-session exit when a newcomer chooses Not now."
+          ]
+        ],
+        [
+          [
+            "newcomer",
+            "Newcomer orientation",
+            "Only for a normal standard journey when Returning Journey is unchecked. It explains the seven centres as a traditional reflection map, reminds the user they stay in control, and adds no audio or animation. Start or Skip continues; Not now returns to Lobby without starting a session."
           ]
         ],
         [
@@ -557,8 +569,23 @@
       "edges": [
         [
           "begin",
+          "newcomer",
+          "Returning off · normal standard"
+        ],
+        [
+          "newcomer",
           "setup",
-          "Valid content"
+          "Start / Skip"
+        ],
+        [
+          "newcomer",
+          "lobby",
+          "Not now"
+        ],
+        [
+          "begin",
+          "setup",
+          "Returning on / demo / Sleep / Music Only / focused"
         ],
         [
           "setup",
@@ -642,7 +669,7 @@
         ]
       ],
       "notes": [
-        "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps."
+        "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps. Returning Journey is an explicit preference, not a record of prior sessions."
       ]
     },
     {

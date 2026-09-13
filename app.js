@@ -386,6 +386,7 @@ const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
 const icebreakerScreen = document.getElementById('icebreaker-screen');
+const newcomerTutorialScreen = document.getElementById('newcomer-tutorial-screen');
 const icebreakerTimer = document.getElementById('icebreaker-timer');
 
 const languageSelect = document.getElementById('language-select');
@@ -4733,11 +4734,38 @@ class MeditationController {
         if (startBtn) { startBtn.disabled = false; startBtn.style.opacity = '1'; }
     }
 
+    shouldShowNewcomerTutorial() {
+        return !state.returningJourney &&
+            !getChecked('high-energy-toggle') &&
+            !getChecked('music-only-toggle') &&
+            !getChecked('sleep-mode-toggle') &&
+            !this.getFocusedExperience();
+    }
+
+    async showNewcomerTutorial() {
+        showScreen(newcomerTutorialScreen);
+        return new Promise(resolve => {
+            const beginButton = document.getElementById('begin-newcomer-tutorial');
+            const skipButton = document.getElementById('skip-newcomer-tutorial');
+            const leaveButton = document.getElementById('leave-newcomer-tutorial');
+            const finish = (continueJourney) => {
+                beginButton?.removeEventListener('click', begin);
+                skipButton?.removeEventListener('click', skip);
+                leaveButton?.removeEventListener('click', leave);
+                resolve(continueJourney);
+            };
+            const begin = () => finish(true);
+            const skip = () => finish(true);
+            const leave = () => finish(false);
+            beginButton?.addEventListener('click', begin, { once: true });
+            skipButton?.addEventListener('click', skip, { once: true });
+            leaveButton?.addEventListener('click', leave, { once: true });
+        });
+    }
+
     async start() {
         if (this.isStarting || this.isMeditationActive) return;
         this.isStarting = true;
-        
-        this.showDndReminderIfNeeded();
 
         try {
             const startBtn = document.getElementById('start-meditation');
@@ -4745,6 +4773,13 @@ class MeditationController {
                 startBtn.disabled = true;
                 startBtn.style.opacity = "0.5";
             }
+
+            if (this.shouldShowNewcomerTutorial() && !await this.showNewcomerTutorial()) {
+                showScreen(lobbyScreen);
+                return;
+            }
+
+            this.showDndReminderIfNeeded();
 
             // CRITICAL: Immediate mobile speech unlock on first user gesture
             if ('speechSynthesis' in window) {
@@ -6670,7 +6705,7 @@ function checkFirstTime() {
 function showScreen(screen) {
     document.body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
     document.dispatchEvent(new Event('decorationchange'));
-    [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen].forEach(s => {
+    [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen].forEach(s => {
         if (s) s.classList.add('hidden');
     });
     if (screen) {

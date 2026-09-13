@@ -1,5 +1,10 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-NEWCOMER-001: first-time chakra orientation
+
+- IMPLEMENTED locally, app 2.91 / shell 5.177, based on c921d57. For a normal standard journey with Returning Journey unchecked, Begin opens a silent, static, novice-friendly orientation before DND, content loading, audio, timers, wake lock or Arriving. It describes chakras as a traditional reflection map rather than medical facts, explains user controls, and avoids requiring any belief or sensation. Start and Skip proceed to the unchanged journey; Not now returns to the Lobby without starting a session.
+- Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh evidence: 32 applicable app checks, the targeted newcomer browser flow and atlas build/verification pass. User device readability and actual journey playback remain open. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
+
 ### NOW — CP-SLEEP-UNLOCK-001: Sleep Mode joins Advanced Features
 
 - COMPLETE locally, app 2.90 / shell 5.176, based on a744820. Sleep Mode now starts hidden/disabled and is revealed by the existing seven rapid Settings → About → App version taps alongside Intimate Care, Shots and Manage Settings. Advanced Features OFF/reload clears and relocks Sleep. The event handler, Begin path and `runSleepJourney()` each reject locked activation.

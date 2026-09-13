@@ -49,6 +49,27 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
   await expect(page.locator('#time-interval')).toHaveValue('2');
 });
 
+test('shows a newcomer orientation only for a normal journey with Returning Journey off', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#returning-journey-toggle')).not.toBeChecked();
+  await page.locator('#chakra-crown').check();
+
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#newcomer-tutorial-screen')).toBeVisible();
+  await expect(page.locator('#newcomer-tutorial-title')).toHaveText('A gentle introduction');
+  await expect(page.locator('#begin-newcomer-tutorial')).toBeVisible();
+  await expect(page.locator('#skip-newcomer-tutorial')).toBeVisible();
+
+  await page.locator('#leave-newcomer-tutorial').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#start-meditation')).toBeEnabled();
+
+  await page.locator('#returning-journey-toggle').check();
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#newcomer-tutorial-screen')).toBeHidden();
+  await expect(page.locator('#icebreaker-screen')).toBeVisible();
+});
+
 test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
   await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
   await expect(page.locator('#reverse-journey-toggle')).toHaveCount(0);

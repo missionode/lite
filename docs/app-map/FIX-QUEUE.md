@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Newcomer chakra orientation — implemented locally, device check pending
+
+When Returning Journey is unchecked on a normal chakra journey, Begin opens a short, quiet orientation before DND, audio, countdowns or Arriving. It explains the seven centres as a traditional reflection map, keeps the language non-medical, and makes the available controls explicit. Start and Skip continue into the existing journey; Not now returns to the Meditation Room without starting a session. Returning Journey, demo, Sleep, Music Only and focused practices bypass this screen. Automated source contracts and a targeted browser flow cover the branches; a user device readability check remains open.
+
 ## Sleep Mode shared unlock — implemented locally, device check pending
 
 Sleep Mode now shares the seven-rapid-tap App version Advanced Features unlock with Intimate Care, Shots and Manage Settings. It starts hidden/disabled, relock clears it, reload starts locked, and both UI and direct journey entry reject it while locked. Automated lock and atlas checks pass; user visual/device journey check remains open.
