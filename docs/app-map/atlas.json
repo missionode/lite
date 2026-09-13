@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-13",
-    "commit": "8d59247 + uncommitted guided newcomer orientation changes (2.92)",
-    "scope": "Version 2.92 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "f05062a + uncommitted newcomer body-map changes (2.93)",
+    "scope": "Version 2.93 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -482,7 +482,7 @@
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. A static body map identifies the seven locations. Start plays one concise guided narration before Arriving; Skip continues silently; Not now returns to Lobby without starting a session. No new animation loop is added."
+            "Only for a normal standard journey when Returning Journey is unchecked. Start replaces the setup copy with a static standing seven-location body-map illustration plus localised chakra labels, then plays one concise guided narration before Arriving. Skip continues silently; Not now returns to Lobby without starting a session. No new animation loop is added."
           ]
         ],
         [

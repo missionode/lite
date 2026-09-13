@@ -4764,13 +4764,19 @@ class MeditationController {
     }
 
     async runNewcomerGuidedOrientation() {
+        const bodyMap = document.getElementById('newcomer-body-map');
         const status = document.getElementById('newcomer-guided-status');
+        showScreen(newcomerTutorialScreen);
+        newcomerTutorialScreen?.classList.add('is-guided');
+        if (bodyMap) bodyMap.hidden = false;
         if (status) {
             status.hidden = false;
             status.textContent = contentT('ui.newcomerGuidedStatus');
         }
         await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
         if (status) status.hidden = true;
+        if (bodyMap) bodyMap.hidden = true;
+        newcomerTutorialScreen?.classList.remove('is-guided');
     }
 
     async start() {

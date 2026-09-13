@@ -17,8 +17,9 @@ assert.match(html, /id="newcomer-tutorial-screen"/);
 assert.match(html, /id="begin-newcomer-tutorial"/);
 assert.match(html, /id="skip-newcomer-tutorial"/);
 assert.match(html, /id="leave-newcomer-tutorial"/);
-assert.match(html, /class="newcomer-body-map"/);
+assert.match(html, /id="newcomer-body-map"[\s\S]*?symbols\/newcomer-chakra-body-map\.png/);
 assert.match(html, /id="newcomer-guided-status"/);
+assert.doesNotMatch(html, /newcomer-silhouette|newcomer-centre-dots/);
 assert.match(html, /traditional map for reflection\. These are prompts for attention, not medical facts/i);
 
 for (const path of localePaths) {
@@ -41,6 +42,7 @@ assert.ok(
   'newcomer choice must happen before DND reminder, audio setup and Arriving'
 );
 assert.match(app, /async runNewcomerGuidedOrientation\(\)[\s\S]*?contentT\('ui\.newcomerGuidedNarration'\)[\s\S]*?'soft'/);
+assert.match(app, /runNewcomerGuidedOrientation\(\)[\s\S]*?showScreen\(newcomerTutorialScreen\)[\s\S]*?bodyMap\.hidden = false/);
 assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);
 
 console.log('newcomer tutorial contracts passed');

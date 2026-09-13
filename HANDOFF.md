@@ -2,8 +2,8 @@
 
 ### NOW — CP-NEWCOMER-001: guided first-time chakra orientation
 
-- EXTENDED locally, app 2.92 / shell 5.178, based on 8d59247. For a normal standard journey with Returning Journey unchecked, Begin opens a novice-friendly orientation before DND, content loading, audio, timers, wake lock or Arriving. A static body-map shows the seven locations. Start plays one concise localized orientation narration, then enters existing Arriving; Skip proceeds without narration; Not now returns to the Lobby without starting a session. The narration presents chakras as a traditional reflection map rather than medical facts and avoids promised outcomes.
-- Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh source/locale contracts and atlas build pass; browser, full app regression and device readability/listening validation are pending this extension. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
+- EXTENDED locally, app 2.93 / shell 5.179, based on f05062a. For a normal standard journey with Returning Journey unchecked, Begin opens a novice-friendly orientation before DND, content loading, audio, timers, wake lock or Arriving. During Start-guided narration, the setup content is replaced by a static, generated standing body-map illustration with seven localized chakra labels; no SVG or animation loop remains. It then enters existing Arriving; Skip proceeds without narration; Not now returns to the Lobby without starting a session. The narration presents chakras as a traditional reflection map rather than medical facts and avoids promised outcomes.
+- Returning Journey, demo, Sleep, Music Only and focused experiences bypass it. Translation coverage exists for English, Malayalam, Hindi and Russian. Fresh source/asset contracts and atlas build are pending validation; browser, full app regression and device readability/listening validation are pending this extension. Preserve unrelated `.DS_Store`, `.codex/` and backup audio changes.
 
 ### NOW — CP-SLEEP-UNLOCK-001: Sleep Mode joins Advanced Features
 
