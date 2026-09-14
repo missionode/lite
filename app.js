@@ -3690,6 +3690,7 @@ class AmbientParticleField {
             this.ctx.fillStyle = wash;
             this.ctx.fillRect(0, 0, width, height);
         }
+        this.drawCelestialHorizon(width, height);
         this.celestialBodies.forEach((body) => {
             if (body.altitude < 4) return;
             const x = (body.azimuth / 360) * width;
@@ -3805,6 +3806,30 @@ class AmbientParticleField {
             }
             this.ctx.restore();
         });
+    }
+
+    drawCelestialHorizon(width, height) {
+        // This is the same 0° baseline used by the altitude projection below.
+        // Keep it deliberately quiet: it is a spatial reference, not a new
+        // landscape layer over the night-sky experience. It is drawn into the
+        // cached celestial canvas, so it creates no repeating frame work.
+        const horizonY = height * 0.88;
+        const glow = this.ctx.createLinearGradient(0, horizonY, width, horizonY);
+        glow.addColorStop(0, 'rgba(154, 181, 234, 0)');
+        glow.addColorStop(0.2, 'rgba(154, 181, 234, 0.08)');
+        glow.addColorStop(0.5, 'rgba(214, 224, 255, 0.18)');
+        glow.addColorStop(0.8, 'rgba(154, 181, 234, 0.08)');
+        glow.addColorStop(1, 'rgba(154, 181, 234, 0)');
+        this.ctx.save();
+        this.ctx.strokeStyle = glow;
+        this.ctx.lineWidth = 1;
+        this.ctx.shadowColor = 'rgba(173, 196, 255, 0.18)';
+        this.ctx.shadowBlur = 7;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, horizonY + 5);
+        this.ctx.quadraticCurveTo(width * 0.5, horizonY - 8, width, horizonY + 5);
+        this.ctx.stroke();
+        this.ctx.restore();
     }
 
     drawMoonWithBooleanMask(x, y, size, phase) {
