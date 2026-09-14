@@ -40,6 +40,8 @@ assert.match(app, /runNewcomerGuidedOrientation\(\)[\s\S]*?showScreen\(newcomerT
 assert.match(html, /newcomer-body-map-stage[\s\S]*?newcomer-label-crown[\s\S]*?newcomer-label-root/);
 const css = readFileSync('style.css', 'utf8');
 assert.match(css, /newcomer-guided-labels li \{[\s\S]*?top: var\(--marker-y\)[\s\S]*?translateY\(-50%\)/);
+assert.match(css, /\.newcomer-marker-connectors \{[\s\S]*?opacity: 0\.38/, 'localized connector arrows should remain secondary to the embedded artwork labels');
+assert.match(css, /\.newcomer-guided-labels \{[\s\S]*?opacity: 0\.42/, 'localized names and locations should remain secondary to the embedded artwork labels');
 assert.match(css, /newcomer-label-crown \{ --marker-y: 7%[\s\S]*?newcomer-label-root \{ --marker-y: 70%/);
 assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);
 

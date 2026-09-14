@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: f10533d · 2026-09-14.
+Source snapshot: fd32bf1 + uncommitted newcomer artwork labeling · 2026-09-14.
 
-Version 3.00 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 3.01 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -241,7 +241,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Press Begin | If the persisted Lobby Video Introduction option is selected, play the explicit video introduction first; otherwise continue directly. The normal start guard and first-time eligibility check happen only after that optional prelude. |
-| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws curved arrowheads from each label to normalized coordinates for the matching marker after image load and resize. Its spoken orientation follows the Meditation Language before Arriving. |
+| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration has fixed English chakra names and leader lines embedded in the artwork. Its separate language-specific names, locations and curved arrowheads remain responsive but are deliberately faded to supporting guidance. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws each arrowhead to normalized coordinates for the matching marker after image load and resize. Its spoken orientation follows the Meditation Language before Arriving. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
 | Preparation | Initial settle → pre-practice guidance. |

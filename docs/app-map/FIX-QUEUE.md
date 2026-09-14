@@ -8,6 +8,10 @@ When Returning Journey is unchecked on a normal chakra journey, Begin proceeds d
 
 The video introduction is an explicit persisted Lobby preference, OFF by default. When selected, the roadmap adds Video Introduction and the video buffers and plays before the normal journey dispatcher continues. Completion acknowledges the Do Not Disturb reminder once; an unavailable video still continues into the chosen journey. Restart Journey is now immediate and does not replay the video. Automated source contracts cover the routing; a device playback check remains open.
 
+## Newcomer body-map artwork labels — implemented locally, device check pending
+
+The standing body-map artwork carries fixed English chakra labels and restrained leader lines. The responsive Display Language labels and connector arrows remain available for localized location guidance but render at reduced opacity, so the image’s fixed labels remain the primary visual reference. The asset, responsive-overlay contracts and atlas are synchronized; a device readability check remains open.
+
 ## Sleep Mode shared unlock — implemented locally, device check pending
 
 Sleep Mode now shares the seven-rapid-tap App version Advanced Features unlock with Intimate Care, Shots and Manage Settings. It starts hidden/disabled, relock clears it, reload starts locked, and both UI and direct journey entry reject it while locked. Automated lock and atlas checks pass; user visual/device journey check remains open.
