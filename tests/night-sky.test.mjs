@@ -53,14 +53,17 @@ const sunAltitudeAt = iso => {
 };
 assert.ok(sunAltitudeAt('2026-09-14T12:00:00+05:30') > -6, 'Indian midday must be outside the night-only celestial window');
 assert.ok(sunAltitudeAt('2026-09-14T23:00:00+05:30') <= -6, 'Indian night must be inside the civil-twilight celestial window');
-assert.match(app, /celestialSunEquatorial\(days, date\)[\s\S]*?observer\.approximate \|\| sunAltitude <= -6[\s\S]*?name: 'Sun', kind: 'sun'[\s\S]*?name: 'Earth', kind: 'earth'[\s\S]*?this\.celestialDaylight = false/,
-    'Granted-location skies should replace Moon, planets and named stars with a calculated Sun plus the low-horizon Earth theme marker before civil twilight without turning Equator fallback coordinates into false daylight');
-assert.match(app, /if \(this\.celestialDaylight\)[\s\S]*?createLinearGradient[\s\S]*?rgba\(35, 48, 124, 0\.34\)[\s\S]*?body\.kind === 'earth'[\s\S]*?255, 250, 230/,
-    'Daylight should retain a cached indigo cosmic wash, a gentle warm Sun and an Earth theme marker rather than switching to an ordinary daytime background');
+assert.match(app, /celestialSunEquatorial\(days, date\)[\s\S]*?observer\.approximate \|\| sunAltitude <= -6[\s\S]*?name: 'Sun', kind: 'sun'[\s\S]*?DAYLIGHT_SOLAR_SYSTEM\.map[\s\S]*?this\.celestialDaylight = false/,
+    'Granted-location skies should replace the night bodies with a calculated Sun plus an explicitly thematic full solar-system tableau before civil twilight without turning Equator fallback coordinates into false daylight');
+assert.match(app, /DAYLIGHT_SOLAR_SYSTEM[\s\S]*?Mercury[\s\S]*?Venus[\s\S]*?Earth[\s\S]*?Mars[\s\S]*?Jupiter[\s\S]*?Saturn[\s\S]*?Uranus[\s\S]*?Neptune[\s\S]*?if \(this\.celestialDaylight\)[\s\S]*?rgba\(35, 48, 124, 0\.34\)[\s\S]*?body\.kind === 'solar-planet'[\s\S]*?255, 250, 230/,
+    'Daylight should retain a cached indigo cosmic wash, a gentle warm Sun, and all eight themed planets rather than switching to an ordinary daytime background');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
     const locale = JSON.parse(readFileSync(`locales/${language}.json`, 'utf8'));
     assert.equal(locale.ui.celestialEarth, earth, `${language} must localize the Earth label`);
     assert.equal(locale.ui.celestialSun, sun, `${language} must localize the Sun label`);
+    for (const planet of ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']) {
+        assert.ok(locale.ui[`celestial${planet}`], `${language} must localize ${planet}`);
+    }
 }
 vm.runInContext(app.slice(app.indexOf('class AmbientParticleField {'),app.indexOf('// Visual Engine'))+
     '\nglobalThis.field = Object.create(AmbientParticleField.prototype);',sandbox);
