@@ -4,6 +4,10 @@
 
 When Returning Journey is unchecked on a normal chakra journey, Begin proceeds directly to a short orientation before Arriving. A static night-sky standing body-map illustration marks each chakra name and body location in the chosen Display Language. Responsive calibrated arrowheads terminate at their matching points. The spoken orientation follows the chosen Meditation Language; its Malayalam copy uses short, natural spoken sentences and the Malayalam chakra names. The app switches explicitly to Arriving afterward, removing the previously visible welcome-screen flicker. Returning Journey, demo, Sleep, Music Only and focused practices bypass this screen. Automated source contracts and a targeted browser flow cover the branches; a user device readability and listening check remains open.
 
+## Lobby video introduction — implemented locally, device check pending
+
+The video introduction is an explicit persisted Lobby preference, OFF by default. When selected, the roadmap adds Video Introduction and the video buffers and plays before the normal journey dispatcher continues. Completion acknowledges the Do Not Disturb reminder once; an unavailable video still continues into the chosen journey. Restart Journey is now immediate and does not replay the video. Automated source contracts cover the routing; a device playback check remains open.
+
 ## Sleep Mode shared unlock — implemented locally, device check pending
 
 Sleep Mode now shares the seven-rapid-tap App version Advanced Features unlock with Intimate Care, Shots and Manage Settings. It starts hidden/disabled, relock clears it, reload starts locked, and both UI and direct journey entry reject it while locked. Automated lock and atlas checks pass; user visual/device journey check remains open.

@@ -12,6 +12,7 @@ const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
 assert.ok(fs.statSync(new URL('../video/generate.mp4', import.meta.url)).size > 0, 'the generated compressed prelude video should exist');
 assert.ok(fs.statSync(new URL('../video/meditator.png', import.meta.url)).size > 0, 'the supplied meditator image should exist');
 assert.match(html, /id="journey-video-prelude"[\s\S]*?class="journey-video-prelude-meditator"[^>]*src="video\/meditator\.png"/, 'the meditator image should lead the prelude');
+assert.match(html, /id="journey-video-prelude-toggle"[\s\S]*?data-i18n="ui\.includeVideoIntroduction"/, 'Lobby should offer an explicit opt-in for the video introduction');
 assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/generate\.mp4"[^>]*type="video\/mp4"/, 'generate.mp4 should be the sole prelude video source');
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?data-i18n="ui\.journeyVideoPreludeLoading"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder, loading status, and explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
@@ -48,7 +49,8 @@ assert.match(app, /volVideo: clampAudioLevel\(storedNumber\('chakra_vol_video', 
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?async previewAudio\(\)[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(state\.volVideo, 0\.25\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'preview and actual video playback should use the independent Video Volume');
 assert.doesNotMatch(app, /fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video playback must not follow the background Music Volume');
 assert.doesNotMatch(app, /requestFullscreen\(|webkitEnterFullscreen/, 'the prelude should not trigger automatic fullscreen');
-assert.match(app, /restart-meditation'\)\?\.addEventListener\('click', async \(\) => \{[\s\S]*?meditation\.stop\(\{ preserveScreen: true \}\)/, 'Restart should prepare the prelude without entering fullscreen');
+assert.match(app, /journeyVideoPreludeEnabled: localStorage\.getItem\('chakra_journey_video_prelude'\) === 'true'/, 'the Lobby video preference should persist independently');
+assert.match(app, /state\.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce[\s\S]*?journeyVideoPrelude\.play\(\)[\s\S]*?startMeditationBtn\.click\(\)/, 'the selected Lobby video should run once before the normal journey dispatcher');
 assert.doesNotMatch(app, /this\.media\.pause\(\);[\s\S]{0,250}this\.exitFullscreen\(\);[\s\S]{0,250}this\.overlay\.classList\.remove/, 'the prelude should not leave fullscreen during the video-to-journey handoff');
 assert.doesNotMatch(app, /journeyVideoPrelude\.exitFullscreen\(\)/, 'the app should not exit user-controlled fullscreen');
 assert.match(app, /this\.media\.pause\(\);[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(0, 0\);/, 'the ready screen should leave the video paused and silent before Play');
@@ -57,7 +59,7 @@ assert.match(app, /this\.journeyVideoPreludeGain\.connect\(this\.spatialMusicPan
 const journeyVideoPrelude = app.slice(app.indexOf('class JourneyVideoPrelude'), app.indexOf('class MeditationController'));
 assert.doesNotMatch(journeyVideoPrelude, /onSkip|skipButton|JOURNEY_VIDEO_PRELUDE_SKIP/, 'the video prelude implementation should not retain an automatic skip path');
 assert.match(app, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
-assert.match(app, /document\.getElementById\('restart-meditation'\)\?\.addEventListener\('click', async \(\) => \{[\s\S]*?meditation\.stop\(\{ preserveScreen: true \}\);[\s\S]*?const preludeResult = await journeyVideoPrelude\.play\(\);[\s\S]*?if \(preludeResult === 'ended'\) meditation\.acknowledgeDndReminder\(\);[\s\S]*?const deadline = Date\.now\(\)/, 'restart should preserve the active screen behind the prelude and acknowledge the reminder before relaunching the journey');
+assert.match(app, /document\.getElementById\('restart-meditation'\)\?\.addEventListener\('click', async \(\) => \{[\s\S]*?meditation\.stop\(\{ preserveScreen: true \}\);[\s\S]*?bypassLobbyVideoPreludeOnce = true;[\s\S]*?startMeditationBtn\.click\(\)/, 'Restart should immediately relaunch without replaying the Lobby-only video');
 assert.match(app, /class MeditationController[\s\S]*?stop\(\{ preserveScreen = false \} = \{\}\)[\s\S]*?if \(!preserveScreen\) \{\s*showScreen\(returnScreen\);/, 'the meditation stop path should keep the active screen in place only during a restart');
 assert.match(app, /const DND_REMINDER_FALLBACK = "Before we begin:[\s\S]*?showDndReminderIfNeeded\(\) \{[\s\S]*?if \(this\.dndReminderAcknowledged\)[\s\S]*?this\.dndReminderAcknowledged = false;[\s\S]*?const reminder = t\('ui\.journeyVideoPreludeReminder'\);[\s\S]*?alert\(reminder === 'ui\.journeyVideoPreludeReminder' \? DND_REMINDER_FALLBACK : reminder\);/, 'the reminder should be consumed once after a completed video while normal starts retain a human-readable fallback');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
@@ -71,6 +73,8 @@ for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');
     assert.ok(locale.ui.journeyVideoPreludeLoading?.trim(), 'each shipped locale needs the video loading status');
     assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
+    assert.ok(locale.ui.includeVideoIntroduction?.trim(), 'each shipped locale needs the Lobby video-introduction option');
+    assert.ok(locale.ui.roadmapVideoIntroduction?.trim(), 'each shipped locale needs the video roadmap label');
     assert.ok(locale.ui.musicVideoVolume?.trim(), 'each shipped locale needs the shared Music / Video Volume label');
 }
 

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: de0601b · 2026-09-14.
+Source snapshot: 9b9f5fb + uncommitted Lobby video-introduction routing · 2026-09-14.
 
-Version 2.99 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 3.00 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -21,7 +21,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 11. [Sound Shots](#shots)
 12. [Experiment activities](#experiments)
 13. [Pause, stop and live controls](#controls)
-14. [Restart and cinematic prelude](#restart)
+14. [Optional Lobby video introduction](#restart)
 15. [Completion, statistics and external handoff](#completion)
 16. [Scripts, language and timing](#content)
 17. [Narration and fallback](#narration)
@@ -240,7 +240,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Press Begin | Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving. |
+| Press Begin | If the persisted Lobby Video Introduction option is selected, play the explicit video introduction first; otherwise continue directly. The normal start guard and first-time eligibility check happen only after that optional prelude. |
 | Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration appears directly, with each chakra name and body location localized in the Display Language. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws curved arrowheads from each label to normalized coordinates for the matching marker after image load and resize. Its spoken orientation follows the Meditation Language before Arriving. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
@@ -664,25 +664,23 @@ flowchart TD
 
 <a id="restart"></a>
 
-## Restart and cinematic prelude
+## Optional Lobby video introduction
 
-Restart re-enters the normal Begin dispatcher after video.
+An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
 
 Sources: [app.js:3778](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3778), [app.js:3831](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3831), [app.js:62](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:62).
 
 ```mermaid
 flowchart TD
-  restart["Mixer → Restart"]
-  stop["Stop, retain scene"]
+  lobby["Lobby → Include video introduction"]
   buffer["Prepare and buffer"]
   ready["Begin introduction"]
   hold["Image hold → playback"]
   recover["Buffer recovery"]
   end["Normal video ending"]
   error["Unavailable video"]
-  dispatch["Begin again"]
-  restart -->|"Confirmed"| stop
-  stop -->|"Prepare"| buffer
+  dispatch["Begin journey"]
+  lobby -->|"Option selected + Begin"| buffer
   buffer -->|"Ready / timeout"| ready
   ready -->|"User clicks"| hold
   hold -->|"Buffer low"| recover
@@ -696,15 +694,14 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Mixer → Restart | Confirmation: cancel leaves the current journey running. |
-| Stop, retain scene | Stop current journey with preserveScreen:true; open prelude overlay. |
+| Lobby → Include video introduction | Persisted choice defaults OFF and appears in the roadmap for every supported journey family. |
 | Prepare and buffer | Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check. |
 | Begin introduction | Reveal button when ready OR after the 90-second bounded wait. Explicit user action required. |
 | Image hold → playback | Hold image 3 seconds, then video; audio fades in over 2.4 seconds using separate video volume. |
 | Buffer recovery | Below 2 seconds ahead pauses except near end; waiting/stalled enters recovery. Resume at up to 4 seconds, bounded by remaining clip. |
 | Normal video ending | Final 0.25-second audiovisual fade; acknowledge DND reminder. |
 | Unavailable video | Missing media, preparation failure, media error or rejected play: unavailable result; error path fades 1.2 seconds. |
-| Begin again | Wait up to 5 seconds for prior start guard to unwind; click main Begin button using current mode selection. |
+| Begin journey | Continue through the current Lobby mode selection exactly once. Restart bypasses this optional prelude and relaunches directly. |
 
 - No skip control and no automatic fullscreen. A buffer countdown reports seconds of media still needed, not a measured wall-clock download ETA. Settings audio preview is separate: play 8 seconds, fade and reset without starting a journey.
 

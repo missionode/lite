@@ -995,18 +995,21 @@ function shouldRefreshLocalizedIntention(value, previousLanguage) {
 }
 
 function getJourneyRoadmapLabels() {
-    if (getChecked('music-only-toggle')) return [t('ui.roadmapMusicOnly')];
+    const withOptionalVideo = labels => state.journeyVideoPreludeEnabled
+        ? [t('ui.roadmapVideoIntroduction'), ...labels]
+        : labels;
+    if (getChecked('music-only-toggle')) return withOptionalVideo([t('ui.roadmapMusicOnly')]);
 
-    if (getChecked('box-breathing-experience-toggle')) return [t('ui.roadmapBoxBreathing')];
+    if (getChecked('box-breathing-experience-toggle')) return withOptionalVideo([t('ui.roadmapBoxBreathing')]);
 
-    if (getChecked('hooponopono-experience-toggle')) return [t('ui.roadmapHooponopono')];
+    if (getChecked('hooponopono-experience-toggle')) return withOptionalVideo([t('ui.roadmapHooponopono')]);
 
     if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
         const labels = [];
         if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
         if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassageReverse'));
         if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
-        return labels;
+        return withOptionalVideo(labels);
     }
 
     if (getChecked('yoga-experience-toggle')) {
@@ -1017,15 +1020,15 @@ function getJourneyRoadmapLabels() {
             labels.push(t('ui.roadmapRestBeforeYoga'));
         }
         labels.push(t('ui.roadmapYoga'));
-        return labels;
+        return withOptionalVideo(labels);
     }
 
     if (getChecked('sleep-mode-toggle')) {
-        return [t('ui.roadmapSleep'), t('ui.roadmapDrowsiness'), t('ui.roadmapLightSleep'), t('ui.roadmapTrueSleep'), t('ui.roadmapDeepSleep'), t('ui.roadmapRemRest')];
+        return withOptionalVideo([t('ui.roadmapSleep'), t('ui.roadmapDrowsiness'), t('ui.roadmapLightSleep'), t('ui.roadmapTrueSleep'), t('ui.roadmapDeepSleep'), t('ui.roadmapRemRest')]);
     }
 
     if (getChecked('high-energy-toggle')) {
-        return [t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')];
+        return withOptionalVideo([t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')]);
     }
 
     const labels = [
@@ -1035,7 +1038,7 @@ function getJourneyRoadmapLabels() {
     labels.push(t('ui.roadmapChakras'));
 
     labels.push(t('ui.roadmapClosing'));
-    return labels;
+    return withOptionalVideo(labels);
 }
 
 function updateJourneyRoadmap() {
@@ -6217,6 +6220,9 @@ const state = {
         if (saved !== null) return saved === 'true';
         return (parseInt(localStorage.getItem('chakra_stats_journeys')) || 0) > 0;
     })(),
+    // A deliberate Lobby preference: the cinematic prelude is optional and
+    // never implied by Restart Journey.
+    journeyVideoPreludeEnabled: localStorage.getItem('chakra_journey_video_prelude') === 'true',
     audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
     // Reverse order is intentionally derived only for the Massage wrapper.
     // These focused practices are Lobby-only Experience Modes. They are
@@ -6623,6 +6629,7 @@ function loadPreferences() {
     syncValue('intention-input', state.intention);
     
     syncChecked('returning-journey-toggle', state.returningJourney);
+    syncChecked('journey-video-prelude-toggle', state.journeyVideoPreludeEnabled);
     syncChecked('audio-filters-toggle', state.audioFilters);
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
@@ -7915,7 +7922,22 @@ function attachEventListeners() {
         });
     }
 
+    let bypassLobbyVideoPreludeOnce = false;
     startMeditationBtn.addEventListener('click', async () => {
+        if (state.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce) {
+            startMeditationBtn.disabled = true;
+            startMeditationBtn.style.opacity = '0.5';
+            const preludeResult = await journeyVideoPrelude.play();
+            if (preludeResult === 'ended') meditation.acknowledgeDndReminder();
+            startMeditationBtn.disabled = false;
+            startMeditationBtn.style.opacity = '1';
+            // The video either completed or was unavailable. In both cases,
+            // continue through the normal dispatcher exactly once.
+            bypassLobbyVideoPreludeOnce = true;
+            startMeditationBtn.click();
+            return;
+        }
+        bypassLobbyVideoPreludeOnce = false;
         if (getChecked('shots-toggle')) {
             const shotType = document.getElementById('shot-type-select')?.value || 'meditation';
             const customFrequency = Number(document.getElementById('shot-frequency-input')?.value);
@@ -8045,6 +8067,14 @@ function attachEventListeners() {
             updateJourneyRoadmap();
         });
     }
+    const journeyVideoPreludeToggle = document.getElementById('journey-video-prelude-toggle');
+    if (journeyVideoPreludeToggle) {
+        journeyVideoPreludeToggle.addEventListener('change', (e) => {
+            state.journeyVideoPreludeEnabled = e.target.checked;
+            localStorage.setItem('chakra_journey_video_prelude', String(state.journeyVideoPreludeEnabled));
+            updateJourneyRoadmap();
+        });
+    }
 
     const mixer = document.getElementById('volume-mixer');
     const mixerCloseButtons = [document.getElementById('close-mixer'), document.getElementById('close-mixer-bottom')].filter(Boolean);
@@ -8067,16 +8097,15 @@ function attachEventListeners() {
         if (!window.confirm(t('ui.restartConfirm'))) return;
         if (mixer) mixer.classList.add('hidden');
         meditation.stop({ preserveScreen: true });
-        // The guide explicitly starts the ready video; only a completed
-        // prelude counts as acknowledgement of its Do Not Disturb reminder.
-        const preludeResult = await journeyVideoPrelude.play();
-        if (preludeResult === 'ended') meditation.acknowledgeDndReminder();
         // A journey may still be unwinding its async start sequence. Wait for
         // the cancellation to release the start guard before launching again.
         const deadline = Date.now() + 5000;
         while (meditation.isStarting && Date.now() < deadline) {
             await new Promise(resolve => setTimeout(resolve, 50));
         }
+        // Restart is immediate. The Lobby toggle controls whether the next
+        // newly started journey includes the optional video introduction.
+        bypassLobbyVideoPreludeOnce = true;
         startMeditationBtn.click();
     });
     document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));

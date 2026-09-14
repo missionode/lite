@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: de0601b · 2026-09-14.
+Source snapshot: 9b9f5fb + uncommitted Lobby video-introduction routing · 2026-09-14.
 
 This inventories static UI declarations in all three HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
@@ -75,62 +75,63 @@ This inventories static UI declarations in all three HTML entry pages. Dynamic c
 | [343](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:343) | input | drone-duration-mode | type=radio · value=expert |
 | [356](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:356) | input | intention-input | type=text |
 | [362](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:362) | input | returning-journey-toggle | type=checkbox |
-| [371](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:371) | input | high-energy-toggle | type=checkbox |
-| [375](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:375) | input | sleep-mode-toggle | type=checkbox |
-| [379](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:379) | input | music-only-toggle | type=checkbox |
-| [383](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:383) | input | box-breathing-experience-toggle | type=checkbox |
-| [387](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:387) | input | hooponopono-experience-toggle | type=checkbox |
-| [391](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:391) | input | yoga-experience-toggle | type=checkbox |
-| [403](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:403) | input | perineal-care-toggle | type=checkbox |
-| [407](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:407) | input | massage-toggle | type=checkbox |
-| [411](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:411) | input | assisted-bathing-toggle | type=checkbox |
-| [419](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:419) | input | time-perineal-care | type=range · min=30 · max=900 · step=30 · value=300 |
-| [424](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:424) | input | time-assisted-bathing | type=range · min=60 · max=1800 · step=60 · value=600 |
-| [434](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:434) | button | start-meditation |  |
-| [435](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:435) | button | open-settings |  |
-| [436](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:436) | button | begin-consultation | type=button |
-| [445](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:445) | button | guide-controlled-continue | type=button |
-| [531](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:531) | button | play-journey-video-prelude | type=button · label=ui.playJourneyVideoPrelude |
-| [540](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:540) | button | close-mixer | type=button |
-| [546](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:546) | input | vol-voice | type=range · min=0.2 · max=2 · step=0.1 · value=1.0 |
-| [547](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:547) | input | vol-drone | type=range · min=0.02 · max=0.2 · step=0.01 · value=0.05 |
-| [548](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:548) | input | vol-bell | type=range · min=0.02 · max=0.12 · step=0.01 · value=0.04 |
-| [549](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:549) | input | vol-mantra | type=range · min=0.005 · max=1 · step=0.005 · value=0.35 |
-| [550](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:550) | input | vol-music | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.2 |
-| [554](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:554) | input | mood-relaxation-intention-toggle | type=checkbox |
-| [558](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:558) | select | pleasure-ambience-intensity | gentle: Gentle; immersive: Immersive; deep: Deep |
-| [568](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:568) | input | pleasure-ambience-url | type=url |
-| [569](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:569) | button | load-pleasure-ambience-url | type=button · label=ui.loadPleasureAmbience |
-| [575](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:575) | input | pleasure-ambience-blur-toggle | type=checkbox |
-| [580](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:580) | input | pleasure-ambience-blur-level | type=range · min=10 · max=65 · step=5 · value=35 |
-| [582](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:582) | button | Decrease value | type=button |
-| [586](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:586) | button | Increase value | type=button |
-| [592](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:592) | input | mood-relaxation-ambience-level | type=range · min=0.2 · max=7.0 · step=0.1 · value=0.3 |
-| [594](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:594) | button | Decrease value | type=button |
-| [598](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:598) | button | Increase value | type=button |
-| [610](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:610) | input | voice-clarity | type=range · min=0 · max=100 · step=1 · value=50 |
-| [611](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:611) | input | voice-warmth | type=range · min=0 · max=100 · step=1 · value=50 |
-| [612](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:612) | input | voice-pace | type=range · min=0.85 · max=1.15 · step=0.05 · value=1 |
-| [613](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:613) | select | voice-echo | off: Off; light: Soft Room; spacious: Temple Air |
-| [615](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:615) | button | Soft | type=button · label=ui.voicePresetSoft |
-| [616](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:616) | button | Shringara | type=button · label=ui.voicePresetShringara |
-| [617](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:617) | button | Balanced | type=button · label=ui.voicePresetBalanced |
-| [618](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:618) | button | Clear | type=button · label=ui.voicePresetClear |
-| [620](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:620) | button | mixer-voice-preview | type=button · label=ui.previewTunedVoice |
-| [631](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:631) | select | music-echo | off: Off; light: Soft Room; spacious: Temple Air |
-| [639](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:639) | select | mixer-spatial-mode | off: Off (Stereo Safe); stereo: Stereo Wide; headphones: Headphone 3D; room: Room Spatial |
-| [651](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:651) | input | audio-filters-toggle | type=checkbox |
-| [652](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:652) | input | eyes-close-mode-toggle | type=checkbox |
-| [654](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:654) | input | brightness-slider | type=range · min=0.1 · max=1 · step=0.05 · value=1 |
-| [658](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:658) | input | mixer-no-frequency-mode-toggle | type=checkbox |
-| [660](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:660) | input | mixer-no-mantra-mode-toggle | type=checkbox |
-| [665](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:665) | button | restart-meditation | type=button · label=ui.restartJourney |
-| [666](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:666) | button | close-mixer-bottom | type=button · label=ui.close |
-| [676](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:676) | button | btn-mixer |  |
-| [677](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:677) | button | pause-meditation |  |
-| [678](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:678) | button | stop-meditation |  |
-| [696](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:696) | a | continue-to-earn | href=https://missionode.github.io/earn-app/receive.html?Source=Lite |
-| [700](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:700) | button | close-completion |  |
+| [366](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:366) | input | journey-video-prelude-toggle | type=checkbox |
+| [375](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:375) | input | high-energy-toggle | type=checkbox |
+| [379](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:379) | input | sleep-mode-toggle | type=checkbox |
+| [383](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:383) | input | music-only-toggle | type=checkbox |
+| [387](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:387) | input | box-breathing-experience-toggle | type=checkbox |
+| [391](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:391) | input | hooponopono-experience-toggle | type=checkbox |
+| [395](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:395) | input | yoga-experience-toggle | type=checkbox |
+| [407](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:407) | input | perineal-care-toggle | type=checkbox |
+| [411](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:411) | input | massage-toggle | type=checkbox |
+| [415](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:415) | input | assisted-bathing-toggle | type=checkbox |
+| [423](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:423) | input | time-perineal-care | type=range · min=30 · max=900 · step=30 · value=300 |
+| [428](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:428) | input | time-assisted-bathing | type=range · min=60 · max=1800 · step=60 · value=600 |
+| [438](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:438) | button | start-meditation |  |
+| [439](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:439) | button | open-settings |  |
+| [440](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:440) | button | begin-consultation | type=button |
+| [449](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:449) | button | guide-controlled-continue | type=button |
+| [535](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:535) | button | play-journey-video-prelude | type=button · label=ui.playJourneyVideoPrelude |
+| [544](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:544) | button | close-mixer | type=button |
+| [550](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:550) | input | vol-voice | type=range · min=0.2 · max=2 · step=0.1 · value=1.0 |
+| [551](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:551) | input | vol-drone | type=range · min=0.02 · max=0.2 · step=0.01 · value=0.05 |
+| [552](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:552) | input | vol-bell | type=range · min=0.02 · max=0.12 · step=0.01 · value=0.04 |
+| [553](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:553) | input | vol-mantra | type=range · min=0.005 · max=1 · step=0.005 · value=0.35 |
+| [554](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:554) | input | vol-music | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.2 |
+| [558](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:558) | input | mood-relaxation-intention-toggle | type=checkbox |
+| [562](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:562) | select | pleasure-ambience-intensity | gentle: Gentle; immersive: Immersive; deep: Deep |
+| [572](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:572) | input | pleasure-ambience-url | type=url |
+| [573](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:573) | button | load-pleasure-ambience-url | type=button · label=ui.loadPleasureAmbience |
+| [579](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:579) | input | pleasure-ambience-blur-toggle | type=checkbox |
+| [584](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:584) | input | pleasure-ambience-blur-level | type=range · min=10 · max=65 · step=5 · value=35 |
+| [586](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:586) | button | Decrease value | type=button |
+| [590](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:590) | button | Increase value | type=button |
+| [596](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:596) | input | mood-relaxation-ambience-level | type=range · min=0.2 · max=7.0 · step=0.1 · value=0.3 |
+| [598](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:598) | button | Decrease value | type=button |
+| [602](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:602) | button | Increase value | type=button |
+| [614](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:614) | input | voice-clarity | type=range · min=0 · max=100 · step=1 · value=50 |
+| [615](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:615) | input | voice-warmth | type=range · min=0 · max=100 · step=1 · value=50 |
+| [616](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:616) | input | voice-pace | type=range · min=0.85 · max=1.15 · step=0.05 · value=1 |
+| [617](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:617) | select | voice-echo | off: Off; light: Soft Room; spacious: Temple Air |
+| [619](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:619) | button | Soft | type=button · label=ui.voicePresetSoft |
+| [620](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:620) | button | Shringara | type=button · label=ui.voicePresetShringara |
+| [621](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:621) | button | Balanced | type=button · label=ui.voicePresetBalanced |
+| [622](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:622) | button | Clear | type=button · label=ui.voicePresetClear |
+| [624](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:624) | button | mixer-voice-preview | type=button · label=ui.previewTunedVoice |
+| [635](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:635) | select | music-echo | off: Off; light: Soft Room; spacious: Temple Air |
+| [643](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:643) | select | mixer-spatial-mode | off: Off (Stereo Safe); stereo: Stereo Wide; headphones: Headphone 3D; room: Room Spatial |
+| [655](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:655) | input | audio-filters-toggle | type=checkbox |
+| [656](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:656) | input | eyes-close-mode-toggle | type=checkbox |
+| [658](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:658) | input | brightness-slider | type=range · min=0.1 · max=1 · step=0.05 · value=1 |
+| [662](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:662) | input | mixer-no-frequency-mode-toggle | type=checkbox |
+| [664](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:664) | input | mixer-no-mantra-mode-toggle | type=checkbox |
+| [669](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:669) | button | restart-meditation | type=button · label=ui.restartJourney |
+| [670](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:670) | button | close-mixer-bottom | type=button · label=ui.close |
+| [680](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:680) | button | btn-mixer |  |
+| [681](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:681) | button | pause-meditation |  |
+| [682](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:682) | button | stop-meditation |  |
+| [700](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:700) | a | continue-to-earn | href=https://missionode.github.io/earn-app/receive.html?Source=Lite |
+| [704](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:704) | button | close-completion |  |
 
 ## docs/assesment.html
 

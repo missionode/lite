@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-14",
-    "commit": "de0601b",
-    "scope": "Version 2.99 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "9b9f5fb + uncommitted Lobby video-introduction routing",
+    "scope": "Version 3.00 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -470,7 +470,7 @@
           [
             "begin",
             "Press Begin",
-            "Guard duplicate starts. The first-time eligibility check happens before DND, audio, wake lock, timers or Arriving."
+            "If the persisted Lobby Video Introduction option is selected, play the explicit video introduction first; otherwise continue directly. The normal start guard and first-time eligibility check happen only after that optional prelude."
           ]
         ],
         [
@@ -1775,22 +1775,15 @@
     {
       "id": "restart",
       "group": "Live session",
-      "title": "Restart and cinematic prelude",
-      "subtitle": "Restart re-enters the normal Begin dispatcher after video.",
+      "title": "Optional Lobby video introduction",
+      "subtitle": "An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.",
       "source": "app.js:3778; app.js:3831; app.js:62",
       "rows": [
         [
           [
-            "restart",
-            "Mixer → Restart",
-            "Confirmation: cancel leaves the current journey running."
-          ]
-        ],
-        [
-          [
-            "stop",
-            "Stop, retain scene",
-            "Stop current journey with preserveScreen:true; open prelude overlay."
+            "lobby",
+            "Lobby → Include video introduction",
+            "Persisted choice defaults OFF and appears in the roadmap for every supported journey family."
           ]
         ],
         [
@@ -1836,21 +1829,16 @@
         [
           [
             "dispatch",
-            "Begin again",
-            "Wait up to 5 seconds for prior start guard to unwind; click main Begin button using current mode selection."
+            "Begin journey",
+            "Continue through the current Lobby mode selection exactly once. Restart bypasses this optional prelude and relaunches directly."
           ]
         ]
       ],
       "edges": [
         [
-          "restart",
-          "stop",
-          "Confirmed"
-        ],
-        [
-          "stop",
+          "lobby",
           "buffer",
-          "Prepare"
+          "Option selected + Begin"
         ],
         [
           "buffer",
