@@ -42,8 +42,8 @@ assert.match(app, /drawCelestialBodies\(width, height\)/,
     'Calculated celestial bodies should be rendered in the ambient sky.');
 assert.match(app, /CELESTIAL_LABEL_KEYS[\s\S]*?ui\.celestialMercury[\s\S]*?ui\.celestialJupiter[\s\S]*?ui\.celestialMoon[\s\S]*?ui\.celestialSirius/,
     'Prominent celestial bodies should have localized display labels.');
-assert.match(app, /translatedLabel = labelKey \? t\(labelKey, state\.displayLanguage\)[\s\S]*?translatedLabel\.startsWith\('ui\.'\)[\s\S]*?const shouldShowLabel = body\.kind === 'sun' \|\| body\.kind === 'earth' \|\| body\.kind === 'solar-planet' \|\| body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.15\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.15\)'[\s\S]*?0\.30\)`[\s\S]*?fillText\(label/,
-    'Non-Moon celestial labels should use 30% text with a 15% translucent backing and outline.');
+assert.match(app, /translatedLabel = labelKey \? t\(labelKey, state\.displayLanguage\)[\s\S]*?translatedLabel\.startsWith\('ui\.'\)[\s\S]*?const shouldShowLabel = body\.kind === 'sun' \|\| body\.kind === 'earth' \|\| body\.kind === 'solar-planet' \|\| body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.20\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.20\)'[\s\S]*?0\.40\)`[\s\S]*?fillText\(label/,
+    'Non-Moon celestial labels should use 40% text with a 20% translucent backing and outline.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');
 assert.match(app, /this\.ctx\.save\(\);\s*this\.ctx\.shadowBlur = 0;\s*this\.ctx\.filter = 'blur\(3px\)';[\s\S]*?fillRect\(labelLeft, labelY - 12, labelWidth, 16\);\s*this\.ctx\.restore\(\);[\s\S]*?strokeText\(label/,

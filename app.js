@@ -3709,7 +3709,7 @@ class AmbientParticleField {
             const illumination = body.kind === 'moon' ? (1 - Math.cos((body.phase ?? 0.5) * Math.PI * 2)) / 2 : 1;
             const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'earth' || body.kind === 'solar-planet' ? size * 3 : body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.22 : body.kind === 'earth' || body.kind === 'solar-planet' ? 0.16 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.27 : body.kind === 'earth' || body.kind === 'solar-planet' ? 0.21 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
             halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
             this.ctx.fillStyle = halo;
             this.ctx.beginPath();
@@ -3794,13 +3794,13 @@ class AmbientParticleField {
                 this.ctx.save();
                 this.ctx.shadowBlur = 0;
                 this.ctx.filter = 'blur(3px)';
-                this.ctx.fillStyle = 'rgba(2, 4, 9, 0.15)';
+                this.ctx.fillStyle = 'rgba(2, 4, 9, 0.20)';
                 this.ctx.fillRect(labelLeft, labelY - 12, labelWidth, 16);
                 this.ctx.restore();
                 this.ctx.lineWidth = 1.4;
-                this.ctx.strokeStyle = 'rgba(2, 4, 9, 0.15)';
+                this.ctx.strokeStyle = 'rgba(2, 4, 9, 0.20)';
                 this.ctx.strokeText(label, labelX, labelY);
-                this.ctx.fillStyle = `rgba(${Math.max(red, 220)}, ${Math.max(green, 220)}, ${Math.max(blue, 220)}, 0.30)`;
+                this.ctx.fillStyle = `rgba(${Math.max(red, 220)}, ${Math.max(green, 220)}, ${Math.max(blue, 220)}, 0.40)`;
                 this.ctx.fillText(label, labelX, labelY);
             }
             this.ctx.restore();
