@@ -35,7 +35,7 @@ assert.ok(
   start.indexOf('newcomerChoice') < start.indexOf('this.showDndReminderIfNeeded()'),
   'newcomer eligibility must be decided before DND reminder, audio setup and Arriving'
 );
-assert.match(app, /async runNewcomerGuidedOrientation\(\)[\s\S]*?t\('ui\.newcomerGuidedNarration'\)[\s\S]*?'soft'/);
+assert.match(app, /async runNewcomerGuidedOrientation\(\)[\s\S]*?contentT\('ui\.newcomerGuidedNarration'\)[\s\S]*?'soft'/);
 assert.match(app, /runNewcomerGuidedOrientation\(\)[\s\S]*?showScreen\(newcomerTutorialScreen\)[\s\S]*?showScreen\(icebreakerScreen\)/);
 assert.match(html, /newcomer-body-map-stage[\s\S]*?newcomer-label-crown[\s\S]*?newcomer-label-root/);
 const css = readFileSync('style.css', 'utf8');

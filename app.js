@@ -4788,7 +4788,9 @@ class MeditationController {
             status.hidden = false;
             status.textContent = t('ui.newcomerGuidedStatus');
         }
-        await this.narrate(t('ui.newcomerGuidedNarration'), false, true, 'soft');
+        // This is spoken guidance, so it must follow Meditation Language rather
+        // than the independent Display Language used by the on-screen labels.
+        await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
         if (status) status.hidden = true;
         newcomerTutorialScreen?.classList.remove('is-guided');
         showScreen(icebreakerScreen);
