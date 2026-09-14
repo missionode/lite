@@ -93,7 +93,7 @@ const DND_REMINDER_FALLBACK = "Before we begin: Please ensure 'Do Not Disturb' i
 const CELESTIAL_DEG = Math.PI / 180;
 const CELESTIAL_RAD = 180 / Math.PI;
 const CELESTIAL_LABEL_KEYS = Object.freeze({
-    Moon: 'ui.celestialMoon', Venus: 'ui.celestialVenus', Jupiter: 'ui.celestialJupiter',
+    Sun: 'ui.celestialSun', Earth: 'ui.celestialEarth', Moon: 'ui.celestialMoon', Venus: 'ui.celestialVenus', Jupiter: 'ui.celestialJupiter',
     Mars: 'ui.celestialMars', Saturn: 'ui.celestialSaturn', Polaris: 'ui.celestialPolaris',
     Sirius: 'ui.celestialSirius', Vega: 'ui.celestialVega', Arcturus: 'ui.celestialArcturus',
     Altair: 'ui.celestialAltair', Betelgeuse: 'ui.celestialBetelgeuse'
@@ -3526,8 +3526,15 @@ class AmbientParticleField {
             // Preserve the deep-space atmosphere during daylight rather than
             // swapping to a conventional blue sky. The Sun is the only
             // calculated daytime body; Moon, planets and named stars rest.
+            // Earth is a deliberately non-astronomical, low-horizon theme
+            // marker: a ground observer cannot literally see Earth in the
+            // sky. It keeps the requested space motif without presenting a
+            // false celestial position as astronomy.
             this.celestialDaylight = true;
-            this.celestialBodies = [{ name: 'Sun', kind: 'sun', magnitude: -27, color: [255, 223, 150], angularDiameter: 0.53, ...sunPosition }];
+            this.celestialBodies = [
+                { name: 'Sun', kind: 'sun', magnitude: -27, color: [255, 232, 184], angularDiameter: 0.53, ...sunPosition },
+                { name: 'Earth', kind: 'earth', magnitude: -4, color: [114, 190, 221], azimuth: 232, altitude: 11 }
+            ];
             return;
         }
         this.celestialDaylight = false;
@@ -3673,7 +3680,9 @@ class AmbientParticleField {
             const y = Math.max(28, height * (0.88 - Math.min(body.altitude, 88) / 100));
             const moonPixelDiameter = 28;
             const size = body.kind === 'sun'
-                ? 14
+                ? 12
+                : body.kind === 'earth'
+                ? 9
                 : body.kind === 'moon'
                 ? moonPixelDiameter / 2
                 : body.kind === 'planet'
@@ -3682,9 +3691,9 @@ class AmbientParticleField {
             const [red, green, blue] = body.color;
             this.ctx.save();
             const illumination = body.kind === 'moon' ? (1 - Math.cos((body.phase ?? 0.5) * Math.PI * 2)) / 2 : 1;
-            const haloRadius = body.kind === 'sun' ? size * 7 : body.kind === 'moon' ? size * 3.5 : size * 4;
+            const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'earth' ? size * 3 : body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.3 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.22 : body.kind === 'earth' ? 0.16 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
             halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
             this.ctx.fillStyle = halo;
             this.ctx.beginPath();
@@ -3696,13 +3705,31 @@ class AmbientParticleField {
                 this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
             } else if (body.kind === 'sun') {
                 const sunGradient = this.ctx.createRadialGradient(x - size * 0.28, y - size * 0.28, Math.max(0.5, size * 0.08), x, y, size);
-                sunGradient.addColorStop(0, 'rgba(255, 255, 244, 1)');
-                sunGradient.addColorStop(0.35, 'rgba(255, 238, 175, 0.98)');
-                sunGradient.addColorStop(1, 'rgba(255, 173, 74, 0.88)');
+                // A soft, balanced daylight palette: warm enough to feel
+                // alive, not white-hot or orange-heavy.
+                sunGradient.addColorStop(0, 'rgba(255, 250, 230, 1)');
+                sunGradient.addColorStop(0.42, 'rgba(255, 235, 184, 0.96)');
+                sunGradient.addColorStop(1, 'rgba(255, 196, 118, 0.82)');
                 this.ctx.fillStyle = sunGradient;
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, size, 0, Math.PI * 2);
                 this.ctx.fill();
+            } else if (body.kind === 'earth') {
+                const earthGradient = this.ctx.createRadialGradient(x - size * 0.34, y - size * 0.38, Math.max(0.4, size * 0.12), x, y, size);
+                earthGradient.addColorStop(0, 'rgba(222, 248, 255, 0.98)');
+                earthGradient.addColorStop(0.38, 'rgba(103, 186, 222, 0.94)');
+                earthGradient.addColorStop(1, 'rgba(27, 80, 145, 0.9)');
+                this.ctx.fillStyle = earthGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 0.48;
+                this.ctx.fillStyle = 'rgba(107, 173, 119, 0.82)';
+                this.ctx.beginPath();
+                this.ctx.ellipse(x - size * 0.2, y - size * 0.1, size * 0.34, size * 0.15, -0.45, 0, Math.PI * 2);
+                this.ctx.ellipse(x + size * 0.29, y + size * 0.22, size * 0.22, size * 0.11, 0.25, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1;
             } else {
                 const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
                 planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
@@ -3715,7 +3742,7 @@ class AmbientParticleField {
             }
             const labelKey = CELESTIAL_LABEL_KEYS[body.name];
             const label = labelKey ? t(labelKey, state.language) : body.name;
-            const shouldShowLabel = body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
+            const shouldShowLabel = body.kind === 'sun' || body.kind === 'earth' || body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
             if (label && shouldShowLabel) {
                 this.ctx.textAlign = x > width * 0.82 ? 'right' : 'left';
                 // Labels remain compact and deliberately translucent. The

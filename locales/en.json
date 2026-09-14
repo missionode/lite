@@ -55,6 +55,8 @@
     "includeVideoIntroduction": "Include video introduction",
     "roadmapVideoIntroduction": "Video introduction",
     "moon": "Moon",
+    "celestialSun": "Sun",
+    "celestialEarth": "Earth",
     "celestialMoon": "Moon",
     "celestialVenus": "Venus",
     "celestialJupiter": "Jupiter",

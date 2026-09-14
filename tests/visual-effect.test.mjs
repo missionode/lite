@@ -42,7 +42,7 @@ assert.match(app, /drawCelestialBodies\(width, height\)/,
     'Calculated celestial bodies should be rendered in the ambient sky.');
 assert.match(app, /CELESTIAL_LABEL_KEYS[\s\S]*?ui\.celestialMoon[\s\S]*?ui\.celestialJupiter[\s\S]*?ui\.celestialSirius/,
     'Prominent celestial bodies should have localized display labels.');
-assert.match(app, /const shouldShowLabel = body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.15\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.15\)'[\s\S]*?0\.30\)`[\s\S]*?fillText\(label/,
+assert.match(app, /const shouldShowLabel = body\.kind === 'sun' \|\| body\.kind === 'earth' \|\| body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.15\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.15\)'[\s\S]*?0\.30\)`[\s\S]*?fillText\(label/,
     'Non-Moon celestial labels should use 30% text with a 15% translucent backing and outline.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');
