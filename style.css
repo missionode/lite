@@ -426,6 +426,13 @@ body {
     inset: 0;
     pointer-events: none;
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 28%, transparent 72%, rgba(0, 0, 0, 0.42));
+    transition: opacity 0.25s ease;
+}
+
+/* The readiness card can use a gentle cinematic shade, but the actual video
+   should be seen at its authored brightness and contrast. */
+.journey-video-prelude.is-video .journey-video-prelude-shade {
+    opacity: 0;
 }
 
 .journey-video-prelude-ready {

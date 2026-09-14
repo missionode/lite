@@ -21,6 +21,7 @@ assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*conta
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?height:\s*100vh[\s\S]*?min-height:\s*100vh/, 'fullscreen should use a stable viewport height');
 assert.match(css, /#app:fullscreen \.journey-video-prelude\s*\{[\s\S]*?width:\s*100%[\s\S]*?height:\s*100%/, 'the prelude should fill the stable fullscreen container');
 assert.match(css, /\.journey-video-prelude\.is-playing \.journey-video-prelude-ready[\s\S]*?backdrop-filter:\s*none[\s\S]*?box-shadow:\s*none/, 'playback should remove expensive loading-card compositing');
+assert.match(css, /\.journey-video-prelude\.is-video \.journey-video-prelude-shade\s*\{\s*opacity:\s*0/, 'actual video playback must remove the dark shade so the video remains fully visible.');
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS = 2\.4/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS = 0\.25/);
 assert.match(app, /const JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS = 1\.2/);
