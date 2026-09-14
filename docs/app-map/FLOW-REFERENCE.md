@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 9b9f5fb + uncommitted Lobby video-introduction routing · 2026-09-14.
+Source snapshot: f10533d · 2026-09-14.
 
 Version 3.00 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
