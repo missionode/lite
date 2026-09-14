@@ -49,7 +49,9 @@ const skyOnly=await page.addStyleTag({content:'#app,#aura-bg{visibility:hidden!i
 await page.screenshot({path:'/private/tmp/natural-sky-field.png'});
 await skyOnly.evaluate(el=>el.remove());
 await page.emulateMedia({reducedMotion:'reduce'});
-await page.waitForFunction(()=>particleField.frame===0);
+// Wait for the media-query change handler itself to settle. A frame id of zero
+// alone can occur in the brief gap between animation frames.
+await page.waitForFunction(()=>particleField.motionPreference.matches&&particleField.frame===0&&particleField.renderTimer===null);
 const before=await page.evaluate(()=>particleField.canvas.toDataURL());
 await page.waitForTimeout(150);
 assert.equal(await page.evaluate(()=>particleField.canvas.toDataURL()),before);

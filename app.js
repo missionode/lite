@@ -3515,16 +3515,22 @@ class AmbientParticleField {
         if (!observer) return;
         const days = celestialJulianDay(date) - 2451543.5;
         const sun = celestialSunEquatorial(days, date);
-        const sunAltitude = celestialHorizontal(sun.ra, sun.dec, observer.latitude, observer.longitude, date).altitude;
+        const sunPosition = celestialHorizontal(sun.ra, sun.dec, observer.latitude, observer.longitude, date);
+        const sunAltitude = sunPosition.altitude;
         // A daytime Moon is real, but it breaks the intentional night-sky
         // scene. Use civil twilight as the visual boundary. When location is
         // unavailable, retain the approximate night sky rather than deriving
         // a false daylight state from the Equator fallback.
         this.celestialNightVisible = observer.approximate || sunAltitude <= -6;
         if (!this.celestialNightVisible) {
-            this.celestialBodies = [];
+            // Preserve the deep-space atmosphere during daylight rather than
+            // swapping to a conventional blue sky. The Sun is the only
+            // calculated daytime body; Moon, planets and named stars rest.
+            this.celestialDaylight = true;
+            this.celestialBodies = [{ name: 'Sun', kind: 'sun', magnitude: -27, color: [255, 223, 150], angularDiameter: 0.53, ...sunPosition }];
             return;
         }
+        this.celestialDaylight = false;
         const namedStars = [
             ['Polaris', 37.9546, 89.2641, 1.98, [205, 225, 255]],
             ['Sirius', 101.2872, -16.7161, 1.46, [220, 232, 255]],
@@ -3650,12 +3656,25 @@ class AmbientParticleField {
     }
 
     drawCelestialBodies(width, height) {
+        if (this.celestialDaylight) {
+            // Cached once per celestial refresh: a transparent indigo wash
+            // keeps the application’s space identity while softening the
+            // procedural field beneath the calculated daytime Sun.
+            const wash = this.ctx.createLinearGradient(0, 0, 0, height);
+            wash.addColorStop(0, 'rgba(35, 48, 124, 0.34)');
+            wash.addColorStop(0.5, 'rgba(50, 66, 148, 0.18)');
+            wash.addColorStop(1, 'rgba(5, 8, 28, 0.08)');
+            this.ctx.fillStyle = wash;
+            this.ctx.fillRect(0, 0, width, height);
+        }
         this.celestialBodies.forEach((body) => {
             if (body.altitude < 4) return;
             const x = (body.azimuth / 360) * width;
             const y = Math.max(28, height * (0.88 - Math.min(body.altitude, 88) / 100));
             const moonPixelDiameter = 28;
-            const size = body.kind === 'moon'
+            const size = body.kind === 'sun'
+                ? 14
+                : body.kind === 'moon'
                 ? moonPixelDiameter / 2
                 : body.kind === 'planet'
                     ? Math.min(1.65, Math.max(0.8, moonPixelDiameter * (body.angularDiameter / 0.52) * 0.4))
@@ -3663,9 +3682,9 @@ class AmbientParticleField {
             const [red, green, blue] = body.color;
             this.ctx.save();
             const illumination = body.kind === 'moon' ? (1 - Math.cos((body.phase ?? 0.5) * Math.PI * 2)) / 2 : 1;
-            const haloRadius = body.kind === 'moon' ? size * 3.5 : size * 4;
+            const haloRadius = body.kind === 'sun' ? size * 7 : body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.3 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
             halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
             this.ctx.fillStyle = halo;
             this.ctx.beginPath();
@@ -3675,6 +3694,15 @@ class AmbientParticleField {
             this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.52 : 0.72})`;
             if (body.kind === 'moon') {
                 this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
+            } else if (body.kind === 'sun') {
+                const sunGradient = this.ctx.createRadialGradient(x - size * 0.28, y - size * 0.28, Math.max(0.5, size * 0.08), x, y, size);
+                sunGradient.addColorStop(0, 'rgba(255, 255, 244, 1)');
+                sunGradient.addColorStop(0.35, 'rgba(255, 238, 175, 0.98)');
+                sunGradient.addColorStop(1, 'rgba(255, 173, 74, 0.88)');
+                this.ctx.fillStyle = sunGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                this.ctx.fill();
             } else {
                 const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
                 planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
@@ -3687,9 +3715,7 @@ class AmbientParticleField {
             }
             const labelKey = CELESTIAL_LABEL_KEYS[body.name];
             const label = labelKey ? t(labelKey, state.language) : body.name;
-            const shouldShowLabel = body.kind !== 'moon' && (
-                body.kind !== 'star' || body.magnitude < 1
-            );
+            const shouldShowLabel = body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
             if (label && shouldShowLabel) {
                 this.ctx.textAlign = x > width * 0.82 ? 'right' : 'left';
                 // Labels remain compact and deliberately translucent. The
