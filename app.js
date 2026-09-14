@@ -116,8 +116,8 @@ function celestialSolveEccentricAnomaly(meanAnomaly, eccentricity) {
     return eccentricAnomaly;
 }
 
-function celestialEclipticToEquatorial(longitude, latitude = 0) {
-    const obliquity = (23.4393 - 3.563e-7 * (celestialJulianDay() - 2451543.5)) * CELESTIAL_DEG;
+function celestialEclipticToEquatorial(longitude, latitude = 0, date = new Date()) {
+    const obliquity = (23.4393 - 3.563e-7 * (celestialJulianDay(date) - 2451543.5)) * CELESTIAL_DEG;
     const lambda = longitude * CELESTIAL_DEG;
     const beta = latitude * CELESTIAL_DEG;
     return {
@@ -136,6 +136,10 @@ function celestialSunLongitude(days) {
     return celestialNormalizeDegrees(Math.atan2(y, x) * CELESTIAL_RAD + w);
 }
 
+function celestialSunEquatorial(days, date = new Date()) {
+    return celestialEclipticToEquatorial(celestialSunLongitude(days), 0, date);
+}
+
 function celestialMoonPhase(days) {
     // 2000-01-06 18:14 UTC was a known new-moon reference. The synodic
     // period gives a stable visual phase without confusing sky coordinates
@@ -143,7 +147,7 @@ function celestialMoonPhase(days) {
     return celestialNormalizeDegrees(((days - 5.259) / 29.530588853) * 360) / 360;
 }
 
-function celestialPlanetEquatorial(days, planet) {
+function celestialPlanetEquatorial(days, planet, date = new Date()) {
     const orbitalElements = {
         venus: [76.6799 + 2.46590e-5 * days, 3.3946 + 2.75e-8 * days, 54.8910 + 1.38374e-5 * days, 0.72333, 0.006773 - 1.302e-9 * days, 48.0052 + 1.6021302244 * days],
         mars: [49.5574 + 2.11081e-5 * days, 1.8497 - 1.78e-8 * days, 286.5016 + 2.92961e-5 * days, 1.523688, 0.093405 + 2.516e-9 * days, 18.6021 + 0.5240207766 * days],
@@ -172,10 +176,10 @@ function celestialPlanetEquatorial(days, planet) {
     const geocentric = { x: heliocentric.x - earth.x, y: heliocentric.y - earth.y, z: heliocentric.z };
     const longitude = Math.atan2(geocentric.y, geocentric.x) * CELESTIAL_RAD;
     const latitude = Math.atan2(geocentric.z, Math.sqrt(geocentric.x ** 2 + geocentric.y ** 2)) * CELESTIAL_RAD;
-    return celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude);
+    return celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude, date);
 }
 
-function celestialMoonEquatorial(days) {
+function celestialMoonEquatorial(days, date = new Date()) {
     const node = (125.1228 - 0.0529538083 * days) * CELESTIAL_DEG;
     const argument = (318.0634 + 0.1643573223 * days) * CELESTIAL_DEG;
     const eccentricity = 0.0549;
@@ -194,7 +198,7 @@ function celestialMoonEquatorial(days) {
         Math.cos(node) * Math.cos(orbitalAngle) - Math.sin(node) * Math.sin(orbitalAngle) * Math.cos(5.1454 * CELESTIAL_DEG)
     ) * CELESTIAL_RAD;
     const latitude = Math.asin(Math.sin(orbitalAngle) * Math.sin(5.1454 * CELESTIAL_DEG)) * CELESTIAL_RAD;
-    return { ...celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude)), longitude: celestialNormalizeDegrees(longitude), latitude, radius };
+    return { ...celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude, date), longitude: celestialNormalizeDegrees(longitude), latitude, radius };
 }
 
 function celestialHorizontal(raDegrees, decDegrees, latitude, longitude, date = new Date()) {
@@ -3510,6 +3514,17 @@ class AmbientParticleField {
         const observer = this.observer;
         if (!observer) return;
         const days = celestialJulianDay(date) - 2451543.5;
+        const sun = celestialSunEquatorial(days, date);
+        const sunAltitude = celestialHorizontal(sun.ra, sun.dec, observer.latitude, observer.longitude, date).altitude;
+        // A daytime Moon is real, but it breaks the intentional night-sky
+        // scene. Use civil twilight as the visual boundary. When location is
+        // unavailable, retain the approximate night sky rather than deriving
+        // a false daylight state from the Equator fallback.
+        this.celestialNightVisible = observer.approximate || sunAltitude <= -6;
+        if (!this.celestialNightVisible) {
+            this.celestialBodies = [];
+            return;
+        }
         const namedStars = [
             ['Polaris', 37.9546, 89.2641, 1.98, [205, 225, 255]],
             ['Sirius', 101.2872, -16.7161, 1.46, [220, 232, 255]],
@@ -3519,12 +3534,12 @@ class AmbientParticleField {
             ['Betelgeuse', 88.7929, 7.4071, 0.5, [255, 184, 145]]
         ];
         const bodies = namedStars.map(([name, ra, dec, magnitude, color]) => ({ name, magnitude, color, ...celestialHorizontal(ra, dec, observer.latitude, observer.longitude, date), kind: 'star' }));
-        const moon = celestialMoonEquatorial(days);
+        const moon = celestialMoonEquatorial(days, date);
         bodies.push({ name: 'Moon', kind: 'moon', magnitude: -12, color: [255, 246, 210], angularDiameter: 0.52, ...celestialHorizontal(moon.ra, moon.dec, observer.latitude, observer.longitude, date), phase: celestialMoonPhase(days) });
         // Approximate apparent diameters as seen from Earth. The Moon is the
         // reference disc; planets remain points of light, not oversized icons.
         for (const [name, color, magnitude, angularDiameter] of [['Venus', [255, 238, 202], -4, 0.025], ['Jupiter', [255, 229, 185], -2, 0.085], ['Mars', [255, 170, 130], 1, 0.012], ['Saturn', [235, 216, 180], 1, 0.018]]) {
-            const equatorial = celestialPlanetEquatorial(days, name.toLowerCase());
+            const equatorial = celestialPlanetEquatorial(days, name.toLowerCase(), date);
             if (!equatorial) continue;
             bodies.push({ name, kind: 'planet', color, magnitude, angularDiameter, ...celestialHorizontal(equatorial.ra, equatorial.dec, observer.latitude, observer.longitude, date) });
         }

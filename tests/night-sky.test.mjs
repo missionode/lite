@@ -42,6 +42,19 @@ console.log('Natural sky behavior passed: deterministic field, bounded draw work
 // Exercise the actual lunar renderer without a browser. Its pixel buffer is
 // inspectable: a new Moon must paint nothing and quarter phases swap sides.
 const app=readFileSync('app.js','utf8');
+const astronomy = vm.createContext({ Date, Math });
+vm.runInContext(app.slice(app.indexOf('const CELESTIAL_DEG'), app.indexOf('// Pleasure ambience')), astronomy);
+const indianObserver = { latitude: 9.9312, longitude: 76.2673 };
+const sunAltitudeAt = iso => {
+    const date = new Date(iso);
+    const days = astronomy.celestialJulianDay(date) - 2451543.5;
+    const sun = astronomy.celestialSunEquatorial(days, date);
+    return astronomy.celestialHorizontal(sun.ra, sun.dec, indianObserver.latitude, indianObserver.longitude, date).altitude;
+};
+assert.ok(sunAltitudeAt('2026-09-14T12:00:00+05:30') > -6, 'Indian midday must be outside the night-only celestial window');
+assert.ok(sunAltitudeAt('2026-09-14T23:00:00+05:30') <= -6, 'Indian night must be inside the civil-twilight celestial window');
+assert.match(app, /celestialSunEquatorial\(days, date\)[\s\S]*?observer\.approximate \|\| sunAltitude <= -6[\s\S]*?this\.celestialBodies = \[\]/,
+    'Granted-location skies should hide the Moon, planets and named stars before civil twilight without turning Equator fallback coordinates into false daylight');
 vm.runInContext(app.slice(app.indexOf('class AmbientParticleField {'),app.indexOf('// Visual Engine'))+
     '\nglobalThis.field = Object.create(AmbientParticleField.prototype);',sandbox);
 const field=sandbox.field;
