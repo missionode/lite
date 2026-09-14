@@ -8026,7 +8026,24 @@ function attachEventListeners() {
     }
 
     let bypassLobbyVideoPreludeOnce = false;
+
+    function validateLobbyStartBeforePrelude() {
+        // The optional cinematic prelude must never delay a basic start
+        // validation. A standard journey has no meaningful continuation
+        // without a selected chakra, so tell the meditator before video
+        // buffering or playback begins.
+        const hasAlternativeMode = getChecked('shots-toggle') || state.bgMusicMode ||
+            getChecked('sleep-mode-toggle') || getChecked('high-energy-toggle') ||
+            Boolean(meditation.getFocusedExperience());
+        if (!hasAlternativeMode && state.selectedChakras.length === 0) {
+            alert("Please select at least one chakra before beginning the journey.");
+            return false;
+        }
+        return true;
+    }
+
     startMeditationBtn.addEventListener('click', async () => {
+        if (!validateLobbyStartBeforePrelude()) return;
         if (state.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce) {
             startMeditationBtn.disabled = true;
             startMeditationBtn.style.opacity = '0.5';

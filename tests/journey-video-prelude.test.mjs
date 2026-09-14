@@ -51,6 +51,8 @@ assert.doesNotMatch(app, /fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDE
 assert.doesNotMatch(app, /requestFullscreen\(|webkitEnterFullscreen/, 'the prelude should not trigger automatic fullscreen');
 assert.match(app, /journeyVideoPreludeEnabled: localStorage\.getItem\('chakra_journey_video_prelude'\) === 'true'/, 'the Lobby video preference should persist independently');
 assert.match(app, /state\.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce[\s\S]*?journeyVideoPrelude\.play\(\)[\s\S]*?startMeditationBtn\.click\(\)/, 'the selected Lobby video should run once before the normal journey dispatcher');
+assert.match(app, /function validateLobbyStartBeforePrelude\(\)[\s\S]*?hasAlternativeMode[\s\S]*?state\.selectedChakras\.length === 0[\s\S]*?Please select at least one chakra[\s\S]*?startMeditationBtn\.addEventListener\('click', async \(\) => \{\s*if \(!validateLobbyStartBeforePrelude\(\)\) return;[\s\S]*?state\.journeyVideoPreludeEnabled/,
+    'A normal journey with no chakras must be rejected at the original Begin click, before the optional video prelude starts.');
 assert.doesNotMatch(app, /this\.media\.pause\(\);[\s\S]{0,250}this\.exitFullscreen\(\);[\s\S]{0,250}this\.overlay\.classList\.remove/, 'the prelude should not leave fullscreen during the video-to-journey handoff');
 assert.doesNotMatch(app, /journeyVideoPrelude\.exitFullscreen\(\)/, 'the app should not exit user-controlled fullscreen');
 assert.match(app, /this\.media\.pause\(\);[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(0, 0\);/, 'the ready screen should leave the video paused and silent before Play');
