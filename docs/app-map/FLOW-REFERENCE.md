@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: fd32bf1 + uncommitted newcomer artwork labeling · 2026-09-14.
+Source snapshot: db80103 · 2026-09-14.
 
 Version 3.01 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
