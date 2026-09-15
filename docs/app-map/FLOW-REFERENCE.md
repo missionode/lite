@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: e763c01 + uncommitted atlas record · 2026-09-14.
+Source snapshot: 13a6089 + uncommitted atlas cleanup · 2026-09-15.
 
-Version 3.05 source-reviewed behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 3.09 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -150,7 +150,7 @@ Sources: [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app
 flowchart TD
   lobby["Choose an experience"]
   exclusive["Exclusive modes"]
-  care["Intimate Service"]
+  care["Intimate Service + ambience"]
   shots["Enable Shots?"]
   sleepgate["Enable Sleep?"]
   begin["Press Begin"]
@@ -181,7 +181,7 @@ flowchart TD
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
 | Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
-| Intimate Service | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. Advanced features switch appears after unlocking; OFF clears care, Shots and Sleep selections and locks/hides their controls. Reload locks again. Shots, Sleep and Manage Settings share this unlock; mode updates preserve the lock. Any combination of three care options is allowed; choosing care clears other modes. |
+| Intimate Service + ambience | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
 | Enable Shots? | Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
 | Enable Sleep? | Hidden and disabled until the shared seven-tap unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
@@ -240,11 +240,11 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Press Begin | If the persisted Lobby Video Introduction option is selected, play the explicit video introduction first; otherwise continue directly. The normal start guard and first-time eligibility check happen only after that optional prelude. |
+| Press Begin | First validate a normal journey has one or more chakras selected; reject immediately if not. If valid and the persisted Lobby Video Introduction option is selected, play the explicit video introduction; otherwise continue directly. Remaining mode-specific guards and first-time eligibility run in the dispatcher after the optional prelude. |
 | Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration has fixed English chakra names and leader lines embedded in the artwork. Its separate language-specific names, locations and curved arrowheads remain responsive but are deliberately faded to supporting guidance. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws each arrowhead to normalized coordinates for the matching marker after image load and resize. Its spoken orientation follows the Meditation Language before Arriving. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
-| Preparation | Initial settle → pre-practice guidance. |
+| Preparation | Initial settle → pre-practice guidance. In English, Malayalam, Hindi and Russian: Sacral includes wholesome fun and everyday happiness; Solar frames a kind, realistic deep-work period; Third Eye includes concentration, attention management, intelligence as an ordinary learning skill, and unforced deep work. These are reflective practices, not outcome guarantees. |
 | Arrival induction | Ordinary non-demo only: narration → 432 Hz transition tone for half the selected drone window. |
 | Moon opening | When Returning is off, use current moon-phase script. |
 | Returning opening | When enabled, use intro.returning; independent of journey statistics. |
@@ -694,10 +694,10 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Lobby → Include video introduction | Persisted choice defaults OFF and appears in the roadmap for every supported journey family. |
+| Lobby → Include video introduction | Persisted choice defaults OFF and appears in the roadmap for every supported journey family. A normal journey with no selected chakras is rejected at the original Begin click, before video preparation. |
 | Prepare and buffer | Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check. |
 | Begin introduction | Reveal button when ready OR after the 90-second bounded wait. Explicit user action required. |
-| Image hold → playback | Hold image 3 seconds, then video; audio fades in over 2.4 seconds using separate video volume. |
+| Image hold → playback | Hold image 3 seconds, then video; remove the readiness-only dark shade. The meditator image and video render fully opaque. Loading and Begin content uses a near-solid dark backing with sharp white text for readability. The prelude is outside ordinary screen dimming, so saved brightness, Sleep and Eyes Close cannot make it translucent. Audio fades in over 2.4 seconds using separate video volume. |
 | Buffer recovery | Below 2 seconds ahead pauses except near end; waiting/stalled enters recovery. Resume at up to 4 seconds, bounded by remaining clip. |
 | Normal video ending | Final 0.25-second audiovisual fade; acknowledge DND reminder. |
 | Unavailable video | Missing media, preparation failure, media error or rejected play: unavailable result; error path fades 1.2 seconds. |
@@ -900,7 +900,7 @@ flowchart TD
   comfort["Comfort + volumes"]
   mixer -->|"Toggle"| nofreq
   mixer -->|"Toggle"| nomantra
-  mixer -->|"Enable"| ambient
+  mixer -->|"Enable from Advanced Lobby"| ambient
   ambient -->|"Load"| source
   source -->|"Ready"| tune
   source -->|"Invalid / fetch failure"| fail
@@ -910,7 +910,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Settings / Journey Tuning | Shared suppression settings, volume controls and optional ambience. |
+| Settings / Journey Tuning | Shared suppression settings, volume controls and comfort controls. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
 | No Frequency ON | Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
@@ -963,9 +963,9 @@ flowchart TD
 | Location permission | Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, not a location-calibrated star catalog. |
 | Motion preference | Only Lobby and Settings may animate. Every other app screen renders static sky, clears meteors and cancels frame/timer work. CSS animations and transitions are disabled there. Reduced motion also makes Lobby/Settings static; preference/screen changes re-evaluate the guard. At most 110 stars shimmer; positions remain fixed. |
 | Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
-| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets and bright stars use compact 11 px labels with 30% text plus 15% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
+| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
 | Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
-| Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors. No filter on body/app ancestors that would rebase fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
+| Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors on ordinary screens only. Video prelude, fixed controls and overlays remain readable. No filter on body/app ancestors rebases fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Before every start the Sleep class is synchronized to the currently selected mode, preventing leftover Sleep dimming in a normal journey. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding. |
 | Screen wake lock | Best-effort request in supported routes; failure is swallowed; release on stop/completion. |
 | Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |

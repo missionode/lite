@@ -47,5 +47,7 @@ assert.doesNotMatch(css,/body\.sleep-mode-active #app\s*\{[^}]*\bfilter\s*:/,'Sl
 assert.doesNotMatch(css,/body\.eyes-close-mode\s*\{[^}]*\bfilter\s*:/,'Eyes Close cannot rebase fixed controls either');
 assert.match(css,/--sleep-dimming:\s*0\.4/);
 assert.match(css,/--eyes-close-dimming:\s*0\.85/);
-assert.match(css,/opacity: calc\(var\(--app-brightness, 1\) \* var\(--sleep-dimming, 1\) \* var\(--eyes-close-dimming, 1\)\)/);
+assert.doesNotMatch(css,/#app\s*\{[^}]*opacity:/,'Brightness dimming must not apply to the #app ancestor or its video prelude.');
+assert.match(css,/#app > \.screen\s*\{[\s\S]*?opacity: calc\(var\(--app-brightness, 1\) \* var\(--sleep-dimming, 1\) \* var\(--eyes-close-dimming, 1\)\)/,'Brightness dimming should remain on ordinary application screens.');
+assert.match(source,/state\.sleepMode = getChecked\('sleep-mode-toggle'\);[\s\S]*?document\.body\.classList\.toggle\('sleep-mode-active', state\.sleepMode\);/,'Each start must synchronize Sleep dimming to the currently selected mode.');
 assert.doesNotMatch(source,/app(?:'\))?\.style\.opacity\s*=/,'Inline opacity cannot override composed dimming');

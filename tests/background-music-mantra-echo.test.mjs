@@ -21,11 +21,12 @@ assert.match(html, /id="music-tuning-panel"/, 'the mixer should expose a separat
 assert.match(html, /id="music-echo"/, 'the mixer should expose a separate music echo selector');
 assert.match(html, /data-i18n="ui\.musicEcho"/, 'the music echo selector should use localized labels');
 assert.match(html, /id="mood-relaxation-ambience-level-control"[^>]*hidden/, 'the ambience level control should be hidden until the ambience is selected');
-assert.match(html, /id="mood-relaxation-intention-toggle"/, 'Journey Tuning should expose the ambience toggle');
+assert.match(html, /id="intimate-service-panel"[\s\S]*?id="mood-relaxation-ambience-section"[\s\S]*?id="mood-relaxation-intention-toggle"/, 'the Advanced Features Lobby panel should contain the ambience toggle');
+assert.doesNotMatch(html, /id="volume-mixer"[\s\S]*?id="mood-relaxation-ambience-section"/, 'Journey Tuning must not duplicate the advanced ambience controls');
 assert.match(html, /id="pleasure-ambience-intensity-control"[^>]*hidden/, 'the ambience intensity selector should be hidden until the ambience is selected');
-assert.match(html, /id="pleasure-ambience-intensity"/, 'Journey Tuning should expose a session-only ambience intensity selector');
+assert.match(html, /id="pleasure-ambience-intensity"/, 'the Advanced Features Lobby panel should expose a session-only ambience intensity selector');
 assert.match(html, /id="pleasure-ambience-url-control"[^>]*hidden/, 'the pleasure URL control should be hidden until the ambience is selected');
-assert.match(html, /id="pleasure-ambience-url"[^>]*type="url"/, 'Journey Tuning should expose a URL input for the primary pleasure track');
+assert.match(html, /id="pleasure-ambience-url"[^>]*type="url"/, 'the Advanced Features Lobby panel should expose a URL input for the primary pleasure track');
 assert.match(html, /id="load-pleasure-ambience-url"[^>]*data-i18n="ui\.loadPleasureAmbience"/, 'the pleasure URL input should have a localized Load action');
 assert.match(html, /data-i18n-placeholder="ui\.pleasureAmbienceUrlPlaceholder"/, 'the pleasure URL input should use a localized placeholder');
 assert.match(html, /id="pleasure-ambience-url-note"[^>]*data-i18n="ui\.pleasureAmbienceUrlNote"/, 'the pleasure URL input should explain the primary-layer replacement and CORS requirement');
@@ -51,7 +52,7 @@ assert.match(app, /const PLEASURE_AMBIENCE_MIN_GAIN = 0\.002/, 'the ambience eng
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience selection must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience selection must not be saved to local storage');
 assert.match(app, /this\.pleasureLoops\.forEach\(loop => loop\.stop\(Math\.max\(0, fadeTime\)\)\)/, 'all ambience layers should use the same smooth fade');
-assert.match(app, /if \(section\) section\.hidden = false/, 'the ambience section should remain available when optional local audio is missing');
+assert.match(app, /if \(section\) section\.hidden = !state\.advancedFeaturesUnlocked;/, 'the ambience section should be available only while Advanced Features is unlocked, including when optional local audio is missing');
 assert.match(app, /if \(urlControl\) urlControl\.hidden = !state\.moodRelaxationIntentionEnabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
 assert.match(app, /t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable source message');
 assert.doesNotMatch(app, /pleasureAudioAvailable = false;\s*state\.moodRelaxationIntentionEnabled = false;/, 'a missing optional asset must not clear the selected ambience state');

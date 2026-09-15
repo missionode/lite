@@ -6,7 +6,7 @@ When Returning Journey is unchecked on a normal chakra journey, Begin proceeds d
 
 ## Lobby video introduction — implemented locally, device check pending
 
-The video introduction is an explicit persisted Lobby preference, OFF by default. When selected, the roadmap adds Video Introduction and the video buffers and plays before the normal journey dispatcher continues. Completion acknowledges the Do Not Disturb reminder once; an unavailable video still continues into the chosen journey. Restart Journey is now immediate and does not replay the video. Automated source contracts cover the routing; a device playback check remains open.
+The video introduction is an explicit persisted Lobby preference, OFF by default. When selected, the roadmap adds Video Introduction and the video buffers and plays before the normal journey dispatcher continues. Completion acknowledges the Do Not Disturb reminder once; an unavailable video still continues into the chosen journey. Restart Journey is now immediate and does not replay the video. The readiness-only dark shade is removed during actual playback, so the video uses its authored brightness and contrast. Automated source contracts cover routing and full-brightness behavior; a device playback/color check remains open.
 
 ## Newcomer body-map artwork labels — implemented locally, device check pending
 

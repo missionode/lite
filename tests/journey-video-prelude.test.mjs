@@ -43,7 +43,10 @@ assert.match(app, /bufferCountdownTimer[\s\S]*?getVideoBufferTargetSeconds\(\)[\
 assert.match(css, /\.journey-video-prelude\.is-playing,[\s\S]*?cursor: none/, 'the pointer should be hidden during cinematic playback');
 assert.match(app, /is-meditator[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?is-video/, 'the meditator image should dissolve into the video after a short hold');
 assert.match(app, /this\.media\?\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering');
-assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: 1[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly');
+assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?--journey-video-visual-opacity:\s*1/, 'the prelude should render its image and video fully opaque.');
+assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: var\(--journey-video-visual-opacity\)[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly at full opacity.');
+assert.match(css, /\.journey-video-prelude-ready\s*\{[\s\S]*?background:\s*rgba\(0, 0, 0, 0\.88\)/, 'the loading and Begin content should use a highly legible backing.');
+assert.doesNotMatch(css, /#app\s*\{[^}]*opacity:/, 'the #app ancestor must not dim the video prelude or its readable content.');
 assert.match(css, /\.journey-video-prelude\.is-leaving[\s\S]*?transition-duration:\s*0\.25s/, 'the short prelude should dissolve only across its final 0.25 seconds');
 assert.match(html, /id="settings-vol-video"[^>]*min="0\.02"[^>]*max="0\.5"[\s\S]*?id="preview-video-audio"/, 'Settings should provide a safe dedicated Video Volume control and preview action');
 assert.match(app, /volVideo: clampAudioLevel\(storedNumber\('chakra_vol_video', 0\.20\), 0\.02, 0\.5, 0\.20\)/, 'Video Volume should persist independently in local storage');

@@ -1,13 +1,18 @@
 import { chromium } from 'playwright';
-import { fileURLToPath } from 'node:url';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { graphs } from './atlas-data.mjs';
 
 const browser = await chromium.launch({headless:true});
+const screenshotDirectory = await mkdtemp(join(tmpdir(), 'akhil-atlas-'));
+try {
 const page = await browser.newPage({viewport:{width:1440,height:1000}});
 const errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 await page.goto(new URL('./index.html',import.meta.url).href);
-await page.waitForFunction(()=>window.atlasQA?.graphs.length===24);
+await page.waitForFunction(count=>window.atlasQA?.graphs.length===count, graphs.length);
 const results=await page.evaluate(()=>{
  const output=[];
  for(const graph of window.atlasQA.graphs){
@@ -31,22 +36,22 @@ const results=await page.evaluate(()=>{
  return output;
 });
 await page.evaluate(()=>window.atlasQA.navigate('overview'));
-await page.screenshot({path:'/private/tmp/chakra-atlas-overview.png',fullPage:true});
+await page.screenshot({path:join(screenshotDirectory,'overview.png'),fullPage:true});
 await page.evaluate(()=>window.atlasQA.navigate('standard'));
-await page.screenshot({path:'/private/tmp/chakra-atlas-standard.png',fullPage:true});
+await page.screenshot({path:join(screenshotDirectory,'standard.png'),fullPage:true});
 await page.locator('#graph .node').first().focus();
 await page.keyboard.press('Enter');
-assert.equal(await page.locator('#node-title').innerText(),'Begin + DND reminder');
+assert.equal(await page.locator('#node-title').innerText(),'Press Begin');
 await page.setViewportSize({width:390,height:844});
 await page.selectOption('#map-select','care');
 assert.equal(await page.locator('#title').innerText(),'Intimate Service and massage');
 const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
 assert.equal(overflow,false,'Unexpected whole-page overflow on mobile');
-await page.screenshot({path:'/private/tmp/chakra-atlas-mobile.png',fullPage:true});
+await page.screenshot({path:join(screenshotDirectory,'mobile.png'),fullPage:true});
 await page.setViewportSize({width:1440,height:1000});
 await page.evaluate(()=>{window.print=()=>{window.printRequested=true;};});
 await page.click('#print-all');
-assert.equal(await page.locator('.print-page').count(),24);
+assert.equal(await page.locator('.print-page').count(),graphs.length);
 assert.equal(await page.evaluate(()=>window.printRequested),true);
 // Confirm the export action produces an actual standalone SVG download.
 const downloadEvent=page.waitForEvent('download');
@@ -54,5 +59,8 @@ await page.click('#export-svg');
 const download=await downloadEvent;
 assert.equal(download.suggestedFilename(),'chakra-care.svg');
 assert.deepEqual(errors,[]);
-console.log(JSON.stringify({mapsChecked:results.length,allNodeSelections:true,labelBounds:true,mobileOverflow:false,keyboard:true,printMaps:24,svgDownload:true,pageErrors:errors}));
-await browser.close();
+console.log(JSON.stringify({mapsChecked:results.length,allNodeSelections:true,labelBounds:true,mobileOverflow:false,keyboard:true,printMaps:graphs.length,svgDownload:true,pageErrors:errors}));
+} finally {
+ await browser.close();
+ await rm(screenshotDirectory,{recursive:true,force:true});
+}

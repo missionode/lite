@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.93">
+    <link rel="stylesheet" href="style.css?v=1.95">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -429,6 +429,16 @@
                         <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
                     </div>
                 </div>
+                <div id="mood-relaxation-ambience-section" class="mixer-section advanced-ambience-panel">
+                    <label class="mixer-section-title" data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</label>
+                    <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</span></label>
+                    <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the supplied pleasure ambience loops throughout the guided session. Use the bounded level below to keep it subtle; No Frequency Mode overrides it.</p>
+                    <div id="pleasure-ambience-intensity-control" class="mixer-row mixer-select-control" hidden><label for="pleasure-ambience-intensity" data-i18n="ui.pleasureAmbienceIntensity">Ambience Intensity</label><select id="pleasure-ambience-intensity"><option value="gentle" data-i18n="ui.pleasureAmbienceGentle">Gentle</option><option value="immersive" data-i18n="ui.pleasureAmbienceImmersive">Immersive</option><option value="deep" data-i18n="ui.pleasureAmbienceDeep">Deep</option></select><p class="mixer-note" data-i18n="ui.pleasureAmbienceIntensityNote">Changes clarity, texture and spatial presence without raising the bounded Ambience Level.</p></div>
+                    <div id="pleasure-ambience-url-control" class="mixer-row mixer-url-control" hidden><label for="pleasure-ambience-url" data-i18n="ui.pleasureAmbienceUrl">Pleasure Audio URL</label><div class="mixer-url-entry"><input id="pleasure-ambience-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" data-i18n-placeholder="ui.pleasureAmbienceUrlPlaceholder" placeholder="https://.../pleasure.mp3" aria-describedby="pleasure-ambience-url-note"><button id="load-pleasure-ambience-url" class="secondary-btn" type="button" data-i18n="ui.loadPleasureAmbience">Load</button></div><p id="pleasure-ambience-url-note" class="mixer-note" data-i18n="ui.pleasureAmbienceUrlNote">Use a direct HTTP or HTTPS audio URL. It replaces only pleasure.mp3; numbered manifest layers remain unchanged. The host must allow browser audio access.</p><p id="pleasure-ambience-url-status" class="mixer-note" role="status" aria-live="polite" hidden></p></div>
+                    <div id="pleasure-ambience-blur-control" class="mixer-row" hidden><label class="checkbox-label"><input type="checkbox" id="pleasure-ambience-blur-toggle" checked> <span data-i18n="ui.pleasureAmbienceBlur">Soft Ambience Blur</span></label><p class="mixer-note" data-i18n="ui.pleasureAmbienceBlurNote">Adds a gentle diffused softness to the pleasure ambience while preserving the clean source underneath.</p></div>
+                    <div id="pleasure-ambience-blur-level-control" class="mixer-row range-control" hidden><label for="pleasure-ambience-blur-level" data-i18n="ui.pleasureAmbienceBlurLevel">Blur Intensity</label><input id="pleasure-ambience-blur-level" type="range" min="10" max="65" step="5" value="35" aria-describedby="pleasure-ambience-blur-level-note"><div class="range-meta"><button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button><span class="range-min" data-i18n="ui.pleasureAmbienceBlurMin">Min 10%</span><output id="pleasure-ambience-blur-level-value" class="range-current">35%</output><span class="range-max" data-i18n="ui.pleasureAmbienceBlurMax">Max 65%</span><button type="button" class="range-step range-increment" aria-label="Increase value">+</button></div><p id="pleasure-ambience-blur-level-note" class="mixer-note" data-i18n="ui.pleasureAmbienceBlurLevelNote">Higher values soften more of the source while retaining a dry signal for clarity. The default is a moderate, spacious blur.</p></div>
+                    <div id="mood-relaxation-ambience-level-control" class="mixer-row range-control" hidden><label for="mood-relaxation-ambience-level" data-i18n="ui.moodRelaxationAmbienceLevel">Ambience Level</label><input id="mood-relaxation-ambience-level" type="range" min="0.2" max="7.0" step="0.1" value="0.3" aria-describedby="mood-relaxation-ambience-level-note"><div class="range-meta"><button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button><span class="range-min" data-i18n="ui.moodRelaxationAmbienceMin">Min 0.2%</span><output id="mood-relaxation-ambience-level-value" class="range-current">0.3%</output><span class="range-max" data-i18n="ui.moodRelaxationAmbienceMax">Max 7.0%</span><button type="button" class="range-step range-increment" aria-label="Increase value">+</button></div><p id="mood-relaxation-ambience-level-note" class="mixer-note" data-i18n="ui.moodRelaxationAmbienceLevelNote">This is a bounded source level from 0.2% to 7.0%, not a calibrated decibel reading. Above 5.0%, confirm before increasing. Actual loudness depends on the device and output volume.</p></div>
+                </div>
             </section>
 
             <div id="session-estimate">~ 36 mins</div>
@@ -552,57 +562,6 @@
                     <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0.02" max="0.12" step="0.01" value="0.04"></div>
                     <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0.005" max="1" step="0.005" value="0.35"></div>
                     <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
-                </div>
-
-                <div id="mood-relaxation-ambience-section" class="mixer-section">
-                    <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</span></label>
-                    <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the supplied pleasure ambience loops throughout the guided session. Use the bounded level below to keep it subtle; No Frequency Mode overrides it.</p>
-                    <div id="pleasure-ambience-intensity-control" class="mixer-row mixer-select-control" hidden>
-                        <label for="pleasure-ambience-intensity" data-i18n="ui.pleasureAmbienceIntensity">Ambience Intensity</label>
-                        <select id="pleasure-ambience-intensity">
-                            <option value="gentle" data-i18n="ui.pleasureAmbienceGentle">Gentle</option>
-                            <option value="immersive" data-i18n="ui.pleasureAmbienceImmersive">Immersive</option>
-                            <option value="deep" data-i18n="ui.pleasureAmbienceDeep">Deep</option>
-                        </select>
-                        <p class="mixer-note" data-i18n="ui.pleasureAmbienceIntensityNote">Changes clarity, texture and spatial presence without raising the bounded Ambience Level.</p>
-                    </div>
-                    <div id="pleasure-ambience-url-control" class="mixer-row mixer-url-control" hidden>
-                        <label for="pleasure-ambience-url" data-i18n="ui.pleasureAmbienceUrl">Pleasure Audio URL</label>
-                        <div class="mixer-url-entry">
-                            <input id="pleasure-ambience-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" data-i18n-placeholder="ui.pleasureAmbienceUrlPlaceholder" placeholder="https://.../pleasure.mp3" aria-describedby="pleasure-ambience-url-note">
-                            <button id="load-pleasure-ambience-url" class="secondary-btn" type="button" data-i18n="ui.loadPleasureAmbience">Load</button>
-                        </div>
-                        <p id="pleasure-ambience-url-note" class="mixer-note" data-i18n="ui.pleasureAmbienceUrlNote">Use a direct HTTP or HTTPS audio URL. It replaces only pleasure.mp3; numbered manifest layers remain unchanged. The host must allow browser audio access.</p>
-                        <p id="pleasure-ambience-url-status" class="mixer-note" role="status" aria-live="polite" hidden></p>
-                    </div>
-                    <div id="pleasure-ambience-blur-control" class="mixer-row" hidden>
-                        <label class="checkbox-label"><input type="checkbox" id="pleasure-ambience-blur-toggle" checked> <span data-i18n="ui.pleasureAmbienceBlur">Soft Ambience Blur</span></label>
-                        <p class="mixer-note" data-i18n="ui.pleasureAmbienceBlurNote">Adds a gentle diffused softness to the pleasure ambience while preserving the clean source underneath.</p>
-                    </div>
-                    <div id="pleasure-ambience-blur-level-control" class="mixer-row range-control" hidden>
-                        <label for="pleasure-ambience-blur-level" data-i18n="ui.pleasureAmbienceBlurLevel">Blur Intensity</label>
-                        <input id="pleasure-ambience-blur-level" type="range" min="10" max="65" step="5" value="35" aria-describedby="pleasure-ambience-blur-level-note">
-                        <div class="range-meta">
-                            <button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button>
-                            <span class="range-min" data-i18n="ui.pleasureAmbienceBlurMin">Min 10%</span>
-                            <output id="pleasure-ambience-blur-level-value" class="range-current">35%</output>
-                            <span class="range-max" data-i18n="ui.pleasureAmbienceBlurMax">Max 65%</span>
-                            <button type="button" class="range-step range-increment" aria-label="Increase value">+</button>
-                        </div>
-                        <p id="pleasure-ambience-blur-level-note" class="mixer-note" data-i18n="ui.pleasureAmbienceBlurLevelNote">Higher values soften more of the source while retaining a dry signal for clarity. The default is a moderate, spacious blur.</p>
-                    </div>
-                    <div id="mood-relaxation-ambience-level-control" class="mixer-row range-control" hidden>
-                        <label for="mood-relaxation-ambience-level" data-i18n="ui.moodRelaxationAmbienceLevel">Ambience Level</label>
-                        <input id="mood-relaxation-ambience-level" type="range" min="0.2" max="7.0" step="0.1" value="0.3" aria-describedby="mood-relaxation-ambience-level-note">
-                        <div class="range-meta">
-                            <button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button>
-                            <span class="range-min" data-i18n="ui.moodRelaxationAmbienceMin">Min 0.2%</span>
-                            <output id="mood-relaxation-ambience-level-value" class="range-current">0.3%</output>
-                            <span class="range-max" data-i18n="ui.moodRelaxationAmbienceMax">Max 7.0%</span>
-                            <button type="button" class="range-step range-increment" aria-label="Increase value">+</button>
-                        </div>
-                        <p id="mood-relaxation-ambience-level-note" class="mixer-note" data-i18n="ui.moodRelaxationAmbienceLevelNote">This is a bounded source level from 0.2% to 7.0%, not a calibrated decibel reading. Above 5.0%, confirm before increasing. Actual loudness depends on the device and output volume.</p>
-                    </div>
                 </div>
 
                 <details id="voice-tuning-panel" class="mixer-section mixer-collapsible">

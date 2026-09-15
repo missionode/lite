@@ -11,14 +11,16 @@ function setup(noFrequencyMode=false) {
     const toast=element();
     const document={hidden:false,getElementById:get,createElement:()=>toast,body:{appendChild(){}},addEventListener(){}};
     const state={noFrequencyMode};
-    vm.runInNewContext(block,{document,state,Event,performance:{now:()=>now},getChecked:name=>get(name).checked,
+    const audio={stopped:false,stopPleasureAmbience(){this.stopped=true;}};
+    vm.runInNewContext(block,{document,state,Event,performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
         localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),prepareRepertoryShotFromUrl(){},
+        audio,syncPleasureAmbienceControl(){},
         clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
         setTimeout(fn,delay){timers.set(++id,{fn,at:now+delay});return id;},clearTimeout:key=>timers.delete(key),
         t:key=>key==='ui.advancedUnlockRemaining'?'{{remaining}} remaining':key,
         updateExperienceModeVisibility(){},updateSessionEstimate(){},updateJourneyRoadmap(){}});
     const advance=ms=>{now+=ms;for(const [key,timer] of [...timers]) if(timer.at<=now){timers.delete(key);timer.fn();}};
-    return {get,toast,state,advance,tap:()=>get('app-version-unlock').listeners.click()};
+    return {get,toast,state,audio,advance,tap:()=>get('app-version-unlock').listeners.click()};
 }
 const app=setup();
 assert.equal(app.get('intimate-service-panel').hidden,true);
@@ -30,6 +32,9 @@ assert.equal(app.get('sleep-mode-toggle').disabled,true);
 assert.equal(app.get('advanced-features-control').hidden,true);
 assert.equal(app.get('experiment-care-group').attached,false,'Locked care is absent from native activity picker');
 assert.equal(app.state.advancedFeaturesUnlocked,false);
+assert.equal(app.audio.stopped,true,'Locked Advanced Features should stop Mood & Relaxation ambience.');
+assert.match(source, /if \(isLocked\) \{[\s\S]*?state\.moodRelaxationIntentionEnabled = false;[\s\S]*?audio\.stopPleasureAmbience\(\)/, 'Relocking Advanced Features must disable and stop Mood & Relaxation ambience.');
+assert.match(source, /mood-relaxation-intention-toggle'\)\?\.addEventListener\('change', \(e\) => \{[\s\S]*?!state\.advancedFeaturesUnlocked \|\| state\.noFrequencyMode/, 'Mood & Relaxation ambience must reject direct activation while Advanced Features is locked.');
 for(let i=0;i<4;i++){app.tap();app.advance(100);assert.equal(app.toast.textContent,'');}
 app.tap(); assert.equal(app.toast.textContent,'2 remaining');
 app.advance(100);app.tap();assert.equal(app.toast.textContent,'1 remaining');

@@ -81,7 +81,6 @@ body {
 }
 
 #app {
-    opacity: calc(var(--app-brightness, 1) * var(--sleep-dimming, 1) * var(--eyes-close-dimming, 1));
     width: 100%;
     max-width: 500px;
     padding: 2rem 1.5rem;
@@ -89,6 +88,12 @@ body {
     position: relative;
     z-index: 3;
     margin: 0 auto; /* kill auto centering */
+}
+
+/* Keep brightness comfort settings within normal application screens. Fixed
+   overlays, especially the optional video prelude, must stay fully legible. */
+#app > .screen {
+    opacity: calc(var(--app-brightness, 1) * var(--sleep-dimming, 1) * var(--eyes-close-dimming, 1));
 }
 
 /* The video hands fullscreen ownership to the persistent app container, so
@@ -348,6 +353,7 @@ body {
 }
 
 .journey-video-prelude {
+    --journey-video-visual-opacity: 1;
     position: fixed;
     inset: 0;
     z-index: 100100;
@@ -394,12 +400,12 @@ body {
 }
 
 .journey-video-prelude.is-meditator .journey-video-prelude-meditator {
-    opacity: 1;
+    opacity: var(--journey-video-visual-opacity);
     transform: scale(1);
 }
 
 .journey-video-prelude.is-video video {
-    opacity: 1;
+    opacity: var(--journey-video-visual-opacity);
 }
 
 .journey-video-prelude.is-video .journey-video-prelude-meditator {
@@ -442,10 +448,10 @@ body {
     gap: 1rem;
     width: min(31rem, calc(100vw - 2.5rem));
     padding: 1.3rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.65);
     border-radius: 1.25rem;
     color: #fff;
-    background: rgba(0, 0, 0, 0.42);
+    background: rgba(0, 0, 0, 0.88);
     box-shadow: 0 1.2rem 3.5rem rgba(0, 0, 0, 0.36);
     backdrop-filter: blur(16px);
     text-align: center;
@@ -456,6 +462,7 @@ body {
     margin: 0;
     font-size: clamp(1rem, 2.8vw, 1.2rem);
     line-height: 1.55;
+    text-shadow: 0 1px 2px #000;
 }
 
 .journey-video-prelude-loading {
@@ -1833,6 +1840,13 @@ body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden) 
 .lobby-intimate-service {
     position: relative;
     overflow: hidden;
+}
+
+.advanced-ambience-panel {
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(251, 191, 36, 0.18);
 }
 
 .lobby-intimate-service[hidden],

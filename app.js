@@ -6465,7 +6465,7 @@ function syncPleasureAmbienceControl() {
     // Optional local ambience files can be absent in a deployed build. Keep
     // this recovery surface visible so a guide can supply a URL; hiding it
     // would make the missing local source impossible to replace on mobile.
-    if (section) section.hidden = false;
+    if (section) section.hidden = !state.advancedFeaturesUnlocked;
     if (toggle) toggle.disabled = state.noFrequencyMode;
     if (control) control.hidden = !state.moodRelaxationIntentionEnabled;
     if (intensityControl) intensityControl.hidden = !state.moodRelaxationIntentionEnabled;
@@ -7119,6 +7119,11 @@ function attachEventListeners() {
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
         state.advancedFeaturesUnlocked = !isLocked;
+        if (isLocked) {
+            state.moodRelaxationIntentionEnabled = false;
+            audio.stopPleasureAmbience();
+            syncChecked('mood-relaxation-intention-toggle', false);
+        }
         document.getElementById('shots-control').hidden = isLocked;
         document.getElementById('sound-healing-title').hidden = isLocked;
         if (shotsToggle) {
@@ -7160,6 +7165,7 @@ function attachEventListeners() {
             toggle.disabled = isLocked;
             toggle.setAttribute('aria-disabled', String(isLocked));
         });
+        syncPleasureAmbienceControl();
     }
 
     function handleIntimateServiceUnlockTap() {
@@ -7891,7 +7897,7 @@ function attachEventListeners() {
     document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
     document.getElementById('mood-relaxation-intention-toggle')?.addEventListener('change', (e) => {
-        if (state.noFrequencyMode) {
+        if (!state.advancedFeaturesUnlocked || state.noFrequencyMode) {
             e.target.checked = state.moodRelaxationIntentionEnabled;
             return;
         }
@@ -8097,6 +8103,9 @@ function attachEventListeners() {
             return;
         }
         state.sleepMode = getChecked('sleep-mode-toggle');
+        // This class is derived from the current selection, never left behind
+        // by an earlier Sleep session.
+        document.body.classList.toggle('sleep-mode-active', state.sleepMode);
         const focusedExperience = meditation.getFocusedExperience();
         if (focusedExperience === 'yoga' && state.selectedYogaPoses.length === 0) {
             alert('Please select at least one yoga pose in Settings before beginning the Yoga Experience.');
@@ -8111,8 +8120,6 @@ function attachEventListeners() {
         if (!audio.isInitialized) await audio.init();
 
         if (state.bgMusicMode) {
-            // Apply sleep mode dim class if needed
-            if (state.sleepMode) document.body.classList.add('sleep-mode-active');
             if (state.eyesCloseMode) {
                 const app = document.getElementById('app');
                 const targetOpacity = Math.min(state.brightness, 0.7);
@@ -8137,8 +8144,6 @@ function attachEventListeners() {
                 return;
             }
             meditation.chakraOrder = order;
-            // Apply sleep mode dim class at session start
-            if (state.sleepMode) document.body.classList.add('sleep-mode-active');
             // Absolute Grounding: Dim UI for Eyes Closed mode
             if (state.eyesCloseMode) {
                 const app = document.getElementById('app');
