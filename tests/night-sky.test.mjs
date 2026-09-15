@@ -42,6 +42,14 @@ console.log('Natural sky behavior passed: deterministic field, bounded draw work
 // Exercise the actual lunar renderer without a browser. Its pixel buffer is
 // inspectable: a new Moon must paint nothing and quarter phases swap sides.
 const app=readFileSync('app.js','utf8');
+assert.match(app, /const namedStars = \[[\s\S]*?\['Sirius',[\s\S]*?-1\.44[\s\S]*?\['Canopus',[\s\S]*?\['Capella',[\s\S]*?\['Rigel',[\s\S]*?\['Procyon',[\s\S]*?\['Achernar',[\s\S]*?\['Aldebaran',[\s\S]*?\['Spica',[\s\S]*?\['Antares'/,
+    'The named catalogue must retain Sirius at its negative apparent magnitude and cover the principal bright naked-eye stars.');
+for (const localeName of ['en', 'ml', 'hi', 'ru']) {
+    const locale = JSON.parse(readFileSync(`locales/${localeName}.json`, 'utf8'));
+    for (const name of ['Sirius', 'Canopus', 'Capella', 'Rigel', 'Procyon', 'Achernar', 'Aldebaran', 'Spica', 'Antares']) {
+        assert.ok(locale.ui[`celestial${name}`], `${localeName} must localize ${name}`);
+    }
+}
 const astronomy = vm.createContext({ Date, Math });
 vm.runInContext(app.slice(app.indexOf('const CELESTIAL_DEG'), app.indexOf('// Pleasure ambience')), astronomy);
 const indianObserver = { latitude: 9.9312, longitude: 76.2673 };
@@ -59,6 +67,8 @@ assert.match(app, /DAYLIGHT_SOLAR_SYSTEM[\s\S]*?Mercury[\s\S]*?Venus[\s\S]*?Eart
     'Daylight should retain a cached indigo cosmic wash, a gentle warm Sun, and all eight themed planets rather than switching to an ordinary daytime background');
 assert.match(app, /drawCelestialHorizon\(width, height\);[\s\S]*?body\.altitude < 4[\s\S]*?drawCelestialHorizon\(width, height\) \{[\s\S]*?const horizonY = height \* 0\.88[\s\S]*?quadraticCurveTo/,
     'The celestial view should include a cached curved horizon matching the altitude projection baseline.');
+assert.match(app, /deepSkyBlackHoleEnabled && this\.celestialNightVisible && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
+    'The Advanced Features black-hole illustration must stay night-only, off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
     const locale = JSON.parse(readFileSync(`locales/${language}.json`, 'utf8'));
     assert.equal(locale.ui.celestialEarth, earth, `${language} must localize the Earth label`);

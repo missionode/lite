@@ -15,7 +15,7 @@ function setup(noFrequencyMode=false,passwordAccepted=true) {
     const audio={stopped:false,stopPleasureAmbience(){this.stopped=true;}};
     vm.runInNewContext(block,{document,state,Event,TextEncoder,ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',window:{prompt:()=> 'operator-entry'},crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
         localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),prepareRepertoryShotFromUrl(){},
-        audio,syncPleasureAmbienceControl(){},
+        audio,particleField:{setDeepSkyBlackHoleEnabled(value){state.deepSkyBlackHoleEnabled=value;}},syncPleasureAmbienceControl(){},
         clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
         setTimeout(fn,delay){timers.set(++id,{fn,at:now+delay});return id;},clearTimeout:key=>timers.delete(key),
         t:key=>key==='ui.advancedUnlockRemaining'?'{{remaining}} remaining':key,
@@ -31,6 +31,7 @@ assert.equal(app.get('shots-toggle').disabled,true);
 assert.equal(app.get('sleep-mode-control').hidden,true);
 assert.equal(app.get('sleep-mode-toggle').disabled,true);
 assert.equal(app.get('advanced-features-control').hidden,true);
+assert.equal(app.get('deep-sky-black-hole-toggle').checked,false);
 assert.equal(app.get('experiment-care-group').attached,false,'Locked care is absent from native activity picker');
 assert.equal(app.state.advancedFeaturesUnlocked,false);
 assert.equal(app.audio.stopped,true,'Locked Advanced Features should stop Mood & Relaxation ambience.');
@@ -49,6 +50,9 @@ assert.equal(app.get('sleep-mode-toggle').disabled,false);
 app.get('sleep-mode-toggle').checked=true; app.state.sleepExperienceEnabled=true; app.state.sleepMode=true;
 app.get('shots-toggle').checked=true;
 assert.equal(app.get('advanced-features-toggle').checked,true);
+assert.equal(app.state.deepSkyBlackHoleEnabled,true,'Deep-sky object appears automatically after the shared unlock.');
+assert.match(source, /particleField\.setDeepSkyBlackHoleEnabled\(!isLocked\)/,
+    'Deep-sky visibility must follow the shared Advanced Features lock without a separate control.');
 assert.equal(app.get('massage-toggle').disabled,false);
 assert.equal(app.get('experiment-care-group').attached,true);
 assert.equal(app.get('experiment-care-group').disabled,false);
@@ -57,6 +61,7 @@ app.get('massage-toggle').checked=true;app.state.massageEnabled=true;
 app.get('advanced-features-toggle').checked=false;
 app.get('advanced-features-toggle').listeners.change();
 assert.equal(app.get('intimate-service-panel').hidden,true);
+assert.equal(app.state.deepSkyBlackHoleEnabled,false,'Re-lock clears the session-only deep-sky object.');
 assert.equal(app.state.massageEnabled,false);
 assert.equal(app.get('shots-control').hidden,true);
 assert.equal(app.get('shots-toggle').checked,false);

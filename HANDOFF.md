@@ -1,5 +1,20 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-DEEP-SKY-001: optional illustrative black hole
+
+- COMPLETE locally, 2026-09-15, pending device review. Unlocking Advanced Features automatically adds one small, unlabelled illustrative accretion ring to the cached Lobby/Settings celestial layer; there is no checkbox or additional section. It is not calculated or described as a real local-sky observation.
+- Re-locking Advanced Features removes the object. It is omitted in daylight, reduced-motion/static journey screens and hidden pages; lock changes invalidate only the cached celestial layer—no animation loop, texture, network request or added per-frame allocation. Targeted advanced unlock/sky contracts and browser performance validation remain required before release.
+
+### NOW — CP-SKY-CATALOG-003: refreshed major-star catalogue
+
+- COMPLETE locally, 2026-09-15, pending device sky review. Corrected Sirius from an erroneous positive magnitude to −1.44, restoring its intended prominent appearance and label. Expanded the named night catalogue from six to nineteen bright naked-eye stars, including Canopus, Rigil Kent, Capella, Rigel, Procyon, Achernar, Acrux, Aldebaran, Spica, Antares, Pollux, Fomalhaut, Deneb and Regulus. Positions remain calculated from the observer/time model; bodies below the existing 4° altitude cutoff remain hidden.
+- All new labels exist in English, Malayalam, Hindi and Russian. The compact caching and label threshold remain unchanged, so this adds no new animation loop or per-frame catalogue allocation. ESA Hipparcos bright-star data was used to cross-check the brightness baseline. Updated visual atlas description and targeted sky/localization contracts; device sky realism/visibility remains open.
+
+### NOW — CP-SETTINGS-ACCESS-002: public import, protected export
+
+- COMPLETE locally, 2026-09-15, pending browser review. Manage Settings is visible as a full-contrast Settings button without Advanced Features, and Import All Settings works directly. The Export All Settings action remains hidden until Advanced Features is unlocked and still rejects direct locked calls.
+- This keeps import available for ordinary operators while retaining backup/export behind the password-confirmed Advanced Features gate. The Settings backup flow atlas now distinguishes public import from the protected export branch.
+
 ### NOW — CP-DEV-GATE-001: password-confirmed Advanced Features
 
 - COMPLETE locally, 2026-09-15, pending browser review. The existing seven rapid Settings → About → App version tap pattern now opens a localized password prompt on the seventh tap. The browser verifies a SHA-256 digest with Web Crypto; a wrong, cancelled, or unsupported verification keeps Advanced Features locked. The phrase is not stored in source or local storage. This is an interim local operator gate, not a substitute for the future server-backed B2B authentication workflow.

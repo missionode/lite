@@ -37,10 +37,14 @@ helpers.replaceManagedSettings({ chakra_voice: 'piper:test' });
 assert.deepEqual(storage.entries().sort(), [['chakra_voice', 'piper:test'], ['unrelated_extension_data', 'keep']].sort());
 
 const html = fs.readFileSync('index.html', 'utf8');
-assert.match(html, /id="open-settings-manager"[^>]* hidden/, 'The developer-only CTA must start hidden.');
+assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');
+assert.match(html, /id="open-settings-manager"[^>]*class="secondary-btn"/, 'The public Manage Settings CTA must remain clearly visible against the sky.');
 assert.match(html, /id="export-settings"/, 'The manager needs export.');
 assert.match(html, /id="import-settings"/, 'The manager needs import.');
-assert.match(source, /if \(!state\.advancedFeaturesUnlocked\) return;/, 'Every manager action must reject locked direct calls.');
+assert.match(html, /id="settings-export-control"[^>]* hidden/, 'Export controls must start hidden until Advanced Features is unlocked.');
+assert.doesNotMatch(html, /id="settings-import-control"[^>]* hidden/, 'Import controls must remain available without Advanced Features.');
+assert.match(source, /settingsExportControl\.hidden = isLocked/, 'Export controls must follow the shared Advanced Features lock.');
+assert.match(source, /document\.getElementById\('export-settings'\)\?\.addEventListener\('click', \(\) => \{\s*if \(!state\.advancedFeaturesUnlocked\) return;/, 'Export must reject locked direct calls.');
 for (const locale of ['en', 'ml', 'ru', 'hi']) {
     const ui = JSON.parse(fs.readFileSync(`locales/${locale}.json`, 'utf8')).ui;
     for (const key of ['manageSettings', 'exportSettings', 'importSettings', 'settingsImportConfirm']) assert.ok(ui[key], `${locale} needs ${key}`);

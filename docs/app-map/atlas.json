@@ -2474,7 +2474,7 @@
           [
             "geo",
             "Location permission",
-            "Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, not a location-calibrated star catalog."
+            "Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, while the named catalogue covers 19 bright naked-eye stars with localized labels."
           ],
           [
             "motion",
@@ -2491,7 +2491,7 @@
           [
             "sky",
             "Sky lifecycle",
-            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
+            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to the Lobby/Settings night canvas; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
           ]
         ],
         [
@@ -2838,29 +2838,22 @@
     {
       "id": "settings-backup",
       "group": "Supporting pages",
-      "title": "Advanced Settings backup and restore",
-      "subtitle": "Developer-only portable backup of this app’s persisted preferences.",
+      "title": "Settings backup and restore",
+      "subtitle": "Portable restore of this app’s persisted preferences; exporting is operator-protected.",
       "source": "app.js:401; app.js:6942; app.js:6995; index.html:215",
       "rows": [
         [
           [
-            "locked",
-            "Settings / About",
-            "Manage Settings CTA starts hidden. Seven rapid App version taps then a successful localized password prompt reveal Advanced Features and this CTA for the current page load. Relock or reload hides it."
-          ]
-        ],
-        [
-          [
             "open",
-            "Manage Settings",
-            "Direct click is rejected unless the shared Advanced Features state is unlocked."
+            "Settings / About",
+            "Manage Settings is always visible and opens without Advanced Features."
           ]
         ],
         [
           [
-            "export",
-            "Export all saved app settings",
-            "Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request."
+            "exportgate",
+            "Advanced Features unlocked?",
+            "Export controls are hidden by default and appear only after the shared seven-tap-and-password unlock. Direct export is rejected while locked."
           ]
         ],
         [
@@ -2868,6 +2861,13 @@
             "pick",
             "Choose backup file",
             "Import accepts JSON files up to 2 MiB."
+          ]
+        ],
+        [
+          [
+            "export",
+            "Export all saved app settings",
+            "Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request."
           ]
         ],
         [
@@ -2899,19 +2899,19 @@
       ],
       "edges": [
         [
-          "locked",
-          "open",
-          "Unlocked"
-        ],
-        [
-          "open",
-          "export",
-          "Export"
-        ],
-        [
           "open",
           "pick",
           "Import"
+        ],
+        [
+          "open",
+          "exportgate",
+          "Open"
+        ],
+        [
+          "exportgate",
+          "export",
+          "Unlocked"
         ],
         [
           "pick",
@@ -2940,12 +2940,12 @@
         ],
         [
           "replace",
-          "locked",
+          "open",
           "Reload"
         ]
       ],
       "notes": [
-        "This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state."
+        "Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state."
       ]
     },
     {

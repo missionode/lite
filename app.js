@@ -98,8 +98,10 @@ const CELESTIAL_RAD = 180 / Math.PI;
 const CELESTIAL_LABEL_KEYS = Object.freeze({
     Sun: 'ui.celestialSun', Mercury: 'ui.celestialMercury', Venus: 'ui.celestialVenus', Earth: 'ui.celestialEarth',
     Mars: 'ui.celestialMars', Jupiter: 'ui.celestialJupiter', Saturn: 'ui.celestialSaturn', Uranus: 'ui.celestialUranus', Neptune: 'ui.celestialNeptune', Moon: 'ui.celestialMoon', Polaris: 'ui.celestialPolaris',
-    Sirius: 'ui.celestialSirius', Vega: 'ui.celestialVega', Arcturus: 'ui.celestialArcturus',
-    Altair: 'ui.celestialAltair', Betelgeuse: 'ui.celestialBetelgeuse'
+    Sirius: 'ui.celestialSirius', Canopus: 'ui.celestialCanopus', RigilKent: 'ui.celestialRigilKent', Vega: 'ui.celestialVega', Arcturus: 'ui.celestialArcturus',
+    Capella: 'ui.celestialCapella', Rigel: 'ui.celestialRigel', Procyon: 'ui.celestialProcyon', Achernar: 'ui.celestialAchernar', Altair: 'ui.celestialAltair',
+    Betelgeuse: 'ui.celestialBetelgeuse', Acrux: 'ui.celestialAcrux', Aldebaran: 'ui.celestialAldebaran', Spica: 'ui.celestialSpica', Antares: 'ui.celestialAntares',
+    Pollux: 'ui.celestialPollux', Fomalhaut: 'ui.celestialFomalhaut', Deneb: 'ui.celestialDeneb', Regulus: 'ui.celestialRegulus'
 });
 
 // The daylight tableau is visual storytelling, not an observation chart. The
@@ -3479,6 +3481,7 @@ class AmbientParticleField {
         this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
         this.observer = null;
         this.celestialBodies = [];
+        this.deepSkyBlackHoleEnabled = false;
         this.moonBuffer = document.createElement('canvas');
         this.moonBuffer.width = 128;
         this.moonBuffer.height = 128;
@@ -3559,11 +3562,25 @@ class AmbientParticleField {
         this.celestialDaylight = false;
         const namedStars = [
             ['Polaris', 37.9546, 89.2641, 1.98, [205, 225, 255]],
-            ['Sirius', 101.2872, -16.7161, 1.46, [220, 232, 255]],
+            ['Sirius', 101.2872, -16.7161, -1.44, [220, 232, 255]],
+            ['Canopus', 95.9879, -52.6957, -0.62, [245, 242, 222]],
+            ['RigilKent', 219.9204, -60.8356, -0.27, [255, 230, 184]],
             ['Vega', 279.2347, 38.7837, 0.03, [205, 225, 255]],
             ['Arcturus', 213.9154, 19.1825, -0.05, [255, 210, 160]],
+            ['Capella', 79.1723, 45.9980, 0.08, [255, 234, 184]],
+            ['Rigel', 78.6345, -8.2016, 0.18, [205, 225, 255]],
+            ['Procyon', 114.8255, 5.2250, 0.40, [245, 242, 224]],
+            ['Achernar', 24.4286, -57.2368, 0.45, [205, 225, 255]],
             ['Altair', 297.6958, 8.8683, 0.77, [240, 242, 255]],
-            ['Betelgeuse', 88.7929, 7.4071, 0.5, [255, 184, 145]]
+            ['Betelgeuse', 88.7929, 7.4071, 0.45, [255, 184, 145]],
+            ['Acrux', 186.6496, -63.0991, 0.77, [205, 225, 255]],
+            ['Aldebaran', 68.9800, 16.5093, 0.87, [255, 190, 138]],
+            ['Spica', 201.2983, -11.1614, 0.97, [205, 225, 255]],
+            ['Antares', 247.3519, -26.4320, 0.96, [255, 170, 130]],
+            ['Pollux', 116.3290, 28.0262, 1.14, [255, 218, 164]],
+            ['Fomalhaut', 344.4128, -29.6222, 1.16, [235, 242, 255]],
+            ['Deneb', 310.3579, 45.2803, 1.25, [205, 225, 255]],
+            ['Regulus', 152.0929, 11.9672, 1.35, [205, 225, 255]]
         ];
         const bodies = namedStars.map(([name, ra, dec, magnitude, color]) => ({ name, magnitude, color, ...celestialHorizontal(ra, dec, observer.latitude, observer.longitude, date), kind: 'star' }));
         const moon = celestialMoonEquatorial(days, date);
@@ -3662,7 +3679,7 @@ class AmbientParticleField {
     drawCachedCelestialBodies(width, height) {
         // Positions change once per minute. Reuse the expensive gradients,
         // text measurement and blurred backings between those updates.
-        const key = `${this.canvas.width}:${this.canvas.height}:${state.language}:${document.fonts?.status}`;
+        const key = `${this.canvas.width}:${this.canvas.height}:${state.language}:${this.deepSkyBlackHoleEnabled}:${document.body.classList.contains('static-decorations')}:${document.fonts?.status}`;
         if (this.celestialLayerKey !== key || this.cachedBodies !== this.celestialBodies) {
             const layer = this.celestialLayer;
             layer.width = this.canvas.width;
@@ -3694,6 +3711,9 @@ class AmbientParticleField {
             this.ctx.fillRect(0, 0, width, height);
         }
         this.drawCelestialHorizon(width, height);
+        if (this.deepSkyBlackHoleEnabled && this.celestialNightVisible && !document.body.classList.contains('static-decorations')) {
+            this.drawDeepSkyBlackHole(width, height);
+        }
         this.celestialBodies.forEach((body) => {
             if (body.altitude < 4) return;
             const x = (body.azimuth / 360) * width;
@@ -3809,6 +3829,44 @@ class AmbientParticleField {
             }
             this.ctx.restore();
         });
+    }
+
+    setDeepSkyBlackHoleEnabled(enabled) {
+        this.deepSkyBlackHoleEnabled = Boolean(enabled);
+        this.celestialLayerKey = null;
+        if (!document.hidden) this.draw(performance.now(), false);
+    }
+
+    drawDeepSkyBlackHole(width, height) {
+        // A deliberately illustrative deep-sky object: fixed, subtle and
+        // cached with the celestial layer rather than animated or positioned
+        // as an observed astronomical body.
+        const x = width * 0.76;
+        const y = height * 0.27;
+        const radius = Math.max(7, Math.min(14, Math.min(width, height) * 0.014));
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(-0.34);
+        const outer = this.ctx.createRadialGradient(0, 0, radius * 0.35, 0, 0, radius * 3.4);
+        outer.addColorStop(0, 'rgba(0, 0, 0, 0.92)');
+        outer.addColorStop(0.24, 'rgba(8, 8, 18, 0.88)');
+        outer.addColorStop(0.35, 'rgba(182, 128, 222, 0.18)');
+        outer.addColorStop(0.56, 'rgba(118, 184, 255, 0.11)');
+        outer.addColorStop(1, 'rgba(16, 10, 38, 0)');
+        this.ctx.fillStyle = outer;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, radius * 3.1, radius * 0.82, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(214, 180, 255, 0.34)';
+        this.ctx.lineWidth = Math.max(0.55, radius * 0.08);
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, radius * 1.75, radius * 0.38, 0, 0, Math.PI * 2);
+        this.ctx.stroke();
+        this.ctx.fillStyle = 'rgba(0, 0, 4, 0.96)';
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius * 0.56, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
     }
 
     drawCelestialHorizon(width, height) {
@@ -7127,6 +7185,7 @@ function attachEventListeners() {
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);
         }
+        particleField.setDeepSkyBlackHoleEnabled(!isLocked);
         document.getElementById('shots-control').hidden = isLocked;
         document.getElementById('sound-healing-title').hidden = isLocked;
         if (shotsToggle) {
@@ -7162,8 +7221,8 @@ function attachEventListeners() {
         if (intimateServicePanel) intimateServicePanel.hidden = isLocked || getChecked('shots-toggle');
         if (advancedFeaturesControl) advancedFeaturesControl.hidden = isLocked;
         if (advancedFeaturesToggle) advancedFeaturesToggle.checked = !isLocked;
-        const settingsManagerButton = document.getElementById('open-settings-manager');
-        if (settingsManagerButton) settingsManagerButton.hidden = isLocked;
+        const settingsExportControl = document.getElementById('settings-export-control');
+        if (settingsExportControl) settingsExportControl.hidden = isLocked;
         intimateServiceToggles.forEach(toggle => {
             toggle.disabled = isLocked;
             toggle.setAttribute('aria-disabled', String(isLocked));
@@ -7233,7 +7292,6 @@ function attachEventListeners() {
     const settingsManagerStatus = document.getElementById('settings-manager-status');
     const showSettingsManagerStatus = (message) => { if (settingsManagerStatus) settingsManagerStatus.textContent = message; };
     settingsManagerButton?.addEventListener('click', () => {
-        if (!state.advancedFeaturesUnlocked) return;
         showSettingsManagerStatus('');
         showScreen(settingsManagerScreen);
     });
@@ -7255,7 +7313,6 @@ function attachEventListeners() {
         showSettingsManagerStatus(t('ui.settingsExported'));
     });
     document.getElementById('import-settings')?.addEventListener('click', async () => {
-        if (!state.advancedFeaturesUnlocked) return;
         const input = document.getElementById('import-settings-file');
         const file = input?.files?.[0];
         if (!file) { showSettingsManagerStatus(t('ui.settingsImportChooseFile')); return; }

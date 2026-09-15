@@ -212,7 +212,7 @@
                     <input id="advanced-features-toggle" type="checkbox">
                     <span data-i18n="ui.advancedFeatures">Advanced features</span>
                 </label>
-                <button id="open-settings-manager" type="button" class="link-btn" hidden data-i18n="ui.manageSettings">Manage Settings</button>
+                <button id="open-settings-manager" type="button" class="secondary-btn" data-i18n="ui.manageSettings">Manage Settings</button>
             </div>
             <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
             <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
@@ -222,9 +222,11 @@
             <div class="settings-title-row"><h1 data-i18n="ui.manageSettings">Manage Settings</h1></div>
             <p class="subtitle" data-i18n="ui.manageSettingsSubtitle">Create a portable backup of this app’s saved settings, or restore one on this device.</p>
             <div class="config-group settings-panel">
-                <p class="mixer-note" data-i18n="ui.manageSettingsNote">Available while Advanced Features is unlocked. Import replaces this app’s saved settings and reloads the app; it does not upload anything.</p>
-                <button id="export-settings" class="primary-btn" type="button" data-i18n="ui.exportSettings">Export All Settings</button>
-                <div class="mixer-url-entry" style="margin-top: 1rem;">
+                <p class="mixer-note" data-i18n="ui.manageSettingsNote">Import is always available. Export is available after Advanced Features is unlocked; import replaces this app’s saved settings and reloads the app without uploading anything.</p>
+                <div id="settings-export-control" hidden>
+                    <button id="export-settings" class="primary-btn" type="button" data-i18n="ui.exportSettings">Export All Settings</button>
+                </div>
+                <div id="settings-import-control" class="mixer-url-entry" style="margin-top: 1rem;">
                     <label for="import-settings-file" data-i18n="ui.importSettingsFile">Settings backup file</label>
                     <input id="import-settings-file" type="file" accept="application/json,.json">
                     <button id="import-settings" class="secondary-btn" type="button" data-i18n="ui.importSettings">Import All Settings</button>
@@ -666,6 +668,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=3.10"></script>
+    <script src="app.js?v=3.16"></script>
 </body>
 </html>
