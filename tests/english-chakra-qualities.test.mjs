@@ -17,9 +17,9 @@ assert.match(scripts.thirdeye.meditation_en, /deep work unfold in a realistic, u
 console.log('English chakra qualities are mapped with grounded, non-promissory guidance.');
 
 for (const [language, terms] of Object.entries({
-    ml: { fun: 'വിനോദത്തിനും', deepWork: 'ആഴത്തിലുള്ള ഏകാഗ്രപ്രവർത്തന', concentration: 'ഏകാഗ്രത', intelligence: 'ബുദ്ധിശക്തി' },
-    hi: { fun: 'स्वस्थ मनोरंजन', deepWork: 'गहरे एकाग्र काम', concentration: 'एकाग्रता', intelligence: 'बुद्धिमत्ता' },
-    ru: { fun: 'здорового веселья', deepWork: 'глубокой сосредоточенной работы', concentration: 'концентрацию', intelligence: 'Интеллект' }
+    ml: { fun: 'ലളിതമായ ആനന്ദത്തിനും', deepWork: 'ആഴത്തിൽ ഏകാഗ്രമായി പ്രവർത്തിക്കാൻ', concentration: 'ഏകാഗ്രത', intelligence: 'ഇവിടെ പറയുന്ന ബുദ്ധിശക്തി' },
+    hi: { fun: 'सहज आनंद', deepWork: 'गहरे, एकाग्र काम', concentration: 'एकाग्रता', intelligence: 'बुद्धिमत्ता' },
+    ru: { fun: 'простого живого веселья', deepWork: 'глубокой сосредоточенной работы', concentration: 'концентрацию', intelligence: 'Здесь интеллект' }
 })) {
     assert.ok(scripts.sacral[`meditation_${language}`].includes(terms.fun), `${language} Sacral guidance must include grounded fun/happiness`);
     assert.ok(scripts.solar[`meditation_${language}`].includes(terms.deepWork), `${language} Solar guidance must include realistic deep work`);
