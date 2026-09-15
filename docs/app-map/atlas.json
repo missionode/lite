@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-15",
-    "commit": "13a6089 + uncommitted atlas cleanup",
-    "scope": "Version 3.09 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "commit": "13a6089 + uncommitted Advanced Features password gate",
+    "scope": "Version 3.10 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
   },
   "graphs": [
     {
@@ -36,7 +36,7 @@
           [
             "manage",
             "Manage Settings",
-            "Developer-only backup and restore after the shared seven-tap Advanced Features unlock."
+            "Developer-only backup and restore after the shared seven-tap-and-password Advanced Features unlock."
           ],
           [
             "experiments",
@@ -321,17 +321,17 @@
           [
             "care",
             "Intimate Service + ambience",
-            "Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes."
+            "Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes."
           ],
           [
             "shots",
             "Enable Shots?",
-            "Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode."
+            "Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode."
           ],
           [
             "sleepgate",
             "Enable Sleep?",
-            "Hidden and disabled until the shared seven-tap unlock. Relock clears it; direct locked start is rejected."
+            "Hidden and disabled until the shared seven-tap-and-password unlock. Relock clears it; direct locked start is rejected."
           ]
         ],
         [
@@ -897,7 +897,7 @@
           [
             "choose",
             "Choose mode",
-            "Music Only is public. Sleep is visible only after the shared seven-tap Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration."
+            "Music Only is public. Sleep is visible only after the shared seven-tap-and-password Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration."
           ]
         ],
         [
@@ -1268,8 +1268,8 @@
         [
           [
             "unlock",
-            "Shared seven-tap unlock",
-            "Settings → About → App version: seven rapid taps reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options."
+            "Shared tap-and-password unlock",
+            "Settings → About → App version: seven rapid taps then a successful password prompt reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options."
           ]
         ],
         [
@@ -1409,7 +1409,7 @@
           [
             "enable",
             "Enable Shots",
-            "Heading and controls start hidden/disabled. Shared seven-tap Advanced features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off."
+            "Heading and controls start hidden/disabled. Shared seven-tap-and-password Advanced Features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off."
           ]
         ],
         [
@@ -1542,7 +1542,7 @@
           [
             "pick",
             "Pick one activity",
-            "Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap Advanced features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked."
+            "Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap-and-password Advanced Features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked."
           ]
         ],
         [
@@ -2846,7 +2846,7 @@
           [
             "locked",
             "Settings / About",
-            "Manage Settings CTA starts hidden. Seven rapid App version taps reveal Advanced Features and this CTA for the current page load. Relock or reload hides it."
+            "Manage Settings CTA starts hidden. Seven rapid App version taps then a successful localized password prompt reveal Advanced Features and this CTA for the current page load. Relock or reload hides it."
           ]
         ],
         [
@@ -3100,7 +3100,7 @@
           [
             "consume",
             "Unlock, then consume query",
-            "While locked, keep parameters pending. Seven rapid App version taps unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation."
+            "While locked, keep parameters pending. Seven rapid App version taps and a successful password prompt unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation."
           ]
         ],
         [

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 13a6089 + uncommitted atlas cleanup · 2026-09-15.
+Source snapshot: 13a6089 + uncommitted Advanced Features password gate · 2026-09-15.
 
-Version 3.09 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 3.10 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -78,7 +78,7 @@ flowchart TD
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
 | Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts. |
 | Meditation Room | Main mode selection, chakra choices, intention, duration and consultation. |
-| Manage Settings | Developer-only backup and restore after the shared seven-tap Advanced Features unlock. |
+| Manage Settings | Developer-only backup and restore after the shared seven-tap-and-password Advanced Features unlock. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
 | Consultation / repertory | Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot. |
@@ -181,9 +181,9 @@ flowchart TD
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
 | Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
-| Intimate Service + ambience | Hidden by default. Settings → About → App version unlocks after seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; 7 shows confirmation. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
-| Enable Shots? | Hidden and disabled until the shared seven-tap unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
-| Enable Sleep? | Hidden and disabled until the shared seven-tap unlock. Relock clears it; direct locked start is rejected. |
+| Intimate Service + ambience | Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
+| Enable Shots? | Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
+| Enable Sleep? | Hidden and disabled until the shared seven-tap-and-password unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
@@ -375,7 +375,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Choose mode | Music Only is public. Sleep is visible only after the shared seven-tap Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration. |
+| Choose mode | Music Only is public. Sleep is visible only after the shared seven-tap-and-password Advanced Features unlock; direct locked activation is rejected. Both bypass normal guided preparation and chakra narration. |
 | Sleep start | DND reminder; load content; exactly five valid stage frequencies required. Sleep dimming multiplies user brightness by 0.4 without filtering the app ancestor; fixed controls retain viewport positioning. |
 | Music Only start | Show background symbol; no session countdown; request wake lock. |
 | Five Sleep stages | Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone. |
@@ -487,7 +487,7 @@ Sources: [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app
 
 ```mermaid
 flowchart TD
-  unlock["Shared seven-tap unlock"]
+  unlock["Shared tap-and-password unlock"]
   start["Focused startup"]
   perineal["Optional perineal care"]
   gate1["Guide: proceed"]
@@ -513,7 +513,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Shared seven-tap unlock | Settings → About → App version: seven rapid taps reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options. |
+| Shared tap-and-password unlock | Settings → About → App version: seven rapid taps then a successful password prompt reveal care and Shots together. Both are locked and choices reset each page load. Select any nonempty subset of care options. |
 | Focused startup | No ordinary Arrival, gratitude, personal intention or Emergence wrapper. |
 | Optional perineal care | Narrate intro/instructions → timed stage → 60-second reminder if reached. |
 | Guide: proceed | Wait for explicit Continue. |
@@ -559,7 +559,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Enable Shots | Heading and controls start hidden/disabled. Shared seven-tap Advanced features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off. |
+| Enable Shots | Heading and controls start hidden/disabled. Shared seven-tap-and-password Advanced Features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off. |
 | Choose type | Meditation, HRIM, Anesthetic, Mood & Relaxation, Sleep, or Custom. Labels here describe app modes. |
 | Meditation Shot | Root 396 → Sacral 417 → Solar 528 → Heart 639 → Throat 741 → Third Eye 852 → Crown 963 Hz. Ignores selected chakra subset. |
 | Sleep Shot | Script sequence: 10 → 6 → 5 → 2 → 6 Hz. |
@@ -604,7 +604,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Settings | Open Experiment Mode. |
-| Pick one activity | Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap Advanced features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked. |
+| Pick one activity | Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap-and-password Advanced Features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked. |
 | Configure duration | Chakra/HRIM use minutes; Box uses seconds per step; care and Corpse routines consume seconds. |
 | Start experiment | Reject care activities while Advanced features is locked, before loading content or starting audio. Otherwise load selected content; initialize audio, ambience and wake lock; set experiment flag and countdown. |
 | Chakra / HRIM | Run one meditateOnChakra with duration override. |
@@ -1094,7 +1094,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Settings / About | Manage Settings CTA starts hidden. Seven rapid App version taps reveal Advanced Features and this CTA for the current page load. Relock or reload hides it. |
+| Settings / About | Manage Settings CTA starts hidden. Seven rapid App version taps then a successful localized password prompt reveal Advanced Features and this CTA for the current page load. Relock or reload hides it. |
 | Manage Settings | Direct click is rejected unless the shared Advanced Features state is unlocked. |
 | Export all saved app settings | Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request. |
 | Choose backup file | Import accepts JSON files up to 2 MiB. |
@@ -1180,7 +1180,7 @@ flowchart TD
 | Load two JSON sources | scripts.json provides configured frequencies; frequency-repertory.json provides reference entries. Validate each Shot frequency. |
 | Browse and search | English/Malayalam toggle; search names, focus, frequency and metadata; clear query; show empty-results state. |
 | Prepare Shot link | Navigate to index.html with shotSource=repertory and shotFrequency query. |
-| Unlock, then consume query | While locked, keep parameters pending. Seven rapid App version taps unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation. |
+| Unlock, then consume query | While locked, keep parameters pending. Seven rapid App version taps and a successful password prompt unlock care and Shots; then remove parameters using history.replaceState before validation/confirmation. |
 | Normal Shot confirmation | Invalid frequency or No Frequency blocks preparation. Cancel leaves Shot off. |
 | Prepared custom Shot | Set custom type and frequency, reset duration, show Lobby and focus frequency field. |
 | User presses Begin | Only now run Shot; completion reload cannot replay consumed URL request. |

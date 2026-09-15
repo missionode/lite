@@ -117,6 +117,8 @@
     "advancedUnlockRemaining": "उन्नत सुविधाएँ चालू करने के लिए {{remaining}} बार और टैप करें।",
     "advancedFeaturesEnabled": "उन्नत सुविधाएँ चालू हैं।",
     "advancedFeaturesDisabled": "उन्नत सुविधाएँ बंद हैं।",
+    "advancedPasswordPrompt": "उन्नत सुविधाओं का पासवर्ड दर्ज करें।",
+    "advancedPasswordIncorrect": "पासवर्ड स्वीकार नहीं किया गया। उन्नत सुविधाएँ लॉक रहेंगी।",
     "visualEffect": "ध्यान दृश्य प्रभाव",
     "visualEffectNatural": "प्राकृतिक",
     "visualEffectAura": "आभा चमक",

@@ -117,6 +117,8 @@
     ,"advancedUnlockRemaining": "{{remaining}} more taps to enable advanced features."
     ,"advancedFeaturesEnabled": "Advanced features enabled."
     ,"advancedFeaturesDisabled": "Advanced features disabled."
+    ,"advancedPasswordPrompt": "Enter the Advanced Features password."
+    ,"advancedPasswordIncorrect": "Password not accepted. Advanced features remain locked."
     ,"visualEffect": "Meditation Visual Effect"
     ,"visualEffectNatural": "Natural"
     ,"visualEffectAura": "Aura Glow"

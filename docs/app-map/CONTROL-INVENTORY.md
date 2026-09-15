@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: 13a6089 + uncommitted atlas cleanup · 2026-09-15.
+Source snapshot: 13a6089 + uncommitted Advanced Features password gate · 2026-09-15.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

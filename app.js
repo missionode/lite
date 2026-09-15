@@ -30,6 +30,9 @@ const DEFAULT_DRONE_DURATION_MODE = 'beginner';
 const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
 const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
 const SLEEP_STAGE_COUNT = 5;
+// This is an interim operator gate, not a replacement for server-backed
+// authentication. The value is a SHA-256 digest, never the plaintext phrase.
+const ADVANCED_FEATURES_PASSWORD_HASH = '5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3';
 const SHOT_CHAKRA_ORDER = Object.freeze(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']);
 const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
 const SPATIAL_MODES = Object.freeze(['off', 'stereo', 'headphones', 'room']);
@@ -7168,7 +7171,15 @@ function attachEventListeners() {
         syncPleasureAmbienceControl();
     }
 
-    function handleIntimateServiceUnlockTap() {
+    async function verifyAdvancedFeaturesPassword(password) {
+        if (typeof password !== 'string' || !globalThis.crypto?.subtle) return false;
+        const bytes = new TextEncoder().encode(password);
+        const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+        const actual = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+        return actual === ADVANCED_FEATURES_PASSWORD_HASH;
+    }
+
+    async function handleIntimateServiceUnlockTap() {
         if (intimateServiceUnlocked) return;
         const now = performance.now();
         if (intimateServiceLastTap === null || now - intimateServiceLastTap > 1500) resetUnlockTaps();
@@ -7178,6 +7189,11 @@ function attachEventListeners() {
         const remaining = 7 - intimateServiceTapCount;
         if (remaining <= 0) {
             resetUnlockTaps();
+            const password = window.prompt(t('ui.advancedPasswordPrompt'));
+            if (!await verifyAdvancedFeaturesPassword(password)) {
+                showUnlockToast(t('ui.advancedPasswordIncorrect'));
+                return;
+            }
             setIntimateServiceLocked(false);
             showUnlockToast(t('ui.advancedFeaturesEnabled'));
             prepareRepertoryShotFromUrl();

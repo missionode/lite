@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-DEV-GATE-001: password-confirmed Advanced Features
+
+- COMPLETE locally, 2026-09-15, pending browser review. The existing seven rapid Settings → About → App version tap pattern now opens a localized password prompt on the seventh tap. The browser verifies a SHA-256 digest with Web Crypto; a wrong, cancelled, or unsupported verification keeps Advanced Features locked. The phrase is not stored in source or local storage. This is an interim local operator gate, not a substitute for the future server-backed B2B authentication workflow.
+- The shared unlock remains page-session-only and still governs Intimate Service, Mood & Relaxation ambience, Shots, Sleep Mode, and Manage Settings. The existing 1.5-second tap timeout, silent first four taps, fifth/sixth countdown, re-lock, reload, and direct-entry guards remain intact. App shell and locale cache generations are refreshed for the code and new localized messages.
+- Focused mock verification covers successful and rejected passwords, the tap sequence, timeout, re-lock/reload, direct guards and all bundled locales. Device prompt accessibility and B2B authentication remain open. The updated modes and settings-backup atlas descriptions reflect the added password branch.
+
 ### NOW — CP-AMBIENCE-001: Advanced Features Lobby ambience
 
 - COMPLETE locally, 2026-09-15. Mood & Relaxation ambience no longer appears in Journey Tuning. Its toggle, intensity, URL recovery, blur and bounded level controls now live once inside the Advanced Features → Lobby → Intimate Service panel. The normal audio engine, No Frequency suppression, source recovery and session-only selection behavior are unchanged.
