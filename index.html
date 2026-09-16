@@ -273,6 +273,24 @@
             </div>
         </div>
 
+        <div id="advanced-password-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="advanced-password-title">
+            <div class="modal-content advanced-password-content">
+                <button id="advanced-password-close" class="sleep-mode-prompt-close" type="button" aria-label="Close" data-i18n-aria-label="ui.close">×</button>
+                <h2 id="advanced-password-title" data-i18n="ui.advancedFeatures">Advanced Features</h2>
+                <p data-i18n="ui.advancedPasswordPrompt">Enter the Advanced Features password.</p>
+                <form id="advanced-password-form">
+                    <div class="advanced-password-entry">
+                        <input id="advanced-password-input" type="password" autocomplete="current-password" required data-i18n-aria-label="ui.advancedPasswordPrompt" aria-label="Advanced Features password">
+                        <button id="advanced-password-reveal" type="button" class="advanced-password-reveal" aria-pressed="false" aria-label="Hold to reveal password" data-i18n-aria-label="ui.advancedPasswordReveal">👁</button>
+                    </div>
+                    <div class="advanced-password-actions">
+                        <button id="advanced-password-cancel" type="button" class="secondary-btn" data-i18n="ui.advancedPasswordCancel">Cancel</button>
+                        <button type="submit" class="primary-btn" data-i18n="ui.advancedPasswordSubmit">Unlock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Lobby Screen -->
         <section id="lobby-screen" class="screen hidden">
             <h1 id="sound-healing-title" data-i18n="ui.soundHealing" hidden>Sound Shot</h1>
@@ -668,6 +686,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=3.23"></script>
+    <script src="app.js?v=3.25"></script>
 </body>
 </html>

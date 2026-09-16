@@ -72,8 +72,8 @@ assert.match(app, /\['Earth', 'earth', \[114, 190, 221\], 1, 5\.1, 14\][\s\S]*?d
 assert.doesNotMatch(app, /atmosphereTroposphere|27°C/, 'Only Earth should be named in the compact solar-system tableau.');
 assert.match(app, /drawCelestialHorizon\(width, height\);[\s\S]*?body\.altitude < 4[\s\S]*?drawCelestialHorizon\(width, height\) \{[\s\S]*?const horizonY = height \* 0\.88[\s\S]*?quadraticCurveTo/,
     'The celestial view should include a cached curved horizon matching the altitude projection baseline.');
-assert.match(app, /deepSkyBlackHoleEnabled && this\.celestialNightVisible && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
-    'The Advanced Features black-hole illustration must stay night-only, off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
+assert.match(app, /deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
+    'The Advanced Features black-hole illustration must be visible on either Lobby/Settings sky, stay off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
     const locale = JSON.parse(readFileSync(`locales/${language}.json`, 'utf8'));
     assert.equal(locale.ui.celestialEarth, earth, `${language} must localize the Earth label`);

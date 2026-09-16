@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const source=fs.readFileSync('app.js','utf8');
+const html=fs.readFileSync('index.html','utf8');
 const block=source.slice(source.indexOf('    const intimateServiceToggles = ['),source.indexOf('    function isIntimateServiceToggle('));
 const approvedDigest=Uint8Array.from('5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3'.match(/.{2}/g).map(value=>parseInt(value,16))).buffer;
 function setup(noFrequencyMode=false,passwordAccepted=true) {
@@ -13,7 +14,7 @@ function setup(noFrequencyMode=false,passwordAccepted=true) {
     const document={hidden:false,getElementById:get,createElement:()=>toast,body:{appendChild(){}},addEventListener(){}};
     const state={noFrequencyMode};
     const audio={stopped:false,stopPleasureAmbience(){this.stopped=true;}};
-    vm.runInNewContext(block,{document,state,Event,TextEncoder,ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',window:{prompt:()=> 'operator-entry'},crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
+    vm.runInNewContext(block,{document,state,Event,TextEncoder,ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',requestAdvancedPassword:async()=> 'operator-entry',crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
         localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),prepareRepertoryShotFromUrl(){},
         audio,particleField:{setDeepSkyBlackHoleEnabled(value){state.deepSkyBlackHoleEnabled=value;}},syncPleasureAmbienceControl(){},
         clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
@@ -97,6 +98,8 @@ for(let i=0;i<6;i++){denied.tap();denied.advance(100);}
 await denied.tap();
 assert.equal(denied.get('intimate-service-panel').hidden,true,'Wrong password keeps Advanced Features locked.');
 assert.match(source,/globalThis\.crypto\?\.subtle[\s\S]*?digest\('SHA-256'/,'Advanced password verification must use Web Crypto.');
+assert.match(html, /id="advanced-password-input" type="password"[\s\S]*?id="advanced-password-reveal"[\s\S]*?Hold to reveal password/, 'The Advanced Features unlock must use a masked password field with a press-and-hold reveal control.');
+assert.match(fs.readFileSync('style.css','utf8'), /\.advanced-password-entry input \{[\s\S]*?min-height: 48px;[\s\S]*?border: 1px solid rgba\(251, 191, 36, 0\.46\)[\s\S]*?background: rgba\(4, 8, 24, 0\.84\)[\s\S]*?\.advanced-password-entry input:focus/, 'The password field must have its own visible dark-sky styling and focus treatment.');
 console.log('Advanced unlock passed: silent taps, password gate, countdown, timeout, re-lock, reload and translations.');
 const experiment=source.slice(source.indexOf('    async startExperiment(activity)'),source.indexOf('    stopExperiment()'));
 const controller=vm.runInNewContext('({'+experiment+'})',{state:{advancedFeaturesUnlocked:false}});
@@ -107,7 +110,6 @@ const shot=source.slice(source.indexOf('    async runShot('),source.indexOf('   
 const lockedShot=vm.runInNewContext('({'+shot+'})',{state:{advancedFeaturesUnlocked:false}});
 await lockedShot.runShot('meditation');
 assert.equal(lockedShot.isShotActive,undefined,'Locked direct Shot call does not activate audio');
-const html=fs.readFileSync('index.html','utf8');
 assert.match(html, /id="shots-control"[^>]* hidden/);
 assert.match(html, /id="sound-healing-title"[^>]* hidden/);
 assert.match(html, /id="sleep-mode-control"[^>]* hidden/);

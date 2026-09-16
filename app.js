@@ -3711,7 +3711,7 @@ class AmbientParticleField {
             this.ctx.fillRect(0, 0, width, height);
         }
         this.drawCelestialHorizon(width, height);
-        if (this.deepSkyBlackHoleEnabled && this.celestialNightVisible && !document.body.classList.contains('static-decorations')) {
+        if (this.deepSkyBlackHoleEnabled && !document.body.classList.contains('static-decorations')) {
             this.drawDeepSkyBlackHole(width, height);
         }
         this.celestialBodies.forEach((body) => {
@@ -7178,6 +7178,59 @@ function attachEventListeners() {
         if (!except || except !== yogaExperienceToggle) state.yogaExperienceEnabled = false;
     }
 
+    const advancedPasswordModal = document.getElementById('advanced-password-modal');
+    const advancedPasswordForm = document.getElementById('advanced-password-form');
+    const advancedPasswordInput = document.getElementById('advanced-password-input');
+    const advancedPasswordReveal = document.getElementById('advanced-password-reveal');
+    const advancedPasswordCancel = document.getElementById('advanced-password-cancel');
+    const advancedPasswordClose = document.getElementById('advanced-password-close');
+    let advancedPasswordResolver = null;
+
+    function closeAdvancedPasswordDialog(password = null) {
+        if (!advancedPasswordResolver) return;
+        const resolve = advancedPasswordResolver;
+        advancedPasswordResolver = null;
+        advancedPasswordModal?.classList.add('hidden');
+        if (advancedPasswordInput) {
+            advancedPasswordInput.value = '';
+            advancedPasswordInput.type = 'password';
+        }
+        resolve(password);
+    }
+
+    function requestAdvancedPassword() {
+        if (!advancedPasswordModal || !advancedPasswordInput) return Promise.resolve(null);
+        advancedPasswordInput.value = '';
+        advancedPasswordInput.type = 'password';
+        advancedPasswordModal.classList.remove('hidden');
+        requestAnimationFrame(() => advancedPasswordInput.focus());
+        return new Promise(resolve => { advancedPasswordResolver = resolve; });
+    }
+
+    function setAdvancedPasswordVisible(visible) {
+        if (!advancedPasswordInput || !advancedPasswordReveal) return;
+        advancedPasswordInput.type = visible ? 'text' : 'password';
+        advancedPasswordReveal.setAttribute('aria-pressed', String(visible));
+    }
+
+    advancedPasswordForm?.addEventListener('submit', event => {
+        event.preventDefault();
+        closeAdvancedPasswordDialog(advancedPasswordInput?.value ?? null);
+    });
+    advancedPasswordCancel?.addEventListener('click', () => closeAdvancedPasswordDialog());
+    advancedPasswordClose?.addEventListener('click', () => closeAdvancedPasswordDialog());
+    advancedPasswordReveal?.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        setAdvancedPasswordVisible(true);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => advancedPasswordReveal?.addEventListener(type, () => setAdvancedPasswordVisible(false)));
+    advancedPasswordReveal?.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') setAdvancedPasswordVisible(true);
+    });
+    advancedPasswordReveal?.addEventListener('keyup', event => {
+        if (event.key === 'Enter' || event.key === ' ') setAdvancedPasswordVisible(false);
+    });
+
     const intimateServiceToggles = [
         document.getElementById('perineal-care-toggle'),
         document.getElementById('massage-toggle'),
@@ -7294,7 +7347,7 @@ function attachEventListeners() {
         const remaining = 7 - intimateServiceTapCount;
         if (remaining <= 0) {
             resetUnlockTaps();
-            const password = window.prompt(t('ui.advancedPasswordPrompt'));
+            const password = await requestAdvancedPassword();
             if (!await verifyAdvancedFeaturesPassword(password)) {
                 showUnlockToast(t('ui.advancedPasswordIncorrect'));
                 return;

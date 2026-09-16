@@ -1,5 +1,10 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-ADVANCED-VISIBILITY-001: visible black hole and masked unlock
+
+- COMPLETE locally, 2026-09-16, pending browser/device review. The illustrative Advanced Features black hole is now drawn on either daytime or night Lobby/Settings sky as soon as the shared unlock succeeds; static journey screens still exclude it. The old browser text prompt is replaced with an in-app masked password dialog. Its dark-sky field has explicit gold focus treatment and a matching eye control; the eye reveals text only while held, then restores masking. Submit, cancel and reveal labels are localized in English, Malayalam, Hindi and Russian.
+- The black-hole condition is cache-invalidated on the shared lock transition. The password is still verified with the existing Web Crypto SHA-256 comparison and is never persisted. Sky, Advanced unlock, locale, browser and atlas checks remain required before release.
+
 ### NOW — CP-SOLAR-CONTAINMENT-001: thematic solar containment glow
 
 - COMPLETE locally, 2026-09-16, pending device visual review. The calculated daytime Sun now has a warm, diffuse containment glow. It begins inside the solar edge, blends through gold and dissolves into the indigo field rather than forming a separate ring. This is cached daytime artwork only; it does not change celestial calculations, climate, energy transfer, animation cadence or per-frame allocation.
