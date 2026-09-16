@@ -22,19 +22,35 @@ function storageFrom(entries) {
 const storage = storageFrom([
     ['chakra_lang', 'en'],
     ['chakra_selected', '["root","heart"]'],
+    ['chakra_visualization_ambience', 'space-race'],
+    ['chakra_vol_visualization_ambience', '0.14'],
     ['unrelated_extension_data', 'keep']
 ]);
 const helpers = vm.runInNewContext(`${source.slice(start, end)}; ({ collectManagedSettings, parseSettingsBackup, replaceManagedSettings })`, { Blob, localStorage: storage });
 
 const settings = helpers.collectManagedSettings();
-assert.deepEqual(JSON.parse(JSON.stringify(settings)), { chakra_lang: 'en', chakra_selected: '["root","heart"]' });
+assert.deepEqual(JSON.parse(JSON.stringify(settings)), {
+    chakra_lang: 'en',
+    chakra_selected: '["root","heart"]',
+    chakra_visualization_ambience: 'space-race',
+    chakra_vol_visualization_ambience: '0.14'
+});
 const validBackup = JSON.stringify({ format: 'chakra-meditation-settings', version: 1, settings });
 assert.deepEqual(JSON.parse(JSON.stringify(helpers.parseSettingsBackup(validBackup))), JSON.parse(JSON.stringify(settings)));
 assert.throws(() => helpers.parseSettingsBackup(JSON.stringify({ format: 'wrong', version: 1, settings })), /compatible/);
 assert.throws(() => helpers.parseSettingsBackup(JSON.stringify({ format: 'chakra-meditation-settings', version: 1, settings: { unsafe_key: 'no' } })), /invalid/);
 
-helpers.replaceManagedSettings({ chakra_voice: 'piper:test' });
-assert.deepEqual(storage.entries().sort(), [['chakra_voice', 'piper:test'], ['unrelated_extension_data', 'keep']].sort());
+helpers.replaceManagedSettings({
+    chakra_voice: 'piper:test',
+    chakra_visualization_ambience: 'silence',
+    chakra_vol_visualization_ambience: '0.08'
+});
+assert.deepEqual(storage.entries().sort(), [
+    ['chakra_voice', 'piper:test'],
+    ['chakra_visualization_ambience', 'silence'],
+    ['chakra_vol_visualization_ambience', '0.08'],
+    ['unrelated_extension_data', 'keep']
+].sort());
 
 const html = fs.readFileSync('index.html', 'utf8');
 assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');

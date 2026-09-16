@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=1.95">
+    <link rel="stylesheet" href="style.css?v=2.03">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -86,6 +86,11 @@
                 <label for="settings-vol-video" data-i18n="ui.videoVolume">Video Volume</label>
                 <input type="range" id="settings-vol-video" min="0.02" max="0.5" step="0.01" value="0.2">
                 <button id="preview-video-audio" class="secondary-btn" type="button" data-i18n="ui.previewVideoAudio">Preview Video Audio</button>
+            </div>
+            <div class="config-group settings-panel">
+                <label for="settings-vol-visualization" data-i18n="ui.visualizationAmbienceVolume">Visualization ambience volume</label>
+                <input type="range" id="settings-vol-visualization" min="0.02" max="0.5" step="0.01" value="0.1">
+                <button id="preview-visualization-ambience" class="secondary-btn" type="button" data-i18n="ui.previewVisualizationAmbience">Preview Visualization Ambience</button>
             </div>
 
             <div id="yoga-experience-setup" class="config-group settings-panel" hidden>
@@ -319,6 +324,26 @@
                 </div>
             </div>
             <h1 id="lobby-title">Meditation Room</h1>
+            <div id="journey-preparation-addons" class="config-group lobby-experience-mode">
+                <label data-i18n="ui.journeyPreparation">Journey preparation</label>
+                <div class="experience-mode-options">
+                    <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="box-breathing-experience-toggle"><span data-i18n="ui.boxBreathingExperience">Box Breathing</span></label>
+                    <div class="journey-addon-control">
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="dharana-addon-toggle"><span data-i18n="ui.dharanaAddon">Focused Attention (Dharana)</span></label>
+                        <div id="dharana-options" class="dharana-options" hidden>
+                            <label><span data-i18n="ui.dharanaAnchor">Focus anchor</span><select id="dharana-anchor"><option value="indigo-circle" data-i18n="ui.dharanaIndigoCircle">Indigo circle</option><option value="gold-dot" data-i18n="ui.dharanaGoldDot">Golden dot</option><option value="violet-triangle" data-i18n="ui.dharanaVioletTriangle">Violet triangle</option></select></label>
+                            <label><span data-i18n="ui.dharanaDuration">Duration</span><select id="dharana-duration"><option value="1">1 min</option><option value="2" selected>2 min</option><option value="3">3 min</option><option value="5">5 min</option></select></label>
+                        </div>
+                    </div>
+                    <div class="journey-addon-control">
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="visualization-addon-toggle"><span data-i18n="ui.visualizationAddon">Guided Visualization</span></label>
+                        <div id="visualization-options" class="dharana-options" hidden>
+                            <label><span data-i18n="ui.visualizationDuration">Duration</span><select id="visualization-duration"><option value="1">1 min</option><option value="2" selected>2 min</option><option value="3">3 min</option><option value="5">5 min</option></select></label>
+                            <label><span data-i18n="ui.visualizationAmbience">Background score</span><select id="visualization-ambience"><option value="silence" data-i18n="ui.visualizationSilence">Silence</option><option value="space-race" data-i18n="ui.visualizationSpaceRace">Space Race</option></select></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="chakra-selection-panel" class="config-group lobby-chakra-selection">
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
@@ -331,6 +356,10 @@
                     <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
                     <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
+            </div>
+            <div id="journey-integration-addons" class="config-group lobby-experience-mode">
+                <label data-i18n="ui.journeyIntegration">Journey integration</label>
+                <div class="experience-mode-options"><label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="hooponopono-experience-toggle"><span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span></label></div>
             </div>
             <div class="time-selector">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
@@ -402,14 +431,6 @@
                     <label class="checkbox-label experience-mode-toggle">
                         <input type="checkbox" id="music-only-toggle">
                         <span data-i18n="ui.musicOnlyMode">Music Only</span>
-                    </label>
-                    <label class="checkbox-label experience-mode-toggle">
-                        <input type="checkbox" id="box-breathing-experience-toggle">
-                        <span data-i18n="ui.boxBreathingExperience">Box Breathing</span>
-                    </label>
-                    <label class="checkbox-label experience-mode-toggle">
-                        <input type="checkbox" id="hooponopono-experience-toggle">
-                        <span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span>
                     </label>
                     <label class="checkbox-label experience-mode-toggle">
                         <input type="checkbox" id="yoga-experience-toggle">
@@ -517,6 +538,9 @@
         <section id="meditation-screen" class="screen hidden">
             <div id="chakra-container" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <img id="chakra-symbol" alt="Meditation symbol" style="width: 100%; height: 100%; object-fit: contain;">
+                <div id="visualization-blackout" class="visualization-blackout" aria-hidden="true" hidden></div>
+                <div id="focus-veil" class="focus-veil" aria-hidden="true" hidden></div>
+                <div id="focus-anchor" class="focus-anchor" aria-hidden="true" hidden></div>
                 <div id="glow-effect"></div>
             </div>
 
@@ -581,6 +605,7 @@
                     <div class="mixer-row"><label data-i18n="ui.drone">Drone</label><input type="range" id="vol-drone" min="0.02" max="0.2" step="0.01" value="0.05"></div>
                     <div class="mixer-row"><label data-i18n="ui.bell">Bell</label><input type="range" id="vol-bell" min="0.02" max="0.12" step="0.01" value="0.04"></div>
                     <div class="mixer-row"><label data-i18n="ui.mantra">Mantra</label><input type="range" id="vol-mantra" min="0.005" max="1" step="0.005" value="0.35"></div>
+                    <div class="mixer-row"><label data-i18n="ui.visualizationAmbienceVolume">Visualization ambience volume</label><input type="range" id="vol-visualization" min="0.02" max="0.5" step="0.01" value="0.1"></div>
                     <div class="mixer-row"><label data-i18n="ui.music">Music</label><input type="range" id="vol-music" min="0.02" max="0.5" step="0.01" value="0.2"></div>
                 </div>
 
@@ -686,6 +711,6 @@
     </div>
     <script src="night-sky.js?v=1.0"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=3.25"></script>
+    <script src="app.js?v=3.41"></script>
 </body>
 </html>

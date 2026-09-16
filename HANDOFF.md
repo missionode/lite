@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-JOURNEY-ADDONS-001: ordered chakra techniques
+
+- COMPLETE locally, 2026-09-16, pending browser/audio review. Box Breathing, Dharana and Guided Visualization are preparation add-ons before Chakra Journey selection. They execute after gratitude in that order, followed by normal chakra stages. With no chakra selected, Dharana and/or Guided Visualization instead run as complete standalone practices. Ho’oponopono remains an integration add-on after the final chakra, before silence, Closing and Emergence.
+- Guided Visualization is silent by default. The supplied local `audio/shane-ivers-space-race.mp3` is an opt-in background score with a separate low-default saved volume. Core music fades down over six seconds; the optional score enters over eight seconds, ducks during localized narration, then has a ten-second exit while normal music returns. Stop/cancel uses a two-second score fade. The score is fetched/decoded only when selected and is intentionally excluded from the mandatory PWA precache—no continuous decode, timer, animation loop, or install-time 8.8 MB download is introduced. English, Malayalam, Hindi and Russian interface/narration text is bundled.
+- Visualization now explicitly separates its private mental-rehearsal focus from the Chakra Journey’s “calling in” intention. The guide explains the distinction, invites the meditator to choose any experience, possibility or direction without typing or speaking it, provides twelve seconds of private reflection, then guides the scene.
+- Yoga remains a standalone pose-based experience. HRIM, Sleep, Music Only, Shots and Intimate Service remain replacement flows. Selecting a replacement clears all Chakra Journey add-ons; selecting an add-on clears replacement modes. The updated journey-addons atlas map records the order, guard and audio branch.
+
 ### NOW — CP-ADVANCED-VISIBILITY-001: visible black hole and masked unlock
 
 - COMPLETE locally, 2026-09-16, pending browser/device review. The illustrative Advanced Features black hole is now drawn on either daytime or night Lobby/Settings sky as soon as the shared unlock succeeds; static journey screens still exclude it. The old browser text prompt is replaced with an in-app masked password dialog. Its dark-sky field has explicit gold focus treatment and a matching eye control; the eye reveals text only while held, then restores masking. Submit, cancel and reveal labels are localized in English, Malayalam, Hindi and Russian.
@@ -21,6 +28,13 @@
 - Re-locking Advanced Features removes the object. It is omitted in daylight, reduced-motion/static journey screens and hidden pages; lock changes invalidate only the cached celestial layer—no animation loop, texture, network request or added per-frame allocation. Targeted advanced unlock/sky contracts and browser performance validation remain required before release.
 
 ### NOW — CP-SKY-CATALOG-003: refreshed major-star catalogue
+
+### NOW — CP-VISUALIZATION-BACKUP-001: Visualization preferences in settings backup
+
+- COMPLETE locally, 2026-09-16, pending browser import/export review. Visualization ambience selection and its saved volume use the normal `chakra_` preference namespace, so they are exported in the existing versioned settings backup and restored by the existing confirmed replacement import. A focused contract now asserts both settings survive export parsing and import replacement while unrelated browser storage remains untouched.
+- The Visualization ambience range now tops out at 0.50 (default remains 0.10), consistently in Settings, Journey Tuning and the saved-value safety clamp.
+- Fixed the Visualization score’s silent-until-slider issue: its loop gain now owns the selected volume while its separate bus only handles narration ducking. The selected score is a native full-session loop. Silence adds a localized, gentle re-orientation cue before the final return prompt.
+- The `settings-backup` atlas explicitly records these two preferences. Automated source-level backup verification remains required before any release; no device download/import test has been performed in this checkpoint.
 
 - COMPLETE locally, 2026-09-15, pending device sky review. Corrected Sirius from an erroneous positive magnitude to −1.44, restoring its intended prominent appearance and label. Expanded the named night catalogue from six to nineteen bright naked-eye stars, including Canopus, Rigil Kent, Capella, Rigel, Procyon, Achernar, Acrux, Aldebaran, Spica, Antares, Pollux, Fomalhaut, Deneb and Regulus. Positions remain calculated from the observer/time model; bodies below the existing 4° altitude cutoff remain hidden.
 - All new labels exist in English, Malayalam, Hindi and Russian. The compact caching and label threshold remain unchanged, so this adds no new animation loop or per-frame catalogue allocation. ESA Hipparcos bright-star data was used to cross-check the brightness baseline. Updated visual atlas description and targeted sky/localization contracts; device sky realism/visibility remains open.

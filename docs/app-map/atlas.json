@@ -1641,6 +1641,68 @@
       ]
     },
     {
+      "id": "journey-addons",
+      "group": "Journeys",
+      "title": "Ordered Chakra Journey add-ons",
+      "subtitle": "Optional preparation and integration techniques within a normal Chakra Journey.",
+      "source": "index.html:322; app.js:5180; app.js:5380",
+      "rows": [
+        [
+          [
+            "prepare",
+            "Preparation add-ons",
+            "Box Breathing, Dharana and Guided Visualization are selected before chakra choices. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance."
+          ]
+        ],
+        [
+          [
+            "chakras",
+            "Chakra Journey",
+            "One or more selected chakras run in the usual chosen order."
+          ]
+        ],
+        [
+          [
+            "integrate",
+            "Integration add-on",
+            "Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence."
+          ]
+        ],
+        [
+          [
+            "separate",
+            "Replacement experiences",
+            "Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "prepare",
+          "chakras",
+          "Chakras selected"
+        ],
+        [
+          "prepare",
+          "separate",
+          "No chakra selected"
+        ],
+        [
+          "chakras",
+          "integrate",
+          "Final chakra"
+        ],
+        [
+          "integrate",
+          "separate",
+          "Other choices"
+        ]
+      ],
+      "notes": [
+        "Preparation add-ons can be combined. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Replacement experiences clear all Chakra Journey add-ons. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt."
+      ]
+    },
+    {
       "id": "controls",
       "group": "Live session",
       "title": "Pause, stop and live controls",
@@ -2929,7 +2991,7 @@
       "id": "settings-backup",
       "group": "Supporting pages",
       "title": "Settings backup and restore",
-      "subtitle": "Portable restore of this app’s persisted preferences; exporting is operator-protected.",
+      "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.",
       "source": "app.js:401; app.js:6942; app.js:6995; index.html:215",
       "rows": [
         [
@@ -2957,7 +3019,7 @@
           [
             "export",
             "Export all saved app settings",
-            "Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request."
+            "Collect only localStorage keys matching chakra_, including Visualization ambience choice and volume. Create a versioned JSON file locally; no upload or network request."
           ]
         ],
         [
@@ -2978,7 +3040,7 @@
           [
             "replace",
             "Replace saved app settings",
-            "Remove existing chakra_ keys only, write validated backup settings, then reload. Other site/extension storage is untouched."
+            "Remove existing chakra_ keys only, restore validated preferences including Visualization ambience choice and volume, then reload. Other site/extension storage is untouched."
           ],
           [
             "invalid",

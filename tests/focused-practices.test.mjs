@@ -5,12 +5,12 @@ const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
+const hi = JSON.parse(fs.readFileSync(new URL('../locales/hi.json', import.meta.url), 'utf8'));
+const ru = JSON.parse(fs.readFileSync(new URL('../locales/ru.json', import.meta.url), 'utf8'));
 
-for (const id of ['box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'yoga-experience-toggle']) {
-    assert.match(html, new RegExp(`id="${id}"`), `${id} should be a Lobby Experience Mode`);
-}
+for (const id of ['box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'yoga-experience-toggle']) assert.match(html, new RegExp(`id="${id}"`), `${id} should remain selectable in the Lobby`);
 assert.doesNotMatch(html, /id="box-meditation-toggle"|id="hooponopono-toggle"/, 'focused practices must not remain Settings add-ons');
-assert.doesNotMatch(app, /state\.boxMeditation\b|state\.hooponopono\b/, 'focused practices must not be appended to a normal meditation flow');
+assert.doesNotMatch(app, /state\.boxMeditation\b|state\.hooponopono\b/, 'legacy add-on state must not return');
 assert.match(app, /boxBreathingExperienceEnabled: false/, 'Box Breathing should start session-only');
 assert.match(app, /hooponoponoExperienceEnabled: false/, 'Ho’oponopono should start session-only');
 assert.match(app, /yogaExperienceEnabled: false/, 'Yoga should start session-only');
@@ -19,16 +19,34 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
     assert.doesNotMatch(app, new RegExp(`localStorage\\.setItem\\('${key}'`), `${key} must not be persisted`);
 }
 
-assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?box-breathing-experience-toggle[\s\S]*?hooponopono-experience-toggle[\s\S]*?yoga-experience-toggle/, 'one focused practice should be selected at a time');
-assert.match(app, /if \(focusedExperience\) \{[\s\S]*?this\.audio\.fadeInBackgroundMusic\(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS\);[\s\S]*?focusedExperience === 'box'[\s\S]*?this\.runBoxBreathing\(\)[\s\S]*?focusedExperience === 'yoga'[\s\S]*?this\.runYogaSession\(\)[\s\S]*?this\.runHooponopono\(\)[\s\S]*?this\.finish\(\);/, 'focused practices should finish directly without a chakra sequence');
-assert.doesNotMatch(app, /state\.boxMeditation\) await this\.runBoxBreathing\(\)|state\.hooponopono\) \{ await this\.runHooponopono\(\)/, 'normal journeys must no longer append either practice');
-assert.match(app, /clearFocusedExperiences\(target\)/, 'Experience Modes should be mutually exclusive');
+assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?yoga-experience-toggle[\s\S]*?intimate-service/, 'Yoga and intimate care remain standalone focused experiences');
+assert.match(app, /state\.selectedChakras\.length === 0[\s\S]*?dharana-addon-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?return 'preparation'/, 'Dharana and Visualization should run independently when no chakra is selected');
+assert.match(app, /focusedExperience === 'preparation'[\s\S]*?runDharana\(\)[\s\S]*?runVisualization\(\)/, 'Standalone preparation should run the selected Dharana and Visualization stages in order');
+assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?box-breathing-experience-toggle[\s\S]*?runBoxBreathing\(\)[\s\S]*?runSequence\(\)/, 'Box Breathing should prepare a normal chakra journey');
+assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
+assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
+assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');
+assert.match(app, /volVisualizationAmbience: clampAudioLevel\(storedNumber\('chakra_vol_visualization_ambience', 0\.10\), 0\.02, 0\.5, 0\.10\)/, 'Saved Visualization ambience volume should accept the same ceiling');
+assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated visible anchor layer rather than text inside the chakra image');
+assert.match(app, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
+assert.match(app, /--focus-anchor-duration[\s\S]*?is-focusing/, 'Focused Attention should slowly settle the anchor over the selected duration');
+assert.match(app, /runDharana\(\)[\s\S]*?visualization-addon-toggle[\s\S]*?runVisualization\(\)[\s\S]*?runSequence\(\)/, 'Visualization should run after Dharana and before chakras');
+assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
+assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
+assert.match(app, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
+assert.match(app, /if \(state\.visualizationAmbience === 'silence'\)[\s\S]*?visualizationSilenceWakePrompt[\s\S]*?pauseAwareSleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
+assert.match(app, /setVisualizationAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\([\s\S]*?setVisualizationAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
+assert.match(app, /async runSequence[\s\S]*?hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?handleSilence[\s\S]*?runClosing[\s\S]*?runEmergence/, 'Ho’oponopono should run after chakras and before closing/emergence');
+assert.match(app, /clearFocusedExperiences\(target\)/, 'Standalone Experience Modes should remain mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');
-assert.match(app, /if \(!focusedExperience && !isHighEnergy && order\.length === 0\)/, 'focused practices should not require chakra selection');
-assert.match(app, /roadmapBoxBreathing/, 'Box Breathing should have its own Lobby roadmap');
+assert.match(app, /if \(!focusedExperience && !isHighEnergy && order\.length === 0\)/, 'Yoga and care should not require chakra selection');
+assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
-for (const locale of [en, ml]) {
+for (const locale of [en, ml, hi, ru]) {
     for (const key of ['boxBreathingExperience', 'hooponoponoExperience', 'yogaExperience', 'beginBoxBreathing', 'beginHooponopono', 'beginYogaExperience', 'roadmapBoxBreathing']) {
+        assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
+    }
+    for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }

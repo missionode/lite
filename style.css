@@ -124,6 +124,20 @@ body {
     z-index: 10;
 }
 
+/* The visual stage owns the full meditation screen. Session information floats
+   above it instead of consuming part of the flex height. */
+#meditation-screen #chakra-container {
+    flex: 1 1 100%;
+    min-height: 100%;
+}
+
+#meditation-screen #session-overlay {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 12;
+    pointer-events: none;
+}
+
 #aura-bg {
     position: fixed;
     top: 0;
@@ -907,6 +921,69 @@ input[type="range"]::-moz-range-progress {
     transition: opacity 1.2s ease, filter 1.4s ease, transform 1.6s ease;
 }
 
+.focus-anchor {
+    position: absolute;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: min(34vw, 14rem);
+    aspect-ratio: 1;
+    font-size: min(24vw, 10rem);
+    line-height: 1;
+    filter: drop-shadow(0 0 18px currentColor) drop-shadow(0 0 44px color-mix(in srgb, currentColor 35%, transparent));
+}
+
+.focus-veil { position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at center, transparent 0 12%, rgba(1, 4, 13, 0.5) 34%, rgba(1, 4, 13, 0.94) 76%); transition: opacity 8s ease-in; }
+.focus-veil.is-active { opacity: 1; }
+.focus-veil[hidden] { display: none; }
+
+body.dharana-active #chakra-container {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: #01040d;
+}
+
+body.visualization-active #meditation-screen,
+body.visualization-active #chakra-container {
+    background: #000 !important;
+}
+
+body.visualization-active #meditation-screen {
+    opacity: 1 !important;
+}
+
+.visualization-blackout {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #000;
+    opacity: 0;
+    transition: opacity 5s ease-in-out;
+    pointer-events: none;
+}
+.visualization-blackout.is-active { opacity: 1; }
+.visualization-blackout[hidden] { display: none; }
+
+body.visualization-active #chakra-symbol,
+body.visualization-active #focus-anchor,
+body.visualization-active #focus-veil,
+body.visualization-active #session-overlay {
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+.focus-anchor[hidden] { display: none; }
+
+.focus-anchor.is-focusing {
+    animation: focusAnchorSettle var(--focus-anchor-duration, 120s) cubic-bezier(0.35, 0, 0.2, 1) forwards;
+}
+
+@keyframes focusAnchorSettle {
+    from { transform: scale(1); opacity: 0.94; }
+    to { transform: scale(0.42); opacity: 0.78; }
+}
+
 /* Keep artwork solid. Animate depth, never its opacity; all atmosphere sits
    behind the image so its detail is not washed out by a screen overlay. */
 #chakra-container.image-breathe-active #chakra-symbol {
@@ -1089,11 +1166,18 @@ input[type="range"]::-moz-range-progress {
 /* The symbol/deity is the visual anchor. Keep supporting metadata quiet and
    leave the mirrored journey timers at the screen edges. */
 #session-overlay #mantra-display {
+    position: fixed;
+    left: 50%;
+    bottom: max(1.1rem, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 13;
+    width: min(90vw, 34rem);
+    text-align: center;
     opacity: 0.48;
     font-size: 1.15rem !important;
     letter-spacing: 0.28em;
     text-shadow: none;
-    margin-bottom: 0.3rem !important;
+    margin: 0 !important;
 }
 
 #session-overlay #progress-tracker {
@@ -1835,6 +1919,14 @@ body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden) 
     justify-content: center;
     gap: 0.45rem 0.75rem;
     width: 100%;
+}
+
+.journey-addon-control {
+    width: 100%;
+}
+
+.journey-addon-control .dharana-options {
+    margin: 0.45rem auto 0;
 }
 
 .lobby-intimate-service {

@@ -20,21 +20,22 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 10. [Intimate Service and massage](#care)
 11. [Sound Shots](#shots)
 12. [Experiment activities](#experiments)
-13. [Pause, stop and live controls](#controls)
-14. [Optional Lobby video introduction](#restart)
-15. [Completion, statistics and external handoff](#completion)
-16. [Scripts, language and timing](#content)
-17. [Narration and fallback](#narration)
-18. [Audio signal architecture](#audio)
-19. [Sound options and live suppression](#sound-options)
-20. [Visuals and browser lifecycle](#visuals)
-21. [Thematic Earth atmosphere](#earth-atmosphere)
-22. [Thematic solar containment glow](#solar-containment)
-23. [Persistence, caching and network](#storage)
-24. [Failure and recovery map](#recovery)
-25. [Settings backup and restore](#settings-backup)
-26. [Consultation flow](#consultation)
-27. [Frequency repertory handoff](#repertory)
+13. [Ordered Chakra Journey add-ons](#journey-addons)
+14. [Pause, stop and live controls](#controls)
+15. [Optional Lobby video introduction](#restart)
+16. [Completion, statistics and external handoff](#completion)
+17. [Scripts, language and timing](#content)
+18. [Narration and fallback](#narration)
+19. [Audio signal architecture](#audio)
+20. [Sound options and live suppression](#sound-options)
+21. [Visuals and browser lifecycle](#visuals)
+22. [Thematic Earth atmosphere](#earth-atmosphere)
+23. [Thematic solar containment glow](#solar-containment)
+24. [Persistence, caching and network](#storage)
+25. [Failure and recovery map](#recovery)
+26. [Settings backup and restore](#settings-backup)
+27. [Consultation flow](#consultation)
+28. [Frequency repertory handoff](#repertory)
 
 <a id="overview"></a>
 
@@ -616,6 +617,35 @@ flowchart TD
 
 - Current inconsistency: UI assigns sec or min, while startExperiment tests for seconds. Countdown therefore treats sec as minutes; care UI also labels raw seconds as min. Ho’oponopono has no duration control, but startExperiment still reads the hidden value. No ordinary completion modal or stats update is used.
 
+<a id="journey-addons"></a>
+
+## Ordered Chakra Journey add-ons
+
+Optional preparation and integration techniques within a normal Chakra Journey.
+
+Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322), [app.js:5180](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5180), [app.js:5380](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5380).
+
+```mermaid
+flowchart TD
+  prepare["Preparation add-ons"]
+  chakras["Chakra Journey"]
+  integrate["Integration add-on"]
+  separate["Replacement experiences"]
+  prepare -->|"Chakras selected"| chakras
+  prepare -->|"No chakra selected"| separate
+  chakras -->|"Final chakra"| integrate
+  integrate -->|"Other choices"| separate
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Preparation add-ons | Box Breathing, Dharana and Guided Visualization are selected before chakra choices. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance. |
+| Chakra Journey | One or more selected chakras run in the usual chosen order. |
+| Integration add-on | Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence. |
+| Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
+
+- Preparation add-ons can be combined. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Replacement experiences clear all Chakra Journey add-ons. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
+
 <a id="controls"></a>
 
 ## Pause, stop and live controls
@@ -1119,7 +1149,7 @@ flowchart TD
 
 ## Settings backup and restore
 
-Portable restore of this app’s persisted preferences; exporting is operator-protected.
+Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.
 
 Sources: [app.js:401](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:401), [app.js:6942](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6942), [app.js:6995](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6995), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
@@ -1149,10 +1179,10 @@ flowchart TD
 | Settings / About | Manage Settings is always visible and opens without Advanced Features. |
 | Advanced Features unlocked? | Export controls are hidden by default and appear only after the shared seven-tap-and-password unlock. Direct export is rejected while locked. |
 | Choose backup file | Import accepts JSON files up to 2 MiB. |
-| Export all saved app settings | Collect only localStorage keys matching chakra_. Create a versioned JSON file locally; no upload or network request. |
+| Export all saved app settings | Collect only localStorage keys matching chakra_, including Visualization ambience choice and volume. Create a versioned JSON file locally; no upload or network request. |
 | Validate backup | Require format chakra-meditation-settings, version 1, up to 200 chakra_ string settings and bounded individual values. |
 | Confirm replacement | Cancellation preserves existing settings. |
-| Replace saved app settings | Remove existing chakra_ keys only, write validated backup settings, then reload. Other site/extension storage is untouched. |
+| Replace saved app settings | Remove existing chakra_ keys only, restore validated preferences including Visualization ambience choice and volume, then reload. Other site/extension storage is untouched. |
 | Show error | Invalid/missing/oversized file preserves existing settings. |
 
 - Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.

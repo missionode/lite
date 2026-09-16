@@ -45,6 +45,9 @@ const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 // PWA's cache while keeping the filename simple for local contributors.
 const BACKGROUND_MUSIC_ASSET_VERSION = '20260831.1';
 const BACKGROUND_MUSIC_URL = `audio/background_music.mp3?v=${BACKGROUND_MUSIC_ASSET_VERSION}`;
+const VISUALIZATION_AMBIENCE_URL = 'audio/shane-ivers-space-race.mp3';
+const VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8;
+const VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10;
 // A mantra begins only after this extended music fade completes. The fading
 // bed is the calm interval between narration and chant; do not replace it
 // with an abrupt mute or a separate dead-silence delay.
@@ -1025,10 +1028,6 @@ function getJourneyRoadmapLabels() {
         : labels;
     if (getChecked('music-only-toggle')) return withOptionalVideo([t('ui.roadmapMusicOnly')]);
 
-    if (getChecked('box-breathing-experience-toggle')) return withOptionalVideo([t('ui.roadmapBoxBreathing')]);
-
-    if (getChecked('hooponopono-experience-toggle')) return withOptionalVideo([t('ui.roadmapHooponopono')]);
-
     if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
         const labels = [];
         if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
@@ -1061,6 +1060,10 @@ function getJourneyRoadmapLabels() {
         t('ui.roadmapIntention')
     ];
     labels.push(t('ui.roadmapChakras'));
+    if (getChecked('box-breathing-experience-toggle')) labels.splice(0, 0, t('ui.roadmapBoxBreathing'));
+    if (getChecked('dharana-addon-toggle')) labels.splice(getChecked('box-breathing-experience-toggle') ? 1 : 0, 0, t('ui.roadmapDharana'));
+    if (getChecked('visualization-addon-toggle')) labels.splice((getChecked('box-breathing-experience-toggle') ? 1 : 0) + (getChecked('dharana-addon-toggle') ? 1 : 0), 0, t('ui.roadmapVisualization'));
+    if (getChecked('hooponopono-experience-toggle')) labels.push(t('ui.roadmapHooponopono'));
 
     labels.push(t('ui.roadmapClosing'));
     return withOptionalVideo(labels);
@@ -1760,6 +1763,10 @@ class AudioEngine {
         this.bgMusicTargetEQ = 0;
         this.bgMusicRestoreTimer = null;
         this.bgMusicSuppressedByMantra = false;
+        this.visualizationAmbienceBuffer = null;
+        this.visualizationAmbienceLoop = null;
+        this.visualizationAmbienceGain = null;
+        this.visualizationAmbienceDucked = false;
         this.lowCutFilter = null;
         this.mantraPresenceLFO = null; // New: Organic Mantra Motion
         this.mantraRequestId = 0;
@@ -1967,6 +1974,9 @@ class AudioEngine {
         this.musicEchoWetGain.connect(this.spatialMusicPanner);
         this.bgMusicBusGain.connect(this.spatialMusicPanner);
         this.spatialMusicPanner.connect(this.lowCutFilter);
+        this.visualizationAmbienceGain = this.ctx.createGain();
+        this.visualizationAmbienceGain.gain.setValueAtTime(1, this.ctx.currentTime);
+        this.visualizationAmbienceGain.connect(this.spatialMusicPanner);
 
         // The optional pleasure ambience bypasses the background-music bus so
         // mantra muting cannot accidentally cut or reopen it. Keep the source
@@ -3297,6 +3307,51 @@ class AudioEngine {
         this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
     }
 
+    async startVisualizationAmbience(fadeSeconds = VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS, force = false) {
+        if (!this.ctx || (!force && state.visualizationAmbience !== 'space-race')) return false;
+        if (!this.visualizationAmbienceBuffer) {
+            const response = await fetch(VISUALIZATION_AMBIENCE_URL, { cache: 'force-cache' });
+            if (!response.ok) throw new Error(`Visualization ambience unavailable (${response.status})`);
+            this.visualizationAmbienceBuffer = await this.ctx.decodeAudioData(await response.arrayBuffer());
+        }
+        if (this.visualizationAmbienceLoop?.isRunning) return true;
+        this.visualizationAmbienceDucked = false;
+        this.visualizationAmbienceGain.gain.cancelScheduledValues(this.ctx.currentTime);
+        this.visualizationAmbienceGain.gain.setValueAtTime(1, this.ctx.currentTime);
+        this.visualizationAmbienceLoop = new SeamlessLoop(this.ctx, this.visualizationAmbienceBuffer, this.visualizationAmbienceGain, state.volVisualizationAmbience, fadeSeconds);
+        this.visualizationAmbienceLoop.start();
+        return true;
+    }
+
+    setVisualizationAmbienceDucked(ducked, duration = 1) {
+        if (!this.ctx || !this.visualizationAmbienceGain || !this.visualizationAmbienceLoop?.isRunning) return;
+        this.visualizationAmbienceDucked = ducked;
+        const now = this.ctx.currentTime;
+        const target = ducked ? 0.32 : 1;
+        this.visualizationAmbienceGain.gain.cancelScheduledValues(now);
+        this.visualizationAmbienceGain.gain.setValueAtTime(this.visualizationAmbienceGain.gain.value, now);
+        this.visualizationAmbienceGain.gain.linearRampToValueAtTime(target, now + duration);
+    }
+
+    setVisualizationAmbienceVolume(level) {
+        if (!this.visualizationAmbienceLoop?.isRunning) return;
+        this.visualizationAmbienceLoop.setGain(clampAudioLevel(Number(level), 0.02, 0.5, 0.10));
+    }
+
+    stopVisualizationAmbience(fadeSeconds = VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS) {
+        if (!this.visualizationAmbienceLoop) return;
+        this.visualizationAmbienceLoop.stop(fadeSeconds);
+        this.visualizationAmbienceLoop = null;
+        this.visualizationAmbienceDucked = false;
+    }
+
+    async previewVisualizationAmbience() {
+        await this.init();
+        this.stopVisualizationAmbience(0.4);
+        await this.startVisualizationAmbience(1.2, true);
+        window.setTimeout(() => this.stopVisualizationAmbience(2), 8000);
+    }
+
     setBackgroundMusicVolume(level, previousLevel = level) {
         if (!this.ctx || !this.bgMusicGain || !this.bgMusicLoop) return;
         const nextLevel = Number(level);
@@ -4532,6 +4587,11 @@ class MeditationController {
         if (focusedExperience === 'hooponopono') {
             return 4 * 60 * 1000;
         }
+        if (focusedExperience === 'preparation') {
+            const dharanaMinutes = getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0;
+            const visualizationMinutes = getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0;
+            return Math.max(1, (dharanaMinutes + visualizationMinutes) * 60) * 1000;
+        }
         if (focusedExperience === 'yoga') {
             const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
             let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
@@ -4981,6 +5041,7 @@ class MeditationController {
         this.sessionStartedAt = null;
         this.visual.stop();
         this.audio.stopBackgroundMusic();
+        this.audio.stopVisualizationAmbience(2);
         this.audio.stopMantraTrack();
         this.stopSessionCountdown();
         wakeLock.release();
@@ -5000,6 +5061,7 @@ class MeditationController {
         this.sessionStartedAt = null;
         this.visual.stop();
         this.audio.stopBackgroundMusic();
+        this.audio.stopVisualizationAmbience(2);
         this.audio.stopMantraTrack();
         this.stopSessionCountdown();
         wakeLock.release();
@@ -5087,7 +5149,7 @@ class MeditationController {
                 assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
                 massage: false,
                 yoga: focusedExperience === 'yoga',
-                hooponopono: focusedExperience === 'hooponopono'
+                hooponopono: getChecked('hooponopono-experience-toggle')
             });
             if (!scriptCheck.valid) {
                 throw new Error(`Script has missing or invalid required sections: ${scriptCheck.missing.slice(0, 5).join(', ')}`);
@@ -5147,12 +5209,11 @@ class MeditationController {
                 if (piperWarmup) await piperWarmup;
                 if (!this.isMeditationActive) return;
                 this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
-                if (focusedExperience === 'box') await this.runBoxBreathing();
-                else if (focusedExperience === 'yoga') await this.runYogaSession();
+                if (focusedExperience === 'yoga') await this.runYogaSession();
                 else if (focusedExperience === 'intimate') await this.runIntimateService();
-                else {
-                    showScreen(meditationScreen);
-                    await this.runHooponopono();
+                else if (focusedExperience === 'preparation') {
+                    if (getChecked('dharana-addon-toggle')) await this.runDharana();
+                    if (this.isMeditationActive && getChecked('visualization-addon-toggle')) await this.runVisualization();
                 }
                 if (this.isMeditationActive) this.finish();
                 return;
@@ -5183,6 +5244,9 @@ class MeditationController {
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
 
             if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('box-breathing-experience-toggle')) await this.runBoxBreathing();
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('dharana-addon-toggle')) await this.runDharana();
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('visualization-addon-toggle')) await this.runVisualization();
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
@@ -5352,6 +5416,89 @@ class MeditationController {
             await this.narrate(text, false); // No intention? Still keep music playing.
         }
         if (!isHighEnergy && this.isMeditationActive) await this.runArrivalReadiness();
+    }
+
+    async runDharana() {
+        const anchor = document.getElementById('dharana-anchor')?.value || 'indigo-circle';
+        const minutes = Number(document.getElementById('dharana-duration')?.value || 2);
+        const symbol = document.getElementById('chakra-symbol');
+        const focusAnchor = document.getElementById('focus-anchor');
+        const focusVeil = document.getElementById('focus-veil');
+        const container = document.getElementById('chakra-container');
+        const shapes = { 'indigo-circle': '●', 'gold-dot': '•', 'violet-triangle': '▲' };
+        const colors = { 'indigo-circle': '#818cf8', 'gold-dot': '#fbbf24', 'violet-triangle': '#c084fc' };
+        showScreen(meditationScreen);
+        document.body.classList.add('dharana-active');
+        this.visual.stop();
+        if (container) container.classList.remove('presence-ready');
+        if (symbol) symbol.style.visibility = 'hidden';
+        if (focusVeil) { focusVeil.hidden = false; void focusVeil.offsetWidth; focusVeil.classList.add('is-active'); }
+        if (focusAnchor) {
+            focusAnchor.textContent = shapes[anchor];
+            focusAnchor.style.color = colors[anchor];
+            focusAnchor.style.setProperty('--focus-anchor-duration', `${Math.max(1, minutes * 60)}s`);
+            focusAnchor.classList.remove('is-focusing');
+            focusAnchor.hidden = false;
+            void focusAnchor.offsetWidth;
+            focusAnchor.classList.add('is-focusing');
+        }
+        setText('mantra-display', journeyT('ui.dharanaTitle'));
+        try {
+        await this.narrate(journeyT('ui.dharanaFocusGuidance'), false);
+            const totalSeconds = Math.max(1, minutes * 60);
+            let remaining = totalSeconds;
+            while (remaining-- > 0 && this.isMeditationActive) {
+                // Static-decoration mode intentionally cancels CSS animation;
+                // update the real focus scale from the session clock instead.
+                if (focusAnchor) {
+                    const progress = (totalSeconds - remaining) / totalSeconds;
+                    focusAnchor.style.transform = `scale(${1 - progress * 0.58})`;
+                }
+                await this.pauseAwareSleep(1000);
+            }
+        } finally {
+            if (focusAnchor) { focusAnchor.hidden = true; focusAnchor.classList.remove('is-focusing'); focusAnchor.style.transform = ''; }
+            if (focusVeil) { focusVeil.classList.remove('is-active'); focusVeil.hidden = true; }
+            document.body.classList.remove('dharana-active');
+            if (symbol) symbol.style.visibility = '';
+        }
+    }
+
+    async runVisualization() {
+        const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
+        const blackout = document.getElementById('visualization-blackout');
+        showScreen(meditationScreen);
+        document.body.classList.add('visualization-active');
+        if (blackout) { blackout.hidden = false; void blackout.offsetWidth; blackout.classList.add('is-active'); }
+        this.audio.fadeOutBackgroundMusic(6);
+        try { await this.audio.startVisualizationAmbience(); } catch (error) { console.warn('Visualization ambience unavailable; continuing in silence.', error); }
+        await this.pauseAwareSleep(1500);
+        this.audio.setVisualizationAmbienceDucked(true, 0.8);
+        setText('mantra-display', journeyT('ui.visualizationTitle'));
+        await this.narrate(journeyT('ui.visualizationFocusPrompt'), false, true);
+        this.audio.setVisualizationAmbienceDucked(false, 2);
+        await this.pauseAwareSleep(12000);
+        if (!this.isMeditationActive) { if (blackout) { blackout.classList.remove('is-active'); blackout.hidden = true; } document.body.classList.remove('visualization-active'); return; }
+        this.audio.setVisualizationAmbienceDucked(true, 0.8);
+        await this.narrate(journeyT('ui.visualizationGuidance'), false, true);
+        this.audio.setVisualizationAmbienceDucked(false, 2);
+        for (let remaining = Math.max(1, minutes * 60); remaining > 0 && this.isMeditationActive; remaining--) await this.pauseAwareSleep(1000);
+        if (!this.isMeditationActive) return;
+        if (state.visualizationAmbience === 'silence') {
+            await this.narrate(journeyT('ui.visualizationSilenceWakePrompt'), false, true);
+            await this.pauseAwareSleep(8000);
+        }
+        if (!this.isMeditationActive) return;
+        this.audio.setVisualizationAmbienceDucked(true, 0.8);
+        await this.narrate(journeyT('ui.visualizationReturn'), false, true);
+        this.audio.setVisualizationAmbienceDucked(false, 1.5);
+        meditationScreen.style.transition = 'opacity 10s ease-in'; meditationScreen.style.opacity = '0.45';
+        requestAnimationFrame(() => { meditationScreen.style.opacity = '1'; });
+        this.audio.stopVisualizationAmbience();
+        await this.pauseAwareSleep(6000); this.audio.fadeInBackgroundMusic(8, true); await this.pauseAwareSleep(4000);
+        meditationScreen.style.transition = ''; meditationScreen.style.opacity = '';
+        if (blackout) { blackout.classList.remove('is-active'); await this.pauseAwareSleep(5000); blackout.hidden = true; }
+        document.body.classList.remove('visualization-active');
     }
 
     async runBoxBreathing() {
@@ -5899,6 +6046,7 @@ class MeditationController {
             if (!isLastChakra && this.isMeditationActive) await this.handleInterval();
         }
         if (!complete) return;
+        if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runHooponopono();
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
         if (this.isMeditationActive) { await this.runEmergence(); }
@@ -5977,10 +6125,13 @@ class MeditationController {
     }
 
     getFocusedExperience() {
-        if (getChecked('box-breathing-experience-toggle')) return 'box';
-        if (getChecked('hooponopono-experience-toggle')) return 'hooponopono';
         if (getChecked('yoga-experience-toggle')) return 'yoga';
         if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) return 'intimate';
+        // Dharana and Visualization are add-ons when a Chakra Journey is
+        // selected, but also complete, useful standalone practices on their
+        // own. This guard makes their independent start explicit without
+        // changing the ordered add-on path above.
+        if (state.selectedChakras.length === 0 && (getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle'))) return 'preparation';
         return null;
     }
 
@@ -6285,6 +6436,7 @@ class MeditationController {
     }
 
     finish() {
+        document.body.classList.remove('visualization-active');
         const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
         this.isHypnosisJourney = false;
@@ -6299,6 +6451,7 @@ class MeditationController {
         this.audio.bgMusicTargetVolume = 0;
         this.audio.bgMusicTargetEQ = 0;
         this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
+        this.audio.stopVisualizationAmbience(VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS);
         this.audio.stopPleasureAmbience(8);
         wakeLock.release();
         piperTTS.cancel('journey finished', { fadeSeconds: 2 });
@@ -6334,8 +6487,9 @@ class MeditationController {
     }
 
     stop({ preserveScreen = false } = {}) {
+        document.body.classList.remove('visualization-active');
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
+        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopVisualizationAmbience(2); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
         this.isExperimentActive = false;
         if (this.guideControlledResolve) this.guideControlledResolve(false);
@@ -6428,6 +6582,8 @@ const state = {
     volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.04), 0.02, 0.12, 0.04),
     volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.005, 1, 0.35),
     volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
+    volVisualizationAmbience: clampAudioLevel(storedNumber('chakra_vol_visualization_ambience', 0.10), 0.02, 0.5, 0.10),
+    visualizationAmbience: localStorage.getItem('chakra_visualization_ambience') || 'silence',
     volVideo: clampAudioLevel(storedNumber('chakra_vol_video', 0.20), 0.02, 0.5, 0.20),
     pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
     pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
@@ -6842,6 +6998,9 @@ function loadPreferences() {
     syncValue('vol-mantra', state.volMantra);
     syncValue('vol-music', state.volMusic);
     syncValue('settings-vol-video', state.volVideo);
+    syncValue('settings-vol-visualization', state.volVisualizationAmbience);
+    syncValue('vol-visualization', state.volVisualizationAmbience);
+    syncValue('visualization-ambience', state.visualizationAmbience);
     syncValue('voice-clarity', state.voiceClarity);
     syncValue('voice-warmth', state.voiceWarmth);
     syncValue('voice-pace', state.voicePace);
@@ -7137,6 +7296,8 @@ function attachEventListeners() {
     const musicOnlyToggle = document.getElementById('music-only-toggle');
     const boxBreathingExperienceToggle = document.getElementById('box-breathing-experience-toggle');
     const hooponoponoExperienceToggle = document.getElementById('hooponopono-experience-toggle');
+    const dharanaAddonToggle = document.getElementById('dharana-addon-toggle');
+    const visualizationAddonToggle = document.getElementById('visualization-addon-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
@@ -7176,6 +7337,15 @@ function attachEventListeners() {
         if (!except || except !== boxBreathingExperienceToggle) state.boxBreathingExperienceEnabled = false;
         if (!except || except !== hooponoponoExperienceToggle) state.hooponoponoExperienceEnabled = false;
         if (!except || except !== yogaExperienceToggle) state.yogaExperienceEnabled = false;
+    }
+
+    function clearJourneyAddons() {
+        if (boxBreathingExperienceToggle) boxBreathingExperienceToggle.checked = false;
+        if (hooponoponoExperienceToggle) hooponoponoExperienceToggle.checked = false;
+        if (dharanaAddonToggle) dharanaAddonToggle.checked = false;
+        if (visualizationAddonToggle) visualizationAddonToggle.checked = false;
+        state.boxBreathingExperienceEnabled = false;
+        state.hooponoponoExperienceEnabled = false;
     }
 
     const advancedPasswordModal = document.getElementById('advanced-password-modal');
@@ -7431,7 +7601,7 @@ function attachEventListeners() {
     }
 
     function isFocusedExperienceToggle(target) {
-        return target === boxBreathingExperienceToggle || target === hooponoponoExperienceToggle || target === yogaExperienceToggle;
+        return target === yogaExperienceToggle;
     }
 
     function enforceMasterToggle(target) {
@@ -7441,6 +7611,7 @@ function attachEventListeners() {
             clearHighEnergyMode();
             clearSleepMode();
             clearFocusedExperiences();
+            clearJourneyAddons();
             clearIntimateService();
         } else if (target !== musicOnlyToggle && target.checked) {
             // Disable Music Only if any other journey feature is enabled.
@@ -7451,6 +7622,7 @@ function attachEventListeners() {
             clearMusicOnlyMode();
             clearSleepMode();
             clearFocusedExperiences();
+            clearJourneyAddons();
             clearIntimateService();
         }
 
@@ -7460,6 +7632,7 @@ function attachEventListeners() {
             clearHighEnergyMode();
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
             clearFocusedExperiences();
+            clearJourneyAddons();
             clearIntimateService();
         }
 
@@ -7468,6 +7641,7 @@ function attachEventListeners() {
             clearHighEnergyMode();
             clearSleepMode();
             clearFocusedExperiences(target);
+            clearJourneyAddons();
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
             clearIntimateService();
         }
@@ -7477,6 +7651,7 @@ function attachEventListeners() {
             clearHighEnergyMode();
             clearSleepMode();
             clearFocusedExperiences();
+            clearJourneyAddons();
             if (corpsePoseToggle) corpsePoseToggle.checked = false;
         }
 
@@ -7531,13 +7706,34 @@ function attachEventListeners() {
         });
     }
 
-    [boxBreathingExperienceToggle, hooponoponoExperienceToggle, yogaExperienceToggle].forEach(toggle => {
+    [boxBreathingExperienceToggle, hooponoponoExperienceToggle].forEach(toggle => {
         toggle?.addEventListener('change', (event) => {
             state.boxBreathingExperienceEnabled = boxBreathingExperienceToggle?.checked === true;
             state.hooponoponoExperienceEnabled = hooponoponoExperienceToggle?.checked === true;
-            state.yogaExperienceEnabled = yogaExperienceToggle?.checked === true;
-            enforceMasterToggle(event.target);
+            if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+            updateExperienceModeVisibility(); updateSessionEstimate();
         });
+    });
+    dharanaAddonToggle?.addEventListener('change', event => {
+        const options = document.getElementById('dharana-options');
+        if (options) options.hidden = !event.target.checked;
+        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+        updateExperienceModeVisibility(); updateSessionEstimate();
+    });
+    visualizationAddonToggle?.addEventListener('change', event => {
+        const options = document.getElementById('visualization-options');
+        if (options) options.hidden = !event.target.checked;
+        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+        updateExperienceModeVisibility(); updateSessionEstimate();
+    });
+    document.getElementById('visualization-ambience')?.addEventListener('change', event => {
+        state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
+        localStorage.setItem('chakra_visualization_ambience', state.visualizationAmbience);
+    });
+    document.getElementById('visualization-duration')?.addEventListener('change', updateSessionEstimate);
+    yogaExperienceToggle?.addEventListener('change', event => {
+        state.yogaExperienceEnabled = yogaExperienceToggle.checked;
+        enforceMasterToggle(event.target);
     });
 
     if (sleepModeToggle) {
@@ -7642,7 +7838,11 @@ function attachEventListeners() {
         const musicOnly = getChecked('music-only-toggle');
         const sleep = getChecked('sleep-mode-toggle');
         const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
-        const focusedExperience = getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('yoga-experience-toggle') || intimateService;
+        const focusedExperience = getChecked('yoga-experience-toggle') || intimateService;
+        const dharanaOptions = document.getElementById('dharana-options');
+        if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
+        const visualizationOptions = document.getElementById('visualization-options');
+        if (visualizationOptions) visualizationOptions.hidden = !getChecked('visualization-addon-toggle') || getChecked('shots-toggle');
         const yogaExperience = getChecked('yoga-experience-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
@@ -7657,7 +7857,7 @@ function attachEventListeners() {
         }
         const shots = getChecked('shots-toggle');
         if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
-        const hideForShots = ['chakra-selection-panel', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
+        const hideForShots = ['journey-preparation-addons', 'chakra-selection-panel', 'journey-integration-addons', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
         hideForShots.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.hidden = shots || (id === 'intimate-service-panel' && !intimateServiceUnlocked);
@@ -7712,10 +7912,7 @@ function attachEventListeners() {
         }
         const shotType = document.getElementById('shot-type-select')?.value;
         const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
-        const focusedLabel = getChecked('box-breathing-experience-toggle')
-            ? 'ui.beginBoxBreathing'
-            : getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
-                : intimateService ? 'ui.beginIntimateService' : 'ui.beginHooponopono';
+        const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience' : intimateService ? 'ui.beginIntimateService' : 'ui.beginJourney';
         if (startMeditationBtn) startMeditationBtn.textContent = t(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
         document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
         refreshRangeControlDisplays();
@@ -7758,6 +7955,12 @@ function attachEventListeners() {
             updateJourneyRoadmap();
             return;
         }
+        if (getChecked('visualization-addon-toggle')) {
+            const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
+            setText('session-estimate', `~ ${minutes} min ${t('ui.visualizationAddon').toLowerCase()}`);
+            updateJourneyRoadmap();
+            return;
+        }
         if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
             let seconds = 0;
             if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
@@ -7794,9 +7997,10 @@ function attachEventListeners() {
         const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
             ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
             : 0;
+        const addonMinutes = isHigh ? 0 : (getChecked('box-breathing-experience-toggle') ? (state.timeBreathing * 16) / 60 : 0) + (getChecked('hooponopono-experience-toggle') ? 4 : 0);
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes);
+            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes + addonMinutes);
         setText('session-estimate', `~ ${estimate} min session`);
         updateJourneyRoadmap();
     }
@@ -8546,7 +8750,13 @@ function attachEventListeners() {
         syncVolume('volVideo', e.target.value, volVideoEls);
         audio.setJourneyVideoPreludeVolume(state.volVideo);
     }));
+    const volVisualizationEls = [document.getElementById('settings-vol-visualization'), document.getElementById('vol-visualization')].filter(Boolean);
+    volVisualizationEls.forEach(el => el.addEventListener('input', (e) => {
+        syncVolume('volVisualizationAmbience', e.target.value, volVisualizationEls);
+        audio.setVisualizationAmbienceVolume(state.volVisualizationAmbience);
+    }));
     document.getElementById('preview-video-audio')?.addEventListener('click', () => { void journeyVideoPrelude.previewAudio(); });
+    document.getElementById('preview-visualization-ambience')?.addEventListener('click', () => { void audio.previewVisualizationAmbience(); });
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: 'Chakra Meditation', artist: 'Mahakatha Vibe',
