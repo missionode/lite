@@ -112,7 +112,7 @@ const CELESTIAL_LABEL_KEYS = Object.freeze({
 const DAYLIGHT_SOLAR_SYSTEM = Object.freeze([
     ['Mercury', 'solar-planet', [176, 166, 152], 0.39, 1.35, 7],
     ['Venus', 'solar-planet', [238, 202, 143], 0.72, 2.35, 10],
-    ['Earth', 'earth', [114, 190, 221], 1, 2.55, 14],
+    ['Earth', 'earth', [114, 190, 221], 1, 5.1, 14],
     ['Mars', 'solar-planet', [209, 126, 93], 1.52, 1.8, 9],
     ['Jupiter', 'solar-planet', [223, 188, 145], 5.2, 6.8, 15],
     ['Saturn', 'solar-planet', [226, 207, 160], 9.58, 5.6, 11],
@@ -3744,6 +3744,7 @@ class AmbientParticleField {
             if (body.kind === 'moon') {
                 this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
             } else if (body.kind === 'sun') {
+                this.drawSolarProtectionLayer(x, y, size);
                 const sunGradient = this.ctx.createRadialGradient(x - size * 0.28, y - size * 0.28, Math.max(0.5, size * 0.08), x, y, size);
                 // A soft, balanced daylight palette: warm enough to feel
                 // alive, not white-hot or orange-heavy.
@@ -3770,6 +3771,7 @@ class AmbientParticleField {
                 this.ctx.ellipse(x + size * 0.29, y + size * 0.22, size * 0.22, size * 0.11, 0.25, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.globalAlpha = 1;
+                this.drawEarthAtmosphericLayers(x, y, size);
             } else if (body.kind === 'solar-planet') {
                 const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
                 planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
@@ -3829,6 +3831,50 @@ class AmbientParticleField {
             }
             this.ctx.restore();
         });
+    }
+
+    drawEarthAtmosphericLayers(x, y, size) {
+        // The five standard atmospheric layers are deliberately not to scale.
+        // This is a compact, daytime-only learning visual inside the thematic
+        // solar-system tableau, not a live climate or orbital simulation.
+        const layers = [
+            [1.28, '101, 213, 255', 0.28],
+            [1.74, '135, 166, 255', 0.20],
+            [2.34, '170, 126, 255', 0.15],
+            [3.12, '107, 241, 229', 0.11],
+            [4.00, '211, 225, 255', 0.075]
+        ];
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = 'screen';
+        layers.forEach(([scale, rgb, alpha]) => {
+            const radius = size * scale;
+            const innerRadius = Math.max(size * 1.02, radius * 0.56);
+            const gradient = this.ctx.createRadialGradient(x, y, innerRadius, x, y, radius * 1.08);
+            gradient.addColorStop(0, `rgba(${rgb}, 0)`);
+            gradient.addColorStop(0.48, `rgba(${rgb}, ${alpha * 0.5})`);
+            gradient.addColorStop(0.76, `rgba(${rgb}, ${alpha})`);
+            gradient.addColorStop(1, `rgba(${rgb}, 0)`);
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(x - radius * 1.1, y - radius * 1.1, radius * 2.2, radius * 2.2);
+        });
+        this.ctx.restore();
+    }
+
+    drawSolarProtectionLayer(x, y, size) {
+        // A daytime-only thematic solar containment glow. It is deliberately
+        // diffuse rather than a literal ring, and remains artwork rather than
+        // a physical statement about the Sun or energy transfer.
+        const radius = size * 4.2;
+        const gradient = this.ctx.createRadialGradient(x, y, size * 0.72, x, y, radius);
+        gradient.addColorStop(0, 'rgba(255, 248, 214, 0.16)');
+        gradient.addColorStop(0.34, 'rgba(255, 224, 149, 0.13)');
+        gradient.addColorStop(0.66, 'rgba(255, 190, 112, 0.075)');
+        gradient.addColorStop(1, 'rgba(255, 184, 104, 0)');
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = 'screen';
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+        this.ctx.restore();
     }
 
     setDeepSkyBlackHoleEnabled(enabled) {

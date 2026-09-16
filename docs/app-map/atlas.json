@@ -36,7 +36,7 @@
           [
             "manage",
             "Manage Settings",
-            "Developer-only backup and restore after the shared seven-tap-and-password Advanced Features unlock."
+            "Public settings import and Advanced Features-protected export."
           ],
           [
             "experiments",
@@ -103,7 +103,7 @@
         [
           "settings",
           "manage",
-          "Advanced Features unlocked"
+          "Manage Settings"
         ],
         [
           "manage",
@@ -2491,7 +2491,7 @@
           [
             "sky",
             "Sky lifecycle",
-            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to the Lobby/Settings night canvas; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
+            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. The Sun receives a warm, diffuse thematic containment glow that dissolves into the indigo field; it is visual artwork, not a claim about solar physics or energy transfer. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to the Lobby/Settings night canvas; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
           ]
         ],
         [
@@ -2595,6 +2595,96 @@
       ],
       "notes": [
         "The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined."
+      ]
+    },
+    {
+      "id": "earth-atmosphere",
+      "group": "Systems",
+      "title": "Thematic Earth atmosphere",
+      "subtitle": "A visual-only five-layer atmosphere diagram in the daytime solar-system tableau.",
+      "source": "app.js:3761; app.js:3836",
+      "rows": [
+        [
+          [
+            "day",
+            "Daytime solar-system tableau",
+            "Thematic Earth is visible alongside the calculated Sun and illustrative planets."
+          ]
+        ],
+        [
+          [
+            "layers",
+            "Five atmospheric layers",
+            "Five overlapping translucent gradient shells surround Earth without layer text or temperature. The outer envelope reaches four Earth radii and progressively dissolves into space; Earth retains the sole compact celestial label. The compact graphic is illustrative, not altitude-proportional."
+          ]
+        ],
+        [
+          [
+            "scope",
+            "Visual-only scope",
+            "No climate, UV, aviation, satellite, orbital or celestial-calculation effect."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "day",
+          "layers",
+          "Draw Earth"
+        ],
+        [
+          "layers",
+          "scope",
+          "Artwork only"
+        ]
+      ],
+      "notes": [
+        "The gradient shells are drawn once into the celestial cache; they create no animation loop or per-frame allocation."
+      ]
+    },
+    {
+      "id": "solar-containment",
+      "group": "Systems",
+      "title": "Thematic solar containment glow",
+      "subtitle": "A visual-only warm containment layer surrounding the daytime Sun.",
+      "source": "app.js:3747; app.js:3863",
+      "rows": [
+        [
+          [
+            "day",
+            "Daytime Sun",
+            "The calculated Sun appears only before civil twilight, within the thematic daytime tableau."
+          ]
+        ],
+        [
+          [
+            "glow",
+            "Diffuse containment glow",
+            "A single warm radial-gradient layer starts inside the Sun edge and dissolves into the indigo field. It remains soft and solid rather than drawing a separate ring."
+          ]
+        ],
+        [
+          [
+            "scope",
+            "Visual-only scope",
+            "No solar-physics, radiation, energy-transfer, climate or celestial-calculation effect."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "day",
+          "glow",
+          "Draw Sun"
+        ],
+        [
+          "glow",
+          "scope",
+          "Artwork only"
+        ]
+      ],
+      "notes": [
+        "The glow is rendered into the existing celestial cache; it adds no animation loop, timers or per-frame allocation."
       ]
     },
     {

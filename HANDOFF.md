@@ -1,5 +1,15 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-SOLAR-CONTAINMENT-001: thematic solar containment glow
+
+- COMPLETE locally, 2026-09-16, pending device visual review. The calculated daytime Sun now has a warm, diffuse containment glow. It begins inside the solar edge, blends through gold and dissolves into the indigo field rather than forming a separate ring. This is cached daytime artwork only; it does not change celestial calculations, climate, energy transfer, animation cadence or per-frame allocation.
+- The visual sky map and the dedicated solar-containment atlas map record its daytime guard and visual-only scope. Targeted sky, browser-performance and atlas checks remain required before release.
+
+### NOW — CP-EARTH-ATMOSPHERE-001: thematic five-layer atmosphere
+
+- COMPLETE locally, 2026-09-16, pending device visual review. The thematic daytime Earth is enlarged modestly for legibility and now has five overlapping translucent atmospheric gradient shells. The outer envelope reaches four Earth radii and progressively dissolves into space, giving a more believable diffuse protective presence without becoming a solid barrier. There are no layer labels or temperature text; Earth remains the sole compact celestial label. The compact layer widths are illustrative, not altitude-proportional. It remains drawn only in the cached daytime solar-system tableau; night sky space is untouched.
+- This is app artwork, not a climate, radiation, aviation, or satellite model and does not alter celestial calculations, other bodies, animation cadence, or per-frame allocation. The new Earth-atmosphere atlas map records its visual-only scope; sky contract, browser performance, and atlas regeneration remain required before release.
+
 ### NOW — CP-DEEP-SKY-001: optional illustrative black hole
 
 - COMPLETE locally, 2026-09-15, pending device review. Unlocking Advanced Features automatically adds one small, unlabelled illustrative accretion ring to the cached Lobby/Settings celestial layer; there is no checkbox or additional section. It is not calculated or described as a real local-sky observation.

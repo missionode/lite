@@ -65,6 +65,11 @@ assert.match(app, /celestialSunEquatorial\(days, date\)[\s\S]*?observer\.approxi
     'Granted-location skies should replace the night bodies with a calculated Sun plus an explicitly thematic full solar-system tableau before civil twilight without turning Equator fallback coordinates into false daylight');
 assert.match(app, /DAYLIGHT_SOLAR_SYSTEM[\s\S]*?Mercury[\s\S]*?Venus[\s\S]*?Earth[\s\S]*?Mars[\s\S]*?Jupiter[\s\S]*?Saturn[\s\S]*?Uranus[\s\S]*?Neptune[\s\S]*?if \(this\.celestialDaylight\)[\s\S]*?rgba\(35, 48, 124, 0\.34\)[\s\S]*?body\.kind === 'solar-planet'[\s\S]*?255, 250, 230/,
     'Daylight should retain a cached indigo cosmic wash, a gentle warm Sun, and all eight themed planets rather than switching to an ordinary daytime background');
+assert.match(app, /body\.kind === 'sun'\) \{[\s\S]*?drawSolarProtectionLayer\(x, y, size\)[\s\S]*?drawSolarProtectionLayer\(x, y, size\) \{[\s\S]*?size \* 4\.2[\s\S]*?createRadialGradient[\s\S]*?fillRect\(/,
+    'The daytime Sun should receive one cached, diffuse containment glow rather than a separate hard ring.');
+assert.match(app, /\['Earth', 'earth', \[114, 190, 221\], 1, 5\.1, 14\][\s\S]*?drawEarthAtmosphericLayers\(x, y, size\)[\s\S]*?const layers = \[[\s\S]*?\[1\.28, '101, 213, 255', 0\.28\][\s\S]*?\[4\.00, '211, 225, 255', 0\.075\][\s\S]*?createRadialGradient\(x, y, innerRadius, x, y, radius \* 1\.08\)[\s\S]*?fillRect\(/,
+    'The thematic Earth should show five overlapping translucent gradient shells that dissolve outward without extra layer labels.');
+assert.doesNotMatch(app, /atmosphereTroposphere|27°C/, 'Only Earth should be named in the compact solar-system tableau.');
 assert.match(app, /drawCelestialHorizon\(width, height\);[\s\S]*?body\.altitude < 4[\s\S]*?drawCelestialHorizon\(width, height\) \{[\s\S]*?const horizonY = height \* 0\.88[\s\S]*?quadraticCurveTo/,
     'The celestial view should include a cached curved horizon matching the altitude projection baseline.');
 assert.match(app, /deepSkyBlackHoleEnabled && this\.celestialNightVisible && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,

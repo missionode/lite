@@ -28,11 +28,13 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 18. [Audio signal architecture](#audio)
 19. [Sound options and live suppression](#sound-options)
 20. [Visuals and browser lifecycle](#visuals)
-21. [Persistence, caching and network](#storage)
-22. [Failure and recovery map](#recovery)
-23. [Settings backup and restore](#settings-backup)
-24. [Consultation flow](#consultation)
-25. [Frequency repertory handoff](#repertory)
+21. [Thematic Earth atmosphere](#earth-atmosphere)
+22. [Thematic solar containment glow](#solar-containment)
+23. [Persistence, caching and network](#storage)
+24. [Failure and recovery map](#recovery)
+25. [Settings backup and restore](#settings-backup)
+26. [Consultation flow](#consultation)
+27. [Frequency repertory handoff](#repertory)
 
 <a id="overview"></a>
 
@@ -59,7 +61,7 @@ flowchart TD
   launch -->|"Configured"| lobby
   settings -->|"Save"| lobby
   lobby -->|"Settings"| settings
-  settings -->|"Advanced Features unlocked"| manage
+  settings -->|"Manage Settings"| manage
   manage -->|"Back"| settings
   settings -->|"Experiment Mode"| experiments
   lobby -->|"Begin"| journeys
@@ -78,7 +80,7 @@ flowchart TD
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
 | Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts. |
 | Meditation Room | Main mode selection, chakra choices, intention, duration and consultation. |
-| Manage Settings | Developer-only backup and restore after the shared seven-tap-and-password Advanced Features unlock. |
+| Manage Settings | Public settings import and Advanced Features-protected export. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
 | Consultation / repertory | Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot. |
@@ -963,7 +965,7 @@ flowchart TD
 | Location permission | Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, while the named catalogue covers 19 bright naked-eye stars with localized labels. |
 | Motion preference | Only Lobby and Settings may animate. Every other app screen renders static sky, clears meteors and cancels frame/timer work. CSS animations and transitions are disabled there. Reduced motion also makes Lobby/Settings static; preference/screen changes re-evaluate the guard. At most 110 stars shimmer; positions remain fixed. |
 | Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
-| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to the Lobby/Settings night canvas; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
+| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. The Sun receives a warm, diffuse thematic containment glow that dissolves into the indigo field; it is visual artwork, not a claim about solar physics or energy transfer. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to the Lobby/Settings night canvas; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
 | Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
 | Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors on ordinary screens only. Video prelude, fixed controls and overlays remain readable. No filter on body/app ancestors rebases fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Before every start the Sleep class is synchronized to the currently selected mode, preventing leftover Sleep dimming in a normal journey. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding. |
@@ -972,6 +974,56 @@ flowchart TD
 | Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
 
 - The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined.
+
+<a id="earth-atmosphere"></a>
+
+## Thematic Earth atmosphere
+
+A visual-only five-layer atmosphere diagram in the daytime solar-system tableau.
+
+Sources: [app.js:3761](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3761), [app.js:3836](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3836).
+
+```mermaid
+flowchart TD
+  day["Daytime solar-system tableau"]
+  layers["Five atmospheric layers"]
+  scope["Visual-only scope"]
+  day -->|"Draw Earth"| layers
+  layers -->|"Artwork only"| scope
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Daytime solar-system tableau | Thematic Earth is visible alongside the calculated Sun and illustrative planets. |
+| Five atmospheric layers | Five overlapping translucent gradient shells surround Earth without layer text or temperature. The outer envelope reaches four Earth radii and progressively dissolves into space; Earth retains the sole compact celestial label. The compact graphic is illustrative, not altitude-proportional. |
+| Visual-only scope | No climate, UV, aviation, satellite, orbital or celestial-calculation effect. |
+
+- The gradient shells are drawn once into the celestial cache; they create no animation loop or per-frame allocation.
+
+<a id="solar-containment"></a>
+
+## Thematic solar containment glow
+
+A visual-only warm containment layer surrounding the daytime Sun.
+
+Sources: [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:3863](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3863).
+
+```mermaid
+flowchart TD
+  day["Daytime Sun"]
+  glow["Diffuse containment glow"]
+  scope["Visual-only scope"]
+  day -->|"Draw Sun"| glow
+  glow -->|"Artwork only"| scope
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Daytime Sun | The calculated Sun appears only before civil twilight, within the thematic daytime tableau. |
+| Diffuse containment glow | A single warm radial-gradient layer starts inside the Sun edge and dissolves into the indigo field. It remains soft and solid rather than drawing a separate ring. |
+| Visual-only scope | No solar-physics, radiation, energy-transfer, climate or celestial-calculation effect. |
+
+- The glow is rendered into the existing celestial cache; it adds no animation loop, timers or per-frame allocation.
 
 <a id="storage"></a>
 

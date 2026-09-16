@@ -216,8 +216,8 @@ earnContext.result();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
-assert.match(html, /app\.js\?v=3\.16/, 'The application query version must be rotated for the current language delivery.');
-assert.match(serviceWorker, /chakra-v5\.205/, 'The shell cache must be rotated for the current language delivery.');
-assert.match(serviceWorker, /chakra-language-v35/, 'The current locale cache generation must remain declared for language delivery.');
+assert.match(html, /app\.js\?v=3\.23/, 'The application query version must be rotated for the current language delivery.');
+assert.match(serviceWorker, /chakra-v5\.212/, 'The shell cache must be rotated for the current language delivery.');
+assert.match(serviceWorker, /chakra-language-v37/, 'The current locale cache generation must remain declared for language delivery.');
 
 console.log('Hindi language contract passed.');
