@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-17",
-    "commit": "3.51 production plus curriculum and branding checkpoint",
-    "scope": "Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The new map connects the approved nine-day facilitator curriculum to reusable Srishti Innovative marketing copy, source artwork, print and digital brochure exports. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels."
+    "commit": "3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint",
+    "scope": "Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The marketing package now has a seven-page digital edition, a print roll-fold with bleed, a social cover and a browsable asset gallery. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels."
   },
   "graphs": [
     {
@@ -45,26 +45,26 @@
           [
             "print",
             "Print brochure",
-            "Two-page A4 landscape tri-fold PDF for physical production."
+            "Two-page A4 roll-fold PDF with embedded fonts, 3 mm bleed, crop/fold marks, 97/100/100 mm outside panels and mirrored inside panels. Printer colour conversion and physical fold proof remain production steps."
           ],
           [
             "digital",
             "Digital brochure",
-            "Five-page portrait PDF for WhatsApp, email and web sharing."
+            "Seven-page 4:5 PDF with clickable WhatsApp, email, website and QR links. Includes the 1080×1350 social cover; original hero proportions retained."
           ]
         ],
         [
           [
             "source",
             "Editable package",
-            "Brand guide, approved Markdown copy, hero prompt and deterministic PDF generator remain together under branding/source."
+            "Editorial PDF generator, original artwork, vector website QR, brand guide, approved copy, production notes and build report are stored under branding. The original build command forwards to the current edition."
           ]
         ],
         [
           [
             "review",
             "Marketing review",
-            "Marketing team may revise messaging or production specifications from the editable sources; application runtime remains unchanged."
+            "Open branding/index.html to browse every current page and download PDFs, social cover, QR and sources. This is a static collateral gallery separate from the PWA."
           ]
         ]
       ],

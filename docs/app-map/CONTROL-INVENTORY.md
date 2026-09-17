@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: 3.51 production plus curriculum and branding checkpoint · 2026-09-17.
+Source snapshot: 3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint · 2026-09-17.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

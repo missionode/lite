@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.51 production plus curriculum and branding checkpoint · 2026-09-17.
+Source snapshot: 3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint · 2026-09-17.
 
-Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The new map connects the approved nine-day facilitator curriculum to reusable Srishti Innovative marketing copy, source artwork, print and digital brochure exports. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels.
+Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The marketing package now has a seven-page digital edition, a print roll-fold with bleed, a social cover and a browsable asset gallery. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -73,10 +73,10 @@ flowchart TD
 | Public positioning | Beginner-friendly, premium and technology-supported. Traditional contemplative practices are not presented as medical treatment or guaranteed outcomes. |
 | Approved brochure copy | Nine-day overview, immersive technology, one-hour starter demo, business solutions, trained-manpower support, franchise opportunity, six-step delivery process and contact details. |
 | Reusable visual assets | Supplied Srishti Innovative logo plus generated text-free hero artwork with exactly two premium inclined seats, two participants and an infinite-cosmos screen. |
-| Print brochure | Two-page A4 landscape tri-fold PDF for physical production. |
-| Digital brochure | Five-page portrait PDF for WhatsApp, email and web sharing. |
-| Editable package | Brand guide, approved Markdown copy, hero prompt and deterministic PDF generator remain together under branding/source. |
-| Marketing review | Marketing team may revise messaging or production specifications from the editable sources; application runtime remains unchanged. |
+| Print brochure | Two-page A4 roll-fold PDF with embedded fonts, 3 mm bleed, crop/fold marks, 97/100/100 mm outside panels and mirrored inside panels. Printer colour conversion and physical fold proof remain production steps. |
+| Digital brochure | Seven-page 4:5 PDF with clickable WhatsApp, email, website and QR links. Includes the 1080×1350 social cover; original hero proportions retained. |
+| Editable package | Editorial PDF generator, original artwork, vector website QR, brand guide, approved copy, production notes and build report are stored under branding. The original build command forwards to the current edition. |
+| Marketing review | Open branding/index.html to browse every current page and download PDFs, social cover, QR and sources. This is a static collateral gallery separate from the PWA. |
 
 - The Quick Starter Demo is one hour and carries the secondary note “Charges may apply.” Public contact: +91 7510726715, syamnath.s@srishtiinnovative.com and www.srishtis.com. Pricing is intentionally omitted. These files are not precached by the PWA or exposed as an in-app route.
 

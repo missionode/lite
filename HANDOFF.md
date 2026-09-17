@@ -1,5 +1,15 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-BRAND-002: editorial branding redesign
+
+- Local revision based on production `c9acf0c`. Redesigned the branding package with Georgia/Arial typography, ivory/midnight layouts, natural image proportions, white logo backing, clear curriculum progression, secondary demo card and consistent contact handling. The original logo and two-seat hero master are unchanged.
+- Outputs: seven-page 4:5 digital PDF, two-page A4 roll-fold with 3 mm bleed/crop/fold marks, 1080×1350 social cover, vector website QR and a responsive local marketing gallery. Both PDFs retain editable text, embedded fonts and contact links. Print profile conversion and physical proof remain printer tasks; no PDF/X claim.
+- `build_editorial.py` is the current generator; the earlier build command forwards to it. Updated package guide, production notes and `curriculum-branding` atlas details. Application behavior, Earth/Sun artwork and runtime maps are unchanged. Owner subsequently authorized production publication of this checkpoint.
+- Execution direct. Local router returned browser / Terra-medium as PLANNED recommendation only; no model switch or child dispatch. Owner requires 50% usage reserve. Starting account remaining: weekly 61%, five-hour 90%; interim 57%/65%. Usage counters are shared account measurements, not task-specific token totals.
+- Validation: PDF page-count/content/link checks and all rendered pages reviewed; layout assertions reject overflowing text. Final production-box, font, geometry and atlas checks are recorded in the branding production package. Device print/phone QR scan are not claimed.
+- Publication checks: all 29 atlas browser checks pass; branding gallery passes at 390/1440px with all images and local downloads present and zero page errors. Fresh PDF checks confirm 7/2 pages, required contacts/demo/franchise text, A4 trim and 1080×1350 social output. Whitespace check passes. Publication routing recommended Astra/high; direct execution, no child dispatch. Weekly reserve was 54% at publication start. Unrelated system files, private `.codex` and backup audio remain excluded.
+- Latest owner instruction during publication lowers the usage reserve to 20% from now onward, superseding the earlier 50% constraint.
+
 ### NOW — CP-UNDO-UNLEARN-008: content-free release integration
 
 - COMPLETE locally, 2026-09-17. App 3.51 / shell 5.244 / locale 53, based on production `da718e4`. Added optional Undo & Unlearn after Ho’oponopono and before final silence, with 5, 8 and 12 minute choices and a pitch-black no-loop screen.

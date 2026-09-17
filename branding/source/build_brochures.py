@@ -154,5 +154,6 @@ def build_trifold():
     return path
 
 if __name__ == "__main__":
-    print(build_trifold())
-    print(build_digital())
+    # Keep the original edition for reference; the supported entry point builds v2.
+    import runpy
+    runpy.run_path(str(Path(__file__).with_name('build_editorial.py')), run_name='__main__')

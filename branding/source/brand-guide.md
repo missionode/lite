@@ -1,4 +1,4 @@
-# Visual Direction
+# Visual Direction - Editorial Edition 2
 
 ## Positioning
 
@@ -14,22 +14,23 @@ Premium, immersive, beginner-friendly, technologically supported meditation. The
 
 ## Palette
 
-- Midnight: `#050B1A`
-- Deep blue: `#081A36`
-- Srishti blue: `#0865C7`
-- Cosmic violet: `#7459CE`
-- Champagne gold: `#D7AE69`
-- Soft white: `#F4F6FB`
-- Muted text: `#B9C4D8`
+- Midnight: `#071629`
+- Ivory: `#F6F2EA`
+- Ink: `#10253D`
+- Srishti blue: preserve the supplied logo
+- Antique gold: `#A77B40`
+- Dark-surface gold: `#D7B784`
+- Muted text on ivory: `#546374`
+- Muted text on midnight: `#B5C9DD`
 
 ## Typography
 
-Use a clean geometric sans serif with generous spacing. Headings should be concise and premium. Body text must remain highly legible over opaque or near-opaque panels.
+Use Georgia for editorial headings and Arial for body text. Reserve tracked capitals for short section labels only. Keep body copy at natural letter spacing. Use solid backgrounds, generous margins and readable contrast. The original logo sits on white to retain its blue lettering and dark tagline.
 
 ## Formats
 
-- Print: A4 landscape, two-sided tri-fold, CMYK conversion to be handled by the selected printer if required.
-- Digital: portrait PDF suitable for WhatsApp, email, and website sharing.
+- Print: A4 landscape roll-fold; 97/100/100 mm outside panels, reversed inside, 3 mm bleed, embedded fonts and crop/fold marks. Printer performs profile-specific colour conversion and fold proof.
+- Digital: seven-page 4:5 portrait PDF with active links; 1080 × 1350 social cover; scalable website QR.
 
 ## Public wording
 
