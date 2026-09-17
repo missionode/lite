@@ -936,6 +936,7 @@ function getJourneyRoadmapLabels() {
     if (getChecked('body-scan-addon-toggle')) preparationIndex++;
     if (getChecked('noting-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapNoting'));
     if (getChecked('hooponopono-experience-toggle')) labels.push(t('ui.roadmapHooponopono'));
+    if (getChecked('undo-unlearn-addon-toggle')) labels.push(t('ui.roadmapUndoUnlearn'));
 
     labels.push(t('ui.roadmapClosing'));
     return withOptionalVideo(labels);
@@ -4506,6 +4507,11 @@ class MeditationController {
         seconds += narration(intention);
         seconds += narration(this.getJourneySystemNarration('arrivalReadiness'));
         seconds += tone(timing('transitions', 'arrivalReadinessGap'));
+        if (getChecked('box-breathing-experience-toggle')) seconds += state.timeBreathing * 16;
+        if (getChecked('visualization-addon-toggle')) seconds += Number(document.getElementById('visualization-duration')?.value || 2) * 60;
+        if (getChecked('dharana-addon-toggle')) seconds += Number(document.getElementById('dharana-duration')?.value || 2) * 60;
+        if (getChecked('body-scan-addon-toggle')) seconds += Number(document.getElementById('body-scan-duration')?.value || 5) * 60;
+        if (getChecked('noting-addon-toggle')) seconds += Number(document.getElementById('noting-duration')?.value || 4) * 60;
         seconds += timing('transitions', 'postBreathing');
 
         selected.forEach(([key, chakra], index) => {
@@ -4518,6 +4524,9 @@ class MeditationController {
                 seconds += timing('transitions', 'intervalPreparation') + Math.max(state.timeInterval, intervalNarration);
             }
         });
+
+        if (getChecked('hooponopono-experience-toggle')) seconds += 4 * 60;
+        if (getChecked('undo-unlearn-addon-toggle')) seconds += Number(document.getElementById('undo-unlearn-duration')?.value || 8) * 60;
 
         seconds += timing('transitions', 'finalSilence');
         seconds += narration(localized(this.scripts.closing));
@@ -6063,6 +6072,7 @@ class MeditationController {
         }
         if (!complete) return;
         if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runHooponopono();
+        if (this.isMeditationActive && getChecked('undo-unlearn-addon-toggle')) await this.runUndoUnlearn();
         if (this.isMeditationActive) { await this.handleSilence(); }
         if (this.isMeditationActive) { await this.runClosing(); }
         if (this.isMeditationActive) { await this.runEmergence(); }
@@ -6123,6 +6133,31 @@ class MeditationController {
         // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
         // to fade out completely into a peaceful silence.
         await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
+    }
+
+    async runUndoUnlearn() {
+        const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
+        const scene = document.getElementById('undo-unlearn-scene');
+        const phases = journeyT('ui.undoUnlearnPhases');
+        const narrations = Array.isArray(phases) ? phases : [];
+        showScreen(meditationScreen);
+        document.body.classList.add('undo-unlearn-active');
+        this.visual.stop();
+        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
+        setText('mantra-display', journeyT('ui.undoUnlearnTitle'));
+        try {
+            await this.narrate(journeyT('ui.undoUnlearnOpening'), false);
+            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, narrations.length)));
+            for (const narration of narrations) {
+                if (!this.isMeditationActive) break;
+                await this.narrate(narration, false);
+                if (this.isMeditationActive) await this.pauseAwareSleep(pauseSeconds * 1000);
+            }
+            if (this.isMeditationActive) await this.narrate(journeyT('ui.undoUnlearnClosing'), false);
+        } finally {
+            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
+            document.body.classList.remove('undo-unlearn-active');
+        }
     }
 
     async runIntimateService() {
@@ -6455,6 +6490,7 @@ class MeditationController {
         document.body.classList.remove('visualization-active');
         document.body.classList.remove('body-scan-active');
         document.body.classList.remove('noting-active');
+        document.body.classList.remove('undo-unlearn-active');
         const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
         this.isHypnosisJourney = false;
@@ -6508,6 +6544,7 @@ class MeditationController {
         document.body.classList.remove('visualization-active');
         document.body.classList.remove('body-scan-active');
         document.body.classList.remove('noting-active');
+        document.body.classList.remove('undo-unlearn-active');
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopVisualizationAmbience(2); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
@@ -7320,6 +7357,7 @@ function attachEventListeners() {
     const visualizationAddonToggle = document.getElementById('visualization-addon-toggle');
     const bodyScanAddonToggle = document.getElementById('body-scan-addon-toggle');
     const notingAddonToggle = document.getElementById('noting-addon-toggle');
+    const undoUnlearnAddonToggle = document.getElementById('undo-unlearn-addon-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
@@ -7364,6 +7402,7 @@ function attachEventListeners() {
         if (visualizationAddonToggle) visualizationAddonToggle.checked = false;
         if (bodyScanAddonToggle) bodyScanAddonToggle.checked = false;
         if (notingAddonToggle) notingAddonToggle.checked = false;
+        if (undoUnlearnAddonToggle) undoUnlearnAddonToggle.checked = false;
         state.boxBreathingExperienceEnabled = false;
         state.hooponoponoExperienceEnabled = false;
     }
@@ -7768,6 +7807,12 @@ function attachEventListeners() {
         if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
         updateExperienceModeVisibility(); updateSessionEstimate();
     });
+    undoUnlearnAddonToggle?.addEventListener('change', event => {
+        const options = document.getElementById('undo-unlearn-options');
+        if (options) options.hidden = !event.target.checked;
+        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+        updateExperienceModeVisibility(); updateSessionEstimate();
+    });
     document.getElementById('visualization-ambience')?.addEventListener('change', event => {
         state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
         localStorage.setItem('chakra_visualization_ambience', state.visualizationAmbience);
@@ -7775,6 +7820,7 @@ function attachEventListeners() {
     document.getElementById('visualization-duration')?.addEventListener('change', updateSessionEstimate);
     document.getElementById('body-scan-duration')?.addEventListener('change', updateSessionEstimate);
     document.getElementById('noting-duration')?.addEventListener('change', updateSessionEstimate);
+    document.getElementById('undo-unlearn-duration')?.addEventListener('change', updateSessionEstimate);
     yogaExperienceToggle?.addEventListener('change', event => {
         if (!state.advancedFeaturesUnlocked) {
             yogaExperienceToggle.checked = false;
@@ -7900,6 +7946,8 @@ function attachEventListeners() {
         if (bodyScanOptions) bodyScanOptions.hidden = !getChecked('body-scan-addon-toggle') || getChecked('shots-toggle');
         const notingOptions = document.getElementById('noting-options');
         if (notingOptions) notingOptions.hidden = !getChecked('noting-addon-toggle') || getChecked('shots-toggle');
+        const undoUnlearnOptions = document.getElementById('undo-unlearn-options');
+        if (undoUnlearnOptions) undoUnlearnOptions.hidden = !getChecked('undo-unlearn-addon-toggle') || getChecked('shots-toggle');
         const yogaExperience = getChecked('yoga-experience-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
@@ -8012,6 +8060,12 @@ function attachEventListeners() {
             updateJourneyRoadmap();
             return;
         }
+        if (getChecked('undo-unlearn-addon-toggle')) {
+            const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
+            setText('session-estimate', `~ ${minutes} min ${t('ui.undoUnlearnAddon').toLowerCase()}`);
+            updateJourneyRoadmap();
+            return;
+        }
         if (getChecked('visualization-addon-toggle')) {
             const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
             setText('session-estimate', `~ ${minutes} min ${t('ui.visualizationAddon').toLowerCase()}`);
@@ -8066,7 +8120,14 @@ function attachEventListeners() {
         const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
             ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
             : 0;
-        const addonMinutes = isHigh ? 0 : (getChecked('box-breathing-experience-toggle') ? (state.timeBreathing * 16) / 60 : 0) + (getChecked('hooponopono-experience-toggle') ? 4 : 0);
+        const addonMinutes = isHigh ? 0
+            : (getChecked('box-breathing-experience-toggle') ? (state.timeBreathing * 16) / 60 : 0)
+                + (getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0)
+                + (getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0)
+                + (getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0)
+                + (getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0)
+                + (getChecked('hooponopono-experience-toggle') ? 4 : 0)
+                + (getChecked('undo-unlearn-addon-toggle') ? Number(document.getElementById('undo-unlearn-duration')?.value || 8) : 0);
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
             : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes + addonMinutes);

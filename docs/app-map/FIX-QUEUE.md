@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Content-free Undo & Unlearn integration — release 3.51 candidate
+
+Added an optional 5/8/12-minute pitch-black integration after Ho’oponopono. It requires no recall, answer, speech, typing, examples or contact; separates three forgiveness possibilities; preserves responsibility/boundaries; and never claims another person has forgiven the meditator. Four-language source coverage and sequence guards are required; device listening remains open.
+
 ## Cosmic Consciousness video subtitle — release 3.50
 
 The optional Lobby video introduction now has a localized “Cosmic Consciousness Introduction” subtitle in all four languages. Playback behavior is unchanged. Production push authorized with the pending Body Scan and Guided Noting preparation release.

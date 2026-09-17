@@ -987,10 +987,15 @@ body.visualization-active #session-overlay {
 .noting-scene { position: absolute; inset: 0; z-index: 6; opacity: 0; background: #000; transition: opacity 3s ease-in-out; }
 .noting-scene.is-active { opacity: 1; }
 .noting-scene[hidden] { display: none; }
+.undo-unlearn-scene { position: absolute; inset: 0; z-index: 6; opacity: 0; background: #000; transition: opacity 3s ease-in-out; }
+.undo-unlearn-scene.is-active { opacity: 1; }
+.undo-unlearn-scene[hidden] { display: none; }
 body.body-scan-active #chakra-container { position: fixed; inset: 0; z-index: 100; background: #000; }
 body.body-scan-active #chakra-symbol, body.body-scan-active #glow-effect, body.body-scan-active #session-overlay { visibility: hidden !important; }
 body.noting-active #chakra-container { position: fixed; inset: 0; z-index: 100; background: #000; }
 body.noting-active #chakra-symbol, body.noting-active #glow-effect, body.noting-active #session-overlay { visibility: hidden !important; }
+body.undo-unlearn-active #chakra-container { position: fixed; inset: 0; z-index: 100; background: #000; }
+body.undo-unlearn-active #chakra-symbol, body.undo-unlearn-active #glow-effect, body.undo-unlearn-active #session-overlay { visibility: hidden !important; }
 
 .focus-anchor.is-focusing {
     opacity: 0.94;
@@ -2535,6 +2540,7 @@ body.static-decorations .focus-anchor {
 body.static-decorations .focus-veil,
 body.static-decorations .visualization-blackout,
 body.static-decorations .body-scan-scene,
-body.static-decorations .noting-scene {
+body.static-decorations .noting-scene,
+body.static-decorations .undo-unlearn-scene {
     transition: opacity 5s ease-in-out !important;
 }

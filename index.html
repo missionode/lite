@@ -374,7 +374,16 @@
             </div>
             <div id="journey-integration-addons" class="config-group lobby-experience-mode">
                 <label data-i18n="ui.journeyIntegration">Journey integration</label>
-                <div class="experience-mode-options"><label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="hooponopono-experience-toggle"><span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span></label></div>
+                <div class="experience-mode-options">
+                    <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="hooponopono-experience-toggle"><span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span></label>
+                    <div class="journey-addon-control">
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="undo-unlearn-addon-toggle"><span data-i18n="ui.undoUnlearnAddon">Undo &amp; Unlearn</span></label>
+                        <div id="undo-unlearn-options" class="dharana-options" hidden>
+                            <p class="mixer-note" data-i18n="ui.undoUnlearnSubtitle">A private practice of acknowledgement, forgiveness, and new learning.</p>
+                            <label><span data-i18n="ui.undoUnlearnDuration">Duration</span><select id="undo-unlearn-duration"><option value="5">5 min</option><option value="8" selected>8 min</option><option value="12">12 min</option></select></label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="time-selector">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
@@ -556,6 +565,7 @@
                 <div id="visualization-blackout" class="visualization-blackout" aria-hidden="true" hidden></div>
                 <div id="body-scan-scene" class="body-scan-scene" aria-hidden="true" hidden></div>
                 <div id="noting-scene" class="noting-scene" aria-hidden="true" hidden></div>
+                <div id="undo-unlearn-scene" class="undo-unlearn-scene" aria-hidden="true" hidden></div>
                 <div id="focus-veil" class="focus-veil" aria-hidden="true" hidden></div>
                 <div id="focus-anchor" class="focus-anchor" aria-hidden="true" hidden></div>
                 <div id="glow-effect"></div>
@@ -731,6 +741,6 @@
     <script src="sky-astronomy.js?v=1.1"></script>
     <script src="night-sky.js?v=1.1"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=3.50"></script>
+    <script src="app.js?v=3.51"></script>
 </body>
 </html>

@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-UNDO-UNLEARN-008: content-free release integration
+
+- COMPLETE locally, 2026-09-17. App 3.51 / shell 5.244 / locale 53, based on production `da718e4`. Added optional Undo & Unlearn after Ho’oponopono and before final silence, with 5, 8 and 12 minute choices and a pitch-black no-loop screen.
+- The narration never asks for a private answer, speech, typing, a person, a memory, “what happened,” or a selected experience. It offers content-free acknowledgement; separate invitations for self-forgiveness, prayer for forgiveness from another person, and forgiving someone else; consolation; bodily softening; and release without checking for an outcome.
+- The narrator does not impersonate another person or claim that forgiveness has been granted. It instead says that, as a compassionate witness, sincere responsibility does not require endless self-punishment, while the other person’s response, safety, boundaries and choice remain their own. English, Malayalam, Hindi and Russian are included.
+
 ### NOW — CP-VIDEO-SUBTITLE-007: Cosmic Consciousness Introduction
 
 - COMPLETE locally, 2026-09-17. App 3.50 / shell 5.243 / locale 52. The optional Lobby video introduction now displays “Cosmic Consciousness Introduction” as a secondary subtitle beneath its existing opt-in label.

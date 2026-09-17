@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.50 preparation and Cosmic Consciousness release following 81a36b0 · 2026-09-17.
+Source snapshot: 3.51 Undo & Unlearn checkpoint following da718e4 · 2026-09-17.
 
-Version 3.50 source-reviewed behavior. The optional Lobby video is identified by the localized Cosmic Consciousness Introduction subtitle. Journey preparation order is Box Breathing, Guided Visualization, Dharana, Body Scan, Guided Noting, then chakras. Body Scan and Guided Noting have localized narration and pitch-black no-loop screens in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels.
+Version 3.51 source-reviewed behavior. Undo & Unlearn runs after optional Ho’oponopono and before final silence, using content-free acknowledgement, three bounded forgiveness invitations, consolation and release without requesting recall, speech, a private answer or contact. All new copy is localized in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -632,7 +632,7 @@ Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322)
 flowchart TD
   prepare["Preparation add-ons"]
   chakras["Chakra Journey"]
-  integrate["Integration add-on"]
+  integrate["Integration add-ons"]
   separate["Replacement experiences"]
   prepare -->|"Chakras selected"| chakras
   prepare -->|"No chakra selected"| separate
@@ -644,10 +644,10 @@ flowchart TD
 | --- | --- |
 | Preparation add-ons | All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. Visualization, Dharana, Body Scan and/or Noting form a standalone preparation without chakras. |
 | Chakra Journey | One or more selected chakras run in the usual chosen order. |
-| Integration add-on | Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence. |
+| Integration add-ons | After the final chakra, optional Ho’oponopono runs first, then optional Undo & Unlearn, before silence, Closing and Emergence. Undo & Unlearn offers 5/8/12 minutes and never asks the meditator to identify, recall, speak, type or mentally answer anything. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
-- Body Scan and Guided Noting use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Narration coverage is contract-checked in all four Meditation Languages, including Body Scan opening/eight regions/closing and Noting opening/four reminders/closing. Replacement experiences clear every add-on. Piper retains clip-edge fades, Voice Space tail and music duck/restore; browser speech remains an event-completion fallback without a Web Audio gain envelope.
+- Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages.
 
 <a id="controls"></a>
 

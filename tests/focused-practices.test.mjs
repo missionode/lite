@@ -41,6 +41,9 @@ assert.doesNotMatch(html, /body-scan-figure|body-scan-light/, 'Body Scan must no
 assert.doesNotMatch(app.slice(app.indexOf('async runBodyScan()'), app.indexOf('async runVisualization()')), /requestAnimationFrame|setInterval/, 'Body Scan must not add a recurring visual loop');
 assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selected[\s\S]*?value="6"/, 'Guided Noting should offer 2, 4 and 6 minute durations');
 assert.match(app, /async runNoting\(\)[\s\S]*?notingReminders[\s\S]*?notingOpening[\s\S]*?notingClosing/, 'Guided Noting should narrate its explanation, reminders and release');
+assert.match(html, /hooponopono-experience-toggle[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?id="undo-unlearn-duration"[\s\S]*?value="5"[\s\S]*?value="8" selected[\s\S]*?value="12"/, 'Undo & Unlearn should follow Ho’oponopono and offer 5, 8 and 12 minutes');
+assert.match(app, /hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?runUndoUnlearn\(\)[\s\S]*?handleSilence/, 'Undo & Unlearn should run after Ho’oponopono and before final silence');
+assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPhases[\s\S]*?undoUnlearnOpening[\s\S]*?undoUnlearnClosing/, 'Undo & Unlearn should narrate its content-free release flow');
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
 assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
 assert.match(app, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
@@ -52,7 +55,7 @@ assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Mo
 const focusedClearBody = app.slice(app.indexOf('function clearFocusedExperiences'), app.indexOf('function clearJourneyAddons'));
 assert.doesNotMatch(focusedClearBody, /boxBreathing|hooponopono|dharana|visualization/i, 'Selecting a compatible journey add-on must not immediately clear it');
 const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app.indexOf('const advancedPasswordModal'));
-    for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization', 'bodyScan', 'noting']) {
+    for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization', 'bodyScan', 'noting', 'undoUnlearn']) {
     assert.match(addonClearBody, new RegExp(feature, 'i'), `Exclusive modes must still clear ${feature}`);
 }
 assert.match(app, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?dharanaClosing[\s\S]*?pauseAwareSleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
@@ -71,6 +74,10 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['notingOpening', 'notingClosing']) assert.ok(locale.ui[key]?.trim(), `${language} ui.${key} narration must not be empty`);
     assert.equal(locale.ui.notingReminders?.length, 4, `${language} Guided Noting needs four spaced reminders`);
     for (const reminder of locale.ui.notingReminders) assert.ok(reminder.trim(), `${language} Guided Noting reminder must not be empty`);
+    for (const key of ['undoUnlearnOpening', 'undoUnlearnClosing']) assert.ok(locale.ui[key]?.trim(), `${language} ui.${key} narration must not be empty`);
+    assert.equal(locale.ui.undoUnlearnPhases?.length, 8, `${language} Undo & Unlearn needs eight content-free phases`);
+    const undoCopy = [locale.ui.undoUnlearnOpening, ...locale.ui.undoUnlearnPhases, locale.ui.undoUnlearnClosing].join(' ');
+    assert.doesNotMatch(undoCopy, /think about what happened|what happened|recall a person/i, `${language} Undo & Unlearn must not request recall or a private answer`);
     for (const key of ['centeringBreath', 'breathingComplete']) {
         assert.equal(typeof locale.system[key], 'string', `${language} system.${key} narration must be a string`);
         assert.ok(locale.system[key].trim(), `${language} system.${key} narration must not be empty`);
@@ -84,7 +91,7 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['boxBreathingExperience', 'hooponoponoExperience', 'yogaExperience', 'beginBoxBreathing', 'beginHooponopono', 'beginYogaExperience', 'roadmapBoxBreathing']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
-    for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization', 'bodyScanAddon', 'bodyScanDuration', 'bodyScanTitle', 'roadmapBodyScan', 'notingAddon', 'notingSubtitle', 'notingDuration', 'notingTitle', 'roadmapNoting']) {
+    for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization', 'bodyScanAddon', 'bodyScanDuration', 'bodyScanTitle', 'roadmapBodyScan', 'notingAddon', 'notingSubtitle', 'notingDuration', 'notingTitle', 'roadmapNoting', 'undoUnlearnAddon', 'undoUnlearnSubtitle', 'undoUnlearnDuration', 'undoUnlearnTitle', 'roadmapUndoUnlearn']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
