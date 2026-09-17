@@ -1,41 +1,84 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.51 production snapshot 4542093 · 2026-09-17.
+Source snapshot: 3.51 production plus curriculum and branding checkpoint · 2026-09-17.
 
-Version 3.51 source-reviewed behavior. Undo & Unlearn runs after optional Ho’oponopono and before final silence, using content-free acknowledgement, three bounded forgiveness invitations, consolation and release without requesting recall, speech, a private answer or contact. All new copy is localized in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels.
+Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The new map connects the approved nine-day facilitator curriculum to reusable Srishti Innovative marketing copy, source artwork, print and digital brochure exports. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
 ## Index
 
-1. [The whole application](#overview)
-2. [Startup and first visit](#startup)
-3. [Mode selection and start routing](#modes)
-4. [Standard chakra journey](#standard)
-5. [Inside one chakra](#chakra)
-6. [HRIM activation](#hrim)
-7. [Sleep and Music Only](#sleep)
-8. [Box breathing and Ho’oponopono](#focused)
-9. [Yoga experience](#yoga)
-10. [Intimate Service and massage](#care)
-11. [Sound Shots](#shots)
-12. [Experiment activities](#experiments)
-13. [Ordered Chakra Journey add-ons](#journey-addons)
-14. [Pause, stop and live controls](#controls)
-15. [Optional Lobby video introduction](#restart)
-16. [Completion, statistics and external handoff](#completion)
-17. [Scripts, language and timing](#content)
-18. [Narration and fallback](#narration)
-19. [Audio signal architecture](#audio)
-20. [Sound options and live suppression](#sound-options)
-21. [Visuals and browser lifecycle](#visuals)
-22. [Earth observer reference and atmosphere](#earth-atmosphere)
-23. [Thematic solar containment glow](#solar-containment)
-24. [Persistence, caching and network](#storage)
-25. [Failure and recovery map](#recovery)
-26. [Settings backup and restore](#settings-backup)
-27. [Consultation flow](#consultation)
-28. [Frequency repertory handoff](#repertory)
+1. [Curriculum and marketing assets](#curriculum-branding)
+2. [The whole application](#overview)
+3. [Startup and first visit](#startup)
+4. [Mode selection and start routing](#modes)
+5. [Standard chakra journey](#standard)
+6. [Inside one chakra](#chakra)
+7. [HRIM activation](#hrim)
+8. [Sleep and Music Only](#sleep)
+9. [Box breathing and Ho’oponopono](#focused)
+10. [Yoga experience](#yoga)
+11. [Intimate Service and massage](#care)
+12. [Sound Shots](#shots)
+13. [Experiment activities](#experiments)
+14. [Ordered Chakra Journey add-ons](#journey-addons)
+15. [Pause, stop and live controls](#controls)
+16. [Optional Lobby video introduction](#restart)
+17. [Completion, statistics and external handoff](#completion)
+18. [Scripts, language and timing](#content)
+19. [Narration and fallback](#narration)
+20. [Audio signal architecture](#audio)
+21. [Sound options and live suppression](#sound-options)
+22. [Visuals and browser lifecycle](#visuals)
+23. [Earth observer reference and atmosphere](#earth-atmosphere)
+24. [Thematic solar containment glow](#solar-containment)
+25. [Persistence, caching and network](#storage)
+26. [Failure and recovery map](#recovery)
+27. [Settings backup and restore](#settings-backup)
+28. [Consultation flow](#consultation)
+29. [Frequency repertory handoff](#repertory)
+
+<a id="curriculum-branding"></a>
+
+## Curriculum and marketing assets
+
+Approved facilitator programme → reusable marketing package. This is documentation and collateral, not an app navigation path.
+
+Sources: [meditation_curriculum.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/meditation_curriculum.md:1), [branding/source/brochure-content.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/branding/source/brochure-content.md:1), [branding/README.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/branding/README.md:1).
+
+```mermaid
+flowchart TD
+  curriculum["Nine-day curriculum"]
+  position["Public positioning"]
+  copy["Approved brochure copy"]
+  visual["Reusable visual assets"]
+  print["Print brochure"]
+  digital["Digital brochure"]
+  source["Editable package"]
+  review["Marketing review"]
+  curriculum -->|"Translate for public audience"| position
+  position -->|"Approved framing"| copy
+  copy -->|"Compose"| visual
+  visual -->|"Print layout"| print
+  visual -->|"Digital layout"| digital
+  copy -->|"Preserve"| source
+  print -->|"Share"| review
+  digital -->|"Share"| review
+  source -->|"Revise"| review
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Nine-day curriculum | Facilitator-ready progression: foundations and Root through Crown, integrated sound practice, Resonant Energy Meditation, reflection, home practice and safety boundaries. |
+| Public positioning | Beginner-friendly, premium and technology-supported. Traditional contemplative practices are not presented as medical treatment or guaranteed outcomes. |
+| Approved brochure copy | Nine-day overview, immersive technology, one-hour starter demo, business solutions, trained-manpower support, franchise opportunity, six-step delivery process and contact details. |
+| Reusable visual assets | Supplied Srishti Innovative logo plus generated text-free hero artwork with exactly two premium inclined seats, two participants and an infinite-cosmos screen. |
+| Print brochure | Two-page A4 landscape tri-fold PDF for physical production. |
+| Digital brochure | Five-page portrait PDF for WhatsApp, email and web sharing. |
+| Editable package | Brand guide, approved Markdown copy, hero prompt and deterministic PDF generator remain together under branding/source. |
+| Marketing review | Marketing team may revise messaging or production specifications from the editable sources; application runtime remains unchanged. |
+
+- The Quick Starter Demo is one hour and carries the secondary note “Charges may apply.” Public contact: +91 7510726715, syamnath.s@srishtiinnovative.com and www.srishtis.com. Pricing is intentionally omitted. These files are not precached by the PWA or exposed as an in-app route.
 
 <a id="overview"></a>
 

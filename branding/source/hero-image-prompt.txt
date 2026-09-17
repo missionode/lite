@@ -1,0 +1,7 @@
+Use case: ads-marketing
+Asset type: premium brochure hero image for an immersive nine-day meditation programme
+Primary request: Create a hyper-realistic luxury private meditation room with exactly two spacious gently inclined premium seats, each occupied by one calm adult meditator in a relaxed seated posture, viewed from behind and slightly above, facing a large cinematic screen filled with an infinite realistic cosmos.
+Scene: intimate high-end wellness suite, not a commercial cinema or crowded theatre.
+Composition: wide landscape; subjects and seats in the lower centre; cosmic screen dominates the upper half; preserve dark negative space for brochure copy.
+Lighting: dim warm architectural light with soft blue, violet, and starlight reflections.
+Constraints: exactly two seats and two participants; no additional people, extra seats, text, logos, UI, watermark, religious symbols, medical imagery, headsets, yoga mats, or stage.

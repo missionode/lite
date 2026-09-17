@@ -2,10 +2,123 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-17",
-    "commit": "3.51 production snapshot 4542093",
-    "scope": "Version 3.51 source-reviewed behavior. Undo & Unlearn runs after optional Ho’oponopono and before final silence, using content-free acknowledgement, three bounded forgiveness invitations, consolation and release without requesting recall, speech, a private answer or contact. All new copy is localized in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels."
+    "commit": "3.51 production plus curriculum and branding checkpoint",
+    "scope": "Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The new map connects the approved nine-day facilitator curriculum to reusable Srishti Innovative marketing copy, source artwork, print and digital brochure exports. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels."
   },
   "graphs": [
+    {
+      "id": "curriculum-branding",
+      "group": "Programme delivery",
+      "title": "Curriculum and marketing assets",
+      "subtitle": "Approved facilitator programme → reusable marketing package. This is documentation and collateral, not an app navigation path.",
+      "source": "meditation_curriculum.md:1; branding/source/brochure-content.md:1; branding/README.md:1",
+      "rows": [
+        [
+          [
+            "curriculum",
+            "Nine-day curriculum",
+            "Facilitator-ready progression: foundations and Root through Crown, integrated sound practice, Resonant Energy Meditation, reflection, home practice and safety boundaries."
+          ]
+        ],
+        [
+          [
+            "position",
+            "Public positioning",
+            "Beginner-friendly, premium and technology-supported. Traditional contemplative practices are not presented as medical treatment or guaranteed outcomes."
+          ]
+        ],
+        [
+          [
+            "copy",
+            "Approved brochure copy",
+            "Nine-day overview, immersive technology, one-hour starter demo, business solutions, trained-manpower support, franchise opportunity, six-step delivery process and contact details."
+          ]
+        ],
+        [
+          [
+            "visual",
+            "Reusable visual assets",
+            "Supplied Srishti Innovative logo plus generated text-free hero artwork with exactly two premium inclined seats, two participants and an infinite-cosmos screen."
+          ]
+        ],
+        [
+          [
+            "print",
+            "Print brochure",
+            "Two-page A4 landscape tri-fold PDF for physical production."
+          ],
+          [
+            "digital",
+            "Digital brochure",
+            "Five-page portrait PDF for WhatsApp, email and web sharing."
+          ]
+        ],
+        [
+          [
+            "source",
+            "Editable package",
+            "Brand guide, approved Markdown copy, hero prompt and deterministic PDF generator remain together under branding/source."
+          ]
+        ],
+        [
+          [
+            "review",
+            "Marketing review",
+            "Marketing team may revise messaging or production specifications from the editable sources; application runtime remains unchanged."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "curriculum",
+          "position",
+          "Translate for public audience"
+        ],
+        [
+          "position",
+          "copy",
+          "Approved framing"
+        ],
+        [
+          "copy",
+          "visual",
+          "Compose"
+        ],
+        [
+          "visual",
+          "print",
+          "Print layout"
+        ],
+        [
+          "visual",
+          "digital",
+          "Digital layout"
+        ],
+        [
+          "copy",
+          "source",
+          "Preserve"
+        ],
+        [
+          "print",
+          "review",
+          "Share"
+        ],
+        [
+          "digital",
+          "review",
+          "Share"
+        ],
+        [
+          "source",
+          "review",
+          "Revise"
+        ]
+      ],
+      "notes": [
+        "The Quick Starter Demo is one hour and carries the secondary note “Charges may apply.” Public contact: +91 7510726715, syamnath.s@srishtiinnovative.com and www.srishtis.com. Pricing is intentionally omitted. These files are not precached by the PWA or exposed as an in-app route."
+      ]
+    },
     {
       "id": "overview",
       "group": "Start here",
