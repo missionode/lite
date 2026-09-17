@@ -1,5 +1,17 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-ADVANCED-YOGA-004: Yoga follows Advanced Features
+
+- COMPLETE locally, 2026-09-17, release candidate 3.47 / shell 5.240 / locale 49. Yoga Experience now starts hidden and disabled and appears only after the shared seven-tap-and-password Advanced Features unlock.
+- Switching Advanced Features off, or reloading into the default locked state, clears Yoga selection/state and hides its setup. Direct checkbox activation and direct Begin attempts while locked are rejected before audio initialization. Existing pose selection, Corpse Pose, Bath and Yoga journey behavior is unchanged after unlock.
+- Advanced-unlock and focused-practice contracts cover initial lock, unlock, relock, reload and direct-selection/start guards. Updated `modes` and `yoga` atlas maps; device UI verification remains open.
+
+### NOW — CP-ADDON-LANGUAGE-003: complete narration coverage contract
+
+- COMPLETE locally, 2026-09-17. App 3.47 / shell 5.240 / locale 49, based on production `ddc1264`. Audited every spoken segment used by Box Breathing, Dharana, Guided Visualization and Ho’oponopono in all supported Meditation Languages: English, Malayalam, Hindi and Russian.
+- Box Breathing has localized preparation, four spoken breathing steps and completion. Dharana has localized focus guidance and closing. Visualization has localized experience-choice prompt, scene guidance, Silence wake-up and return. Ho’oponopono has localized intro, four phrases and closing in `scripts.json`.
+- The audit found and restored both missing Malayalam “hold the breath” prompts in Box Breathing. Strengthened the focused-practice contract to require non-empty narration and exact four-step/four-phrase arrays for every language. This verifies source coverage and routing, not voice pronunciation or target-device audio quality. Updated the `journey-addons` and `content` atlas evidence.
+
 ### NOW — CP-ADDON-SELECTION-002: selectable add-ons and visible transition release
 
 - COMPLETE locally, 2026-09-17. Corrected the shared selection reset so Box Breathing, Dharana, Guided Visualization and Ho’oponopono remain independently selectable and combinable; exclusive Yoga, HRIM, Sleep, Music Only, Shots and Intimate Service still clear all journey add-ons.

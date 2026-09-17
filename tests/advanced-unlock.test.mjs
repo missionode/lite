@@ -15,7 +15,7 @@ function setup(noFrequencyMode=false,passwordAccepted=true) {
     const state={noFrequencyMode};
     const audio={stopped:false,stopPleasureAmbience(){this.stopped=true;}};
     vm.runInNewContext(block,{document,state,Event,TextEncoder,ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',requestAdvancedPassword:async()=> 'operator-entry',crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
-        localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),prepareRepertoryShotFromUrl(){},
+        localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),yogaExperienceToggle:get('yoga-experience-toggle'),yogaExperienceSetup:get('yoga-experience-setup'),prepareRepertoryShotFromUrl(){},
         audio,particleField:{setDeepSkyBlackHoleEnabled(value){state.deepSkyBlackHoleEnabled=value;}},syncPleasureAmbienceControl(){},
         clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
         setTimeout(fn,delay){timers.set(++id,{fn,at:now+delay});return id;},clearTimeout:key=>timers.delete(key),
@@ -31,6 +31,8 @@ assert.equal(app.get('sound-healing-title').hidden,true);
 assert.equal(app.get('shots-toggle').disabled,true);
 assert.equal(app.get('sleep-mode-control').hidden,true);
 assert.equal(app.get('sleep-mode-toggle').disabled,true);
+assert.equal(app.get('yoga-mode-control').hidden,true);
+assert.equal(app.get('yoga-experience-toggle').disabled,true);
 assert.equal(app.get('advanced-features-control').hidden,true);
 assert.equal(app.get('deep-sky-black-hole-toggle').checked,false);
 assert.equal(app.get('experiment-care-group').attached,false,'Locked care is absent from native activity picker');
@@ -48,7 +50,10 @@ assert.equal(app.get('sound-healing-title').hidden,false);
 assert.equal(app.get('shots-toggle').disabled,false);
 assert.equal(app.get('sleep-mode-control').hidden,false);
 assert.equal(app.get('sleep-mode-toggle').disabled,false);
+assert.equal(app.get('yoga-mode-control').hidden,false);
+assert.equal(app.get('yoga-experience-toggle').disabled,false);
 app.get('sleep-mode-toggle').checked=true; app.state.sleepExperienceEnabled=true; app.state.sleepMode=true;
+app.get('yoga-experience-toggle').checked=true; app.state.yogaExperienceEnabled=true;
 app.get('shots-toggle').checked=true;
 assert.equal(app.get('advanced-features-toggle').checked,true);
 assert.equal(app.state.deepSkyBlackHoleEnabled,true,'Deep-sky object appears automatically after the shared unlock.');
@@ -72,6 +77,10 @@ assert.equal(app.get('sleep-mode-toggle').checked,false);
 assert.equal(app.get('sleep-mode-toggle').disabled,true);
 assert.equal(app.state.sleepExperienceEnabled,false);
 assert.equal(app.state.sleepMode,false);
+assert.equal(app.get('yoga-mode-control').hidden,true);
+assert.equal(app.get('yoga-experience-toggle').checked,false);
+assert.equal(app.get('yoga-experience-toggle').disabled,true);
+assert.equal(app.state.yogaExperienceEnabled,false);
 assert.equal(app.get('massage-toggle').disabled,true);
 assert.equal(app.get('experiment-care-group').attached,false);
 assert.equal(app.get('experiment-activity').value,'chakra:root','Re-lock clears stale care selection');
@@ -87,6 +96,7 @@ assert.equal(app.get('intimate-service-panel').hidden,false);
 assert.equal(setup().get('intimate-service-panel').hidden,true,'New page locks again');
 assert.equal(setup().get('shots-control').hidden,true,'New page locks Shots again');
 assert.equal(setup().get('sleep-mode-control').hidden,true,'New page locks Sleep Mode again');
+assert.equal(setup().get('yoga-mode-control').hidden,true,'New page locks Yoga Experience again');
 assert.equal(app.get('intimate-service-panel').listeners.click,undefined,'Panel itself is no longer an unlock target');
 assert.match(source,/element.hidden = shots \|\| \(id === 'intimate-service-panel' && !intimateServiceUnlocked\)/,'Mode changes preserve the lock');
 for(const locale of ['en','ml','ru','hi']) {
@@ -114,6 +124,9 @@ assert.match(html, /id="shots-control"[^>]* hidden/);
 assert.match(html, /id="sound-healing-title"[^>]* hidden/);
 assert.match(html, /id="sleep-mode-control"[^>]* hidden/);
 assert.match(source, /getChecked\('sleep-mode-toggle'\) && !state\.advancedFeaturesUnlocked/, 'Locked direct Sleep start must be rejected');
+assert.match(html, /id="yoga-mode-control"[^>]* hidden[\s\S]*?id="yoga-experience-toggle" disabled/, 'Yoga Experience must begin hidden and disabled');
+assert.match(source, /yogaExperienceToggle\?\.addEventListener\('change',[\s\S]*?!state\.advancedFeaturesUnlocked[\s\S]*?yogaExperienceToggle\.checked = false/, 'Locked direct Yoga selection must be rejected');
+assert.match(source, /getChecked\('yoga-experience-toggle'\) && !state\.advancedFeaturesUnlocked/, 'Locked direct Yoga start must be rejected');
 const sleepJourney=source.slice(source.indexOf('    async runSleepJourney()'),source.indexOf('    async runShot('));
 const lockedSleep=vm.runInNewContext('({'+sleepJourney+'})',{state:{advancedFeaturesUnlocked:false}});
 await lockedSleep.runSleepJourney();

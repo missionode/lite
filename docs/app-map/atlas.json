@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-17",
-    "commit": "3.46 release checkpoint following ab6cbd8",
-    "scope": "Version 3.46 source-reviewed behavior. Compatible journey add-ons remain independently selectable; Dharana and Visualization black-screen transitions and localized Dharana closing have automated source/test evidence, while device listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification."
+    "commit": "3.47 Advanced Yoga and narration audit following ddc1264",
+    "scope": "Version 3.47 source-reviewed behavior. Yoga Experience is session-locked behind Advanced Features with visibility, selection and direct-start guards. Add-on narration coverage is contract-checked in English, Malayalam, Hindi and Russian; missing Malayalam Box Breathing hold prompts were restored. Device voice pronunciation/listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification."
   },
   "graphs": [
     {
@@ -316,12 +316,12 @@
           [
             "exclusive",
             "Exclusive modes",
-            "HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons: selecting one must not clear itself or the other add-ons."
+            "HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Yoga is hidden and disabled until Advanced Features is unlocked; relock clears it and direct locked selection/start is rejected. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons."
           ],
           [
             "care",
             "Intimate Service + ambience",
-            "Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes."
+            "Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep, Yoga and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes."
           ],
           [
             "shots",
@@ -1125,14 +1125,21 @@
       "id": "yoga",
       "group": "Journeys",
       "title": "Yoga experience",
-      "subtitle": "Optional rest and bathing before selected poses.",
-      "source": "app.js:5129; app.js:7558; timing-config.json:1",
+      "subtitle": "Advanced Features-gated rest, bathing and selected poses.",
+      "source": "app.js:5129; app.js:7400; app.js:8440; timing-config.json:1",
       "rows": [
+        [
+          [
+            "unlock",
+            "Unlock Advanced Features",
+            "Seven rapid App version taps and password verification reveal and enable Yoga for this page load. Reload or switching Advanced Features off hides, disables and clears Yoga."
+          ]
+        ],
         [
           [
             "begin",
             "Select Yoga + poses",
-            "At least one selected pose required at Begin. Shared focused startup."
+            "At least one selected pose required at Begin. A locked direct selection or start is rejected before audio initialization. Shared focused startup."
           ]
         ],
         [
@@ -1193,6 +1200,11 @@
         ]
       ],
       "edges": [
+        [
+          "unlock",
+          "begin",
+          "Unlocked"
+        ],
         [
           "begin",
           "corpse",
@@ -1255,7 +1267,7 @@
         ]
       ],
       "notes": [
-        "Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by the selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate."
+        "Yoga shares the session-only Advanced Features gate with Sleep, Shots and Intimate Service. Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate."
       ]
     },
     {
@@ -1699,7 +1711,7 @@
         ]
       ],
       "notes": [
-        "Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Dharana closing runs only while the session remains active and follows the Meditation Language in English, Malayalam, Hindi and Russian. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt."
+        "Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Narration coverage is contract-checked for all four Meditation Languages: Box has localized preparation, four spoken steps and completion; Dharana has focus and closing; Visualization has choice, scene guidance, Silence wake-up and return; Ho’oponopono has intro, four phrases and closing. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt."
       ]
     },
     {
@@ -2159,7 +2171,7 @@
         ]
       ],
       "notes": [
-        "Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation."
+        "Default add-on narration is complete in English, Malayalam, Hindi and Russian. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono resolves from scripts.json. Automated checks establish key presence, non-empty copy and expected phrase/step counts, not pronunciation quality. Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation."
       ]
     },
     {

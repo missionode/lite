@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Yoga Advanced Features gate — release 3.47 candidate
+
+Yoga Experience now shares the session-only Advanced Features gate: hidden/disabled while locked, enabled after the password unlock, cleared on relock/reload, and protected against direct locked selection or start. Automated lock lifecycle checks are required; device UI verification remains open.
+
+## Four-language add-on narration coverage — release 3.47 candidate
+
+Audited every spoken segment in Box Breathing, Dharana, Guided Visualization and Ho’oponopono for English, Malayalam, Hindi and Russian. Restored the two empty Malayalam Box Breathing hold prompts as “ശ്വാസം പിടിച്ചുവയ്ക്കുക”. The focused-practice contract now rejects missing/empty narration and incorrect Box-step or Ho’oponopono-phrase counts. Source coverage passes; pronunciation and target-device listening remain open.
+
 ## Journey add-on selection and visual release — release 3.46
 
 Box Breathing and Ho’oponopono no longer clear themselves when checked. Box Breathing, Dharana, Guided Visualization and Ho’oponopono can be combined, while replacement experiences still clear all add-ons. Dharana now uses a pitch-black full-screen scene and releases its anchor/veil while the closing narration runs; Visualization's black-overlay transition remains active under static-journey performance mode. Automated source, language, audio-transition and thermal-budget checks pass; device playback remains open. Production push authorized.

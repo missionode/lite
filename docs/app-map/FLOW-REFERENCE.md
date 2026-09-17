@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.46 release checkpoint following ab6cbd8 · 2026-09-17.
+Source snapshot: 3.47 Advanced Yoga and narration audit following ddc1264 · 2026-09-17.
 
-Version 3.46 source-reviewed behavior. Compatible journey add-ons remain independently selectable; Dharana and Visualization black-screen transitions and localized Dharana closing have automated source/test evidence, while device listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
+Version 3.47 source-reviewed behavior. Yoga Experience is session-locked behind Advanced Features with visibility, selection and direct-start guards. Add-on narration coverage is contract-checked in English, Malayalam, Hindi and Russian; missing Malayalam Box Breathing hold prompts were restored. Device voice pronunciation/listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -183,8 +183,8 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
-| Exclusive modes | HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons: selecting one must not clear itself or the other add-ons. |
-| Intimate Service + ambience | Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
+| Exclusive modes | HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Yoga is hidden and disabled until Advanced Features is unlocked; relock clears it and direct locked selection/start is rejected. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons. |
+| Intimate Service + ambience | Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep, Yoga and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
 | Enable Shots? | Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode and Shots clear all journey add-ons. |
 | Enable Sleep? | Hidden and disabled until the shared seven-tap-and-password unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
@@ -437,12 +437,13 @@ flowchart TD
 
 ## Yoga experience
 
-Optional rest and bathing before selected poses.
+Advanced Features-gated rest, bathing and selected poses.
 
-Sources: [app.js:5129](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5129), [app.js:7558](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7558), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
+Sources: [app.js:5129](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5129), [app.js:7400](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7400), [app.js:8440](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:8440), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
 
 ```mermaid
 flowchart TD
+  unlock["Unlock Advanced Features"]
   begin["Select Yoga + poses"]
   corpse["Optional Corpse Pose"]
   bath["Optional Bath Session"]
@@ -452,6 +453,7 @@ flowchart TD
   prep["Yoga preparation"]
   poses["Selected pose loop"]
   finish["Completion"]
+  unlock -->|"Unlocked"| begin
   begin -->|"Corpse enabled"| corpse
   begin -->|"Only Bath enabled"| bath
   begin -->|"Neither enabled"| prep
@@ -468,7 +470,8 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Select Yoga + poses | At least one selected pose required at Begin. Shared focused startup. |
+| Unlock Advanced Features | Seven rapid App version taps and password verification reveal and enable Yoga for this page load. Reload or switching Advanced Features off hides, disables and clears Yoga. |
+| Select Yoga + poses | At least one selected pose required at Begin. A locked direct selection or start is rejected before audio initialization. Shared focused startup. |
 | Optional Corpse Pose | Intro → stillness countdown → transition narration at configured point → settle. |
 | Optional Bath Session | Intro → instructions → countdown with reminder at 60 seconds. |
 | Guide: proceed | Bath completion waits for explicit Continue; does not advance automatically. |
@@ -478,7 +481,7 @@ flowchart TD
 | Selected pose loop | Pose name/image → explanation → hold countdown → next-pose prompt and gap. |
 | Completion | Session-complete narration → settle → common completion. |
 
-- Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by the selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate.
+- Yoga shares the session-only Advanced Features gate with Sleep, Shots and Intimate Service. Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate.
 
 <a id="care"></a>
 
@@ -644,7 +647,7 @@ flowchart TD
 | Integration add-on | Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
-- Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Dharana closing runs only while the session remains active and follows the Meditation Language in English, Malayalam, Hindi and Russian. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
+- Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Narration coverage is contract-checked for all four Meditation Languages: Box has localized preparation, four spoken steps and completion; Dharana has focus and closing; Visualization has choice, scene guidance, Silence wake-up and return; Ho’oponopono has intro, four phrases and closing. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
 
 <a id="controls"></a>
 
@@ -817,7 +820,7 @@ flowchart TD
 | Resolve voice | Matching browser voice or supported configured Piper voice; Hindi has no default Piper voice. |
 | Timing layers | Built-in defaults → timing-config → optional named query profile → saved preferences; demo changes selected core duration. |
 
-- Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation.
+- Default add-on narration is complete in English, Malayalam, Hindi and Russian. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono resolves from scripts.json. Automated checks establish key presence, non-empty copy and expected phrase/step counts, not pronunciation quality. Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation.
 
 <a id="narration"></a>
 

@@ -7420,6 +7420,16 @@ function attachEventListeners() {
             if (isLocked) clearSleepMode();
             sleepModeToggle.disabled = isLocked;
         }
+        const yogaModeControl = document.getElementById('yoga-mode-control');
+        if (yogaModeControl) yogaModeControl.hidden = isLocked;
+        if (yogaExperienceToggle) {
+            if (isLocked) {
+                yogaExperienceToggle.checked = false;
+                state.yogaExperienceEnabled = false;
+                if (yogaExperienceSetup) yogaExperienceSetup.hidden = true;
+            }
+            yogaExperienceToggle.disabled = isLocked;
+        }
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
             experimentCareOptions.hidden = isLocked;
@@ -7685,6 +7695,14 @@ function attachEventListeners() {
     });
     document.getElementById('visualization-duration')?.addEventListener('change', updateSessionEstimate);
     yogaExperienceToggle?.addEventListener('change', event => {
+        if (!state.advancedFeaturesUnlocked) {
+            yogaExperienceToggle.checked = false;
+            state.yogaExperienceEnabled = false;
+            if (yogaExperienceSetup) yogaExperienceSetup.hidden = true;
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
+            return;
+        }
         state.yogaExperienceEnabled = yogaExperienceToggle.checked;
         enforceMasterToggle(event.target);
     });
@@ -8428,6 +8446,13 @@ function attachEventListeners() {
         }
         if (getChecked('sleep-mode-toggle') && !state.advancedFeaturesUnlocked) {
             clearSleepMode();
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
+            return;
+        }
+        if (getChecked('yoga-experience-toggle') && !state.advancedFeaturesUnlocked) {
+            syncChecked('yoga-experience-toggle', false);
+            state.yogaExperienceEnabled = false;
             updateExperienceModeVisibility();
             updateSessionEstimate();
             return;

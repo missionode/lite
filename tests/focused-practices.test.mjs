@@ -7,8 +7,10 @@ const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const hi = JSON.parse(fs.readFileSync(new URL('../locales/hi.json', import.meta.url), 'utf8'));
 const ru = JSON.parse(fs.readFileSync(new URL('../locales/ru.json', import.meta.url), 'utf8'));
+const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
 
 for (const id of ['box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'yoga-experience-toggle']) assert.match(html, new RegExp(`id="${id}"`), `${id} should remain selectable in the Lobby`);
+assert.match(html, /id="yoga-mode-control"[^>]* hidden[\s\S]*?id="yoga-experience-toggle" disabled/, 'Yoga Experience should be available only after Advanced Features unlock');
 assert.doesNotMatch(html, /id="box-meditation-toggle"|id="hooponopono-toggle"/, 'focused practices must not remain Settings add-ons');
 assert.doesNotMatch(app, /state\.boxMeditation\b|state\.hooponopono\b/, 'legacy add-on state must not return');
 assert.match(app, /boxBreathingExperienceEnabled: false/, 'Box Breathing should start session-only');
@@ -51,8 +53,21 @@ assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), 
 assert.match(app, /if \(!focusedExperience && !isHighEnergy && order\.length === 0\)/, 'Yoga and care should not require chakra selection');
 assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
-for (const locale of [en, ml, hi, ru]) {
-    assert.ok(locale.ui.dharanaClosing?.trim(), 'Each locale needs the Dharana closing narration');
+for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
+    for (const key of ['dharanaFocusGuidance', 'dharanaClosing', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationSilenceWakePrompt', 'visualizationReturn']) {
+        assert.equal(typeof locale.ui[key], 'string', `${language} ui.${key} narration must be a string`);
+        assert.ok(locale.ui[key].trim(), `${language} ui.${key} narration must not be empty`);
+    }
+    for (const key of ['centeringBreath', 'breathingComplete']) {
+        assert.equal(typeof locale.system[key], 'string', `${language} system.${key} narration must be a string`);
+        assert.ok(locale.system[key].trim(), `${language} system.${key} narration must not be empty`);
+    }
+    assert.equal(locale.system.breathingSteps?.length, 4, `${language} Box Breathing needs four localized spoken steps`);
+    for (const step of locale.system.breathingSteps) assert.ok(step.text?.trim(), `${language} Box Breathing step narration must not be empty`);
+    assert.ok(scripts.hooponopono.intro[language]?.trim(), `${language} Ho’oponopono intro narration is required`);
+    assert.equal(scripts.hooponopono.phrases[language]?.length, 4, `${language} Ho’oponopono needs four spoken phrases`);
+    for (const phrase of scripts.hooponopono.phrases[language]) assert.ok(phrase.trim(), `${language} Ho’oponopono phrase narration must not be empty`);
+    assert.ok(scripts.hooponopono.closing[language]?.trim(), `${language} Ho’oponopono closing narration is required`);
     for (const key of ['boxBreathingExperience', 'hooponoponoExperience', 'yogaExperience', 'beginBoxBreathing', 'beginHooponopono', 'beginYogaExperience', 'roadmapBoxBreathing']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
