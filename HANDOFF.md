@@ -1,5 +1,16 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-ADDON-SELECTION-002: selectable add-ons and visible transition release
+
+- COMPLETE locally, 2026-09-17. Corrected the shared selection reset so Box Breathing, Dharana, Guided Visualization and Ho’oponopono remain independently selectable and combinable; exclusive Yoga, HRIM, Sleep, Music Only, Shots and Intimate Service still clear all journey add-ons.
+- Dharana now uses a true black full-screen scene. Its anchor and veil enter through one-shot opacity transitions and release for four seconds while the localized closing narration runs. Guided Visualization's black overlay transition is also explicitly preserved when static journey decorations disable decorative animation. These transitions do not add an animation loop or recurring canvas work.
+- Audio review: Piper narration retains its existing short clip-edge fades, Voice Space reverb tail and music duck/restore handoff. Browser speech synthesis remains an event-driven fallback without a controllable Web Audio gain envelope; the journey still waits for speech completion before advancing. Device playback/listening remains open.
+
+### NOW — CP-DHARANA-CLOSING-001: gentle focus release
+
+- COMPLETE locally, 2026-09-17. App 3.46 / shell 5.239 / locale 48, based on production `ab6cbd8`; awaiting this checkpoint's commit and push. Dharana now narrates a gentle release after its timed focus and before hiding the anchor/veil: soften the anchor, relax the gaze, widen awareness to breath/body/space, and carry steadiness into the next stage. If the session has stopped, the closing is skipped. Existing opening guidance, shrinking anchor, duration, audio path and stage order are unchanged.
+- Closing copy is authored in English, Malayalam, Hindi and Russian and follows Meditation Language through the existing locale narration path; it is not loaded from `scripts.json`. Focused-practice and language/cache checks cover key presence/order. Updated the Journey Add-ons atlas map and generated references. Device listening and voice-pronunciation review remain open. Included in the current owner-authorized production checkpoint.
+
 ### NOW — CP-SKY-RELEASE-003: centered directions and frozen journey sky
 
 - 2026-09-17, release 3.45 / shell 5.238 / locale 47; production publication explicitly authorized. North/east/south/west now sit at equal inset positions (12.5/37.5/62.5/87.5%); the entire panorama uses the same azimuth offset so sky coordinates remain aligned. Journeys retain the existing sky snapshot even on explicit layout redraws: no ten-second calculation there. Lobby/Settings retain their bounded update. Earth atmosphere and Sun shield remain intact.

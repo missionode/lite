@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.45 release snapshot (parent 6337889) · 2026-09-17.
+Source snapshot: 3.46 release checkpoint following ab6cbd8 · 2026-09-17.
 
-Version 3.45 source-reviewed behavior. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal and listening verification remain open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
+Version 3.46 source-reviewed behavior. Compatible journey add-ons remain independently selectable; Dharana and Visualization black-screen transitions and localized Dharana closing have automated source/test evidence, while device listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -174,8 +174,8 @@ flowchart TD
   begin -->|"1 · Shots"| shot
   begin -->|"2 · Music"| music
   begin -->|"3 · Sleep"| sleep
-  begin -->|"4 · Focused"| focused
-  begin -->|"5 · Standard / HRIM"| guided
+  begin -->|"4 · Standalone"| focused
+  begin -->|"5 · Guided / add-ons"| guided
   focused -->|"Valid"| start
   guided -->|"Valid"| start
 ```
@@ -183,19 +183,19 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Choose an experience | Ordinary mode uses selected chakras; choose at least one. |
-| Exclusive modes | HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices. |
+| Exclusive modes | HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons: selecting one must not clear itself or the other add-ons. |
 | Intimate Service + ambience | Hidden by default. Settings → About → App version needs seven rapid taps, resetting after 1.5 seconds between taps. Taps 1–4 are silent; 5–6 show a countdown; tap 7 opens a localized password prompt. Only a Web Crypto SHA-256 match unlocks the current page load; wrong, cancelled or unsupported verification retains the lock. The unlocked Lobby panel contains care stages and Mood & Relaxation ambience controls; they are not duplicated in Journey Tuning. Advanced Features OFF clears care, Shots, Sleep and enabled ambience, stops ambience playback, then locks/hides their controls. Reload locks again. Any combination of three care options is allowed; choosing care clears other modes. |
-| Enable Shots? | Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode. |
+| Enable Shots? | Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode and Shots clear all journey add-ons. |
 | Enable Sleep? | Hidden and disabled until the shared seven-tap-and-password unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
 | Sleep | Load and validate five stages; start silent narration-free journey. |
-| Focused practice | Priority if inconsistent state: Box → Ho’oponopono → Yoga → Intimate. Yoga requires a selected pose. |
-| Guided meditation | HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras. |
+| Focused practice | Yoga and Intimate Care are standalone routes. Box Breathing prepares a guided journey; Dharana and Visualization run before selected chakras (or together as a standalone preparation); Ho’oponopono integrates after the chakra loop. Yoga requires a selected pose. |
+| Guided meditation | HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras unless Dharana or Visualization provides a standalone preparation route. |
 | Shared guided start | DND reminder, scripts, validation, audio, Piper warmup, wake lock, timers, selected routine. |
 
-- Shots hide incompatible Lobby controls. Focused practices hide intention and returning-opening controls. Checking Music Only, Sleep or a focused mode can clear Corpse Pose.
+- Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose.
 
 <a id="standard"></a>
 
@@ -639,12 +639,12 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Preparation add-ons | Box Breathing, Dharana and Guided Visualization are selected before chakra choices. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance. |
+| Preparation add-ons | Box Breathing, Dharana and Guided Visualization are selected before chakra choices and remain independently selectable. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Dharana enters a pitch-black full-screen scene, keeps its shrinking anchor visible through a localized closing narration, then fades the anchor and veil while awareness widens to breath/body/space. Visualization also fades its pitch-black overlay in and out under static-journey performance mode. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance. |
 | Chakra Journey | One or more selected chakras run in the usual chosen order. |
 | Integration add-on | Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
-- Preparation add-ons can be combined. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Replacement experiences clear all Chakra Journey add-ons. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
+- Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Dharana closing runs only while the session remains active and follows the Meditation Language in English, Malayalam, Hindi and Russian. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
 
 <a id="controls"></a>
 

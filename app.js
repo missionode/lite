@@ -5404,9 +5404,17 @@ class MeditationController {
                 }
                 await this.pauseAwareSleep(1000);
             }
+            if (this.isMeditationActive) {
+                focusAnchor?.classList.add('is-releasing');
+                focusVeil?.classList.add('is-releasing');
+                await Promise.all([
+                    this.narrate(journeyT('ui.dharanaClosing'), false),
+                    this.pauseAwareSleep(4000)
+                ]);
+            }
         } finally {
-            if (focusAnchor) { focusAnchor.hidden = true; focusAnchor.classList.remove('is-focusing'); focusAnchor.style.transform = ''; }
-            if (focusVeil) { focusVeil.classList.remove('is-active'); focusVeil.hidden = true; }
+            if (focusAnchor) { focusAnchor.hidden = true; focusAnchor.classList.remove('is-focusing', 'is-releasing'); focusAnchor.style.transform = ''; }
+            if (focusVeil) { focusVeil.classList.remove('is-active', 'is-releasing'); focusVeil.hidden = true; }
             document.body.classList.remove('dharana-active');
             if (symbol) symbol.style.visibility = '';
         }
@@ -7280,11 +7288,7 @@ function attachEventListeners() {
     }
 
     function clearFocusedExperiences(except = null) {
-        if (boxBreathingExperienceToggle && boxBreathingExperienceToggle !== except) boxBreathingExperienceToggle.checked = false;
-        if (hooponoponoExperienceToggle && hooponoponoExperienceToggle !== except) hooponoponoExperienceToggle.checked = false;
         if (yogaExperienceToggle && yogaExperienceToggle !== except) yogaExperienceToggle.checked = false;
-        if (!except || except !== boxBreathingExperienceToggle) state.boxBreathingExperienceEnabled = false;
-        if (!except || except !== hooponoponoExperienceToggle) state.hooponoponoExperienceEnabled = false;
         if (!except || except !== yogaExperienceToggle) state.yogaExperienceEnabled = false;
     }
 
@@ -7725,6 +7729,7 @@ function attachEventListeners() {
                 clearHighEnergyMode();
                 clearSleepMode();
                 clearFocusedExperiences();
+                clearJourneyAddons();
                 clearIntimateService();
                 resetShotDurationForType(shotTypeSelect?.value || 'meditation');
             }

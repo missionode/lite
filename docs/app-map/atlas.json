@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-17",
-    "commit": "3.45 release snapshot (parent 6337889)",
-    "scope": "Version 3.45 source-reviewed behavior. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal and listening verification remain open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification."
+    "commit": "3.46 release checkpoint following ab6cbd8",
+    "scope": "Version 3.46 source-reviewed behavior. Compatible journey add-ons remain independently selectable; Dharana and Visualization black-screen transitions and localized Dharana closing have automated source/test evidence, while device listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification."
   },
   "graphs": [
     {
@@ -316,7 +316,7 @@
           [
             "exclusive",
             "Exclusive modes",
-            "HRIM, Sleep, Music Only, Box, Ho’oponopono and Yoga clear competing modes and intimate-service choices."
+            "HRIM, Sleep, Music Only and Yoga clear competing modes, all journey add-ons and intimate-service choices. Box Breathing, Dharana, Visualization and Ho’oponopono are compatible journey add-ons: selecting one must not clear itself or the other add-ons."
           ],
           [
             "care",
@@ -326,7 +326,7 @@
           [
             "shots",
             "Enable Shots?",
-            "Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode."
+            "Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode and Shots clear all journey add-ons."
           ],
           [
             "sleepgate",
@@ -362,12 +362,12 @@
           [
             "focused",
             "Focused practice",
-            "Priority if inconsistent state: Box → Ho’oponopono → Yoga → Intimate. Yoga requires a selected pose."
+            "Yoga and Intimate Care are standalone routes. Box Breathing prepares a guided journey; Dharana and Visualization run before selected chakras (or together as a standalone preparation); Ho’oponopono integrates after the chakra loop. Yoga requires a selected pose."
           ],
           [
             "guided",
             "Guided meditation",
-            "HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras."
+            "HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras unless Dharana or Visualization provides a standalone preparation route."
           ]
         ],
         [
@@ -437,12 +437,12 @@
         [
           "begin",
           "focused",
-          "4 · Focused"
+          "4 · Standalone"
         ],
         [
           "begin",
           "guided",
-          "5 · Standard / HRIM"
+          "5 · Guided / add-ons"
         ],
         [
           "focused",
@@ -456,7 +456,7 @@
         ]
       ],
       "notes": [
-        "Shots hide incompatible Lobby controls. Focused practices hide intention and returning-opening controls. Checking Music Only, Sleep or a focused mode can clear Corpse Pose."
+        "Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose."
       ]
     },
     {
@@ -1651,7 +1651,7 @@
           [
             "prepare",
             "Preparation add-ons",
-            "Box Breathing, Dharana and Guided Visualization are selected before chakra choices. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance."
+            "Box Breathing, Dharana and Guided Visualization are selected before chakra choices and remain independently selectable. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Dharana enters a pitch-black full-screen scene, keeps its shrinking anchor visible through a localized closing narration, then fades the anchor and veil while awareness widens to breath/body/space. Visualization also fades its pitch-black overlay in and out under static-journey performance mode. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance."
           ]
         ],
         [
@@ -1699,7 +1699,7 @@
         ]
       ],
       "notes": [
-        "Preparation add-ons can be combined. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Replacement experiences clear all Chakra Journey add-ons. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt."
+        "Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Dharana closing runs only while the session remains active and follows the Meditation Language in English, Malayalam, Hindi and Russian. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt."
       ]
     },
     {

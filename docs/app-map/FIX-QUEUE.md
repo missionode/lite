@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Journey add-on selection and visual release — release 3.46
+
+Box Breathing and Ho’oponopono no longer clear themselves when checked. Box Breathing, Dharana, Guided Visualization and Ho’oponopono can be combined, while replacement experiences still clear all add-ons. Dharana now uses a pitch-black full-screen scene and releases its anchor/veil while the closing narration runs; Visualization's black-overlay transition remains active under static-journey performance mode. Automated source, language, audio-transition and thermal-budget checks pass; device playback remains open. Production push authorized.
+
+## Dharana closing narration — release 3.46
+
+After the selected focus interval, active sessions now keep the anchor visible while a localized closing releases the gaze and widens awareness to breath, body and surrounding space. Visual cleanup follows the narration; stopped sessions skip it. English, Malayalam, Hindi and Russian are included. Automated source/language checks pass; device listening remains open.
+
 ## Centered directions and journey snapshot — release 3.45
 
 Directions now have equal viewport insets and spacing; the entire sky projection shifts with them so labels remain correct. Journey redraws no longer recalculate astronomical positions; no ten-second update occurs during journeys. Lobby/Settings keep the bounded update. Protective Earth/Sun artwork is retained. Production push authorized.

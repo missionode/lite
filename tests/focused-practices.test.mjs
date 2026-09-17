@@ -29,6 +29,7 @@ assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Jou
 assert.match(app, /volVisualizationAmbience: clampAudioLevel\(storedNumber\('chakra_vol_visualization_ambience', 0\.10\), 0\.02, 0\.5, 0\.10\)/, 'Saved Visualization ambience volume should accept the same ceiling');
 assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated visible anchor layer rather than text inside the chakra image');
 assert.match(app, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
+assert.match(app, /while \(remaining-- > 0 && this\.isMeditationActive\)[\s\S]*?dharanaClosing[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');
 assert.match(app, /--focus-anchor-duration[\s\S]*?is-focusing/, 'Focused Attention should slowly settle the anchor over the selected duration');
 assert.match(app, /runDharana\(\)[\s\S]*?visualization-addon-toggle[\s\S]*?runVisualization\(\)[\s\S]*?runSequence\(\)/, 'Visualization should run after Dharana and before chakras');
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
@@ -39,10 +40,19 @@ assert.match(app, /setVisualizationAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\(
 assert.match(app, /async runSequence[\s\S]*?hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?handleSilence[\s\S]*?runClosing[\s\S]*?runEmergence/, 'Ho’oponopono should run after chakras and before closing/emergence');
 assert.match(app, /clearFocusedExperiences\(target\)/, 'Standalone Experience Modes should remain mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');
+const focusedClearBody = app.slice(app.indexOf('function clearFocusedExperiences'), app.indexOf('function clearJourneyAddons'));
+assert.doesNotMatch(focusedClearBody, /boxBreathing|hooponopono|dharana|visualization/i, 'Selecting a compatible journey add-on must not immediately clear it');
+const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app.indexOf('const advancedPasswordModal'));
+for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization']) {
+    assert.match(addonClearBody, new RegExp(feature, 'i'), `Exclusive modes must still clear ${feature}`);
+}
+assert.match(app, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?dharanaClosing[\s\S]*?pauseAwareSleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
+assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
 assert.match(app, /if \(!focusedExperience && !isHighEnergy && order\.length === 0\)/, 'Yoga and care should not require chakra selection');
 assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
 for (const locale of [en, ml, hi, ru]) {
+    assert.ok(locale.ui.dharanaClosing?.trim(), 'Each locale needs the Dharana closing narration');
     for (const key of ['boxBreathingExperience', 'hooponoponoExperience', 'yogaExperience', 'beginBoxBreathing', 'beginHooponopono', 'beginYogaExperience', 'roadmapBoxBreathing']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
