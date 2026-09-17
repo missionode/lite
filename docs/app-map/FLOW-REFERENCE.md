@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.51 Undo & Unlearn checkpoint following da718e4 · 2026-09-17.
+Source snapshot: 3.51 production snapshot 4542093 · 2026-09-17.
 
 Version 3.51 source-reviewed behavior. Undo & Unlearn runs after optional Ho’oponopono and before final silence, using content-free acknowledgement, three bounded forgiveness invitations, consolation and release without requesting recall, speech, a private answer or contact. All new copy is localized in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels.
 
