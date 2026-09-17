@@ -32,6 +32,20 @@ const ctx = {
     }
 };
 const input = makeBuffer(2,2000,100);
+// Exercise the actual Visualization start method with the real loop class.
+const startVisualization = vm.runInNewContext(`({${app.slice(app.indexOf('    async startVisualizationAmbience('), app.indexOf('    setVisualizationAmbienceDucked('))}}).startVisualizationAmbience`, {
+    SeamlessLoop: Loop, state: { visualizationAmbience: 'space-race', volVisualizationAmbience: 0.1 },
+    VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS: 8
+});
+for (const fade of [8, 1.2]) {
+    const engine = { ctx, visualizationAmbienceBuffer: input, visualizationAmbienceGain: ctx.createGain() };
+    engine.visualizationAmbienceGain.gain.cancelScheduledValues = () => {};
+    await startVisualization.call(engine, fade);
+    const entry = engine.visualizationAmbienceLoop.output.gain.events;
+    assert.deepEqual(entry.slice(-2), [['set', 0, 0], ['ramp', 0.1, fade]], 'Session and preview must fade from silence to the saved level');
+    assert.equal(engine.visualizationAmbienceLoop.activeSources[0].source.loop, true);
+}
+sources.length = 0;
 for(let c=0;c<2;c++) for(let i=0;i<input.length;i++) input.getChannelData(c)[i]=Math.sin(i*.017+c)*.4;
 const loop = new Loop(ctx, input, {}, 0.35, 5);
 loop.start();

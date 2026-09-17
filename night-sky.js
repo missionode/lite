@@ -1,6 +1,5 @@
-// A cached, procedural dark-sky backdrop. The fine star field is illustrative;
-// location/time-aware named bodies are composited by AmbientParticleField.
-// No textures, network requests, WebGL, or per-frame noise generation required.
+// Cached catalogue stars projected for the same observer as the named bodies.
+// Only a bounded bright subset scintillates. No per-frame astronomy or noise.
 class NaturalNightSky {
     constructor() {
         this.background = document.createElement('canvas');
@@ -60,67 +59,30 @@ class NaturalNightSky {
         });
     }
 
-    resize(width, height, dpr) {
+    resize(width, height, dpr, catalog = [], sunAltitude = -18) {
         this.width = width;
         this.height = height;
+        this.dpr = dpr;
         this.background.width = Math.round(width * dpr);
         this.background.height = Math.round(height * dpr);
         const ctx = this.background.getContext('2d');
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, width, height);
-
-        // Generate faint, irregular luminance and dark dust lanes only when
-        // resizing. A small texture is upsampled once into the cached sky.
-        const texture = document.createElement('canvas');
-        texture.width = Math.min(480, Math.max(160, Math.round(width / 3)));
-        texture.height = Math.max(1, Math.round(texture.width * height / width));
-        // Bound portrait texture work as well as landscape work.
-        if (texture.height > 480) {
-            texture.width = Math.max(1, Math.round(texture.width * 480 / texture.height));
-            texture.height = 480;
-        }
-        const textureContext = texture.getContext('2d');
-        const pixels = textureContext.createImageData(texture.width, texture.height);
-        for (let y = 0; y < texture.height; y++) {
-            for (let x = 0; x < texture.width; x++) {
-                const u = x / texture.width, v = y / texture.height;
-                const bend = 0.64 - u * 0.52 + Math.sin(u * 4.8) * 0.045;
-                const offset = v - bend;
-                const broad = Math.exp(-offset * offset / 0.034);
-                const cloud = this.dust(u * 7 + 12, v * 7 + 8);
-                const fine = this.noise(u * 54, v * 54);
-                const rift = Math.exp(-Math.pow(offset + (cloud - 0.5) * 0.11, 2) / 0.00065);
-                const grain = Math.pow(Math.max(0, cloud - 0.18), 1.65);
-                const light = broad * grain * (1 - rift * 0.77) * (0.8 + fine * 0.2);
-                const i = (y * texture.width + x) * 4;
-                pixels.data[i] = 151;
-                pixels.data[i + 1] = 164;
-                pixels.data[i + 2] = 186;
-                pixels.data[i + 3] = Math.round(light * 48);
-            }
-        }
-        textureContext.putImageData(pixels, 0, 0);
-        ctx.drawImage(texture, 0, 0, width, height);
-
-        const random = this.random();
-        const count = Math.min(2400, Math.max(700, Math.round(width * height / 800)));
+        // All stars use the same observer projection as the named bodies.
+        // A restrained daytime floor preserves the cosmic chart theme.
+        const darkness = Math.max(0.10, Math.min(1, (-sunAltitude + 2) / 20));
         this.stars = [];
         this.twinklingStars = [];
-        for (let index = 0; index < count; index++) {
-            const nx = random();
-            const cluster = random() < 0.42;
-            const band = 0.64 - nx * 0.52 + Math.sin(nx * 4.8) * 0.045;
-            const ny = cluster ? band + (random() + random() + random() - 1.5) * 0.22 : random();
-            const brightness = Math.pow(random(), 5);
-            const colorSample = random();
-            const color = colorSample < 0.19 ? 0 : colorSample < 0.77 ? 1 : colorSample < 0.96 ? 2 : 3;
+        for (const body of catalog) {
+            if (body.altitude < 0 || body.name) continue;
+            const {x, y} = SkyAstronomy.project(body.azimuth, body.altitude, width, height);
+            const random = this.random(body.id);
+            const brightness = Math.max(0, Math.min(1, (6 - body.magnitude) / 6));
+            const color = body.color[0] < 220 ? 0 : body.color[2] > 240 ? 1 : body.color[2] > 190 ? 2 : 3;
             const star = {
-                x: nx * width,
-                y: ny * height,
-                radius: 0.32 + brightness * 1.22,
-                alpha: (0.14 + brightness * 0.72) * (cluster ? 0.79 : 1),
-                color,
-                phase: random() * Math.PI * 2,
+                x, y, radius: 0.28 + brightness * 1.10,
+                alpha: (0.16 + brightness * 0.68) * darkness,
+                color, phase: random() * Math.PI * 2,
                 twinkleSpeed: 1.1 + random() * 2.4,
                 twinkleDepth: 0.08 + random() * 0.18,
                 isTwinkler: brightness > 0.38 && this.twinklingStars.length < 110

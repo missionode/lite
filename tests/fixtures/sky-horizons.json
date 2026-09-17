@@ -1,0 +1,172 @@
+{
+  "source": "NASA JPL Horizons DE441; public Greenwich observatory (000@399); quantity 4, APPARENT=AIRLESS; retrieved 2026-09-17",
+  "observer": {
+    "latitude": 51.4773207,
+    "longitude": 0,
+    "height": 67.0693
+  },
+  "cases": [
+    {
+      "name": "Sun",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 358.53012,
+      "altitude": -61.588901
+    },
+    {
+      "name": "Sun",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 179.217164,
+      "altitude": 15.484374
+    },
+    {
+      "name": "Sun",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 358.30393,
+      "altitude": -61.507575
+    },
+    {
+      "name": "Moon",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 74.18496,
+      "altitude": -24.328818
+    },
+    {
+      "name": "Moon",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 237.784338,
+      "altitude": 9.247511
+    },
+    {
+      "name": "Moon",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 67.207599,
+      "altitude": -33.451458
+    },
+    {
+      "name": "Mercury",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 17.205162,
+      "altitude": -62.083942
+    },
+    {
+      "name": "Mercury",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 187.855674,
+      "altitude": 13.74434
+    },
+    {
+      "name": "Mercury",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 15.849528,
+      "altitude": -62.285943
+    },
+    {
+      "name": "Venus",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 59.305743,
+      "altitude": -43.960589
+    },
+    {
+      "name": "Venus",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 219.034069,
+      "altitude": 11.606928
+    },
+    {
+      "name": "Venus",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 59.237171,
+      "altitude": -44.319743
+    },
+    {
+      "name": "Mars",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 294.716224,
+      "altitude": -34.639444
+    },
+    {
+      "name": "Mars",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 130.211157,
+      "altitude": 12.173958
+    },
+    {
+      "name": "Mars",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 295.147677,
+      "altitude": -34.548293
+    },
+    {
+      "name": "Jupiter",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 264.486124,
+      "altitude": 15.340363
+    },
+    {
+      "name": "Jupiter",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 74.183403,
+      "altitude": -1.484658
+    },
+    {
+      "name": "Jupiter",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 265.255693,
+      "altitude": 14.766874
+    },
+    {
+      "name": "Saturn",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 254.826338,
+      "altitude": 27.630724
+    },
+    {
+      "name": "Saturn",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 59.899406,
+      "altitude": -6.739174
+    },
+    {
+      "name": "Saturn",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 255.695098,
+      "altitude": 27.023123
+    },
+    {
+      "name": "Uranus",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 305.250276,
+      "altitude": -44.560809
+    },
+    {
+      "name": "Uranus",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 143.558364,
+      "altitude": 14.271363
+    },
+    {
+      "name": "Uranus",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 306.331492,
+      "altitude": -45.020643
+    },
+    {
+      "name": "Neptune",
+      "date": "2000-01-01T00:00:00.000Z",
+      "azimuth": 318.713406,
+      "altitude": -52.052062
+    },
+    {
+      "name": "Neptune",
+      "date": "2000-01-01T12:00:00.000Z",
+      "azimuth": 155.495447,
+      "altitude": 16.002364
+    },
+    {
+      "name": "Neptune",
+      "date": "2000-01-02T00:00:00.000Z",
+      "azimuth": 320.040602,
+      "altitude": -52.429657
+    }
+  ]
+}

@@ -107,138 +107,6 @@ const CELESTIAL_LABEL_KEYS = Object.freeze({
     Pollux: 'ui.celestialPollux', Fomalhaut: 'ui.celestialFomalhaut', Deneb: 'ui.celestialDeneb', Regulus: 'ui.celestialRegulus'
 });
 
-// The daylight tableau is visual storytelling, not an observation chart. The
-// low-horizon spacing follows each planet's logarithmic orbital distance so
-// that all eight fit in a viewport. Disc sizes follow a restrained logarithmic
-// diameter scale: recognisable differences without one gas giant swallowing
-// the interface.
-const DAYLIGHT_SOLAR_SYSTEM = Object.freeze([
-    ['Mercury', 'solar-planet', [176, 166, 152], 0.39, 1.35, 7],
-    ['Venus', 'solar-planet', [238, 202, 143], 0.72, 2.35, 10],
-    ['Earth', 'earth', [114, 190, 221], 1, 5.1, 14],
-    ['Mars', 'solar-planet', [209, 126, 93], 1.52, 1.8, 9],
-    ['Jupiter', 'solar-planet', [223, 188, 145], 5.2, 6.8, 15],
-    ['Saturn', 'solar-planet', [226, 207, 160], 9.58, 5.6, 11],
-    ['Uranus', 'solar-planet', [151, 217, 224], 19.2, 3.85, 16],
-    ['Neptune', 'solar-planet', [105, 145, 218], 30.05, 3.8, 12]
-]);
-
-function celestialJulianDay(date = new Date()) {
-    return date.getTime() / 86400000 + 2440587.5;
-}
-
-function celestialNormalizeDegrees(value) {
-    return ((value % 360) + 360) % 360;
-}
-
-function celestialSolveEccentricAnomaly(meanAnomaly, eccentricity) {
-    let eccentricAnomaly = meanAnomaly + eccentricity * Math.sin(meanAnomaly) * (1 + eccentricity * Math.cos(meanAnomaly));
-    for (let iteration = 0; iteration < 5; iteration += 1) {
-        eccentricAnomaly -= (eccentricAnomaly - eccentricity * Math.sin(eccentricAnomaly) - meanAnomaly) /
-            (1 - eccentricity * Math.cos(eccentricAnomaly));
-    }
-    return eccentricAnomaly;
-}
-
-function celestialEclipticToEquatorial(longitude, latitude = 0, date = new Date()) {
-    const obliquity = (23.4393 - 3.563e-7 * (celestialJulianDay(date) - 2451543.5)) * CELESTIAL_DEG;
-    const lambda = longitude * CELESTIAL_DEG;
-    const beta = latitude * CELESTIAL_DEG;
-    return {
-        ra: Math.atan2(Math.sin(lambda) * Math.cos(obliquity) - Math.tan(beta) * Math.sin(obliquity), Math.cos(lambda)) * CELESTIAL_RAD,
-        dec: Math.asin(Math.sin(beta) * Math.cos(obliquity) + Math.cos(beta) * Math.sin(obliquity) * Math.sin(lambda)) * CELESTIAL_RAD
-    };
-}
-
-function celestialSunLongitude(days) {
-    const w = 282.9404 + 4.70935e-5 * days;
-    const meanAnomaly = (356.0470 + 0.9856002585 * days) * CELESTIAL_DEG;
-    const eccentricity = 0.016709 - 1.151e-9 * days;
-    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
-    const x = Math.cos(eccentricAnomaly) - eccentricity;
-    const y = Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
-    return celestialNormalizeDegrees(Math.atan2(y, x) * CELESTIAL_RAD + w);
-}
-
-function celestialSunEquatorial(days, date = new Date()) {
-    return celestialEclipticToEquatorial(celestialSunLongitude(days), 0, date);
-}
-
-function celestialMoonPhase(days) {
-    // 2000-01-06 18:14 UTC was a known new-moon reference. The synodic
-    // period gives a stable visual phase without confusing sky coordinates
-    // with illumination geometry.
-    return celestialNormalizeDegrees(((days - 5.259) / 29.530588853) * 360) / 360;
-}
-
-function celestialPlanetEquatorial(days, planet, date = new Date()) {
-    const orbitalElements = {
-        venus: [76.6799 + 2.46590e-5 * days, 3.3946 + 2.75e-8 * days, 54.8910 + 1.38374e-5 * days, 0.72333, 0.006773 - 1.302e-9 * days, 48.0052 + 1.6021302244 * days],
-        mars: [49.5574 + 2.11081e-5 * days, 1.8497 - 1.78e-8 * days, 286.5016 + 2.92961e-5 * days, 1.523688, 0.093405 + 2.516e-9 * days, 18.6021 + 0.5240207766 * days],
-        jupiter: [100.4542 + 2.76854e-5 * days, 1.3030 - 1.557e-7 * days, 273.8777 + 1.64505e-5 * days, 5.20256, 0.048498 + 4.469e-9 * days, 19.8950 + 0.0830853001 * days],
-        saturn: [113.6634 + 2.38980e-5 * days, 2.4886 - 1.081e-7 * days, 339.3939 + 2.97661e-5 * days, 9.55475, 0.055546 - 9.499e-9 * days, 316.9670 + 0.0334442282 * days]
-    }[planet];
-    if (!orbitalElements) return null;
-    const [node, inclination, argument, semiMajorAxis, eccentricity, meanAnomalyDegrees] = orbitalElements;
-    const meanAnomaly = celestialNormalizeDegrees(meanAnomalyDegrees) * CELESTIAL_DEG;
-    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
-    const xv = semiMajorAxis * (Math.cos(eccentricAnomaly) - eccentricity);
-    const yv = semiMajorAxis * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
-    const trueAnomaly = Math.atan2(yv, xv);
-    const radius = Math.sqrt(xv * xv + yv * yv);
-    const nodeRad = node * CELESTIAL_DEG;
-    const inclinationRad = inclination * CELESTIAL_DEG;
-    const argumentRad = (argument + trueAnomaly * CELESTIAL_RAD) * CELESTIAL_DEG;
-    const heliocentric = {
-        x: radius * (Math.cos(nodeRad) * Math.cos(argumentRad) - Math.sin(nodeRad) * Math.sin(argumentRad) * Math.cos(inclinationRad)),
-        y: radius * (Math.sin(nodeRad) * Math.cos(argumentRad) + Math.cos(nodeRad) * Math.sin(argumentRad) * Math.cos(inclinationRad)),
-        z: radius * Math.sin(argumentRad) * Math.sin(inclinationRad)
-    };
-    const earthLongitude = celestialSunLongitude(days) + 180;
-    const earthRadius = 1 - 0.0167 * Math.cos((357.529 + 0.98560028 * days) * CELESTIAL_DEG);
-    const earth = { x: earthRadius * Math.cos(earthLongitude * CELESTIAL_DEG), y: earthRadius * Math.sin(earthLongitude * CELESTIAL_DEG), z: 0 };
-    const geocentric = { x: heliocentric.x - earth.x, y: heliocentric.y - earth.y, z: heliocentric.z };
-    const longitude = Math.atan2(geocentric.y, geocentric.x) * CELESTIAL_RAD;
-    const latitude = Math.atan2(geocentric.z, Math.sqrt(geocentric.x ** 2 + geocentric.y ** 2)) * CELESTIAL_RAD;
-    return celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude, date);
-}
-
-function celestialMoonEquatorial(days, date = new Date()) {
-    const node = (125.1228 - 0.0529538083 * days) * CELESTIAL_DEG;
-    const argument = (318.0634 + 0.1643573223 * days) * CELESTIAL_DEG;
-    const eccentricity = 0.0549;
-    const meanAnomaly = (115.3654 + 13.0649929509 * days) * CELESTIAL_DEG;
-    const eccentricAnomaly = celestialSolveEccentricAnomaly(meanAnomaly, eccentricity);
-    const x = 60.2666 * (Math.cos(eccentricAnomaly) - eccentricity);
-    const y = 60.2666 * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly);
-    const trueAnomaly = Math.atan2(y, x);
-    const radius = Math.sqrt(x * x + y * y);
-    // Convert the lunar orbital elements into ecliptic coordinates before
-    // converting to RA/Dec. Keeping the node in both axes avoids the Moon
-    // being assigned an incorrect hour angle and disappearing from the sky.
-    const orbitalAngle = trueAnomaly + argument;
-    const longitude = Math.atan2(
-        Math.sin(node) * Math.cos(orbitalAngle) + Math.cos(node) * Math.sin(orbitalAngle) * Math.cos(5.1454 * CELESTIAL_DEG),
-        Math.cos(node) * Math.cos(orbitalAngle) - Math.sin(node) * Math.sin(orbitalAngle) * Math.cos(5.1454 * CELESTIAL_DEG)
-    ) * CELESTIAL_RAD;
-    const latitude = Math.asin(Math.sin(orbitalAngle) * Math.sin(5.1454 * CELESTIAL_DEG)) * CELESTIAL_RAD;
-    return { ...celestialEclipticToEquatorial(celestialNormalizeDegrees(longitude), latitude, date), longitude: celestialNormalizeDegrees(longitude), latitude, radius };
-}
-
-function celestialHorizontal(raDegrees, decDegrees, latitude, longitude, date = new Date()) {
-    const julianDay = celestialJulianDay(date);
-    const centuries = (julianDay - 2451545.0) / 36525;
-    const greenwichSidereal = celestialNormalizeDegrees(280.46061837 + 360.98564736629 * (julianDay - 2451545.0) + 0.000387933 * centuries ** 2);
-    const hourAngle = (celestialNormalizeDegrees(greenwichSidereal + longitude - raDegrees)) * CELESTIAL_DEG;
-    const lat = latitude * CELESTIAL_DEG;
-    const dec = decDegrees * CELESTIAL_DEG;
-    const altitude = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hourAngle)) * CELESTIAL_RAD;
-    const azimuth = celestialNormalizeDegrees(Math.atan2(
-        Math.sin(hourAngle),
-        Math.cos(hourAngle) * Math.sin(lat) - Math.tan(dec) * Math.cos(lat)
-    ) * CELESTIAL_RAD + 180);
-    return { altitude, azimuth };
-}
 // Pleasure ambience is a separate, fixed-level support layer. It is not
 // tied to the user music slider or the short frequency-exposure timer.
 const PLEASURE_AMBIENCE_GAIN = 0.003;
@@ -1076,6 +944,9 @@ function updateJourneyRoadmap() {
 }
 
 function applyLocaleUI() {
+    particleField.updateSkyLocationStatus();
+    particleField.celestialLayerKey = null;
+    if (particleField.started) particleField.draw(performance.now(), false);
     document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
     document.title = t('ui.chakraMeditation');
     setText('app-title', t('ui.chakraMeditation'));
@@ -3319,7 +3190,7 @@ class AudioEngine {
         this.visualizationAmbienceGain.gain.cancelScheduledValues(this.ctx.currentTime);
         this.visualizationAmbienceGain.gain.setValueAtTime(1, this.ctx.currentTime);
         this.visualizationAmbienceLoop = new SeamlessLoop(this.ctx, this.visualizationAmbienceBuffer, this.visualizationAmbienceGain, state.volVisualizationAmbience, fadeSeconds);
-        this.visualizationAmbienceLoop.start();
+        this.visualizationAmbienceLoop.start(fadeSeconds);
         return true;
     }
 
@@ -3550,6 +3421,16 @@ class AmbientParticleField {
         this.render = this.render.bind(this);
         this.handleVisibility = this.handleVisibility.bind(this);
         this.handleMotionChange = this.handleMotionChange.bind(this);
+        this.layoutFrame = 0;
+        this.invalidateSkyLayout = () => {
+            this.celestialLayerKey = null;
+            if (!this.started || document.hidden || this.layoutFrame) return;
+            // One redraw for an actual layout event, never an idle loop.
+            this.layoutFrame = requestAnimationFrame(() => {
+                this.layoutFrame = 0;
+                if (!document.hidden) this.draw(performance.now(), false);
+            });
+        };
     }
 
     start() {
@@ -3559,6 +3440,13 @@ class AmbientParticleField {
         document.addEventListener('visibilitychange', this.handleVisibility);
         document.addEventListener('decorationchange', this.handleMotionChange);
         this.motionPreference.addEventListener('change', this.handleMotionChange);
+        document.addEventListener('scroll', this.invalidateSkyLayout, { passive: true, capture: true });
+        this.layoutObserver = new MutationObserver(this.invalidateSkyLayout);
+        const mantra = document.getElementById('mantra-display');
+        if (mantra) this.layoutObserver.observe(mantra, { childList: true, characterData: true, subtree: true });
+        for (const element of document.querySelectorAll('.screen, #controls, body')) {
+            this.layoutObserver.observe(element, { attributes: true, attributeFilter: ['class'] });
+        }
         this.resize();
         this.requestObserverLocation();
         if (!this.motionPreference.matches && !document.hidden) {
@@ -3569,8 +3457,7 @@ class AmbientParticleField {
     }
 
     setFallbackObserver() {
-        this.observer = { latitude: 0, longitude: 0, approximate: true };
-        this.refreshCelestialBodies();
+        this.observer = { latitude: 51.4779, longitude: 0, height: 0, approximate: true };
     }
 
     requestObserverLocation() {
@@ -3578,9 +3465,9 @@ class AmbientParticleField {
         navigator.geolocation.getCurrentPosition(
             ({ coords }) => {
                 if (!Number.isFinite(coords.latitude) || !Number.isFinite(coords.longitude)) return;
-                this.observer = { latitude: coords.latitude, longitude: coords.longitude, approximate: false };
+                this.observer = { latitude: coords.latitude, longitude: coords.longitude, height: Number.isFinite(coords.altitude) ? coords.altitude : 0, approximate: false };
                 this.refreshCelestialBodies();
-                if (this.motionPreference.matches) this.draw(performance.now(), false);
+                this.draw(performance.now(), false);
             },
             () => { /* Keep the approximate fallback sky when declined. */ },
             { enableHighAccuracy: false, maximumAge: 900000, timeout: 8000 }
@@ -3588,66 +3475,36 @@ class AmbientParticleField {
     }
 
     refreshCelestialBodies(date = new Date()) {
-        const observer = this.observer;
-        if (!observer) return;
-        const days = celestialJulianDay(date) - 2451543.5;
-        const sun = celestialSunEquatorial(days, date);
-        const sunPosition = celestialHorizontal(sun.ra, sun.dec, observer.latitude, observer.longitude, date);
-        const sunAltitude = sunPosition.altitude;
-        // A daytime Moon is real, but it breaks the intentional night-sky
-        // scene. Use civil twilight as the visual boundary. When location is
-        // unavailable, retain the approximate night sky rather than deriving
-        // a false daylight state from the Equator fallback.
-        this.celestialNightVisible = observer.approximate || sunAltitude <= -6;
-        if (!this.celestialNightVisible) {
-            // Preserve the deep-space atmosphere during daylight rather than
-            // swapping to a conventional blue sky. The Sun is calculated;
-            // the rest form a clearly thematic, low-horizon solar-system
-            // tableau. They are not falsely presented as real sky positions.
-            this.celestialDaylight = true;
-            this.celestialBodies = [
-                { name: 'Sun', kind: 'sun', magnitude: -27, color: [255, 232, 184], angularDiameter: 0.53, ...sunPosition },
-                ...DAYLIGHT_SOLAR_SYSTEM.map(([name, kind, color, orbitalDistance, displaySize, altitude], index) => ({
-                    name, kind, color, orbitalDistance, displaySize, altitude,
-                    azimuth: 20 + index * (320 / (DAYLIGHT_SOLAR_SYSTEM.length - 1))
-                }))
-            ];
-            return;
+        if (!this.observer) return;
+        if (this.skySnapshot && document.body.classList.contains('static-decorations')) return;
+        // Bound retries as well as successful updates; a failed engine must
+        // never turn into a per-frame calculation/error loop.
+        this.lastCelestialRefresh = performance.now();
+        try {
+            const sky = SkyAstronomy.snapshot(date, this.observer);
+            this.skySnapshot = sky;
+            this.skyFailed = false;
+            this.celestialDaylight = sky.sunAltitude > -6;
+            this.celestialNightVisible = !this.celestialDaylight;
+            this.celestialBodies = [...sky.stars.filter(star => star.name), ...sky.bodies];
+            if (this.sky.width) this.sky.resize(this.sky.width, this.sky.height, this.sky.dpr, sky.stars, sky.sunAltitude);
+            this.updateSkyLocationStatus();
+        } catch (error) {
+            this.celestialBodies = [];
+            this.skySnapshot = null;
+            this.skyFailed = true;
+            this.celestialDaylight = false;
+            if (this.sky.width) this.sky.resize(this.sky.width, this.sky.height, this.sky.dpr);
+            this.updateSkyLocationStatus();
+            console.warn('Sky position calculation unavailable.', error);
         }
-        this.celestialDaylight = false;
-        const namedStars = [
-            ['Polaris', 37.9546, 89.2641, 1.98, [205, 225, 255]],
-            ['Sirius', 101.2872, -16.7161, -1.44, [220, 232, 255]],
-            ['Canopus', 95.9879, -52.6957, -0.62, [245, 242, 222]],
-            ['RigilKent', 219.9204, -60.8356, -0.27, [255, 230, 184]],
-            ['Vega', 279.2347, 38.7837, 0.03, [205, 225, 255]],
-            ['Arcturus', 213.9154, 19.1825, -0.05, [255, 210, 160]],
-            ['Capella', 79.1723, 45.9980, 0.08, [255, 234, 184]],
-            ['Rigel', 78.6345, -8.2016, 0.18, [205, 225, 255]],
-            ['Procyon', 114.8255, 5.2250, 0.40, [245, 242, 224]],
-            ['Achernar', 24.4286, -57.2368, 0.45, [205, 225, 255]],
-            ['Altair', 297.6958, 8.8683, 0.77, [240, 242, 255]],
-            ['Betelgeuse', 88.7929, 7.4071, 0.45, [255, 184, 145]],
-            ['Acrux', 186.6496, -63.0991, 0.77, [205, 225, 255]],
-            ['Aldebaran', 68.9800, 16.5093, 0.87, [255, 190, 138]],
-            ['Spica', 201.2983, -11.1614, 0.97, [205, 225, 255]],
-            ['Antares', 247.3519, -26.4320, 0.96, [255, 170, 130]],
-            ['Pollux', 116.3290, 28.0262, 1.14, [255, 218, 164]],
-            ['Fomalhaut', 344.4128, -29.6222, 1.16, [235, 242, 255]],
-            ['Deneb', 310.3579, 45.2803, 1.25, [205, 225, 255]],
-            ['Regulus', 152.0929, 11.9672, 1.35, [205, 225, 255]]
-        ];
-        const bodies = namedStars.map(([name, ra, dec, magnitude, color]) => ({ name, magnitude, color, ...celestialHorizontal(ra, dec, observer.latitude, observer.longitude, date), kind: 'star' }));
-        const moon = celestialMoonEquatorial(days, date);
-        bodies.push({ name: 'Moon', kind: 'moon', magnitude: -12, color: [255, 246, 210], angularDiameter: 0.52, ...celestialHorizontal(moon.ra, moon.dec, observer.latitude, observer.longitude, date), phase: celestialMoonPhase(days) });
-        // Approximate apparent diameters as seen from Earth. The Moon is the
-        // reference disc; planets remain points of light, not oversized icons.
-        for (const [name, color, magnitude, angularDiameter] of [['Venus', [255, 238, 202], -4, 0.025], ['Jupiter', [255, 229, 185], -2, 0.085], ['Mars', [255, 170, 130], 1, 0.012], ['Saturn', [235, 216, 180], 1, 0.018]]) {
-            const equatorial = celestialPlanetEquatorial(days, name.toLowerCase(), date);
-            if (!equatorial) continue;
-            bodies.push({ name, kind: 'planet', color, magnitude, angularDiameter, ...celestialHorizontal(equatorial.ra, equatorial.dec, observer.latitude, observer.longitude, date) });
-        }
-        this.celestialBodies = bodies;
+    }
+
+    updateSkyLocationStatus() {
+        const element = document.getElementById('sky-location-status');
+        if (!element || typeof state === 'undefined') return;
+        const key = this.skyFailed ? 'ui.skyUnavailable' : this.observer?.approximate ? 'ui.skyReference' : 'ui.skyLocal';
+        element.textContent = t(key, state.displayLanguage);
     }
 
     resize() {
@@ -3661,7 +3518,8 @@ class AmbientParticleField {
         this.canvas.style.width = `${window.innerWidth}px`;
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        this.sky.resize(window.innerWidth, window.innerHeight, dpr);
+        if (!this.skySnapshot) this.refreshCelestialBodies();
+        this.sky.resize(window.innerWidth, window.innerHeight, dpr, this.skySnapshot?.stars || [], this.skySnapshot?.sunAltitude ?? -18);
         this.particles = this.sky.stars;
         this.draw(performance.now(), false);
     }
@@ -3682,6 +3540,8 @@ class AmbientParticleField {
 
     handleVisibility() {
         if (document.hidden) {
+            cancelAnimationFrame(this.layoutFrame);
+            this.layoutFrame = 0;
             clearTimeout(this.renderTimer);
             this.renderTimer = null;
             cancelAnimationFrame(this.frame);
@@ -3719,7 +3579,7 @@ class AmbientParticleField {
         if (!this.ctx) return;
         const width = window.innerWidth;
         const height = window.innerHeight;
-        if (this.observer && timestamp - this.lastCelestialRefresh >= 60000) {
+        if (this.observer && !document.body.classList.contains('static-decorations') && timestamp - this.lastCelestialRefresh >= 10000) {
             this.refreshCelestialBodies();
             this.lastCelestialRefresh = timestamp;
         }
@@ -3732,9 +3592,10 @@ class AmbientParticleField {
     }
 
     drawCachedCelestialBodies(width, height) {
-        // Positions change once per minute. Reuse the expensive gradients,
+        // Positions refresh at most once per ten seconds while animating.
+        // Static journey screens have no timer. Reuse expensive gradients,
         // text measurement and blurred backings between those updates.
-        const key = `${this.canvas.width}:${this.canvas.height}:${state.language}:${this.deepSkyBlackHoleEnabled}:${document.body.classList.contains('static-decorations')}:${document.fonts?.status}`;
+        const key = `${this.canvas.width}:${this.canvas.height}:${state.displayLanguage}:${this.deepSkyBlackHoleEnabled}:${document.body.classList.contains('static-decorations')}:${document.fonts?.status}`;
         if (this.celestialLayerKey !== key || this.cachedBodies !== this.celestialBodies) {
             const layer = this.celestialLayer;
             layer.width = this.canvas.width;
@@ -3766,18 +3627,17 @@ class AmbientParticleField {
             this.ctx.fillRect(0, 0, width, height);
         }
         this.drawCelestialHorizon(width, height);
+        this.drawEarthIllustration(width, height);
         if (this.deepSkyBlackHoleEnabled && !document.body.classList.contains('static-decorations')) {
             this.drawDeepSkyBlackHole(width, height);
         }
+        const labelBounds = [];
         this.celestialBodies.forEach((body) => {
-            if (body.altitude < 4) return;
-            const x = (body.azimuth / 360) * width;
-            const y = Math.max(28, height * (0.88 - Math.min(body.altitude, 88) / 100));
-            const moonPixelDiameter = 28;
+            if (body.altitude < 0) return;
+            const { x, y } = SkyAstronomy.project(body.azimuth, body.altitude, width, height);
+            const moonPixelDiameter = Math.max(8, (height * 0.88 - 20) * (body.angularDiameter || 0.52) / 90);
             const size = body.kind === 'sun'
-                ? 12
-                : body.kind === 'earth' || body.kind === 'solar-planet'
-                ? body.displaySize
+                ? moonPixelDiameter / 2
                 : body.kind === 'moon'
                 ? moonPixelDiameter / 2
                 : body.kind === 'planet'
@@ -3785,10 +3645,11 @@ class AmbientParticleField {
                     : Math.max(0.75, 1.65 - body.magnitude * 0.22);
             const [red, green, blue] = body.color;
             this.ctx.save();
-            const illumination = body.kind === 'moon' ? (1 - Math.cos((body.phase ?? 0.5) * Math.PI * 2)) / 2 : 1;
-            const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'earth' || body.kind === 'solar-planet' ? size * 3 : body.kind === 'moon' ? size * 3.5 : size * 4;
+            if (body.kind === 'star') this.ctx.globalAlpha = Math.max(0.10, Math.min(1, (2 - this.skySnapshot.sunAltitude) / 20));
+            const illumination = body.kind === 'moon' ? body.illumination : 1;
+            const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.27 : body.kind === 'earth' || body.kind === 'solar-planet' ? 0.21 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
+            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.27 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
             halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
             this.ctx.fillStyle = halo;
             this.ctx.beginPath();
@@ -3797,7 +3658,7 @@ class AmbientParticleField {
             this.ctx.shadowBlur = body.kind === 'moon' ? 0 : 3;
             this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.52 : 0.72})`;
             if (body.kind === 'moon') {
-                this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5);
+                this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5, body.lightAngle, body.illumination);
             } else if (body.kind === 'sun') {
                 this.drawSolarProtectionLayer(x, y, size);
                 const sunGradient = this.ctx.createRadialGradient(x - size * 0.28, y - size * 0.28, Math.max(0.5, size * 0.08), x, y, size);
@@ -3810,39 +3671,6 @@ class AmbientParticleField {
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, size, 0, Math.PI * 2);
                 this.ctx.fill();
-            } else if (body.kind === 'earth') {
-                const earthGradient = this.ctx.createRadialGradient(x - size * 0.34, y - size * 0.38, Math.max(0.4, size * 0.12), x, y, size);
-                earthGradient.addColorStop(0, 'rgba(222, 248, 255, 0.98)');
-                earthGradient.addColorStop(0.38, 'rgba(103, 186, 222, 0.94)');
-                earthGradient.addColorStop(1, 'rgba(27, 80, 145, 0.9)');
-                this.ctx.fillStyle = earthGradient;
-                this.ctx.beginPath();
-                this.ctx.arc(x, y, size, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.globalAlpha = 0.48;
-                this.ctx.fillStyle = 'rgba(107, 173, 119, 0.82)';
-                this.ctx.beginPath();
-                this.ctx.ellipse(x - size * 0.2, y - size * 0.1, size * 0.34, size * 0.15, -0.45, 0, Math.PI * 2);
-                this.ctx.ellipse(x + size * 0.29, y + size * 0.22, size * 0.22, size * 0.11, 0.25, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.globalAlpha = 1;
-                this.drawEarthAtmosphericLayers(x, y, size);
-            } else if (body.kind === 'solar-planet') {
-                const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
-                planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-                planetGradient.addColorStop(0.28, `rgba(${red}, ${green}, ${blue}, 0.96)`);
-                planetGradient.addColorStop(1, `rgba(${Math.round(red * 0.5)}, ${Math.round(green * 0.5)}, ${Math.round(blue * 0.5)}, 0.84)`);
-                this.ctx.fillStyle = planetGradient;
-                this.ctx.beginPath();
-                this.ctx.arc(x, y, size, 0, Math.PI * 2);
-                this.ctx.fill();
-                if (body.name === 'Saturn') {
-                    this.ctx.strokeStyle = 'rgba(237, 218, 177, 0.62)';
-                    this.ctx.lineWidth = Math.max(0.7, size * 0.16);
-                    this.ctx.beginPath();
-                    this.ctx.ellipse(x, y, size * 1.7, size * 0.55, -0.28, 0, Math.PI * 2);
-                    this.ctx.stroke();
-                }
             } else {
                 const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
                 planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
@@ -3858,19 +3686,29 @@ class AmbientParticleField {
             // Never expose an untranslated implementation key such as
             // "ui.celestialEarth" while locale files are loading.
             const label = !translatedLabel || translatedLabel === labelKey || translatedLabel.startsWith('ui.') ? body.name : translatedLabel;
-            const shouldShowLabel = body.kind === 'sun' || body.kind === 'earth' || body.kind === 'solar-planet' || body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
+            const shouldShowLabel = body.kind === 'sun' || body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
             if (label && shouldShowLabel) {
-                this.ctx.textAlign = x > width * 0.82 ? 'right' : 'left';
+                this.ctx.textAlign = 'left';
                 // Labels remain compact and deliberately translucent. The
                 // light backing only lifts them from busy star fields instead
                 // of reading as an interface layer over the night sky.
                 this.ctx.font = '500 11px Inter, Manjari, sans-serif';
-                const labelX = x > width * 0.82 ? x - size - 8 : x + size + 8;
-                const labelY = y + 4;
                 const metrics = this.ctx.measureText(label);
                 const paddingX = 4;
                 const labelWidth = metrics.width + paddingX * 2;
-                const labelLeft = this.ctx.textAlign === 'right' ? labelX - labelWidth : labelX - paddingX;
+                const placement = this.placeCelestialLabel(x, y, size, labelWidth, width, height, labelBounds);
+                const labelLeft = placement.left, labelX = labelLeft + paddingX, labelY = placement.top + 12;
+                if (Math.abs(labelY - y - 4) > 8) {
+                    // Only labels move. A fine leader retains the exact body
+                    // position when several objects are close on mobile.
+                    this.ctx.save();
+                    this.ctx.shadowBlur = 0;
+                    this.ctx.strokeStyle = 'rgba(200, 219, 243, 0.18)';
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.beginPath(); this.ctx.moveTo(x, y);
+                    this.ctx.lineTo(Math.max(labelLeft, Math.min(labelLeft + labelWidth, x)), labelY - 4);
+                    this.ctx.stroke(); this.ctx.restore();
+                }
                 // Soften only the backing; restore before drawing crisp text.
                 this.ctx.save();
                 this.ctx.shadowBlur = 0;
@@ -3888,26 +3726,116 @@ class AmbientParticleField {
         });
     }
 
+    placeCelestialLabel(x, y, size, labelWidth, width, height, occupied) {
+        const right = x + size + 4, left = x - size - labelWidth - 4;
+        const sides = x > width * 0.82 ? [left, right] : [right, left];
+        let fallback;
+        for (const offset of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
+            for (const side of sides) {
+                const box = {left: Math.max(4, Math.min(width - labelWidth - 4, side)),
+                    top: Math.max(4, Math.min(height * 0.88 - 20, y - 8 + offset)), width: labelWidth, height: 16};
+                fallback ||= box;
+                if (occupied.some(b => box.left < b.left + b.width + 2 && box.left + box.width + 2 > b.left &&
+                    box.top < b.top + b.height + 2 && box.top + box.height + 2 > b.top)) continue;
+                occupied.push(box);
+                return box;
+            }
+        }
+        occupied.push(fallback);
+        return fallback;
+    }
+
+    drawEarthIllustration(width, height) {
+        // Below the observed horizon: artwork, never a fabricated sky position.
+        const key = CELESTIAL_LABEL_KEYS.Earth, name = t(key, state.displayLanguage);
+        const label = name && name !== key ? name : 'Earth';
+        this.ctx.save();
+        this.ctx.font = '500 11px Inter, Manjari, sans-serif';
+        const obstacles = [];
+        const selectors = '#mantra-display, #progress-tracker, #controls, .screen:not(.hidden) button, .screen:not(.hidden) label, .screen:not(.hidden) input, .screen:not(.hidden) select, .screen:not(.hidden) p, .screen:not(.hidden) h1, .screen:not(.hidden) h2, .duration-value';
+        // Measured only on cached-layer rebuilds or explicit layout changes.
+        for (const element of document.querySelectorAll(selectors)) {
+            const box = element.getBoundingClientRect();
+            if (!box.width || !box.height || box.bottom < height * 0.88 || box.top > height || box.right < width / 2 - 70 || box.left > width / 2 + 150) continue;
+            const style = getComputedStyle(element);
+            const revealingControls = element.id === 'controls' && document.body.classList.contains('fullscreen-controls-visible');
+            if (style.visibility === 'hidden' || (Number(style.opacity) === 0 && !revealingControls)) continue;
+            if (element.id === 'controls') {
+                // Reserve the final resting position as well as the animated
+                // one: reveal starts translated down by one rem.
+                const translation = style.transform === 'none' ? 0 : new DOMMatrixReadOnly(style.transform).m42;
+                obstacles.push({ left: box.left, right: box.right, top: box.top - Math.max(0, translation), bottom: box.bottom });
+            } else obstacles.push(box);
+        }
+        const placement = this.earthReferenceLayout(width, height, obstacles, this.ctx.measureText(label).width);
+        this.earthReferencePlacement = placement;
+        if (!placement) { this.ctx.restore(); return; }
+        const { x, y, size } = placement;
+        this.drawEarthAtmosphericLayers(x, y, size);
+        const surface = this.ctx.createRadialGradient(x - size * 0.3, y - size * 0.4, 0, x, y, size);
+        surface.addColorStop(0, 'rgba(183, 231, 247, 1)');
+        surface.addColorStop(0.5, 'rgba(44, 138, 194, 1)');
+        surface.addColorStop(0.85, 'rgba(17, 67, 114, 1)');
+        surface.addColorStop(1, 'rgba(6, 23, 49, 0.98)');
+        this.ctx.fillStyle = surface;
+        this.ctx.beginPath(); this.ctx.arc(x, y, size, 0, Math.PI * 2); this.ctx.fill();
+        this.ctx.fillStyle = 'rgba(99, 172, 128, 0.72)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x - size * 0.25, y - size * 0.2, size * 0.38, size * 0.22, -0.6, 0, Math.PI * 2);
+        this.ctx.ellipse(x + size * 0.26, y + size * 0.2, size * 0.19, size * 0.38, -0.5, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.filter = 'blur(0.7px)';
+        this.ctx.fillStyle = 'rgba(237, 251, 255, 0.32)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x - size * 0.13, y - size * 0.39, size * 0.63, size * 0.12, -0.3, 0, Math.PI * 2);
+        this.ctx.ellipse(x + size * 0.08, y + size * 0.37, size * 0.60, size * 0.09, -0.3, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.filter = 'none';
+        this.ctx.textAlign = 'left'; this.ctx.fillStyle = 'rgba(225, 242, 255, 0.7)';
+        this.ctx.fillText(label, x + size * 1.5, y + 4);
+        this.ctx.restore();
+    }
+
+    earthReferenceLayout(width, height, obstacles = [], labelWidth = 40) {
+        const x = width / 2, top = height * 0.88 + 22, bottom = height - 8;
+        for (const size of [Math.min(14, height * 0.016), 10, 8, 6, 4, 3]) {
+            const radius = size * 2.8;
+            const positions = [];
+            for (let y = top + radius; y <= bottom - radius; y += 3) positions.push(y);
+            positions.sort((a, b) => Math.abs(a - height * 0.943) - Math.abs(b - height * 0.943));
+            for (const y of positions) {
+                const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
+                    top: y - radius, bottom: y + radius };
+                if (bounds.right > width - 4 || bounds.left < 4) continue;
+                if (obstacles.some(b => bounds.left < b.right + 5 && bounds.right > b.left - 5 &&
+                    bounds.top < b.bottom + 5 && bounds.bottom > b.top - 5)) continue;
+                return { x, y, size, bounds };
+            }
+        }
+        return null; // Text/controls win when the viewport has no clear pocket.
+    }
+
     drawEarthAtmosphericLayers(x, y, size) {
-        // The five standard atmospheric layers are deliberately not to scale.
-        // This is a compact, daytime-only learning visual inside the thematic
-        // solar-system tableau, not a live climate or orbital simulation.
+        // Owner-retained design: five merged protective atmosphere volumes.
+        // The nearest layer uses a cool aqua 26°C comfort palette: artwork,
+        // not a measured/simulated temperature or radiation-shielding claim.
+        // Keep the visible band outside the opaque disc, even on tiny markers.
+        // Preserve this and the Sun shield unless the owner requests removal.
         const layers = [
-            [1.28, '101, 213, 255', 0.28],
-            [1.74, '135, 166, 255', 0.20],
-            [2.34, '170, 126, 255', 0.15],
-            [3.12, '107, 241, 229', 0.11],
-            [4.00, '211, 225, 255', 0.075]
+            [1.50, '112, 232, 244', 0.90], // Troposphere: cool aqua comfort.
+            [1.82, '96, 190, 255', 0.58],  // Stratosphere.
+            [2.13, '126, 160, 246', 0.38], // Mesosphere.
+            [2.47, '102, 212, 235', 0.24], // Thermosphere.
+            [2.80, '166, 202, 255', 0.16]  // Exosphere: soft outer dissolve.
         ];
         this.ctx.save();
         this.ctx.globalCompositeOperation = 'screen';
         layers.forEach(([scale, rgb, alpha]) => {
             const radius = size * scale;
-            const innerRadius = Math.max(size * 1.02, radius * 0.56);
-            const gradient = this.ctx.createRadialGradient(x, y, innerRadius, x, y, radius * 1.08);
-            gradient.addColorStop(0, `rgba(${rgb}, 0)`);
-            gradient.addColorStop(0.48, `rgba(${rgb}, ${alpha * 0.5})`);
-            gradient.addColorStop(0.76, `rgba(${rgb}, ${alpha})`);
+            const gradient = this.ctx.createRadialGradient(x, y, size * 0.98, x, y, radius);
+            gradient.addColorStop(0, `rgba(${rgb}, ${alpha})`);
+            gradient.addColorStop(0.18, `rgba(${rgb}, ${alpha * 0.92})`);
+            gradient.addColorStop(0.60, `rgba(${rgb}, ${alpha * 0.40})`);
             gradient.addColorStop(1, `rgba(${rgb}, 0)`);
             this.ctx.fillStyle = gradient;
             this.ctx.fillRect(x - radius * 1.1, y - radius * 1.1, radius * 2.2, radius * 2.2);
@@ -3916,9 +3844,9 @@ class AmbientParticleField {
     }
 
     drawSolarProtectionLayer(x, y, size) {
-        // A daytime-only thematic solar containment glow. It is deliberately
-        // diffuse rather than a literal ring, and remains artwork rather than
-        // a physical statement about the Sun or energy transfer.
+        // Owner-retained feature; see AGENTS.md and docs/SKY-ACCURACY.md.
+        // Visual-only shield: a soft circular rim inside the diffuse glow.
+        // It is not a claim about filtering real radiation or energy transfer.
         const radius = size * 4.2;
         const gradient = this.ctx.createRadialGradient(x, y, size * 0.72, x, y, radius);
         gradient.addColorStop(0, 'rgba(255, 248, 214, 0.16)');
@@ -3928,6 +3856,14 @@ class AmbientParticleField {
         this.ctx.save();
         this.ctx.globalCompositeOperation = 'screen';
         this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+        const shield = this.ctx.createRadialGradient(x, y, size * 1.15, x, y, size * 2.8);
+        shield.addColorStop(0, 'rgba(255, 241, 190, 0)');
+        shield.addColorStop(0.38, 'rgba(255, 236, 177, 0.025)');
+        shield.addColorStop(0.56, 'rgba(255, 245, 207, 0.24)');
+        shield.addColorStop(0.72, 'rgba(255, 231, 170, 0.04)');
+        shield.addColorStop(1, 'rgba(255, 231, 170, 0)');
+        this.ctx.fillStyle = shield;
         this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
         this.ctx.restore();
     }
@@ -3988,24 +3924,31 @@ class AmbientParticleField {
         this.ctx.shadowColor = 'rgba(173, 196, 255, 0.18)';
         this.ctx.shadowBlur = 7;
         this.ctx.beginPath();
-        this.ctx.moveTo(0, horizonY + 5);
-        this.ctx.quadraticCurveTo(width * 0.5, horizonY - 8, width, horizonY + 5);
+        this.ctx.moveTo(0, horizonY);
+        this.ctx.lineTo(width, horizonY);
         this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+        this.ctx.font = '500 10px Inter, Manjari, sans-serif';
+        this.ctx.fillStyle = 'rgba(209, 224, 247, 0.48)';
+        for (const [az, key] of [[0, 'skyNorth'], [90, 'skyEast'], [180, 'skySouth'], [270, 'skyWest']]) {
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(t(`ui.${key}`, state.displayLanguage), SkyAstronomy.project(az, 0, width, height).x, horizonY + 15);
+        }
         this.ctx.restore();
     }
 
-    drawMoonWithBooleanMask(x, y, size, phase) {
+    drawMoonWithBooleanMask(x, y, size, phase, lightAngle, fraction = (1 - Math.cos(phase * Math.PI * 2)) / 2) {
         const buffer = this.moonBuffer;
         const bufferContext = this.moonBufferContext;
         if (!bufferContext) return;
         // Cache a lit sphere, including the curved terminator. Pixel alpha is
         // the illumination mask, so the unlit side never paints a dark disc.
         // Surface features are procedural texture, not a surveyed lunar map.
-        const phaseKey = Math.round(phase * 10000);
+        const phaseKey = `${Math.round(fraction * 10000)}:${phase < 0.5}`;
         if (phaseKey !== this.cachedMoonPhase) {
             const pixels = bufferContext.createImageData(128, 128);
-            const lightX = Math.sin(phase * Math.PI * 2);
-            const lightZ = -Math.cos(phase * Math.PI * 2);
+            const lightZ = 2 * fraction - 1;
+            const lightX = Math.sqrt(Math.max(0, 1 - lightZ * lightZ)) * (phase < 0.5 ? 1 : -1);
             const maria = [[-0.26,-0.24,0.27,0.32],[0.18,-0.38,0.29,0.18],
                 [0.38,-0.02,0.23,0.29],[-0.47,0.08,0.15,0.3],[0.01,0.16,0.2,0.16]];
             const random = this.sky.random(93827);
@@ -4041,6 +3984,11 @@ class AmbientParticleField {
         this.ctx.save();
         this.ctx.shadowBlur = 0;
         this.ctx.globalCompositeOperation = 'source-over';
+        if (Number.isFinite(lightAngle)) {
+            this.ctx.translate(x, y);
+            this.ctx.rotate(lightAngle - (phase < 0.5 ? 0 : Math.PI));
+            x = 0; y = 0;
+        }
         this.ctx.drawImage(buffer, x - size, y - size, size * 2, size * 2);
         this.ctx.restore();
     }
@@ -5482,6 +5430,7 @@ class MeditationController {
         this.audio.setVisualizationAmbienceDucked(true, 0.8);
         await this.narrate(journeyT('ui.visualizationGuidance'), false, true);
         this.audio.setVisualizationAmbienceDucked(false, 2);
+        await this.pauseAwareSleep(3000);
         for (let remaining = Math.max(1, minutes * 60); remaining > 0 && this.isMeditationActive; remaining--) await this.pauseAwareSleep(1000);
         if (!this.isMeditationActive) return;
         if (state.visualizationAmbience === 'silence') {

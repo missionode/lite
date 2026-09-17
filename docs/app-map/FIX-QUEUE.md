@@ -1,5 +1,21 @@
 # Fix queue derived from the flow atlas
 
+## Centered directions and journey snapshot — release 3.45
+
+Directions now have equal viewport insets and spacing; the entire sky projection shifts with them so labels remain correct. Journey redraws no longer recalculate astronomical positions; no ten-second update occurs during journeys. Lobby/Settings keep the bounded update. Protective Earth/Sun artwork is retained. Production push authorized.
+
+## Retained protective artwork visibility — implemented locally
+
+App 3.44: Earth's five atmospheric gradients are stronger outside its opaque limb, including on tiny markers; the innermost layer expresses a cool-aqua 26°C comfort theme (no temperature label or physical claim). Outer footprint, text-clearance guards and static performance remain unchanged. Earth atmosphere and the Sun shield are now explicit owner-retained features in `AGENTS.md` and both atlas maps. Removal/default disabling/substantial fading requires owner approval; unit and actual browser-pixel/render-path tests guard against accidental loss. Device review remains open.
+
+## Observer sky and Earth atmosphere — implemented locally
+
+2026-09-17: removed the decorative daytime planet row, random background stars and daytime Moon suppression. Real stars and topocentric solar-system bodies share a zero-altitude horizon; denied location is explicitly a Greenwich reference. Earth remains below-horizon artwork with softly merged atmosphere layers. Calculation failures clear stale positions and bound retries; static journeys keep no repeating work. NASA reference, unit and desktop/mobile browser checks pass. Live-sky/device thermal and offline upgrade checks remain open; see `../SKY-ACCURACY.md`.
+
+Earth adaptation: centered observer marker below the horizon; shrink/omit guards protect foreground text/controls, including their reveal position. Five softly merged atmospheric layers and a feathered Sun shield ring remain visual-only. Layout events cause a coalesced redraw, not idle polling.
+
+Current broad test baseline: 34/37 non-browser tests pass. Content-safety/drone-duration need owner-managed `docs/dot.json`; chakra-selection has a stale array-order source assertion, reproduced on `6337889`. Track that test cleanup separately rather than altering unrelated Shots behavior in the sky change.
+
 ## Newcomer chakra orientation — implemented locally, device check pending
 
 When Returning Journey is unchecked on a normal chakra journey, Begin proceeds directly to a short orientation before Arriving. A static night-sky standing body-map illustration marks each chakra name and body location in the chosen Display Language. Responsive calibrated arrowheads terminate at their matching points. The spoken orientation follows the chosen Meditation Language; its Malayalam copy uses short, natural spoken sentences and the Malayalam chakra names. The app switches explicitly to Arriving afterward, removing the previously visible welcome-screen flicker. Returning Journey, demo, Sleep, Music Only and focused practices bypass this screen. Automated source contracts and a targeted browser flow cover the branches; a user device readability and listening check remains open.

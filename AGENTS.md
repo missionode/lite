@@ -1,5 +1,9 @@
 # Project working agreement
 
+## Preserve the Earth atmosphere and Sun shield
+
+These are owner-required visual features, not disposable decoration. Preserve the centered Earth reference with five softly merged atmospheric layers (troposphere through exosphere), a clearly visible cool-aqua innermost layer expressing a **26°C comfort theme**, and the Sun's soft protective shield ring. Do not remove, switch off by default, or substantially fade either effect without explicit owner approval. The temperature and protection are illustrative, never physical safety or climate claims. Keep Earth-only labeling, text/control-clearance shrink/omit guards, truthful observer sky coordinates and static journey performance. Keep `earth-atmosphere` and `solar-containment` atlas maps and their regression checks synchronized. Temporary omission where foreground content leaves no safe space is intentional, not removal.
+
 ## Follow the efficient Loop workflow
 
 For meaningful project work, follow `Loop/EFFICIENT-WORKFLOW.md`: bounded context, honest routing evidence, deterministic repeatable checks, behavior-focused tests and concise continuity. Keep required atlas updates and approval gates. This project-local companion applies even when the installed Loop plugin is older. Recommendations/`PLANNED` routing results do not switch the active model; use direct execution when a separate run adds no value.

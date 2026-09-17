@@ -9,14 +9,18 @@ const context = () => ({
     createImageData: (w,h) => ({data:new Uint8ClampedArray(w*h*4)}),
     drawImage(...args){this.draws.push({args,alpha:this.globalAlpha});}
 });
-const sandbox = vm.createContext({document:{body:{classList:{contains:()=>false}},createElement(){const ctx=context();return {getContext:()=>ctx};}}});
+const sandbox = vm.createContext({Date, document:{body:{classList:{contains:()=>false}},createElement(){const ctx=context();return {getContext:()=>ctx};}}});
+for (const file of ['vendor/astronomy.browser.min.js', 'data/sky-stars.js', 'sky-astronomy.js']) {
+    vm.runInContext(readFileSync(file, 'utf8'), sandbox);
+}
+const positions = vm.runInContext("SkyAstronomy.snapshot(new Date('2026-09-17T18:30:00Z'), {latitude:9.93, longitude:76.27})", sandbox);
 vm.runInContext(readFileSync('night-sky.js','utf8')+'\nglobalThis.sky = new NaturalNightSky();',sandbox);
 const sky=sandbox.sky;
-sky.resize(1440,900,1.5);
+sky.resize(1440,900,1.5,positions.stars,positions.sunAltitude);
 const first=JSON.stringify(sky.stars);
-assert.ok(sky.stars.length>=700 && sky.stars.length<=2400);
+assert.equal(sky.stars.length,positions.stars.filter(s=>s.altitude>=0&&!s.name).length,'Only above-horizon catalogue stars are drawn');
 assert.ok(sky.twinklingStars.length>0 && sky.twinklingStars.length<=110);
-sky.resize(1440,900,1.5);
+sky.resize(1440,900,1.5,positions.stars,positions.sunAltitude);
 assert.equal(JSON.stringify(sky.stars),first,'Resizing to the same viewport must not shuffle the sky');
 const motionBefore=JSON.stringify(sky.stars.map(s=>[s.x,s.y]));
 const ctx=context();
@@ -34,44 +38,20 @@ const staticFrame=JSON.stringify(ctx.draws.map(d=>({alpha:d.alpha,args:d.args.sl
 ctx.draws=[];
 sky.draw(ctx,3700,false);
 assert.equal(JSON.stringify(ctx.draws.map(d=>({alpha:d.alpha,args:d.args.slice(1)}))),staticFrame,'Reduced-motion output is time invariant');
-sky.resize(390,844,1.5);
-assert.ok(sky.stars.length>=700 && sky.stars.length<=2400);
+sky.resize(390,844,1.5,positions.stars,positions.sunAltitude);
+assert.equal(sky.stars.length,positions.stars.filter(s=>s.altitude>=0&&!s.name).length,'Mobile uses the same real stars, not a different generated field');
 assert.ok(sky.stars.every(s=>Number.isFinite(s.x) && Number.isFinite(s.y)));
 console.log('Natural sky behavior passed: deterministic field, bounded draw work, stationary stars and reduced motion.');
 
 // Exercise the actual lunar renderer without a browser. Its pixel buffer is
 // inspectable: a new Moon must paint nothing and quarter phases swap sides.
 const app=readFileSync('app.js','utf8');
-assert.match(app, /const namedStars = \[[\s\S]*?\['Sirius',[\s\S]*?-1\.44[\s\S]*?\['Canopus',[\s\S]*?\['Capella',[\s\S]*?\['Rigel',[\s\S]*?\['Procyon',[\s\S]*?\['Achernar',[\s\S]*?\['Aldebaran',[\s\S]*?\['Spica',[\s\S]*?\['Antares'/,
-    'The named catalogue must retain Sirius at its negative apparent magnitude and cover the principal bright naked-eye stars.');
 for (const localeName of ['en', 'ml', 'hi', 'ru']) {
     const locale = JSON.parse(readFileSync(`locales/${localeName}.json`, 'utf8'));
     for (const name of ['Sirius', 'Canopus', 'Capella', 'Rigel', 'Procyon', 'Achernar', 'Aldebaran', 'Spica', 'Antares']) {
         assert.ok(locale.ui[`celestial${name}`], `${localeName} must localize ${name}`);
     }
 }
-const astronomy = vm.createContext({ Date, Math });
-vm.runInContext(app.slice(app.indexOf('const CELESTIAL_DEG'), app.indexOf('// Pleasure ambience')), astronomy);
-const indianObserver = { latitude: 9.9312, longitude: 76.2673 };
-const sunAltitudeAt = iso => {
-    const date = new Date(iso);
-    const days = astronomy.celestialJulianDay(date) - 2451543.5;
-    const sun = astronomy.celestialSunEquatorial(days, date);
-    return astronomy.celestialHorizontal(sun.ra, sun.dec, indianObserver.latitude, indianObserver.longitude, date).altitude;
-};
-assert.ok(sunAltitudeAt('2026-09-14T12:00:00+05:30') > -6, 'Indian midday must be outside the night-only celestial window');
-assert.ok(sunAltitudeAt('2026-09-14T23:00:00+05:30') <= -6, 'Indian night must be inside the civil-twilight celestial window');
-assert.match(app, /celestialSunEquatorial\(days, date\)[\s\S]*?observer\.approximate \|\| sunAltitude <= -6[\s\S]*?name: 'Sun', kind: 'sun'[\s\S]*?DAYLIGHT_SOLAR_SYSTEM\.map[\s\S]*?this\.celestialDaylight = false/,
-    'Granted-location skies should replace the night bodies with a calculated Sun plus an explicitly thematic full solar-system tableau before civil twilight without turning Equator fallback coordinates into false daylight');
-assert.match(app, /DAYLIGHT_SOLAR_SYSTEM[\s\S]*?Mercury[\s\S]*?Venus[\s\S]*?Earth[\s\S]*?Mars[\s\S]*?Jupiter[\s\S]*?Saturn[\s\S]*?Uranus[\s\S]*?Neptune[\s\S]*?if \(this\.celestialDaylight\)[\s\S]*?rgba\(35, 48, 124, 0\.34\)[\s\S]*?body\.kind === 'solar-planet'[\s\S]*?255, 250, 230/,
-    'Daylight should retain a cached indigo cosmic wash, a gentle warm Sun, and all eight themed planets rather than switching to an ordinary daytime background');
-assert.match(app, /body\.kind === 'sun'\) \{[\s\S]*?drawSolarProtectionLayer\(x, y, size\)[\s\S]*?drawSolarProtectionLayer\(x, y, size\) \{[\s\S]*?size \* 4\.2[\s\S]*?createRadialGradient[\s\S]*?fillRect\(/,
-    'The daytime Sun should receive one cached, diffuse containment glow rather than a separate hard ring.');
-assert.match(app, /\['Earth', 'earth', \[114, 190, 221\], 1, 5\.1, 14\][\s\S]*?drawEarthAtmosphericLayers\(x, y, size\)[\s\S]*?const layers = \[[\s\S]*?\[1\.28, '101, 213, 255', 0\.28\][\s\S]*?\[4\.00, '211, 225, 255', 0\.075\][\s\S]*?createRadialGradient\(x, y, innerRadius, x, y, radius \* 1\.08\)[\s\S]*?fillRect\(/,
-    'The thematic Earth should show five overlapping translucent gradient shells that dissolve outward without extra layer labels.');
-assert.doesNotMatch(app, /atmosphereTroposphere|27°C/, 'Only Earth should be named in the compact solar-system tableau.');
-assert.match(app, /drawCelestialHorizon\(width, height\);[\s\S]*?body\.altitude < 4[\s\S]*?drawCelestialHorizon\(width, height\) \{[\s\S]*?const horizonY = height \* 0\.88[\s\S]*?quadraticCurveTo/,
-    'The celestial view should include a cached curved horizon matching the altitude projection baseline.');
 assert.match(app, /deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
     'The Advanced Features black-hole illustration must be visible on either Lobby/Settings sky, stay off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
@@ -85,6 +65,60 @@ for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമ�
 vm.runInContext(app.slice(app.indexOf('class AmbientParticleField {'),app.indexOf('// Visual Engine'))+
     '\nglobalThis.field = Object.create(AmbientParticleField.prototype);',sandbox);
 const field=sandbox.field;
+const frozen=Object.create(Object.getPrototypeOf(field));
+frozen.observer={latitude:0,longitude:0};frozen.skySnapshot=positions;
+sandbox.document.body.classList.contains=()=>true;
+frozen.refreshCelestialBodies(new Date('2030-01-01'));
+assert.equal(frozen.skySnapshot,positions,'A journey redraw must not recalculate its sky snapshot');
+sandbox.document.body.classList.contains=()=>false;
+// Retained visual contract: five visible merged atmosphere volumes and a
+// distinct feathered Sun shield. These tests catch removal/fading regressions.
+const gradients=[];
+field.ctx={save(){},restore(){},fillRect(){},createRadialGradient(...args){
+    const gradient={args,stops:[],addColorStop(at,color){this.stops.push([at,color]);}};
+    gradients.push(gradient);return gradient;
+}};
+field.drawEarthAtmosphericLayers(50,50,10);
+assert.equal(gradients.length,5,'Keep all five owner-required atmosphere layers');
+assert.ok(gradients[0].args[5]>=15,'Inner atmosphere must extend visibly beyond the disc');
+assert.equal(gradients[0].stops[0][1],'rgba(112, 232, 244, 0.9)','Preserve the bright cool-aqua 26°C visual theme');
+for(const layer of gradients){
+    assert.equal(layer.stops.at(-1)[0],1);
+    assert.match(layer.stops.at(-1)[1],/, 0\)$/,'Each layer dissolves outward');
+}
+gradients.length=0;
+field.drawSolarProtectionLayer(50,50,10);
+assert.equal(gradients.length,2,'Keep both diffuse solar glow and protective ring');
+assert.ok(gradients[1].stops.some(([at,color])=>at>0&&at<1&&color.endsWith(', 0.24)')),'Sun shield must retain a visible soft rim');
+for(const [width,height] of [[1440,900],[390,844],[844,390]]){
+    const earth=field.earthReferenceLayout(width,height);
+    assert.ok(earth);
+    assert.equal(earth.x,width/2,'Earth stays on the center observer axis');
+    assert.ok(earth.bounds.top>height*.88&&earth.bounds.bottom<height);
+    const mantra={left:0,right:width,top:height-48,bottom:height};
+    const withText=field.earthReferenceLayout(width,height,[mantra]);
+    if(withText)assert.ok(withText.bounds.bottom<=mantra.top-5,'Earth and all atmospheric glow must clear mantra text');
+    assert.equal(field.earthReferenceLayout(width,height,[{left:0,right:width,top:height*.88,bottom:height}]),null,'Suppress Earth when no safe center pocket exists');
+}
+const occupied=[];
+for(let i=0;i<9;i++){
+    const box=field.placeCelestialLabel(190,620,2,75,390,844,occupied);
+    assert.ok(box.left>=0&&box.left+box.width<=390&&box.top+box.height<844*.88);
+    for(const other of occupied.slice(0,-1)){
+        assert.ok(box.left>=other.left+other.width||box.left+box.width<=other.left||
+            box.top>=other.top+other.height||box.top+box.height<=other.top,'Crowded mobile labels must separate without changing sky coordinates');
+    }
+}
+sandbox.performance={now:()=>500};
+sandbox.document.getElementById=()=>null;
+const failed=Object.create(Object.getPrototypeOf(field));
+failed.observer={latitude:0,longitude:0}; failed.sky=sky;
+failed.refreshCelestialBodies(new Date(NaN));
+assert.equal(failed.lastCelestialRefresh,500,'Failures are throttled, not retried every frame');
+assert.equal(failed.skyFailed,true);
+assert.equal(failed.celestialBodies.length,0);
+assert.equal(sky.stars.length,0,'Failure must not leave old positions on display');
+console.log('Sky failure cleanup and crowded mobile-label placement passed.');
 let moonPixels, builds=0;
 field.sky=sky;
 field.moonBuffer={width:128,height:128};
@@ -110,7 +144,7 @@ assert.equal(builds,beforeCache,'Same lunar phase must reuse cached pixels');
 console.log('Lunar rendering passed: transparent new Moon, opposed quarters, phase coverage and texture caching.');
 
 // Stable celestial layers must not repeat font/blur/gradient work per frame.
-sandbox.state = {language:'en'};
+sandbox.state = {displayLanguage:'en'};
 field.canvas = {width:1200,height:800};
 field.celestialLayer = {getContext:()=>({setTransform(){}})};
 field.celestialBodies = [];
@@ -119,7 +153,7 @@ field.drawCelestialBodies = () => {celestialBuilds++;};
 field.drawCachedCelestialBodies(800,533);
 for (let i=0;i<100;i++) field.drawCachedCelestialBodies(800,533);
 assert.equal(celestialBuilds,1,'100 unchanged frames reuse the cached celestial layer');
-sandbox.state.language='ml'; field.drawCachedCelestialBodies(800,533);
+sandbox.state.displayLanguage='ml'; field.drawCachedCelestialBodies(800,533);
 assert.equal(celestialBuilds,2,'Language changes invalidate translated labels');
 field.celestialBodies=[]; field.drawCachedCelestialBodies(800,533);
 assert.equal(celestialBuilds,3,'Updated positions invalidate the layer');

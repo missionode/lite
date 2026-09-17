@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 13a6089 + uncommitted Advanced Features password gate · 2026-09-15.
+Source snapshot: 3.45 release snapshot (parent 6337889) · 2026-09-17.
 
-Version 3.10 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested.
+Version 3.45 source-reviewed behavior. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal and listening verification remain open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -29,7 +29,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 19. [Audio signal architecture](#audio)
 20. [Sound options and live suppression](#sound-options)
 21. [Visuals and browser lifecycle](#visuals)
-22. [Thematic Earth atmosphere](#earth-atmosphere)
+22. [Earth observer reference and atmosphere](#earth-atmosphere)
 23. [Thematic solar containment glow](#solar-containment)
 24. [Persistence, caching and network](#storage)
 25. [Failure and recovery map](#recovery)
@@ -98,12 +98,12 @@ flowchart TD
 
 Loading order and optional browser capabilities.
 
-Sources: [app.js:895](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:895), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:6184](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6184), [app.js:6505](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6505).
+Sources: [app.js:946](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:946), [app.js:3394](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3394), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
 
 ```mermaid
 flowchart TD
   open["Open / reload"]
-  sky["Start sky"]
+  sky["Start observer sky"]
   timing["Load timing JSON"]
   language["Load language registry"]
   voices["Load voice registry"]
@@ -128,7 +128,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Open / reload | Objects and state are constructed; splash is visible. |
-| Start sky | Approximate sky is immediately available; location permission can refine it. |
+| Start observer sky | Load local Astronomy Engine and the real star catalogue before the sky controller. Begin with an explicitly labelled Greenwich reference, then replace it with granted device coordinates. Positions use the current UTC instant; display timezone does not shift them. |
 | Load timing JSON | Built-in defaults on failure; timingProfile query can apply fast-test overrides. |
 | Load language registry | Restore meditation language or Malayalam default; restore display language or English fallback. Load all four locale bundles. |
 | Load voice registry | Load Piper definitions; enumerate browser voices; restore preferences and attach UI handlers. |
@@ -621,7 +621,7 @@ flowchart TD
 
 ## Ordered Chakra Journey add-ons
 
-Optional preparation and integration techniques within a normal Chakra Journey.
+Optional preparation and integration techniques. Visualization: eight-second score fade-in (preview 1.2s), twelve-second private reflection, three-second settling after scene guidance, and eight-second Silence return pause.
 
 Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322), [app.js:5180](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5180), [app.js:5380](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5380).
 
@@ -960,7 +960,7 @@ flowchart TD
 
 Natural sky, chakra imagery, immersion and optional capabilities.
 
-Sources: [app.js:3322](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3322), [app.js:3695](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3695), [app.js:6534](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6534), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
+Sources: [app.js:3394](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3394), [sky-astronomy.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sky-astronomy.js:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
 
 ```mermaid
 flowchart TD
@@ -992,10 +992,10 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Natural sky startup | Load NaturalNightSky before app; cache a seeded 700–2,400-star backdrop with faint procedural galactic luminance and dark dust lanes. Neutral night gradient replaces drifting colored CSS clouds. |
-| Location permission | Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, while the named catalogue covers 19 bright naked-eye stars with localized labels. |
-| Motion preference | Only Lobby and Settings may animate. Every other app screen renders static sky, clears meteors and cancels frame/timer work. CSS animations and transitions are disabled there. Reduced motion also makes Lobby/Settings static; preference/screen changes re-evaluate the guard. At most 110 stars shimmer; positions remain fixed. |
+| Location permission | Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. Settings explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server. |
+| Motion preference | Only Lobby and Settings may animate. Every other app screen renders one static sky, clears meteors and cancels frame/timer work. Reduced motion also makes Lobby/Settings static. At most 110 catalogue stars scintillate; sky positions refresh only on bounded calculation updates, not random drift. |
 | Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
-| Sky lifecycle | Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. The Sun receives a warm, diffuse thematic containment glow that dissolves into the indigo field; it is visual artwork, not a claim about solar physics or energy transfer. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to either Lobby/Settings sky; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors. |
+| Sky lifecycle | Astronomy Engine 2.1.19 calculates Sun, Moon and seven other planets for the observer, with light time, aberration, precession/nutation and standard refraction. A 5,044-star J2000 catalogue supplies both named and background stars, advanced by proper motion and annual aberration. All share a north–east–south–west panorama with directions centered evenly at 12.5%, 37.5%, 62.5%, 87.5% of viewport width and a straight zero-altitude horizon. Only centers at or above the horizon draw; daylight no longer hides the Moon or replaces real planets with a decorative row. Daylight retains a restrained indigo wash and enhanced visibility to preserve the space theme. Planet sizes and brightness are enhanced; this is a chart, not a camera simulation. Lunar illumination and bright-limb orientation follow the calculated Sun; the Moon stays unlabeled. Earth is a centered observer marker below the horizon with five soft atmospheric volumes and its localized name. It shrinks or is omitted when foreground text/controls leave no safe pocket; explicit layout events trigger a coalesced redraw without idle polling. Advanced Features adds the existing illustrative black hole on Lobby/Settings only. Positions and cached gradients/labels update at most once per ten seconds during animation; static journeys have no repeating work and retain their existing astronomy snapshot even during explicit layout redraws. Labels use Display Language with plain-name fallback; compact 40% text and 20% backing/outline are retained. Crowded labels may move and gain fine leader lines; object coordinates never move for layout. Meteors remain illustrative, singly scheduled after 5–9 seconds and then every 25–70 seconds with a bounded cached trail. Calculation failures clear stale positions and show an unavailable status; retries remain bounded. |
 | Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
 | Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors on ordinary screens only. Video prelude, fixed controls and overlays remain readable. No filter on body/app ancestors rebases fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Before every start the Sleep class is synchronized to the currently selected mode, preventing leftover Sleep dimming in a normal journey. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding. |
@@ -1003,32 +1003,39 @@ flowchart TD
 | Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
 | Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
 
-- The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined.
+- Sky positions use local Astronomy Engine and a real star catalogue; only textures, enhanced brightness and decorative protective effects are illustrative. NASA reference comparisons and desktop/mobile browser checks pass. Assets are bundled offline; DPR is capped at 1.5. Unit/pixel tests cover protective-layer visibility, lifecycle and caching. Device thermal profiling and actual local-sky comparison remain open.
 
 <a id="earth-atmosphere"></a>
 
-## Thematic Earth atmosphere
+## Earth observer reference and atmosphere
 
-A visual-only five-layer atmosphere diagram in the daytime solar-system tableau.
+A centered reference below the horizon, clear of text and controls.
 
-Sources: [app.js:3761](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3761), [app.js:3836](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3836).
+Sources: [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:3798](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3798), [app.js:3817](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3817).
 
 ```mermaid
 flowchart TD
-  day["Daytime solar-system tableau"]
-  layers["Five atmospheric layers"]
+  day["Earth observer marker"]
+  fit["Clear center pocket?"]
+  layers["Five soft atmospheric volumes"]
+  hidden["No clear pocket"]
   scope["Visual-only scope"]
-  day -->|"Draw Earth"| layers
+  day -->|"Place reference"| fit
+  fit -->|"Fits"| layers
+  fit -->|"Crowded"| hidden
   layers -->|"Artwork only"| scope
+  hidden -->|"Layout changes"| fit
 ```
 
 | Step | Current behavior |
 | --- | --- |
-| Daytime solar-system tableau | Thematic Earth is visible alongside the calculated Sun and illustrative planets. |
-| Five atmospheric layers | Five overlapping translucent gradient shells surround Earth without layer text or temperature. The outer envelope reaches four Earth radii and progressively dissolves into space; Earth retains the sole compact celestial label. The compact graphic is illustrative, not altitude-proportional. |
+| Earth observer marker | Earth marks the central observer reference below the horizon in daytime and night. Actual sky directions use device latitude/longitude and time; the artwork does not reposition celestial bodies. |
+| Clear center pocket? | Measure visible mantra, labels and controls only on cached-layer rebuilds or explicit layout events. Reserve the final position of sliding controls. Shrink Earth when needed, without moving it off the center axis. |
+| Five soft atmospheric volumes | OWNER-RETAINED: troposphere, stratosphere, mesosphere, thermosphere and exosphere remain five merged atmospheric volumes. The innermost layer uses a cool-aqua 26°C comfort palette, not a temperature reading. Brighter outward bands stay visible beyond the opaque disc even when Earth shrinks, fading smoothly into space. Soft clouds and a shaded surface remain. The outer glow reaches 2.8 illustrative Earth radii; only the Earth name is shown. Not altitude-proportional. |
+| No clear pocket | Omit the marker if even the minimum Earth plus its glow/name would cover text or controls. Re-evaluate on scroll, screen/label/control changes or resize, not an idle polling timer. |
 | Visual-only scope | No climate, UV, aviation, satellite, orbital or celestial-calculation effect. |
 
-- The gradient shells are drawn once into the celestial cache; they create no animation loop or per-frame allocation.
+- Owner approval is required before removal, disabling by default or substantial fading. Preserve five layers and the 26°C cool-aqua visual theme; no added temperature/layer labels. Unit and browser pixel tests protect visibility on tiny markers. Drawing is cached; event-driven layout redraws do not add an idle loop.
 
 <a id="solar-containment"></a>
 
@@ -1036,11 +1043,11 @@ flowchart TD
 
 A visual-only warm containment layer surrounding the daytime Sun.
 
-Sources: [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:3863](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3863).
+Sources: [app.js:3662](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3662), [app.js:3845](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3845).
 
 ```mermaid
 flowchart TD
-  day["Daytime Sun"]
+  day["Sun above the horizon"]
   glow["Diffuse containment glow"]
   scope["Visual-only scope"]
   day -->|"Draw Sun"| glow
@@ -1049,11 +1056,11 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Daytime Sun | The calculated Sun appears only before civil twilight, within the thematic daytime tableau. |
-| Diffuse containment glow | A single warm radial-gradient layer starts inside the Sun edge and dissolves into the indigo field. It remains soft and solid rather than drawing a separate ring. |
+| Sun above the horizon | The calculated topocentric Sun draws when its apparent center is at or above zero altitude. It no longer belongs to a decorative planetary tableau. |
+| Diffuse containment glow | A warm diffuse glow surrounds the calculated Sun with a softly feathered circular shield rim. This protective-ring motif is artwork, not real radiation filtering. |
 | Visual-only scope | No solar-physics, radiation, energy-transfer, climate or celestial-calculation effect. |
 
-- The glow is rendered into the existing celestial cache; it adds no animation loop, timers or per-frame allocation.
+- OWNER-RETAINED: keep both diffuse glow and the soft shield ring. Removal, disabling by default or substantial fading requires owner approval. Unit and browser render checks protect this contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim.
 
 <a id="storage"></a>
 
@@ -1061,7 +1068,7 @@ flowchart TD
 
 Local state and the actual service-worker request routing.
 
-Sources: [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:5958](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5958), [app.js:6184](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6184), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
+Sources: [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [app.js:7073](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7073), [app.js:7186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7186), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
 
 ```mermaid
 flowchart TD
@@ -1091,7 +1098,7 @@ flowchart TD
 | Page / experience requests | HTML/CSS/JS, JSON, audio/video and Piper assets. |
 | localStorage | Languages, voices, durations, chakra choices, intention, custom script, mixer settings and stats; consultation stores answers separately. |
 | Session-only choices | Experience modes, shared care/Shots unlock and mood ambience enablement reset on page load. No full in-progress journey restore. |
-| Service worker install | cache.addAll shell/content/audio assets; one rejected required asset rejects precache installation. skipWaiting requested. |
+| Service worker install | cache.addAll shell/content/audio assets, including pinned Astronomy Engine and the versioned star catalogue/renderer; one rejected required asset rejects precache installation. skipWaiting requested. |
 | Activate cache generation | Claim clients; delete every cache except three exact current shell/Piper/language names. |
 | Optional ambience | Manifest and matching pleasure files use network no-store, despite manifest appearing in precache. |
 | Piper / language | Cache-first, fetch on miss, cache successful response. Piper recognizes local assets and Hugging Face voice URLs. |
@@ -1106,7 +1113,7 @@ flowchart TD
 
 Implemented fallback destinations and open verification areas.
 
-Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [app.js:4537](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4537), [app.js:4416](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4416), [app.js:5241](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5241), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [app.js:3463](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3463), [app.js:3477](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3477), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -1138,7 +1145,7 @@ flowchart TD
 | Journey content invalid | Shared guided start alerts and stops; Sleep caller catches and stops; Shot catch uses stopShot; Experiment catch returns to experiment. |
 | Audio / narration failure | Mantra soft-fails and restores music; Piper falls back to browser; browser speech error/timeout releases wait. |
 | Prelude unavailable | Media error/rejected play → fade / unavailable → Begin dispatcher; stalled media enters buffer recovery. |
-| Optional capability denied | Geolocation → approximate sky; wake lock/output selection unsupported → continue. |
+| Optional capability denied | Geolocation failure retains the explicitly labelled Greenwich reference. Sky calculation failure clears old positions, reports unavailable and bounds retries to ten seconds on animated screens; static screens add no retry timer. Wake lock/output selection unsupported → continue. |
 | Storage / cache failure | Some reads have guards; many localStorage writes are direct. Precache addAll has no partial-install fallback. |
 | Intentional stop | Cancel pending narration/generation and guide waits; stop playback; return screen. |
 | Runtime verification needed | Slow network, page hidden, mobile audio interruption, rapid double Begin/Restart, cache upgrades and storage denial. |
@@ -1275,4 +1282,4 @@ This atlas represents the reachable branches identified in the main UI/controlle
 
 The atlas follows the source snapshot identified above, including explicitly labeled uncommitted changes. It is source analysis, not device playback or a formal proof of exhaustive state-space coverage. User/browser events can interleave in ways that require runtime tests. The logical audio diagram intentionally groups individual filter and oscillator nodes.
 
-Prior baseline: 21 of 23 non-browser test commands passed. Content-safety and drone-duration checks stop because owner-managed docs/dot.json is absent. New natural-sky behavior has static/unit evidence; browser preview was declined. No listening checks were run.
+2026-09-17 baseline: 34 of 37 non-browser checks pass. Content-safety and drone-duration need owner-managed docs/dot.json; chakra-selection has a pre-existing array-order assertion mismatch. Observer sky has unit, NASA/JPL reference and desktop/mobile Chromium evidence; see ../SKY-ACCURACY.md. No device thermal profiling or listening checks were run.

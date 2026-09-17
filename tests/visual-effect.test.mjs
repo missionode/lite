@@ -16,33 +16,19 @@ assert.match(app, /class AmbientParticleField[\s\S]*?requestAnimationFrame\(this
     'The particle field should use a lightweight animation loop.');
 assert.match(app, /navigator\.geolocation\.getCurrentPosition[\s\S]*?refreshCelestialBodies/,
     'The sky should use the granted observer location when available.');
-assert.match(app, /setFallbackObserver\(\)[\s\S]*?latitude: 0, longitude: 0, approximate: true[\s\S]*?refreshCelestialBodies\(\)/,
-    'The sky should retain an approximate celestial fallback when location is unavailable.');
-assert.match(app, /const orbitalAngle = trueAnomaly \+ argument[\s\S]*?Math\.sin\(node\) \* Math\.cos\(orbitalAngle\)/,
-    'The Moon should convert its orbital node correctly before horizon projection.');
-assert.match(app, /namedStars = \[[\s\S]*?Polaris[\s\S]*?Sirius[\s\S]*?Vega[\s\S]*?Arcturus/,
-    'The sky should include recognizable bright stars.');
-assert.match(app, /name: 'Moon'[\s\S]*?kind: 'moon'[\s\S]*?phase:/,
-    'The sky should draw a location-aware phased Moon.');
 assert.match(app, /incidence<=0\) continue[\s\S]*?pixels\.data\[i\+3\][\s\S]*?drawImage\(buffer/,
     'The unlit Moon should stay transparent while the lit sphere is composited.');
-assert.match(app, /function celestialMoonPhase\(days\)[\s\S]*?29\.530588853/,
-    'Moon illumination should use the synodic cycle rather than right ascension.');
 assert.match(app, /const halo = this\.ctx\.createRadialGradient[\s\S]*?halo\.addColorStop/,
     'Celestial bodies should receive a restrained atmospheric halo.');
-assert.match(app, /angularDiameter: 0\.52[\s\S]*?body\.angularDiameter \/ 0\.52/,
-    'The Moon should provide the apparent-size reference for planet scaling.');
 assert.match(app, /createRadialGradient\(x - size \* 0\.35[\s\S]*?planetGradient\.addColorStop/,
     'Planets should use soft radial lighting rather than flat coloured dots.');
 assert.doesNotMatch(app, /fillStyle = 'rgba\(4, 6, 18, 0\.82\)'/,
     'The Moon should not use a pasted opaque dark disc for its phase.');
-assert.match(app, /\['Venus'[\s\S]*?\['Jupiter'[\s\S]*?\['Mars'[\s\S]*?\['Saturn'/,
-    'The sky should include visible planet candidates with individual colours.');
 assert.match(app, /drawCelestialBodies\(width, height\)/,
     'Calculated celestial bodies should be rendered in the ambient sky.');
 assert.match(app, /CELESTIAL_LABEL_KEYS[\s\S]*?ui\.celestialMercury[\s\S]*?ui\.celestialJupiter[\s\S]*?ui\.celestialMoon[\s\S]*?ui\.celestialSirius/,
     'Prominent celestial bodies should have localized display labels.');
-assert.match(app, /translatedLabel = labelKey \? t\(labelKey, state\.displayLanguage\)[\s\S]*?translatedLabel\.startsWith\('ui\.'\)[\s\S]*?const shouldShowLabel = body\.kind === 'sun' \|\| body\.kind === 'earth' \|\| body\.kind === 'solar-planet' \|\| body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.20\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.20\)'[\s\S]*?0\.40\)`[\s\S]*?fillText\(label/,
+assert.match(app, /translatedLabel = labelKey \? t\(labelKey, state\.displayLanguage\)[\s\S]*?translatedLabel\.startsWith\('ui\.'\)[\s\S]*?const shouldShowLabel = body\.kind === 'sun' \|\| body\.kind === 'planet' \|\| \(body\.kind === 'star' && body\.magnitude < 1\)[\s\S]*?font = '500 11px Inter, Manjari, sans-serif'[\s\S]*?rgba\(2, 4, 9, 0\.20\)[\s\S]*?strokeStyle = 'rgba\(2, 4, 9, 0\.20\)'[\s\S]*?0\.40\)`[\s\S]*?fillText\(label/,
     'Non-Moon celestial labels should use 40% text with a 20% translucent backing and outline.');
 assert.match(app, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/,
     'Particle rendering should cap device-pixel density for mobile performance.');

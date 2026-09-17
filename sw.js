@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.234';
+const CACHE_NAME = 'chakra-v5.238';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v46';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v47';
 const ASSETS = [
   './',
   './index.html',
@@ -11,7 +11,10 @@ const ASSETS = [
   './audio/ambience-manifest.json',
   './style.css',
   './app.js',
-  './night-sky.js?v=1.0',
+  './vendor/astronomy.browser.min.js?v=2.1.19',
+  './data/sky-stars.js?v=1.0',
+  './sky-astronomy.js?v=1.1',
+  './night-sky.js?v=1.1',
   './celestial-presence.js?v=1.2',
   './manifest.json',
   './Splash-v2.png',

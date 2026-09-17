@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-15",
-    "commit": "13a6089 + uncommitted Advanced Features password gate",
-    "scope": "Version 3.10 source-reviewed meditation-app behavior. Visual scheduling/cache and audio changes have static/unit evidence only; no device thermal profiling or listening verification. The newcomer orientation has targeted automated and browser evidence; no device playback verification was run. Branches are composed across maps; this is not a claim that every browser, timing race, or setting combination has been runtime-tested."
+    "date": "2026-09-17",
+    "commit": "3.45 release snapshot (parent 6337889)",
+    "scope": "Version 3.45 source-reviewed behavior. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal and listening verification remain open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification."
   },
   "graphs": [
     {
@@ -170,7 +170,7 @@
       "group": "Start here",
       "title": "Startup and first visit",
       "subtitle": "Loading order and optional browser capabilities.",
-      "source": "app.js:895; app.js:1160; app.js:6184; app.js:6505",
+      "source": "app.js:946; app.js:3394; app.js:6748; index.html:148",
       "rows": [
         [
           [
@@ -182,8 +182,8 @@
         [
           [
             "sky",
-            "Start sky",
-            "Approximate sky is immediately available; location permission can refine it."
+            "Start observer sky",
+            "Load local Astronomy Engine and the real star catalogue before the sky controller. Begin with an explicitly labelled Greenwich reference, then replace it with granted device coordinates. Positions use the current UTC instant; display timezone does not shift them."
           ],
           [
             "timing",
@@ -1644,7 +1644,7 @@
       "id": "journey-addons",
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
-      "subtitle": "Optional preparation and integration techniques within a normal Chakra Journey.",
+      "subtitle": "Optional preparation and integration techniques. Visualization: eight-second score fade-in (preview 1.2s), twelve-second private reflection, three-second settling after scene guidance, and eight-second Silence return pause.",
       "source": "index.html:322; app.js:5180; app.js:5380",
       "rows": [
         [
@@ -2523,7 +2523,7 @@
       "group": "Systems",
       "title": "Visuals and browser lifecycle",
       "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
-      "source": "app.js:3322; app.js:3695; app.js:6534; style.css:1; night-sky.js:1; celestial-presence.js:1",
+      "source": "app.js:3394; sky-astronomy.js:1; night-sky.js:1; style.css:1; celestial-presence.js:1",
       "rows": [
         [
           [
@@ -2536,12 +2536,12 @@
           [
             "geo",
             "Location permission",
-            "Success updates observer and named celestial bodies using the current device instant plus the granted coordinates; time-zone display does not alter that astronomical instant. Denied/unavailable retains approximate sky. Fine background stars are procedural, while the named catalogue covers 19 bright naked-eye stars with localized labels."
+            "Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. Settings explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server."
           ],
           [
             "motion",
             "Motion preference",
-            "Only Lobby and Settings may animate. Every other app screen renders static sky, clears meteors and cancels frame/timer work. CSS animations and transitions are disabled there. Reduced motion also makes Lobby/Settings static; preference/screen changes re-evaluate the guard. At most 110 stars shimmer; positions remain fixed."
+            "Only Lobby and Settings may animate. Every other app screen renders one static sky, clears meteors and cancels frame/timer work. Reduced motion also makes Lobby/Settings static. At most 110 catalogue stars scintillate; sky positions refresh only on bounded calculation updates, not random drift."
           ]
         ],
         [
@@ -2553,7 +2553,7 @@
           [
             "sky",
             "Sky lifecycle",
-            "Resize rebuilds the cached backdrop with deterministic placement; normal frames composite it and shimmer selected stars. Celestial positions refresh at most once per minute. A faint curved horizon guide marks the same 0° baseline used for altitude projection; it is cached with celestial bodies and is deliberately not a landscape layer. With a granted observer position, nighttime starts at civil twilight (Sun altitude at or below −6°): then the Moon, planets and named stars may draw. Before twilight, those bodies are suppressed and a calculated, softly warm Sun with a cached transparent indigo cosmic wash is drawn instead, preserving the space theme rather than switching to an ordinary blue daytime sky. The Sun receives a warm, diffuse thematic containment glow that dissolves into the indigo field; it is visual artwork, not a claim about solar physics or energy transfer. A low-horizon daytime solar-system tableau contains Mercury through Neptune; its spacing follows logarithmic orbital distance and its restrained disc sizes follow logarithmic planetary diameters so all eight remain legible. This tableau—including Earth—is explicitly thematic, not an astronomical sky-position claim. Unlocking Advanced Features automatically adds one unlabelled illustrative deep-sky black-hole ring to either Lobby/Settings sky; it is excluded from static journey screens and never asserted as a local-sky body. Labels use the display language and fall back to the plain body name rather than exposing an unloaded ui.* lookup key; all planet labels are supplied in English, Malayalam, Hindi and Russian. The Equator fallback retains its approximate night sky rather than inferring daylight from false coordinates. Textured lunar illumination is phase-cached; planets are small points and the Moon is intentionally unlabeled. Named planets, bright stars and daytime solar bodies use compact 11 px labels with 40% text plus 20% backing and outline. Backing alone receives a soft 3 px blur; text/outline stay sharp and underlying stars are not blurred. Unsupported canvas filters retain plain backing. Meteors occur singly: first after 5–9 seconds, then every 25–70 seconds. Wide-screen paths start beside central controls; 0.75–1.05 second flights use a slightly brighter 1.8 px cached trail. A viewport-bounded trail grows behind the head, then fades with a faint 180 ms residual. One tiny cached sprite supplies the tapered glow; idle frames do no meteor drawing or array allocation. Hidden pages cancel animation and clear meteors."
+            "Astronomy Engine 2.1.19 calculates Sun, Moon and seven other planets for the observer, with light time, aberration, precession/nutation and standard refraction. A 5,044-star J2000 catalogue supplies both named and background stars, advanced by proper motion and annual aberration. All share a north–east–south–west panorama with directions centered evenly at 12.5%, 37.5%, 62.5%, 87.5% of viewport width and a straight zero-altitude horizon. Only centers at or above the horizon draw; daylight no longer hides the Moon or replaces real planets with a decorative row. Daylight retains a restrained indigo wash and enhanced visibility to preserve the space theme. Planet sizes and brightness are enhanced; this is a chart, not a camera simulation. Lunar illumination and bright-limb orientation follow the calculated Sun; the Moon stays unlabeled. Earth is a centered observer marker below the horizon with five soft atmospheric volumes and its localized name. It shrinks or is omitted when foreground text/controls leave no safe pocket; explicit layout events trigger a coalesced redraw without idle polling. Advanced Features adds the existing illustrative black hole on Lobby/Settings only. Positions and cached gradients/labels update at most once per ten seconds during animation; static journeys have no repeating work and retain their existing astronomy snapshot even during explicit layout redraws. Labels use Display Language with plain-name fallback; compact 40% text and 20% backing/outline are retained. Crowded labels may move and gain fine leader lines; object coordinates never move for layout. Meteors remain illustrative, singly scheduled after 5–9 seconds and then every 25–70 seconds with a bounded cached trail. Calculation failures clear stale positions and show an unavailable status; retries remain bounded."
           ]
         ],
         [
@@ -2656,28 +2656,40 @@
         ]
       ],
       "notes": [
-        "The lunar surface and background star field are illustrative procedural renderings; existing named-body location calculations remain approximate. New sky has no external assets or network dependency and caps DPR at 1.5. Static/unit checks cover bounded work, stable placement, reduced-motion draws, lunar illumination, cache invalidation and frame cancellation. Browser/device appearance and temperature remain unverified because the preview request was declined."
+        "Sky positions use local Astronomy Engine and a real star catalogue; only textures, enhanced brightness and decorative protective effects are illustrative. NASA reference comparisons and desktop/mobile browser checks pass. Assets are bundled offline; DPR is capped at 1.5. Unit/pixel tests cover protective-layer visibility, lifecycle and caching. Device thermal profiling and actual local-sky comparison remain open."
       ]
     },
     {
       "id": "earth-atmosphere",
       "group": "Systems",
-      "title": "Thematic Earth atmosphere",
-      "subtitle": "A visual-only five-layer atmosphere diagram in the daytime solar-system tableau.",
-      "source": "app.js:3761; app.js:3836",
+      "title": "Earth observer reference and atmosphere",
+      "subtitle": "A centered reference below the horizon, clear of text and controls.",
+      "source": "app.js:3747; app.js:3798; app.js:3817",
       "rows": [
         [
           [
             "day",
-            "Daytime solar-system tableau",
-            "Thematic Earth is visible alongside the calculated Sun and illustrative planets."
+            "Earth observer marker",
+            "Earth marks the central observer reference below the horizon in daytime and night. Actual sky directions use device latitude/longitude and time; the artwork does not reposition celestial bodies."
+          ]
+        ],
+        [
+          [
+            "fit",
+            "Clear center pocket?",
+            "Measure visible mantra, labels and controls only on cached-layer rebuilds or explicit layout events. Reserve the final position of sliding controls. Shrink Earth when needed, without moving it off the center axis."
           ]
         ],
         [
           [
             "layers",
-            "Five atmospheric layers",
-            "Five overlapping translucent gradient shells surround Earth without layer text or temperature. The outer envelope reaches four Earth radii and progressively dissolves into space; Earth retains the sole compact celestial label. The compact graphic is illustrative, not altitude-proportional."
+            "Five soft atmospheric volumes",
+            "OWNER-RETAINED: troposphere, stratosphere, mesosphere, thermosphere and exosphere remain five merged atmospheric volumes. The innermost layer uses a cool-aqua 26°C comfort palette, not a temperature reading. Brighter outward bands stay visible beyond the opaque disc even when Earth shrinks, fading smoothly into space. Soft clouds and a shaded surface remain. The outer glow reaches 2.8 illustrative Earth radii; only the Earth name is shown. Not altitude-proportional."
+          ],
+          [
+            "hidden",
+            "No clear pocket",
+            "Omit the marker if even the minimum Earth plus its glow/name would cover text or controls. Re-evaluate on scroll, screen/label/control changes or resize, not an idle polling timer."
           ]
         ],
         [
@@ -2691,17 +2703,32 @@
       "edges": [
         [
           "day",
+          "fit",
+          "Place reference"
+        ],
+        [
+          "fit",
           "layers",
-          "Draw Earth"
+          "Fits"
+        ],
+        [
+          "fit",
+          "hidden",
+          "Crowded"
         ],
         [
           "layers",
           "scope",
           "Artwork only"
+        ],
+        [
+          "hidden",
+          "fit",
+          "Layout changes"
         ]
       ],
       "notes": [
-        "The gradient shells are drawn once into the celestial cache; they create no animation loop or per-frame allocation."
+        "Owner approval is required before removal, disabling by default or substantial fading. Preserve five layers and the 26°C cool-aqua visual theme; no added temperature/layer labels. Unit and browser pixel tests protect visibility on tiny markers. Drawing is cached; event-driven layout redraws do not add an idle loop."
       ]
     },
     {
@@ -2709,20 +2736,20 @@
       "group": "Systems",
       "title": "Thematic solar containment glow",
       "subtitle": "A visual-only warm containment layer surrounding the daytime Sun.",
-      "source": "app.js:3747; app.js:3863",
+      "source": "app.js:3662; app.js:3845",
       "rows": [
         [
           [
             "day",
-            "Daytime Sun",
-            "The calculated Sun appears only before civil twilight, within the thematic daytime tableau."
+            "Sun above the horizon",
+            "The calculated topocentric Sun draws when its apparent center is at or above zero altitude. It no longer belongs to a decorative planetary tableau."
           ]
         ],
         [
           [
             "glow",
             "Diffuse containment glow",
-            "A single warm radial-gradient layer starts inside the Sun edge and dissolves into the indigo field. It remains soft and solid rather than drawing a separate ring."
+            "A warm diffuse glow surrounds the calculated Sun with a softly feathered circular shield rim. This protective-ring motif is artwork, not real radiation filtering."
           ]
         ],
         [
@@ -2746,7 +2773,7 @@
         ]
       ],
       "notes": [
-        "The glow is rendered into the existing celestial cache; it adds no animation loop, timers or per-frame allocation."
+        "OWNER-RETAINED: keep both diffuse glow and the soft shield ring. Removal, disabling by default or substantial fading requires owner approval. Unit and browser render checks protect this contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim."
       ]
     },
     {
@@ -2754,7 +2781,7 @@
       "group": "Systems",
       "title": "Persistence, caching and network",
       "subtitle": "Local state and the actual service-worker request routing.",
-      "source": "sw.js:1; app.js:5958; app.js:6184; piper-models.json:1",
+      "source": "sw.js:1; app.js:6748; app.js:7073; app.js:7186; piper-models.json:1",
       "rows": [
         [
           [
@@ -2779,7 +2806,7 @@
           [
             "install",
             "Service worker install",
-            "cache.addAll shell/content/audio assets; one rejected required asset rejects precache installation. skipWaiting requested."
+            "cache.addAll shell/content/audio assets, including pinned Astronomy Engine and the versioned star catalogue/renderer; one rejected required asset rejects precache installation. skipWaiting requested."
           ]
         ],
         [
@@ -2875,7 +2902,7 @@
       "group": "Systems",
       "title": "Failure and recovery map",
       "subtitle": "Implemented fallback destinations and open verification areas.",
-      "source": "app.js:1; app.js:4537; app.js:4416; app.js:5241; sw.js:1",
+      "source": "app.js:1; app.js:3463; app.js:3477; sw.js:1",
       "rows": [
         [
           [
@@ -2910,7 +2937,7 @@
           [
             "optional",
             "Optional capability denied",
-            "Geolocation → approximate sky; wake lock/output selection unsupported → continue."
+            "Geolocation failure retains the explicitly labelled Greenwich reference. Sky calculation failure clears old positions, reports unavailable and bounds retries to ten seconds on animated screens; static screens add no retry timer. Wake lock/output selection unsupported → continue."
           ],
           [
             "storage",
