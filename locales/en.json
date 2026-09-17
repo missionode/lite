@@ -53,6 +53,7 @@
     "returning": "Returning",
     "returningJourney": "Returning Journey",
     "includeVideoIntroduction": "Include video introduction",
+    "videoIntroductionSubtitle": "Cosmic Consciousness Introduction",
     "roadmapVideoIntroduction": "Video introduction",
     "moon": "Moon",
     "skyNorth": "N",
@@ -165,6 +166,21 @@
     ,"visualizationSilenceWakePrompt": "As this quiet practice comes to a close, begin to notice your breath and the space around you. There is no need to hurry."
     ,"roadmapDharana": "Focused attention"
     ,"roadmapVisualization": "Visualization"
+    ,"bodyScanAddon": "Body Scan Guided Session"
+    ,"bodyScanDuration": "Duration"
+    ,"bodyScanTitle": "Body scan"
+    ,"bodyScanOpening": "If it feels comfortable, close your eyes. Let your body be supported exactly as it is. We will move awareness slowly from the top of the head to the toes. Notice sensation, tension, or no clear sensation, without needing to change anything. You may skip any area that feels uncomfortable."
+    ,"bodyScanRegions": ["Bring awareness to the top of your head and scalp. Notice pressure, warmth, coolness, tingling, or simply quiet.", "Notice the forehead, eyes, cheeks, mouth, and jaw. Let each sensation be present without trying to correct it.", "Move awareness through the neck, shoulders, arms, hands, and fingers. Notice where the body feels light, heavy, open, or tense.", "Notice the chest and upper back, and the natural movement of breathing. There is no need to deepen or control the breath.", "Bring awareness to the abdomen, lower back, and pelvis. Observe the sensations here with patience and choice.", "Move through the thighs and knees. Notice contact, temperature, clothing, or the absence of a distinct sensation.", "Continue through the lower legs and ankles, noticing whatever is present without judgement.", "Finally, feel the feet, heels, soles, and every toe. Sense their contact with the ground or the support beneath you."]
+    ,"bodyScanClosing": "Now sense the body as one complete field, from the top of the head to the tips of the toes. Feel the support beneath you. Nothing needs to be corrected. Let this grounded awareness remain with you as the journey continues."
+    ,"roadmapBodyScan": "Body scan"
+    ,"notingAddon": "Guided Noting"
+    ,"notingSubtitle": "Notice, name, and release."
+    ,"notingDuration": "Duration"
+    ,"notingTitle": "Guided noting"
+    ,"notingOpening": "Now notice whatever experience is most apparent. Give it one quiet, simple label in your mind, such as thinking, hearing, planning, itching, warmth, or feeling. Then release the label and wait. The purpose is not to stop thoughts or change emotions. If anything feels overwhelming, return to the feeling of breathing or end the practice."
+    ,"notingReminders": ["Notice what is here now. Name it gently, then let the word go.", "A repeated thought can simply be labelled thinking again. Nothing has gone wrong.", "If an emotion is strong, use a simple label such as sadness, fear, anger, or just feeling. You do not need to investigate it.", "If no label seems right, quietly use knowing, or return to breathing. The exact word is not important."]
+    ,"notingClosing": "Now let all labels fall away. Notice the quiet awareness in which thoughts, sounds, emotions, and sensations appear and pass. Carry this clear, spacious attention into the next part of the journey."
+    ,"roadmapNoting": "Guided noting"
     ,"journeyPreparation": "Journey preparation"
     ,"journeyIntegration": "Journey integration"
     ,"advancedPasswordReveal": "Hold to reveal password"

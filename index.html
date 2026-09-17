@@ -331,6 +331,13 @@
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="box-breathing-experience-toggle"><span data-i18n="ui.boxBreathingExperience">Box Breathing</span></label>
                     <div class="journey-addon-control">
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="visualization-addon-toggle"><span data-i18n="ui.visualizationAddon">Guided Visualization</span></label>
+                        <div id="visualization-options" class="dharana-options" hidden>
+                            <label><span data-i18n="ui.visualizationDuration">Duration</span><select id="visualization-duration"><option value="1">1 min</option><option value="2" selected>2 min</option><option value="3">3 min</option><option value="5">5 min</option></select></label>
+                            <label><span data-i18n="ui.visualizationAmbience">Background score</span><select id="visualization-ambience"><option value="silence" data-i18n="ui.visualizationSilence">Silence</option><option value="space-race" data-i18n="ui.visualizationSpaceRace">Space Race</option></select></label>
+                        </div>
+                    </div>
+                    <div class="journey-addon-control">
                         <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="dharana-addon-toggle"><span data-i18n="ui.dharanaAddon">Focused Attention (Dharana)</span></label>
                         <div id="dharana-options" class="dharana-options" hidden>
                             <label><span data-i18n="ui.dharanaAnchor">Focus anchor</span><select id="dharana-anchor"><option value="indigo-circle" data-i18n="ui.dharanaIndigoCircle">Indigo circle</option><option value="gold-dot" data-i18n="ui.dharanaGoldDot">Golden dot</option><option value="violet-triangle" data-i18n="ui.dharanaVioletTriangle">Violet triangle</option></select></label>
@@ -338,10 +345,16 @@
                         </div>
                     </div>
                     <div class="journey-addon-control">
-                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="visualization-addon-toggle"><span data-i18n="ui.visualizationAddon">Guided Visualization</span></label>
-                        <div id="visualization-options" class="dharana-options" hidden>
-                            <label><span data-i18n="ui.visualizationDuration">Duration</span><select id="visualization-duration"><option value="1">1 min</option><option value="2" selected>2 min</option><option value="3">3 min</option><option value="5">5 min</option></select></label>
-                            <label><span data-i18n="ui.visualizationAmbience">Background score</span><select id="visualization-ambience"><option value="silence" data-i18n="ui.visualizationSilence">Silence</option><option value="space-race" data-i18n="ui.visualizationSpaceRace">Space Race</option></select></label>
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="body-scan-addon-toggle"><span data-i18n="ui.bodyScanAddon">Body Scan Guided Session</span></label>
+                        <div id="body-scan-options" class="dharana-options" hidden>
+                            <label><span data-i18n="ui.bodyScanDuration">Duration</span><select id="body-scan-duration"><option value="3">3 min</option><option value="5" selected>5 min</option><option value="8">8 min</option></select></label>
+                        </div>
+                    </div>
+                    <div class="journey-addon-control">
+                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="noting-addon-toggle"><span data-i18n="ui.notingAddon">Guided Noting</span></label>
+                        <div id="noting-options" class="dharana-options" hidden>
+                            <p class="mixer-note" data-i18n="ui.notingSubtitle">Notice, name, and release.</p>
+                            <label><span data-i18n="ui.notingDuration">Duration</span><select id="noting-duration"><option value="2">2 min</option><option value="4" selected>4 min</option><option value="6">6 min</option></select></label>
                         </div>
                     </div>
                 </div>
@@ -415,7 +428,7 @@
                 </label>
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
                     <input type="checkbox" id="journey-video-prelude-toggle">
-                    <span data-i18n="ui.includeVideoIntroduction">Include video introduction</span>
+                    <span class="journey-video-option-copy"><span data-i18n="ui.includeVideoIntroduction">Include video introduction</span><small data-i18n="ui.videoIntroductionSubtitle">Cosmic Consciousness Introduction</small></span>
                 </label>
             </div>
 
@@ -541,6 +554,8 @@
             <div id="chakra-container" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <img id="chakra-symbol" alt="Meditation symbol" style="width: 100%; height: 100%; object-fit: contain;">
                 <div id="visualization-blackout" class="visualization-blackout" aria-hidden="true" hidden></div>
+                <div id="body-scan-scene" class="body-scan-scene" aria-hidden="true" hidden></div>
+                <div id="noting-scene" class="noting-scene" aria-hidden="true" hidden></div>
                 <div id="focus-veil" class="focus-veil" aria-hidden="true" hidden></div>
                 <div id="focus-anchor" class="focus-anchor" aria-hidden="true" hidden></div>
                 <div id="glow-effect"></div>
@@ -716,6 +731,6 @@
     <script src="sky-astronomy.js?v=1.1"></script>
     <script src="night-sky.js?v=1.1"></script>
     <script src="celestial-presence.js?v=1.2"></script>
-    <script src="app.js?v=3.47"></script>
+    <script src="app.js?v=3.50"></script>
 </body>
 </html>

@@ -869,6 +869,9 @@ input[type="range"]::-moz-range-progress {
     border-radius: 4px;
 }
 
+.journey-video-option-copy { display: inline-flex; flex-direction: column; align-items: flex-start; gap: .2rem; }
+.journey-video-option-copy small { font-size: .72rem; line-height: 1.25; letter-spacing: .04em; opacity: .72; }
+
 /* Meditation Styles */
 #chakra-container {
     width: 100%;
@@ -977,6 +980,17 @@ body.visualization-active #session-overlay {
 }
 
 .focus-anchor[hidden] { display: none; }
+
+.body-scan-scene { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; overflow: hidden; opacity: 0; background: #000; transition: opacity 3s ease-in-out; }
+.body-scan-scene.is-active { opacity: 1; }
+.body-scan-scene[hidden] { display: none; }
+.noting-scene { position: absolute; inset: 0; z-index: 6; opacity: 0; background: #000; transition: opacity 3s ease-in-out; }
+.noting-scene.is-active { opacity: 1; }
+.noting-scene[hidden] { display: none; }
+body.body-scan-active #chakra-container { position: fixed; inset: 0; z-index: 100; background: #000; }
+body.body-scan-active #chakra-symbol, body.body-scan-active #glow-effect, body.body-scan-active #session-overlay { visibility: hidden !important; }
+body.noting-active #chakra-container { position: fixed; inset: 0; z-index: 100; background: #000; }
+body.noting-active #chakra-symbol, body.noting-active #glow-effect, body.noting-active #session-overlay { visibility: hidden !important; }
 
 .focus-anchor.is-focusing {
     opacity: 0.94;
@@ -2519,6 +2533,8 @@ body.static-decorations .focus-anchor {
     transition: opacity 3s ease-in, transform 4s ease-in-out !important;
 }
 body.static-decorations .focus-veil,
-body.static-decorations .visualization-blackout {
+body.static-decorations .visualization-blackout,
+body.static-decorations .body-scan-scene,
+body.static-decorations .noting-scene {
     transition: opacity 5s ease-in-out !important;
 }

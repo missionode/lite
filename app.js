@@ -929,8 +929,12 @@ function getJourneyRoadmapLabels() {
     ];
     labels.push(t('ui.roadmapChakras'));
     if (getChecked('box-breathing-experience-toggle')) labels.splice(0, 0, t('ui.roadmapBoxBreathing'));
-    if (getChecked('dharana-addon-toggle')) labels.splice(getChecked('box-breathing-experience-toggle') ? 1 : 0, 0, t('ui.roadmapDharana'));
-    if (getChecked('visualization-addon-toggle')) labels.splice((getChecked('box-breathing-experience-toggle') ? 1 : 0) + (getChecked('dharana-addon-toggle') ? 1 : 0), 0, t('ui.roadmapVisualization'));
+    let preparationIndex = getChecked('box-breathing-experience-toggle') ? 1 : 0;
+    if (getChecked('visualization-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapVisualization'));
+    if (getChecked('dharana-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapDharana'));
+    if (getChecked('body-scan-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapBodyScan'));
+    if (getChecked('body-scan-addon-toggle')) preparationIndex++;
+    if (getChecked('noting-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapNoting'));
     if (getChecked('hooponopono-experience-toggle')) labels.push(t('ui.roadmapHooponopono'));
 
     labels.push(t('ui.roadmapClosing'));
@@ -4536,9 +4540,11 @@ class MeditationController {
             return 4 * 60 * 1000;
         }
         if (focusedExperience === 'preparation') {
-            const dharanaMinutes = getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0;
             const visualizationMinutes = getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0;
-            return Math.max(1, (dharanaMinutes + visualizationMinutes) * 60) * 1000;
+            const dharanaMinutes = getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0;
+            const bodyScanMinutes = getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0;
+            const notingMinutes = getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0;
+            return Math.max(1, (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes) * 60) * 1000;
         }
         if (focusedExperience === 'yoga') {
             const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
@@ -5160,8 +5166,10 @@ class MeditationController {
                 if (focusedExperience === 'yoga') await this.runYogaSession();
                 else if (focusedExperience === 'intimate') await this.runIntimateService();
                 else if (focusedExperience === 'preparation') {
-                    if (getChecked('dharana-addon-toggle')) await this.runDharana();
                     if (this.isMeditationActive && getChecked('visualization-addon-toggle')) await this.runVisualization();
+                    if (this.isMeditationActive && getChecked('dharana-addon-toggle')) await this.runDharana();
+                    if (this.isMeditationActive && getChecked('body-scan-addon-toggle')) await this.runBodyScan();
+                    if (this.isMeditationActive && getChecked('noting-addon-toggle')) await this.runNoting();
                 }
                 if (this.isMeditationActive) this.finish();
                 return;
@@ -5193,8 +5201,10 @@ class MeditationController {
 
             if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
             if (this.isMeditationActive && !this.isHighEnergy && getChecked('box-breathing-experience-toggle')) await this.runBoxBreathing();
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('dharana-addon-toggle')) await this.runDharana();
             if (this.isMeditationActive && !this.isHighEnergy && getChecked('visualization-addon-toggle')) await this.runVisualization();
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('dharana-addon-toggle')) await this.runDharana();
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('body-scan-addon-toggle')) await this.runBodyScan();
+            if (this.isMeditationActive && !this.isHighEnergy && getChecked('noting-addon-toggle')) await this.runNoting();
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
@@ -5417,6 +5427,55 @@ class MeditationController {
             if (focusVeil) { focusVeil.classList.remove('is-active', 'is-releasing'); focusVeil.hidden = true; }
             document.body.classList.remove('dharana-active');
             if (symbol) symbol.style.visibility = '';
+        }
+    }
+
+    async runBodyScan() {
+        const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
+        const scene = document.getElementById('body-scan-scene');
+        const regions = journeyT('ui.bodyScanRegions');
+        const regionNarrations = Array.isArray(regions) ? regions : [];
+        showScreen(meditationScreen);
+        document.body.classList.add('body-scan-active');
+        this.visual.stop();
+        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
+        setText('mantra-display', journeyT('ui.bodyScanTitle'));
+        try {
+            await this.narrate(journeyT('ui.bodyScanOpening'), false);
+            const pauseSeconds = Math.max(2, Math.floor((minutes * 60) / Math.max(1, regionNarrations.length)));
+            for (let index = 0; index < regionNarrations.length && this.isMeditationActive; index++) {
+                await this.narrate(regionNarrations[index], false);
+                await this.pauseAwareSleep(pauseSeconds * 1000);
+            }
+            if (this.isMeditationActive) await this.narrate(journeyT('ui.bodyScanClosing'), false);
+        } finally {
+            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
+            document.body.classList.remove('body-scan-active');
+        }
+    }
+
+    async runNoting() {
+        const minutes = Number(document.getElementById('noting-duration')?.value || 4);
+        const scene = document.getElementById('noting-scene');
+        const reminders = journeyT('ui.notingReminders');
+        const prompts = Array.isArray(reminders) ? reminders : [];
+        showScreen(meditationScreen);
+        document.body.classList.add('noting-active');
+        this.visual.stop();
+        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
+        setText('mantra-display', journeyT('ui.notingTitle'));
+        try {
+            await this.narrate(journeyT('ui.notingOpening'), false);
+            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, prompts.length)));
+            for (const prompt of prompts) {
+                if (!this.isMeditationActive) break;
+                await this.pauseAwareSleep(pauseSeconds * 1000);
+                if (this.isMeditationActive) await this.narrate(prompt, false);
+            }
+            if (this.isMeditationActive) await this.narrate(journeyT('ui.notingClosing'), false);
+        } finally {
+            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
+            document.body.classList.remove('noting-active');
         }
     }
 
@@ -6088,7 +6147,7 @@ class MeditationController {
         // selected, but also complete, useful standalone practices on their
         // own. This guard makes their independent start explicit without
         // changing the ordered add-on path above.
-        if (state.selectedChakras.length === 0 && (getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle'))) return 'preparation';
+        if (state.selectedChakras.length === 0 && (getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle'))) return 'preparation';
         return null;
     }
 
@@ -6394,6 +6453,8 @@ class MeditationController {
 
     finish() {
         document.body.classList.remove('visualization-active');
+        document.body.classList.remove('body-scan-active');
+        document.body.classList.remove('noting-active');
         const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
         this.isMeditationActive = false; 
         this.isHypnosisJourney = false;
@@ -6445,6 +6506,8 @@ class MeditationController {
 
     stop({ preserveScreen = false } = {}) {
         document.body.classList.remove('visualization-active');
+        document.body.classList.remove('body-scan-active');
+        document.body.classList.remove('noting-active');
         const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
         this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopVisualizationAmbience(2); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
         this.stopSessionCountdown();
@@ -7255,6 +7318,8 @@ function attachEventListeners() {
     const hooponoponoExperienceToggle = document.getElementById('hooponopono-experience-toggle');
     const dharanaAddonToggle = document.getElementById('dharana-addon-toggle');
     const visualizationAddonToggle = document.getElementById('visualization-addon-toggle');
+    const bodyScanAddonToggle = document.getElementById('body-scan-addon-toggle');
+    const notingAddonToggle = document.getElementById('noting-addon-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
@@ -7297,6 +7362,8 @@ function attachEventListeners() {
         if (hooponoponoExperienceToggle) hooponoponoExperienceToggle.checked = false;
         if (dharanaAddonToggle) dharanaAddonToggle.checked = false;
         if (visualizationAddonToggle) visualizationAddonToggle.checked = false;
+        if (bodyScanAddonToggle) bodyScanAddonToggle.checked = false;
+        if (notingAddonToggle) notingAddonToggle.checked = false;
         state.boxBreathingExperienceEnabled = false;
         state.hooponoponoExperienceEnabled = false;
     }
@@ -7689,11 +7756,25 @@ function attachEventListeners() {
         if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
         updateExperienceModeVisibility(); updateSessionEstimate();
     });
+    bodyScanAddonToggle?.addEventListener('change', event => {
+        const options = document.getElementById('body-scan-options');
+        if (options) options.hidden = !event.target.checked;
+        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+        updateExperienceModeVisibility(); updateSessionEstimate();
+    });
+    notingAddonToggle?.addEventListener('change', event => {
+        const options = document.getElementById('noting-options');
+        if (options) options.hidden = !event.target.checked;
+        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
+        updateExperienceModeVisibility(); updateSessionEstimate();
+    });
     document.getElementById('visualization-ambience')?.addEventListener('change', event => {
         state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
         localStorage.setItem('chakra_visualization_ambience', state.visualizationAmbience);
     });
     document.getElementById('visualization-duration')?.addEventListener('change', updateSessionEstimate);
+    document.getElementById('body-scan-duration')?.addEventListener('change', updateSessionEstimate);
+    document.getElementById('noting-duration')?.addEventListener('change', updateSessionEstimate);
     yogaExperienceToggle?.addEventListener('change', event => {
         if (!state.advancedFeaturesUnlocked) {
             yogaExperienceToggle.checked = false;
@@ -7815,6 +7896,10 @@ function attachEventListeners() {
         if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
         const visualizationOptions = document.getElementById('visualization-options');
         if (visualizationOptions) visualizationOptions.hidden = !getChecked('visualization-addon-toggle') || getChecked('shots-toggle');
+        const bodyScanOptions = document.getElementById('body-scan-options');
+        if (bodyScanOptions) bodyScanOptions.hidden = !getChecked('body-scan-addon-toggle') || getChecked('shots-toggle');
+        const notingOptions = document.getElementById('noting-options');
+        if (notingOptions) notingOptions.hidden = !getChecked('noting-addon-toggle') || getChecked('shots-toggle');
         const yogaExperience = getChecked('yoga-experience-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
@@ -7930,6 +8015,18 @@ function attachEventListeners() {
         if (getChecked('visualization-addon-toggle')) {
             const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
             setText('session-estimate', `~ ${minutes} min ${t('ui.visualizationAddon').toLowerCase()}`);
+            updateJourneyRoadmap();
+            return;
+        }
+        if (getChecked('body-scan-addon-toggle')) {
+            const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
+            setText('session-estimate', `~ ${minutes} min ${t('ui.bodyScanAddon').toLowerCase()}`);
+            updateJourneyRoadmap();
+            return;
+        }
+        if (getChecked('noting-addon-toggle')) {
+            const minutes = Number(document.getElementById('noting-duration')?.value || 4);
+            setText('session-estimate', `~ ${minutes} min ${t('ui.notingAddon').toLowerCase()}`);
             updateJourneyRoadmap();
             return;
         }

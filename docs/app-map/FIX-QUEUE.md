@@ -1,5 +1,17 @@
 # Fix queue derived from the flow atlas
 
+## Cosmic Consciousness video subtitle — release 3.50
+
+The optional Lobby video introduction now has a localized “Cosmic Consciousness Introduction” subtitle in all four languages. Playback behavior is unchanged. Production push authorized with the pending Body Scan and Guided Noting preparation release.
+
+## Guided Noting preparation — release 3.49 candidate
+
+Added a selectable 2/4/6-minute Guided Noting stage after Body Scan. It uses neutral labels, four spaced reminders, choice-based safety language, a pitch-black no-loop screen, standalone preparation routing, roadmap/estimate integration and four-language narration. Device listening remains open.
+
+## Guided Body Scan preparation — release 3.48 candidate
+
+Added a selectable 3/5/8-minute Body Scan with eight localized head-to-toe narration regions, whole-body closing, standalone preparation routing and journey estimate/roadmap integration. Its screen is a plain pitch-black fade; the body figure and scanning light were removed by owner request. Preparation order is Box → Visualization → Dharana → Body Scan → chakras. Automated source, language and thermal checks pass; device listening remains open.
+
 ## Yoga Advanced Features gate — release 3.47 candidate
 
 Yoga Experience now shares the session-only Advanced Features gate: hidden/disabled while locked, enabled after the password unlock, cleared on relock/reload, and protected against direct locked selection or start. Automated lock lifecycle checks are required; device UI verification remains open.

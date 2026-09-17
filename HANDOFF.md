@@ -1,5 +1,22 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-VIDEO-SUBTITLE-007: Cosmic Consciousness Introduction
+
+- COMPLETE locally, 2026-09-17. App 3.50 / shell 5.243 / locale 52. The optional Lobby video introduction now displays “Cosmic Consciousness Introduction” as a secondary subtitle beneath its existing opt-in label.
+- The subtitle is localized in English, Malayalam, Hindi and Russian. Video validation, selection, persistence, buffering, fullscreen playback and journey handoff are unchanged. Updated the optional-video atlas map and release documentation.
+
+### NOW — CP-GUIDED-NOTING-006: notice, name and release
+
+- COMPLETE locally, 2026-09-17. App 3.49 / shell 5.242 / locale 51, based on production `81a36b0` plus the local Body Scan checkpoint. Added Guided Noting with 2, 4 and 6 minute choices immediately after Body Scan and before chakras.
+- The practice explains neutral mental labels, includes spacious pause-aware intervals and four gentle reminders, permits returning to breath or stopping when overwhelmed, and closes by releasing labels. It runs with chakras or as a standalone preparation and is cleared by replacement experiences.
+- Its screen is pitch black with no figure, labels, animation or visual loop. Opening, reminders, closing, labels and roadmap are authored in English, Malayalam, Hindi and Russian. Preparation order is Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
+
+### NOW — CP-BODY-SCAN-005: guided head-to-toe preparation
+
+- COMPLETE locally, 2026-09-17. App 3.48 / shell 5.241 / locale 50, based on production `81a36b0`. Added an optional Body Scan Guided Session with 3, 5 and 8 minute choices. It may run with selected chakras or as a standalone preparation when no chakra is selected.
+- Preparation order is now identical in Lobby, roadmap and runtime: Box Breathing → Guided Visualization → Focused Attention (Dharana) → Body Scan → Chakra Journey. Body Scan guides eight regions from scalp to toes, uses non-corrective/choice-based language, and closes with whole-body grounding before Root.
+- The visual is now only a pitch-black fade; the body figure and scanning light were removed by owner request. It has no recurring canvas or decorative animation loop. Opening, regions, closing, labels and roadmap are authored in English, Malayalam, Hindi and Russian. Focused-practice, language, thermal and syntax checks pass; device listening remains open.
+
 ### NOW — CP-ADVANCED-YOGA-004: Yoga follows Advanced Features
 
 - COMPLETE locally, 2026-09-17, release candidate 3.47 / shell 5.240 / locale 49. Yoga Experience now starts hidden and disabled and appears only after the shared seven-tap-and-password Advanced Features unlock.

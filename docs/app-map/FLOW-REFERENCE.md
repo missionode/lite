@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.47 Advanced Yoga and narration audit following ddc1264 · 2026-09-17.
+Source snapshot: 3.50 preparation and Cosmic Consciousness release following 81a36b0 · 2026-09-17.
 
-Version 3.47 source-reviewed behavior. Yoga Experience is session-locked behind Advanced Features with visibility, selection and direct-start guards. Add-on narration coverage is contract-checked in English, Malayalam, Hindi and Russian; missing Malayalam Box Breathing hold prompts were restored. Device voice pronunciation/listening remains open. Sky calculations have 27 independent NASA/JPL reference comparisons and desktop/mobile browser checks; device thermal verification remains open. The sky is an enhanced observer chart, not an exact camera view. Other maps retain their recorded evidence levels; this is not exhaustive state-space verification.
+Version 3.50 source-reviewed behavior. The optional Lobby video is identified by the localized Cosmic Consciousness Introduction subtitle. Journey preparation order is Box Breathing, Guided Visualization, Dharana, Body Scan, Guided Noting, then chakras. Body Scan and Guided Noting have localized narration and pitch-black no-loop screens in English, Malayalam, Hindi and Russian; device voice pronunciation/listening remains open. Other maps retain their recorded evidence levels.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -191,8 +191,8 @@ flowchart TD
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
 | Sleep | Load and validate five stages; start silent narration-free journey. |
-| Focused practice | Yoga and Intimate Care are standalone routes. Box Breathing prepares a guided journey; Dharana and Visualization run before selected chakras (or together as a standalone preparation); Ho’oponopono integrates after the chakra loop. Yoga requires a selected pose. |
-| Guided meditation | HRIM bypasses chakra-selection requirement; standard requires one or more selected chakras unless Dharana or Visualization provides a standalone preparation route. |
+| Focused practice | Yoga and Intimate Care are standalone routes. Box prepares a guided journey; Visualization, Dharana, Body Scan and Guided Noting run before selected chakras or together as a standalone preparation; Ho’oponopono integrates after the chakra loop. |
+| Guided meditation | HRIM bypasses chakra selection; standard requires chakras unless one of the standalone-capable preparation practices is selected. |
 | Shared guided start | DND reminder, scripts, validation, audio, Piper warmup, wake lock, timers, selected routine. |
 
 - Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose.
@@ -624,9 +624,9 @@ flowchart TD
 
 ## Ordered Chakra Journey add-ons
 
-Optional preparation and integration techniques. Visualization: eight-second score fade-in (preview 1.2s), twelve-second private reflection, three-second settling after scene guidance, and eight-second Silence return pause.
+Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
 
-Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322), [app.js:5180](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5180), [app.js:5380](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5380).
+Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322), [app.js:5160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5160), [app.js:5369](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5369), [app.js:5423](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5423).
 
 ```mermaid
 flowchart TD
@@ -642,12 +642,12 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Preparation add-ons | Box Breathing, Dharana and Guided Visualization are selected before chakra choices and remain independently selectable. With selected chakras, after gratitude Box runs first, then Dharana, then Visualization. With no selected chakra, Dharana and/or Visualization are a complete standalone practice. Dharana enters a pitch-black full-screen scene, keeps its shrinking anchor visible through a localized closing narration, then fades the anchor and veil while awareness widens to breath/body/space. Visualization also fades its pitch-black overlay in and out under static-journey performance mode. Chakra Journey intention (a quality such as peace or clarity) remains separate from Visualization: Visualization gives a private silent reflection to choose any personally meaningful experience, possibility or direction before scene guidance. |
+| Preparation add-ons | All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. Visualization, Dharana, Body Scan and/or Noting form a standalone preparation without chakras. |
 | Chakra Journey | One or more selected chakras run in the usual chosen order. |
 | Integration add-on | Ho’oponopono is selected after the Chakra Journey section and runs after the final chakra, before silence, Closing and Emergence. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
-- Preparation add-ons can be combined without clearing one another. Dharana and Visualization may run independently without a chakra selection; Box Breathing and Ho’oponopono remain journey add-ons. Narration coverage is contract-checked for all four Meditation Languages: Box has localized preparation, four spoken steps and completion; Dharana has focus and closing; Visualization has choice, scene guidance, Silence wake-up and return; Ho’oponopono has intro, four phrases and closing. Replacement experiences clear all Chakra Journey add-ons. Piper narration retains clip-edge fades, Voice Space tail and music duck/restore; browser speech is an event-completion fallback without a Web Audio gain envelope. When selected, the Visualization score begins audibly without a tuning interaction and uses one native loop for the complete timed practice; stop/cancel uses a short fade. Silence keeps the practice quiet and adds a gentle spoken re-orientation before the final return prompt.
+- Body Scan and Guided Noting use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Narration coverage is contract-checked in all four Meditation Languages, including Body Scan opening/eight regions/closing and Noting opening/four reminders/closing. Replacement experiences clear every add-on. Piper retains clip-edge fades, Voice Space tail and music duck/restore; browser speech remains an event-completion fallback without a Web Audio gain envelope.
 
 <a id="controls"></a>
 
@@ -729,7 +729,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Lobby → Include video introduction | Persisted choice defaults OFF and appears in the roadmap for every supported journey family. A normal journey with no selected chakras is rejected at the original Begin click, before video preparation. |
+| Lobby → Include video introduction | The option carries a localized “Cosmic Consciousness Introduction” subtitle. Its persisted choice defaults OFF and appears in the roadmap for every supported journey family. A normal journey with no selected chakras is rejected at the original Begin click, before video preparation. |
 | Prepare and buffer | Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check. |
 | Begin introduction | Reveal button when ready OR after the 90-second bounded wait. Explicit user action required. |
 | Image hold → playback | Hold image 3 seconds, then video; remove the readiness-only dark shade. The meditator image and video render fully opaque. Loading and Begin content uses a near-solid dark backing with sharp white text for readability. The prelude is outside ordinary screen dimming, so saved brightness, Sleep and Eyes Close cannot make it translucent. Audio fades in over 2.4 seconds using separate video volume. |

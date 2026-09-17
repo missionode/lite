@@ -13,6 +13,7 @@ assert.ok(fs.statSync(new URL('../video/generate.mp4', import.meta.url)).size > 
 assert.ok(fs.statSync(new URL('../video/meditator.png', import.meta.url)).size > 0, 'the supplied meditator image should exist');
 assert.match(html, /id="journey-video-prelude"[\s\S]*?class="journey-video-prelude-meditator"[^>]*src="video\/meditator\.png"/, 'the meditator image should lead the prelude');
 assert.match(html, /id="journey-video-prelude-toggle"[\s\S]*?data-i18n="ui\.includeVideoIntroduction"/, 'Lobby should offer an explicit opt-in for the video introduction');
+assert.match(html, /id="journey-video-prelude-toggle"[\s\S]*?data-i18n="ui\.videoIntroductionSubtitle"/, 'The Lobby video option should identify the Cosmic Consciousness introduction');
 assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/generate\.mp4"[^>]*type="video\/mp4"/, 'generate.mp4 should be the sole prelude video source');
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?data-i18n="ui\.journeyVideoPreludeLoading"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder, loading status, and explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
@@ -80,6 +81,7 @@ for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeLoading?.trim(), 'each shipped locale needs the video loading status');
     assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
     assert.ok(locale.ui.includeVideoIntroduction?.trim(), 'each shipped locale needs the Lobby video-introduction option');
+    assert.ok(locale.ui.videoIntroductionSubtitle?.trim(), 'each shipped locale needs the Cosmic Consciousness subtitle');
     assert.ok(locale.ui.roadmapVideoIntroduction?.trim(), 'each shipped locale needs the video roadmap label');
     assert.ok(locale.ui.musicVideoVolume?.trim(), 'each shipped locale needs the shared Music / Video Volume label');
 }

@@ -22,9 +22,9 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
 }
 
 assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?yoga-experience-toggle[\s\S]*?intimate-service/, 'Yoga and intimate care remain standalone focused experiences');
-assert.match(app, /state\.selectedChakras\.length === 0[\s\S]*?dharana-addon-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?return 'preparation'/, 'Dharana and Visualization should run independently when no chakra is selected');
-assert.match(app, /focusedExperience === 'preparation'[\s\S]*?runDharana\(\)[\s\S]*?runVisualization\(\)/, 'Standalone preparation should run the selected Dharana and Visualization stages in order');
-assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?box-breathing-experience-toggle[\s\S]*?runBoxBreathing\(\)[\s\S]*?runSequence\(\)/, 'Box Breathing should prepare a normal chakra journey');
+assert.match(app, /state\.selectedChakras\.length === 0[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?return 'preparation'/, 'Preparation add-ons including Noting should run independently without chakras');
+assert.match(app, /focusedExperience === 'preparation'[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)/, 'Standalone preparation should run Visualization, Dharana, Body Scan and Noting in order');
+assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runBoxBreathing\(\)[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)[\s\S]*?runSequence\(\)/, 'Journey preparation should run Box, Visualization, Dharana, Body Scan and Noting before chakras');
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
 assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
 assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');
@@ -33,7 +33,14 @@ assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated vis
 assert.match(app, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
 assert.match(app, /while \(remaining-- > 0 && this\.isMeditationActive\)[\s\S]*?dharanaClosing[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');
 assert.match(app, /--focus-anchor-duration[\s\S]*?is-focusing/, 'Focused Attention should slowly settle the anchor over the selected duration');
-assert.match(app, /runDharana\(\)[\s\S]*?visualization-addon-toggle[\s\S]*?runVisualization\(\)[\s\S]*?runSequence\(\)/, 'Visualization should run after Dharana and before chakras');
+assert.match(html, /box-breathing-experience-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?dharana-addon-toggle[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?chakra-selection-panel/, 'Lobby preparation controls should match the approved runtime order');
+assert.match(html, /id="body-scan-duration"[\s\S]*?value="3"[\s\S]*?value="5" selected[\s\S]*?value="8"/, 'Body Scan should offer 3, 5 and 8 minute durations');
+assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'Body Scan should narrate opening, head-to-toe regions and grounded closing');
+assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.body-scan-scene[\s\S]*?background:\s*#000/, 'Body Scan should use a pitch-black fade');
+assert.doesNotMatch(html, /body-scan-figure|body-scan-light/, 'Body Scan must not display a body figure or scanning light');
+assert.doesNotMatch(app.slice(app.indexOf('async runBodyScan()'), app.indexOf('async runVisualization()')), /requestAnimationFrame|setInterval/, 'Body Scan must not add a recurring visual loop');
+assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selected[\s\S]*?value="6"/, 'Guided Noting should offer 2, 4 and 6 minute durations');
+assert.match(app, /async runNoting\(\)[\s\S]*?notingReminders[\s\S]*?notingOpening[\s\S]*?notingClosing/, 'Guided Noting should narrate its explanation, reminders and release');
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
 assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
 assert.match(app, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
@@ -45,7 +52,7 @@ assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Mo
 const focusedClearBody = app.slice(app.indexOf('function clearFocusedExperiences'), app.indexOf('function clearJourneyAddons'));
 assert.doesNotMatch(focusedClearBody, /boxBreathing|hooponopono|dharana|visualization/i, 'Selecting a compatible journey add-on must not immediately clear it');
 const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app.indexOf('const advancedPasswordModal'));
-for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization']) {
+    for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization', 'bodyScan', 'noting']) {
     assert.match(addonClearBody, new RegExp(feature, 'i'), `Exclusive modes must still clear ${feature}`);
 }
 assert.match(app, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?dharanaClosing[\s\S]*?pauseAwareSleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
@@ -58,6 +65,12 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
         assert.equal(typeof locale.ui[key], 'string', `${language} ui.${key} narration must be a string`);
         assert.ok(locale.ui[key].trim(), `${language} ui.${key} narration must not be empty`);
     }
+    for (const key of ['bodyScanOpening', 'bodyScanClosing']) assert.ok(locale.ui[key]?.trim(), `${language} ui.${key} narration must not be empty`);
+    assert.equal(locale.ui.bodyScanRegions?.length, 8, `${language} Body Scan needs eight head-to-toe narration regions`);
+    for (const region of locale.ui.bodyScanRegions) assert.ok(region.trim(), `${language} Body Scan region narration must not be empty`);
+    for (const key of ['notingOpening', 'notingClosing']) assert.ok(locale.ui[key]?.trim(), `${language} ui.${key} narration must not be empty`);
+    assert.equal(locale.ui.notingReminders?.length, 4, `${language} Guided Noting needs four spaced reminders`);
+    for (const reminder of locale.ui.notingReminders) assert.ok(reminder.trim(), `${language} Guided Noting reminder must not be empty`);
     for (const key of ['centeringBreath', 'breathingComplete']) {
         assert.equal(typeof locale.system[key], 'string', `${language} system.${key} narration must be a string`);
         assert.ok(locale.system[key].trim(), `${language} system.${key} narration must not be empty`);
@@ -71,7 +84,7 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['boxBreathingExperience', 'hooponoponoExperience', 'yogaExperience', 'beginBoxBreathing', 'beginHooponopono', 'beginYogaExperience', 'roadmapBoxBreathing']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
-    for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization']) {
+    for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization', 'bodyScanAddon', 'bodyScanDuration', 'bodyScanTitle', 'roadmapBodyScan', 'notingAddon', 'notingSubtitle', 'notingDuration', 'notingTitle', 'roadmapNoting']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
 }
