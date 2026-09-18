@@ -548,6 +548,14 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-18 (Native Malayalam narration edit)
+
+- Scope: all Malayalam production narration in `scripts.json` was reviewed as spoken Malayalam. The edited fields preserve the existing journey order, concepts, safety/consent boundaries, placeholders, frequencies and mantra identifiers while improving grammar, spelling, punctuation, calm pacing and consistency of address.
+- Key corrections: standardized `സൗമ്യ`, corrected the Yoga transition to `അടുത്ത ആസനം`, corrected Ho’oponopono “I am sorry” to `എനിക്ക് ഖേദമുണ്ട്`, replaced literal translation patterns, and divided dense passages into shorter TTS-friendly sentences. No English, Hindi, Russian, timing, audio or application-code behavior was changed.
+- Atlas: the Scripts, language and timing map now records the Malayalam spoken-register contract and identifies `scripts.json` as a direct source. `build-atlas.mjs` regenerated the 29-map reference successfully. Audible Piper/browser pronunciation remains a device-listening check rather than an automated claim; `verify-atlas.mjs` could not launch its Chromium process because macOS denied Mach-port registration, so browser-level atlas verification is `BLOCKED` by the environment.
+- Validation: `static/unit` PASS — JSON parsing, the new 59-field Malayalam editorial regression contract, hypnosis journey, Yoga Experience, language-intention, Russian and Hindi language contracts, and diff whitespace checks. `test:content-safety` remains `BLOCKED` before its assertions because the owner-managed `docs/dot.json` file is absent; it was not restored or modified.
+- Preserve unrelated local state: `.DS_Store`, `audio/.DS_Store`, `.codex/`, and `audio/BACKUP/background_music.mp3` remain outside this checkpoint.
+
 ### Local checkpoint — 2026-09-07 (Meditation visual effects)
 
 - Scope: Settings now has a persisted `Meditation Visual Effect` selector with `Natural`, `Aura Glow`, `Holographic`, and `Sacred Depth`. It applies to the existing meditation image area for normal chakra symbols and presiding-deity images without changing image assets or adding WebGL/canvas/per-frame JavaScript.

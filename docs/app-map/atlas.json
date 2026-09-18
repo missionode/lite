@@ -2171,7 +2171,7 @@
       "group": "Systems",
       "title": "Scripts, language and timing",
       "subtitle": "Content selection, validation, fallback and demo behavior.",
-      "source": "app.js:641; app.js:944; app.js:1160; app.js:7176; language-manifest.json:1",
+      "source": "app.js:641; app.js:944; app.js:1160; app.js:7176; scripts.json:1; language-manifest.json:1",
       "rows": [
         [
           [
@@ -2284,7 +2284,7 @@
         ]
       ],
       "notes": [
-        "Default add-on narration is complete in English, Malayalam, Hindi and Russian. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono resolves from scripts.json. Automated checks establish key presence, non-empty copy and expected phrase/step counts, not pronunciation quality. Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation."
+        "Default add-on narration is complete in English, Malayalam, Hindi and Russian. The production Malayalam fields in scripts.json use a calm, consistent spoken register, natural sentence pacing and corrected care/yoga terminology; Ho’oponopono preserves its four canonical meanings. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono resolves from scripts.json. Automated checks establish key presence, non-empty copy and expected phrase/step counts, not audible pronunciation quality. Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation."
       ]
     },
     {

@@ -210,8 +210,8 @@ assert.doesNotMatch(
   /റൂട്ട്|സാക്രൽ|സോളാർ പ്ലെക്സസ്|തൊണ്ടചക്ര|മൂന്നാം കണ്ണ് ചക്ര|കിരീടചക്ര/u,
   'Malayalam chakra narration must not mix English or explanatory chakra names',
 );
-assert.match(scripts.intro.gratitude_ml, /പൂർണ്ണമായി എന്നിൽ ശ്രദ്ധിക്കൂ/u);
-assert.match(scripts.intro.moon.waning_ml, /പിൻവാങ്ങുന്ന ചന്ദ്രനെ തിരിച്ചുവരവിന്റെ പ്രതീകമായി/u);
+assert.match(scripts.intro.gratitude_ml, /എന്റെ ശബ്ദത്തിലേക്ക് മുഴുവൻ ശ്രദ്ധ കൊണ്ടുവരൂ/u);
+assert.match(scripts.intro.moon.waning_ml, /തേയുന്ന ചന്ദ്രനെ ഉള്ളിലേക്കുള്ള മടക്കത്തിന്റെ പ്രതീകമായി/u);
 
 const englishChakraNames = {
   root: 'Root Chakra',

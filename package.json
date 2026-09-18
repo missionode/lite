@@ -7,6 +7,7 @@
     "test:lobby-scroll": "node tests/lobby-scroll.test.mjs",
     "test:narration-audio-only": "node tests/narration-audio-only.test.mjs",
     "test:language-intention": "node tests/language-intention.test.mjs",
+    "test:malayalam-script": "node tests/malayalam-script.test.mjs",
     "test:russian-language": "node tests/russian-language.test.mjs",
     "test:hindi-language": "node tests/hindi-language.test.mjs",
     "test:demo-script": "node tests/demo-script.test.mjs",
