@@ -548,6 +548,12 @@
 
 ## NOW
 
+### Release checkpoint — 2026-09-18 (Owner moved facilitator bundle)
+
+- The owner intentionally moved `docs/dot.json` outside this project after CP-DOT-001. Production records that deletion so the facilitator bundle is not reintroduced by this push. The application runtime, built-in `scripts.json` and four production language paths are unchanged.
+- The flow atlas was regenerated after the permanent Earth / truthful Moon observer-guide update: 29 maps, 252 nodes and 287 edges. The atlas remains accurate; moving the optional facilitator fixture adds no application navigation or runtime-flow branch.
+- `test:content-safety` is again unavailable because it requires the owner-managed facilitator fixture. Sky, astronomy, lifecycle, thermal, syntax and atlas evidence from CP-EARTH-002 remains the applicable release evidence.
+
 ### Local checkpoint — 2026-09-18 (Permanent Earth and Moon observer guide)
 
 - Owner correction to CP-EARTH-001: Earth must behave like the other space objects and remain visible at the same below-horizon coordinate during scrolling. The earlier allowance to move or omit Earth for foreground clearance is superseded.
