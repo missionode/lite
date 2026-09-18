@@ -11,6 +11,16 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.
 - Audio, narration, journeys, localization, Earth atmosphere and Sun shield were not modified.
 - Browser/device evidence was not requested and is not claimed.
 
+## CP-MOD-003 — complete initial-state factory
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.
+
+- Initial persisted preferences, defaults, session-only flags and legacy precedence now originate in `modules/app-state.js`.
+- Existing runtime consumers continue to mutate the same plain state object; no journey, media or UI consumer was rewritten.
+- Direct state tests cover defaults, restoration, session reset and legacy precedence. Eleven neighboring feature/thermal contracts pass.
+- Script ordering, versioned offline precache, JavaScript syntax, atlas regeneration and diff checks pass.
+- `drone-duration.test.mjs` remains blocked before assertions by the known absent owner-managed `docs/dot.json`; browser/device evidence was not requested and is not claimed.
+
 ## CP-MOD-002 — preference normalization seam
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence after refreshing one stale shell-version assertion.

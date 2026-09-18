@@ -11,7 +11,6 @@ assert.match(html, /id="yoga-experience-toggle"/, 'Yoga should be a Lobby Experi
 assert.match(html, /id="yoga-experience-setup"[^>]*hidden/, 'Yoga setup should not appear among normal Settings by default');
 assert.match(html, /id="yoga-experience-panel-host"/, 'the Lobby should host the Yoga setup panel');
 assert.doesNotMatch(html, /id="yoga-bridge-toggle"/, 'Yoga must not remain a chakra-journey bridge');
-assert.match(app, /selectedChakras: JSON\.parse\(localStorage\.getItem\('chakra_selected'\)\) \|\| \[\]/, 'a new client should have no preselected chakras');
 assert.doesNotMatch(html, /value="(?:thirdeye|crown)" checked|value="(?:thirdeye|crown)"[^>]*disabled/, 'Third Eye and Crown should be optional and editable');
 assert.doesNotMatch(app, /state\.yogaBridgeEnabled|getChecked\('yoga-bridge-toggle'\)/, 'normal journeys must not use a Yoga Bridge flag');
 

@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-18",
-    "commit": "58e2ee0 baseline + uncommitted modularization warm-up",
-    "scope": "Source-reviewed application behavior plus the first behavior-preserving modularization checkpoint. Settings backup validation and replacement now have one bounded module; all other runtime ownership remains unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
+    "commit": "20a2845 baseline + uncommitted state-factory checkpoint",
+    "scope": "Source-reviewed application behavior plus three behavior-preserving modularization checkpoints. Settings backup and initial application-state construction now have bounded module owners; runtime state consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -334,7 +334,7 @@
           [
             "next",
             "Next queued boundary",
-            "Settings/state → content/localization → media → journey stages → UI composition. Each remains planned until separately delivered."
+            "Content/localization → media → journey stages → UI composition. Each remains planned until separately delivered."
           ]
         ]
       ],
@@ -391,7 +391,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement, and app-state owns numeric and legacy-boolean preference normalization. Both frozen APIs load before app.js and are precached. Full initial-state ownership remains queued. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
+        "Delivered seams: settings backup owns collection/validation/replacement, and app-state owns all initial persisted/default/session-only state construction plus legacy preference precedence. Both frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
       ]
     },
     {

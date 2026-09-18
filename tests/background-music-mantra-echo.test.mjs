@@ -89,7 +89,6 @@ assert.match(serviceWorker, /audio\/background_music\.mp3\?v=20260831\.1/, 'the 
 assert.match(app, /const PLEASURE_AMBIENCE_GAIN = 0\.003/, 'pleasure ambience should use a fixed barely-audible gain');
 assert.match(app, /const PLEASURE_AMBIENCE_HARMONIC_MIX = 0\.04/, 'pleasure harmonic enrichment should remain a very low parallel mix');
 assert.match(app, /const PLEASURE_AMBIENCE_INTENSITIES = Object\.freeze/, 'ambience intensity should use explicit bounded profiles');
-assert.match(app, /pleasureAmbienceIntensity: 'gentle'/, 'Gentle should be the default session ambience profile');
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_pleasure_ambience_intensity'\)/, 'ambience intensity must reset rather than persist');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_pleasure_ambience_intensity'/, 'ambience intensity must not be saved to local storage');
 assert.match(app, /translation && translation !== path\) element\.textContent = translation/, 'stale language bundles should preserve readable fallback labels instead of showing raw ui keys');
@@ -135,13 +134,11 @@ assert.match(app, /stopPleasureAmbience\(fadeTime = PLEASURE_AMBIENCE_FADE_SECON
 assert.match(app, /this\.pleasureManifest = null;[\s\S]*?this\.pleasureBuffers\.clear\(\);/, 'stopping the ambience should clear decoded buffers before the next journey');
 assert.match(app, /if \(!state\.bgMusicMode\) void this\.audio\.startPleasureAmbience\(\)/, 'guided sessions should start the pleasure ambience without changing Music Only');
 assert.match(app, /this\.audio\.stopPleasureAmbience\(\)/, 'session completion and cancellation should stop the pleasure ambience');
-assert.match(app, /pleasureAmbienceGain: clampPleasureAmbienceGain\(storedNumber\('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN\)\)/, 'the ambience level should have a bounded saved preference');
 assert.match(app, /setPleasureAmbienceGain\(gain\)/, 'the audio engine should expose a smooth ambience level update');
 assert.match(app, /this\.pleasureBlurFilter = this\.ctx\.createBiquadFilter\(\)/, 'pleasure ambience should have a dedicated blur filter');
 assert.match(app, /this\.pleasureBlurConvolver\.buffer = this\.createImpulseResponse\(0\.9, 4\.5\)/, 'pleasure blur should use gentle diffusion');
 assert.match(app, /setPleasureAmbienceBlur\(enabled = true\)/, 'pleasure blur should be independently toggleable');
 assert.match(app, /state\.pleasureAmbienceBlur = true/, 'enabling the ambience should restore blur as the default');
-assert.match(app, /pleasureAmbienceBlurAmount: clampPleasureAmbienceBlurAmount\(storedNumber\('chakra_pleasure_ambience_blur_amount', PLEASURE_BLUR_DEFAULT_AMOUNT\)\)/, 'pleasure blur intensity should have a bounded saved preference');
 assert.match(app, /pleasure-ambience-blur-level'\)\?\.addEventListener\('input'/, 'the pleasure blur intensity slider should update from user input');
 assert.match(app, /mood-relaxation-ambience-level'\)\?\.addEventListener\('input'/, 'the ambience level slider should update from user input');
 
@@ -215,7 +212,6 @@ assert.match(app, /const previousVolume = state\.volMusic;[\s\S]*?audio\.setBack
 assert.doesNotMatch(app, /this\.bgMusicLoop\.stop\(0\)/, 'background music must never be restarted with an immediate cut');
 assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS\)[\s\S]*?const retirementSeconds = Math\.max\(0, fadeTime\);[\s\S]*?this\.bgMusicLoop\.stop\(retirementSeconds\);[\s\S]*?this\.bgMusicRetirePromise = retirement;/, 'background music stops should use a controlled fade and retain its retirement until a later start can safely proceed');
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?bgMusicTargetVolume = 0;[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion uses one music exit envelope without restoring music');
-assert.match(app, /musicEcho: localStorage\.getItem\('chakra_music_echo'\) \|\| 'light'/, 'music echo preference should have a safe default');
 assert.match(app, /syncValue\('music-echo', state\.musicEcho\)/, 'the music echo selector should restore its saved value');
 assert.match(app, /document\.getElementById\('music-echo'\)\?\.addEventListener\('change'/, 'music echo changes should be persisted independently');
 assert.match(app, /if \(state\.noMantraMode\) return;/, 'No Mantra Mode should be independent from No Frequency Mode');

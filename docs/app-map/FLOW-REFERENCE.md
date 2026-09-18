@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 58e2ee0 baseline + uncommitted modularization warm-up · 2026-09-18.
+Source snapshot: 20a2845 baseline + uncommitted state-factory checkpoint · 2026-09-18.
 
-Source-reviewed application behavior plus the first behavior-preserving modularization checkpoint. Settings backup validation and replacement now have one bounded module; all other runtime ownership remains unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus three behavior-preserving modularization checkpoints. Settings backup and initial application-state construction now have bounded module owners; runtime state consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -175,9 +175,9 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Next queued boundary | Settings/state → content/localization → media → journey stages → UI composition. Each remains planned until separately delivered. |
+| Next queued boundary | Content/localization → media → journey stages → UI composition. Each remains planned until separately delivered. |
 
-- Delivered seams: settings backup owns collection/validation/replacement, and app-state owns numeric and legacy-boolean preference normalization. Both frozen APIs load before app.js and are precached. Full initial-state ownership remains queued. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement, and app-state owns all initial persisted/default/session-only state construction plus legacy preference precedence. Both frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 

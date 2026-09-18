@@ -46,8 +46,6 @@ assert.match(html, /id="visual-effect-select"[\s\S]*?value="natural"[\s\S]*?valu
     'Settings should expose the meditation visual effect choices.');
 assert.match(app, /const MEDITATION_VISUAL_EFFECTS = new Set\(\['natural', 'aura', 'holographic', 'depth'\]\)/,
     'Runtime should normalize the supported visual effect modes.');
-assert.match(app, /visualEffect:\s*normalizeMeditationVisualEffect\(localStorage\.getItem\('chakra_visual_effect'\)\)/,
-    'The selected visual effect should be restored from local storage.');
 assert.match(app, /localStorage\.setItem\('chakra_visual_effect', state\.visualEffect\)/,
     'The selected visual effect should be saved with Settings.');
 assert.match(app, /classList\.add\(`visual-effect-\$\{effect\}`\)[\s\S]*?classList\.toggle\('visual-effect-active', active\)/,

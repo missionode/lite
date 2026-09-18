@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: 58e2ee0 baseline + uncommitted modularization warm-up · 2026-09-18.
+Source snapshot: 20a2845 baseline + uncommitted state-factory checkpoint · 2026-09-18.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

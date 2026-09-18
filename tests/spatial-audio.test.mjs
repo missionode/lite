@@ -10,7 +10,6 @@ const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.
 assert.match(app, /const SPATIAL_MODES = Object\.freeze\(\['off', 'stereo', 'headphones', 'room'\]\)/);
 assert.match(app, /const DEFAULT_SPATIAL_MODE = 'off'/, 'Spatial audio must be off by default');
 assert.match(app, /function normalizeSpatialMode\(value\)[\s\S]*?DEFAULT_SPATIAL_MODE/);
-assert.match(app, /spatialMode: normalizeSpatialMode\(localStorage\.getItem\('chakra_spatial_mode'\)\)/);
 
 for (const id of ['spatial-mode', 'mixer-spatial-mode']) {
     assert.match(html, new RegExp(`id="${id}"`), `${id} should be available`);

@@ -11,7 +11,6 @@ assert.match(html, /id="mixer-no-frequency-mode-toggle"/, 'the in-session mixer 
 assert.match(html, /id="no-mantra-mode-toggle"/, 'Settings should expose the independent No Mantra Mode');
 assert.match(html, /id="mixer-no-mantra-mode-toggle"/, 'the in-session mixer should expose the independent No Mantra Mode');
 assert.doesNotMatch(html, /id="frequencies-toggle"|id="mixer-frequencies-toggle"/, 'the former 110 Hz fallback controls should not remain');
-assert.match(app, /noFrequencyMode: localStorage\.getItem\('chakra_no_frequency_mode'\) === 'true'/, 'No Frequency Mode should default to off and persist only when enabled');
 assert.doesNotMatch(app, /state\.chakraFrequencies|chakra_frequencies/, 'the former fallback preference must not control generated audio');
 
 const method = (name, nextName) => {

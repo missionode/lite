@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-003: complete initial-state factory
+
+- ACTIVE on `modularize`, following `20a2845`. Moved the complete initial application-state factory from `app.js` into `modules/app-state.js`: language/voice, volumes, ambience, journey preferences, statistics, timings, custom scripts, Advanced/session-only defaults and legacy care-key precedence now have one bounded owner.
+- `app.js` now composes the factory with existing normalization/clamping functions and constants, then continues using the same mutable plain object. No runtime consumer, storage key, default, journey route, audio behavior or visual behavior changed.
+- Added a direct state contract covering clean-install defaults, persisted restoration, session-only reset rules, returning-journey fallback and current-over-legacy precedence. Removed initial-state source-location assertions from affected feature tests while preserving their runtime behavior contracts.
+- Known baseline limitation: `drone-duration.test.mjs` still stops before assertions because owner-moved `docs/dot.json` is absent; this is unrelated and documented. Browser/device evidence was not requested and is not claimed.
+- Progress: 27% complete | Confidence: high for state foundation, medium for full migration | Current phase: settings/state complete | Main remaining scope: content/localization, media, journeys and UI.
+
 ### NOW — CP-MOD-002: preference normalization boundary
 
 - ACTIVE on `modularize`, following `a88d5b1`. Added the frozen `window.ChakraAppState` module as the first state boundary. Numeric/default reads and current-key/legacy-key boolean resolution now have one directly tested owner; `app.js` retains thin compatibility wrappers so the large initial-state object and all consumers remain behaviorally unchanged.

@@ -13,9 +13,6 @@ for (const id of ['box-breathing-experience-toggle', 'hooponopono-experience-tog
 assert.match(html, /id="yoga-mode-control"[^>]* hidden[\s\S]*?id="yoga-experience-toggle" disabled/, 'Yoga Experience should be available only after Advanced Features unlock');
 assert.doesNotMatch(html, /id="box-meditation-toggle"|id="hooponopono-toggle"/, 'focused practices must not remain Settings add-ons');
 assert.doesNotMatch(app, /state\.boxMeditation\b|state\.hooponopono\b/, 'legacy add-on state must not return');
-assert.match(app, /boxBreathingExperienceEnabled: false/, 'Box Breathing should start session-only');
-assert.match(app, /hooponoponoExperienceEnabled: false/, 'Ho’oponopono should start session-only');
-assert.match(app, /yogaExperienceEnabled: false/, 'Yoga should start session-only');
 for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
     assert.match(app, new RegExp(`localStorage\\.removeItem\\('${key}'\\)`), `${key} should be cleared instead of restored`);
     assert.doesNotMatch(app, new RegExp(`localStorage\\.setItem\\('${key}'`), `${key} must not be persisted`);
@@ -28,7 +25,6 @@ assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runBoxBreathing\(\
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
 assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
 assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');
-assert.match(app, /volVisualizationAmbience: clampAudioLevel\(storedNumber\('chakra_vol_visualization_ambience', 0\.10\), 0\.02, 0\.5, 0\.10\)/, 'Saved Visualization ambience volume should accept the same ceiling');
 assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated visible anchor layer rather than text inside the chakra image');
 assert.match(app, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
 assert.match(app, /while \(remaining-- > 0 && this\.isMeditationActive\)[\s\S]*?dharanaClosing[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');

@@ -6586,117 +6586,31 @@ const journeyVideoPrelude = new JourneyVideoPrelude(audio);
 const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
-function storedNumber(key, fallback) {
-    return window.ChakraAppState.storedNumber(localStorage, key, fallback);
-}
-
-function storedBooleanWithLegacy(key, legacyKey) {
-    return window.ChakraAppState.storedBooleanWithLegacy(localStorage, key, legacyKey);
-}
-
 document.addEventListener('visibilitychange', async () => {
     document.documentElement.classList.toggle('page-hidden', document.hidden);
     if (wakeLock.wakeLock !== null && document.visibilityState === 'visible') await wakeLock.request();
 });
 document.documentElement.classList.toggle('page-hidden', document.hidden);
 
-const state = {
-    language: localStorage.getItem('chakra_lang') || 'ml',
-    // Content/narration language and visible interface language are separate
-    // so a facilitator can guide in one language while reading the UI in
-    // another. English is the safe default for the visible interface.
-    displayLanguage: localStorage.getItem('chakra_display_language') || 'en',
-    voiceName: localStorage.getItem('chakra_voice') || 'piper:ml_IN-arjun-medium',
-    timePerChakra: parseFloat(localStorage.getItem('chakra_time')) || 5.0,
-    timeHighEnergy: parseFloat(localStorage.getItem('chakra_time_high_energy')) || 5.0,
-    droneDurationMode: normalizeDroneDurationMode(localStorage.getItem('chakra_drone_duration_mode')),
-    hrimDroneDurationMode: normalizeHrimDroneDurationMode(localStorage.getItem('chakra_hrim_drone_duration_mode')),
-    voices: [],
-    volVoice: clampAudioLevel(storedNumber('chakra_vol_voice', 0.9), 0.2, 2, 0.9),
-    volDrone: clampAudioLevel(storedNumber('chakra_vol_drone', 0.05), 0.02, 0.2, 0.05),
-    volBell: clampAudioLevel(storedNumber('chakra_vol_bell', 0.04), 0.02, 0.12, 0.04),
-    volMantra: clampAudioLevel(storedNumber('chakra_vol_mantra', 0.35), 0.005, 1, 0.35),
-    volMusic: clampAudioLevel(storedNumber('chakra_vol_music', 0.20), 0.02, 0.5, 0.20),
-    volVisualizationAmbience: clampAudioLevel(storedNumber('chakra_vol_visualization_ambience', 0.10), 0.02, 0.5, 0.10),
-    visualizationAmbience: localStorage.getItem('chakra_visualization_ambience') || 'silence',
-    volVideo: clampAudioLevel(storedNumber('chakra_vol_video', 0.20), 0.02, 0.5, 0.20),
-    pleasureAmbienceGain: clampPleasureAmbienceGain(storedNumber('chakra_pleasure_ambience_gain', PLEASURE_AMBIENCE_GAIN)),
-    pleasureAmbienceUrl: normalizePleasureAmbienceUrl(localStorage.getItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY)),
-    pleasureAmbienceBlurAmount: clampPleasureAmbienceBlurAmount(storedNumber('chakra_pleasure_ambience_blur_amount', PLEASURE_BLUR_DEFAULT_AMOUNT)),
-    // Intensity is a session-only character preset. It never changes the
-    // saved Ambience Level or the user's base Blur Intensity preference.
-    pleasureAmbienceIntensity: 'gentle',
-    voiceClarity: parseFloat(localStorage.getItem('chakra_voice_clarity')) || 50,
-    voiceWarmth: parseFloat(localStorage.getItem('chakra_voice_warmth')) || 50,
-    voicePace: parseFloat(localStorage.getItem('chakra_voice_pace')) || 1,
-    voiceEcho: localStorage.getItem('chakra_voice_echo') || 'light',
-    musicEcho: localStorage.getItem('chakra_music_echo') || 'light',
-    spatialMode: normalizeSpatialMode(localStorage.getItem('chakra_spatial_mode')),
-    stats: {
-        journeys: parseInt(localStorage.getItem('chakra_stats_journeys')) || 0,
-        time: parseInt(localStorage.getItem('chakra_stats_time')) || 0
+const state = window.ChakraAppState.createInitialState({
+    storage: localStorage,
+    helpers: {
+        normalizeDroneDurationMode,
+        normalizeHrimDroneDurationMode,
+        normalizeSleepDroneDurationMode,
+        normalizeSpatialMode,
+        clampAudioLevel,
+        clampPleasureAmbienceGain,
+        normalizePleasureAmbienceUrl,
+        clampPleasureAmbienceBlurAmount,
+        normalizeMeditationVisualEffect
     },
-    selectedChakras: JSON.parse(localStorage.getItem('chakra_selected')) || [],
-    intention: localStorage.getItem('chakra_intention') || '',
-    sleepMode: false,
-    // This preference controls the opening style; stats.journeys remains the
-    // historical count of completed journeys.
-    returningJourney: (() => {
-        const saved = localStorage.getItem('chakra_returning_journey');
-        if (saved !== null) return saved === 'true';
-        return (parseInt(localStorage.getItem('chakra_stats_journeys')) || 0) > 0;
-    })(),
-    // A deliberate Lobby preference: the cinematic prelude is optional and
-    // never implied by Restart Journey.
-    journeyVideoPreludeEnabled: localStorage.getItem('chakra_journey_video_prelude') === 'true',
-    audioFilters: localStorage.getItem('chakra_audio_filters') === 'true',
-    // Reverse order is intentionally derived only for the Massage wrapper.
-    // These focused practices are Lobby-only Experience Modes. They are
-    // intentionally session-only and must never be added to a chakra journey.
-    boxBreathingExperienceEnabled: false,
-    hooponoponoExperienceEnabled: false,
-    yogaExperienceEnabled: false,
-    // Default off: this mode disables intentional frequency generators while
-    // preserving narration and background music in a guided journey.
-    noFrequencyMode: localStorage.getItem('chakra_no_frequency_mode') === 'true',
-    noMantraMode: localStorage.getItem('chakra_no_mantra_mode') === 'true',
-    // This ambience choice is intentionally session-only. It must not be
-    // restored after a reload or written to localStorage.
-    moodRelaxationIntentionEnabled: false,
-    pleasureAmbienceBlur: true,
-    deityPath: localStorage.getItem('chakra_deity_path') || 'none',
-    visualEffect: normalizeMeditationVisualEffect(localStorage.getItem('chakra_visual_effect')),
-    advancedFeaturesUnlocked: false,
-    // Experience Mode selections are intentionally session-only. They should
-    // never be restored from or written to localStorage.
-    bgMusicMode: false,
-    highEnergyEnabled: false,
-    sleepExperienceEnabled: false,
-    sleepDroneDurationMode: normalizeSleepDroneDurationMode(localStorage.getItem('chakra_sleep_drone_duration_mode')),
-    eyesCloseMode: localStorage.getItem('chakra_eyes_close_mode') === 'true',
-    corpsePoseEnabled: localStorage.getItem('chakra_corpse_enabled') === 'true',
-    brightness: parseFloat(localStorage.getItem('chakra_brightness')) || 1.0,
-    bathSessionEnabled: localStorage.getItem('chakra_bath_enabled') === 'true',
-    perinealCareEnabled: storedBooleanWithLegacy('chakra_intimate_perineal_care', 'chakra_perineal_care'),
-    assistedBathingEnabled: storedBooleanWithLegacy('chakra_intimate_assisted_bathing', 'chakra_assisted_bathing'),
-    massageEnabled: storedBooleanWithLegacy('chakra_intimate_massage', 'chakra_massage'),
-    selectedYogaPoses: JSON.parse(localStorage.getItem('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
-    // Journey Timings (in seconds)
-    timeSleepStage: parseFloat(localStorage.getItem('chakra_time_sleep_stage')) || 5.0,
-    timeShot: parseInt(localStorage.getItem('chakra_time_shot')) || 7,
-    timeIcebreaker: parseInt(localStorage.getItem('chakra_time_icebreaker')) || 60,
-    timeEmergence: parseInt(localStorage.getItem('chakra_time_emergence')) || 60,
-    timeBreathing: parseInt(localStorage.getItem('chakra_time_breathing')) || 8,
-    timeCorpse: parseInt(localStorage.getItem('chakra_time_corpse')) || 300,
-    timeInterval: parseInt(localStorage.getItem('chakra_time_interval')) || 10,
-    timeYogaPrep: parseInt(localStorage.getItem('chakra_time_yoga_prep')) || 60,
-    timeYogaPose: parseInt(localStorage.getItem('chakra_time_yoga_pose')) || 60,
-    timeBath: parseInt(localStorage.getItem('chakra_time_bath')) || 600,
-    timePerinealCare: parseInt(localStorage.getItem('chakra_time_perineal_care')) || 300,
-    timeAssistedBathing: parseInt(localStorage.getItem('chakra_time_assisted_bathing')) || 600,
-    scriptSource: localStorage.getItem('chakra_script_source') || 'default',
-    customScript: JSON.parse(localStorage.getItem('chakra_custom_script')) || null
-};
+    constants: {
+        PLEASURE_AMBIENCE_GAIN,
+        PLEASURE_AMBIENCE_URL_STORAGE_KEY,
+        PLEASURE_BLUR_DEFAULT_AMOUNT
+    }
+});
 
 function isDemoScriptSelected() {
     return state.scriptSource === 'custom' && getDemoCoreDurationMinutes(state.customScript) !== null;

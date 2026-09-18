@@ -127,7 +127,6 @@ assert.doesNotMatch(app, /localStorage\.(?:getItem|setItem)\(['"](?:chakra_)?sho
 assert.match(app, /if \(!state\.moodRelaxationIntentionEnabled \|\| state\.noFrequencyMode\) return false;/, 'the intention tone must require explicit activation and respect No Frequency Mode');
 assert.match(app, /getDroneDurationMs\(practiceMinutes, durationMode\)/, 'the intention tone must use the active drone-duration timing');
 assert.match(app, /narrateIntentionWithFrequency\(intentionText/, 'the intention narration must be the activation point for the optional tone');
-assert.match(app, /moodRelaxationIntentionEnabled: false/, 'the ambience choice should start disabled on every page load');
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience choice must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience choice must not be saved to local storage');
 assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');

@@ -50,11 +50,9 @@ assert.match(css, /\.journey-video-prelude-ready\s*\{[\s\S]*?background:\s*rgba\
 assert.doesNotMatch(css, /#app\s*\{[^}]*opacity:/, 'the #app ancestor must not dim the video prelude or its readable content.');
 assert.match(css, /\.journey-video-prelude\.is-leaving[\s\S]*?transition-duration:\s*0\.25s/, 'the short prelude should dissolve only across its final 0.25 seconds');
 assert.match(html, /id="settings-vol-video"[^>]*min="0\.02"[^>]*max="0\.5"[\s\S]*?id="preview-video-audio"/, 'Settings should provide a safe dedicated Video Volume control and preview action');
-assert.match(app, /volVideo: clampAudioLevel\(storedNumber\('chakra_vol_video', 0\.20\), 0\.02, 0\.5, 0\.20\)/, 'Video Volume should persist independently in local storage');
 assert.match(app, /class JourneyVideoPrelude[\s\S]*?async previewAudio\(\)[\s\S]*?this\.audio\.fadeJourneyVideoPrelude\(state\.volVideo, 0\.25\)[\s\S]*?const onPlay = \(\) => \{[\s\S]*?const playback = this\.media\.play\(\)[\s\S]*?fadeJourneyVideoPrelude\(state\.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'preview and actual video playback should use the independent Video Volume');
 assert.doesNotMatch(app, /fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video playback must not follow the background Music Volume');
 assert.doesNotMatch(app, /requestFullscreen\(|webkitEnterFullscreen/, 'the prelude should not trigger automatic fullscreen');
-assert.match(app, /journeyVideoPreludeEnabled: localStorage\.getItem\('chakra_journey_video_prelude'\) === 'true'/, 'the Lobby video preference should persist independently');
 assert.match(app, /state\.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce[\s\S]*?journeyVideoPrelude\.play\(\)[\s\S]*?startMeditationBtn\.click\(\)/, 'the selected Lobby video should run once before the normal journey dispatcher');
 assert.match(app, /function validateLobbyStartBeforePrelude\(\)[\s\S]*?hasAlternativeMode[\s\S]*?state\.selectedChakras\.length === 0[\s\S]*?Please select at least one chakra[\s\S]*?startMeditationBtn\.addEventListener\('click', async \(\) => \{\s*if \(!validateLobbyStartBeforePrelude\(\)\) return;[\s\S]*?state\.journeyVideoPreludeEnabled/,
     'A normal journey with no chakras must be rejected at the original Begin click, before the optional video prelude starts.');
