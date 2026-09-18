@@ -3445,7 +3445,6 @@ class AmbientParticleField {
         document.addEventListener('visibilitychange', this.handleVisibility);
         document.addEventListener('decorationchange', this.handleMotionChange);
         this.motionPreference.addEventListener('change', this.handleMotionChange);
-        document.addEventListener('scroll', this.invalidateSkyLayout, { passive: true, capture: true });
         this.layoutObserver = new MutationObserver(this.invalidateSkyLayout);
         const mantra = document.getElementById('mantra-display');
         if (mantra) this.layoutObserver.observe(mantra, { childList: true, characterData: true, subtree: true });
@@ -3651,6 +3650,7 @@ class AmbientParticleField {
             const [red, green, blue] = body.color;
             this.ctx.save();
             if (body.kind === 'star') this.ctx.globalAlpha = Math.max(0.10, Math.min(1, (2 - this.skySnapshot.sunAltitude) / 20));
+            if (body.kind === 'moon') this.drawEarthMoonGuide(x, y, width, height);
             const illumination = body.kind === 'moon' ? body.illumination : 1;
             const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'moon' ? size * 3.5 : size * 4;
             const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
@@ -3756,25 +3756,8 @@ class AmbientParticleField {
         const label = name && name !== key ? name : 'Earth';
         this.ctx.save();
         this.ctx.font = '500 11px Inter, Manjari, sans-serif';
-        const obstacles = [];
-        const selectors = '#mantra-display, #progress-tracker, #controls, .screen:not(.hidden) button, .screen:not(.hidden) label, .screen:not(.hidden) input, .screen:not(.hidden) select, .screen:not(.hidden) p, .screen:not(.hidden) h1, .screen:not(.hidden) h2, .duration-value';
-        // Measured only on cached-layer rebuilds or explicit layout changes.
-        for (const element of document.querySelectorAll(selectors)) {
-            const box = element.getBoundingClientRect();
-            if (!box.width || !box.height || box.bottom < height * 0.88 || box.top > height || box.right < width / 2 - 70 || box.left > width / 2 + 150) continue;
-            const style = getComputedStyle(element);
-            const revealingControls = element.id === 'controls' && document.body.classList.contains('fullscreen-controls-visible');
-            if (style.visibility === 'hidden' || (Number(style.opacity) === 0 && !revealingControls)) continue;
-            if (element.id === 'controls') {
-                // Reserve the final resting position as well as the animated
-                // one: reveal starts translated down by one rem.
-                const translation = style.transform === 'none' ? 0 : new DOMMatrixReadOnly(style.transform).m42;
-                obstacles.push({ left: box.left, right: box.right, top: box.top - Math.max(0, translation), bottom: box.bottom });
-            } else obstacles.push(box);
-        }
-        const placement = this.earthReferenceLayout(width, height, obstacles, this.ctx.measureText(label).width);
+        const placement = this.earthReferenceLayout(width, height, [], this.ctx.measureText(label).width);
         this.earthReferencePlacement = placement;
-        if (!placement) { this.ctx.restore(); return; }
         const { x, y, size } = placement;
         this.drawEarthAtmosphericLayers(x, y, size);
         const surface = this.ctx.createRadialGradient(x - size * 0.3, y - size * 0.4, 0, x, y, size);
@@ -3814,24 +3797,39 @@ class AmbientParticleField {
             const sizingTop = sizingHeight * 0.88 + 22;
             const sizingBottom = sizingHeight - 8;
             this.earthReferenceSize = [Math.min(14, sizingHeight * 0.016), 10, 8, 6, 4, 3]
-                .find(size => sizingTop + size * 2.8 <= sizingBottom - size * 2.8) || null;
+                .find(size => sizingTop + size * 2.8 <= sizingBottom - size * 2.8) || 3;
             this.earthReferenceSizeWidth = widthKey;
         }
         const size = this.earthReferenceSize;
-        if (!size) return null;
         const radius = size * 2.8;
-        const positions = [];
-        for (let y = top + radius; y <= bottom - radius; y += 3) positions.push(y);
-        positions.sort((a, b) => Math.abs(a - height * 0.943) - Math.abs(b - height * 0.943));
-        for (const y of positions) {
-            const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
-                top: y - radius, bottom: y + radius };
-            if (bounds.right > width - 4 || bounds.left < 4) continue;
-            if (obstacles.some(b => bounds.left < b.right + 5 && bounds.right > b.left - 5 &&
-                bounds.top < b.bottom + 5 && bounds.bottom > b.top - 5)) continue;
-            return { x, y, size, bounds };
-        }
-        return null; // Text/controls win when the viewport has no clear pocket.
+        const minimumY = top + radius;
+        const maximumY = Math.max(minimumY, bottom - radius);
+        const y = Math.max(minimumY, Math.min(maximumY, height * 0.943));
+        const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
+            top: y - radius, bottom: y + radius };
+        return { x, y, size, bounds };
+    }
+
+    drawEarthMoonGuide(moonX, moonY, width, height) {
+        const earth = this.earthReferencePlacement;
+        const horizonY = height * 0.88;
+        if (!earth || moonY > horizonY) return;
+        const startX = earth.x;
+        const startY = earth.y - earth.size * 1.05;
+        const controlX = startX + (moonX - startX) * 0.52;
+        const controlY = Math.min(horizonY - 8, moonY + (horizonY - moonY) * 0.42);
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = 'screen';
+        this.ctx.strokeStyle = 'rgba(190, 214, 245, 0.14)';
+        this.ctx.lineWidth = 0.65;
+        this.ctx.setLineDash([2, 6]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.quadraticCurveTo(controlX, controlY, moonX, moonY);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        this.ctx.restore();
+        this.moonObserverPlacement = { earthX: startX, earthY: startY, moonX, moonY };
     }
 
     drawEarthAtmosphericLayers(x, y, size) {

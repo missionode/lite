@@ -548,6 +548,15 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-18 (Permanent Earth and Moon observer guide)
+
+- Owner correction to CP-EARTH-001: Earth must behave like the other space objects and remain visible at the same below-horizon coordinate during scrolling. The earlier allowance to move or omit Earth for foreground clearance is superseded.
+- Earth no longer measures page controls or listens to document scroll for collision layout. It keeps one responsive size per viewport width and one centered below-horizon position; foreground UI may cover background pixels, but sky logic never moves, shrinks or hides Earth.
+- The Moon retains its exact Astronomy Engine topocentric azimuth and altitude. When it is above the true horizon, a faint dashed cached observer curve connects Earth to the Moon, clarifying their relationship without moving the Moon, adding a label or starting another animation loop. A below-horizon Moon remains hidden.
+- Protected visuals remain unchanged: all five merged atmospheric volumes, cool-aqua 26°C theme, Earth-only label and Sun shield. Delivery rotates to `app.js?v=3.53` and shell cache `chakra-v5.246`; the Visuals and Earth atmosphere atlas maps were regenerated with the permanent-anchor and Moon-guide contract.
+- Validation: `static/unit` PASS — syntax, permanent Earth position/size through simulated foreground scroll, Earth-to-Moon guide, night-sky lifecycle, celestial-presence mock, 27 astronomy reference cases (maximum error 0.263 arcminutes), thermal budget, atlas build and diff checks. No browser, screenshot or device visual run was performed.
+- External owner state: the moved/deleted `docs/dot.json` and unrelated `.DS_Store`, `.codex/` and backup-audio state remain outside this checkpoint.
+
 ### Local checkpoint — 2026-09-18 (Scroll-stable Earth size)
 
 - Root cause: every scroll invalidated the cached celestial layer, remeasured moving foreground rectangles and allowed `earthReferenceLayout()` to choose a smaller fallback globe. Earth therefore appeared to pulse in size while the page moved.

@@ -2678,7 +2678,7 @@
           [
             "sky",
             "Sky lifecycle",
-            "Astronomy Engine 2.1.19 calculates Sun, Moon and seven other planets for the observer, with light time, aberration, precession/nutation and standard refraction. A 5,044-star J2000 catalogue supplies both named and background stars, advanced by proper motion and annual aberration. All share a north–east–south–west panorama with directions centered evenly at 12.5%, 37.5%, 62.5%, 87.5% of viewport width and a straight zero-altitude horizon. Only centers at or above the horizon draw; daylight no longer hides the Moon or replaces real planets with a decorative row. Daylight retains a restrained indigo wash and enhanced visibility to preserve the space theme. Planet sizes and brightness are enhanced; this is a chart, not a camera simulation. Lunar illumination and bright-limb orientation follow the calculated Sun; the Moon stays unlabeled. Earth is a centered observer marker below the horizon with five soft atmospheric volumes and its localized name. Its size stays fixed while scrolling; foreground changes may move it vertically or omit it when no safe pocket remains. Explicit layout events trigger a coalesced redraw without idle polling. Advanced Features adds the existing illustrative black hole on Lobby/Settings only. Positions and cached gradients/labels update at most once per ten seconds during animation; static journeys have no repeating work and retain their existing astronomy snapshot even during explicit layout redraws. Labels use Display Language with plain-name fallback; compact 40% text and 20% backing/outline are retained. Crowded labels may move and gain fine leader lines; object coordinates never move for layout. Meteors remain illustrative, singly scheduled after 5–9 seconds and then every 25–70 seconds with a bounded cached trail. Calculation failures clear stale positions and show an unavailable status; retries remain bounded."
+            "Astronomy Engine 2.1.19 calculates Sun, Moon and seven other planets for the observer, with light time, aberration, precession/nutation and standard refraction. A 5,044-star J2000 catalogue supplies both named and background stars, advanced by proper motion and annual aberration. All share a north–east–south–west panorama with directions centered evenly at 12.5%, 37.5%, 62.5%, 87.5% of viewport width and a straight zero-altitude horizon. Only centers at or above the horizon draw; daylight no longer hides the Moon or replaces real planets with a decorative row. Daylight retains a restrained indigo wash and enhanced visibility to preserve the space theme. Planet sizes and brightness are enhanced; this is a chart, not a camera simulation. Lunar illumination and bright-limb orientation follow the calculated Sun; the Moon stays unlabeled and retains its exact topocentric azimuth/altitude. When above the horizon, a faint cached observer guide connects the fixed Earth reference to the Moon without moving either body. Earth is permanently rendered at one centered position below the horizon with a fixed responsive size, five soft atmospheric volumes and its localized name; scrolling never moves, resizes or hides it. Advanced Features adds the existing illustrative black hole on Lobby/Settings only. Positions and cached gradients/labels update at most once per ten seconds during animation; static journeys have no repeating work and retain their existing astronomy snapshot during layout redraws. Labels use Display Language with plain-name fallback; compact 40% text and 20% backing/outline are retained. Crowded labels may move and gain fine leader lines; object coordinates never move for layout. Meteors remain illustrative, singly scheduled after 5–9 seconds and then every 25–70 seconds with a bounded cached trail. Calculation failures clear stale positions and show an unavailable status; retries remain bounded."
           ]
         ],
         [
@@ -2788,21 +2788,21 @@
       "id": "earth-atmosphere",
       "group": "Systems",
       "title": "Earth observer reference and atmosphere",
-      "subtitle": "A centered reference below the horizon, clear of text and controls.",
-      "source": "app.js:3747; app.js:3798; app.js:3817",
+      "subtitle": "A permanent centered observer anchor below the horizon.",
+      "source": "app.js:3635; app.js:3754; app.js:3787; app.js:3822",
       "rows": [
         [
           [
             "day",
             "Earth observer marker",
-            "Earth marks the central observer reference below the horizon in daytime and night. Actual sky directions use device latitude/longitude and time; the artwork does not reposition celestial bodies."
+            "Earth permanently marks the central observer reference below the horizon in daytime and night. Actual sky directions use device latitude/longitude and time; the artwork does not reposition celestial bodies."
           ]
         ],
         [
           [
             "fit",
-            "Clear center pocket?",
-            "Choose one Earth size for the current viewport width, then measure visible mantra, labels and controls only on cached-layer rebuilds or explicit layout events. Scrolling may move or temporarily omit Earth for clearance, but never resizes it. Reserve the final position of sliding controls and keep Earth on the center axis."
+            "Fixed observer anchor",
+            "Choose one responsive Earth size for the current viewport width and one centered position below the horizon. Scrolling and foreground layout changes do not move, resize or hide it."
           ]
         ],
         [
@@ -2812,16 +2812,16 @@
             "OWNER-RETAINED: troposphere, stratosphere, mesosphere, thermosphere and exosphere remain five merged atmospheric volumes. The innermost layer uses a cool-aqua 26°C comfort palette, not a temperature reading. Brighter outward bands stay visible beyond the fixed-size opaque disc, fading smoothly into space. Soft clouds and a shaded surface remain. The outer glow reaches 2.8 illustrative Earth radii; only the Earth name is shown. Not altitude-proportional."
           ],
           [
-            "hidden",
-            "No clear pocket",
-            "Omit the fixed-size marker if its glow/name would cover text or controls. Re-evaluate on scroll, screen/label/control changes or resize, not an idle polling timer."
+            "overlap",
+            "Foreground crosses anchor",
+            "Earth remains rendered at the same cached sky coordinate like the other celestial objects. Foreground interface content may visually cover part of the background artwork, but layout logic never shrinks or suppresses Earth."
           ]
         ],
         [
           [
             "scope",
-            "Visual-only scope",
-            "No climate, UV, aviation, satellite, orbital or celestial-calculation effect."
+            "Earth-to-Moon reference",
+            "The Moon retains its exact calculated azimuth/altitude above the horizon. A faint cached guide connects Earth to an above-horizon Moon for observer context; below-horizon Moon remains hidden. No climate, UV, aviation, satellite, orbital or celestial-calculation effect."
           ]
         ]
       ],
@@ -2834,26 +2834,26 @@
         [
           "fit",
           "layers",
-          "Fits"
+          "Always visible"
         ],
         [
           "fit",
-          "hidden",
-          "Crowded"
+          "overlap",
+          "Content crosses"
         ],
         [
           "layers",
           "scope",
-          "Artwork only"
+          "Observer relation"
         ],
         [
-          "hidden",
+          "overlap",
           "fit",
-          "Layout changes"
+          "Scroll continues"
         ]
       ],
       "notes": [
-        "Owner approval is required before removal, disabling by default or substantial fading. Preserve five layers and the 26°C cool-aqua visual theme; no added temperature/layer labels. Unit and browser pixel tests protect visibility on tiny markers. Drawing is cached; event-driven layout redraws do not add an idle loop."
+        "Owner approval is required before removal, disabling by default or substantial fading. Preserve five layers and the 26°C cool-aqua visual theme; no added temperature/layer labels. Moon coordinates remain truthful; the guide is illustrative and adds no animation loop. Unit and browser pixel tests protect visibility on tiny markers."
       ]
     },
     {

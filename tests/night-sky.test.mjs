@@ -97,15 +97,22 @@ for(const [width,height] of [[1440,900],[390,844],[844,390]]){
     assert.ok(earth.bounds.top>height*.88&&earth.bounds.bottom<height);
     const mantra={left:0,right:width,top:height-48,bottom:height};
     const withText=field.earthReferenceLayout(width,height,[mantra]);
-    if(withText)assert.ok(withText.bounds.bottom<=mantra.top-5,'Earth and all atmospheric glow must clear mantra text');
-    assert.equal(field.earthReferenceLayout(width,height,[{left:0,right:width,top:height*.88,bottom:height}]),null,'Suppress Earth when no safe center pocket exists');
+    assert.deepEqual(withText,earth,'Foreground movement must not move, resize or hide Earth');
+    assert.deepEqual(field.earthReferenceLayout(width,height,[{left:0,right:width,top:height*.88,bottom:height}]),earth,'Earth remains visible even when foreground content crosses its area');
 }
 const scrollStableField=Object.create(Object.getPrototypeOf(field));
-const beforeScroll=scrollStableField.earthReferenceLayout(390,900);
-const afterScroll=scrollStableField.earthReferenceLayout(390,844,[{left:100,right:290,top:760,bottom:770}]);
-assert.ok(beforeScroll&&afterScroll,'Earth should retain a safe placement through a normal page scroll');
-assert.equal(afterScroll.size,beforeScroll.size,'Scrolling must not resize the Earth');
-assert.notEqual(afterScroll.y,beforeScroll.y,'Earth may move vertically to preserve foreground clearance');
+const beforeScroll=scrollStableField.earthReferenceLayout(390,844);
+const afterScroll=scrollStableField.earthReferenceLayout(390,844,[{left:0,right:390,top:740,bottom:844}]);
+assert.deepEqual(afterScroll,beforeScroll,'Scrolling must keep Earth at the same size and position');
+let guideDrawn=false;
+field.earthReferencePlacement={x:195,y:796,size:10};
+field.ctx={save(){},restore(){},setLineDash(){},beginPath(){},moveTo(){},quadraticCurveTo(){},stroke(){guideDrawn=true;}};
+field.drawEarthMoonGuide(260,500,390,844);
+assert.ok(guideDrawn,'An above-horizon Moon should receive a subtle observer guide from Earth');
+assert.equal(field.moonObserverPlacement.earthX,195);
+assert.equal(field.moonObserverPlacement.earthY,785.5);
+assert.equal(field.moonObserverPlacement.moonX,260);
+assert.equal(field.moonObserverPlacement.moonY,500);
 const occupied=[];
 for(let i=0;i<9;i++){
     const box=field.placeCelestialLabel(190,620,2,75,390,844,occupied);
