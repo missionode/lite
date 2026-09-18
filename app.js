@@ -423,89 +423,22 @@ function setSymbolImage(src, symbolEl = document.getElementById('chakra-symbol')
 }
 
 function getScriptPath(source, path) {
-    return path.split('.').reduce((value, key) => value == null ? undefined : value[key], source);
+    return window.ChakraContentLocalization.getPath(source, path);
 }
 
 function hasScriptPath(source, path) {
-    return getScriptPath(source, path) != null;
+    return window.ChakraContentLocalization.hasPath(source, path);
 }
 
 function hasLocalizedScriptPath(scripts, path, fallbackLanguage = null) {
-    if (hasScriptPath(scripts, path)) return true;
-    const parts = path.split('.');
-    const final = parts.pop() || '';
-    const parentPath = parts.join('.');
-
-    // Canonical chakra narration uses meditation_<language>, while older
-    // custom bundles used the section-level <language> field. Closing uses
-    // section-level languages, with meditation_<language> accepted as legacy.
-    const meditationMatch = final.match(/^meditation_([a-zA-Z-]+)$/);
-    if (meditationMatch && hasScriptPath(scripts, `${parentPath}.${meditationMatch[1]}`)) return true;
-    if (/^[a-zA-Z-]+$/.test(final) && hasScriptPath(scripts, `${parentPath}.meditation_${final}`)) return true;
-
-    const suffixMatch = final.match(/^(.+)_([a-zA-Z-]+)$/);
-    if (!suffixMatch) {
-        // Section-level language fields (for example closing.ru) are used by
-        // legacy custom bundles as well as newer localized content.
-        return Boolean(
-            fallbackLanguage && final !== fallbackLanguage &&
-            hasLocalizedScriptPath(scripts, parts.concat(fallbackLanguage).join('.'))
-        );
-    }
-    const basePath = parts.concat(suffixMatch[1]).join('.');
-    if (hasScriptPath(scripts, `${basePath}.${suffixMatch[2]}`)) return true;
-    if (['text', 'content', 'value'].some(field =>
-        hasScriptPath(scripts, `${parentPath}.${field}.${suffixMatch[2]}`)
-    )) return true;
-    // Existing guide-authored uploads commonly contain English/Malayalam only.
-    // Runtime localization already falls back to English, so accepting that
-    // fallback keeps those bundles usable after a new app language is added.
-    return Boolean(
-        fallbackLanguage && suffixMatch[2] !== fallbackLanguage &&
-        hasLocalizedScriptPath(scripts, `${basePath}_${fallbackLanguage}`)
-    );
+    return window.ChakraContentLocalization.hasLocalizedPath(scripts, path, fallbackLanguage);
 }
 
 function validateScriptBundle(scripts, options = {}) {
-    const languageIds = (options.languages || languageRegistry.map(language => language.id)).length
-        ? (options.languages || languageRegistry.map(language => language.id))
-        : ['ml', 'en'];
-    const localized = (base) => languageIds.map(language => `${base}_${language}`);
-    const chakraKeys = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
-    const required = [
-        ...localized('intro.gratitude'), ...localized('intro.returning'),
-        ...['new', 'waxing', 'full', 'waning'].flatMap(phase => localized(`intro.moon.${phase}`)),
-        ...languageIds.map(language => `closing.${language}`),
-        ...languageIds.map(language => `closing.affirmation_${language}`),
-        ...chakraKeys.flatMap(key => [
-            ...languageIds.map(language => `${key}.meditation_${language}`),
-            ...languageIds.map(language => `${key}.affirmation_${language}`),
-            `${key}.mantra`, `${key}.color`, `${key}.symbol`, `${key}.frequency`
-        ])
-    ];
-    if (options.highEnergy) required.push(
-        ...languageIds.flatMap(language => [`high_energy.meditation_${language}`, `high_energy.intention_${language}`, `high_energy.affirmation_${language}`]),
-        'high_energy.mantra', 'high_energy.color', 'high_energy.symbol', 'high_energy.frequency'
-    );
-    if (options.corpse) required.push(...languageIds.flatMap(language => [`corpse_pose.intro.${language}`, `corpse_pose.transition.${language}`]));
-    if (options.bath) required.push(...languageIds.flatMap(language => [`bath_session.title.${language}`, `bath_session.intro.${language}`, `bath_session.instructions.${language}`, `bath_session.reminder.${language}`]));
-    if (options.perinealCare) required.push(...languageIds.flatMap(language => [`perineal_care.title.${language}`, `perineal_care.intro.${language}`, `perineal_care.instructions.${language}`, `perineal_care.reminder.${language}`]));
-    if (options.assistedBathing) required.push(...languageIds.flatMap(language => [`assisted_bathing.title.${language}`, `assisted_bathing.intro.${language}`, `assisted_bathing.instructions.${language}`, `assisted_bathing.reminder.${language}`]));
-    if (options.massage) required.push(...languageIds.flatMap(language => [`massage.title.${language}`, `massage.intro.${language}`, `massage.instructions.${language}`, `massage.reminder.${language}`]));
-    if (options.yoga) required.push(...languageIds.flatMap(language => [`yoga.intro.${language}`, `yoga.preparation.${language}`, `yoga.next_pose_prompt.${language}`, `yoga.session_complete.${language}`]), 'yoga.poses');
-    if (options.hooponopono) required.push(...languageIds.flatMap(language => [`hooponopono.intro.${language}`, `hooponopono.phrases.${language}`, `hooponopono.closing.${language}`]));
-    const fallbackLanguage = options.allowLanguageFallback ? 'en' : null;
-    const missing = required.filter(path => !hasLocalizedScriptPath(scripts, path, fallbackLanguage));
-    const frequencyKeys = options.highEnergy ? [...chakraKeys, 'high_energy'] : chakraKeys;
-    const invalidFrequencies = frequencyKeys
-        .filter(key => hasScriptPath(scripts, `${key}.frequency`))
-        .filter(key => {
-            const frequency = Number(getScriptPath(scripts, `${key}.frequency`));
-            return !Number.isFinite(frequency) || frequency < 1 || frequency > 20000;
-        })
-        .map(key => `${key}.frequency (must be between 1 and 20000 Hz)`);
-    const issues = [...missing, ...invalidFrequencies];
-    return { valid: issues.length === 0, missing: issues };
+    return window.ChakraContentLocalization.validateScriptBundle(scripts, {
+        ...options,
+        registeredLanguages: languageRegistry.map(language => language.id)
+    });
 }
 
 const DEMO_SCRIPT_ID = 'stakeholder-client-demo';
@@ -770,35 +703,19 @@ async function loadTimingConfig() {
 }
 
 function getLanguageConfig(language = state.language) {
-    return languageRegistry.find(item => item.id === language) ||
-        languageRegistry.find(item => item.id === 'en') || { id: language, locale: language, browserPrefixes: [language] };
+    return window.ChakraContentLocalization.getLanguageConfig(languageRegistry, language, 'en');
 }
 
 function getLocalizedValue(bundle, path) {
-    return path.split('.').reduce((value, key) => value == null ? undefined : value[key], bundle);
+    return window.ChakraContentLocalization.getPath(bundle, path);
 }
 
 function localized(source, field = null, language = state.language) {
-    if (source == null) return undefined;
-    const value = field == null ? source : source[field];
-    if (value != null && typeof value === 'object' && value[language] != null) return value[language];
-    if (field == null) {
-        for (const contentField of ['text', 'content', 'value']) {
-            if (source[contentField] != null) return localized(source[contentField], null, language);
-        }
-    }
-    if (field && source[`${field}_${language}`] != null) return source[`${field}_${language}`];
-    if (field && source[`${field}_en`] != null) return source[`${field}_en`];
-    if (field == null && source[language] != null) return source[language];
-    if (field == null && source.en != null) return source.en;
-    return typeof value === 'string' || Array.isArray(value) ? value : undefined;
+    return window.ChakraContentLocalization.localized(source, field, language);
 }
 
 function t(path, language = state.displayLanguage) {
-    const value = getLocalizedValue(localeBundles[language], path);
-    if (value != null) return value;
-    const fallback = getLocalizedValue(localeBundles[fallbackLanguageId], path);
-    return fallback == null ? path : fallback;
+    return window.ChakraContentLocalization.translate(localeBundles, path, language, fallbackLanguageId);
 }
 
 // In-session stage labels must follow the narrated Meditation Language. This

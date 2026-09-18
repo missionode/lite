@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-004: content and localization service
+
+- ACTIVE on `modularize`, following `ab73d84`. Added the frozen `window.ChakraContentLocalization` service for nested path lookup, language-registry fallback, supported localized content shapes, UI bundle fallback and complete journey-script validation including frequency bounds.
+- `app.js` retains thin compatibility wrappers, preserving all callers, selected Meditation/Display Language behavior, custom-script fallback and UI rendering. The module loads before the app and is versioned in the offline shell cache.
+- Demo, Hindi, Russian, Malayalam and language-intention contracts pass. Validator tests now execute the owned module rather than slicing implementation text from `app.js`. Timing controls, locale-driven DOM rendering, narration, audio and journeys remain unchanged.
+- Progress: 38% complete | Confidence: high for foundational modules, medium for full migration | Current phase: content/localization complete | Main remaining scope: media, journeys and UI.
+
 ### NOW — CP-MOD-003: complete initial-state factory
 
 - ACTIVE on `modularize`, following `20a2845`. Moved the complete initial application-state factory from `app.js` into `modules/app-state.js`: language/voice, volumes, ambience, journey preferences, statistics, timings, custom scripts, Advanced/session-only defaults and legacy care-key precedence now have one bounded owner.

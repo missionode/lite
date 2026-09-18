@@ -158,7 +158,7 @@ A later product-design pass can distinguish a simple participant entry from adva
 
 ### Modularization track — active on `modularize`
 
-The atlas-led migration is now active. Delivered seams move settings backup operations into `modules/settings-backup.js` and all initial persisted/default/session-only state construction into `modules/app-state.js`, both behind frozen APIs while preserving classic-script startup order. Content/localization is next, followed by audio and narration lifecycle, journey stage orchestration, then UI controllers. Each boundary must retain behavior, update its atlas ownership/source references, remove source-slicing tests where touched, and pass a focused parity gate before the next extraction. Native ES-module conversion and optional-feature lazy loading remain later decisions, not completed behavior.
+The atlas-led migration is now active. Delivered seams move settings backup operations into `modules/settings-backup.js`, initial state into `modules/app-state.js`, and content path lookup, language fallback, localized shapes and script validation into `modules/content-localization.js`. All expose frozen APIs and preserve classic-script startup order. Audio and narration lifecycle is next, followed by journey stage orchestration and UI controllers. Each boundary must retain behavior, update its atlas ownership/source references, remove source-slicing tests where touched, and pass a focused parity gate before the next extraction. Native ES-module conversion and optional-feature lazy loading remain later decisions, not completed behavior.
 
 ## Working order
 

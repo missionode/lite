@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 20a2845 baseline + uncommitted state-factory checkpoint · 2026-09-18.
+Source snapshot: ab73d84 baseline + uncommitted content/localization checkpoint · 2026-09-18.
 
-Source-reviewed application behavior plus three behavior-preserving modularization checkpoints. Settings backup and initial application-state construction now have bounded module owners; runtime state consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus four behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution and script validation now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -142,7 +142,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -175,9 +175,9 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Next queued boundary | Content/localization → media → journey stages → UI composition. Each remains planned until separately delivered. |
+| Next queued boundary | Media → journey stages → UI composition. Each remains planned until separately delivered. |
 
-- Delivered seams: settings backup owns collection/validation/replacement, and app-state owns all initial persisted/default/session-only state construction plus legacy preference precedence. Both frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation. Frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 
@@ -870,7 +870,7 @@ flowchart TD
 
 Content selection, validation, fallback and demo behavior.
 
-Sources: [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:7176](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7176), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
+Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:7176](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7176), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
 
 ```mermaid
 flowchart TD

@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-18",
-    "commit": "20a2845 baseline + uncommitted state-factory checkpoint",
-    "scope": "Source-reviewed application behavior plus three behavior-preserving modularization checkpoints. Settings backup and initial application-state construction now have bounded module owners; runtime state consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
+    "commit": "ab73d84 baseline + uncommitted content/localization checkpoint",
+    "scope": "Source-reviewed application behavior plus four behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution and script validation now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -283,7 +283,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; tests/settings-backup.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; tests/settings-backup.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -334,7 +334,7 @@
           [
             "next",
             "Next queued boundary",
-            "Content/localization → media → journey stages → UI composition. Each remains planned until separately delivered."
+            "Media → journey stages → UI composition. Each remains planned until separately delivered."
           ]
         ]
       ],
@@ -391,7 +391,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement, and app-state owns all initial persisted/default/session-only state construction plus legacy preference precedence. Both frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation. Frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
       ]
     },
     {
@@ -2287,7 +2287,7 @@
       "group": "Systems",
       "title": "Scripts, language and timing",
       "subtitle": "Content selection, validation, fallback and demo behavior.",
-      "source": "app.js:641; app.js:944; app.js:1160; app.js:7176; scripts.json:1; language-manifest.json:1",
+      "source": "modules/content-localization.js:1; app.js:641; app.js:944; app.js:1160; app.js:7176; scripts.json:1; language-manifest.json:1",
       "rows": [
         [
           [

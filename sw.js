@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.249';
+const CACHE_NAME = 'chakra-v5.250';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -18,6 +18,7 @@ const ASSETS = [
   './celestial-presence.js?v=1.2',
   './modules/settings-backup.js?v=1.0',
   './modules/app-state.js?v=1.1',
+  './modules/content-localization.js?v=1.0',
   './manifest.json',
   './Splash-v2.png',
   './scripts.json',

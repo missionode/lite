@@ -5,18 +5,16 @@ import vm from 'node:vm';
 const readText = (path) => fs.readFileSync(new URL(path, import.meta.url), 'utf8');
 const demo = JSON.parse(readText('../demo-script.json'));
 const app = readText('../app.js');
+const contentLocalization = readText('../modules/content-localization.js');
 
 assert.match(demo._demo?.purpose_en || '', /client-facing guided demonstration/i);
 assert.match(demo._demo?.purpose_ml || '', /പ്രദർശനം/);
 assert.equal(demo.high_energy.name, 'High Energy Journey');
 assert.equal(JSON.stringify(demo).match(/\btest\b/gi), null, 'Demo narration must not expose internal test terminology.');
 
-const validatorStart = app.indexOf('function getScriptPath(');
-const validatorEnd = app.indexOf('let piperVoiceRegistry', validatorStart);
-assert.ok(validatorStart >= 0 && validatorEnd > validatorStart, 'Script validator source must remain extractable.');
-const { validateScriptBundle } = vm.runInNewContext(
-    `let languageRegistry = [];\n${app.slice(validatorStart, validatorEnd)}\n({ validateScriptBundle });`,
-);
+const validatorContext = vm.createContext({});
+vm.runInContext(contentLocalization, validatorContext);
+const { validateScriptBundle } = validatorContext.ChakraContentLocalization;
 
 const demoTimingStart = app.indexOf("const DEMO_SCRIPT_ID = 'stakeholder-client-demo';");
 const demoTimingEnd = app.indexOf('let piperVoiceRegistry', demoTimingStart);

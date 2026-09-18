@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const contentLocalization = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
@@ -187,16 +188,12 @@ assert.match(app, /generation !== this\.droneTimerGeneration/, 'a stale timer mu
 assert.match(app, /chakra_drone_duration_mode/, 'the selected mode should persist locally');
 assert.match(app, /chakra_hrim_drone_duration_mode/, 'the HRIM mode should persist separately');
 assert.match(app, /input\.disabled = highEnergy && input\.value === 'beginner'/, 'Beginner must be disabled in the HRIM UI');
-assert.match(app, /'high_energy\.frequency'/, 'HRIM custom scripts should require a frequency');
-assert.match(app, /frequency < 1 \|\| frequency > 20000/, 'custom frequency values should remain in the safe Web Audio range');
+assert.match(contentLocalization, /'high_energy\.frequency'/, 'HRIM custom scripts should require a frequency');
+assert.match(contentLocalization, /frequency < 1 \|\| frequency > 20000/, 'custom frequency values should remain in the safe Web Audio range');
 
-const validationStart = app.indexOf('function getScriptPath(');
-const validationEnd = app.indexOf('let piperVoiceRegistry', validationStart);
-const validation = vm.runInNewContext(`
-    let languageRegistry = [];
-    ${app.slice(validationStart, validationEnd)}
-    ({ validateScriptBundle });
-`);
+const validationContext = vm.createContext({});
+vm.runInContext(contentLocalization, validationContext);
+const validation = validationContext.ChakraContentLocalization;
 assert.equal(
     validation.validateScriptBundle(scripts, { languages: ['ml', 'en'], highEnergy: true }).valid,
     true,

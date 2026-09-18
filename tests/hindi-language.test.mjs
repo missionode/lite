@@ -141,12 +141,9 @@ assert.deepEqual(
 assert.match(scripts.yoga.intro.hi, /दर्द|चक्कर|संतुलन/, 'Hindi Yoga narration must retain stop boundaries.');
 assert.match(scripts.assisted_bathing.instructions.hi, /दर्द|परेशानी|चक्कर|असुविधा/, 'Hindi assisted-care narration must retain stop boundaries.');
 
-const validatorStart = app.indexOf('function getScriptPath(');
-const validatorEnd = app.indexOf('let piperVoiceRegistry', validatorStart);
-assert.ok(validatorStart >= 0 && validatorEnd > validatorStart, 'Script validator source must remain extractable.');
 const validatorContext = { result: null };
 vm.runInNewContext(
-    `let languageRegistry = [{ id: 'hi' }];\n${app.slice(validatorStart, validatorEnd)}\nresult = validateScriptBundle;`,
+    `${fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8')}\nresult = ChakraContentLocalization.validateScriptBundle;`,
     validatorContext,
 );
 
@@ -216,8 +213,8 @@ earnContext.result();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
-assert.match(html, /app\.js\?v=3\.51/, 'The application query version must be rotated for the current language delivery.');
-assert.match(serviceWorker, /chakra-v5\.244/, 'The shell cache must be rotated for the current language delivery.');
+assert.match(html, /app\.js\?v=3\.57/, 'The application query version must be rotated for the current language delivery.');
+assert.match(serviceWorker, /chakra-v5\.250/, 'The shell cache must be rotated for the current language delivery.');
 assert.match(serviceWorker, /chakra-language-v53/, 'The current locale cache generation must remain declared for language delivery.');
 
 console.log('Hindi language contract passed.');

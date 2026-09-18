@@ -21,6 +21,16 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.
 - Script ordering, versioned offline precache, JavaScript syntax, atlas regeneration and diff checks pass.
 - `drone-duration.test.mjs` remains blocked before assertions by the known absent owner-managed `docs/dot.json`; browser/device evidence was not requested and is not claimed.
 
+## CP-MOD-004 — content and localization service
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.
+
+- Path lookup, language configuration fallback, supported localized content shapes, UI translation fallback and script validation now originate in `modules/content-localization.js`.
+- Existing app-level functions remain thin compatibility wrappers, so callers and language selection behavior are unchanged.
+- Direct module, state, focused-practice, Yoga, demo and all four-language contracts pass.
+- Script ordering, versioned offline precache, syntax, atlas regeneration and diff checks pass.
+- Timing controls, narration/audio and journey sequencing were not modified. Browser/device evidence was not requested and is not claimed.
+
 ## CP-MOD-002 — preference normalization seam
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence after refreshing one stale shell-version assertion.

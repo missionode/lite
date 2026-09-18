@@ -3,7 +3,7 @@
 1. Add the modularization safety-loop map and queue future boundaries.
 2. Warm-up: extract settings backup helpers and test the module directly.
 3. Centralize settings schema and persistent/session state ownership. Complete: initial-state factory and direct behavior contract delivered.
-4. Extract content, localization and timing services.
+4. Extract content and localization services. Complete: lookup, fallback, localized shapes and script validation. Timing controls remain with UI until their ownership boundary.
 5. Separate narration and audio lifecycle owners.
 6. Convert journey orchestration into reusable stage contracts.
 7. Split Lobby, Settings, Advanced Features and session UI controllers.
