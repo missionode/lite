@@ -10,3 +10,13 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.
 - The touched test now executes the module directly instead of slicing implementation text from `app.js`.
 - Audio, narration, journeys, localization, Earth atmosphere and Sun shield were not modified.
 - Browser/device evidence was not requested and is not claimed.
+
+## CP-MOD-002 — preference normalization seam
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence after refreshing one stale shell-version assertion.
+
+- Numeric/default and current-key/legacy-key boolean preference reads execute directly against the frozen module API.
+- Existing zero-volume, ambience, focused-practice, Advanced Features and video-prelude contracts remain unchanged.
+- Script order and service-worker precache cover both extracted modules.
+- The initial state object remains in `app.js`; this checkpoint deliberately does not move audio, journey or UI state.
+- Browser/device evidence was not requested and is not claimed.

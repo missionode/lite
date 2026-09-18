@@ -142,7 +142,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -177,7 +177,7 @@ flowchart TD
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
 | Next queued boundary | Settings/state → content/localization → media → journey stages → UI composition. Each remains planned until separately delivered. |
 
-- Delivered warm-up: settings backup collection, validation and replacement are owned by modules/settings-backup.js and loaded before app.js. The remaining sequence is queued, not claimed as implemented. Native ES modules remain a later compatibility decision; this first seam preserves the existing classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement, and app-state owns numeric and legacy-boolean preference normalization. Both frozen APIs load before app.js and are precached. Full initial-state ownership remains queued. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 
@@ -1158,7 +1158,7 @@ flowchart TD
 
 Local state and the actual service-worker request routing.
 
-Sources: [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [app.js:7073](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7073), [app.js:7186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7186), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
+Sources: [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [app.js:7073](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7073), [app.js:7186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7186), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
 
 ```mermaid
 flowchart TD

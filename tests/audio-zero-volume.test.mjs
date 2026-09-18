@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync('app.js', 'utf8');
+const appStateModule = fs.readFileSync('modules/app-state.js', 'utf8');
 
 assert.match(
   app,
@@ -10,21 +11,18 @@ assert.match(
   'AudioContext should prefer the system default loudspeaker output when supported',
 );
 
-assert.match(
-  app,
-  /const storedValue = localStorage\.getItem\(key\);[\s\S]*?storedValue === null[\s\S]*?return fallback;[\s\S]*?Number\(storedValue\)/,
-  'missing volume preferences must use defaults while explicit zero remains valid',
-);
-
-const storedNumberSource = app.match(/function storedNumber\(key, fallback\) \{[\s\S]*?\n\}/)?.[0];
-assert.ok(storedNumberSource, 'storedNumber helper must exist');
-const makeStoredNumber = storedValue => vm.runInNewContext(
-  `(${storedNumberSource})`,
-  { localStorage: { getItem: () => storedValue } },
-);
-assert.equal(makeStoredNumber(null)('volume', 0.9), 0.9, 'missing volume uses its default');
-assert.equal(makeStoredNumber('0')('volume', 0.9), 0, 'explicit zero remains a true mute');
-assert.equal(makeStoredNumber('invalid')('volume', 0.9), 0.9, 'invalid volume uses its default');
+const context = vm.createContext({});
+vm.runInContext(appStateModule, context);
+const makeStorage = storedValue => ({ getItem: () => storedValue });
+assert.ok(Object.isFrozen(context.ChakraAppState), 'state storage readers should expose a stable API');
+assert.equal(context.ChakraAppState.storedNumber(makeStorage(null), 'volume', 0.9), 0.9, 'missing volume uses its default');
+assert.equal(context.ChakraAppState.storedNumber(makeStorage('0'), 'volume', 0.9), 0, 'explicit zero remains a true mute');
+assert.equal(context.ChakraAppState.storedNumber(makeStorage('invalid'), 'volume', 0.9), 0.9, 'invalid volume uses its default');
+const legacyValues = new Map([['legacy', 'true']]);
+const legacyStorage = { getItem: key => legacyValues.has(key) ? legacyValues.get(key) : null };
+assert.equal(context.ChakraAppState.storedBooleanWithLegacy(legacyStorage, 'current', 'legacy'), true, 'legacy booleans migrate when the current key is absent');
+legacyValues.set('current', 'false');
+assert.equal(context.ChakraAppState.storedBooleanWithLegacy(legacyStorage, 'current', 'legacy'), false, 'the current boolean key takes precedence over legacy data');
 
 assert.doesNotMatch(
   app,

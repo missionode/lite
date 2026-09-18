@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-002: preference normalization boundary
+
+- ACTIVE on `modularize`, following `a88d5b1`. Added the frozen `window.ChakraAppState` module as the first state boundary. Numeric/default reads and current-key/legacy-key boolean resolution now have one directly tested owner; `app.js` retains thin compatibility wrappers so the large initial-state object and all consumers remain behaviorally unchanged.
+- The module loads before app startup and is included in the PWA shell cache. Audio zero-volume behaviour and intimate-care legacy preference precedence are exercised directly against the module instead of extracting helper source from `app.js`.
+- This intentionally stops short of the full state factory after a broad patch precondition failed without changing files. The narrower seam preserves the 20% weekly reserve and provides a safer next extraction point.
+- Progress: 18% complete | Confidence: high for delivered seams, medium for full migration | Current phase: settings/state foundation | Main remaining scope: initial-state factory, content, media, journeys and UI.
+
 ### NOW — CP-MOD-001: atlas-led modularization warm-up
 
 - ACTIVE migration on branch `modularize`, based on `58e2ee0`. Added a 30th atlas map defining one-boundary-at-a-time extraction, parity validation, source-reference refresh and checkpoint review. Future settings/state, content, media, journey and UI boundaries are explicitly queued rather than presented as delivered.

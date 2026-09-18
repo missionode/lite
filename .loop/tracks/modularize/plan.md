@@ -2,7 +2,7 @@
 
 1. Add the modularization safety-loop map and queue future boundaries.
 2. Warm-up: extract settings backup helpers and test the module directly.
-3. Centralize settings schema and persistent/session state ownership.
+3. Centralize settings schema and persistent/session state ownership. Preference normalization seam delivered; full state factory remains queued.
 4. Extract content, localization and timing services.
 5. Separate narration and audio lifecycle owners.
 6. Convert journey orchestration into reusable stage contracts.

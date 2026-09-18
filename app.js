@@ -6587,16 +6587,11 @@ const piperTTS = new PiperTTS(audio);
 const meditation = new MeditationController(audio, visual);
 
 function storedNumber(key, fallback) {
-    const storedValue = localStorage.getItem(key);
-    if (storedValue === null || storedValue === '') return fallback;
-    const value = Number(storedValue);
-    return Number.isFinite(value) ? value : fallback;
+    return window.ChakraAppState.storedNumber(localStorage, key, fallback);
 }
 
 function storedBooleanWithLegacy(key, legacyKey) {
-    const storedValue = localStorage.getItem(key);
-    if (storedValue !== null) return storedValue === 'true';
-    return legacyKey ? localStorage.getItem(legacyKey) === 'true' : false;
+    return window.ChakraAppState.storedBooleanWithLegacy(localStorage, key, legacyKey);
 }
 
 document.addEventListener('visibilitychange', async () => {
