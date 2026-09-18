@@ -239,7 +239,7 @@ assert.match(scripts.hooponopono.intro.ml, /വേണമെങ്കിൽ മ�
 assert.match(scripts.closing.en, /awareness you cultivated/i);
 assert.match(scripts.closing.ml, /വളർത്തിയ അവബോധം/u);
 assert.match(scripts.bath_session.intro.en, /sadhak guide/i);
-assert.match(scripts.bath_session.intro.ml, /സാധകന്റെ മാർഗ്ഗനിർദ്ദേശം/u);
+assert.match(scripts.bath_session.intro.ml, /മാർഗ്ഗനിർദ്ദേശകന്റെ നിർദേശങ്ങൾ/u);
 assert.match(scripts.yoga.intro.en, /stop for pain/i);
 assert.match(scripts.yoga.intro.ml, /വേദന/u);
 

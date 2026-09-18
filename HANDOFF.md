@@ -548,6 +548,12 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-18 (Facilitator dot.json restoration)
+
+- Restored the owner-supplied root `dot.json` to its expected `docs/dot.json` location. A preservation assertion verified every pre-existing object, array entry and scalar value before writing; no existing English, Malayalam, facilitator, timing, frequency or metadata value was replaced.
+- Added only missing production fields: the complete Hindi and Russian narration siblings from `scripts.json`, plus Hindi/Russian Arrival induction, readiness and Emergence system narration from their production locale bundles. The resulting facilitator bundle has no missing production leaves and all four system languages are complete.
+- Validation: `static/unit` PASS — JSON parsing, facilitator/production schema and localized-field coverage, content safety, Malayalam editorial contract, Hindi, Russian and hypnosis journey contracts, and diff whitespace checks. The existing Scripts, language and timing atlas flow remains accurate; this is a fixture-content restoration with no navigation or runtime-flow change.
+
 ### Local checkpoint — 2026-09-18 (Native Malayalam narration edit)
 
 - Scope: all Malayalam production narration in `scripts.json` was reviewed as spoken Malayalam. The edited fields preserve the existing journey order, concepts, safety/consent boundaries, placeholders, frequencies and mantra identifiers while improving grammar, spelling, punctuation, calm pacing and consistency of address.
