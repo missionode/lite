@@ -3803,19 +3803,33 @@ class AmbientParticleField {
 
     earthReferenceLayout(width, height, obstacles = [], labelWidth = 40) {
         const x = width / 2, top = height * 0.88 + 22, bottom = height - 8;
-        for (const size of [Math.min(14, height * 0.016), 10, 8, 6, 4, 3]) {
-            const radius = size * 2.8;
-            const positions = [];
-            for (let y = top + radius; y <= bottom - radius; y += 3) positions.push(y);
-            positions.sort((a, b) => Math.abs(a - height * 0.943) - Math.abs(b - height * 0.943));
-            for (const y of positions) {
-                const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
-                    top: y - radius, bottom: y + radius };
-                if (bounds.right > width - 4 || bounds.left < 4) continue;
-                if (obstacles.some(b => bounds.left < b.right + 5 && bounds.right > b.left - 5 &&
-                    bounds.top < b.bottom + 5 && bounds.bottom > b.top - 5)) continue;
-                return { x, y, size, bounds };
-            }
+        const widthKey = Math.round(width);
+        if (this.earthReferenceSizeWidth !== widthKey) {
+            // Choose one size for this viewport width and retain it while the
+            // page scrolls. Mobile browser chrome can also change innerHeight
+            // during a scroll, so cap the sizing height by the stable width.
+            // Foreground content may move the Earth or hide it, but must not
+            // make the globe pulse between fallback sizes.
+            const sizingHeight = Math.min(height, width * 2);
+            const sizingTop = sizingHeight * 0.88 + 22;
+            const sizingBottom = sizingHeight - 8;
+            this.earthReferenceSize = [Math.min(14, sizingHeight * 0.016), 10, 8, 6, 4, 3]
+                .find(size => sizingTop + size * 2.8 <= sizingBottom - size * 2.8) || null;
+            this.earthReferenceSizeWidth = widthKey;
+        }
+        const size = this.earthReferenceSize;
+        if (!size) return null;
+        const radius = size * 2.8;
+        const positions = [];
+        for (let y = top + radius; y <= bottom - radius; y += 3) positions.push(y);
+        positions.sort((a, b) => Math.abs(a - height * 0.943) - Math.abs(b - height * 0.943));
+        for (const y of positions) {
+            const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
+                top: y - radius, bottom: y + radius };
+            if (bounds.right > width - 4 || bounds.left < 4) continue;
+            if (obstacles.some(b => bounds.left < b.right + 5 && bounds.right > b.left - 5 &&
+                bounds.top < b.bottom + 5 && bounds.bottom > b.top - 5)) continue;
+            return { x, y, size, bounds };
         }
         return null; // Text/controls win when the viewport has no clear pocket.
     }

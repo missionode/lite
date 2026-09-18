@@ -100,6 +100,12 @@ for(const [width,height] of [[1440,900],[390,844],[844,390]]){
     if(withText)assert.ok(withText.bounds.bottom<=mantra.top-5,'Earth and all atmospheric glow must clear mantra text');
     assert.equal(field.earthReferenceLayout(width,height,[{left:0,right:width,top:height*.88,bottom:height}]),null,'Suppress Earth when no safe center pocket exists');
 }
+const scrollStableField=Object.create(Object.getPrototypeOf(field));
+const beforeScroll=scrollStableField.earthReferenceLayout(390,900);
+const afterScroll=scrollStableField.earthReferenceLayout(390,844,[{left:100,right:290,top:760,bottom:770}]);
+assert.ok(beforeScroll&&afterScroll,'Earth should retain a safe placement through a normal page scroll');
+assert.equal(afterScroll.size,beforeScroll.size,'Scrolling must not resize the Earth');
+assert.notEqual(afterScroll.y,beforeScroll.y,'Earth may move vertically to preserve foreground clearance');
 const occupied=[];
 for(let i=0;i<9;i++){
     const box=field.placeCelestialLabel(190,620,2,75,390,844,occupied);

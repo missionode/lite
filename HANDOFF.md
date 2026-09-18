@@ -548,6 +548,14 @@
 
 ## NOW
 
+### Local checkpoint — 2026-09-18 (Scroll-stable Earth size)
+
+- Root cause: every scroll invalidated the cached celestial layer, remeasured moving foreground rectangles and allowed `earthReferenceLayout()` to choose a smaller fallback globe. Earth therefore appeared to pulse in size while the page moved.
+- Fix: Earth now selects one responsive size for the current viewport width and retains it across scroll-driven obstacle and mobile browser-height changes. It may move vertically to preserve text/control clearance or be temporarily omitted when no safe pocket exists, but it no longer resizes during scrolling. The five atmosphere layers, cool-aqua 26°C theme, Earth-only label, Sun shield, center axis and static-journey performance remain unchanged.
+- Delivery: `app.js?v=3.52`, shell cache `chakra-v5.245`. The Visuals and Earth atmosphere atlas maps record the fixed-size scroll contract and were regenerated successfully.
+- Validation: `static/unit` PASS — JavaScript/service-worker syntax, night-sky regression including a scroll-height/obstacle size-stability assertion, celestial-presence mock lifecycle, 27 astronomy reference cases with maximum error 0.263 arcminutes, thermal budget, atlas build and diff checks. No browser, screenshot or device visual run was performed.
+- External owner state: the owner-moved deletion of `docs/dot.json` and unrelated `.DS_Store`, `.codex/` and backup-audio state remain outside this checkpoint.
+
 ### Local checkpoint — 2026-09-18 (Facilitator dot.json restoration)
 
 - Restored the owner-supplied root `dot.json` to its expected `docs/dot.json` location. A preservation assertion verified every pre-existing object, array entry and scalar value before writing; no existing English, Malayalam, facilitator, timing, frequency or metadata value was replaced.
