@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.246';
+const CACHE_NAME = 'chakra-v5.247';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -16,6 +16,7 @@ const ASSETS = [
   './sky-astronomy.js?v=1.1',
   './night-sky.js?v=1.1',
   './celestial-presence.js?v=1.2',
+  './modules/settings-backup.js?v=1.0',
   './manifest.json',
   './Splash-v2.png',
   './scripts.json',

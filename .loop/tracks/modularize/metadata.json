@@ -1,0 +1,9 @@
+{
+  "id": "modularize",
+  "type": "migration",
+  "state": "ACTIVE",
+  "branch": "modularize",
+  "baseline": "58e2ee0",
+  "startedAt": "2026-09-18",
+  "currentCheckpoint": "CP-MOD-001"
+}

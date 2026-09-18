@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint · 2026-09-17.
+Source snapshot: 58e2ee0 baseline + uncommitted modularization warm-up · 2026-09-18.
 
-Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The marketing package now has a seven-page digital edition, a print roll-fold with bleed, a social cover and a browsable asset gallery. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels.
+Source-reviewed application behavior plus the first behavior-preserving modularization checkpoint. Settings backup validation and replacement now have one bounded module; all other runtime ownership remains unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -10,33 +10,34 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 
 1. [Curriculum and marketing assets](#curriculum-branding)
 2. [The whole application](#overview)
-3. [Startup and first visit](#startup)
-4. [Mode selection and start routing](#modes)
-5. [Standard chakra journey](#standard)
-6. [Inside one chakra](#chakra)
-7. [HRIM activation](#hrim)
-8. [Sleep and Music Only](#sleep)
-9. [Box breathing and Ho’oponopono](#focused)
-10. [Yoga experience](#yoga)
-11. [Intimate Service and massage](#care)
-12. [Sound Shots](#shots)
-13. [Experiment activities](#experiments)
-14. [Ordered Chakra Journey add-ons](#journey-addons)
-15. [Pause, stop and live controls](#controls)
-16. [Optional Lobby video introduction](#restart)
-17. [Completion, statistics and external handoff](#completion)
-18. [Scripts, language and timing](#content)
-19. [Narration and fallback](#narration)
-20. [Audio signal architecture](#audio)
-21. [Sound options and live suppression](#sound-options)
-22. [Visuals and browser lifecycle](#visuals)
-23. [Earth observer reference and atmosphere](#earth-atmosphere)
-24. [Thematic solar containment glow](#solar-containment)
-25. [Persistence, caching and network](#storage)
-26. [Failure and recovery map](#recovery)
-27. [Settings backup and restore](#settings-backup)
-28. [Consultation flow](#consultation)
-29. [Frequency repertory handoff](#repertory)
+3. [Modularization safety loop](#modularization)
+4. [Startup and first visit](#startup)
+5. [Mode selection and start routing](#modes)
+6. [Standard chakra journey](#standard)
+7. [Inside one chakra](#chakra)
+8. [HRIM activation](#hrim)
+9. [Sleep and Music Only](#sleep)
+10. [Box breathing and Ho’oponopono](#focused)
+11. [Yoga experience](#yoga)
+12. [Intimate Service and massage](#care)
+13. [Sound Shots](#shots)
+14. [Experiment activities](#experiments)
+15. [Ordered Chakra Journey add-ons](#journey-addons)
+16. [Pause, stop and live controls](#controls)
+17. [Optional Lobby video introduction](#restart)
+18. [Completion, statistics and external handoff](#completion)
+19. [Scripts, language and timing](#content)
+20. [Narration and fallback](#narration)
+21. [Audio signal architecture](#audio)
+22. [Sound options and live suppression](#sound-options)
+23. [Visuals and browser lifecycle](#visuals)
+24. [Earth observer reference and atmosphere](#earth-atmosphere)
+25. [Thematic solar containment glow](#solar-containment)
+26. [Persistence, caching and network](#storage)
+27. [Failure and recovery map](#recovery)
+28. [Settings backup and restore](#settings-backup)
+29. [Consultation flow](#consultation)
+30. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -134,6 +135,49 @@ flowchart TD
 | Other exits | Shot completion reloads; Music Only stops manually; experiments return to their screen. |
 
 - Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries.
+
+<a id="modularization"></a>
+
+## Modularization safety loop
+
+Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
+
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+
+```mermaid
+flowchart TD
+  atlas["Atlas behavior contract"]
+  boundary["Select one bounded owner"]
+  baseline["Capture baseline"]
+  extract["Extract behind a stable API"]
+  test["Targeted parity check"]
+  maps["Refresh affected maps"]
+  checkpoint["Validated checkpoint"]
+  next["Next queued boundary"]
+  atlas -->|"Define scope"| boundary
+  atlas -->|"Protect behavior"| baseline
+  boundary -->|"Approved slice"| extract
+  baseline -->|"Parity target"| extract
+  extract -->|"Direct contract"| test
+  extract -->|"Ownership changed"| maps
+  test -->|"Pass"| checkpoint
+  maps -->|"Synchronized"| checkpoint
+  checkpoint -->|"Proceed incrementally"| next
+  next -->|"Repeat"| atlas
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Atlas behavior contract | Choose the affected runtime maps and protected invariants before moving code. |
+| Select one bounded owner | Prefer a cohesive dependency-light surface with an existing deterministic test. |
+| Capture baseline | Record branch, dirty files, current test evidence and exact public behavior. |
+| Extract behind a stable API | Move ownership without changing labels, storage keys, timing, audio, visuals or journey order. |
+| Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
+| Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
+| Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
+| Next queued boundary | Settings/state → content/localization → media → journey stages → UI composition. Each remains planned until separately delivered. |
+
+- Delivered warm-up: settings backup collection, validation and replacement are owned by modules/settings-backup.js and loaded before app.js. The remaining sequence is queued, not claimed as implemented. Native ES modules remain a later compatibility decision; this first seam preserves the existing classic-script startup order.
 
 <a id="startup"></a>
 
@@ -1204,7 +1248,7 @@ flowchart TD
 
 Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.
 
-Sources: [app.js:401](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:401), [app.js:6942](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6942), [app.js:6995](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6995), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [app.js:7620](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7620), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
 ```mermaid
 flowchart TD

@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-17",
-    "commit": "3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint",
-    "scope": "Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The marketing package now has a seven-page digital edition, a print roll-fold with bleed, a social cover and a browsable asset gallery. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels."
+    "date": "2026-09-18",
+    "commit": "58e2ee0 baseline + uncommitted modularization warm-up",
+    "scope": "Source-reviewed application behavior plus the first behavior-preserving modularization checkpoint. Settings backup validation and replacement now have one bounded module; all other runtime ownership remains unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -276,6 +276,122 @@
       ],
       "notes": [
         "Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries."
+      ]
+    },
+    {
+      "id": "modularization",
+      "group": "Start here",
+      "title": "Modularization safety loop",
+      "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
+      "source": "modules/settings-backup.js:1; tests/settings-backup.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "rows": [
+        [
+          [
+            "atlas",
+            "Atlas behavior contract",
+            "Choose the affected runtime maps and protected invariants before moving code."
+          ]
+        ],
+        [
+          [
+            "boundary",
+            "Select one bounded owner",
+            "Prefer a cohesive dependency-light surface with an existing deterministic test."
+          ],
+          [
+            "baseline",
+            "Capture baseline",
+            "Record branch, dirty files, current test evidence and exact public behavior."
+          ]
+        ],
+        [
+          [
+            "extract",
+            "Extract behind a stable API",
+            "Move ownership without changing labels, storage keys, timing, audio, visuals or journey order."
+          ]
+        ],
+        [
+          [
+            "test",
+            "Targeted parity check",
+            "Test the module directly and confirm its integration references and offline asset delivery."
+          ],
+          [
+            "maps",
+            "Refresh affected maps",
+            "Update delivered ownership and source references; keep future work in the fix queue."
+          ]
+        ],
+        [
+          [
+            "checkpoint",
+            "Validated checkpoint",
+            "Review scope and errors; commit only intended files after fresh checks."
+          ]
+        ],
+        [
+          [
+            "next",
+            "Next queued boundary",
+            "Settings/state → content/localization → media → journey stages → UI composition. Each remains planned until separately delivered."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "atlas",
+          "boundary",
+          "Define scope"
+        ],
+        [
+          "atlas",
+          "baseline",
+          "Protect behavior"
+        ],
+        [
+          "boundary",
+          "extract",
+          "Approved slice"
+        ],
+        [
+          "baseline",
+          "extract",
+          "Parity target"
+        ],
+        [
+          "extract",
+          "test",
+          "Direct contract"
+        ],
+        [
+          "extract",
+          "maps",
+          "Ownership changed"
+        ],
+        [
+          "test",
+          "checkpoint",
+          "Pass"
+        ],
+        [
+          "maps",
+          "checkpoint",
+          "Synchronized"
+        ],
+        [
+          "checkpoint",
+          "next",
+          "Proceed incrementally"
+        ],
+        [
+          "next",
+          "atlas",
+          "Repeat"
+        ]
+      ],
+      "notes": [
+        "Delivered warm-up: settings backup collection, validation and replacement are owned by modules/settings-backup.js and loaded before app.js. The remaining sequence is queued, not claimed as implemented. Native ES modules remain a later compatibility decision; this first seam preserves the existing classic-script startup order."
       ]
     },
     {
@@ -3144,7 +3260,7 @@
       "group": "Supporting pages",
       "title": "Settings backup and restore",
       "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.",
-      "source": "app.js:401; app.js:6942; app.js:6995; index.html:215",
+      "source": "modules/settings-backup.js:1; app.js:7620; index.html:215",
       "rows": [
         [
           [

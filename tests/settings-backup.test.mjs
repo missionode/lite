@@ -3,9 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source = fs.readFileSync('app.js', 'utf8');
-const start = source.indexOf('const SETTINGS_BACKUP_FORMAT');
-const end = source.indexOf('// ── UTILS');
-assert.ok(start >= 0 && end > start, 'Settings backup helpers must remain available before app initialization.');
+const moduleSource = fs.readFileSync('modules/settings-backup.js', 'utf8');
 
 function storageFrom(entries) {
     const values = new Map(entries);
@@ -26,7 +24,10 @@ const storage = storageFrom([
     ['chakra_vol_visualization_ambience', '0.14'],
     ['unrelated_extension_data', 'keep']
 ]);
-const helpers = vm.runInNewContext(`${source.slice(start, end)}; ({ collectManagedSettings, parseSettingsBackup, replaceManagedSettings })`, { Blob, localStorage: storage });
+const context = vm.createContext({ Blob, localStorage: storage });
+vm.runInContext(moduleSource, context);
+const helpers = context.ChakraSettingsBackup;
+assert.ok(Object.isFrozen(helpers), 'The settings backup module must expose a stable read-only API.');
 
 const settings = helpers.collectManagedSettings();
 assert.deepEqual(JSON.parse(JSON.stringify(settings)), {
@@ -53,6 +54,12 @@ assert.deepEqual(storage.entries().sort(), [
 ].sort());
 
 const html = fs.readFileSync('index.html', 'utf8');
+const serviceWorker = fs.readFileSync('sw.js', 'utf8');
+assert.ok(
+    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.54'),
+    'The settings backup module must load before the application consumes its API.'
+);
+assert.match(serviceWorker, /\.\/modules\/settings-backup\.js\?v=1\.0/, 'The extracted runtime module must remain available offline.');
 assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');
 assert.match(html, /id="open-settings-manager"[^>]*class="secondary-btn"/, 'The public Manage Settings CTA must remain clearly visible against the sky.');
 assert.match(html, /id="export-settings"/, 'The manager needs export.');

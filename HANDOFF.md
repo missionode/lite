@@ -1,5 +1,14 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-001: atlas-led modularization warm-up
+
+- ACTIVE migration on branch `modularize`, based on `58e2ee0`. Added a 30th atlas map defining one-boundary-at-a-time extraction, parity validation, source-reference refresh and checkpoint review. Future settings/state, content, media, journey and UI boundaries are explicitly queued rather than presented as delivered.
+- First low-risk seam delivered: settings backup collection, validation and replacement moved from `app.js` to the frozen `window.ChakraSettingsBackup` API in `modules/settings-backup.js`. Script order and service-worker precache preserve synchronous startup and offline delivery. Storage keys, import/export behavior and Advanced Features guards are unchanged.
+- The settings-backup test now executes the module directly instead of slicing helper text from the monolith. Static/unit validation covers syntax, scoped export, strict validation, replacement, load order, offline asset inclusion, atlas generation and whitespace. Browser/device evidence was not requested and is not claimed.
+- Protected Earth atmosphere, 26°C visual theme, Earth/Moon relationship and Sun shield are untouched. Unrelated `.DS_Store`, personal `.codex` and backup audio remain excluded.
+- Execution: direct, energy-saving checkpoint. No child model dispatch. Next safe boundary is the settings schema and persistent/session-state adapter after identifying and replacing its source-coupled tests.
+- Progress: 12% complete | Confidence: high for CP-MOD-001, medium for the full migration | Current phase: architecture contract and warm-up seam | Main remaining scope: state, content, media, journey and UI ownership.
+
 ### NOW — CP-BRAND-002: editorial branding redesign
 
 - Local revision based on production `c9acf0c`. Redesigned the branding package with Georgia/Arial typography, ivory/midnight layouts, natural image proportions, white logo backing, clear curriculum progression, secondary demo card and consistent contact handling. The original logo and two-seat hero master are unchanged.

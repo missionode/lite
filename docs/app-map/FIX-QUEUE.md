@@ -156,6 +156,10 @@ After behavior is stable, extract bounded areas such as configuration/content, a
 
 A later product-design pass can distinguish a simple participant entry from advanced facilitator controls. That is a design change, not a prerequisite for fixing the concrete defects above.
 
+### Modularization track — active on `modularize`
+
+The atlas-led migration is now active. The first delivered seam moves settings backup collection, validation and replacement into `modules/settings-backup.js` behind a frozen API while preserving classic-script startup order. Remaining extraction order is: centralized settings/state ownership, content/localization, audio and narration lifecycle, journey stage orchestration, then UI controllers. Each boundary must retain behavior, update its atlas ownership/source references, remove source-slicing tests where touched, and pass a focused parity gate before the next extraction. Native ES-module conversion and optional-feature lazy loading remain later decisions, not completed behavior.
+
 ## Working order
 
 For each fix: reproduce or prove the branch → implement the smallest correction → verify that branch and its neighboring exits → update the corresponding atlas map and source references. Keep a separate change record for each fix. Do not claim deployment from local checks.
