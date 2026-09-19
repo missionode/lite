@@ -17,6 +17,7 @@
     "test:content-localization": "node tests/content-localization.test.mjs",
     "test:media-lifecycle": "node tests/media-lifecycle.test.mjs",
     "test:piper-lifecycle": "node tests/piper-lifecycle.test.mjs",
+    "test:audio-route-lifecycle": "node tests/audio-route-lifecycle.test.mjs",
     "test:audio-transitions": "node tests/audio-transitions.test.mjs",
     "test:long-narration": "node tests/long-narration.test.mjs",
     "test:thermal-budget": "node tests/thermal-budget.test.mjs",

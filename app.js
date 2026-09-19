@@ -57,6 +57,8 @@ const mediaLifecycle = window.ChakraMediaLifecycle;
 if (!mediaLifecycle) throw new Error('Media lifecycle module is unavailable.');
 const piperLifecycle = window.ChakraPiperLifecycle;
 if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
+const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
+if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -1632,45 +1634,7 @@ class AudioEngine {
     }
 
     setConvolverActive(key, input, convolver, output, active, tailSeconds = 0) {
-        if (!this.ctx || !input || !convolver || !output) return;
-        this.effectRoutes ||= new Map();
-        let route = this.effectRoutes.get(key);
-        if (!route) {
-            route = { connected: true, retirement: null };
-            this.effectRoutes.set(key, route);
-        }
-        if (route.retirement) {
-            route.retirement.onended = null;
-            try { route.retirement.stop(); } catch (error) {}
-            route.retirement.disconnect();
-            route.retirement = null;
-        }
-        if (active) {
-            if (!route.connected) { input.connect(convolver); convolver.connect(output); route.connected = true; }
-            return;
-        }
-        if (!route.connected) return;
-        const disconnect = () => {
-            input.disconnect(convolver);
-            convolver.disconnect(output);
-            route.connected = false;
-        };
-        if (tailSeconds <= 0) { disconnect(); return; }
-        // A silent native audio-clock deadline freezes on pause, unlike a wall
-        // timer. No polling loop; restarting cancels the pending disconnection.
-        const deadline = this.ctx.createBufferSource();
-        deadline.buffer = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
-        deadline.loop = true;
-        deadline.connect(this.ctx.destination);
-        route.retirement = deadline;
-        deadline.onended = () => {
-            deadline.disconnect();
-            if (route.retirement !== deadline) return;
-            route.retirement = null;
-            disconnect();
-        };
-        deadline.start();
-        deadline.stop(this.ctx.currentTime + tailSeconds);
+        return audioRouteLifecycle.setConvolverActive(this, key, input, convolver, output, active, tailSeconds);
     }
 
     setVoicePlaybackActive(active, exitFade = 0) {

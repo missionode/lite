@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-19",
-    "commit": "599506d baseline + uncommitted Piper-lifecycle checkpoint",
-    "scope": "Source-reviewed application behavior plus six behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives and Piper synthesis/playback lifecycle now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
+    "commit": "66bb8cb baseline + uncommitted audio-route checkpoint",
+    "scope": "Source-reviewed application behavior plus seven behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle and Web Audio effect-route retirement now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -283,7 +283,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; tests/piper-lifecycle.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; tests/audio-route-lifecycle.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -334,7 +334,7 @@
           [
             "next",
             "Next queued boundary",
-            "AudioEngine buses → journey stages → UI composition. Each remains planned until separately delivered."
+            "AudioEngine bus construction → journey stages → UI composition. Each remains planned until separately delivered."
           ]
         ]
       ],
@@ -391,7 +391,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation. Frozen APIs load before app.js and are precached. AudioEngine buses remain in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
       ]
     },
     {
@@ -2551,7 +2551,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; app.js:59; app.js:1045; app.js:2186; app.js:2312; app.js:2663",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:59; app.js:1047; app.js:2150; app.js:2276; app.js:2627",
       "rows": [
         [
           [

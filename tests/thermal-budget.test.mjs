@@ -32,24 +32,26 @@ piper.decode = async () => { piper.generation++; return { length: 10, numberOfCh
 await assert.rejects(piper.prepare('cancelled'));
 assert.equal(piper.clipCache.size, size, 'Cancelled preparation never enters the cache');
 
-const method = app.slice(app.indexOf('    setConvolverActive('), app.indexOf('    setVoicePlaybackActive('));
-const setConvolverActive = vm.runInNewContext('({' + method + '})').setConvolverActive;
+const routeSource = fs.readFileSync('modules/audio-route-lifecycle.js', 'utf8');
+const routeContext = vm.createContext({});
+vm.runInContext(routeSource, routeContext);
+const setConvolverActive = (...args) => routeContext.ChakraAudioRouteLifecycle.setConvolverActive(engine, ...args);
 const nodes = () => ({ connections: 1, connect() { this.connections++; }, disconnect() { this.connections--; } });
 const input = nodes(), convolution = nodes(), output = nodes();
 const deadlines = [];
 const engine = { ctx: { currentTime: 10, sampleRate: 48000, destination: {}, createBuffer: () => ({}), createBufferSource() {
     const node = { connect(){}, disconnect(){}, start(){}, stop(at){ this.endsAt = at; } }; deadlines.push(node); return node;
 } } };
-setConvolverActive.call(engine, 'test', input, convolution, output, false, 3);
+setConvolverActive('test', input, convolution, output, false, 3);
 assert.equal(input.connections, 1, 'Tail remains connected until the audio deadline');
 assert.equal(deadlines[0].endsAt, 13);
-setConvolverActive.call(engine, 'test', input, convolution, output, true);
+setConvolverActive('test', input, convolution, output, true);
 assert.equal(deadlines[0].onended, null, 'Restart cancels stale retirement');
-setConvolverActive.call(engine, 'test', input, convolution, output, false, 3);
+setConvolverActive('test', input, convolution, output, false, 3);
 deadlines[1].onended();
 assert.equal(input.connections, 0); assert.equal(convolution.connections, 0);
-setConvolverActive.call(engine, 'test', input, convolution, output, true);
-setConvolverActive.call(engine, 'test', input, convolution, output, true);
+setConvolverActive('test', input, convolution, output, true);
+setConvolverActive('test', input, convolution, output, true);
 assert.equal(input.connections, 1, 'Reactivation reconnects exactly once');
 assert.match(app, /screen !== lobbyScreen && screen !== configScreen/);
 assert.match(app, /buffer.duration - 12/);

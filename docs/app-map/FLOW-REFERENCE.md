@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 599506d baseline + uncommitted Piper-lifecycle checkpoint · 2026-09-19.
+Source snapshot: 66bb8cb baseline + uncommitted audio-route checkpoint · 2026-09-19.
 
-Source-reviewed application behavior plus six behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives and Piper synthesis/playback lifecycle now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus seven behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle and Web Audio effect-route retirement now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -142,7 +142,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [tests/piper-lifecycle.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/piper-lifecycle.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [tests/audio-route-lifecycle.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-route-lifecycle.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -175,9 +175,9 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Next queued boundary | AudioEngine buses → journey stages → UI composition. Each remains planned until separately delivered. |
+| Next queued boundary | AudioEngine bus construction → journey stages → UI composition. Each remains planned until separately delivered. |
 
-- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation. Frozen APIs load before app.js and are precached. AudioEngine buses remain in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 
@@ -965,7 +965,7 @@ flowchart TD
 
 Logical buses; shared filters are expanded in selected-node details.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [app.js:59](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:59), [app.js:1045](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1045), [app.js:2186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2186), [app.js:2312](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2312), [app.js:2663](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2663).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [app.js:59](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:59), [app.js:1047](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1047), [app.js:2150](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2150), [app.js:2276](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2276), [app.js:2627](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2627).
 
 ```mermaid
 flowchart TD

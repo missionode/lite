@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-007: Web Audio effect-route lifecycle
+
+- ACTIVE on `modularize`, following `66bb8cb`. Added the frozen `window.ChakraAudioRouteLifecycle` owner for idempotent convolver connection, audio-clock tail retirement, stale-retirement cancellation and deterministic disconnection.
+- `AudioEngine.setConvolverActive()` remains as a thin compatibility method. Voice Space, Music Space, mantra tail and ambience blur retain their exact callers and tail durations; pause still freezes native audio-clock deadlines and reactivation still cancels pending retirement without polling.
+- The module loads before app `3.60` and is precached by shell `chakra-v5.253`. Direct route, thermal, audio-effects, background-music, spatial and shell-delivery contracts pass at unit/static evidence. No browser/device listening or thermal claim is made.
+- The owner authorized work down to a 10% weekly reserve. Routing remains direct for this bounded compatibility seam; no duplicate child run or model switch is claimed.
+- Progress: 59% complete | Confidence: high for delivered module seams, medium for full migration | Current phase: audio lifecycle extraction | Main remaining scope: AudioEngine bus construction, journeys and UI.
+
 ### NOW — CP-MOD-006: Piper synthesis and playback lifecycle
 
 - ACTIVE on `modularize`, following `599506d`. Added the frozen `window.ChakraPiperLifecycle` owner for voice-model configuration, serial worker queueing, progress/error handling, synthesis/decode caching, normalization, clip playback envelopes, preview, pause and graceful/immediate cancellation.
