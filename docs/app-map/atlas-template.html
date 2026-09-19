@@ -27,6 +27,18 @@
 /* ATLAS_DATA */
 (() => {
  const $ = id => document.getElementById(id);
+ if (typeof atlas === 'undefined') {
+  $('group').textContent='Atlas source template';
+  $('title').textContent='Open the generated flow atlas';
+  $('subtitle').textContent='This template contains no embedded map data until the atlas build runs.';
+  $('size').textContent='Template only';
+  $('position').textContent='No runtime map loaded';
+  $('node-title').textContent='Generated atlas required';
+  $('node-detail').textContent='Use docs/app-map/index.html for the complete interactive flow atlas.';
+  const link=document.createElement('a');link.href='./index.html';link.textContent='Open generated atlas';$('node-routes').append(link);
+  $('scope').textContent='The template is a build input. Opening it directly no longer runs the atlas application.';
+  return;
+ }
  const ns = 'http://www.w3.org/2000/svg';
  let current, selected = null;
  const drilldowns={overview:{launch:'startup',settings:'content',lobby:'modes',experiments:'experiments',journeys:'modes',consult:'consultation',runtime:'controls',support:'audio',complete:'completion',other:'shots'},modes:{shot:'shots',music:'sleep',sleep:'sleep',focused:'focused',guided:'standard',care:'care'},standard:{loop:'chakra',finish:'completion',setup:'audio'},hrim:{stage:'chakra',finish:'completion'},yoga:{finish:'completion'},care:{massage:'chakra',finish:'completion'},controls:{fullscreen:'visuals',mixer:'sound-options'},content:{voice:'narration'},storage:{offline:'recovery'}};

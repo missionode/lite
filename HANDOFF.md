@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-ATLAS-001: direct-template fallback
+
+- Root cause: `docs/app-map/atlas-template.html` is a build input; its `/* ATLAS_DATA */` placeholder does not define `atlas` when that raw file is opened directly. The generated `docs/app-map/index.html` embeds the data correctly.
+- The template now stops safely, explains that it is a source template and links to the generated atlas. The atlas verifier covers both the raw-template fallback and all generated maps.
+- `chext_loader.js` is not present or referenced in the repository. Its `unload` permissions-policy warning remains browser-extension output, not an atlas/application error.
+
 ### NEXT AFTER WEEKLY RESET — CP-ASSESS-PLAN-002: operator-led assessment tournament
 
 - APPROVED and queued before modularization resumes. Redesign only `/docs/assesment.html` as a standalone two-choice, no-repeat hybrid bracket that estimates relative status/confidence for all seven chakras.

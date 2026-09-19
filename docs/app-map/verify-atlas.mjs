@@ -8,6 +8,14 @@ import { graphs } from './atlas-data.mjs';
 const browser = await chromium.launch({headless:true});
 const screenshotDirectory = await mkdtemp(join(tmpdir(), 'akhil-atlas-'));
 try {
+const templatePage = await browser.newPage({viewport:{width:900,height:700}});
+const templateErrors=[];
+templatePage.on('pageerror',e=>templateErrors.push(e.message));
+await templatePage.goto(new URL('./atlas-template.html',import.meta.url).href);
+assert.equal(await templatePage.locator('#title').innerText(),'Open the generated flow atlas');
+assert.equal(await templatePage.locator('#node-routes a').getAttribute('href'),'./index.html');
+assert.deepEqual(templateErrors,[]);
+await templatePage.close();
 const page = await browser.newPage({viewport:{width:1440,height:1000}});
 const errors=[];
 page.on('pageerror',e=>errors.push(e.message));
@@ -59,7 +67,7 @@ await page.click('#export-svg');
 const download=await downloadEvent;
 assert.equal(download.suggestedFilename(),'chakra-care.svg');
 assert.deepEqual(errors,[]);
-console.log(JSON.stringify({mapsChecked:results.length,allNodeSelections:true,labelBounds:true,mobileOverflow:false,keyboard:true,printMaps:graphs.length,svgDownload:true,pageErrors:errors}));
+console.log(JSON.stringify({mapsChecked:results.length,templateFallback:true,allNodeSelections:true,labelBounds:true,mobileOverflow:false,keyboard:true,printMaps:graphs.length,svgDownload:true,pageErrors:errors}));
 } finally {
  await browser.close();
  await rm(screenshotDirectory,{recursive:true,force:true});
