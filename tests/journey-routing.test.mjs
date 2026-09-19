@@ -39,11 +39,28 @@ assert.deepEqual(
     Array.from(routing.buildChakraOrder({ focusedExperience: 'intimate', massageSelected: true })),
     ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root']
 );
+assert.deepEqual(
+    Array.from(routing.buildPreparationStagePlan({
+        box: true, visualization: true, dharana: true, bodyScan: true, noting: true
+    })),
+    ['box', 'visualization', 'dharana', 'bodyScan', 'noting']
+);
+assert.deepEqual(
+    Array.from(routing.buildPreparationStagePlan({ visualization: true, bodyScan: true })),
+    ['visualization', 'bodyScan'],
+    'standalone preparation should omit unselected stages while preserving order'
+);
+assert.deepEqual(
+    Array.from(routing.buildPreparationStagePlan({ highEnergy: true, box: true, visualization: true })),
+    [],
+    'high-energy journeys should bypass preparation add-ons'
+);
 
 const app = fs.readFileSync('app.js', 'utf8');
 assert.match(app, /journeyRouting\.resolveFocusedExperience/);
 assert.match(app, /journeyRouting\.resolveLaunchRoute/);
 assert.match(app, /journeyRouting\.validateLobbyStart/);
 assert.match(app, /journeyRouting\.buildChakraOrder/);
+assert.match(app, /journeyRouting\.buildPreparationStagePlan/);
 
 console.log('Journey routing contract passed: focused modes, launch priority, chakra guard and order.');

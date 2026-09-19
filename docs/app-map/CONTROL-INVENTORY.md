@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: fc1bc48 baseline + uncommitted journey-routing checkpoint · 2026-09-19.
+Source snapshot: fc029a3 baseline + uncommitted preparation-plan checkpoint · 2026-09-19.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

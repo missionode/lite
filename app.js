@@ -4629,12 +4629,7 @@ class MeditationController {
                 this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
                 if (focusedExperience === 'yoga') await this.runYogaSession();
                 else if (focusedExperience === 'intimate') await this.runIntimateService();
-                else if (focusedExperience === 'preparation') {
-                    if (this.isMeditationActive && getChecked('visualization-addon-toggle')) await this.runVisualization();
-                    if (this.isMeditationActive && getChecked('dharana-addon-toggle')) await this.runDharana();
-                    if (this.isMeditationActive && getChecked('body-scan-addon-toggle')) await this.runBodyScan();
-                    if (this.isMeditationActive && getChecked('noting-addon-toggle')) await this.runNoting();
-                }
+                else if (focusedExperience === 'preparation') await this.runPreparationStages();
                 if (this.isMeditationActive) this.finish();
                 return;
             }
@@ -4664,11 +4659,7 @@ class MeditationController {
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
 
             if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('box-breathing-experience-toggle')) await this.runBoxBreathing();
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('visualization-addon-toggle')) await this.runVisualization();
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('dharana-addon-toggle')) await this.runDharana();
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('body-scan-addon-toggle')) await this.runBodyScan();
-            if (this.isMeditationActive && !this.isHighEnergy && getChecked('noting-addon-toggle')) await this.runNoting();
+            if (this.isMeditationActive) await this.runPreparationStages({ includeBox: true, highEnergy: this.isHighEnergy });
             // Immediate screen switch to meditation room for better user experience
             if (this.isMeditationActive) showScreen(meditationScreen);            
             if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
@@ -4775,6 +4766,28 @@ class MeditationController {
         wakeLock.release();
         document.getElementById('controls')?.classList.add('hidden');
         showScreen(experimentScreen);
+    }
+
+    async runPreparationStages({ includeBox = false, highEnergy = false } = {}) {
+        const stages = journeyRouting.buildPreparationStagePlan({
+            highEnergy,
+            box: includeBox && getChecked('box-breathing-experience-toggle'),
+            visualization: getChecked('visualization-addon-toggle'),
+            dharana: getChecked('dharana-addon-toggle'),
+            bodyScan: getChecked('body-scan-addon-toggle'),
+            noting: getChecked('noting-addon-toggle')
+        });
+        const runners = {
+            box: () => this.runBoxBreathing(),
+            visualization: () => this.runVisualization(),
+            dharana: () => this.runDharana(),
+            bodyScan: () => this.runBodyScan(),
+            noting: () => this.runNoting()
+        };
+        for (const stage of stages) {
+            if (!this.isMeditationActive) break;
+            await runners[stage]();
+        }
     }
 
     async runGratitude(isHighEnergy = false) {

@@ -4,6 +4,9 @@
     const MASSAGE_CHAKRA_ORDER = Object.freeze([
         'crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'
     ]);
+    const PREPARATION_STAGE_ORDER = Object.freeze([
+        'box', 'visualization', 'dharana', 'bodyScan', 'noting'
+    ]);
 
     function resolveFocusedExperience({
         yogaSelected = false,
@@ -47,11 +50,26 @@
         return Array.isArray(selectedChakras) ? [...selectedChakras] : [];
     }
 
+    function buildPreparationStagePlan({
+        highEnergy = false,
+        box = false,
+        visualization = false,
+        dharana = false,
+        bodyScan = false,
+        noting = false
+    } = {}) {
+        if (highEnergy) return [];
+        const selected = { box, visualization, dharana, bodyScan, noting };
+        return PREPARATION_STAGE_ORDER.filter(stage => selected[stage]);
+    }
+
     global.ChakraJourneyRouting = Object.freeze({
         resolveFocusedExperience,
         resolveLaunchRoute,
         validateLobbyStart,
         buildChakraOrder,
-        MASSAGE_CHAKRA_ORDER
+        buildPreparationStagePlan,
+        MASSAGE_CHAKRA_ORDER,
+        PREPARATION_STAGE_ORDER
     });
 })(typeof window === 'undefined' ? globalThis : window);

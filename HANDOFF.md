@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-009: ordered preparation-stage plan
+
+- ACTIVE on `modularize`, following `fc029a3`. The frozen journey-routing owner now also emits the canonical Box → Visualization → Dharana → Body Scan → Guided Noting plan.
+- The controller still executes the original stage methods and stops between stages when the session ends. Standalone preparation omits Box, high-energy bypasses preparation, and all timing/narration/audio/visual implementations remain unchanged.
+- App `3.62`, journey-routing `1.1` and shell `chakra-v5.255` are synchronized. Direct route, focused-practice, newcomer, hypnosis and thermal contracts pass at unit/static evidence; browser/device evidence is not claimed.
+- Execution was direct and intentionally tiny because only 4% weekly capacity was available above the owner’s 10% reserve. AudioEngine buses remain deferred until the reset.
+- Progress: 69% complete | Confidence: high for delivered module seams, medium for full migration | Current phase: journey orchestration | Main remaining scope: remaining journey-stage contracts, deferred AudioEngine buses and UI.
+
 ### NOW — CP-MOD-008: deterministic journey routing
 
 - ACTIVE on `modularize`, following `fc1bc48`. Added the frozen `window.ChakraJourneyRouting` owner for focused-mode selection, launch priority, pre-video chakra validation and intimate-massage chakra ordering.

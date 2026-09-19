@@ -20,8 +20,9 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
 }
 
 assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?journeyRouting\.resolveFocusedExperience[\s\S]*?yoga-experience-toggle[\s\S]*?assisted-bathing-toggle[\s\S]*?noting-addon-toggle/, 'Focused experience inputs should be delegated to the journey-routing owner');
-assert.match(app, /focusedExperience === 'preparation'[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)/, 'Standalone preparation should run Visualization, Dharana, Body Scan and Noting in order');
-assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runBoxBreathing\(\)[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)[\s\S]*?runSequence\(\)/, 'Journey preparation should run Box, Visualization, Dharana, Body Scan and Noting before chakras');
+assert.match(app, /focusedExperience === 'preparation'\) await this\.runPreparationStages\(\)/, 'Standalone preparation should use the shared ordered stage runner');
+assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runPreparationStages\(\{ includeBox: true, highEnergy: this\.isHighEnergy \}\)[\s\S]*?runSequence\(\)/, 'Journey preparation should run through the shared plan before chakras');
+assert.match(app, /async runPreparationStages[\s\S]*?buildPreparationStagePlan[\s\S]*?runBoxBreathing[\s\S]*?runVisualization[\s\S]*?runDharana[\s\S]*?runBodyScan[\s\S]*?runNoting/, 'The controller should map each planned preparation stage to its existing runtime method');
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
 assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
 assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');

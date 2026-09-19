@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: fc1bc48 baseline + uncommitted journey-routing checkpoint · 2026-09-19.
+Source snapshot: fc029a3 baseline + uncommitted preparation-plan checkpoint · 2026-09-19.
 
-Source-reviewed application behavior plus eight behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle, Web Audio effect-route retirement and journey start routing now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus nine behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle, Web Audio effect-route retirement, journey start routing and ordered preparation planning now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -177,7 +177,7 @@ flowchart TD
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
 | Next queued boundary | Journey stage contracts → UI composition. AudioEngine bus construction is deferred until the next weekly reset. Each remains planned until separately delivered. |
 
-- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation and chakra-order selection. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js and is owner-deferred until the next weekly reset. Journey stage execution remains the next bounded orchestration work. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection and ordered preparation-stage planning. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js and is owner-deferred until the next weekly reset. Remaining journey stage execution is the next bounded orchestration work. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 
@@ -713,7 +713,7 @@ flowchart TD
 
 Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
 
-Sources: [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322), [app.js:5160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5160), [app.js:5369](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5369), [app.js:5423](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5423).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [app.js:4770](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4770), [app.js:5180](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5180), [app.js:5389](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5389), [app.js:5443](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5443), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
 
 ```mermaid
 flowchart TD
