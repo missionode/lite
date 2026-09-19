@@ -36,6 +36,13 @@ Purpose: reduce repeated context, investigation and rework while preserving corr
 - Do not create scripts or reorganize the app merely because this policy mentions them. Implement them as bounded follow-up tasks when requested and validate their failure paths.
 - Prefer compact summaries plus task-local redacted logs on failure. Report nonzero exits, warnings, exclusions and missing prerequisites; do not label an incomplete suite as fully green.
 
+## Project sandbox and pull-request economy
+
+- Apply the project-specific contract in `.loop/workflow.md`. For Lite, substantial, risky, experimental and parallel checkpoints default to a task-specific Git worktree, focused branch and reviewable pull request; tiny isolated edits remain direct when isolation overhead would exceed risk.
+- Seed each isolated task with a compact context packet rather than the full conversation. One sandbox owns each shared integration hotspot at a time, especially the atlas, app shell, service worker, settings schema, shared translations and common audio engine.
+- A worktree improves isolation but does not itself save model tokens. Token efficiency comes from bounded context, one owner, targeted source reads, deterministic checks, focused diffs and avoiding duplicated agents or repeated full-suite runs.
+- Merge only validated checkpoint scope. After an approved remote merge, synchronize the local integration branch without overwriting unrelated work and run the combined regression gate. Production publication remains separate and approval-gated.
+
 ## Quality that prevents repeat work
 
 - Prefer tests of behavior over regexes tied to internal function signatures, arbitrary source text or release versions. Source contracts are appropriate for static invariants, not proof of timing, audio, rendering or lifecycle behavior.

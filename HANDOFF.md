@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### APPROVED — CP-WORKFLOW-001: isolated sandbox and PR delivery
+
+- Upcoming substantial, risky, experimental or parallel work now follows `.loop/workflow.md`: compact task packet → task-specific worktree/branch → targeted implementation and two-stage review → atlas/handoff update → validated checkpoint → focused PR → approved merge → local integration synchronization → combined regression gate. Production publication remains separate.
+- Tiny isolated corrections may remain direct when worktree/PR overhead exceeds their risk. Worktrees do not inherently save tokens; efficiency comes from bounded context, targeted reads/checks, one owner per shared integration hotspot and avoiding duplicate agents or repeated analysis.
+- Assessment, remaining modularization/loading work and the approved Cosmic Observatory theme remain separate checkpoints in that order. No application behavior, cache or deployment changes in this policy checkpoint.
+- Execution: direct policy/documentation update; no child model dispatch or model switch. Atlas regenerated to 33 maps, and browser verification passed all maps, node selection, labels, keyboard, mobile overflow, print, SVG export and direct-template fallback with no page errors. `git diff --check` passed; runtime/device performance is unchanged and therefore not claimed.
+
 ### QUEUED — CP-THEME-PLAN-001: approved Cosmic Observatory design
 
 - Owner approved the generated desktop/mobile visual direction. Original image is preserved in `docs/design/lite-cosmic-observatory/approved-concept-v1.png`; complete visual and functional contract is in `.loop/tracks/cosmic-observatory-theme/spec-plan-review.md`.

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: bbbaaf2 baseline + CP-THEME-PLAN-001 documentation changes · 2026-09-19.
+Source snapshot: 69c7b90 baseline + CP-WORKFLOW-001 documentation changes · 2026-09-19.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints and explicitly labelled future plans. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references and programme-delivery assets are non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved isolated delivery workflow. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references, workflow policy and programme-delivery assets are non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -36,10 +36,11 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 26. [Thematic solar containment glow](#solar-containment)
 27. [Persistence, caching and network](#storage)
 28. [Failure and recovery map](#recovery)
-29. [Settings backup and restore](#settings-backup)
-30. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
-31. [Consultation flow](#consultation)
-32. [Frequency repertory handoff](#repertory)
+29. [Isolated checkpoint delivery](#delivery-workflow)
+30. [Settings backup and restore](#settings-backup)
+31. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
+32. [Consultation flow](#consultation)
+33. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1311,6 +1312,54 @@ flowchart TD
 | Runtime verification needed | Slow network, page hidden, mobile audio interruption, rapid double Begin/Restart, cache upgrades and storage denial. |
 
 - Not every async failure is caught by the top-level window.onerror handler. Missing boundaries are shown as verification work rather than invented successful recovery.
+
+<a id="delivery-workflow"></a>
+
+## Isolated checkpoint delivery
+
+Approved project workflow for high-quality, token-aware implementation without changing runtime behavior.
+
+Sources: [.loop/workflow.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/workflow.md:1), [Loop/EFFICIENT-WORKFLOW.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/Loop/EFFICIENT-WORKFLOW.md:1), [Loop/DELIVERY-WORKFLOW.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/Loop/DELIVERY-WORKFLOW.md:1).
+
+```mermaid
+flowchart TD
+  scope["Bounded approved checkpoint"]
+  context["Compact task packet"]
+  sandbox["Task worktree + branch"]
+  implement["Focused implementation"]
+  review["Two-stage review"]
+  sync["Atlas + handoff + checkpoint"]
+  pr["Focused pull request"]
+  merge["Approved integration merge"]
+  regress["Combined regression gate"]
+  release["Separate production checkpoint"]
+  scope -->|"Bound context"| context
+  context -->|"Isolate"| sandbox
+  sandbox -->|"Own files"| implement
+  implement -->|"Validate"| review
+  review -->|"Fix findings"| implement
+  review -->|"Pass"| sync
+  sync -->|"PR-ready"| pr
+  pr -->|"Approved"| merge
+  merge -->|"Synchronize local"| regress
+  regress -->|"Repair in owner branch"| implement
+  regress -->|"Pass"| release
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Bounded approved checkpoint | Define objective, invariants, acceptance criteria, baseline, file ownership and exact checks. Tiny isolated changes may remain direct. |
+| Compact task packet | Load the active handoff, affected atlas map and targeted source ranges; do not copy the full conversation or repeatedly scan history. |
+| Task worktree + branch | Use isolation for substantial, risky, experimental or parallel work. One owner per shared integration hotspot. |
+| Focused implementation | Make one coherent checkpoint; use deterministic tools and targeted tests. Avoid duplicate agents and background overhead. |
+| Two-stage review | First requirements/scope; then correctness, maintainability, accessibility, security, performance and regression risk. |
+| Atlas + handoff + checkpoint | Synchronize affected flows and continuity; run fresh applicable checks and record limitations. |
+| Focused pull request | Include only intended files, evidence, performance impact, manual checks and rollback boundary. External actions follow approval gates. |
+| Approved integration merge | Merge into the integration branch, then fast-forward the local workspace without overwriting unrelated changes. |
+| Combined regression gate | Exercise integrated behavior, localization, errors, atlas and relevant performance before release consideration. |
+| Separate production checkpoint | Production merge, push and deployment require their own review and authorization. |
+
+- A worktree consumes disk space, not model tokens. Effective savings come from bounded context, targeted reads and checks, one owner, focused diffs and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order.
 
 <a id="settings-backup"></a>
 

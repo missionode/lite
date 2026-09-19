@@ -166,6 +166,10 @@ Do not begin this phase until the bounded module owners, AudioEngine extraction 
 
 ## Working order
 
+### Approved delivery workflow
+
+CP-WORKFLOW-001 makes isolated worktrees and focused pull requests the default for substantial, risky, experimental or parallel checkpoints. Tiny isolated corrections remain direct when isolation overhead exceeds risk. Every sandbox receives bounded context, one checkpoint and declared file ownership; only one sandbox may own shared atlas, app-shell, service-worker, settings-schema, translation or audio-engine surfaces at a time. Pull-request readiness requires fresh targeted checks, two-stage review, synchronized atlas/handoff and a validated checkpoint commit. Approved remote merges are synchronized back to the local integration branch before combined regression checks; production publication remains separate. This improves effective token and engineering efficiency by reducing repeated context and rework, not because worktrees intrinsically reduce tokens. See `.loop/workflow.md` and the `delivery-workflow` atlas map.
+
 ### Approved visual checkpoint after assessment and modularization
 
 CP-THEME-PLAN-001 adopts the Cosmic Observatory desktop/mobile concept saved under `docs/design/lite-cosmic-observatory/`. Follow `.loop/tracks/cosmic-observatory-theme/spec-plan-review.md` after both prerequisite tracks are complete. Implement shared visual tokens and responsive surfaces against the completed module APIs. Preserve all existing controls, defaults, translations, access rules, journey/audio behavior, offline delivery, static journey performance and Earth/Sun requirements. The generated mockup is an appearance reference; its omissions, sample timing, cardinal arrangement and curved horizon cannot change requirements. Validate responsive usability, functional parity and measured performance before accepting the design. The `cosmic-theme-planned` atlas map is future state only.

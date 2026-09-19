@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-19', commit: 'bbbaaf2 baseline + CP-THEME-PLAN-001 documentation changes', scope: 'Source-reviewed application behavior plus nine delivered modularization checkpoints and explicitly labelled future plans. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references and programme-delivery assets are non-runtime.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-19', commit: '69c7b90 baseline + CP-WORKFLOW-001 documentation changes', scope: 'Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved isolated delivery workflow. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references, workflow policy and programme-delivery assets are non-runtime.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -307,5 +307,18 @@ add('cosmic-theme-planned','Start here','PLANNED · Cosmic Observatory theme','C
  [['verify','Parity and performance gate','Check languages, keyboard, mobile/tablet/desktop, video, journeys, offline updates and CPU/memory. Resolve regressions before acceptance.']],
  [['review','Review implemented design','Present the working theme checkpoint. Production publication needs its own request.']]
 ],[['assessment','modules','Existing priority'],['modules','reference','Prerequisites complete'],['reference','contract','Appearance only'],['contract','tokens','Define system'],['contract','sky','Retain invariants'],['tokens','surfaces','Apply'],['sky','surfaces','Preserve'],['surfaces','verify','Exercise'],['verify','surfaces','Correct regressions'],['verify','review','Pass']],['PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative. The generated celestial placements, atmospheric bands, curve of the horizon, example durations and omitted controls must not override the application requirements.']);
+
+add('delivery-workflow','Systems','Isolated checkpoint delivery','Approved project workflow for high-quality, token-aware implementation without changing runtime behavior.','.loop/workflow.md:1; Loop/EFFICIENT-WORKFLOW.md:1; Loop/DELIVERY-WORKFLOW.md:1',[
+ [['scope','Bounded approved checkpoint','Define objective, invariants, acceptance criteria, baseline, file ownership and exact checks. Tiny isolated changes may remain direct.']],
+ [['context','Compact task packet','Load the active handoff, affected atlas map and targeted source ranges; do not copy the full conversation or repeatedly scan history.']],
+ [['sandbox','Task worktree + branch','Use isolation for substantial, risky, experimental or parallel work. One owner per shared integration hotspot.']],
+ [['implement','Focused implementation','Make one coherent checkpoint; use deterministic tools and targeted tests. Avoid duplicate agents and background overhead.']],
+ [['review','Two-stage review','First requirements/scope; then correctness, maintainability, accessibility, security, performance and regression risk.']],
+ [['sync','Atlas + handoff + checkpoint','Synchronize affected flows and continuity; run fresh applicable checks and record limitations.']],
+ [['pr','Focused pull request','Include only intended files, evidence, performance impact, manual checks and rollback boundary. External actions follow approval gates.']],
+ [['merge','Approved integration merge','Merge into the integration branch, then fast-forward the local workspace without overwriting unrelated changes.']],
+ [['regress','Combined regression gate','Exercise integrated behavior, localization, errors, atlas and relevant performance before release consideration.']],
+ [['release','Separate production checkpoint','Production merge, push and deployment require their own review and authorization.']]
+],[['scope','context','Bound context'],['context','sandbox','Isolate'],['sandbox','implement','Own files'],['implement','review','Validate'],['review','implement','Fix findings'],['review','sync','Pass'],['sync','pr','PR-ready'],['pr','merge','Approved'],['merge','regress','Synchronize local'],['regress','implement','Repair in owner branch'],['regress','release','Pass']],['A worktree consumes disk space, not model tokens. Effective savings come from bounded context, targeted reads and checks, one owner, focused diffs and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order.']);
 
 export { graphs };
