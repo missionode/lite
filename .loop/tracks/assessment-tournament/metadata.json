@@ -1,0 +1,9 @@
+{
+  "id": "assessment-tournament",
+  "type": "feature",
+  "state": "APPROVED",
+  "branch": "modularize",
+  "approvedAt": "2026-09-19",
+  "currentCheckpoint": "CP-ASSESS-PLAN-001",
+  "implementationGate": "weekly usage reset"
+}

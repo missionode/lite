@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-19",
-    "commit": "68ccf1c baseline + uncommitted loading-plan checkpoint",
-    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints and one planning checkpoint. Existing module owners and runtime behavior remain unchanged. The modularization map now distinguishes delivered boundaries, queued extraction work and a post-parity measured loading/resource-lifecycle phase. Programme-delivery assets remain non-runtime."
+    "commit": "4d4dcf5 baseline + uncommitted assessment-plan checkpoint",
+    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset and before modularization resumes. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -3454,6 +3454,181 @@
       ],
       "notes": [
         "Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state."
+      ]
+    },
+    {
+      "id": "assessment-tournament-planned",
+      "group": "Supporting pages",
+      "title": "PLANNED · Operator-led chakra assessment tournament",
+      "subtitle": "Approved future replacement after the weekly reset; no runtime behavior is delivered by this map.",
+      "source": ".loop/tracks/assessment-tournament/spec.md:1; .loop/tracks/assessment-tournament/plan.md:1; docs/app-map/FIX-QUEUE.md:1",
+      "rows": [
+        [
+          [
+            "gate",
+            "Weekly reset gate",
+            "Implement this approved feature before modularization resumes. The current consultation remains authoritative until replacement validation passes."
+          ]
+        ],
+        [
+          [
+            "open",
+            "Open standalone assessment",
+            "Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed."
+          ],
+          [
+            "load",
+            "Load versioned question JSON",
+            "Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned."
+          ]
+        ],
+        [
+          [
+            "ask",
+            "Show one neutral question",
+            "Two answer cards plus Equal and Skip. Record the stable question ID immediately."
+          ],
+          [
+            "ledger",
+            "No-repeat ledger",
+            "Answered, equal and skipped IDs can never re-enter this assessment."
+          ]
+        ],
+        [
+          [
+            "coverage",
+            "Balance seven-chakra evidence",
+            "Prioritize under-measured chakras; use only genuinely new questions."
+          ],
+          [
+            "tiebreak",
+            "Unused tie-breakers",
+            "Ask new cards only when confidence is insufficient or chakra scores are close."
+          ]
+        ],
+        [
+          [
+            "score",
+            "Normalize seven chakra statuses",
+            "Calculate relative Root through Crown strength/status plus evidence confidence."
+          ],
+          [
+            "archetypes",
+            "Aggregate friendly archetypes",
+            "Display only the approved positive, participant-acceptable names."
+          ]
+        ],
+        [
+          [
+            "dot",
+            "Render one unlabelled dot",
+            "Small green solid, orange half-filled or red outlined dot only. Orange until several consistent independent signals exist; no text, percentage or action."
+          ]
+        ],
+        [
+          [
+            "result",
+            "Operator result",
+            "Seven chakra statuses, archetype names and the dot. No recommendation, journey handoff, Advanced Features controls or automatic service action."
+          ]
+        ],
+        [
+          [
+            "clear",
+            "Clear for New Client",
+            "Explicitly remove current assessment state before the next client."
+          ],
+          [
+            "verify",
+            "Replacement gate",
+            "Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "gate",
+          "open",
+          "After reset"
+        ],
+        [
+          "open",
+          "load",
+          "Start"
+        ],
+        [
+          "load",
+          "ask",
+          "Valid"
+        ],
+        [
+          "load",
+          "verify",
+          "Invalid → safe failure"
+        ],
+        [
+          "ask",
+          "ledger",
+          "Answer / equal / skip"
+        ],
+        [
+          "ledger",
+          "coverage",
+          "Unique evidence"
+        ],
+        [
+          "coverage",
+          "ask",
+          "More coverage"
+        ],
+        [
+          "coverage",
+          "tiebreak",
+          "Minimum reached"
+        ],
+        [
+          "tiebreak",
+          "ask",
+          "New tie-breaker"
+        ],
+        [
+          "tiebreak",
+          "score",
+          "Resolved / limit reached"
+        ],
+        [
+          "score",
+          "archetypes",
+          "Summarize"
+        ],
+        [
+          "archetypes",
+          "dot",
+          "Independent signals"
+        ],
+        [
+          "dot",
+          "result",
+          "Display"
+        ],
+        [
+          "result",
+          "clear",
+          "Next client"
+        ],
+        [
+          "clear",
+          "open",
+          "Fresh state"
+        ],
+        [
+          "result",
+          "verify",
+          "Validate replacement"
+        ]
+      ],
+      "notes": [
+        "PLANNED only. Questions and hidden weights/signals will live in versioned JSON; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. The dot is an operator interpretation aid, not consent. English content is approved before Malayalam, Hindi and Russian adaptation."
       ]
     },
     {

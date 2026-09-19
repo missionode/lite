@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 68ccf1c baseline + uncommitted loading-plan checkpoint · 2026-09-19.
+Source snapshot: 4d4dcf5 baseline + uncommitted assessment-plan checkpoint · 2026-09-19.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints and one planning checkpoint. Existing module owners and runtime behavior remain unchanged. The modularization map now distinguishes delivered boundaries, queued extraction work and a post-parity measured loading/resource-lifecycle phase. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset and before modularization resumes. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -36,8 +36,9 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 26. [Persistence, caching and network](#storage)
 27. [Failure and recovery map](#recovery)
 28. [Settings backup and restore](#settings-backup)
-29. [Consultation flow](#consultation)
-30. [Frequency repertory handoff](#repertory)
+29. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
+30. [Consultation flow](#consultation)
+31. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1306,6 +1307,65 @@ flowchart TD
 | Show error | Invalid/missing/oversized file preserves existing settings. |
 
 - Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.
+
+<a id="assessment-tournament-planned"></a>
+
+## PLANNED · Operator-led chakra assessment tournament
+
+Approved future replacement after the weekly reset; no runtime behavior is delivered by this map.
+
+Sources: [.loop/tracks/assessment-tournament/spec.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/spec.md:1), [.loop/tracks/assessment-tournament/plan.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/plan.md:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+
+```mermaid
+flowchart TD
+  gate["Weekly reset gate"]
+  open["Open standalone assessment"]
+  load["Load versioned question JSON"]
+  ask["Show one neutral question"]
+  ledger["No-repeat ledger"]
+  coverage["Balance seven-chakra evidence"]
+  tiebreak["Unused tie-breakers"]
+  score["Normalize seven chakra statuses"]
+  archetypes["Aggregate friendly archetypes"]
+  dot["Render one unlabelled dot"]
+  result["Operator result"]
+  clear["Clear for New Client"]
+  verify["Replacement gate"]
+  gate -->|"After reset"| open
+  open -->|"Start"| load
+  load -->|"Valid"| ask
+  load -->|"Invalid → safe failure"| verify
+  ask -->|"Answer / equal / skip"| ledger
+  ledger -->|"Unique evidence"| coverage
+  coverage -->|"More coverage"| ask
+  coverage -->|"Minimum reached"| tiebreak
+  tiebreak -->|"New tie-breaker"| ask
+  tiebreak -->|"Resolved / limit reached"| score
+  score -->|"Summarize"| archetypes
+  archetypes -->|"Independent signals"| dot
+  dot -->|"Display"| result
+  result -->|"Next client"| clear
+  clear -->|"Fresh state"| open
+  result -->|"Validate replacement"| verify
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Weekly reset gate | Implement this approved feature before modularization resumes. The current consultation remains authoritative until replacement validation passes. |
+| Open standalone assessment | Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. |
+| Load versioned question JSON | Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned. |
+| Show one neutral question | Two answer cards plus Equal and Skip. Record the stable question ID immediately. |
+| No-repeat ledger | Answered, equal and skipped IDs can never re-enter this assessment. |
+| Balance seven-chakra evidence | Prioritize under-measured chakras; use only genuinely new questions. |
+| Unused tie-breakers | Ask new cards only when confidence is insufficient or chakra scores are close. |
+| Normalize seven chakra statuses | Calculate relative Root through Crown strength/status plus evidence confidence. |
+| Aggregate friendly archetypes | Display only the approved positive, participant-acceptable names. |
+| Render one unlabelled dot | Small green solid, orange half-filled or red outlined dot only. Orange until several consistent independent signals exist; no text, percentage or action. |
+| Operator result | Seven chakra statuses, archetype names and the dot. No recommendation, journey handoff, Advanced Features controls or automatic service action. |
+| Clear for New Client | Explicitly remove current assessment state before the next client. |
+| Replacement gate | Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence. |
+
+- PLANNED only. Questions and hidden weights/signals will live in versioned JSON; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. The dot is an operator interpretation aid, not consent. English content is approved before Malayalam, Hindi and Russian adaptation.
 
 <a id="consultation"></a>
 

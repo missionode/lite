@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NEXT AFTER WEEKLY RESET — CP-ASSESS-PLAN-001: operator-led assessment tournament
+
+- APPROVED and queued before modularization resumes. Redesign only `/docs/assesment.html` as a standalone two-choice, no-repeat hybrid bracket that estimates relative status/confidence for all seven chakras.
+- Load versioned questions/weights/signals from JSON; keep validation, adaptive selection, scoring, archetype aggregation and thresholds in code. Participant-facing archetype names remain positive and neutral.
+- Result scope is seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. No heading, explanation, percentage, Advanced Features settings, journey handoff or automatic action.
+- Current consultation behavior remains authoritative until the replacement passes schema, no-repeat, balance, tie-breaker, persistence/reset, responsive and operator-review gates. After assessment delivery, resume modularization from CP-MOD-010.
+- Track: `.loop/tracks/assessment-tournament/` | Implementation gate: weekly usage reset.
+
 ### NOW — CP-MOD-010: post-parity loading and lifecycle plan
 
 - PLANNED on `modularize`, following `68ccf1c`. Phase 8 now defines a measured lazy-loading pass after extraction parity; it does not alter the current journey, AudioEngine or UI-controller order.
