@@ -27,11 +27,12 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - Tests prove no question repeats after answer, equal or skip; minimum chakra evidence is balanced; close/uncertain results use only unused tie-breakers; incomplete evidence cannot produce a decisive dot.
 - A single answer cannot produce green or red. The final dot requires several consistent independent signals.
 - Refresh/resume and new-client clearing behave explicitly and safely.
-- English content receives operator approval before Malayalam, Hindi and Russian adaptation.
+- The source question bank remains English. The existing Google Translate widget translates the page, dynamically generated questions, choices, progress and results; translation therefore requires an internet connection, matching the current assessment page.
 - The current and planned atlas maps remain distinct until implementation replaces the current consultation.
 
 ## Exclusions
 
 - No journey recommendation, Lobby handoff, automatic session configuration, service activation or sales prompt.
 - No Advanced Features assessment settings panel.
+- No separate native Malayalam, Hindi or Russian assessment bundles in this feature; multilingual readiness uses the existing Google Translate integration.
 - No implementation before the weekly usage reset; this approved plan is the next feature before modularization resumes.

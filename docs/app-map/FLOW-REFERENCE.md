@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 4d4dcf5 baseline + uncommitted assessment-plan checkpoint · 2026-09-19.
+Source snapshot: 72ac1a2 baseline + uncommitted multilingual-plan correction · 2026-09-19.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset and before modularization resumes. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset, using the current Google Translate path, before modularization resumes. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1320,7 +1320,7 @@ Sources: [.loop/tracks/assessment-tournament/spec.md:1](/Users/lekshmisyam/Deskt
 flowchart TD
   gate["Weekly reset gate"]
   open["Open standalone assessment"]
-  load["Load versioned question JSON"]
+  load["Load English versioned question JSON"]
   ask["Show one neutral question"]
   ledger["No-repeat ledger"]
   coverage["Balance seven-chakra evidence"]
@@ -1352,8 +1352,8 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Weekly reset gate | Implement this approved feature before modularization resumes. The current consultation remains authoritative until replacement validation passes. |
-| Open standalone assessment | Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. |
-| Load versioned question JSON | Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned. |
+| Open standalone assessment | Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. Existing Google Translate remains the multilingual path. |
+| Load English versioned question JSON | Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned. |
 | Show one neutral question | Two answer cards plus Equal and Skip. Record the stable question ID immediately. |
 | No-repeat ledger | Answered, equal and skipped IDs can never re-enter this assessment. |
 | Balance seven-chakra evidence | Prioritize under-measured chakras; use only genuinely new questions. |
@@ -1365,7 +1365,7 @@ flowchart TD
 | Clear for New Client | Explicitly remove current assessment state before the next client. |
 | Replacement gate | Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence. |
 
-- PLANNED only. Questions and hidden weights/signals will live in versioned JSON; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. The dot is an operator interpretation aid, not consent. English content is approved before Malayalam, Hindi and Russian adaptation.
+- PLANNED only. Questions and hidden weights/signals will live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. Preserve the current internet-dependent Google Translate widget for the page and all dynamically generated content; separate native locale bundles are out of scope. The dot is an operator interpretation aid, not consent.
 
 <a id="consultation"></a>
 

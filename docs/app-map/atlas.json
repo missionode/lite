@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-19",
-    "commit": "4d4dcf5 baseline + uncommitted assessment-plan checkpoint",
-    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset and before modularization resumes. Programme-delivery assets remain non-runtime."
+    "commit": "72ac1a2 baseline + uncommitted multilingual-plan correction",
+    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset, using the current Google Translate path, before modularization resumes. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -3474,11 +3474,11 @@
           [
             "open",
             "Open standalone assessment",
-            "Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed."
+            "Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. Existing Google Translate remains the multilingual path."
           ],
           [
             "load",
-            "Load versioned question JSON",
+            "Load English versioned question JSON",
             "Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned."
           ]
         ],
@@ -3628,7 +3628,7 @@
         ]
       ],
       "notes": [
-        "PLANNED only. Questions and hidden weights/signals will live in versioned JSON; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. The dot is an operator interpretation aid, not consent. English content is approved before Malayalam, Hindi and Russian adaptation."
+        "PLANNED only. Questions and hidden weights/signals will live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. Preserve the current internet-dependent Google Translate widget for the page and all dynamically generated content; separate native locale bundles are out of scope. The dot is an operator interpretation aid, not consent."
       ]
     },
     {
