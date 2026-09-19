@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### QUEUED — CP-THEME-PLAN-001: approved Cosmic Observatory design
+
+- Owner approved the generated desktop/mobile visual direction. Original image is preserved in `docs/design/lite-cosmic-observatory/approved-concept-v1.png`; complete visual and functional contract is in `.loop/tracks/cosmic-observatory-theme/spec-plan-review.md`.
+- Order remains assessment → complete modularization/measured loading review → theme implementation. Current modularization progress is unchanged by this planning checkpoint.
+- Preserve every functional requirement, language, access gate, timing/audio behavior and protected Earth/Sun effect. Image omissions, example durations, copy and illustrative sky coordinates do not override executable requirements.
+- Atlas adds a separate planned theme map. This is documentation and a reference asset only, with no app code, cache or deployed UI change.
+- Execution: direct documentation work; no model switch. Validation: atlas regeneration and all 32-map browser checks passed (selection, labels, keyboard, mobile overflow, print, SVG export and template fallback), with no page errors; diff whitespace check passed. No app playback/device-performance claim.
+
 ### NOW — CP-ATLAS-001: direct-template fallback
 
 - Root cause: `docs/app-map/atlas-template.html` is a build input; its `/* ATLAS_DATA */` placeholder does not define `atlas` when that raw file is opened directly. The generated `docs/app-map/index.html` embeds the data correctly.

@@ -1,0 +1,9 @@
+{
+  "id": "cosmic-observatory-theme",
+  "type": "visual-redesign",
+  "state": "APPROVED",
+  "currentCheckpoint": "CP-THEME-PLAN-001",
+  "implementationStatus": "QUEUED",
+  "dependsOn": ["assessment-tournament", "modularize"],
+  "reference": "docs/design/lite-cosmic-observatory/approved-concept-v1.png"
+}

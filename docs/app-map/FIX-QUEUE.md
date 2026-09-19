@@ -166,6 +166,10 @@ Do not begin this phase until the bounded module owners, AudioEngine extraction 
 
 ## Working order
 
+### Approved visual checkpoint after assessment and modularization
+
+CP-THEME-PLAN-001 adopts the Cosmic Observatory desktop/mobile concept saved under `docs/design/lite-cosmic-observatory/`. Follow `.loop/tracks/cosmic-observatory-theme/spec-plan-review.md` after both prerequisite tracks are complete. Implement shared visual tokens and responsive surfaces against the completed module APIs. Preserve all existing controls, defaults, translations, access rules, journey/audio behavior, offline delivery, static journey performance and Earth/Sun requirements. The generated mockup is an appearance reference; its omissions, sample timing, cardinal arrangement and curved horizon cannot change requirements. Validate responsive usability, functional parity and measured performance before accepting the design. The `cosmic-theme-planned` atlas map is future state only.
+
 ### Approved next feature after weekly reset — assessment tournament
 
 Before modularization resumes, replace the standalone consultation with the approved operator-led two-choice hybrid bracket recorded in `.loop/tracks/assessment-tournament/`. Questions and hidden weights/signals come from one operator-approved English versioned JSON file; code owns validation, no-repeat selection, seven-chakra evidence balancing, unused tie-breakers, confidence, participant-friendly archetypes and a conservative result dot. Preserve the current Google Translate widget and ensure dynamically generated questions, choices, progress, archetypes and results are translated; this multilingual path remains internet-dependent. The visible result contains seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. It has no Advanced Features controls, journey handoff or automatic action. Keep the existing `consultation` map authoritative until implementation is validated; the `assessment-tournament-planned` map is future state only.

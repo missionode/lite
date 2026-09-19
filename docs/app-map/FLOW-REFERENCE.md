@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 72ac1a2 baseline + uncommitted multilingual-plan correction · 2026-09-19.
+Source snapshot: bbbaaf2 baseline + CP-THEME-PLAN-001 documentation changes · 2026-09-19.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints and approved future-state plans. Existing runtime behavior remains unchanged. The current consultation map stays authoritative; a separately labelled map records the operator-led assessment tournament queued after the weekly reset, using the current Google Translate path, before modularization resumes. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints and explicitly labelled future plans. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references and programme-delivery assets are non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -12,33 +12,34 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 2. [The whole application](#overview)
 3. [Modularization safety loop](#modularization)
 4. [Startup and first visit](#startup)
-5. [Mode selection and start routing](#modes)
-6. [Standard chakra journey](#standard)
-7. [Inside one chakra](#chakra)
-8. [HRIM activation](#hrim)
-9. [Sleep and Music Only](#sleep)
-10. [Box breathing and Ho’oponopono](#focused)
-11. [Yoga experience](#yoga)
-12. [Intimate Service and massage](#care)
-13. [Sound Shots](#shots)
-14. [Experiment activities](#experiments)
-15. [Ordered Chakra Journey add-ons](#journey-addons)
-16. [Pause, stop and live controls](#controls)
-17. [Optional Lobby video introduction](#restart)
-18. [Completion, statistics and external handoff](#completion)
-19. [Scripts, language and timing](#content)
-20. [Narration and fallback](#narration)
-21. [Audio signal architecture](#audio)
-22. [Sound options and live suppression](#sound-options)
-23. [Visuals and browser lifecycle](#visuals)
-24. [Earth observer reference and atmosphere](#earth-atmosphere)
-25. [Thematic solar containment glow](#solar-containment)
-26. [Persistence, caching and network](#storage)
-27. [Failure and recovery map](#recovery)
-28. [Settings backup and restore](#settings-backup)
-29. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
-30. [Consultation flow](#consultation)
-31. [Frequency repertory handoff](#repertory)
+5. [PLANNED · Cosmic Observatory theme](#cosmic-theme-planned)
+6. [Mode selection and start routing](#modes)
+7. [Standard chakra journey](#standard)
+8. [Inside one chakra](#chakra)
+9. [HRIM activation](#hrim)
+10. [Sleep and Music Only](#sleep)
+11. [Box breathing and Ho’oponopono](#focused)
+12. [Yoga experience](#yoga)
+13. [Intimate Service and massage](#care)
+14. [Sound Shots](#shots)
+15. [Experiment activities](#experiments)
+16. [Ordered Chakra Journey add-ons](#journey-addons)
+17. [Pause, stop and live controls](#controls)
+18. [Optional Lobby video introduction](#restart)
+19. [Completion, statistics and external handoff](#completion)
+20. [Scripts, language and timing](#content)
+21. [Narration and fallback](#narration)
+22. [Audio signal architecture](#audio)
+23. [Sound options and live suppression](#sound-options)
+24. [Visuals and browser lifecycle](#visuals)
+25. [Earth observer reference and atmosphere](#earth-atmosphere)
+26. [Thematic solar containment glow](#solar-containment)
+27. [Persistence, caching and network](#storage)
+28. [Failure and recovery map](#recovery)
+29. [Settings backup and restore](#settings-backup)
+30. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
+31. [Consultation flow](#consultation)
+32. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -251,6 +252,51 @@ flowchart TD
 | Hide splash | 2.5-second delay begins after async initialization reaches its end. |
 
 - Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. This does not establish complete offline readiness.
+
+<a id="cosmic-theme-planned"></a>
+
+## PLANNED · Cosmic Observatory theme
+
+CP-THEME-PLAN-001: owner-approved appearance; implementation follows assessment and modularization.
+
+Sources: [.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1), [docs/design/lite-cosmic-observatory/README.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/design/lite-cosmic-observatory/README.md:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+
+```mermaid
+flowchart TD
+  assessment["Complete assessment"]
+  modules["Complete modularization"]
+  reference["Approved visual reference"]
+  contract["Preserve all requirements"]
+  tokens["Shared visual tokens"]
+  sky["Protected sky behavior"]
+  surfaces["Responsive live controls"]
+  verify["Parity and performance gate"]
+  review["Review implemented design"]
+  assessment -->|"Existing priority"| modules
+  modules -->|"Prerequisites complete"| reference
+  reference -->|"Appearance only"| contract
+  contract -->|"Define system"| tokens
+  contract -->|"Retain invariants"| sky
+  tokens -->|"Apply"| surfaces
+  sky -->|"Preserve"| surfaces
+  surfaces -->|"Exercise"| verify
+  verify -->|"Correct regressions"| surfaces
+  verify -->|"Pass"| review
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Complete assessment | Deliver the separately planned standalone assessment with its existing translation contract. |
+| Complete modularization | Resume the existing migration and measured loading review. Theme work does not reorder these checkpoints. |
+| Approved visual reference | See docs/design/lite-cosmic-observatory/approved-concept-v1.png: midnight panels, ivory text, champagne actions and cosmic setting. |
+| Preserve all requirements | Keep every option, default, gate, translation, navigation, timing, audio and persistence contract. Mockup omissions and sample values are illustrative. |
+| Shared visual tokens | Define readable surfaces, typography, spacing, selection states and keyboard focus. |
+| Protected sky behavior | Keep truthful observer coordinates, proper cardinal order, straight horizon, centered Earth with five soft layers and 26°C aqua theme, Sun shield and static journey performance. |
+| Responsive live controls | Restyle Lobby, summary, Settings and applicable surfaces using existing handlers. Keep all options available and localize adopted copy. |
+| Parity and performance gate | Check languages, keyboard, mobile/tablet/desktop, video, journeys, offline updates and CPU/memory. Resolve regressions before acceptance. |
+| Review implemented design | Present the working theme checkpoint. Production publication needs its own request. |
+
+- PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative. The generated celestial placements, atmospheric bands, curve of the horizon, example durations and omitted controls must not override the application requirements.
 
 <a id="modes"></a>
 
