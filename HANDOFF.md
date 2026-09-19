@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-010: post-parity loading and lifecycle plan
+
+- PLANNED on `modularize`, following `68ccf1c`. Phase 8 now defines a measured lazy-loading pass after extraction parity; it does not alter the current journey, AudioEngine or UI-controller order.
+- Target architecture: a small eager shell; offline-cached but unexecuted optional feature bundles; preload on user selection; Begin awaits only unfinished preparation; explicit cleanup for workers, buffers, AudioNodes, media, animation, observers, timers and listeners.
+- Candidate boundaries remain provisional until profiling: Advanced/Yoga/Intimate/Experiments, Sleep, video introduction, specialized preparation, Piper runtime/model and optional spatial effects. Tiny modules will not be split without measured value.
+- Acceptance requires before/after cold, warm and offline evidence, journey-start latency, route/cancellation/PWA regression checks and safe localized load failure. This checkpoint changes planning/atlas only and makes no performance claim.
+- Progress: 69% complete | Confidence: high for delivered seams, medium for remaining migration | Current phase: journey orchestration | Main remaining scope: journey stages, deferred AudioEngine buses, UI controllers, then measured loading/resource lifecycle.
+
 ### NOW — CP-MOD-009: ordered preparation-stage plan
 
 - ACTIVE on `modularize`, following `fc029a3`. The frozen journey-routing owner now also emits the canonical Box → Visualization → Dharana → Body Scan → Guided Noting plan.

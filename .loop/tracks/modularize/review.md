@@ -1,5 +1,14 @@
 # Review
 
+## CP-MOD-010 — post-parity loading and lifecycle plan
+
+Status: `PLAN_SYNC PASS`; implementation remains queued.
+
+- The migration now explicitly separates offline caching from JavaScript execution and active runtime resources.
+- Lazy loading remains after behavior parity and measurement, so it does not reorder the current module extraction or the deferred AudioEngine checkpoint.
+- The approved direction is a small eager shell plus measured feature-level dynamic bundles, selection-time preload, import deduplication, safe offline/failure paths and explicit resource disposal.
+- Performance acceptance requires cold/warm/offline and journey-start measurements plus route/cancellation/PWA regression evidence. No runtime code or performance claim changed in this checkpoint.
+
 ## CP-MOD-009 — ordered preparation-stage plan
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence.

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: fc029a3 baseline + uncommitted preparation-plan checkpoint · 2026-09-19.
+Source snapshot: 68ccf1c baseline + uncommitted loading-plan checkpoint · 2026-09-19.
 
-Source-reviewed application behavior plus nine behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle, Web Audio effect-route retirement, journey start routing and ordered preparation planning now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints and one planning checkpoint. Existing module owners and runtime behavior remain unchanged. The modularization map now distinguishes delivered boundaries, queued extraction work and a post-parity measured loading/resource-lifecycle phase. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -153,7 +153,14 @@ flowchart TD
   test["Targeted parity check"]
   maps["Refresh affected maps"]
   checkpoint["Validated checkpoint"]
-  next["Next queued boundary"]
+  next["Queued extraction work"]
+  measure["PLANNED · Measure baseline"]
+  partition["PLANNED · Approve feature bundles"]
+  cache["PLANNED · Cache without execution"]
+  preload["PLANNED · Preload on intent"]
+  activate["PLANNED · Activate selected feature"]
+  release["PLANNED · Release resources"]
+  verify["PLANNED · Evidence gate"]
   atlas -->|"Define scope"| boundary
   atlas -->|"Protect behavior"| baseline
   boundary -->|"Approved slice"| extract
@@ -163,7 +170,16 @@ flowchart TD
   test -->|"Pass"| checkpoint
   maps -->|"Synchronized"| checkpoint
   checkpoint -->|"Proceed incrementally"| next
-  next -->|"Repeat"| atlas
+  next -->|"Repeat until parity"| atlas
+  next -->|"After parity"| measure
+  measure -->|"Use evidence"| partition
+  partition -->|"Approved boundary"| cache
+  cache -->|"Offline-ready"| preload
+  preload -->|"Selected feature"| activate
+  activate -->|"Stop / finish"| release
+  activate -->|"Exercise routes"| verify
+  release -->|"Audit cleanup"| verify
+  verify -->|"Keep only net-positive boundaries"| measure
 ```
 
 | Step | Current behavior |
@@ -175,9 +191,16 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Next queued boundary | Journey stage contracts → UI composition. AudioEngine bus construction is deferred until the next weekly reset. Each remains planned until separately delivered. |
+| Queued extraction work | Journey stages → deferred AudioEngine buses → UI controllers. Complete parity before delivery changes. |
+| PLANNED · Measure baseline | Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners. |
+| PLANNED · Approve feature bundles | Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity. |
+| PLANNED · Cache without execution | Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them. |
+| PLANNED · Preload on intent | Selection or clear intent starts one deduplicated import; Begin awaits only unfinished preparation. |
+| PLANNED · Activate selected feature | Load failure is safe and localized; unselected features remain inactive. |
+| PLANNED · Release resources | Stop workers, buffers, AudioNodes, media, animation/WebGL, observers, timers and listeners where safe. |
+| PLANNED · Evidence gate | Cold/warm/offline, PWA update, route, cancellation/restart and device/browser performance evidence must show net benefit. |
 
-- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection and ordered preparation-stage planning. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js and is owner-deferred until the next weekly reset. Remaining journey stage execution is the next bounded orchestration work. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection and ordered preparation-stage planning. Frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. AudioEngine bus construction remains owner-deferred until the next weekly reset.
 
 <a id="startup"></a>
 
