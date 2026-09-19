@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
+const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
@@ -194,10 +195,10 @@ assert.match(app, /const MANTRA_FADE_SECONDS = 8/, 'mantra should use a longer d
 assert.match(mediaLifecycle, /PIPER_CLIP_FADE_SECONDS: 0\.05/);
 assert.match(app, /const NARRATION_MANTRA_FADE_SECONDS = 5/, 'the final narration tail should be long enough to make the mantra handoff unhurried');
 assert.match(mediaLifecycle, /PIPER_CANCEL_FADE_SECONDS: 0\.12/);
-assert.match(app, /const requestedFadeIn = Number\(callbacks\.fadeInSeconds\)/, 'Piper should keep the normal clip fade-in separate from the transition fade-out');
-assert.match(app, /const requestedFadeOut = Number\(callbacks\.fadeOutSeconds\)/, 'Piper should support an explicit final-clip fade-out');
-assert.match(app, /cancel\(reason = 'cancelled', \{ immediate = false, fadeSeconds = PIPER_CANCEL_FADE_SECONDS \} = \{\}\)/, 'Piper cancellation distinguishes graceful and emergency stops');
-assert.match(app, /source\.stop\(now \+ fadeSeconds \+ 0\.02\)/, 'graceful Piper cancellation should ramp the clip down before stopping');
+assert.match(piperLifecycle, /const requestedFadeIn = Number\(callbacks\.fadeInSeconds\)/, 'Piper should keep the normal clip fade-in separate from the transition fade-out');
+assert.match(piperLifecycle, /const requestedFadeOut = Number\(callbacks\.fadeOutSeconds\)/, 'Piper should support an explicit final-clip fade-out');
+assert.match(piperLifecycle, /const immediate = options\.immediate === true/, 'Piper cancellation distinguishes graceful and emergency stops');
+assert.match(piperLifecycle, /source\.stop\(now \+ fadeSeconds \+ 0\.02\)/, 'graceful Piper cancellation should ramp the clip down before stopping');
 assert.match(app, /piperTTS\.cancel\('experiment stopped', \{ fadeSeconds: 2 \}\)/, 'Experiment stop fades active narration');
 assert.match(app, /piperTTS\.cancel\('journey finished', \{ fadeSeconds: 2 \}\)/, 'completion fades stale narration');
 assert.match(app, /piperTTS\.cancel\('journey stopped', \{ fadeSeconds: 2 \}\)/, 'manual stop fades active narration');

@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-006: Piper synthesis and playback lifecycle
+
+- ACTIVE on `modularize`, following `599506d`. Added the frozen `window.ChakraPiperLifecycle` owner for voice-model configuration, serial worker queueing, progress/error handling, synthesis/decode caching, normalization, clip playback envelopes, preview, pause and graceful/immediate cancellation.
+- `app.js` now supplies its existing registry, translation, pace, volume, Worker/WebAssembly and envelope dependencies through one factory call. The worker protocol, 16 MiB/48-clip cache, 50 ms final-word-safe clip envelope, 120 ms default cancellation, two-second journey stop callers, browser fallback and narration order are unchanged.
+- The module loads after media-lifecycle and before app `3.59`, and is precached by shell `chakra-v5.252`. Direct Piper, thermal, long-narration, background-music, audio-transition and shell-delivery contracts pass at unit/static evidence. The known Node module-format warning remains; no browser/device listening or thermal claim is made.
+- The owner explicitly reduced the weekly reserve from 20% to 10% for this checkpoint. Routing remains high-risk / Astra-high as a PLANNED recommendation only; direct bounded execution avoids a duplicate child run.
+- Progress: 54% complete | Confidence: high for delivered module seams, medium for full migration | Current phase: narration lifecycle complete, audio buses pending | Main remaining scope: AudioEngine ownership, journeys and UI.
+
 ### NOW — CP-MOD-005: deterministic media lifecycle primitives
 
 - ACTIVE on `modularize`, following `af02f9c`. Added the frozen `window.ChakraMediaLifecycle` owner for stage fade-window scoping, Unicode-safe narration chunking, the existing 50 ms Piper clip / 120 ms cancellation envelopes, and native single-source seamless-loop preparation, gain and cleanup.

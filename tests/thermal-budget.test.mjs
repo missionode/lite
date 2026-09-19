@@ -7,15 +7,14 @@ const mediaSource = fs.readFileSync('modules/media-lifecycle.js', 'utf8');
 const mediaContext = vm.createContext({});
 vm.runInContext(mediaSource, mediaContext);
 const { splitNarrationText } = mediaContext.ChakraMediaLifecycle;
-const PiperTTS = vm.runInNewContext(
-    app.slice(app.indexOf('class PiperTTS'), app.indexOf('// Audio Engine')) + '; PiperTTS',
-    { getPiperMeditationSettings: () => settings }
-);
+const piperSource = fs.readFileSync('modules/piper-lifecycle.js', 'utf8');
+const piperContext = vm.createContext({});
+vm.runInContext(piperSource, piperContext);
 const text = ('മലയാളം '.repeat(90) + '😀'.repeat(190));
 const chunks = splitNarrationText(text);
 assert.ok(chunks.every(chunk => Array.from(chunk).length <= 180));
 assert.equal(chunks.join('').replace(/\s/g, ''), text.replace(/\s/g, ''), 'No Unicode text is lost');
-const piper = new PiperTTS({});
+const piper = piperContext.ChakraPiperLifecycle.createPiperTTS({}, { getMeditationSettings: () => settings });
 let builds = 0;
 piper.synthesize = async text => { builds++; return text; };
 piper.decode = async text => ({ text, length: 1024 * 1024, numberOfChannels: 1 });
