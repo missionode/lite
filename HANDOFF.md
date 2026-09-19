@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-008: deterministic journey routing
+
+- ACTIVE on `modularize`, following `fc1bc48`. Added the frozen `window.ChakraJourneyRouting` owner for focused-mode selection, launch priority, pre-video chakra validation and intimate-massage chakra ordering.
+- `app.js` remains responsible for reading UI state, showing existing alerts and executing each route. Shots → Music Only → Sleep → guided priority, standalone preparation eligibility, Yoga/Intimate precedence and Crown-to-Root massage order are unchanged.
+- The module loads before app `3.61` and is precached by shell `chakra-v5.254`. Direct route and neighboring journey contracts pass at unit/static evidence. No browser/device journey evidence is claimed.
+- The owner asked to defer the large AudioEngine bus checkpoint until the weekly reset and continue with smaller work while retaining a 10% weekly reserve. Execution remains direct; no model switch is claimed.
+- Progress: 65% complete | Confidence: high for delivered module seams, medium for full migration | Current phase: journey orchestration | Main remaining scope: journey stages, deferred AudioEngine buses and UI.
+
 ### NOW — CP-MOD-007: Web Audio effect-route lifecycle
 
 - ACTIVE on `modularize`, following `66bb8cb`. Added the frozen `window.ChakraAudioRouteLifecycle` owner for idempotent convolver connection, audio-clock tail retirement, stale-retirement cancellation and deterministic disconnection.

@@ -59,6 +59,8 @@ const piperLifecycle = window.ChakraPiperLifecycle;
 if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
+const journeyRouting = window.ChakraJourneyRouting;
+if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -5629,14 +5631,12 @@ class MeditationController {
     }
 
     getFocusedExperience() {
-        if (getChecked('yoga-experience-toggle')) return 'yoga';
-        if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) return 'intimate';
-        // Dharana and Visualization are add-ons when a Chakra Journey is
-        // selected, but also complete, useful standalone practices on their
-        // own. This guard makes their independent start explicit without
-        // changing the ordered add-on path above.
-        if (state.selectedChakras.length === 0 && (getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle'))) return 'preparation';
-        return null;
+        return journeyRouting.resolveFocusedExperience({
+            yogaSelected: getChecked('yoga-experience-toggle'),
+            intimateSelected: getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle'),
+            selectedChakraCount: state.selectedChakras.length,
+            preparationSelected: getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle')
+        });
     }
 
     async handleInterval() {
@@ -7942,10 +7942,18 @@ function attachEventListeners() {
         // validation. A standard journey has no meaningful continuation
         // without a selected chakra, so tell the meditator before video
         // buffering or playback begins.
-        const hasAlternativeMode = getChecked('shots-toggle') || state.bgMusicMode ||
-            getChecked('sleep-mode-toggle') || getChecked('high-energy-toggle') ||
-            Boolean(meditation.getFocusedExperience());
-        if (!hasAlternativeMode && state.selectedChakras.length === 0) {
+        const route = journeyRouting.resolveLaunchRoute({
+            shotsSelected: getChecked('shots-toggle'),
+            backgroundMusicMode: state.bgMusicMode,
+            sleepSelected: getChecked('sleep-mode-toggle')
+        });
+        const validation = journeyRouting.validateLobbyStart({
+            route,
+            highEnergySelected: getChecked('high-energy-toggle'),
+            focusedExperience: meditation.getFocusedExperience(),
+            selectedChakraCount: state.selectedChakras.length
+        });
+        if (!validation.valid) {
             alert("Please select at least one chakra before beginning the journey.");
             return false;
         }
@@ -7968,7 +7976,12 @@ function attachEventListeners() {
             return;
         }
         bypassLobbyVideoPreludeOnce = false;
-        if (getChecked('shots-toggle')) {
+        const launchRoute = journeyRouting.resolveLaunchRoute({
+            shotsSelected: getChecked('shots-toggle'),
+            backgroundMusicMode: state.bgMusicMode,
+            sleepSelected: getChecked('sleep-mode-toggle')
+        });
+        if (launchRoute === 'shot') {
             const shotType = document.getElementById('shot-type-select')?.value || 'meditation';
             const customFrequency = Number(document.getElementById('shot-frequency-input')?.value);
             if (!audio.isInitialized) await audio.init();
@@ -8005,14 +8018,14 @@ function attachEventListeners() {
         // Initialize Audio Engine early for music-only mode
         if (!audio.isInitialized) await audio.init();
 
-        if (state.bgMusicMode) {
+        if (launchRoute === 'music') {
             if (state.eyesCloseMode) {
                 const app = document.getElementById('app');
                 const targetOpacity = Math.min(state.brightness, 0.7);
                 if (app) app.style.setProperty('--app-brightness', String(targetOpacity));
             }
             await meditation.runBackgroundMusicOnly();
-        } else if (state.sleepMode) {
+        } else if (launchRoute === 'sleep') {
             document.body.classList.add('sleep-mode-active');
             meditation.runSleepJourney().catch(err => {
                 console.error('Failed to start Sleep Mode:', err);
@@ -8020,10 +8033,11 @@ function attachEventListeners() {
                 meditation.stop();
             });
         } else {
-            const intimateMassage = focusedExperience === 'intimate' && getChecked('massage-toggle');
-            const order = intimateMassage
-                ? ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root']
-                : [...state.selectedChakras];
+            const order = journeyRouting.buildChakraOrder({
+                focusedExperience,
+                massageSelected: getChecked('massage-toggle'),
+                selectedChakras: state.selectedChakras
+            });
             const isHighEnergy = getChecked('high-energy-toggle');
             if (!focusedExperience && !isHighEnergy && order.length === 0) {
                 alert("Please select at least one chakra before beginning the journey.");

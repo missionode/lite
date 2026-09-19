@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-19",
-    "commit": "66bb8cb baseline + uncommitted audio-route checkpoint",
-    "scope": "Source-reviewed application behavior plus seven behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle and Web Audio effect-route retirement now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
+    "commit": "fc1bc48 baseline + uncommitted journey-routing checkpoint",
+    "scope": "Source-reviewed application behavior plus eight behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, deterministic media primitives, Piper lifecycle, Web Audio effect-route retirement and journey start routing now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -283,7 +283,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; tests/audio-route-lifecycle.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; tests/journey-routing.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -334,7 +334,7 @@
           [
             "next",
             "Next queued boundary",
-            "AudioEngine bus construction → journey stages → UI composition. Each remains planned until separately delivered."
+            "Journey stage contracts → UI composition. AudioEngine bus construction is deferred until the next weekly reset. Each remains planned until separately delivered."
           ]
         ]
       ],
@@ -391,7 +391,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation and chakra-order selection. Frozen APIs load before app.js and are precached. AudioEngine bus construction remains in app.js and is owner-deferred until the next weekly reset. Journey stage execution remains the next bounded orchestration work. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
       ]
     },
     {
@@ -532,7 +532,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, and dispatch priority.",
-      "source": "app.js:6872; app.js:7160; app.js:4561",
+      "source": "modules/journey-routing.js:1; app.js:5633; app.js:7940; app.js:7963",
       "rows": [
         [
           [

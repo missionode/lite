@@ -22,7 +22,7 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
 }
 assert.match(app, /function persistChakraSelection\(\)[\s\S]*?localStorage\.setItem\('chakra_selected'/, 'Room selection should persist immediately');
 assert.match(app, /querySelectorAll\('#chakra-selection input\[type="checkbox"\]'\)[\s\S]*?addEventListener\('change', persistChakraSelection\)/, 'Room selection should update the active state on change');
-assert.match(app, /const hideForShots = \['chakra-selection-panel'/, 'Chakra selection should be hidden when Shots is active');
+assert.match(app, /const hideForShots = \[[^\]]*'chakra-selection-panel'/, 'Chakra selection should be hidden when Shots is active');
 for (const locale of [en, ml]) {
     assert.ok(locale.ui.chakraJourney?.trim(), 'Chakra Journey label is required');
     assert.ok(locale.ui.chakraSelectionHelp?.trim(), 'Chakra selection guidance is required');

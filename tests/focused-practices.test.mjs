@@ -19,8 +19,7 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
     assert.doesNotMatch(app, new RegExp(`localStorage\\.setItem\\('${key}'`), `${key} must not be persisted`);
 }
 
-assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?yoga-experience-toggle[\s\S]*?intimate-service/, 'Yoga and intimate care remain standalone focused experiences');
-assert.match(app, /state\.selectedChakras\.length === 0[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?return 'preparation'/, 'Preparation add-ons including Noting should run independently without chakras');
+assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?journeyRouting\.resolveFocusedExperience[\s\S]*?yoga-experience-toggle[\s\S]*?assisted-bathing-toggle[\s\S]*?noting-addon-toggle/, 'Focused experience inputs should be delegated to the journey-routing owner');
 assert.match(app, /focusedExperience === 'preparation'[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)/, 'Standalone preparation should run Visualization, Dharana, Body Scan and Noting in order');
 assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runBoxBreathing\(\)[\s\S]*?runVisualization\(\)[\s\S]*?runDharana\(\)[\s\S]*?runBodyScan\(\)[\s\S]*?runNoting\(\)[\s\S]*?runSequence\(\)/, 'Journey preparation should run Box, Visualization, Dharana, Body Scan and Noting before chakras');
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
@@ -57,7 +56,7 @@ const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app
 }
 assert.match(app, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?dharanaClosing[\s\S]*?pauseAwareSleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
-assert.match(app, /if \(!focusedExperience && !isHighEnergy && order\.length === 0\)/, 'Yoga and care should not require chakra selection');
+assert.match(app, /journeyRouting\.buildChakraOrder\([\s\S]*?focusedExperience[\s\S]*?massage-toggle[\s\S]*?selectedChakras/, 'Guided starts should delegate chakra-order selection to the journey-routing owner');
 assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
 for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
