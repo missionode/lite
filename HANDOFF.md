@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-005: deterministic media lifecycle primitives
+
+- ACTIVE on `modularize`, following `af02f9c`. Added the frozen `window.ChakraMediaLifecycle` owner for stage fade-window scoping, Unicode-safe narration chunking, the existing 50 ms Piper clip / 120 ms cancellation envelopes, and native single-source seamless-loop preparation, gain and cleanup.
+- `app.js` retains thin helper wrappers and binds its existing `SeamlessLoop` callers to the module class. AudioEngine buses, Piper worker orchestration, narration fallback, journey timing, gain values, fades and spatial processing are unchanged. The module loads before the app and is precached by shell `chakra-v5.251`; the app query is `3.58`.
+- Direct media, stage-fade, audio-transition, long-narration, thermal, background-music and shell-delivery contracts pass at unit/static evidence. The Piper test retains one known Node module-format warning. No browser, device playback, listening or thermal claim is made.
+- Routing: high-risk / Astra-high was a PLANNED recommendation only; no child dispatch or model switch occurred. Direct execution was used for this bounded compatibility seam to preserve the owner’s 20% weekly reserve.
+- Progress: 45% complete | Confidence: high for delivered module seams, medium for full migration | Current phase: media lifecycle foundation | Main remaining scope: Piper/AudioEngine ownership, journeys and UI.
+
 ### NOW — CP-MOD-004: content and localization service
 
 - ACTIVE on `modularize`, following `ab73d84`. Added the frozen `window.ChakraContentLocalization` service for nested path lookup, language-registry fallback, supported localized content shapes, UI bundle fallback and complete journey-script validation including frequency bounds.

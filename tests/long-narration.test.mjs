@@ -39,7 +39,10 @@ assert.deepEqual(await recovery.phonemize('Test','en-us'),[1,2]);
 assert.equal(attempts,2,'Bad output retires the instance and the next request can recover');
 
 const app=fs.readFileSync('app.js','utf8');
-const splitNarrationText = vm.runInNewContext(app.slice(app.indexOf('function splitNarrationText('),app.indexOf('class PiperTTS')) + '; splitNarrationText');
+const mediaSource=fs.readFileSync('modules/media-lifecycle.js','utf8');
+const mediaContext=vm.createContext({});
+vm.runInContext(mediaSource,mediaContext);
+const splitNarrationText = mediaContext.ChakraMediaLifecycle.splitNarrationText;
 const method=app.slice(app.indexOf('    async narrateWithPiper('),app.indexOf('    async narrateSoft('));
 const decoded=[],played=[];
 let cancelDuringDecode=false;

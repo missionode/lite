@@ -56,20 +56,25 @@ assert.deepEqual(storage.entries().sort(), [
 const html = fs.readFileSync('index.html', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert.ok(
-    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.57'),
+    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.58'),
     'The settings backup module must load before the application consumes its API.'
 );
 assert.ok(
-    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.57'),
+    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.58'),
     'The state preference module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/settings-backup\.js\?v=1\.0/, 'The extracted runtime module must remain available offline.');
 assert.match(serviceWorker, /\.\/modules\/app-state\.js\?v=1\.1/, 'The state preference module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.57'),
+    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.58'),
     'The content/localization module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/content-localization\.js\?v=1\.0/, 'The content/localization module must remain available offline.');
+assert.ok(
+    html.indexOf('modules/media-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.58'),
+    'The media lifecycle module must load before the application consumes its API.'
+);
+assert.match(serviceWorker, /\.\/modules\/media-lifecycle\.js\?v=1\.0/, 'The media lifecycle module must remain available offline.');
 assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');
 assert.match(html, /id="open-settings-manager"[^>]*class="secondary-btn"/, 'The public Manage Settings CTA must remain clearly visible against the sky.');
 assert.match(html, /id="export-settings"/, 'The manager needs export.');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.250';
+const CACHE_NAME = 'chakra-v5.251';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -19,6 +19,7 @@ const ASSETS = [
   './modules/settings-backup.js?v=1.0',
   './modules/app-state.js?v=1.1',
   './modules/content-localization.js?v=1.0',
+  './modules/media-lifecycle.js?v=1.0',
   './manifest.json',
   './Splash-v2.png',
   './scripts.json',

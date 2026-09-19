@@ -4,7 +4,7 @@
 2. Warm-up: extract settings backup helpers and test the module directly.
 3. Centralize settings schema and persistent/session state ownership. Complete: initial-state factory and direct behavior contract delivered.
 4. Extract content and localization services. Complete: lookup, fallback, localized shapes and script validation. Timing controls remain with UI until their ownership boundary.
-5. Separate narration and audio lifecycle owners.
+5. Separate narration and audio lifecycle owners. In progress: deterministic fade, chunking, envelope and native-loop primitives delivered in CP-MOD-005; Piper worker orchestration and AudioEngine buses remain.
 6. Convert journey orchestration into reusable stage contracts.
 7. Split Lobby, Settings, Advanced Features and session UI controllers.
 8. Review optional lazy loading after parity and offline checks.

@@ -3,8 +3,12 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const app = fs.readFileSync('app.js', 'utf8');
 let settings = { lengthScale: 1 };
-const { PiperTTS, splitNarrationText } = vm.runInNewContext(
-    app.slice(app.indexOf('function splitNarrationText('), app.indexOf('// Audio Engine')) + '; ({PiperTTS, splitNarrationText})',
+const mediaSource = fs.readFileSync('modules/media-lifecycle.js', 'utf8');
+const mediaContext = vm.createContext({});
+vm.runInContext(mediaSource, mediaContext);
+const { splitNarrationText } = mediaContext.ChakraMediaLifecycle;
+const PiperTTS = vm.runInNewContext(
+    app.slice(app.indexOf('class PiperTTS'), app.indexOf('// Audio Engine')) + '; PiperTTS',
     { getPiperMeditationSettings: () => settings }
 );
 const text = ('മലയാളം '.repeat(90) + '😀'.repeat(190));

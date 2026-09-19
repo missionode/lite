@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-18",
-    "commit": "ab73d84 baseline + uncommitted content/localization checkpoint",
-    "scope": "Source-reviewed application behavior plus four behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution and script validation now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
+    "date": "2026-09-19",
+    "commit": "af02f9c baseline + uncommitted media-lifecycle checkpoint",
+    "scope": "Source-reviewed application behavior plus five behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, script validation and deterministic media-lifecycle primitives now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime."
   },
   "graphs": [
     {
@@ -283,7 +283,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; tests/settings-backup.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; tests/media-lifecycle.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -334,7 +334,7 @@
           [
             "next",
             "Next queued boundary",
-            "Media → journey stages → UI composition. Each remains planned until separately delivered."
+            "Piper/AudioEngine orchestration → journey stages → UI composition. Each remains planned until separately delivered."
           ]
         ]
       ],
@@ -391,7 +391,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation. Frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup. Frozen APIs load before app.js and are precached. Piper worker orchestration and AudioEngine buses remain in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order."
       ]
     },
     {
@@ -2408,7 +2408,7 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "app.js:1155; app.js:5311; app.js:5706; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
+      "source": "modules/media-lifecycle.js:1; app.js:1040; app.js:5695; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
       "rows": [
         [
           [
@@ -2428,7 +2428,7 @@
           [
             "piper",
             "Piper worker",
-            "Warm model; serial worker requests. Split text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup."
+            "Warm model; serial worker requests. The media-lifecycle module splits text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup."
           ],
           [
             "browser",
@@ -2551,7 +2551,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "app.js:50; app.js:2790; app.js:3142; app.js:5681",
+      "source": "modules/media-lifecycle.js:1; app.js:59; app.js:1339; app.js:2480; app.js:2606; app.js:2957",
       "rows": [
         [
           [

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: ab73d84 baseline + uncommitted content/localization checkpoint · 2026-09-18.
+Source snapshot: af02f9c baseline + uncommitted media-lifecycle checkpoint · 2026-09-19.
 
-Source-reviewed application behavior plus four behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution and script validation now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
+Source-reviewed application behavior plus five behavior-preserving modularization checkpoints. Settings backup, initial application state, localized content resolution, script validation and deterministic media-lifecycle primitives now have bounded module owners; runtime consumers remain unchanged. The modularization map distinguishes delivered boundaries from queued extractions. Programme-delivery assets remain non-runtime.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -142,7 +142,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [tests/settings-backup.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-backup.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [tests/media-lifecycle.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/media-lifecycle.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -175,9 +175,9 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Next queued boundary | Media → journey stages → UI composition. Each remains planned until separately delivered. |
+| Next queued boundary | Piper/AudioEngine orchestration → journey stages → UI composition. Each remains planned until separately delivered. |
 
-- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation. Frozen APIs load before app.js and are precached. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup. Frozen APIs load before app.js and are precached. Piper worker orchestration and AudioEngine buses remain in app.js for a later bounded checkpoint. Native ES modules remain a later compatibility decision; these seams preserve classic-script startup order.
 
 <a id="startup"></a>
 
@@ -915,7 +915,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [app.js:1155](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1155), [app.js:5311](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5311), [app.js:5706](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5706), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [app.js:1040](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1040), [app.js:5695](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5695), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
 
 ```mermaid
 flowchart TD
@@ -948,7 +948,7 @@ flowchart TD
 | --- | --- |
 | Localized text | Narration is audio-only: no scrolling text surfaces or Settings toggle. Duck music unless silence requested; spoken audio and deliberate pauses continue unchanged. |
 | Voice engine choice | Use Piper only when selected, supported and configured. |
-| Piper worker | Warm model; serial worker requests. Split text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
+| Piper worker | Warm model; serial worker requests. The media-lifecycle module splits text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
 | Browser speech | Select matching voice and locale; apply pace/pitch/volume; speak each sentence. |
 | Decode + normalize ahead | In-memory LRU cache keyed by text, voice definition and synthesis settings: at most 16 MiB and 48 decoded clips. Hits skip synthesis, decoding and normalization; misses prepare ahead. Evict oldest clips; oversized clips play uncached; cancelled preparation is never cached. No disk persistence. Reuse normalization per buffer via WeakMap. After preparation, recheck pause, session activity and Piper cancellation generation before playback. |
 | Play through Web Audio | Play prepared speech through voice gain, tone controls and effects. |
@@ -965,7 +965,7 @@ flowchart TD
 
 Logical buses; shared filters are expanded in selected-node details.
 
-Sources: [app.js:50](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:50), [app.js:2790](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2790), [app.js:3142](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3142), [app.js:5681](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5681).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [app.js:59](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:59), [app.js:1339](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1339), [app.js:2480](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2480), [app.js:2606](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2606), [app.js:2957](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2957).
 
 ```mermaid
 flowchart TD

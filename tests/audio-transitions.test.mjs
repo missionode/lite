@@ -4,10 +4,13 @@ import vm from 'node:vm';
 
 const app = fs.readFileSync('app.js', 'utf8');
 const timers = [];
-const Loop = vm.runInNewContext(`${app.slice(app.indexOf('class SeamlessLoop {'), app.indexOf('class AudioEngine {'))}; SeamlessLoop`, {
+const mediaSource = fs.readFileSync('modules/media-lifecycle.js', 'utf8');
+const mediaContext = vm.createContext({
     setTimeout(fn, delay) { timers.push({ fn, delay }); return timers.length; },
     clearTimeout() {}
 });
+vm.runInContext(mediaSource, mediaContext);
+const Loop = mediaContext.ChakraMediaLifecycle.SeamlessLoop;
 class Param {
     value = 1;
     events = [];
@@ -95,7 +98,7 @@ assert.equal(short.crossfadeDuration, 0.2, 'short buffers cannot schedule backwa
 short.start();
 const events = short.activeSources[0].gain.gain.events;
 assert.ok(events.every((event, index) => index === 0 || event[2] >= events[index - 1][2]));
-assert.match(app, /PIPER_CLIP_FADE_SECONDS, \/\/ Preserve final spoken words/, 'speech endings retain their words');
+assert.equal(mediaContext.ChakraMediaLifecycle.constants.PIPER_CLIP_FADE_SECONDS, 0.05, 'speech endings retain their short final-word-safe envelope');
 const stopDrone = vm.runInNewContext('({'+app.slice(app.indexOf('    stopDrone() {'),app.indexOf('    async playMantraTrack'))+'})').stopDrone;
 let lfoStops=0;
 const engine={ctx:{currentTime:0},stopBinaural(){},droneOscillators:[],elementalNodes:[{
