@@ -1,5 +1,14 @@
 # Chakra Meditation — Active Handoff
 
+### CP-ASSESS-IMPL-002 — assessment tournament production integration
+
+- Production-based release branch `codex/assessment-tournament-production` contains only the assessment implementation and aligned documentation; it deliberately excludes the separate modularization branch history.
+- Replaced the legacy seven-card review with a standalone operator-led bracket: a single prompt and two answer cards per step, no repeated prompt, seven relative chakra statuses, positive participant-friendly archetypes and one small patterned green/orange/red dot without a label. The dot is an operator aid only; it does not recommend or activate a service. Assessment never starts or configures a journey.
+- Versioned English question bank, pure scheduling/scoring engine and sanitized local persistence are separate owners. Stale/invalid storage resets safely; storage denial falls back to memory; Clear for New Client is deliberate and confirmed. Existing Google Translate dynamically translates future prompts/results, including Malayalam, Hindi and Russian; network is required.
+- PWA shell cache moved from `chakra-v5.246` to `chakra-v5.247` and precaches the page, question bank and two modules. The production-base `assessment-tournament` atlas map, generated references, fix queue and this handoff record the delivered behavior and its exits.
+- Validation: assessment contract/schema/engine/persistence, journey-routing, focused-practices, journey-video-prelude, syntax, JSON and whitespace checks pass. Chromium passed desktop and 390×844 mobile layout, answer progression, refresh/resume, seven-result completion, confirmed new-client clearing and dynamic Google Translate content for Malayalam, Hindi and Russian with no page errors. Atlas verification is run against this production baseline before merge. Evidence is source, automated and local Chromium; no operator-led session or target-device usability claim is made.
+- Remaining follow-up: trained-operator acceptance of neutral wording and real-session usability. It is tracked in `docs/app-map/FIX-QUEUE.md` and does not hold the tested software integration.
+
 ### NOW — CP-BRAND-002: editorial branding redesign
 
 - Local revision based on production `c9acf0c`. Redesigned the branding package with Georgia/Arial typography, ivory/midnight layouts, natural image proportions, white logo backing, clear curriculum progression, secondary demo card and consistent contact handling. The original logo and two-seat hero master are unchanged.

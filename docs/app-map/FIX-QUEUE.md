@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Operator acceptance — assessment tournament follow-up
+
+The software checkpoint is integrated and automated/browser-tested: one prompt at a time, non-repeating answers, seven chakra results, positive archetypes, private patterned service-fit dot, sanitized resume/reset and Google Translate dynamic strings. Schedule a trained-operator review of neutrality, interpretation and real-session usability. This is an acceptance follow-up, not a blocker to the tested software merge; do not add medical diagnosis, direct intimate-service questions or automatic recommendations.
+
 ## Content-free Undo & Unlearn integration — release 3.51 candidate
 
 Added an optional 5/8/12-minute pitch-black integration after Ho’oponopono. It requires no recall, answer, speech, typing, examples or contact; separates three forgiveness possibilities; preserves responsibility/boundaries; and never claims another person has forgiven the meditator. Four-language source coverage and sequence guards are required; device listening remains open.

@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-17",
-    "commit": "3.51 baseline c9acf0c + CP-BRAND-002 editorial branding checkpoint",
-    "scope": "Version 3.51 source-reviewed application behavior plus a separately identified, non-runtime programme-delivery map. The marketing package now has a seven-page digital edition, a print roll-fold with bleed, a social cover and a browsable asset gallery. It does not imply an in-app curriculum, lead form, franchise workflow or medical outcome. Other maps retain their recorded evidence levels."
+    "date": "2026-09-24",
+    "commit": "production 58e2ee0 + uncommitted assessment tournament integration",
+    "scope": "Production source-reviewed application behavior plus the isolated operator-led assessment tournament integration. The assessment is a standalone operator aid, independent of journey routing. Assessment changes are explicitly marked uncommitted until merge; other maps retain their recorded evidence levels."
   },
   "graphs": [
     {
@@ -142,7 +142,7 @@
           [
             "lobby",
             "Meditation Room",
-            "Main mode selection, chakra choices, intention, duration and consultation."
+            "Main mode selection, chakra choices, intention, duration and assessment entry point."
           ]
         ],
         [
@@ -163,8 +163,8 @@
           ],
           [
             "consult",
-            "Consultation / repertory",
-            "Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot."
+            "Assessment / repertory",
+            "Separate HTML pages. Assessment is an operator-led reflection aid; repertory can prepare a custom Shot."
           ]
         ],
         [
@@ -275,7 +275,7 @@
         ]
       ],
       "notes": [
-        "Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries."
+        "Use each detailed map for guards, optional stages and failure branches. Assessment is separate from journey start and manual planning remains with the operator. Runtime behavior takes precedence over older HANDOFF entries."
       ]
     },
     {
@@ -3253,64 +3253,73 @@
       ]
     },
     {
-      "id": "consultation",
+      "id": "assessment-tournament",
       "group": "Supporting pages",
-      "title": "Consultation flow",
-      "subtitle": "Seven cards, 35 responses, local notes and consultant review.",
-      "source": "docs/assesment.html:503; docs/assesment.html:611; docs/assesment.html:726",
+      "title": "Operator-led chakra assessment",
+      "subtitle": "Adaptive one-question/two-choice tournament → seven chakra statuses, positive archetypes and one private operator dot.",
+      "source": "docs/assesment.html:1; modules/assessment-tournament.js:1; modules/assessment-persistence.js:1; data/assessment-questions.json:1; sw.js:1",
       "rows": [
         [
           [
             "lobby",
-            "Begin Session Consultation",
-            "Navigate to docs/assesment.html."
+            "Open assessment",
+            "Lobby CTA navigates to the standalone docs/assesment.html page; it is not connected to journey start or recommendations."
           ]
         ],
         [
           [
             "restore",
-            "Restore local responses",
-            "chakraAnswers and chakraAssessmentNotes; malformed stored object falls back to empty."
+            "Restore current client",
+            "Resume only sanitized, version-compatible local state. Invalid or stale state starts fresh; storage denial continues in memory."
           ]
         ],
         [
           [
-            "answer",
-            "Seven chakra cards",
-            "Five questions each; choose aligned, unsure or a concern direction. Optional per-card notes."
+            "interview",
+            "One prompt at a time",
+            "Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated."
           ]
         ],
         [
           [
-            "save",
-            "Save and update",
-            "Every response/note change saves locally and updates evaluations."
+            "coverage",
+            "Adaptive coverage",
+            "Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing."
           ]
         ],
         [
           [
-            "card",
-            "Completed card insight",
-            "After all questions in a card: strengths, patterns, uncertainties, follow-up and meditation consideration."
+            "result",
+            "Assessment complete",
+            "Show seven relative chakra statuses/confidence and up to three positive archetypes. This is an operator reflection aid, not diagnosis or automatic recommendation."
           ]
         ],
         [
           [
-            "review",
-            "All 35 answered",
-            "Show combined consultant review, recurring themes and follow-up prompts. Partial answers show progress."
+            "dot",
+            "Private service-fit signal",
+            "Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. It does not activate or promise service."
           ]
         ],
         [
-          [
-            "manual",
-            "Manual session planning",
-            "Review with client; navigate back to Lite and choose session settings manually. No automatic prescription handoff."
-          ],
           [
             "clear",
             "Clear for New Client",
-            "Confirmation required; accepted → delete answers/notes and reload. Cancel preserves current record."
+            "Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client."
+          ]
+        ],
+        [
+          [
+            "translate",
+            "Translate dynamically rendered content",
+            "Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required."
+          ]
+        ],
+        [
+          [
+            "failure",
+            "Failure and exit",
+            "Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress."
           ]
         ]
       ],
@@ -3322,36 +3331,26 @@
         ],
         [
           "restore",
-          "answer",
-          "Continue"
+          "interview",
+          "Valid / fresh"
         ],
         [
-          "answer",
-          "save",
-          "Input"
+          "interview",
+          "coverage",
+          "Answer / equal / skip"
         ],
         [
-          "save",
-          "card",
-          "Card complete"
+          "coverage",
+          "interview",
+          "More evidence; exclude consumed IDs"
         ],
         [
-          "save",
-          "answer",
-          "More responses"
+          "coverage",
+          "result",
+          "Evidence complete"
         ],
         [
-          "card",
-          "review",
-          "All complete"
-        ],
-        [
-          "review",
-          "manual",
-          "Consultant reviews"
-        ],
-        [
-          "answer",
+          "result",
           "clear",
           "New client"
         ],
@@ -3359,10 +3358,30 @@
           "clear",
           "restore",
           "Confirmed reset"
+        ],
+        [
+          "interview",
+          "translate",
+          "Prompt render"
+        ],
+        [
+          "result",
+          "translate",
+          "Result render"
+        ],
+        [
+          "restore",
+          "failure",
+          "Invalid stored data"
+        ],
+        [
+          "failure",
+          "interview",
+          "Safe fresh state"
         ]
       ],
       "notes": [
-        "Font-size controls persist a separate scale. EN/Malayalam translation uses an external Google Translate widget, unlike the app’s native locale bundles. Answers and notes persist on the same browser until cleared."
+        "The JSON bank owns English questions, answer-card labels, chakra/value weights and positive archetype strings; the pure engine owns scheduling, uniqueness, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Chromium verified English, Malayalam, Hindi and Russian dynamic prompt rendering, desktop/mobile layout, resume, completion and reset. Google Translate requires a network connection. Trained-operator content acceptance remains a follow-up, not a software test."
       ]
     },
     {
