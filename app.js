@@ -4784,10 +4784,7 @@ class MeditationController {
             bodyScan: () => this.runBodyScan(),
             noting: () => this.runNoting()
         };
-        for (const stage of stages) {
-            if (!this.isMeditationActive) break;
-            await runners[stage]();
-        }
+        await journeyRouting.executePreparationStages(stages, runners, () => this.isMeditationActive);
     }
 
     async runGratitude(isHighEnergy = false) {

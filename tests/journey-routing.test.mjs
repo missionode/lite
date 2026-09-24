@@ -56,6 +56,24 @@ assert.deepEqual(
     'high-energy journeys should bypass preparation add-ons'
 );
 
+const executedStages = [];
+let active = true;
+const runners = Object.fromEntries(routing.PREPARATION_STAGE_ORDER.map(stage => [stage, async () => {
+    executedStages.push(stage);
+    if (stage === 'visualization') active = false;
+}]));
+assert.equal(await routing.executePreparationStages(['box', 'visualization', 'dharana'], runners, () => active), false);
+assert.deepEqual(executedStages, ['box', 'visualization'], 'execution must preserve order and stop before the next stage after cancellation');
+assert.equal(await routing.executePreparationStages([], runners, () => true), true, 'an empty stage plan completes without running handlers');
+await assert.rejects(
+    routing.executePreparationStages(['unknown'], runners, () => true),
+    /No preparation runner is registered for: unknown/
+);
+await assert.rejects(
+    routing.executePreparationStages(['box'], { box: async () => { throw new Error('stage-failed'); } }, () => true),
+    /stage-failed/
+);
+
 const app = fs.readFileSync('app.js', 'utf8');
 assert.match(app, /journeyRouting\.resolveFocusedExperience/);
 assert.match(app, /journeyRouting\.resolveLaunchRoute/);

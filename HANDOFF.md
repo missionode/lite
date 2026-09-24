@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### COMPLETE LOCALLY — CP-MOD-011: preparation execution and measured-loading baseline
+
+- Isolated implementation on `codex/modularize-cp-011`, based on clean `modularize` commit `f98c43b`. The frozen journey-routing module now executes the canonical preparation callbacks sequentially and stops between stages when the session is no longer active; original practice implementations remain in `app.js`.
+- Added direct contracts for ordering, cancellation, empty plan, missing callback and error propagation. Focused routing, focused-practice, video-prelude, hypnosis, thermal and journey-chrome checks pass; atlas rebuilt and all 33 browser map checks pass.
+- Same-harness indicative local cold samples: both before and after load 13 classic scripts and about 849 KiB uncompressed JavaScript bodies. Post cold: DCL 592 ms, load 1,770 ms, ScriptDuration 0.731 s, TaskDuration 1.993 s, heap 6.71 MB. These sit inside prior-run variability (DCL 510–1,390 ms; load 1,110–2,916 ms; ScriptDuration 0.73–1.07 s; TaskDuration 1.78–3.15 s; heap 6.7–7.5 MB), so this seam is not a startup optimization. Local uncompressed and font-blocked harness is not production/device evidence; no speedup claim.
+- Module URL/cache versions rotate to journey-routing `1.2` / shell `chakra-v5.256`. Lazy loading remains deferred until extraction parity and measured cold/warm/offline route evidence. AudioEngine bus construction remains owner-deferred until the weekly reset. No production push is in scope.
+
 ### COMPLETE LOCALLY — CP-WORKFLOW-003: objective-scoped automatic tiering
 
 - The first assessment specialist packet was conservatively misclassified as high-risk because a forbidden-action sentence contained a high-risk keyword. The bounded child returned no output and was interrupted; no child work was used.
@@ -40,20 +47,20 @@
 - APPROVED and queued before modularization resumes. Redesign only `/docs/assesment.html` as a standalone two-choice, no-repeat hybrid bracket that estimates relative status/confidence for all seven chakras.
 - Load versioned questions/weights/signals from JSON; keep validation, adaptive selection, scoring, archetype aggregation and thresholds in code. Participant-facing archetype names remain positive and neutral.
 - Result scope is seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. No heading, explanation, percentage, Advanced Features settings, journey handoff or automatic action.
-- Current consultation behavior remains authoritative until the replacement passes schema, no-repeat, balance, tie-breaker, persistence/reset, responsive and operator-review gates. After assessment delivery, resume modularization from CP-MOD-010.
+- Current consultation behavior remains authoritative until the replacement passes schema, no-repeat, balance, tie-breaker, persistence/reset, responsive and operator-review gates. After assessment delivery, resume modularization from CP-MOD-011.
 - Track: `.loop/tracks/assessment-tournament/` | Implementation gate: owner authorized implementation.
 - CP-ASSESS-PLAN-002 correction: multilingual readiness preserves the current Google Translate widget over one English JSON question bank. Dynamically rendered questions, choices, progress, archetypes and results must translate; translation remains internet-dependent. Do not create separate native assessment locale bundles.
 - CP-ASSESS-PLAN-003 adds the neutral eight-value priority bracket. Pairings and card positions are balanced, unordered pairs do not repeat, Equal/Skip remain available and a single answer can never produce green/red or imply consent.
 
-### NOW — CP-MOD-010: post-parity loading and lifecycle plan
+### COMPLETE PLAN — CP-MOD-010: post-parity loading and lifecycle plan
 
 - PLANNED on `modularize`, following `68ccf1c`. Phase 8 now defines a measured lazy-loading pass after extraction parity; it does not alter the current journey, AudioEngine or UI-controller order.
 - Target architecture: a small eager shell; offline-cached but unexecuted optional feature bundles; preload on user selection; Begin awaits only unfinished preparation; explicit cleanup for workers, buffers, AudioNodes, media, animation, observers, timers and listeners.
 - Candidate boundaries remain provisional until profiling: Advanced/Yoga/Intimate/Experiments, Sleep, video introduction, specialized preparation, Piper runtime/model and optional spatial effects. Tiny modules will not be split without measured value.
 - Acceptance requires before/after cold, warm and offline evidence, journey-start latency, route/cancellation/PWA regression checks and safe localized load failure. This checkpoint changes planning/atlas only and makes no performance claim.
-- Progress: 69% complete | Confidence: high for delivered seams, medium for remaining migration | Current phase: journey orchestration | Main remaining scope: journey stages, deferred AudioEngine buses, UI controllers, then measured loading/resource lifecycle.
+- Next: finish CP-MOD-011, continue journey-stage/UI ownership extraction, revisit the owner-deferred AudioEngine bus after weekly reset, then run the measured lazy-loading gate. Progress is not recalculated from this small seam.
 
-### NOW — CP-MOD-009: ordered preparation-stage plan
+### PREVIOUS — CP-MOD-009: ordered preparation-stage plan
 
 - ACTIVE on `modularize`, following `fc029a3`. The frozen journey-routing owner now also emits the canonical Box → Visualization → Dharana → Body Scan → Guided Noting plan.
 - The controller still executes the original stage methods and stops between stages when the session ends. Standalone preparation omits Box, high-energy bypasses preparation, and all timing/narration/audio/visual implementations remain unchanged.

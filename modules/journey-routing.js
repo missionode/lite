@@ -63,12 +63,25 @@
         return PREPARATION_STAGE_ORDER.filter(stage => selected[stage]);
     }
 
+    async function executePreparationStages(stages, runners, shouldContinue) {
+        if (!Array.isArray(stages) || !runners || typeof runners !== 'object' || typeof shouldContinue !== 'function') {
+            throw new TypeError('Preparation execution requires a stage list, runners and a continuation guard');
+        }
+        for (const stage of stages) {
+            if (!shouldContinue()) return false;
+            if (typeof runners[stage] !== 'function') throw new Error(`No preparation runner is registered for: ${stage}`);
+            await runners[stage]();
+        }
+        return true;
+    }
+
     global.ChakraJourneyRouting = Object.freeze({
         resolveFocusedExperience,
         resolveLaunchRoute,
         validateLobbyStart,
         buildChakraOrder,
         buildPreparationStagePlan,
+        executePreparationStages,
         MASSAGE_CHAKRA_ORDER,
         PREPARATION_STAGE_ORDER
     });
