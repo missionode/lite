@@ -39,7 +39,7 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - A single answer cannot produce green or red. The final dot requires several consistent independent signals.
 - Refresh/resume and new-client clearing behave explicitly and safely.
 - The source question bank remains English. The existing Google Translate widget translates the page, dynamically generated questions, choices, progress and results; translation therefore requires an internet connection, matching the current assessment page.
-- The current and planned atlas maps remain distinct until implementation replaces the current consultation.
+- The atlas describes the delivered tournament; trained-operator wording and usability remain pending follow-up evidence.
 
 ## Exclusions
 

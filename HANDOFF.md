@@ -13,12 +13,12 @@
 - Automatic routing now supports a `[LOOP_CLASSIFY]...[/LOOP_CLASSIFY]` objective slice. The router classifies only that concise objective while still sending the complete safety/permissions packet to the child. Unmarked real push/deploy/release requests remain high-risk.
 - Regression tests cover both the constraint false-positive and genuine unmarked high-risk routing. This changes project workflow only, not Lite runtime behavior.
 
-### ACTIVE — CP-WORKFLOW-002 / CP-ASSESS-PLAN-003
+### COMPLETE — CP-WORKFLOW-002 / CP-ASSESS-PLAN-003
 
 - Workflow now auto-selects Caveman, Focused, Isolated Autonomy, Ephemeral Specialists or High-Risk Gate from bounded scope. Substantial work uses a task-scoped AST/symbol map; short-lived specialists return unified diffs/findings to the sole integrating agent; durable resume packets permit fresh-session resets; actual model tiering uses the Loop router and must distinguish recommendations from executed dispatch.
-- Owner authorized assessment implementation as the next isolated checkpoint. Add a neutral eight-value pairwise bracket—Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism—with non-repeating, balanced/position-countered comparisons. Multiple independent signals may influence only the existing conservative unlabelled operator dot; never infer consent, service activation or a participant-facing intimate-care conclusion.
+- The owner-authorized assessment implementation and neutral eight-value pairwise bracket are now delivered in CP-ASSESS-IMPL-001/002. Non-repeating balanced comparisons may inform only the conservative unlabelled operator dot; never infer consent, service activation or a participant-facing intimate-care conclusion.
 - Theme requirement correction: preserve the current dynamic sky until the redesign. During the approved redesign, the core UI may simplify its background; relocate the current observational sky to a dedicated responsive Sky page reached by a Settings CTA, preserving its accurate calculations and illustrative Earth/Sun treatments there.
-- Next execution boundary: checkpoint these synchronized plans, then create `codex/assessment-tournament` in an isolated worktree from the clean `modularize` baseline. No production action is authorized.
+- Execution outcome: the assessment was implemented on its production-based isolated branch, released, then synchronized into modularize without rolling back later modularization work.
 - Planning validation: current assessment baseline test passes; metadata JSON parses; atlas regenerated to 33 maps and browser verification passes selections, bounds, keyboard, mobile overflow, print, SVG and template fallback with no page errors; diff whitespace check passes. No new runtime behavior is claimed yet.
 
 ### APPROVED — CP-WORKFLOW-001: isolated sandbox and PR delivery
@@ -42,15 +42,12 @@
 - The template now stops safely, explains that it is a source template and links to the generated atlas. The atlas verifier covers both the raw-template fallback and all generated maps.
 - `chext_loader.js` is not present or referenced in the repository. Its `unload` permissions-policy warning remains browser-extension output, not an atlas/application error.
 
-### ACTIVE NEXT — CP-ASSESS-PLAN-003: operator-led assessment tournament
+### COMPLETE LOCALLY — CP-ASSESS-IMPL-002: operator-led assessment tournament
 
-- APPROVED and queued before modularization resumes. Redesign only `/docs/assesment.html` as a standalone two-choice, no-repeat hybrid bracket that estimates relative status/confidence for all seven chakras.
-- Load versioned questions/weights/signals from JSON; keep validation, adaptive selection, scoring, archetype aggregation and thresholds in code. Participant-facing archetype names remain positive and neutral.
-- Result scope is seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. No heading, explanation, percentage, Advanced Features settings, journey handoff or automatic action.
-- Current consultation behavior remains authoritative until the replacement passes schema, no-repeat, balance, tie-breaker, persistence/reset, responsive and operator-review gates. After assessment delivery, resume modularization from CP-MOD-011.
-- Track: `.loop/tracks/assessment-tournament/` | Implementation gate: owner authorized implementation.
-- CP-ASSESS-PLAN-002 correction: multilingual readiness preserves the current Google Translate widget over one English JSON question bank. Dynamically rendered questions, choices, progress, archetypes and results must translate; translation remains internet-dependent. Do not create separate native assessment locale bundles.
-- CP-ASSESS-PLAN-003 adds the neutral eight-value priority bracket. Pairings and card positions are balanced, unordered pairs do not repeat, Equal/Skip remain available and a single answer can never produce green/red or imply consent.
+- The standalone assessment is implemented, persisted safely in the browser and integrated with its versioned question bank, pure engine and PWA cache. Seven chakra status cards, positive archetypes and the private patterned dot do not configure or start a meditation journey.
+- Focused engine/persistence tests and Chromium checks cover desktop/mobile, answer progression, resume/reset, results and Google Translate dynamic content in Malayalam, Hindi and Russian. The assessment is now synchronized with the modularized source and atlas.
+- CP-ASSESS-IMPL-003 remains a trained-operator review of neutral wording and real-session usability; it does not authorize diagnosis, consent inference or automatic intimate-service recommendations.
+- Assessment track: `.loop/tracks/assessment-tournament/`.
 
 ### COMPLETE PLAN — CP-MOD-010: post-parity loading and lifecycle plan
 
@@ -58,7 +55,7 @@
 - Target architecture: a small eager shell; offline-cached but unexecuted optional feature bundles; preload on user selection; Begin awaits only unfinished preparation; explicit cleanup for workers, buffers, AudioNodes, media, animation, observers, timers and listeners.
 - Candidate boundaries remain provisional until profiling: Advanced/Yoga/Intimate/Experiments, Sleep, video introduction, specialized preparation, Piper runtime/model and optional spatial effects. Tiny modules will not be split without measured value.
 - Acceptance requires before/after cold, warm and offline evidence, journey-start latency, route/cancellation/PWA regression checks and safe localized load failure. This checkpoint changes planning/atlas only and makes no performance claim.
-- Next: finish CP-MOD-011, continue journey-stage/UI ownership extraction, revisit the owner-deferred AudioEngine bus after weekly reset, then run the measured lazy-loading gate. Progress is not recalculated from this small seam.
+- Next: continue journey-stage/UI ownership extraction, revisit the owner-deferred AudioEngine bus after weekly reset, then run the measured lazy-loading gate. Progress is not recalculated from this small seam.
 
 ### PREVIOUS — CP-MOD-009: ordered preparation-stage plan
 
@@ -130,6 +127,14 @@
 - Protected Earth atmosphere, 26°C visual theme, Earth/Moon relationship and Sun shield are untouched. Unrelated `.DS_Store`, personal `.codex` and backup audio remain excluded.
 - Execution: direct, energy-saving checkpoint. No child model dispatch. Next safe boundary is the settings schema and persistent/session-state adapter after identifying and replacing its source-coupled tests.
 - Progress: 12% complete | Confidence: high for CP-MOD-001, medium for the full migration | Current phase: architecture contract and warm-up seam | Main remaining scope: state, content, media, journey and UI ownership.
+### CP-ASSESS-IMPL-002 — assessment tournament production integration
+
+- Production-based release branch `codex/assessment-tournament-production` contains only the assessment implementation and aligned documentation; it deliberately excludes the separate modularization branch history.
+- Replaced the legacy seven-card review with a standalone operator-led bracket: a single prompt and two answer cards per step, no repeated prompt, seven relative chakra statuses, positive participant-friendly archetypes and one small patterned green/orange/red dot without a label. The dot is an operator aid only; it does not recommend or activate a service. Assessment never starts or configures a journey.
+- Versioned English question bank, pure scheduling/scoring engine and sanitized local persistence are separate owners. Stale/invalid storage resets safely; storage denial falls back to memory; Clear for New Client is deliberate and confirmed. Existing Google Translate dynamically translates future prompts/results, including Malayalam, Hindi and Russian; network is required.
+- PWA shell cache moved from `chakra-v5.246` to `chakra-v5.247` and precaches the page, question bank and two modules. The production-base `assessment-tournament` atlas map, generated references, fix queue and this handoff record the delivered behavior and its exits.
+- Validation: assessment contract/schema/engine/persistence, journey-routing, focused-practices, journey-video-prelude, syntax, JSON and whitespace checks pass. Chromium passed desktop and 390×844 mobile layout, answer progression, refresh/resume, seven-result completion, confirmed new-client clearing and dynamic Google Translate content for Malayalam, Hindi and Russian with no page errors. Atlas verification is run against this production baseline before merge. Evidence is source, automated and local Chromium; no operator-led session or target-device usability claim is made.
+- Remaining follow-up: trained-operator acceptance of neutral wording and real-session usability. It is tracked in `docs/app-map/FIX-QUEUE.md` and does not hold the tested software integration.
 
 ### NOW — CP-BRAND-002: editorial branding redesign
 

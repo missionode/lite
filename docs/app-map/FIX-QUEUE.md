@@ -7,6 +7,9 @@ The CP-MOD-011 baseline is a single indicative local cold Chromium sample: 13 cl
 ## CP-MOD-011 — ordered preparation execution ownership
 
 Journey routing now executes the existing stage callbacks in canonical order and checks session activity before each stage. The stage implementations and their UI/audio/narration ownership stay in `app.js`; no user-visible flow is intended to change. Atlas map `modularization` records the boundary and `journey-addons` records the cancellation guard.
+## Operator acceptance — assessment tournament follow-up
+
+The software checkpoint is integrated and automated/browser-tested: one prompt at a time, non-repeating answers, seven chakra results, positive archetypes, private patterned service-fit dot, sanitized resume/reset and Google Translate dynamic strings. Schedule a trained-operator review of neutrality, interpretation and real-session usability. This is an acceptance follow-up, not a blocker to the tested software merge; do not add medical diagnosis, direct intimate-service questions or automatic recommendations.
 
 ## Content-free Undo & Unlearn integration — release 3.51 candidate
 
@@ -186,6 +189,6 @@ CP-THEME-PLAN-001 adopts the Cosmic Observatory desktop/mobile concept saved und
 
 ### Active next feature — assessment tournament
 
-Before modularization resumes, replace the standalone consultation with the approved operator-led two-choice hybrid bracket recorded in `.loop/tracks/assessment-tournament/`. Questions and hidden weights/signals come from one operator-approved English versioned JSON file; code owns validation, no-repeat selection, seven-chakra evidence balancing, unused tie-breakers, confidence, participant-friendly archetypes and a conservative result dot. Include the neutral prompt “Which of these two do you prioritize more?” across Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism. Balance pair/card positions, never repeat an unordered pair and require multiple independent signals; no choice is consent or an automatic intimate-service conclusion. Preserve the current Google Translate widget and ensure dynamically generated questions, choices, progress, archetypes and results are translated; this multilingual path remains internet-dependent. The visible result contains seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. It has no Advanced Features controls, journey handoff or automatic action. Keep the existing `consultation` map authoritative until implementation is validated; the `assessment-tournament-planned` map remains planned until the replacement passes.
+Assessment tournament software is integrated and source/automated/browser-verified; its delivered flow is documented in the `assessment-tournament` map. Remaining follow-up is trained-operator acceptance of neutral wording and real-session usability. Keep it separate from journey routing, diagnosis, consent inference, sales prompts and automatic service recommendations.
 
 For each fix: reproduce or prove the branch → implement the smallest correction → verify that branch and its neighboring exits → update the corresponding atlas map and source references. Keep a separate change record for each fix. Do not claim deployment from local checks.
