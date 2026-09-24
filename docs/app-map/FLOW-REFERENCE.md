@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 6261a08 baseline + uncommitted CP-MOD-029 · 2026-09-25.
+Source snapshot: 17a42f0 baseline + uncommitted CP-MOD-030 · 2026-09-25.
 
-Source-reviewed behavior at the latest modularize integration baseline with timing configuration and preference application integrated. The active checkpoint extracts automatic journey voice-profile application while app retains voice/gender recognition and injects current services. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the latest modularize integration baseline with timing configuration and automatic journey voice-profile application integrated. The active checkpoint extracts session-only journey-mode hydration while app retains persistent Yoga setup. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -41,9 +41,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 31. [Display-language UI renderer](#locale-ui-renderer)
 32. [Timing configuration and saved values](#timing-configuration)
 33. [Automatic journey voice profile](#journey-voice-profile)
-34. [Settings backup and restore](#settings-backup)
-35. [Operator-led chakra assessment](#assessment-tournament)
-36. [Frequency repertory handoff](#repertory)
+34. [Session-only journey-mode hydration](#session-mode-hydration)
+35. [Settings backup and restore](#settings-backup)
+36. [Operator-led chakra assessment](#assessment-tournament)
+37. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1547,6 +1548,37 @@ flowchart TD
 | Apply audio engine tuning | Set voice warmth/clarity and voice echo when the corresponding audio methods are available. |
 
 - Voice/gender detection and journey dispatch remain app-owned. The module is eager classic-script code and offline-pre-cached. This is an ownership extraction only; no audio-quality, device, or performance improvement is claimed.
+
+<a id="session-mode-hydration"></a>
+
+## Session-only journey-mode hydration
+
+App-load behavior for session-only mode controls and retired selection keys.
+
+Sources: [modules/session-mode-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-mode-hydration.js:1), [tests/session-mode-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-mode-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  startup["Startup"]
+  prep["Reset preparation choices"]
+  preferences["Restore saved preferences"]
+  modes["Reset exclusive modes"]
+  yoga["Restore Yoga setup"]
+  startup -->|"App initialization"| prep
+  prep -->|"Established sequence"| preferences
+  preferences -->|"Persistent controls restored"| modes
+  modes -->|"Exclusive modes reset"| yoga
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Startup | Enter loadPreferences and apply the existing ordered setup. |
+| Reset preparation choices | Clear retired reverse/Box Breathing/Ho’oponopono keys and uncheck those preparation selections. |
+| Restore saved preferences | Persistent language, timing, audio and care setup remain app-owned and are still restored. |
+| Reset exclusive modes | Clear retired Music Only/High Energy/Sleep keys and turn those session-only toggles off. |
+| Restore Yoga setup | Keep persisted Corpse Pose, Bath, pose and care setup. Do not restore the session-only Yoga mode toggle. |
+
+- Only the retired mode keys listed in code are removed. No stored configuration or in-progress journey is restored/cleared by this owner. It remains synchronous, eager and offline-pre-cached.
 
 <a id="settings-backup"></a>
 

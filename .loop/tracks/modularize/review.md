@@ -9,7 +9,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, inte
 - Direct contract tests cover all three profile branches, saved values, UI controls, audio tuning, absent optional audio methods and invalid dependencies. All 62 runnable Node contract files and 11 model-router Python tests pass. `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent.
 - Atlas builder passes at 36 maps / 321 nodes / 377 edges. Atlas browser verification cannot start because Playwright is unavailable. Syntax checks and `git diff --check` pass. Module stays eager and precached; no performance, browser, device or audio claim.
 
-Next: integrate CP-MOD-029, then reassess Settings preference hydration as a larger stateful boundary. AudioEngine bus work remains behind the reset gate; measured lazy loading remains after extraction parity.
+Integrated via PR #48 at `17a42f0`; production unchanged.
+
+## CP-MOD-030 — Session-only experience-mode hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regression, offline-delivery, atlas-build and syntax evidence.
+
+- Extract app-load cleanup for retired preparation/experience-mode storage keys and the forced-off session-mode checkbox defaults. Preserve the original ordering among preparation toggles, saved mixer preferences, other session-only modes and Yoga's separately restored setup.
+- Keep localStorage ownership app-injected. Do not clear persisted Yoga pose/care preferences or alter Advanced Features gates.
+- Direct tests cover exact retired keys, checkbox reset defaults, call/event ordering, repeatable reset and invalid dependencies. All 63 runnable Node test files and 11 model-router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
+- Atlas builder passes at 37 maps / 326 nodes / 381 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery only; no performance or device claim.
+
+Next: integrate CP-MOD-030, then assess the larger saved-preference hydration owner. AudioEngine bus work remains behind its reset gate; measured lazy loading remains after extraction parity.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 

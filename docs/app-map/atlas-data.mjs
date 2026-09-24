@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '6261a08 baseline + uncommitted CP-MOD-029', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration and preference application integrated. The active checkpoint extracts automatic journey voice-profile application while app retains voice/gender recognition and injects current services. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '17a42f0 baseline + uncommitted CP-MOD-030', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration and automatic journey voice-profile application integrated. The active checkpoint extracts session-only journey-mode hydration while app retains persistent Yoga setup. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -364,5 +364,13 @@ add('journey-voice-profile','Systems','Automatic journey voice profile','Chooses
  [['controls','Synchronize mixer','Refresh voice sliders, music echo and both spatial-mode controls; activate the selected preset button.']],
  [['audio','Apply audio engine tuning','Set voice warmth/clarity and voice echo when the corresponding audio methods are available.']]
 ],[['start','values','Selected profile'],['values','persist','Profile assigned'],['persist','controls','Values saved'],['controls','audio','Controls synchronized']],['Voice/gender detection and journey dispatch remain app-owned. The module is eager classic-script code and offline-pre-cached. This is an ownership extraction only; no audio-quality, device, or performance improvement is claimed.']);
+
+add('session-mode-hydration','Systems','Session-only journey-mode hydration','App-load behavior for session-only mode controls and retired selection keys.','modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:5973',[
+ [['startup','Startup','Enter loadPreferences and apply the existing ordered setup.']],
+ [['prep','Reset preparation choices','Clear retired reverse/Box Breathing/Ho’oponopono keys and uncheck those preparation selections.']],
+ [['preferences','Restore saved preferences','Persistent language, timing, audio and care setup remain app-owned and are still restored.']],
+ [['modes','Reset exclusive modes','Clear retired Music Only/High Energy/Sleep keys and turn those session-only toggles off.']],
+ [['yoga','Restore Yoga setup','Keep persisted Corpse Pose, Bath, pose and care setup. Do not restore the session-only Yoga mode toggle.']]
+],[['startup','prep','App initialization'],['prep','preferences','Established sequence'],['preferences','modes','Persistent controls restored'],['modes','yoga','Exclusive modes reset']],['Only the retired mode keys listed in code are removed. No stored configuration or in-progress journey is restored/cleared by this owner. It remains synchronous, eager and offline-pre-cached.']);
 
 export { graphs };

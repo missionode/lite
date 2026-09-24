@@ -78,6 +78,7 @@ const journeyRoadmap = window.ChakraJourneyRoadmap;
 const localeUiRenderer = window.ChakraLocaleUiRenderer;
 const timingSettings = window.ChakraTimingSettings;
 const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
+const sessionModeHydration = window.ChakraSessionModeHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -87,6 +88,7 @@ if (!visualizationPractice) throw new Error('Visualization practice module is un
 if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
 if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
+if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -6029,13 +6031,9 @@ function loadPreferences() {
     syncChecked('audio-filters-toggle', state.audioFilters);
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
-    // The former normal-journey reverse preference is retired. Massage now
-    // derives its complete Crown-to-Root order without changing this state.
-    localStorage.removeItem('chakra_reverse_journey');
-    localStorage.removeItem('chakra_box_meditation');
-    localStorage.removeItem('chakra_hooponopono');
-    syncChecked('box-breathing-experience-toggle', false);
-    syncChecked('hooponopono-experience-toggle', false);
+    // Experience modes are session-only; retired selection keys are cleared
+    // before the persistent practice preferences are restored below.
+    sessionModeHydration.resetPreparationSelections({ storage: localStorage, syncChecked });
     syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('no-mantra-mode-toggle', state.noMantraMode);
     syncChecked('mood-relaxation-intention-toggle', state.moodRelaxationIntentionEnabled);
@@ -6043,12 +6041,7 @@ function loadPreferences() {
     const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
     if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    localStorage.removeItem('chakra_bg_music_mode');
-    localStorage.removeItem('chakra_high_energy');
-    localStorage.removeItem('chakra_sleep_experience');
-    syncChecked('music-only-toggle', false);
-    syncChecked('high-energy-toggle', false);
-    syncChecked('sleep-mode-toggle', false);
+    sessionModeHydration.resetExclusiveModes({ storage: localStorage, syncChecked });
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
