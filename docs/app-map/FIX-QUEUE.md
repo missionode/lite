@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-032 — Journey-selection hydration
+
+Selected chakras, the existing intention fallback and returning/video/audio-filter control state are applied by a tested owner. The app still owns stored state, validation, mode gates and journey dispatch; no route or saved preference semantics change.
+
 ## CP-MOD-031 — Mixer preference hydration
 
 The ordered 19-item mapping from app-owned mixer settings into Lobby/Settings controls has a dedicated tested owner. Preserve duplicate mirror controls and its current loadPreferences position; it does not own persistent state or audio-engine tuning.

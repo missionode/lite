@@ -31,7 +31,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, inte
 - Direct tests cover all 19 ordered pairs, duplicate mirrors, neighboring hydration order, classic-script/offline delivery and missing dependencies. All 64 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
 - Atlas builder passes at 38 maps / 330 nodes / 384 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. This is a small ownership boundary; no performance benefit is claimed.
 
-Next: validate and integrate CP-MOD-031, then continue with other cohesive preference-hydration groups before the measured-loading gate.
+Integrated via PR #50 at `9711f0e`; production unchanged.
+
+## CP-MOD-032 — Journey selection preference hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integrated regression, offline-delivery, atlas-build and syntax evidence.
+
+- Extract selected-chakra checkbox hydration, blank-intention fallback and returning/video/audio-filter control restoration. Keep state, default copy, validation and journey dispatch app-owned.
+- Preserve exact selection semantics and its position after mixer/statistics hydration but before mode and frequency controls. Keep current eager/offline delivery.
+- Direct contracts cover checked/unchecked chakra inputs, saved and blank intentions, all three journey toggles, service validation and startup order. All 65 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
+- Atlas builder passes at 39 maps / 335 nodes / 388 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. No performance or browser claim.
+
+Next: validate and integrate CP-MOD-032, then continue with remaining cohesive preference hydration before measuring optional loading.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 

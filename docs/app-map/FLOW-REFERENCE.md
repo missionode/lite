@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 2662379 baseline + uncommitted CP-MOD-031 · 2026-09-25.
+Source snapshot: 9711f0e baseline + uncommitted CP-MOD-032 · 2026-09-25.
 
-Source-reviewed behavior at the latest modularize integration baseline with timing configuration, automatic journey voice profile and session-only mode hydration integrated. The active checkpoint extracts mixer control hydration while app remains state and audio owner. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the latest modularize integration baseline with timing configuration, journey voice profile, session-only mode and mixer preference hydration integrated. The active checkpoint extracts journey-selection hydration while app retains state, copy policy and validation/dispatch. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -43,9 +43,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 33. [Automatic journey voice profile](#journey-voice-profile)
 34. [Session-only journey-mode hydration](#session-mode-hydration)
 35. [Mixer preference control hydration](#mixer-preference-hydration)
-36. [Settings backup and restore](#settings-backup)
-37. [Operator-led chakra assessment](#assessment-tournament)
-38. [Frequency repertory handoff](#repertory)
+36. [Journey selection preference hydration](#journey-selection-hydration)
+37. [Settings backup and restore](#settings-backup)
+38. [Operator-led chakra assessment](#assessment-tournament)
+39. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1608,6 +1609,37 @@ flowchart TD
 | Settings mirrors | Hydrate the five duplicate Settings volume controls using the same values. |
 
 - Preserve all 19 ordered control/state pairs and duplicate mirrors. The app retains persistence, the value-sync helper and audio behavior. This eager mapping is not a performance optimization.
+
+<a id="journey-selection-hydration"></a>
+
+## Journey selection preference hydration
+
+Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.
+
+Sources: [modules/journey-selection-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-selection-hydration.js:1), [tests/journey-selection-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-selection-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  state["Read app selection state"]
+  chakra["Restore selected chakras"]
+  intention["Restore intention"]
+  toggles["Restore journey controls"]
+  continue["Continue preference hydration"]
+  state -->|"Preferences loaded"| chakra
+  chakra -->|"Checkboxes restored"| intention
+  intention -->|"Value restored"| toggles
+  toggles -->|"Display state ready"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Read app selection state | Read selected chakras, intention, returning journey, video prelude and audio-filter preference from app-owned state. |
+| Restore selected chakras | Mark only the matching Chakra-selection inputs checked. |
+| Restore intention | Keep the saved intention; when blank/whitespace, use the existing app default intention. |
+| Restore journey controls | Synchronize returning journey, optional video prelude and audio filters. |
+| Continue preference hydration | Frequency, session-only mode reset, Beginner/Advanced gating, and Begin validation remain with the app. |
+
+- This is display hydration only; it does not change settings persistence, selected-chakra validation, journey eligibility or dispatch. It loads eagerly and is offline-pre-cached, not a performance optimization.
 
 <a id="settings-backup"></a>
 
