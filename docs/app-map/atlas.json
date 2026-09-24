@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-24",
-    "commit": "f8ce117 baseline + CP-WORKFLOW-002 / CP-ASSESS-PLAN-003 changes",
-    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment is now the active next checkpoint, followed by resumed modularization; the approved Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented."
+    "commit": "f3933aa baseline + CP-WORKFLOW-003 routing correction",
+    "scope": "Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment foundation continues in its isolated branch, followed by resumed modularization; the Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented."
   },
   "graphs": [
     {
@@ -3555,7 +3555,7 @@
           [
             "tier",
             "Automatic model tiering",
-            "Use the least-cost capable route and record recommended versus actually executed model/effort."
+            "Classify a marked bounded objective, not forbidden-action wording; use the least-cost capable route and record recommendation versus actual execution."
           ]
         ],
         [

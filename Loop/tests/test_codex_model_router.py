@@ -42,6 +42,20 @@ class CodexModelRouterTests(unittest.TestCase):
         self.assertEqual(router.classify_task("verify the responsive visual layout in browser"), "browser")
         self.assertEqual(router.classify_task("merge, deploy, and push this production release"), "high-risk")
 
+    def test_objective_slice_ignores_forbidden_action_words_in_constraints(self):
+        prompt = """[LOOP_CLASSIFY]
+Review the assessment scoring algorithm and propose deterministic tests.
+[/LOOP_CLASSIFY]
+Constraints: read only. Do not delete files, push, deploy, or release anything.
+"""
+        self.assertEqual(router.classify_task(prompt), "reasoning")
+
+    def test_unmarked_high_risk_request_remains_high_risk(self):
+        self.assertEqual(
+            router.classify_task("Review the algorithm, then push the production release"),
+            "high-risk",
+        )
+
     def test_auto_plan_uses_prompt_classification(self):
         class Args:
             task_class = router.AUTO_TASK_CLASS

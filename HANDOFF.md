@@ -1,5 +1,11 @@
 # Chakra Meditation — Active Handoff
 
+### COMPLETE LOCALLY — CP-WORKFLOW-003: objective-scoped automatic tiering
+
+- The first assessment specialist packet was conservatively misclassified as high-risk because a forbidden-action sentence contained a high-risk keyword. The bounded child returned no output and was interrupted; no child work was used.
+- Automatic routing now supports a `[LOOP_CLASSIFY]...[/LOOP_CLASSIFY]` objective slice. The router classifies only that concise objective while still sending the complete safety/permissions packet to the child. Unmarked real push/deploy/release requests remain high-risk.
+- Regression tests cover both the constraint false-positive and genuine unmarked high-risk routing. This changes project workflow only, not Lite runtime behavior.
+
 ### ACTIVE — CP-WORKFLOW-002 / CP-ASSESS-PLAN-003
 
 - Workflow now auto-selects Caveman, Focused, Isolated Autonomy, Ephemeral Specialists or High-Risk Gate from bounded scope. Substantial work uses a task-scoped AST/symbol map; short-lived specialists return unified diffs/findings to the sole integrating agent; durable resume packets permit fresh-session resets; actual model tiering uses the Loop router and must distinguish recommendations from executed dispatch.

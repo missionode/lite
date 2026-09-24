@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: f8ce117 baseline + CP-WORKFLOW-002 / CP-ASSESS-PLAN-003 changes · 2026-09-24.
+Source snapshot: f3933aa baseline + CP-WORKFLOW-003 routing correction · 2026-09-24.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment is now the active next checkpoint, followed by resumed modularization; the approved Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented.
+Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment foundation continues in its isolated branch, followed by resumed modularization; the Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1377,7 +1377,7 @@ flowchart TD
 | Task worktree + branch | Use isolation for substantial, risky, experimental or parallel work. One owner per shared integration hotspot. |
 | Ephemeral specialists | Dispatch only independent high-value subtasks with minimal immutable packets; no recursive dispatch or external actions. |
 | Unified diff handoff | Specialists return bounded diffs/findings; the primary agent reviews, applies and validates accepted hunks as sole integrator. |
-| Automatic model tiering | Use the least-cost capable route and record recommended versus actually executed model/effort. |
+| Automatic model tiering | Classify a marked bounded objective, not forbidden-action wording; use the least-cost capable route and record recommendation versus actual execution. |
 | Focused implementation | Make one coherent checkpoint; use deterministic tools and targeted tests. Avoid duplicate agents and background overhead. |
 | Two-stage review | First requirements/scope; then correctness, maintainability, accessibility, security, performance and regression risk. |
 | Atlas + handoff + checkpoint | Synchronize affected flows and continuity; run fresh applicable checks and record limitations. |

@@ -45,6 +45,8 @@ TASK_CLASSES = {
     "browser",
 }
 AUTO_TASK_CLASS = "auto"
+CLASSIFY_START = "[LOOP_CLASSIFY]"
+CLASSIFY_END = "[/LOOP_CLASSIFY]"
 
 
 class RoutingError(RuntimeError):
@@ -78,9 +80,19 @@ def candidates_for(policy: Dict[str, Any], task_class: str) -> List[Dict[str, st
     return candidates
 
 
+def classification_scope(prompt: str) -> str:
+    """Use an explicit objective slice when the packet also carries safety constraints."""
+    start = prompt.find(CLASSIFY_START)
+    end = prompt.find(CLASSIFY_END)
+    if start < 0 or end < 0 or end <= start:
+        return prompt
+    return prompt[start + len(CLASSIFY_START):end]
+
+
 def classify_task(prompt: str) -> str:
     """Infer the smallest capable routing lane from a bounded task prompt."""
-    text = " ".join(prompt.lower().split())
+    scoped_prompt = classification_scope(prompt)
+    text = " ".join(scoped_prompt.lower().split())
     if not text:
         raise RoutingError("Cannot auto-classify an empty bounded task prompt")
 
@@ -176,7 +188,7 @@ def classify_task(prompt: str) -> str:
 
     if _contains_any(text, high_risk_terms):
         return "high-risk"
-    if _contains_any(text, large_context_terms) or len(prompt) > 12000:
+    if _contains_any(text, large_context_terms) or len(scoped_prompt) > 12000:
         return "large-context"
     if _contains_any(text, browser_terms):
         return "browser"
@@ -184,7 +196,7 @@ def classify_task(prompt: str) -> str:
         return "reasoning"
     if _contains_any(text, focused_terms):
         return "focused"
-    if _contains_any(text, simple_terms) and len(prompt) < 2000:
+    if _contains_any(text, simple_terms) and len(scoped_prompt) < 2000:
         return "simple"
     return "standard"
 

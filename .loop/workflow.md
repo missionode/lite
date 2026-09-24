@@ -64,7 +64,7 @@ Mode selection is automatic and may escalate when evidence reveals more coupling
 
 ## Automatic model tiering
 
-- Route each bounded task through `Loop/scripts/codex_model_router.py --task-class auto` when a separate run adds value. Choose the least-cost healthy tier that satisfies context, reasoning, browser, safety and modality needs.
+- Route each bounded task through `Loop/scripts/codex_model_router.py --task-class auto` when a separate run adds value. Wrap the concise classification objective in `[LOOP_CLASSIFY]...[/LOOP_CLASSIFY]`; keep permissions and forbidden-action constraints outside that slice so words such as “do not delete” cannot falsely select the high-risk lane. The complete packet still reaches the child. Choose the least-cost healthy tier that satisfies context, reasoning, browser, safety and modality needs.
 - Caveman and simple focused work use the lightest capable tier. Normal implementation uses the standard tier; architecture/root-cause/performance work uses reasoning; repository-wide mapping uses large-context; browser/visual validation uses browser; releases and consequential actions use high-risk.
 - Use a self-contained fresh child for compact independent work. Use retained history only when the task truly depends on it. Never recursively route an already routed child.
 - Record recommended versus actually executed model and effort. If automatic dispatch is unavailable, continue safely with the active model or request a human switch when capability is essential; never claim a switch that did not occur.
