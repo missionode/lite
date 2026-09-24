@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-036 — Personal-care preference hydration
+
+Perineal-care, assisted-bathing and massage controls display their already-loaded preference values. Session authorization and execution are unchanged.
+
 ## CP-MOD-035 — Script preference hydration
 
 The current saved script source selects the default/custom UI, and loaded custom scripts keep their existing status copy. Loading, validation and demo-timing decisions remain app-owned.

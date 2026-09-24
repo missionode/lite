@@ -84,6 +84,7 @@ const journeySelectionHydration = window.ChakraJourneySelectionHydration;
 const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
 const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration;
 const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
+const carePreferenceHydration = window.ChakraCarePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -99,6 +100,7 @@ if (!journeySelectionHydration) throw new Error('Journey selection hydration mod
 if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
 if (!appearancePreferenceHydration) throw new Error('Appearance preference hydration module is unavailable.');
 if (!scriptPreferenceHydration) throw new Error('Script preference hydration module is unavailable.');
+if (!carePreferenceHydration) throw new Error('Care preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -6016,9 +6018,7 @@ function loadPreferences() {
     localStorage.removeItem('chakra_yoga_bridge');
     syncChecked('yoga-experience-toggle', false);
     syncChecked('bath-session-toggle', state.bathSessionEnabled);
-    syncChecked('perineal-care-toggle', state.perinealCareEnabled);
-    syncChecked('assisted-bathing-toggle', state.assistedBathingEnabled);
-    syncChecked('massage-toggle', state.massageEnabled);
+    carePreferenceHydration.hydrate({ state, syncChecked });
     const yogaSubOptions = document.getElementById('yoga-sub-options');
     if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
 

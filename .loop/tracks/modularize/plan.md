@@ -64,6 +64,8 @@ CP-MOD-034 extracts the existing visual-effect selector/application and brightne
 
 CP-MOD-035 extracts saved script-source control hydration, custom-script panel visibility and the existing status message. App retains script state, demo selection/timing decisions, loading, validation and voice selection. Preserve call order before range-control refresh. Eager delivery remains; this is not a performance optimization.
 
+CP-MOD-036 extracts the three persisted personal-care checkbox restorations (perineal care, assisted bathing and massage) into one directly tested presentation boundary. Preserve mapping and setup order after the persisted Bath control; app retains state, session gating and care execution. Eager delivery remains; this is not a performance optimization.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.

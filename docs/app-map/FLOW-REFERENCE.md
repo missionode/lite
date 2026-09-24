@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: f2d8827 baseline + uncommitted CP-MOD-035 · 2026-09-25.
+Source snapshot: 9aec136 baseline + uncommitted CP-MOD-036 · 2026-09-25.
 
-Source-reviewed behavior at modularize integration baseline f2d8827. Timing and appearance preference control hydration are integrated; the active checkpoint extracts script-selector and custom-script status presentation while app retains state, loading, validation and demo timing decisions. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at modularize integration baseline 9aec136. Timing, appearance and script preference controls are integrated; the active checkpoint extracts only three personal-care checkbox restorations while app retains state and gating. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -47,9 +47,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 37. [Timing preference control hydration](#timing-preference-hydration)
 38. [Appearance preference control hydration](#appearance-preference-hydration)
 39. [Script preference control hydration](#script-preference-hydration)
-40. [Settings backup and restore](#settings-backup)
-41. [Operator-led chakra assessment](#assessment-tournament)
-42. [Frequency repertory handoff](#repertory)
+40. [Personal-care preference control hydration](#care-preference-hydration)
+41. [Settings backup and restore](#settings-backup)
+42. [Operator-led chakra assessment](#assessment-tournament)
+43. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1730,6 +1731,34 @@ flowchart TD
 | Continue startup | Range display refresh and voice auto-selection remain in the app. |
 
 - The app injects demo-script detection and timing copy; actual script loading, validation and persistence remain app-owned. Eager and offline-pre-cached; no performance claim.
+
+<a id="care-preference-hydration"></a>
+
+## Personal-care preference control hydration
+
+Restores saved personal-care toggle values without changing session authorization or care execution.
+
+Sources: [modules/care-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/care-preference-hydration.js:1), [tests/care-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/care-preference-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  state["Loaded preferences"]
+  bath["Restore Bath setting"]
+  care["Restore care controls"]
+  gates["Continue startup"]
+  state -->|"Saved care state ready"| bath
+  bath -->|"Continue established order"| care
+  care -->|"Controls synchronized"| gates
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded preferences | The app owns saved care state and determines when the care experience is available. |
+| Restore Bath setting | The existing Yoga settings owner restores Bath independently. |
+| Restore care controls | Copy perineal-care, assisted-bathing and massage values to their checkboxes in the existing order. |
+| Continue startup | Session-only mode reset, Advanced Features visibility and care execution remain unchanged. |
+
+- The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.
 
 <a id="settings-backup"></a>
 
