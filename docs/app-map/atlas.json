@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-24",
-    "commit": "modularize 4f18cd5 baseline + assessment sync candidate (uncommitted)",
-    "scope": "Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament being synchronized from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "modularize 4f18cd5 baseline + assessment sync 807e17e",
+    "scope": "Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament integrated from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {

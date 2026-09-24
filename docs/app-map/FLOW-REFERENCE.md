@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: modularize 4f18cd5 baseline + assessment sync candidate (uncommitted) · 2026-09-24.
+Source snapshot: modularize 4f18cd5 baseline + assessment sync 807e17e · 2026-09-24.
 
-Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament being synchronized from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament integrated from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
