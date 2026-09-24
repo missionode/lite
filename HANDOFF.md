@@ -1,13 +1,13 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-024: Yoga Experience settings ownership
+### NOW — CP-MOD-025: Shared range-control UI ownership
 
-- Active isolated branch `codex/modularize-cp-024`, based on modularize integration commit `a46333d` (CP-MOD-023 merged via PR #42). This checkpoint extracts Yoga setup selection persistence and timing-row visibility; hydration and session execution remain app-owned.
-- Direct tests cover read selection, exact existing storage keys/values, state assignment, row visibility, bath-toggle accessibility reset, script order and offline precache. Yoga's existing pose validation and adjacent visibility/settings tests are included in the fresh gate.
-- Atlas sources/generated references are synchronized at 32 maps / 295 nodes / 340 edges; no journey-routing edges changed. Browser atlas verification failed to start because Playwright is not installed. Owner-managed `docs/dot.json` remains absent from isolated worktrees and its dependent drone-duration suite is explicitly excluded. No performance/device/audio claims; production unchanged.
-- CP-MOD-024 direct, integration and adjacent checks passed: Yoga settings persistence/visibility, Yoga Experience, Lobby visibility, estimates, settings backup, Advanced unlock, routing, focused practices, thermal budget and Hindi/Malayalam/Russian contracts. JavaScript syntax and diff checks passed.
-- Next: integrate only CP-MOD-024, then continue cohesive Settings/controller ownership. Respect the approved AudioEngine weekly-reset gate; measure optional loading only after behavior parity.
-- Local integration baseline contains CP-MOD-023; preserve unrelated root `.DS_Store`, `.codex/` and backup-audio changes. Keep the missing `docs/dot.json` and browser tooling limitations explicit.
+- Active isolated branch `codex/modularize-cp-025`, based on modularize integration commit `ad3d49b` (CP-MOD-024 merged via PR #43). This checkpoint extracts shared range formatting, idempotent DOM enhancement, bounded step controls and display refresh; timing configuration and persistence remain app-owned.
+- Direct behavior test covers time/ambience value formatting, min/max clamping, disabled boundary controls, bubbling input updates, idempotence, refresh and offline module order.
+- Atlas regenerated at 32 maps / 295 nodes / 340 edges; two stale mode-map source line references were corrected. The builder passes; visual Playwright verification cannot start because that package is not installed. Owner-managed `docs/dot.json` remains absent and its dependent drone-duration suite is excluded. No performance/device/audio claim; production unchanged.
+- CP-MOD-025 direct range tests and selected adjacent Settings, practice, localization, routing, thermal and version-delivery contracts pass; app/module/service-worker syntax and diff checks pass.
+- CP-MOD-024 is integrated via PR #43. Preserve unrelated local `.DS_Store`, `.codex/` and backup-audio files.
+- Next: finish CP-MOD-025 review/integration, then continue cohesive Settings/UI ownership and honor the approved AudioEngine weekly-reset gate before measurement/lazy loading.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 
