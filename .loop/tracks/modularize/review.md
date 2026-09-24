@@ -1,5 +1,17 @@
 # Review
 
+## CP-MOD-037 — Repeatable startup baseline and offline shell parity
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the measured baseline and exact-URL cache correction.
+
+- Added `tests/e2e/modularization-baseline.spec.js` and an opt-in package script. It records cold, warm and offline local Chromium navigation/resource data; verifies service-worker control and exact versioned app/CSS cache entries; fails on uncaught page errors; and deliberately does not start audio.
+- The test exposed a genuine offline failure: `index.html` requests `app.js?v=3.87` and `style.css?v=2.03`, while the shell cache used unversioned URLs. Updated the shell cache generation and entries to those exact URLs and updated version assertions.
+- Latest local static-server sample (external requests/fonts blocked; no response compression): cold DCL/load 484/1,206 ms, 38 scripts, ~903 KiB encoded JS, ~915 KiB transfer; warm 496/702 ms, zero transfer; offline 194/195 ms, zero transfer. An earlier cold/warm sample differed (403/793 and 386/567 ms), demonstrating timing variability. Seven preparation modules contribute ~16.9 KiB encoded JS versus ~903 KiB total. These samples are not device/production or CPU/thermal evidence.
+- Chromium cold/warm/offline test passes with no page errors. `node docs/app-map/build-atlas.mjs` and `node docs/app-map/verify-atlas.mjs` pass; atlas reports 43 maps, 352 nodes, 401 edges and no page errors. Applicable Node suite: 69 runnable pass; 11 Loop router Python tests pass. `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent.
+- Test evidence is source, automated and local Chromium; no device playback, thermal, compressed-network or production performance claims. No user files, production branch or deployment changed.
+
+Next: a bounded selected-practice lazy-loading experiment is justified by the measured ~1.9% initial-JavaScript share. Require standalone and combined preparation route parity, selected-only loading, offline cache loading, retry/error recovery, and startup resource comparison. Defer AudioEngine bus work until its owner-approved weekly reset.
+
 ## CP-MOD-029 — Journey voice-profile application
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integrated regression, offline-delivery, atlas-build and syntax evidence.

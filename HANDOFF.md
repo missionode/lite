@@ -1,6 +1,14 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-036: Personal-care preference control hydration
+### NOW — CP-MOD-037: Offline cache parity and measured-loading baseline
+
+- Active isolated branch `codex/modularize-cp-037`, based on integration commit `8fe9497` (CP-MOD-036 merged via PR #55). This checkpoint fixes the service-worker shell cache's app/CSS query mismatch and adds a local cold/warm/offline Chromium baseline; production and the root user's unrelated dirty files remain untouched.
+- Exact `app.js?v=3.87` and `style.css?v=2.03` requests now match precache entries under `chakra-v5.283`. The test verifies first launch, controlled warm reload and offline reload without starting playback.
+- Latest baseline: cold DCL/load 484/1,206 ms, 38 scripts, ~903 KiB encoded JS and ~915 KiB transfer; warm 496/702 ms and zero transfer; offline 194/195 ms and zero transfer. An earlier sample was faster, confirming noisy navigation timing. Seven practice modules are ~16.9 KiB (~1.9% of initial JS). Local uncompressed/headless results are not CPU, thermal, production or device claims.
+- Validation: selected Chromium cold/warm/offline test passes; atlas verification passes at 43 maps/352 nodes/401 edges. Applicable suite is 69 Node tests and 11 router Python tests; two dot.json-dependent tests are excluded because the owner fixture is absent. Browser evidence is local only; no device audio or heat validation.
+- Next: create CP-MOD-038 for a selected-only lazy-load experiment for the seven practice modules. Gate on standalone/combined routes, offline cache loading, failure/retry behavior and measured startup payload. Preserve the 10% usage reserve. AudioEngine bus remains deferred to the approved weekly-reset window. Production publication is not in scope.
+
+### COMPLETE — CP-MOD-036: Personal-care preference control hydration
 
 - Active isolated branch `codex/modularize-cp-036`, based on modularize integration commit `9aec136` (CP-MOD-035 merged via PR #54). `modules/care-preference-hydration.js` owns only perineal-care, assisted-bathing and massage checkbox hydration; app retains state, authorization/gates and care execution.
 - Preserve their original order after Bath preference restoration. Eager/offline-pre-cached; no performance claim.

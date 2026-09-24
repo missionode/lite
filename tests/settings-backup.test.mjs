@@ -101,7 +101,7 @@ assert.ok(
 );
 assert.match(serviceWorker, /\.\/modules\/yoga-experience-settings\.js\?v=1\.0/, 'Yoga experience settings must remain available offline.');
 assert.ok(html.indexOf('modules/locale-ui-renderer.js?v=1.0') < html.indexOf('app.js?v=3.87'), 'Locale UI rendering must load before the app uses it.');
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?\.\/modules\/locale-ui-renderer\.js\?v=1\.0/, 'Locale UI rendering must remain available offline.');
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?\.\/modules\/locale-ui-renderer\.js\?v=1\.0/, 'Locale UI rendering must remain available offline.');
 assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');
 assert.match(html, /id="open-settings-manager"[^>]*class="secondary-btn"/, 'The public Manage Settings CTA must remain clearly visible against the sky.');
 assert.match(html, /id="export-settings"/, 'The manager needs export.');

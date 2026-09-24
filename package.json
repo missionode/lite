@@ -70,6 +70,7 @@
     "test:sky-astronomy": "node tests/sky-astronomy.test.mjs",
     "test:model-routing": "python3 -m unittest Loop/tests/test_codex_model_router.py",
     "test:e2e": "playwright test",
+    "test:e2e:modularization-baseline": "playwright test tests/e2e/modularization-baseline.spec.js",
     "test:e2e:ui": "playwright test --ui"
   },
   "devDependencies": {

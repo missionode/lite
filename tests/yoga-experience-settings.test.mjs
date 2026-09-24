@@ -10,7 +10,7 @@ assert.match(app, /const yogaExperienceSettings = window\.ChakraYogaExperienceSe
 assert.match(app, /yogaExperienceSettings\.persist\(\{ document, state, storage: localStorage \}\)/);
 assert.match(app, /yogaExperienceSettings\.syncTimingRows\(\{ document, getChecked \}\)/);
 assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/);
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?modules\/yoga-experience-settings\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/yoga-experience-settings\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

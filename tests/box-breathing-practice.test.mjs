@@ -10,7 +10,7 @@ assert.match(app, /const boxBreathingPractice = window\.ChakraBoxBreathingPracti
 assert.match(app, /if \(!boxBreathingPractice\) throw new Error\('Box Breathing practice module is unavailable\.'\)/);
 assert.match(app, /async runBoxBreathing\(\) \{[\s\S]*?boxBreathingPractice\.run\(/, 'the controller should delegate Box Breathing to its lifecycle owner');
 assert.match(html, /modules\/box-breathing-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/, 'the module should load before app.js with a refreshed app version');
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
