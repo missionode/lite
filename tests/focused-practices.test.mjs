@@ -5,6 +5,7 @@ const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.js', import.meta.url), 'utf8');
 const dharanaPractice = fs.readFileSync(new URL('../modules/dharana-practice.js', import.meta.url), 'utf8');
 const boxBreathingPractice = fs.readFileSync(new URL('../modules/box-breathing-practice.js', import.meta.url), 'utf8');
+const visualizationPractice = fs.readFileSync(new URL('../modules/visualization-practice.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -51,8 +52,8 @@ assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPhases[\s\S]*?undo
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
 assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
 assert.match(mediaLifecycle, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
-assert.match(app, /if \(state\.visualizationAmbience === 'silence'\)[\s\S]*?visualizationSilenceWakePrompt[\s\S]*?pauseAwareSleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
-assert.match(app, /setVisualizationAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\([\s\S]*?setVisualizationAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
+assert.match(visualizationPractice, /ambience === 'silence'[\s\S]*?silenceWakePrompt[\s\S]*?sleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
+assert.match(visualizationPractice, /setAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\(focusPrompt[\s\S]*?setAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
 assert.match(app, /async runSequence[\s\S]*?hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?handleSilence[\s\S]*?runClosing[\s\S]*?runEmergence/, 'Ho’oponopono should run after chakras and before closing/emergence');
 assert.match(app, /clearFocusedExperiences\(target\)/, 'Standalone Experience Modes should remain mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 7c432ee baseline + uncommitted CP-MOD-015 · 2026-09-24.
+Source snapshot: f669a3e baseline + uncommitted CP-MOD-016 · 2026-09-24.
 
-Source-reviewed application behavior at the latest modularize integration baseline with Box Breathing execution extracted on the active checkpoint branch, pending integration. Dharana, Guided Noting and Body Scan ownership are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed application behavior at the latest modularize integration baseline with Visualization lifecycle ownership extracted on the active checkpoint branch, pending integration. Box Breathing, Dharana, Guided Noting and Body Scan ownership are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -192,7 +192,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Queued extraction work | Journey preparation planning/execution, Body Scan, Guided Noting, Dharana and Box Breathing ownership extracted; Visualization remains in app.js, then deferred AudioEngine buses → UI controllers. Complete parity before delivery changes. |
+| Queued extraction work | Journey preparation planning/execution and Box Breathing, Visualization, Dharana, Body Scan and Guided Noting ownership extracted; deferred AudioEngine buses → UI controllers remain. Complete parity before delivery changes. |
 | PLANNED · Measure baseline | Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners. |
 | PLANNED · Approve feature bundles | Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity. |
 | PLANNED · Cache without execution | Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them. |
@@ -789,7 +789,7 @@ flowchart TD
 
 Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [app.js:4772](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4772), [app.js:4880](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4880), [app.js:4908](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4908), [app.js:4930](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4930), [app.js:4952](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4952), [app.js:4992](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4992), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [app.js:4956](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4956), [app.js:4984](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4984), [app.js:5470](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5470), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
 
 ```mermaid
 flowchart TD

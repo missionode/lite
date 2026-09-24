@@ -64,11 +64,13 @@ const bodyScanPractice = window.ChakraBodyScanPractice;
 const guidedNotingPractice = window.ChakraGuidedNotingPractice;
 const dharanaPractice = window.ChakraDharanaPractice;
 const boxBreathingPractice = window.ChakraBoxBreathingPractice;
+const visualizationPractice = window.ChakraVisualizationPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
 if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.');
 if (!boxBreathingPractice) throw new Error('Box Breathing practice module is unavailable.');
+if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -4954,39 +4956,29 @@ class MeditationController {
     async runVisualization() {
         const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
         const blackout = document.getElementById('visualization-blackout');
-        showScreen(meditationScreen);
-        document.body.classList.add('visualization-active');
-        if (blackout) { blackout.hidden = false; void blackout.offsetWidth; blackout.classList.add('is-active'); }
-        this.audio.fadeOutBackgroundMusic(6);
-        try { await this.audio.startVisualizationAmbience(); } catch (error) { console.warn('Visualization ambience unavailable; continuing in silence.', error); }
-        await this.pauseAwareSleep(1500);
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        setText('mantra-display', journeyT('ui.visualizationTitle'));
-        await this.narrate(journeyT('ui.visualizationFocusPrompt'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 2);
-        await this.pauseAwareSleep(12000);
-        if (!this.isMeditationActive) { if (blackout) { blackout.classList.remove('is-active'); blackout.hidden = true; } document.body.classList.remove('visualization-active'); return; }
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        await this.narrate(journeyT('ui.visualizationGuidance'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 2);
-        await this.pauseAwareSleep(3000);
-        for (let remaining = Math.max(1, minutes * 60); remaining > 0 && this.isMeditationActive; remaining--) await this.pauseAwareSleep(1000);
-        if (!this.isMeditationActive) return;
-        if (state.visualizationAmbience === 'silence') {
-            await this.narrate(journeyT('ui.visualizationSilenceWakePrompt'), false, true);
-            await this.pauseAwareSleep(8000);
-        }
-        if (!this.isMeditationActive) return;
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        await this.narrate(journeyT('ui.visualizationReturn'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 1.5);
-        meditationScreen.style.transition = 'opacity 10s ease-in'; meditationScreen.style.opacity = '0.45';
-        requestAnimationFrame(() => { meditationScreen.style.opacity = '1'; });
-        this.audio.stopVisualizationAmbience();
-        await this.pauseAwareSleep(6000); this.audio.fadeInBackgroundMusic(8, true); await this.pauseAwareSleep(4000);
-        meditationScreen.style.transition = ''; meditationScreen.style.opacity = '';
-        if (blackout) { blackout.classList.remove('is-active'); await this.pauseAwareSleep(5000); blackout.hidden = true; }
-        document.body.classList.remove('visualization-active');
+        await visualizationPractice.run({
+            minutes,
+            ambience: state.visualizationAmbience,
+            body: document.body,
+            meditationScreen,
+            blackout,
+            title: () => setText('mantra-display', journeyT('ui.visualizationTitle')),
+            focusPrompt: journeyT('ui.visualizationFocusPrompt'),
+            guidance: journeyT('ui.visualizationGuidance'),
+            silenceWakePrompt: journeyT('ui.visualizationSilenceWakePrompt'),
+            returnPrompt: journeyT('ui.visualizationReturn'),
+            showScreen,
+            fadeBackgroundMusicOut: seconds => this.audio.fadeOutBackgroundMusic(seconds),
+            startAmbience: () => this.audio.startVisualizationAmbience(),
+            setAmbienceDucked: (ducked, seconds) => this.audio.setVisualizationAmbienceDucked(ducked, seconds),
+            stopAmbience: () => this.audio.stopVisualizationAmbience(),
+            fadeBackgroundMusicIn: (seconds, resume) => this.audio.fadeInBackgroundMusic(seconds, resume),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive,
+            requestFrame: callback => requestAnimationFrame(callback),
+            warn: (...args) => console.warn(...args)
+        });
     }
 
     async runBoxBreathing() {

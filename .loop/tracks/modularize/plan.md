@@ -24,6 +24,8 @@ CP-MOD-014 extracts Dharana's anchor selection, shrinking session clock, narrate
 
 CP-MOD-015 extracts Box Breathing's tutorial, localized four-step cycle, responsive pause accounting, completion narration and background-music handoff behind a frozen direct-test API. The controller supplies existing translation, timing, audio, narration and session services. The established 100 ms pause-check cadence is intentionally unchanged; this extraction is not a CPU optimization.
 
+CP-MOD-016 extracts Visualization's blackout, narration, silence wake prompt, ambient/music handoffs, active-duration clock, gradual re-entry and cleanup sequence behind a frozen direct-test API. The controller injects localized narration and existing audio, screen and session services. Preserve current ordering, fade durations and cancellation behavior; this is an ownership/testing step, not a performance optimization.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.
