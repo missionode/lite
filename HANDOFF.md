@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### ACTIVE — CP-WORKFLOW-002 / CP-ASSESS-PLAN-003
+
+- Workflow now auto-selects Caveman, Focused, Isolated Autonomy, Ephemeral Specialists or High-Risk Gate from bounded scope. Substantial work uses a task-scoped AST/symbol map; short-lived specialists return unified diffs/findings to the sole integrating agent; durable resume packets permit fresh-session resets; actual model tiering uses the Loop router and must distinguish recommendations from executed dispatch.
+- Owner authorized assessment implementation as the next isolated checkpoint. Add a neutral eight-value pairwise bracket—Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism—with non-repeating, balanced/position-countered comparisons. Multiple independent signals may influence only the existing conservative unlabelled operator dot; never infer consent, service activation or a participant-facing intimate-care conclusion.
+- Theme requirement correction: preserve the current dynamic sky until the redesign. During the approved redesign, the core UI may simplify its background; relocate the current observational sky to a dedicated responsive Sky page reached by a Settings CTA, preserving its accurate calculations and illustrative Earth/Sun treatments there.
+- Next execution boundary: checkpoint these synchronized plans, then create `codex/assessment-tournament` in an isolated worktree from the clean `modularize` baseline. No production action is authorized.
+- Planning validation: current assessment baseline test passes; metadata JSON parses; atlas regenerated to 33 maps and browser verification passes selections, bounds, keyboard, mobile overflow, print, SVG and template fallback with no page errors; diff whitespace check passes. No new runtime behavior is claimed yet.
+
 ### APPROVED — CP-WORKFLOW-001: isolated sandbox and PR delivery
 
 - Upcoming substantial, risky, experimental or parallel work now follows `.loop/workflow.md`: compact task packet → task-specific worktree/branch → targeted implementation and two-stage review → atlas/handoff update → validated checkpoint → focused PR → approved merge → local integration synchronization → combined regression gate. Production publication remains separate.
@@ -11,7 +19,7 @@
 
 - Owner approved the generated desktop/mobile visual direction. Original image is preserved in `docs/design/lite-cosmic-observatory/approved-concept-v1.png`; complete visual and functional contract is in `.loop/tracks/cosmic-observatory-theme/spec-plan-review.md`.
 - Order remains assessment → complete modularization/measured loading review → theme implementation. Current modularization progress is unchanged by this planning checkpoint.
-- Preserve every functional requirement, language, access gate, timing/audio behavior and protected Earth/Sun effect. Image omissions, example durations, copy and illustrative sky coordinates do not override executable requirements.
+- Preserve every functional requirement, language, access gate and timing/audio behavior. At redesign, the core UI may simplify the sky to match the concept; relocate the current dynamic observational sky and its Earth/Sun treatments to a dedicated Settings-linked Sky page.
 - Atlas adds a separate planned theme map. This is documentation and a reference asset only, with no app code, cache or deployed UI change.
 - Execution: direct documentation work; no model switch. Validation: atlas regeneration and all 32-map browser checks passed (selection, labels, keyboard, mobile overflow, print, SVG export and template fallback), with no page errors; diff whitespace check passed. No app playback/device-performance claim.
 
@@ -21,14 +29,15 @@
 - The template now stops safely, explains that it is a source template and links to the generated atlas. The atlas verifier covers both the raw-template fallback and all generated maps.
 - `chext_loader.js` is not present or referenced in the repository. Its `unload` permissions-policy warning remains browser-extension output, not an atlas/application error.
 
-### NEXT AFTER WEEKLY RESET — CP-ASSESS-PLAN-002: operator-led assessment tournament
+### ACTIVE NEXT — CP-ASSESS-PLAN-003: operator-led assessment tournament
 
 - APPROVED and queued before modularization resumes. Redesign only `/docs/assesment.html` as a standalone two-choice, no-repeat hybrid bracket that estimates relative status/confidence for all seven chakras.
 - Load versioned questions/weights/signals from JSON; keep validation, adaptive selection, scoring, archetype aggregation and thresholds in code. Participant-facing archetype names remain positive and neutral.
 - Result scope is seven chakra statuses, archetype names and one small unlabelled green/orange/red patterned dot only. No heading, explanation, percentage, Advanced Features settings, journey handoff or automatic action.
 - Current consultation behavior remains authoritative until the replacement passes schema, no-repeat, balance, tie-breaker, persistence/reset, responsive and operator-review gates. After assessment delivery, resume modularization from CP-MOD-010.
-- Track: `.loop/tracks/assessment-tournament/` | Implementation gate: weekly usage reset.
+- Track: `.loop/tracks/assessment-tournament/` | Implementation gate: owner authorized implementation.
 - CP-ASSESS-PLAN-002 correction: multilingual readiness preserves the current Google Translate widget over one English JSON question bank. Dynamically rendered questions, choices, progress, archetypes and results must translate; translation remains internet-dependent. Do not create separate native assessment locale bundles.
+- CP-ASSESS-PLAN-003 adds the neutral eight-value priority bracket. Pairings and card positions are balanced, unordered pairs do not repeat, Equal/Skip remain available and a single answer can never produce green/red or imply consent.
 
 ### NOW — CP-MOD-010: post-parity loading and lifecycle plan
 

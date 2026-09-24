@@ -17,6 +17,16 @@ Replace the standalone `/docs/assesment.html` consultation with an operator-led,
 - There are no assessment controls in Advanced Features. The question bank is JSON; the algorithm and conservative thresholds are code-owned.
 - Clear for New Client removes the current assessment state. Current browser-local persistence must not leak one client’s answers into another assessment.
 
+## Value-priority bracket
+
+Include a neutral pairwise value bracket using the participant-facing prompt “Which of these two do you prioritize more?” and the approved value cards: Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism.
+
+- Randomize or balance pairings so position and repeated-card order do not bias the result; never repeat the same unordered pairing in one assessment.
+- Treat these choices as preferences in the current context, not permanent personality facts, consent, relationship status or a diagnosis.
+- Use several independent comparisons before contributing to the conservative unlabelled operator dot. No single value or answer may determine green or red.
+- Keep participant-visible wording neutral. Intimate-care interpretation remains limited to the trained operator’s unlabelled dot; do not expose hidden weights, service labels, sales language or automatic recommendations.
+- Equal and skip remain valid, non-punitive responses. Clear for New Client removes these answers with all other assessment state.
+
 ## Participant-friendly archetypes
 
 Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector, Authentic Communicator, Insightful Observer, Meaning Seeker, Independent Navigator, Receptive Collaborator, Embodied Observer, Thoughtful Trust Builder and Clear Preference Communicator.
@@ -25,6 +35,7 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 
 - Stable schema validation rejects missing IDs, duplicate IDs, malformed choices, invalid weights and unsupported signals.
 - Tests prove no question repeats after answer, equal or skip; minimum chakra evidence is balanced; close/uncertain results use only unused tie-breakers; incomplete evidence cannot produce a decisive dot.
+- Tests prove all eight approved value cards receive balanced opportunities, unordered value pairings do not repeat, position is counterbalanced and value evidence cannot override the multi-signal minimum for the dot.
 - A single answer cannot produce green or red. The final dot requires several consistent independent signals.
 - Refresh/resume and new-client clearing behave explicitly and safely.
 - The source question bank remains English. The existing Google Translate widget translates the page, dynamically generated questions, choices, progress and results; translation therefore requires an internet connection, matching the current assessment page.

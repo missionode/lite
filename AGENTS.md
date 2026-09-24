@@ -1,8 +1,8 @@
 # Project working agreement
 
-## Preserve the Earth atmosphere and Sun shield
+## Preserve the dynamic sky until its approved redesign relocation
 
-These are owner-required visual features, not disposable decoration. Preserve the centered Earth reference with five softly merged atmospheric layers (troposphere through exosphere), a clearly visible cool-aqua innermost layer expressing a **26°C comfort theme**, and the Sun's soft protective shield ring. Do not remove, switch off by default, or substantially fade either effect without explicit owner approval. The temperature and protection are illustrative, never physical safety or climate claims. Keep Earth-only labeling, text/control-clearance shrink/omit guards, truthful observer sky coordinates and static journey performance. Keep `earth-atmosphere` and `solar-containment` atlas maps and their regression checks synchronized. Temporary omission where foreground content leaves no safe space is intentional, not removal.
+Until the approved Cosmic Observatory redesign is implemented, preserve the current centered Earth reference with five softly merged atmospheric layers (troposphere through exosphere), its clearly visible cool-aqua **26°C comfort theme**, the Sun's soft protective shield ring, Earth-only labeling, text/control-clearance guards, truthful observer coordinates and static journey performance. During that redesign, the owner explicitly permits the main application background to simplify or diverge from these sky requirements to achieve the approved interface. Move the current dynamic observational sky into a dedicated Sky page and add a Settings CTA to it; preserve its astronomy behavior and illustrative atmosphere/Sun treatments there unless the owner changes them again. Keep `earth-atmosphere`, `solar-containment`, Settings navigation and dedicated-sky atlas maps/tests synchronized. The temperature and protection remain illustrative, never physical safety or climate claims.
 
 ## Follow the efficient Loop workflow
 

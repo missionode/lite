@@ -24,8 +24,9 @@ The reference was generated using the built-in image tool. The tool did not expo
 - Derive the summary and duration labels from actual existing semantics. The image's selected chakras, 15-minute value, duration presets and sample copy are not new defaults or total-session timing requirements.
 - Keep the assessment independent; this theme does not add assessment-to-journey automation or alter its planned algorithm.
 - Preserve all narration, sound, fades, pause/stop/restart behavior, pitch-black practice scenes, reduced motion, static journey sky and thermal constraints. Do not add continuous animation, expensive backdrop blur or new effects merely to match the image.
-- Preserve centered Earth and five softly merged atmospheric layers, clearly visible cool-aqua 26°C comfort styling and the Sun's soft protective shield. Keep Earth-only labeling and the authoritative content-clearance guards; do not infer changes to scrolling/placement behavior from this static image.
-- Use the actual observer calculations for planets, stars, Sun and Moon. The concept's positions, cardinal ordering and curved horizon are illustrative: retain the implemented truthful coordinates, proper cardinal order and straight horizon. Use softly blended atmosphere, not the image's conspicuous separated bands.
+- The owner now permits the redesigned core UI to simplify or replace the current dynamic-sky background where needed to achieve the approved concept. This is a redesign-only exception, not permission to remove the capability before that checkpoint.
+- Move the current dynamic observational sky into a dedicated responsive Sky page and add a clear Settings CTA to open it. On that page preserve truthful observer calculations, proper cardinal order, straight horizon, Earth-only labeling, static/performance safeguards, the five softly merged atmospheric layers with the cool-aqua 26°C theme and the Sun shield unless separately revised.
+- The concept's generated celestial positions, cardinal ordering, curved horizon and separated atmosphere bands remain illustrative; they must not be presented as observationally accurate.
 - All functional controls must remain live HTML/CSS; do not use the full mockup as the interface or replace the calculated sky with its decorative star field.
 
 ## Implementation checkpoints after prerequisites
@@ -33,8 +34,8 @@ The reference was generated using the built-in image tool. The tool did not expo
 1. Inventory the completed module interfaces, all controls and languages; capture behavior and performance baselines.
 2. Establish shared color, typography, spacing, surface and focus tokens from the approved concept; verify text contrast and font fallback.
 3. Restyle the Lobby and responsive summary using existing state and control handlers; preserve full feature coverage and duration semantics.
-4. Carry the theme through Settings/dialogs and applicable supporting surfaces with their existing translation/access contracts. Preserve minimal active-journey screens.
-5. Validate all controls, keyboard/focus, touch targets, language wrapping, video readability, long content, mobile/tablet/desktop layouts, reduced motion, protected sky effects, offline updates and audio/journey regressions.
+4. Carry the theme through Settings/dialogs and applicable supporting surfaces with their existing translation/access contracts. Add the Settings CTA and dedicated Sky page while preserving the relocated sky's observational behavior. Preserve minimal active-journey screens.
+5. Validate all controls, keyboard/focus, touch targets, language wrapping, video readability, long content, mobile/tablet/desktop layouts, reduced motion, dedicated-sky behavior, offline updates and audio/journey regressions.
 6. Compare startup and journey CPU/memory with the baseline. Resolve regressions before acceptance. Synchronize affected implemented maps and present the working visual checkpoint for review; production publication remains a separate request.
 
 ## Planning review

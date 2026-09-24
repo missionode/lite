@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 69c7b90 baseline + CP-WORKFLOW-001 documentation changes · 2026-09-19.
+Source snapshot: f8ce117 baseline + CP-WORKFLOW-002 / CP-ASSESS-PLAN-003 changes · 2026-09-24.
 
-Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved isolated delivery workflow. Assessment precedes resumed modularization; the approved Cosmic Observatory visual redesign follows completion of both. Existing runtime requirements remain authoritative. Design references, workflow policy and programme-delivery assets are non-runtime.
+Source-reviewed application behavior plus nine delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment is now the active next checkpoint, followed by resumed modularization; the approved Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -38,7 +38,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 28. [Failure and recovery map](#recovery)
 29. [Isolated checkpoint delivery](#delivery-workflow)
 30. [Settings backup and restore](#settings-backup)
-31. [PLANNED · Operator-led chakra assessment tournament](#assessment-tournament-planned)
+31. [ACTIVE PLAN · Operator-led chakra assessment tournament](#assessment-tournament-planned)
 32. [Consultation flow](#consultation)
 33. [Frequency repertory handoff](#repertory)
 
@@ -269,7 +269,9 @@ flowchart TD
   reference["Approved visual reference"]
   contract["Preserve all requirements"]
   tokens["Shared visual tokens"]
-  sky["Protected sky behavior"]
+  sky["Simplify redesigned core sky"]
+  skyCta["Settings · Open Sky CTA"]
+  skyPage["Dedicated dynamic Sky page"]
   surfaces["Responsive live controls"]
   verify["Parity and performance gate"]
   review["Review implemented design"]
@@ -277,9 +279,12 @@ flowchart TD
   modules -->|"Prerequisites complete"| reference
   reference -->|"Appearance only"| contract
   contract -->|"Define system"| tokens
-  contract -->|"Retain invariants"| sky
+  contract -->|"Approved exception"| sky
+  contract -->|"Preserve access"| skyCta
   tokens -->|"Apply"| surfaces
-  sky -->|"Preserve"| surfaces
+  sky -->|"Apply"| surfaces
+  skyCta -->|"Open"| skyPage
+  skyPage -->|"Exercise"| verify
   surfaces -->|"Exercise"| verify
   verify -->|"Correct regressions"| surfaces
   verify -->|"Pass"| review
@@ -292,12 +297,14 @@ flowchart TD
 | Approved visual reference | See docs/design/lite-cosmic-observatory/approved-concept-v1.png: midnight panels, ivory text, champagne actions and cosmic setting. |
 | Preserve all requirements | Keep every option, default, gate, translation, navigation, timing, audio and persistence contract. Mockup omissions and sample values are illustrative. |
 | Shared visual tokens | Define readable surfaces, typography, spacing, selection states and keyboard focus. |
-| Protected sky behavior | Keep truthful observer coordinates, proper cardinal order, straight horizon, centered Earth with five soft layers and 26°C aqua theme, Sun shield and static journey performance. |
+| Simplify redesigned core sky | The main redesign may use a simpler concept-aligned background while retaining static/performance constraints. |
+| Settings · Open Sky CTA | Localized, keyboard/touch accessible navigation to the dedicated responsive Sky page. |
+| Dedicated dynamic Sky page | Relocate current observer calculations, proper cardinal order, straight horizon, Earth atmosphere/26°C styling and Sun shield here. |
 | Responsive live controls | Restyle Lobby, summary, Settings and applicable surfaces using existing handlers. Keep all options available and localize adopted copy. |
 | Parity and performance gate | Check languages, keyboard, mobile/tablet/desktop, video, journeys, offline updates and CPU/memory. Resolve regressions before acceptance. |
 | Review implemented design | Present the working theme checkpoint. Production publication needs its own request. |
 
-- PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative. The generated celestial placements, atmospheric bands, curve of the horizon, example durations and omitted controls must not override the application requirements.
+- PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative until redesign. The current dynamic sky must be preserved until then and subsequently relocated, not silently deleted; generated celestial placements remain illustrative.
 
 <a id="modes"></a>
 
@@ -1196,7 +1203,7 @@ flowchart TD
 | Foreground crosses anchor | Earth remains rendered at the same cached sky coordinate like the other celestial objects. Foreground interface content may visually cover part of the background artwork, but layout logic never shrinks or suppresses Earth. |
 | Earth-to-Moon reference | The Moon retains its exact calculated azimuth/altitude above the horizon. A faint cached guide connects Earth to an above-horizon Moon for observer context; below-horizon Moon remains hidden. No climate, UV, aviation, satellite, orbital or celestial-calculation effect. |
 
-- Owner approval is required before removal, disabling by default or substantial fading. Preserve five layers and the 26°C cool-aqua visual theme; no added temperature/layer labels. Moon coordinates remain truthful; the guide is illustrative and adds no animation loop. Unit and browser pixel tests protect visibility on tiny markers.
+- OWNER-RETAINED in the current runtime. During the separately approved redesign, relocate this dynamic sky and its five-layer 26°C cool-aqua treatment to the dedicated Settings-linked Sky page before simplifying the core background. Moon coordinates remain truthful; the guide is illustrative and adds no animation loop. Unit and browser pixel tests protect current visibility on tiny markers.
 
 <a id="solar-containment"></a>
 
@@ -1221,7 +1228,7 @@ flowchart TD
 | Diffuse containment glow | A warm diffuse glow surrounds the calculated Sun with a softly feathered circular shield rim. This protective-ring motif is artwork, not real radiation filtering. |
 | Visual-only scope | No solar-physics, radiation, energy-transfer, climate or celestial-calculation effect. |
 
-- OWNER-RETAINED: keep both diffuse glow and the soft shield ring. Removal, disabling by default or substantial fading requires owner approval. Unit and browser render checks protect this contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim.
+- OWNER-RETAINED in the current runtime. During the approved redesign, relocate this treatment with the dynamic sky to the dedicated Settings-linked Sky page before simplifying the core background. Unit and browser render checks protect the current contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim.
 
 <a id="storage"></a>
 
@@ -1324,22 +1331,37 @@ Sources: [.loop/workflow.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/work
 ```mermaid
 flowchart TD
   scope["Bounded approved checkpoint"]
+  mode["Automatic mode selection"]
+  ast["Task-scoped AST map"]
   context["Compact task packet"]
   sandbox["Task worktree + branch"]
+  agents["Ephemeral specialists"]
+  diff["Unified diff handoff"]
+  tier["Automatic model tiering"]
   implement["Focused implementation"]
   review["Two-stage review"]
   sync["Atlas + handoff + checkpoint"]
+  reset["Durable session reset"]
   pr["Focused pull request"]
   merge["Approved integration merge"]
   regress["Combined regression gate"]
   release["Separate production checkpoint"]
-  scope -->|"Bound context"| context
-  context -->|"Isolate"| sandbox
-  sandbox -->|"Own files"| implement
+  scope -->|"Classify"| mode
+  mode -->|"Substantial"| ast
+  mode -->|"Caveman / Focused"| context
+  ast -->|"Bound neighborhood"| context
+  context -->|"Route"| tier
+  tier -->|"Isolate when needed"| sandbox
+  sandbox -->|"Independent work exists"| agents
+  sandbox -->|"Single owner"| implement
+  agents -->|"Return"| diff
+  diff -->|"Validate / apply"| implement
   implement -->|"Validate"| review
   review -->|"Fix findings"| implement
   review -->|"Pass"| sync
+  sync -->|"Durable boundary"| reset
   sync -->|"PR-ready"| pr
+  reset -->|"Fresh task"| scope
   pr -->|"Approved"| merge
   merge -->|"Synchronize local"| regress
   regress -->|"Repair in owner branch"| implement
@@ -1349,17 +1371,23 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Bounded approved checkpoint | Define objective, invariants, acceptance criteria, baseline, file ownership and exact checks. Tiny isolated changes may remain direct. |
-| Compact task packet | Load the active handoff, affected atlas map and targeted source ranges; do not copy the full conversation or repeatedly scan history. |
+| Automatic mode selection | Caveman → Focused → Isolated Autonomy → Ephemeral Specialists → High-Risk Gate. Escalate from evidence, not ceremony. |
+| Task-scoped AST map | Map affected symbols, imports/callers, state owners, tests and atlas nodes. Keep parser indexes ephemeral and verify against source. |
+| Compact task packet | Load the active handoff, affected atlas/AST neighborhood and targeted source ranges; do not copy the full conversation or repeatedly scan history. |
 | Task worktree + branch | Use isolation for substantial, risky, experimental or parallel work. One owner per shared integration hotspot. |
+| Ephemeral specialists | Dispatch only independent high-value subtasks with minimal immutable packets; no recursive dispatch or external actions. |
+| Unified diff handoff | Specialists return bounded diffs/findings; the primary agent reviews, applies and validates accepted hunks as sole integrator. |
+| Automatic model tiering | Use the least-cost capable route and record recommended versus actually executed model/effort. |
 | Focused implementation | Make one coherent checkpoint; use deterministic tools and targeted tests. Avoid duplicate agents and background overhead. |
 | Two-stage review | First requirements/scope; then correctness, maintainability, accessibility, security, performance and regression risk. |
 | Atlas + handoff + checkpoint | Synchronize affected flows and continuity; run fresh applicable checks and record limitations. |
+| Durable session reset | At a clean boundary, save baseline, decisions, owned symbols, evidence, risks and exact next action; start fresh instead of forking long history. |
 | Focused pull request | Include only intended files, evidence, performance impact, manual checks and rollback boundary. External actions follow approval gates. |
 | Approved integration merge | Merge into the integration branch, then fast-forward the local workspace without overwriting unrelated changes. |
 | Combined regression gate | Exercise integrated behavior, localization, errors, atlas and relevant performance before release consideration. |
 | Separate production checkpoint | Production merge, push and deployment require their own review and authorization. |
 
-- A worktree consumes disk space, not model tokens. Effective savings come from bounded context, targeted reads and checks, one owner, focused diffs and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order.
+- Caveman Mode is deliberately primitive: smallest context, one direct agent, no sub-agents and the smallest deterministic check. A worktree consumes disk space, not model tokens. Effective savings come from bounded AST neighborhoods, unified diffs, fresh sessions, targeted checks, one owner and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order.
 
 <a id="settings-backup"></a>
 
@@ -1405,19 +1433,21 @@ flowchart TD
 
 <a id="assessment-tournament-planned"></a>
 
-## PLANNED · Operator-led chakra assessment tournament
+## ACTIVE PLAN · Operator-led chakra assessment tournament
 
-Approved future replacement after the weekly reset; no runtime behavior is delivered by this map.
+Owner-authorized next isolated checkpoint; current consultation remains runtime truth until replacement validation passes.
 
 Sources: [.loop/tracks/assessment-tournament/spec.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/spec.md:1), [.loop/tracks/assessment-tournament/plan.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/plan.md:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
-  gate["Weekly reset gate"]
+  gate["Isolated implementation gate"]
   open["Open standalone assessment"]
   load["Load English versioned question JSON"]
   ask["Show one neutral question"]
   ledger["No-repeat ledger"]
+  values["Value-priority bracket"]
+  pairs["Balanced unseen pairs"]
   coverage["Balance seven-chakra evidence"]
   tiebreak["Unused tie-breakers"]
   score["Normalize seven chakra statuses"]
@@ -1426,12 +1456,15 @@ flowchart TD
   result["Operator result"]
   clear["Clear for New Client"]
   verify["Replacement gate"]
-  gate -->|"After reset"| open
+  gate -->|"Authorized"| open
   open -->|"Start"| load
   load -->|"Valid"| ask
   load -->|"Invalid → safe failure"| verify
   ask -->|"Answer / equal / skip"| ledger
-  ledger -->|"Unique evidence"| coverage
+  ledger -->|"Chakra evidence"| coverage
+  ledger -->|"Value round"| values
+  values -->|"Present pair"| pairs
+  pairs -->|"Unique response"| ledger
   coverage -->|"More coverage"| ask
   coverage -->|"Minimum reached"| tiebreak
   tiebreak -->|"New tie-breaker"| ask
@@ -1446,11 +1479,13 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Weekly reset gate | Implement this approved feature before modularization resumes. The current consultation remains authoritative until replacement validation passes. |
+| Isolated implementation gate | Implement in codex/assessment-tournament before modularization resumes. Current consultation remains authoritative until replacement validation passes. |
 | Open standalone assessment | Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. Existing Google Translate remains the multilingual path. |
 | Load English versioned question JSON | Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned. |
 | Show one neutral question | Two answer cards plus Equal and Skip. Record the stable question ID immediately. |
 | No-repeat ledger | Answered, equal and skipped IDs can never re-enter this assessment. |
+| Value-priority bracket | Ask “Which of these two do you prioritize more?” across Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism. |
+| Balanced unseen pairs | Counter card position; never repeat the same unordered value pair. Equal/Skip remain valid. |
 | Balance seven-chakra evidence | Prioritize under-measured chakras; use only genuinely new questions. |
 | Unused tie-breakers | Ask new cards only when confidence is insufficient or chakra scores are close. |
 | Normalize seven chakra statuses | Calculate relative Root through Crown strength/status plus evidence confidence. |
@@ -1460,7 +1495,7 @@ flowchart TD
 | Clear for New Client | Explicitly remove current assessment state before the next client. |
 | Replacement gate | Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence. |
 
-- PLANNED only. Questions and hidden weights/signals will live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds will live in code. Preserve the current internet-dependent Google Translate widget for the page and all dynamically generated content; separate native locale bundles are out of scope. The dot is an operator interpretation aid, not consent.
+- PLANNED until implementation passes. Questions, value cards and hidden weights/signals live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds live in code. Preserve the current internet-dependent Google Translate widget for all dynamic content. The dot is an operator interpretation aid, not consent; no single answer can determine it.
 
 <a id="consultation"></a>
 

@@ -26,6 +26,49 @@ approved bounded checkpoint
 
 The integration branch is currently `modularize`. `production` remains the stable release branch. Assessment, remaining modularization and the approved Cosmic Observatory redesign receive separate worktrees and review boundaries.
 
+## Automatic execution modes
+
+Loop selects the least expensive safe mode from the bounded task after reading the active handoff and affected atlas map. The user does not need to select a mode manually.
+
+| Mode | Automatic trigger | Execution |
+|---|---|---|
+| **Caveman** | Clear, low-risk lookup or tiny one-file text/style/documentation correction with a deterministic check | One direct agent, minimal files, no worktree, no sub-agent, no broad scan, smallest relevant check and concise result. Escalate immediately if scope expands. |
+| **Focused** | Small bounded implementation or bug with limited coupling | One direct agent, targeted source/test context and focused validation; use a branch only when isolation adds value. |
+| **Isolated autonomy** | Feature, refactor, assessment, performance, audio, persistence, localization or broad visual work | Compact task packet, task worktree/branch, checkpoint loop, two-stage review, atlas/handoff update and PR-ready output. |
+| **Ephemeral specialists** | Two or more genuinely independent subtasks where specialist analysis is expected to save more rework than its context cost | The primary agent dispatches the smallest useful number of short-lived sub-agents, validates their output and remains the sole integrator. |
+| **High-risk gate** | Merge, production publication, auth/secrets, migration, destructive recovery or another consequential external action | Prepare and validate autonomously, then stop at the required approval boundary. |
+
+Mode selection is automatic and may escalate when evidence reveals more coupling or risk. De-escalation is allowed at a clean checkpoint. The selected mode, actual routing evidence and reason are recorded; a planned recommendation is never reported as an executed switch.
+
+## AST repository mapping
+
+- Before substantial implementation, build a task-scoped syntax-aware map of the affected entry points, exported symbols, callers, imports, state owners, event handlers, tests and atlas nodes. Prefer an available language parser or AST index; use bounded textual fallback only when parser support is unavailable and label that limitation.
+- Map only the dependency neighborhood needed for the checkpoint. Do not load or serialize the whole repository merely because an AST tool can do so.
+- Treat the map as navigation evidence, not source truth. Verify every intended edit against current source and refresh the affected portion after structural changes.
+- Keep ephemeral machine indexes outside commits. Preserve only the concise ownership/dependency findings needed in the track, handoff or atlas.
+
+## Ephemeral sub-agents and unified diffs
+
+- The primary agent may call short-lived sub-agents automatically when the task has independent ownership boundaries or needs a distinct specialist review. Caveman Mode never dispatches a sub-agent.
+- Each sub-agent receives a minimal immutable packet: objective, allowed files, relevant symbols, invariants, expected tests and forbidden actions. It may not recursively dispatch, merge, push, deploy or broaden scope.
+- Prefer sub-agent output as a unified diff plus concise rationale, tests proposed/run, assumptions and risks. A read-only reviewer returns findings with exact paths/lines instead of rewriting files.
+- The primary agent inspects the current source, validates and applies accepted diff hunks. Sub-agent output is advisory and never proves completion by itself.
+- End the sub-agent after its bounded response. Do not preserve a long-running parallel chat or repeatedly resend full project history.
+
+## Chat history and session resets
+
+- Reset at natural boundaries: completed checkpoint, major feature transition, context saturation or a materially different task. Do not reset in the middle of an unresolved edit/test cycle.
+- Before reset, write a compact resume packet containing baseline commit, objective, decisions, invariants, owned files/symbols, completed evidence, unresolved risks and exact next command/action.
+- Start the next bounded task as a fresh session when possible. Do not fork a long conversation merely to save tokens because a fork retains its history.
+- Durable truth remains in source, track, atlas, handoff and Git—not private chat memory. Never discard unresolved approvals, failures or recovery information during reset.
+
+## Automatic model tiering
+
+- Route each bounded task through `Loop/scripts/codex_model_router.py --task-class auto` when a separate run adds value. Choose the least-cost healthy tier that satisfies context, reasoning, browser, safety and modality needs.
+- Caveman and simple focused work use the lightest capable tier. Normal implementation uses the standard tier; architecture/root-cause/performance work uses reasoning; repository-wide mapping uses large-context; browser/visual validation uses browser; releases and consequential actions use high-risk.
+- Use a self-contained fresh child for compact independent work. Use retained history only when the task truly depends on it. Never recursively route an already routed child.
+- Record recommended versus actually executed model and effort. If automatic dispatch is unavailable, continue safely with the active model or request a human switch when capability is essential; never claim a switch that did not occur.
+
 ## When isolation is required
 
 Use one task-specific worktree and branch for:
@@ -45,6 +88,7 @@ Use direct work on the active branch for a genuinely tiny, isolated documentatio
 - Prefer deterministic scripts and focused diffs over repeated model analysis. Review the changed files and affected flows, then run the broader suite once at the integration gate.
 - A new bounded task may receive a compact fresh context. Forking a long conversation is not a token-saving strategy because it retains history.
 - Record usage only when host telemetry is available. Never invent token savings or claim that a worktree itself reduces tokens.
+- Produce bounded unified diffs and summaries rather than replaying entire files between agents. Reset sessions only after a durable resume packet exists.
 
 ## Performance and quality gates
 
