@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-029 — Automatic journey voice profile ownership
+
+The existing High Energy, feminine-voice Shringara and default soft profile branch has moved to a direct-testable module. Preserve profile values, storage keys, saved settings, control/preset synchronization and optional audio tuning behavior. This remains an eager ownership extraction, not a performance optimization. Device listening/quality validation is not claimed.
+
 ## Production release E2E gate corrections — local validation complete
 
 Standalone preparation choices now launch without chakra selection, execute in the shown order, receive a matching standalone roadmap and include their durations in the session countdown. During an active journey, once mouse movement reveals the controls, the bottom reveal area yields pointer interaction to the controls. E2E checks were corrected for current selectors, script JSON fields, voice minimum and session-only HRIM mode. Full browser suite: 26/26 passed; atlas: 32 maps verified. Production publication remains a separate approved action; device playback/thermal validation is not claimed.

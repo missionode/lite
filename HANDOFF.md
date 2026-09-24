@@ -1,12 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-028: Timing configuration and preference application
+### NOW — CP-MOD-029: Journey voice-profile application
 
-- Active isolated branch `codex/modularize-cp-028`, based on modularize integration commit `519bbed` (CP-MOD-027 merged via PR #46). `modules/timing-settings.js` now owns fallback resolution, shallow profile overlays, range bounds, configured defaults, saved-value clamping and load fallback. App accessors and demo-specific core-duration selection remain in place.
-- Preserve timing units, existing keys, per-section shallow merge and the configuration → profile → controls → preference → demo order.
-- CP-MOD-027 is integrated and local `modularize` is synchronized at `519bbed`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
-- CP-MOD-028: all 61 runnable tests pass. `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent. Syntax and diff checks pass. Atlas builder passes at 35 maps / 316 nodes / 373 edges; Playwright verification cannot start because Playwright is unavailable. No UI/browser, device, audio or performance evidence is claimed.
-- Next: integrate CP-MOD-028, then reassess remaining cohesive extraction work. Keep AudioEngine bus changes behind the weekly-reset gate and lazy loading behind parity plus repeatable cold/warm/offline evidence.
+- Active isolated branch `codex/modularize-cp-029`, based on modularize integration commit `6261a08` (CP-MOD-028 merged via PR #47). `modules/journey-voice-profile.js` now owns the chosen profile's existing state, persistence, control and audio-tuning effects; app retains voice/gender recognition and supplies dependencies.
+- Preserve profile values, storage keys, selection rules and persistence → controls → audio effect ordering. Module remains eager and offline-pre-cached; no performance claim.
+- Local `modularize` is synchronized at `6261a08`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
+- CP-MOD-029: all 62 runnable Node test files and 11 Loop router Python tests pass; two owner-fixture-dependent tests are excluded because `docs/dot.json` is absent. Atlas builder passes at 36 maps / 321 nodes / 377 edges; Playwright verification cannot start because the package is unavailable. Syntax and diff checks pass. No browser/device/audio/performance claim.
+- Next: integrate CP-MOD-029, then assess preference hydration as one cohesive stateful boundary. Keep AudioEngine bus work behind the approved weekly-reset gate and lazy loading behind parity plus repeatable cold/warm/offline evidence.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 
