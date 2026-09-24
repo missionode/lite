@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-24",
-    "commit": "modularize 63d0dd6 baseline + uncommitted CP-MOD-012",
-    "scope": "Source-reviewed application behavior with the production assessment integrated and Body Scan execution extracted on the active checkpoint branch, pending integration. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "562a26d baseline + uncommitted CP-MOD-013",
+    "scope": "Source-reviewed application behavior at the production release baseline with Guided Noting execution extracted on the active modularization checkpoint branch, pending integration. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; app.js:4908; tests/journey-routing.test.mjs:1; tests/body-scan-practice.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; app.js:4908; tests/journey-routing.test.mjs:1; tests/body-scan-practice.test.mjs:1; tests/guided-noting-practice.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Queued extraction work",
-            "Journey preparation planning/execution and Body Scan ownership extracted; remaining stage implementations → deferred AudioEngine buses → UI controllers. Complete parity before delivery changes."
+            "Journey preparation planning/execution, Body Scan and Guided Noting ownership extracted; remaining stage implementations → deferred AudioEngine buses → UI controllers. Complete parity before delivery changes."
           ]
         ],
         [
@@ -474,7 +474,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup while the app injects localization, audio, screen and session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. CP-MOD-012 measured one indicative local cold/warm run before and after extraction: startup still eagerly loads the same feature set plus one small practice module; response bodies grow by about 1.4 KiB net. Timing differences fall within single-run noise, so no performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup. The app injects localized narration and existing screen/audio/session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. The CP-MOD-012 measurement showed one additional eagerly loaded practice module and about 1.4 KiB net local uncompressed body growth; timing differences were within single-run noise. No performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset."
       ]
     },
     {
@@ -2121,7 +2121,7 @@
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
       "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.",
-      "source": "modules/journey-routing.js:1; modules/body-scan-practice.js:1; app.js:4772; app.js:4908; app.js:5180; app.js:5389; app.js:5443; index.html:322",
+      "source": "modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; app.js:4772; app.js:4908; app.js:5180; app.js:5389; app.js:5443; index.html:322",
       "rows": [
         [
           [
@@ -2175,7 +2175,7 @@
         ]
       ],
       "notes": [
-        "Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Body Scan execution lives in `modules/body-scan-practice.js`; the controller injects localized narration and existing screen/audio/session services. Other stage implementations remain in the controller. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages."
+        "Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Body Scan execution lives in `modules/body-scan-practice.js` and Guided Noting execution in `modules/guided-noting-practice.js`; the controller injects localized narration and existing screen/audio/session services. Other practice stage implementations remain in the controller. Guided Noting preserves the selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages."
       ]
     },
     {

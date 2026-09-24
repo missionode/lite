@@ -1,5 +1,17 @@
 # Review
 
+## CP-MOD-013 — Guided Noting stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas source and syntax evidence.
+
+- Timed reminder sequencing, active-session checks and black-scene cleanup now belong to frozen `modules/guided-noting-practice.js`; `MeditationController` still supplies the selected duration, localized copy and existing screen/audio/session services.
+- Direct tests cover prompt order, even interval calculation, cancellation during an interval, narration failure, fade failure and no-scene/empty-prompt paths. The focused preparation and ordered-routing contracts pass.
+- Index script ordering and service-worker precache include the new eager module. Behavior and delivery remain synchronous/offline-compatible; no lazy loading or performance gain is claimed.
+- Dependency map used a bounded symbol/reference lookup because no JavaScript AST parser is available in the local dependency set. Public boundary and syntax were verified directly; no broad repository rewrite was inferred from textual matches.
+- Browser was not run; browser console/page-error evidence is `NOT_RUN`. CLI test output had no errors or unexpected warnings. Device audio/thermal evidence remains open.
+
+Next: extract the next low-coupling practice lifecycle, then the UI controllers; complete parity before the repeated cold/warm/offline loading measurement gate.
+
 ## CP-MOD-012 — Body Scan stage ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regression, atlas and local-browser evidence.

@@ -61,8 +61,10 @@ const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const bodyScanPractice = window.ChakraBodyScanPractice;
+const guidedNotingPractice = window.ChakraGuidedNotingPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
+if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -4953,25 +4955,22 @@ class MeditationController {
         const minutes = Number(document.getElementById('noting-duration')?.value || 4);
         const scene = document.getElementById('noting-scene');
         const reminders = journeyT('ui.notingReminders');
-        const prompts = Array.isArray(reminders) ? reminders : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('noting-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.notingTitle'));
-        try {
-            await this.narrate(journeyT('ui.notingOpening'), false);
-            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, prompts.length)));
-            for (const prompt of prompts) {
-                if (!this.isMeditationActive) break;
-                await this.pauseAwareSleep(pauseSeconds * 1000);
-                if (this.isMeditationActive) await this.narrate(prompt, false);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.notingClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('noting-active');
-        }
+        await guidedNotingPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            reminders,
+            opening: journeyT('ui.notingOpening'),
+            title: journeyT('ui.notingTitle'),
+            closing: journeyT('ui.notingClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runVisualization() {
