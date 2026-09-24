@@ -75,6 +75,7 @@ const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
 const yogaExperienceSettings = window.ChakraYogaExperienceSettings;
 const rangeControls = window.ChakraRangeControls;
 const journeyRoadmap = window.ChakraJourneyRoadmap;
+const localeUiRenderer = window.ChakraLocaleUiRenderer;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -91,6 +92,7 @@ if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility mod
 if (!yogaExperienceSettings) throw new Error('Yoga experience settings module is unavailable.');
 if (!rangeControls) throw new Error('Range controls module is unavailable.');
 if (!journeyRoadmap) throw new Error('Journey roadmap module is unavailable.');
+if (!localeUiRenderer) throw new Error('Locale UI renderer module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -736,76 +738,16 @@ function applyLocaleUI() {
     particleField.celestialLayerKey = null;
     if (particleField.started) particleField.draw(performance.now(), false);
     document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
-    document.title = t('ui.chakraMeditation');
-    setText('app-title', t('ui.chakraMeditation'));
-    const configSubtitle = document.querySelector('#config-screen > .subtitle');
-    if (configSubtitle) configSubtitle.textContent = t('ui.settingsSubtitle');
-    const languageLabel = document.querySelector('label[for="language-select"]');
-    if (languageLabel) languageLabel.textContent = t('ui.meditationLanguage');
-    const displayLanguageLabel = document.querySelector('label[for="display-language-select"]');
-    if (displayLanguageLabel) displayLanguageLabel.textContent = t('ui.displayLanguage');
-    if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
-    if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
-    if (beginConsultationBtn) beginConsultationBtn.textContent = t('ui.beginConsultation');
-    setText('lobby-title', t('ui.meditationRoom'));
-    setText('completion-title', t('ui.journeyComplete'));
-    setText('completion-message', t('ui.meditationCompleted'));
-    setText('continue-to-earn', t('ui.continueToEarn'));
-    setText('close-completion', t('ui.returnToRoom'));
-    setText('returning-journey-label', t('ui.returningJourney'));
-    setText('save-config', t('ui.startMeditation'));
-    setText('start-meditation', t('ui.beginJourney'));
-    const experimentGuidedGroup = document.getElementById('experiment-guided-group');
-    const experimentCareGroup = document.getElementById('experiment-care-group');
-    if (experimentGuidedGroup) experimentGuidedGroup.label = t('ui.experimentGuidedPractice');
-    if (experimentCareGroup) experimentCareGroup.label = t('ui.experimentCare');
-    document.querySelectorAll('.stat-lbl').forEach((element) => {
-        element.textContent = t('ui.sessionTime');
+    localeUiRenderer.render({
+        document,
+        translate: t,
+        setText,
+        testVoiceButton: testVoiceBtn,
+        settingsButton: openSettingsBtn,
+        consultationButton: beginConsultationBtn,
+        refreshJourneyRoadmap: updateJourneyRoadmap,
+        refreshDroneDurationSummary: updateDroneDurationSummary
     });
-    const intentionInput = document.getElementById('intention-input');
-    if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
-    const pleasureAmbienceUrlInput = document.getElementById('pleasure-ambience-url');
-    if (pleasureAmbienceUrlInput) pleasureAmbienceUrlInput.placeholder = t('ui.pleasureAmbienceUrlPlaceholder');
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-        const path = element.dataset.i18n;
-        const translation = path ? t(path) : null;
-        // A stale cached language bundle can be temporarily behind a newly
-        // deployed interface. Keep the readable HTML fallback in that case
-        // instead of replacing it with a raw `ui.*` lookup key.
-        if (translation && translation !== path) element.textContent = translation;
-    });
-    document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
-        const path = element.dataset.i18nAriaLabel;
-        if (path) element.setAttribute('aria-label', t(path));
-    });
-
-    const controlLabels = {
-        'audio-filters-toggle': 'ui.audioFilters',
-        'box-breathing-experience-toggle': 'ui.boxBreathingExperience',
-        'hooponopono-experience-toggle': 'ui.hooponoponoExperience',
-        'no-frequency-mode-toggle': 'ui.noFrequencyMode',
-        'no-mantra-mode-toggle': 'ui.noMantraMode',
-        'eyes-close-mode-toggle': 'ui.eyesCloseMode',
-        'music-only-toggle': 'ui.musicOnlyMode',
-        'sleep-mode-toggle': 'ui.sleepMode',
-        'corpse-pose-toggle': 'ui.corpsePoseOption',
-        'yoga-experience-toggle': 'ui.yogaExperience',
-        'bath-session-toggle': 'ui.bathSession',
-        'perineal-care-toggle': 'ui.perinealCare',
-        'assisted-bathing-toggle': 'ui.assistedBathing',
-        'massage-toggle': 'ui.massage',
-        'high-energy-toggle': 'ui.highEnergy',
-        'returning-journey-toggle': 'ui.returningJourney'
-    };
-    Object.entries(controlLabels).forEach(([inputId, path]) => {
-        const input = document.getElementById(inputId);
-        const label = input && input.closest('label');
-        if (!label) return;
-        const textNode = Array.from(label.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-        if (textNode) textNode.textContent = ` ${t(path)}`;
-    });
-    updateJourneyRoadmap();
-    updateDroneDurationSummary();
 }
 
 async function loadLanguageManifest() {

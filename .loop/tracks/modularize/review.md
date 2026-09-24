@@ -9,7 +9,9 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-control, integ
 - Atlas regenerated at 32 maps / 295 nodes / 340 edges; the build surfaced and corrected two stale `app.js` source-line references in the mode map. The visual Playwright verifier cannot start because Playwright is absent from this worktree. The unrelated `tests/drone-duration.test.mjs` remains blocked by owner-managed `docs/dot.json`; neither limitation is reported as passing. No visual/device/performance outcome is claimed; the module remains eager and offline-pre-cached.
 - Integrated via PR #44 at `f531002`; production unchanged.
 
-Next: CP-MOD-026 extracts the localized, display-only Lobby journey roadmap while keeping start validation and dispatch in the app.
+Integrated via PR #45 at `ace1752`; production unchanged.
+
+Next: CP-MOD-027 extracts localized display-language UI rendering while preserving app-owned sky, roadmap and duration-summary refreshes.
 
 ## CP-MOD-024 — Yoga Experience settings ownership
 
@@ -29,7 +31,20 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct route-contract
 - Direct contract covers Music Only, care combinations/order, Yoga, Sleep, HRIM, standalone practices, full guided/returning stages, optional-video prefix, separator/rendering, missing-target no-op, delivery order and offline precache. Every used roadmap key is confirmed in English, Malayalam, Hindi and Russian. All 59 runnable `tests/*.test.mjs` contracts pass, including the extracted roadmap and adjacent route/UI contracts; two owner-fixture tests (`content-safety` and `drone-duration`) are excluded because `docs/dot.json` is absent from the isolated worktree. Prior UI owners, range settings, routing, estimate, Settings backup, Advanced unlock, thermal, practice lifecycle, syntax and diff checks pass.
 - Atlas builder passes at 33 maps / 307 nodes / 364 edges, including a distinct display-only roadmap map. Visual Playwright verification cannot start because Playwright is missing. The two fixture-dependent test exclusions and visual-verifier limitation are not counted as passes. No user-interface browser, device, performance or audio claim; module remains eager/offline-pre-cached.
 
-Next: integrate CP-MOD-026, then continue only cohesive Settings/controller seams and audit the approved AudioEngine checkpoint gate. Lazy loading remains blocked on remaining extraction parity and repeatable cold/warm/offline evidence.
+Integrated via PR #45 at `ace1752`; production unchanged.
+
+## CP-MOD-027 — Display-language UI renderer
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct mock-DOM behavior, app integration order, locale fallback and offline-delivery evidence.
+
+- Extract only the DOM label/text/placeholder/ARIA rendering from `applyLocaleUI()` into `modules/locale-ui-renderer.js`. The app still invalidates/redraws the current sky first, sets the document language, then delegates text painting and app-owned roadmap/duration-summary refresh callbacks in the existing order.
+- Preserve readable HTML fallback text when a translated key is missing from a stale cached language bundle. Do not change locale selection, voice selection, journey labels, celestial language, timing or persistence.
+- Direct mock-DOM test covers title/text labels, group labels, stat captions, placeholders, data-i18n fallback, ARIA labels, selectable control text nodes and app-owned roadmap/duration refresh ordering. All 60 runnable `tests/*.test.mjs` pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. Current roadmap/localization/Settings/sky regressions, classic-script order, offline precache, JavaScript syntax and `git diff --check` pass.
+- Atlas builder passes at 34 maps / 311 nodes / 368 edges, including the dedicated renderer ownership map and refreshed source references. Visual Playwright verification cannot start because Playwright is missing; that is not a pass. No user-interface browser, device, performance or audio claim; module remains eager/offline-pre-cached.
+
+Next: integrate CP-MOD-027, then continue a cohesive Settings timing-configuration boundary and inspect remaining app/controller ownership; keep AudioEngine bus construction behind the approved weekly-reset gate and lazy loading behind parity plus repeatable cold/warm/offline measurements.
+
+Next: validate CP-MOD-027, integrate it, then inspect the remaining Settings/controller surface and keep the AudioEngine bus gate deferred until its approved weekly reset. Lazy loading remains gated on extraction parity and repeatable cold/warm/offline evidence.
 
 ## CP-MOD-020 — Lobby session-estimate view-model
 

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const rangeControls = fs.readFileSync(new URL('../modules/range-controls.js', import.meta.url), 'utf8');
+const localeUiRenderer = fs.readFileSync(new URL('../modules/locale-ui-renderer.js', import.meta.url), 'utf8');
 const moodAmbienceView = fs.readFileSync(new URL('../modules/mood-ambience-settings-view.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
@@ -95,7 +96,7 @@ assert.match(app, /const PLEASURE_AMBIENCE_HARMONIC_MIX = 0\.04/, 'pleasure harm
 assert.match(app, /const PLEASURE_AMBIENCE_INTENSITIES = Object\.freeze/, 'ambience intensity should use explicit bounded profiles');
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_pleasure_ambience_intensity'\)/, 'ambience intensity must reset rather than persist');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_pleasure_ambience_intensity'/, 'ambience intensity must not be saved to local storage');
-assert.match(app, /translation && translation !== path\) element\.textContent = translation/, 'stale language bundles should preserve readable fallback labels instead of showing raw ui keys');
+assert.match(localeUiRenderer, /translation && translation !== path\) element\.textContent = translation/, 'stale language bundles should preserve readable fallback labels instead of showing raw ui keys');
 assert.match(app, /const PLEASURE_BLUR_DEFAULT_AMOUNT = 0\.35/, 'pleasure blur should have a higher 35% default amount');
 assert.match(app, /const PLEASURE_BLUR_MAX_AMOUNT = 0\.65/, 'pleasure blur should have a bounded maximum amount');
 assert.match(app, /function clampPleasureAmbienceBlurAmount\(value\)/, 'pleasure blur intensity should be clamped before use');
