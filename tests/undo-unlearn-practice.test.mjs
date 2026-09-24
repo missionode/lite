@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const undoUnlearnPractice = window\.ChakraUndoUnlearnPractice/);
 assert.match(app, /async runUndoUnlearn\(\) \{[\s\S]*?undoUnlearnPractice\.run\(/);
-assert.match(html, /modules\/undo-unlearn-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.74/);
-assert.match(serviceWorker, /chakra-v5\.269[\s\S]*?modules\/undo-unlearn-practice\.js\?v=1\.0/);
+assert.match(html, /modules\/undo-unlearn-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.75/);
+assert.match(serviceWorker, /chakra-v5\.270[\s\S]*?modules\/undo-unlearn-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
