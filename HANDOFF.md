@@ -1,14 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-027: Display-language UI renderer
+### NOW — CP-MOD-028: Timing configuration and preference application
 
-- Isolated branch `codex/modularize-cp-027`, based on modularize integration commit `ace1752` (CP-MOD-026 merged via PR #45). `modules/locale-ui-renderer.js` now owns label/text/placeholder/ARIA painting; sky invalidation and document-language selection stay app-owned, as do roadmap and drone-summary refreshes in their existing order.
-- Preserve the missing-translation HTML fallback and language/control label behavior. Module remains eager and offline-cached; no performance change is claimed.
-- CP-MOD-026 integrated through PR #45. The local `modularize` branch is synchronized to `ace1752`; preserve the unrelated local `.DS_Store`, `.codex/` and backup-audio files.
-- Latest integrated test gate: all 59 runnable `tests/*.test.mjs` pass; `content-safety` and `drone-duration` are excluded because `docs/dot.json` is absent. Atlas is at 33 maps / 307 nodes / 364 edges. The builder passes; visual Playwright verification could not start because Playwright is absent. These are explicit limitations, not passing evidence.
-- All 60 runnable `tests/*.test.mjs` pass. `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. Atlas builder passes at 34 maps / 311 nodes / 368 edges. Atlas Playwright verification cannot start because Playwright is missing.
-- JavaScript syntax, module delivery-order, offline-precache, localization/roadmap regressions and `git diff --check` pass. No user-facing browser, device, audio or performance evidence is claimed. Production remains unchanged.
-- Next: integrate CP-MOD-027, then continue cohesive Settings timing/config ownership; respect the AudioEngine weekly-reset gate and measured-lazy-loading criteria.
+- Active isolated branch `codex/modularize-cp-028`, based on modularize integration commit `519bbed` (CP-MOD-027 merged via PR #46). `modules/timing-settings.js` now owns fallback resolution, shallow profile overlays, range bounds, configured defaults, saved-value clamping and load fallback. App accessors and demo-specific core-duration selection remain in place.
+- Preserve timing units, existing keys, per-section shallow merge and the configuration → profile → controls → preference → demo order.
+- CP-MOD-027 is integrated and local `modularize` is synchronized at `519bbed`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
+- CP-MOD-028: all 61 runnable tests pass. `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent. Syntax and diff checks pass. Atlas builder passes at 35 maps / 316 nodes / 373 edges; Playwright verification cannot start because Playwright is unavailable. No UI/browser, device, audio or performance evidence is claimed.
+- Next: integrate CP-MOD-028, then reassess remaining cohesive extraction work. Keep AudioEngine bus changes behind the weekly-reset gate and lazy loading behind parity plus repeatable cold/warm/offline evidence.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

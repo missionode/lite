@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "ace1752 baseline + uncommitted CP-MOD-027",
-    "scope": "Source-reviewed behavior at the latest modularize integration baseline with all delivered practice owners, screen navigation, session estimates, ambience/drone views, Lobby visibility, Yoga settings, range controls and localized Lobby roadmap integrated. The active checkpoint extracts display-language UI painting; the application retains sky refresh and summary orchestration. Assessment is a separate operator aid. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "519bbed baseline + uncommitted CP-MOD-028",
+    "scope": "Source-reviewed behavior at the latest modularize integration baseline with practice owners, screen navigation, estimates, Settings/Lobby views, localized roadmap and display-language UI renderer integrated. The active checkpoint extracts timing configuration and preference application while app-level timing accessors and demo preset remain. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -3978,6 +3978,80 @@
       ],
       "notes": [
         "The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module."
+      ]
+    },
+    {
+      "id": "timing-configuration",
+      "group": "Systems",
+      "title": "Timing configuration and saved values",
+      "subtitle": "The ordered setup path for timing-config.json, named profiles, slider bounds and persisted practice durations.",
+      "source": "modules/timing-settings.js:1; tests/timing-settings.test.mjs:1; timing-config.json:1; app.js:514",
+      "rows": [
+        [
+          [
+            "fetch",
+            "Load configuration",
+            "Fetch timing-config.json; on an unavailable response, retain the built-in empty config and warn once."
+          ]
+        ],
+        [
+          [
+            "profile",
+            "Apply optional profile",
+            "If the timingProfile query value names an available profile, shallow-merge journey/transitions/narration/estimate sections and report the selected profile."
+          ]
+        ],
+        [
+          [
+            "bounds",
+            "Apply range bounds",
+            "Update configured min/max/step for the mapped Settings controls, then enhance shared range controls."
+          ]
+        ],
+        [
+          [
+            "preferences",
+            "Resolve saved practice time",
+            "If the existing localStorage key is absent, use the configured default or built-in fallback. Preserve stored values where present, then clamp against the active configured bounds and persist a changed clamp."
+          ]
+        ],
+        [
+          [
+            "demo",
+            "Apply demo preset",
+            "Only after timingConfig has been assigned and preferences are normalized, run the existing demo core-duration preset callback."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "fetch",
+          "profile",
+          "Fetch succeeds"
+        ],
+        [
+          "fetch",
+          "bounds",
+          "Fetch falls back"
+        ],
+        [
+          "profile",
+          "bounds",
+          "Optional named profile"
+        ],
+        [
+          "bounds",
+          "preferences",
+          "Controls updated"
+        ],
+        [
+          "preferences",
+          "demo",
+          "Apply final demo override"
+        ]
+      ],
+      "notes": [
+        "The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization."
       ]
     },
     {

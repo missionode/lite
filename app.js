@@ -76,6 +76,7 @@ const yogaExperienceSettings = window.ChakraYogaExperienceSettings;
 const rangeControls = window.ChakraRangeControls;
 const journeyRoadmap = window.ChakraJourneyRoadmap;
 const localeUiRenderer = window.ChakraLocaleUiRenderer;
+const timingSettings = window.ChakraTimingSettings;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -93,6 +94,7 @@ if (!yogaExperienceSettings) throw new Error('Yoga experience settings module is
 if (!rangeControls) throw new Error('Range controls module is unavailable.');
 if (!journeyRoadmap) throw new Error('Journey roadmap module is unavailable.');
 if (!localeUiRenderer) throw new Error('Locale UI renderer module is unavailable.');
+if (!timingSettings) throw new Error('Timing settings module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -517,60 +519,13 @@ let timingConfig = {
     narration: {},
     estimate: {}
 };
-const timingFallbacks = {
-    'transitions.initialSettle': 2,
-    'transitions.openingPause': 1,
-    'transitions.postBreathing': 3,
-    'transitions.breathingPreparation': 5,
-    'transitions.breathingTutorialFade': 1,
-    'transitions.breathingCompletion': 5,
-    'transitions.corpseTransitionAt': 60,
-    'transitions.corpseFinalSettle': 3,
-    'transitions.bathToYogaRest': 900,
-    'transitions.yogaPoseGap': 5,
-    'transitions.yogaFinalSettle': 5,
-    'transitions.chakraPostMantra': 4,
-    'transitions.chakraLeadOut': 15,
-    'transitions.intervalPreparation': 2,
-    'transitions.closingFirstPause': 2,
-    'transitions.closingSecondPause': 3,
-    'transitions.hooponoponoIntroPause': 2,
-    'transitions.hooponoponoPhrasePause': 2,
-    'transitions.hooponoponoFinalRest': 15,
-    'transitions.finalSilence': 60,
-    'narration.piperLeadIn': 1.2,
-    'narration.sentenceGap': 1.5,
-    'narration.exitGap': 2,
-    'narration.fadeOutPause': 2.5,
-    'narration.browserSafetyPerCharacter': 200,
-    'narration.browserSafetyBuffer': 3000,
-    'estimate.baseOverhead': 5,
-    'estimate.normalExtra': 7,
-    'estimate.highEnergyExtra': 3,
-    'estimate.boxBreathingOverhead': 4,
-    'estimate.hooponoponoOverhead': 3,
-    'estimate.chakraStageOverhead': 2,
-    'estimate.yogaPoseTransitionEstimate': 15
-};
 
 function timing(section, key, fallback = 0) {
-    const value = timingConfig[section]?.[key];
-    return value == null ? (timingFallbacks[`${section}.${key}`] ?? fallback) : value;
+    return timingSettings.resolve(timingConfig, section, key, fallback);
 }
 
 function timingDefault(key, fallback) {
-    return timingConfig.journey?.[key]?.default ?? fallback;
-}
-
-function mergeTimingProfile(base, profile) {
-    return ['journey', 'transitions', 'narration', 'estimate'].reduce((merged, section) => {
-        merged[section] = { ...(base[section] || {}), ...(profile[section] || {}) };
-        return merged;
-    }, { schemaVersion: base.schemaVersion });
-}
-
-function formatRangeControlValue(input) {
-    return rangeControls.formatValue(input, document);
+    return timingSettings.resolveJourneyDefault(timingConfig, key, fallback);
 }
 
 function enhanceRangeControls() {
@@ -581,79 +536,20 @@ function refreshRangeControlDisplays() {
     rangeControls.refresh({ document });
 }
 
-function applyTimingControls() {
-    const controls = {
-        'time-per-chakra': 'timePerChakra',
-        'time-high-energy': 'timeHighEnergy',
-        'time-icebreaker': 'icebreaker',
-        'time-emergence': 'emergence',
-        'time-breathing': 'breathingStep',
-        'time-corpse': 'corpsePose',
-        'time-interval': 'interval',
-        'time-yoga-prep': 'yogaPreparation',
-        'time-yoga-pose': 'yogaPose',
-        'time-bath': 'bath',
-        'time-perineal-care': 'perinealCare',
-        'time-assisted-bathing': 'assistedBathing'
-    };
-    Object.entries(controls).forEach(([id, key]) => {
-        const input = document.getElementById(id);
-        const definition = timingConfig.journey?.[key];
-        if (!input || !definition) return;
-        ['min', 'max', 'step'].forEach(attribute => {
-            if (definition[attribute] != null) input.setAttribute(attribute, definition[attribute]);
-        });
-    });
-    enhanceRangeControls();
-}
-
 async function loadTimingConfig() {
-    try {
-        const response = await fetch('timing-config.json');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        timingConfig = await response.json();
-        const profileName = new URLSearchParams(window.location.search).get('timingProfile');
-        if (profileName && timingConfig.profiles?.[profileName]) {
-            timingConfig = mergeTimingProfile(timingConfig, timingConfig.profiles[profileName]);
-            console.info(`[Timing] Using profile: ${profileName}`);
-        }
-    } catch (error) {
-        console.warn('Timing configuration unavailable; using built-in timing defaults.', error);
-    }
-    applyTimingControls();
-    if (typeof state !== 'undefined') {
-        const persisted = (key) => localStorage.getItem(key) !== null;
-        const defaults = {
-            timePerChakra: ['chakra_time', 'timePerChakra', 5],
-            timeHighEnergy: ['chakra_time_high_energy', 'timeHighEnergy', 5],
-            timeSleepStage: ['chakra_time_sleep_stage', 'sleepStageDuration', 5],
-            timeShot: ['chakra_time_shot', 'shotDuration', 7],
-            timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
-            timeEmergence: ['chakra_time_emergence', 'emergence', 60],
-            timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
-            timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
-            timeInterval: ['chakra_time_interval', 'interval', 10],
-            timeYogaPrep: ['chakra_time_yoga_prep', 'yogaPreparation', 60],
-            timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
-            timeBath: ['chakra_time_bath', 'bath', 600],
-            timePerinealCare: ['chakra_time_perineal_care', 'perinealCare', 300],
-            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600]
-        };
-        Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
-            if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
-            const definition = timingConfig.journey?.[configKey];
-            if (definition) {
-                const minimum = Number(definition.min);
-                const maximum = Number(definition.max);
-                const bounded = Math.min(maximum, Math.max(minimum, Number(state[stateKey])));
-                if (Number.isFinite(bounded) && bounded !== state[stateKey]) {
-                    state[stateKey] = bounded;
-                    localStorage.setItem(storageKey, String(bounded));
-                }
-            }
-        });
-        applyDemoCoreDurationPreset();
-    }
+    timingConfig = await timingSettings.loadAndApply({
+        initialConfig: timingConfig,
+        fetchConfig: path => fetch(path),
+        search: window.location.search,
+        storage: localStorage,
+        state,
+        document,
+        enhanceRangeControls,
+        applyDemoCoreDurationPreset,
+        onConfig: config => { timingConfig = config; },
+        onProfile: profileName => console.info(`[Timing] Using profile: ${profileName}`),
+        onWarning: (message, error) => console.warn(message, error)
+    });
 }
 
 function getLanguageConfig(language = state.language) {
