@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-09-24.1",
+  "valuePrompt": "Which of these two do you prioritize more?",
+  "settings": {
+    "minimumEvidencePerChakra": 2,
+    "valueRounds": 12,
+    "minimumDotResponses": 8,
+    "minimumDotDistinctValues": 3
+  },
+  "chakras": [
+    { "id": "root", "name": "Root Chakra", "archetype": "Steady Grounder" },
+    { "id": "sacral", "name": "Sacral Chakra", "archetype": "Creative Explorer" },
+    { "id": "solar", "name": "Solar Plexus Chakra", "archetype": "Purposeful Achiever" },
+    { "id": "heart", "name": "Heart Chakra", "archetype": "Compassionate Connector" },
+    { "id": "throat", "name": "Throat Chakra", "archetype": "Authentic Communicator" },
+    { "id": "third-eye", "name": "Third Eye Chakra", "archetype": "Insightful Observer" },
+    { "id": "crown", "name": "Crown Chakra", "archetype": "Meaning Seeker" }
+  ],
+  "values": [
+    { "id": "sensual-joy", "label": "Sensual Joy", "archetype": "Embodied Observer", "operatorSignal": 2 },
+    { "id": "luxury", "label": "Luxury", "archetype": "Receptive Collaborator", "operatorSignal": 1 },
+    { "id": "independence", "label": "Independence", "archetype": "Independent Navigator", "operatorSignal": -1 },
+    { "id": "spontaneity", "label": "Spontaneity", "archetype": "Creative Explorer", "operatorSignal": 1 },
+    { "id": "commitment", "label": "Commitment", "archetype": "Thoughtful Trust Builder", "operatorSignal": 0 },
+    { "id": "social-approval", "label": "Social Approval", "archetype": "Compassionate Connector", "operatorSignal": -1 },
+    { "id": "emotional-safety", "label": "Emotional Safety", "archetype": "Clear Preference Communicator", "operatorSignal": -1 },
+    { "id": "romantic-idealism", "label": "Romantic Idealism", "archetype": "Meaning Seeker", "operatorSignal": 1 }
+  ],
+  "questions": [
+    { "id": "root-1", "tier": "core", "coverage": ["root"], "prompt": "Which feels more supportive when circumstances change?", "choices": [{ "id": "steady", "label": "Creating a simple, steady next step", "weights": { "root": 1 } }, { "id": "control", "label": "Waiting until everything feels fully controlled", "weights": { "root": 0 } }] },
+    { "id": "root-2", "tier": "core", "coverage": ["root"], "prompt": "When everyday pressure rises, which response is closer?", "choices": [{ "id": "ground", "label": "Pause, orient and continue gradually", "weights": { "root": 1 } }, { "id": "rush", "label": "Keep reacting until the pressure passes", "weights": { "root": 0 } }] },
+    { "id": "root-3", "tier": "core", "coverage": ["root"], "prompt": "What matters more in a changing routine?", "choices": [{ "id": "adapt", "label": "A stable base with room to adapt", "weights": { "root": 1 } }, { "id": "fixed", "label": "Keeping the routine exactly unchanged", "weights": { "root": 0 } }] },
+    { "id": "root-tie", "tier": "tie-breaker", "coverage": ["root"], "prompt": "When uncertainty remains, which direction fits better?", "choices": [{ "id": "present", "label": "Return attention to what can be done now", "weights": { "root": 1 } }, { "id": "forecast", "label": "Keep searching for every possible future risk", "weights": { "root": 0 } }] },
+
+    { "id": "sacral-1", "tier": "core", "coverage": ["sacral"], "prompt": "Which relationship with enjoyment feels healthier?", "choices": [{ "id": "receive", "label": "Enjoy it while remaining free to stop", "weights": { "sacral": 1 } }, { "id": "depend", "label": "Need more stimulation to keep feeling satisfied", "weights": { "sacral": 0 } }] },
+    { "id": "sacral-2", "tier": "core", "coverage": ["sacral"], "prompt": "When emotions become strong, which feels closer?", "choices": [{ "id": "feel", "label": "Notice and express them with some steadiness", "weights": { "sacral": 1 } }, { "id": "avoid", "label": "Disconnect from them until they disappear", "weights": { "sacral": 0 } }] },
+    { "id": "sacral-3", "tier": "core", "coverage": ["sacral"], "prompt": "How would you rather approach creativity?", "choices": [{ "id": "play", "label": "Experiment without demanding a perfect result", "weights": { "sacral": 1 } }, { "id": "prove", "label": "Create only when the result can prove something", "weights": { "sacral": 0 } }] },
+    { "id": "sacral-tie", "tier": "tie-breaker", "coverage": ["sacral"], "prompt": "In closeness, which balance matters more?", "choices": [{ "id": "close-free", "label": "Connection while keeping individuality", "weights": { "sacral": 1 } }, { "id": "merge", "label": "Giving up personal space to preserve closeness", "weights": { "sacral": 0 } }] },
+
+    { "id": "solar-1", "tier": "core", "coverage": ["solar"], "prompt": "When making a decision, which approach feels stronger?", "choices": [{ "id": "decide", "label": "Choose while staying open to useful advice", "weights": { "solar": 1 } }, { "id": "defer", "label": "Wait for someone else to decide", "weights": { "solar": 0 } }] },
+    { "id": "solar-2", "tier": "core", "coverage": ["solar"], "prompt": "When a challenge may not work out, which matters more?", "choices": [{ "id": "try", "label": "Make a reasonable attempt and learn", "weights": { "solar": 1 } }, { "id": "avoid", "label": "Avoid beginning unless success is certain", "weights": { "solar": 0 } }] },
+    { "id": "solar-3", "tier": "core", "coverage": ["solar"], "prompt": "Which boundary style feels more sustainable?", "choices": [{ "id": "clear", "label": "Clear limits with room for respectful discussion", "weights": { "solar": 1 } }, { "id": "yield", "label": "Agree even when an important need is ignored", "weights": { "solar": 0 } }] },
+    { "id": "solar-tie", "tier": "tie-breaker", "coverage": ["solar"], "prompt": "Which relationship with ambition fits better?", "choices": [{ "id": "purpose", "label": "Let purpose guide effort without taking over life", "weights": { "solar": 1 } }, { "id": "prove", "label": "Keep achieving mainly to prove personal worth", "weights": { "solar": 0 } }] },
+
+    { "id": "heart-1", "tier": "core", "coverage": ["heart"], "prompt": "When caring for someone, which balance matters more?", "choices": [{ "id": "care-boundary", "label": "Offer care while protecting your own needs", "weights": { "heart": 1 } }, { "id": "self-sacrifice", "label": "Ignore your needs so the other person never struggles", "weights": { "heart": 0 } }] },
+    { "id": "heart-2", "tier": "core", "coverage": ["heart"], "prompt": "When appreciation is offered, which response is closer?", "choices": [{ "id": "receive", "label": "Receive it without depending on it", "weights": { "heart": 1 } }, { "id": "distrust", "label": "Question or reject it immediately", "weights": { "heart": 0 } }] },
+    { "id": "heart-3", "tier": "core", "coverage": ["heart"], "prompt": "After emotional hurt, which direction feels healthier?", "choices": [{ "id": "process", "label": "Process it gradually while keeping appropriate boundaries", "weights": { "heart": 1 } }, { "id": "close", "label": "Close off from connection to prevent all future hurt", "weights": { "heart": 0 } }] },
+    { "id": "heart-tie", "tier": "tie-breaker", "coverage": ["heart"], "prompt": "When someone needs support, which feels more balanced?", "choices": [{ "id": "support", "label": "Help within realistic personal limits", "weights": { "heart": 1 } }, { "id": "rescue", "label": "Take full responsibility for solving it", "weights": { "heart": 0 } }] },
+
+    { "id": "throat-1", "tier": "core", "coverage": ["throat"], "prompt": "When asked what you want, which response fits better?", "choices": [{ "id": "express", "label": "Say it clearly and allow discussion", "weights": { "throat": 1 } }, { "id": "hide", "label": "Keep it hidden even when it matters", "weights": { "throat": 0 } }] },
+    { "id": "throat-2", "tier": "core", "coverage": ["throat"], "prompt": "During disagreement, which approach matters more?", "choices": [{ "id": "dialogue", "label": "Express your view and listen in return", "weights": { "throat": 1 } }, { "id": "dominate", "label": "Keep speaking until the other view stops", "weights": { "throat": 0 } }] },
+    { "id": "throat-3", "tier": "core", "coverage": ["throat"], "prompt": "When a respectful no is needed, which is closer?", "choices": [{ "id": "say-no", "label": "State the limit directly and calmly", "weights": { "throat": 1 } }, { "id": "avoid-no", "label": "Agree now and resent it later", "weights": { "throat": 0 } }] },
+    { "id": "throat-tie", "tier": "tie-breaker", "coverage": ["throat"], "prompt": "While another person speaks, which habit supports understanding?", "choices": [{ "id": "listen", "label": "Listen before preparing the response", "weights": { "throat": 1 } }, { "id": "rehearse", "label": "Plan the reply while they are still speaking", "weights": { "throat": 0 } }] },
+
+    { "id": "third-eye-1", "tier": "core", "coverage": ["third-eye"], "prompt": "Before an important conclusion, which approach feels wiser?", "choices": [{ "id": "check", "label": "Combine perception with available facts", "weights": { "third-eye": 1 } }, { "id": "first", "label": "Treat the first interpretation as final", "weights": { "third-eye": 0 } }] },
+    { "id": "third-eye-2", "tier": "core", "coverage": ["third-eye"], "prompt": "How would you rather work with intuition?", "choices": [{ "id": "consider", "label": "Consider it and check it against reality", "weights": { "third-eye": 1 } }, { "id": "absolute", "label": "Treat it as unquestionably correct", "weights": { "third-eye": 0 } }] },
+    { "id": "third-eye-3", "tier": "core", "coverage": ["third-eye"], "prompt": "When another perspective appears, which response helps clarity?", "choices": [{ "id": "review", "label": "Review it without automatically abandoning your view", "weights": { "third-eye": 1 } }, { "id": "reject", "label": "Reject it before considering its evidence", "weights": { "third-eye": 0 } }] },
+    { "id": "third-eye-tie", "tier": "tie-breaker", "coverage": ["third-eye"], "prompt": "Which role for imagination feels more useful?", "choices": [{ "id": "grounded", "label": "Explore possibilities while staying practical", "weights": { "third-eye": 1 } }, { "id": "escape", "label": "Use imagined possibilities to avoid present decisions", "weights": { "third-eye": 0 } }] },
+
+    { "id": "crown-1", "tier": "core", "coverage": ["crown"], "prompt": "Which relationship with meaning feels steadier?", "choices": [{ "id": "meaning-open", "label": "Hold a sense of meaning without needing every answer", "weights": { "crown": 1 } }, { "id": "certainty", "label": "Require one complete explanation for everything", "weights": { "crown": 0 } }] },
+    { "id": "crown-2", "tier": "core", "coverage": ["crown"], "prompt": "How should contemplative practice relate to daily life?", "choices": [{ "id": "support-life", "label": "Support practical responsibilities and relationships", "weights": { "crown": 1 } }, { "id": "replace-life", "label": "Replace difficult practical responsibilities", "weights": { "crown": 0 } }] },
+    { "id": "crown-3", "tier": "core", "coverage": ["crown"], "prompt": "When an answer is not immediately available, which matters more?", "choices": [{ "id": "allow", "label": "Allow some uncertainty while staying engaged", "weights": { "crown": 1 } }, { "id": "explain", "label": "Accept the first explanation that removes uncertainty", "weights": { "crown": 0 } }] },
+    { "id": "crown-tie", "tier": "tie-breaker", "coverage": ["crown"], "prompt": "Which kind of connection feels more grounded?", "choices": [{ "id": "connected-individual", "label": "Connection with something larger while keeping individuality", "weights": { "crown": 1 } }, { "id": "identity", "label": "Let the idea of connection define every practical choice", "weights": { "crown": 0 } }] }
+  ]
+}
