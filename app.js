@@ -68,6 +68,7 @@ const visualizationPractice = window.ChakraVisualizationPractice;
 const hooponoponoPractice = window.ChakraHooponoponoPractice;
 const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
 const screenNavigationModule = window.ChakraScreenNavigation;
+const sessionEstimate = window.ChakraSessionEstimate;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -77,6 +78,7 @@ if (!visualizationPractice) throw new Error('Visualization practice module is un
 if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
+if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -7358,99 +7360,17 @@ function attachEventListeners() {
     }
 
     function updateSessionEstimate() {
-        if (getChecked('shots-toggle')) {
-            setText('session-estimate', `~ ${state.timeShot} sec frequency shot`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('music-only-toggle')) {
-            setText('session-estimate', 'Music only — stop anytime');
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('box-breathing-experience-toggle')) {
-            const seconds = state.timeBreathing * 16;
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.boxBreathingExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('hooponopono-experience-toggle')) {
-            setText('session-estimate', `~ 4 min ${t('ui.hooponoponoExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('undo-unlearn-addon-toggle')) {
-            const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.undoUnlearnAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('visualization-addon-toggle')) {
-            const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.visualizationAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('body-scan-addon-toggle')) {
-            const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.bodyScanAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('noting-addon-toggle')) {
-            const minutes = Number(document.getElementById('noting-duration')?.value || 4);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.notingAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
-            let seconds = 0;
-            if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
-            if (getChecked('massage-toggle')) {
-                seconds += (7 * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
-                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
-            }
-            if (getChecked('assisted-bathing-toggle')) seconds += state.timeAssistedBathing;
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.intimateService').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('yoga-experience-toggle')) {
-            const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
-            const bathEnabled = getChecked('bath-session-toggle');
-            let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
-            if (getChecked('corpse-pose-toggle')) seconds += state.timeCorpse;
-            if (bathEnabled) {
-                seconds += state.timeBath;
-                seconds += timing('transitions', 'bathToYogaRest');
-            }
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.yogaExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('sleep-mode-toggle')) {
-            setText('session-estimate', `~ ${Math.round(state.timeSleepStage * SLEEP_STAGE_COUNT)} min sleep journey`);
-            updateJourneyRoadmap();
-            return;
-        }
-        const isHigh = getChecked('high-energy-toggle');
-        let overhead = timing('estimate', 'baseOverhead');
-
-        const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
-            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
-            : 0;
-        const addonMinutes = isHigh ? 0
-            : (getChecked('box-breathing-experience-toggle') ? (state.timeBreathing * 16) / 60 : 0)
-                + (getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0)
-                + (getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0)
-                + (getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0)
-                + (getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0)
-                + (getChecked('hooponopono-experience-toggle') ? 4 : 0)
-                + (getChecked('undo-unlearn-addon-toggle') ? Number(document.getElementById('undo-unlearn-duration')?.value || 8) : 0);
-        const estimate = isHigh
-            ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes + addonMinutes);
-        setText('session-estimate', `~ ${estimate} min session`);
+        const estimate = sessionEstimate.resolve({
+            isChecked: getChecked,
+            state,
+            readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
+            countYogaPoses: () => document.querySelectorAll('#yoga-pose-selection input:checked').length,
+            timing,
+            translate: t,
+            isDemoScriptSelected,
+            sleepStageCount: SLEEP_STAGE_COUNT
+        });
+        setText('session-estimate', estimate);
         updateJourneyRoadmap();
     }
 

@@ -56,42 +56,42 @@ assert.deepEqual(storage.entries().sort(), [
 const html = fs.readFileSync('index.html', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert.ok(
-    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The settings backup module must load before the application consumes its API.'
 );
 assert.ok(
-    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.71'),
     'The state preference module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/settings-backup\.js\?v=1\.0/, 'The extracted runtime module must remain available offline.');
 assert.match(serviceWorker, /\.\/modules\/app-state\.js\?v=1\.1/, 'The state preference module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The content/localization module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/content-localization\.js\?v=1\.0/, 'The content/localization module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/media-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/media-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The media lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/media-lifecycle\.js\?v=1\.0/, 'The media lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/piper-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/piper-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The Piper lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/piper-lifecycle\.js\?v=1\.0/, 'The Piper lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/audio-route-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/audio-route-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The audio route lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/audio-route-lifecycle\.js\?v=1\.0/, 'The audio route lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/journey-routing.js?v=1.2') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/journey-routing.js?v=1.2') < html.indexOf('app.js?v=3.71'),
     'The journey routing module must load before the app.',
 );
 assert.match(serviceWorker, /\.\/modules\/journey-routing\.js\?v=1\.2/, 'The journey routing module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/body-scan-practice.js?v=1.0') < html.indexOf('app.js?v=3.70'),
+    html.indexOf('modules/body-scan-practice.js?v=1.0') < html.indexOf('app.js?v=3.71'),
     'The Body Scan practice module must load before the app consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/body-scan-practice\.js\?v=1\.0/, 'The Body Scan practice module must remain available offline.');

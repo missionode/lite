@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-020 — Lobby session-estimate view-model
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/session-estimate.js` owns the previous ordered choice priority and all time formulas. Inputs (selected modes, durations, timing configuration, locale labels and Yoga pose count) remain supplied by app services; app writes the same estimate string and refreshes the roadmap once.
+- Direct tests cover exclusive-mode priority, each standalone preparation, Intimate Service combinations, Yoga, Sleep, HRIM, the standard chakra/add-on estimate, demo-script handling, and module/offline delivery. Sleep estimate contract moved from source slicing to the direct calculation owner.
+- Eager script/offline precache remain. No user-visible behavior or performance change is claimed. Browser/device evidence was not run; graph topology remains unchanged.
+- Atlas and source inventory regenerated; static source/ownership checks and syntax/diff checks pass.
+
+Next: continue bounded UI controller extraction; after parity, capture repeatable cold/warm/offline loading baselines.
+
 ## CP-MOD-019 — Shared screen navigation ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
@@ -8,7 +19,7 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focu
 - Direct tests cover Lobby/Settings dynamic-background exception, hidden/visible transitions, scroll reset, decoration notification, null destination and module delivery. Lobby-scroll, all journey practice modules, thermal, settings and four-language checks pass.
 - Eager script/offline precache remain. No behavior or performance change is claimed. Browser/device evidence is not claimed; graph topology did not change.
 
-Next: extract Settings and remaining UI controller ownership, then capture measured loading baselines after parity.
+Next: CP-MOD-020 extracts the Lobby estimate view-model; then continue Settings and UI ownership before measured loading.
 
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 
