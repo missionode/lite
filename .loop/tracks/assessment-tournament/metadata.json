@@ -1,0 +1,9 @@
+{
+  "id": "assessment-tournament",
+  "type": "feature",
+  "state": "ACTIVE",
+  "branch": "codex/assessment-tournament",
+  "approvedAt": "2026-09-19",
+  "currentCheckpoint": "CP-ASSESS-IMPL-001",
+  "implementationGate": "owner authorized implementation"
+}
