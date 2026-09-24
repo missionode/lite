@@ -82,6 +82,7 @@ const sessionModeHydration = window.ChakraSessionModeHydration;
 const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
 const journeySelectionHydration = window.ChakraJourneySelectionHydration;
 const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
+const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -95,6 +96,7 @@ if (!sessionModeHydration) throw new Error('Session mode hydration module is una
 if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
 if (!journeySelectionHydration) throw new Error('Journey selection hydration module is unavailable.');
 if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
+if (!appearancePreferenceHydration) throw new Error('Appearance preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -6024,13 +6026,11 @@ function loadPreferences() {
             r.checked = (r.value === state.deityPath);
         });
     }, 0);
-    syncValue('visual-effect-select', state.visualEffect);
-    visual.applyImageEffect();
+    appearancePreferenceHydration.hydrateEffect({ state, syncValue, applyImageEffect: () => visual.applyImageEffect() });
 
     timingPreferenceHydration.hydrateJourney({ state, syncValue, setText });
     
-    syncValue('brightness-slider', state.brightness);
-    document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));
+    appearancePreferenceHydration.hydrateBrightness({ state, syncValue, document });
 
     // Sync Script Selection
     syncValue('script-source-select', state.scriptSource);

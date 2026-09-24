@@ -54,7 +54,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extracti
 - Direct contract, syntax checks and `git diff --check` pass. All 66 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
 - Atlas builder passes at 40 maps / 339 nodes / 391 edges. Browser verifier cannot start because Playwright is unavailable. No browser/device/performance claim.
 
-Next: integrate CP-MOD-033, then continue cohesive settings/UI hydration boundaries before measured loading.
+Integrated via PR #52 at `685a38d`; production unchanged.
+
+## CP-MOD-034 — Appearance preference control hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extraction.
+
+- Extract only visual-effect selector/application and brightness control/CSS synchronization from `loadPreferences`.
+- Preserve their original relative call positions and keep state plus image-effect rendering app-owned.
+- Direct contract covers effect selection/application order, brightness UI/CSS synchronization, placement around journey timing, classic-script delivery and offline precache. All 67 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
+- Atlas builder passes at 41 maps / 343 nodes / 394 edges. Browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery remains; no browser/device/performance claim.
+
+Next: integrate CP-MOD-034, then inspect remaining cohesive preference hydration boundaries before measured loading.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 

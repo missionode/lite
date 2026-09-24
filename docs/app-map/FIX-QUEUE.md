@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-034 — Appearance preference hydration
+
+Visual-effect and brightness control presentation follows the existing saved state and app-owned image renderer. Script selection, status messaging and voice selection remain in `loadPreferences`.
+
 ## CP-MOD-033 — Timing control presentation hydration
 
 Core and auxiliary duration values are copied into current controls with their existing range-fill and unit labels. Stored timing defaults/clamping, duration calculations and drone-duration selection remain in their current owners.
