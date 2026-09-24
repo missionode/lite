@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-019: Shared screen navigation ownership
+### NOW — CP-MOD-020: Lobby session-estimate ownership
 
-- Active isolated branch `codex/modularize-cp-019`, based on modularize integration commit `6440f65` (CP-MOD-018 merged). This checkpoint extracts cross-app screen switching into a small view/navigation owner while preserving current screen visibility, static-sky guard, decoration event and top-of-screen scroll reset behavior.
-- CP-MOD-018 is complete via [PR #37](https://github.com/missionode/lite/pull/37), merged to `modularize` at `6440f65`. Direct lifecycle/fade-failure cleanup tests, all other practice modules, routing, audio/fades, thermal, settings, and Hindi/Malayalam/Russian contracts passed. Atlas regenerated to 32 maps / 295 nodes / 340 edges with static source assertions. Browser verifier unavailable (Playwright absent); device playback/thermal evidence is not claimed. Production remains unchanged.
-- CP-MOD-019 direct navigation tests cover all screen-hiding, static decoration guards, scroll reset, decorationchange, null destination and delivery. Lobby-scroll, all practice owners, thermal, settings and four-language tests pass; syntax, atlas static ownership assertions, and diff checks pass. Atlas regeneration preserves 32 maps / 295 nodes / 340 edges. Browser verifier is unavailable because Playwright is absent; no device evidence is claimed. Existing call sites remain unchanged through an app wrapper. Production publication remains unauthorized by this modularization request.
+- Active isolated branch `codex/modularize-cp-020`, based on modularize integration commit `d90e81d` (CP-MOD-019 merged). This checkpoint extracts deterministic Lobby session-estimate precedence and calculation into `modules/session-estimate.js`; UI rendering and roadmap refresh remain in app.js.
+- CP-MOD-019 is complete via [PR #38](https://github.com/missionode/lite/pull/38), merged to `modularize` at `d90e81d`. Direct screen navigation and Lobby-scroll, all journey practice owners, thermal, settings, and four-language tests passed; atlas/source checks remain at 32 maps / 295 nodes / 340 edges. Browser verifier unavailable (Playwright absent); device evidence not claimed. Production remains unchanged.
+- CP-MOD-020 direct tests cover mode precedence, all standalone estimates, intimate care, Yoga, Sleep, HRIM, standard chakra/add-on formula, and demo timing. Focused modes, Sleep-duration routing, all practice/navigation owners, thermal, settings, and Hindi/Malayalam/Russian checks pass. Atlas has been updated to 32 maps / 295 nodes / 340 edges with static owner assertions. Existing text, keys, defaults and roadmap-refresh point remain unchanged. Browser verifier unavailable (Playwright absent); device evidence is not claimed. Production publication remains unauthorized by this modularization request.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

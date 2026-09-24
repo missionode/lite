@@ -37,6 +37,7 @@
     "test:hooponopono": "node tests/hooponopono-practice.test.mjs",
     "test:undo-unlearn": "node tests/undo-unlearn-practice.test.mjs",
     "test:screen-navigation": "node tests/screen-navigation.test.mjs",
+    "test:session-estimate": "node tests/session-estimate.test.mjs",
     "test:yoga-experience": "node tests/yoga-experience.test.mjs",
     "test:advanced-unlock": "node tests/advanced-unlock.test.mjs",
     "test:drone-duration": "node tests/drone-duration.test.mjs",

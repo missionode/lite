@@ -4,6 +4,7 @@ import vm from 'node:vm';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const contentLocalization = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
+const sessionEstimate = fs.readFileSync(new URL('../modules/session-estimate.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
@@ -144,7 +145,7 @@ assert.match(app, /normalizeSleepStages\(this\.scripts\)/, 'Sleep Mode should lo
 assert.match(app, /mainOscillator\.frequency\.setValueAtTime\(beat, now\)/, 'Sleep Mode should play low script frequencies as the main oscillator');
 assert.match(app, /this\.startTimedDrone\(136\.1, 3, state\.timeYogaPose, state\.droneDurationMode\)/, 'Yoga grounding drone should use the fixed exposure timer');
 assert.doesNotMatch(app, /this\.audio\.startDrone\(136\.1, 3\)/, 'Yoga must not start an unbounded grounding drone');
-assert.match(app, /state\.timeSleepStage \* SLEEP_STAGE_COUNT/, 'Sleep Mode should estimate one common duration across five stages');
+assert.match(sessionEstimate, /state\.timeSleepStage \* sleepStageCount/, 'Sleep Mode should estimate one common duration across five stages');
 assert.equal(timingConfig.journey.sleepStageDuration.max, 10, 'Sleep Mode should cap the shared stage duration at 10 minutes');
 for (const key of ['chakra_bg_music_mode', 'chakra_high_energy', 'chakra_sleep_experience']) {
     assert.doesNotMatch(app, new RegExp(`localStorage\\.getItem\\(['"]${key}['"]\\)`), `${key} must not restore an Experience Mode selection`);
