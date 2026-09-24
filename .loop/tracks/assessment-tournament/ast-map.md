@@ -1,6 +1,6 @@
 # Assessment task-scoped repository map
 
-Checkpoint: `CP-ASSESS-IMPL-001`
+Checkpoint: `CP-ASSESS-IMPL-002`
 
 Mapping method: bounded symbol/dependency inspection. This dependency-light PWA has no JavaScript AST parser installed, so the map uses syntax checks plus targeted symbol/call-site search. It is navigation evidence, not a claim of complete AST coverage.
 
@@ -8,25 +8,24 @@ Mapping method: bounded symbol/dependency inspection. This dependency-light PWA 
 
 - `index.html` — Lobby owns the `#begin-consultation` CTA.
 - `app.js` — the CTA handler navigates to `./docs/assesment.html`; assessment state is not shared with journey state.
-- `docs/assesment.html` — current standalone page, CSS, English question data, local persistence, rendering, Google Translate initialization and reset behavior.
-- `sw.js` — precaches the assessment page; new same-origin JSON/module assets must be added and the shell cache rotated only when implementation is ready.
+- `docs/assesment.html` — standalone one-question/two-card shell, safe dynamic rendering, progress/results, font controls, Google Translate initialization and deliberate new-client reset.
+- `sw.js` — shell cache `chakra-v5.257` precaches the assessment page and its versioned JSON, engine and persistence dependencies.
 
-## Current assessment symbols
+## Delivered assessment owners
 
-- Data: `chakras`, `consultationMeta`, `themeLabels`.
-- State: `chakraAnswers`, `chakraAssessmentNotes`, `chakraFontScale` in `localStorage`.
-- Interpretation: `trainingNeed`, `buildChakraInsight`, `renderChakraInsight`, `renderAssessmentReview`, `renderEval`.
-- UI lifecycle: `activateChakra`, `syncThemeToScroll`, `scheduleThemeSync`, delegated `change`/`input`, font controls, Translate toggle and `googleTranslateElementInit`.
-- Reset: `#newAssessment` confirms, removes both assessment keys and reloads.
+- Data: `data/assessment-questions.json` owns English prompts, two-choice labels, weights, value cards and positive archetype names.
+- Algorithm: `ChakraAssessmentTournament` owns validation, deterministic selection, no-repeat ledgers, scoring/confidence and conservative dot thresholds.
+- State: `ChakraAssessmentPersistence` owns `chakraAssessmentTournamentV1`; load/save sanitize through the engine and clear also removes retired `chakraAnswers` and `chakraAssessmentNotes`.
+- UI lifecycle: `start`, `renderNext`, `answer`, `renderResult`, safe DOM helpers, font controls, Translate toggle and `googleTranslateElementInit`.
+- Reset: `#newAssessment` confirms, clears replacement and legacy assessment state, then renders a fresh first prompt without reloading.
 
-## Target seams
+## Verified seams
 
 - `data/assessment-questions.json` — versioned English question/value bank and declarative weights/signals only.
 - `modules/assessment-tournament.js` — pure schema validation, deterministic unique-question ledger, balanced chakra coverage, value-pair scheduling, scoring/confidence/archetypes, conservative dot and serializable state transitions.
-- `docs/assesment.html` — responsive one-question/two-card shell, Equal/Skip, progress, result and Google Translate-compatible dynamic rendering.
-- `tests/chakra-assessment.test.mjs` — executable schema/engine/UI contract including no-repeat, balanced coverage, value position counterbalance, resume/reset and conservative dot thresholds.
-- `sw.js` — cache the new JSON/module and rotate the cache generation after runtime validation.
-- `docs/app-map/atlas-data.mjs` — replace the current consultation map only after executable parity passes; until then retain both current and active-plan maps.
+- `docs/assesment.html` — one-question/two-card shell, Equal/Skip, progress, result and text-node dynamic rendering.
+- `tests/chakra-assessment.test.mjs`, `tests/assessment-tournament.test.mjs`, `tests/assessment-persistence.test.mjs` — UI, engine, no-repeat/balance, resume/reset, failure and cache contracts.
+- `docs/app-map/atlas-data.mjs` — delivered assessment map; live translation, responsive-device and operator acceptance remain explicitly pending.
 
 ## Invariants
 

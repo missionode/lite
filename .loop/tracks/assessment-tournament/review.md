@@ -1,5 +1,20 @@
 # Review
 
+## CP-ASSESS-IMPL-002 — tournament UI, persistence and offline delivery
+
+Status: `IMPLEMENTED_AND_BROWSER_VERIFIED_IN_ISOLATED_WORKTREE`; focused and responsive browser validation passes; trained-operator content acceptance remains pending.
+
+- Replaced the retired seven-card/35-question page with one prompt at a time, two native answer cards, Both equally, Skip, progress, private results and a deliberate Clear for New Client action.
+- Wired the versioned JSON and pure engine into the page. Dynamic question/result copy uses text nodes and element construction, not HTML injection.
+- Added a dedicated persistence owner for sanitized deterministic resume. Wrong content versions and malformed/invalid stored records become fresh state; denied storage continues in memory. Reset removes the new state plus both retired assessment keys.
+- Results show seven chakra statuses/confidence, up to three positive archetypes and one small patterned dot with no visible label. Nothing configures or launches a meditation journey.
+- Rotated the shell cache to `chakra-v5.257` and precached the versioned question bank, engine and persistence module.
+- Google Translate now uses its current “Select Language” launcher styling and maintains an off-screen translated-string cache for future prompts/results. Chromium confirmed English, Malayalam, Hindi and Russian are available and confirmed newly rendered prompts translate in Malayalam, Hindi and Russian.
+- Focused UI, schema/engine and persistence tests pass. JavaScript syntax and JSON parse pass. Chromium confirms desktop/mobile layout, answer advancement, refresh/resume, complete seven-chakra results and new-client clearing, with no page errors. Trained-operator content acceptance remains `CP-ASSESS-IMPL-003`.
+- The generated 32-map atlas passes its required browser verifier: every map/node selection, label bounds, keyboard entry, mobile overflow, print output, SVG download and template fallback pass with no page errors.
+- Duplicate-code audit: the old embedded bank, old scoring/review implementation and direct legacy-key writes were removed with the page replacement. Tournament state sanitation remains centralized in the engine and storage ownership remains centralized in the persistence module.
+- Execution used the direct standard lane in the existing isolated worktree. A separate child/model dispatch would have duplicated ownership of the same page, cache and atlas hotspots, so none was launched and no automatic model switch is claimed.
+
 ## CP-ASSESS-IMPL-001 — schema and pure tournament engine
 
 Status: `IMPLEMENTED_IN_ISOLATED_WORKTREE`; focused validation passes; not integrated or published.

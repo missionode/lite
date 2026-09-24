@@ -103,7 +103,7 @@
         const validValueIds = new Set(bank.values.map(item => item.id));
         const seenPairs = new Set();
         const valueHistory = [];
-        (Array.isArray(candidate.valueHistory) ? candidate.valueHistory : []).forEach(entry => {
+        (Array.isArray(candidate.valueHistory) ? candidate.valueHistory : []).slice(0, bank.settings.valueRounds).forEach(entry => {
             if (!isPlainObject(entry) || !validValueIds.has(entry.leftId) || !validValueIds.has(entry.rightId) || entry.leftId === entry.rightId) return;
             const pairId = canonicalPairId(entry.leftId, entry.rightId);
             if (seenPairs.has(pairId) || entry.pairId !== pairId) return;
