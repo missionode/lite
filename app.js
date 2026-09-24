@@ -71,6 +71,7 @@ const screenNavigationModule = window.ChakraScreenNavigation;
 const sessionEstimate = window.ChakraSessionEstimate;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
 const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
+const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -83,6 +84,7 @@ if (!screenNavigationModule) throw new Error('Screen navigation module is unavai
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
 if (!droneDurationSettingsView) throw new Error('Drone duration settings view module is unavailable.');
+if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -7187,105 +7189,23 @@ function attachEventListeners() {
     });
     
     function updateExperienceModeVisibility() {
-        const noFrequencyMode = state.noFrequencyMode;
-        const highEnergy = getChecked('high-energy-toggle');
-        const musicOnly = getChecked('music-only-toggle');
-        const sleep = getChecked('sleep-mode-toggle');
-        const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
-        const standalonePreparation = state.selectedChakras.length === 0 && [
-            'box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle',
-            'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle', 'noting-addon-toggle'
-        ].some(id => getChecked(id));
-        const focusedExperience = getChecked('yoga-experience-toggle') || intimateService || standalonePreparation;
-        const dharanaOptions = document.getElementById('dharana-options');
-        if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
-        const visualizationOptions = document.getElementById('visualization-options');
-        if (visualizationOptions) visualizationOptions.hidden = !getChecked('visualization-addon-toggle') || getChecked('shots-toggle');
-        const bodyScanOptions = document.getElementById('body-scan-options');
-        if (bodyScanOptions) bodyScanOptions.hidden = !getChecked('body-scan-addon-toggle') || getChecked('shots-toggle');
-        const notingOptions = document.getElementById('noting-options');
-        if (notingOptions) notingOptions.hidden = !getChecked('noting-addon-toggle') || getChecked('shots-toggle');
-        const undoUnlearnOptions = document.getElementById('undo-unlearn-options');
-        if (undoUnlearnOptions) undoUnlearnOptions.hidden = !getChecked('undo-unlearn-addon-toggle') || getChecked('shots-toggle');
-        const yogaExperience = getChecked('yoga-experience-toggle');
-        const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
-        const highEnergyDuration = document.getElementById('high-energy-duration-control');
-        const droneDuration = document.getElementById('drone-duration-control');
-        const durationLabel = document.querySelector('label[for="time-per-chakra"]');
-        const timeInput = document.getElementById('time-per-chakra');
-        const meditationRoomTitle = document.getElementById('lobby-title');
-        if (shotsToggle) {
-            if (noFrequencyMode || !state.advancedFeaturesUnlocked) shotsToggle.checked = false;
-            shotsToggle.disabled = noFrequencyMode || !state.advancedFeaturesUnlocked;
-            shotsToggle.title = noFrequencyMode ? t('ui.noFrequencyShotsUnavailable') : '';
-        }
-        const shots = getChecked('shots-toggle');
-        if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
-        const hideForShots = ['journey-preparation-addons', 'chakra-selection-panel', 'journey-integration-addons', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
-        hideForShots.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.hidden = shots || (id === 'intimate-service-panel' && !intimateServiceUnlocked);
+        lobbyExperienceVisibility.sync({
+            document,
+            state,
+            getChecked,
+            translate: t,
+            timingConfig,
+            isDemoScriptSelected,
+            getDemoCoreDurationMinutes,
+            setText,
+            shotsToggle,
+            yogaExperienceSetup,
+            intimateServiceUnlocked,
+            startMeditationBtn,
+            refreshRangeControlDisplays,
+            syncDroneDurationModeControls,
+            updateDroneDurationSummary
         });
-        ['intention-config-group', 'journey-preferences-group'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.hidden = shots || focusedExperience;
-        });
-        if (yogaExperienceSetup) yogaExperienceSetup.hidden = !yogaExperience || shots;
-        const intimateTiming = document.getElementById('intimate-service-timings');
-        if (intimateTiming) intimateTiming.hidden = shots || !intimateService;
-        const perinealTiming = document.getElementById('row-perineal-care');
-        if (perinealTiming) perinealTiming.style.display = getChecked('perineal-care-toggle') ? '' : 'none';
-        const assistedBathingTiming = document.getElementById('row-assisted-bathing');
-        if (assistedBathingTiming) assistedBathingTiming.style.display = getChecked('assisted-bathing-toggle') ? '' : 'none';
-        const massageNote = document.getElementById('massage-reverse-journey-note');
-        if (massageNote) massageNote.hidden = shots || !getChecked('massage-toggle');
-        const shotOptions = document.getElementById('shot-options');
-        if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
-        const customFrequency = document.getElementById('custom-shot-frequency');
-        if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || document.getElementById('shot-type-select')?.value !== 'custom';
-        const shotFrequencyNote = document.getElementById('shot-frequency-note');
-        const selectedShotType = document.getElementById('shot-type-select')?.value;
-        if (shotFrequencyNote) {
-            shotFrequencyNote.textContent = selectedShotType === 'mood_relaxation' ? t('ui.moodRelaxationShotNote') : '';
-            shotFrequencyNote.hidden = !shots || noFrequencyMode || selectedShotType !== 'mood_relaxation';
-        }
-        if (normalDuration) normalDuration.style.display = shots || focusedExperience || !highEnergy ? (focusedExperience ? 'none' : 'flex') : 'none';
-        if (highEnergyDuration) highEnergyDuration.style.display = shots || focusedExperience ? 'none' : (highEnergy ? 'flex' : 'none');
-        if (droneDuration && !shots) droneDuration.hidden = musicOnly || noFrequencyMode || focusedExperience;
-        if (durationLabel) durationLabel.textContent = t(shots ? 'ui.shotDuration' : (sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration'));
-        if (timeInput) {
-            const definition = shots ? timingConfig.journey?.shotDuration : sleep ? timingConfig.journey?.sleepStageDuration : timingConfig.journey?.timePerChakra;
-            const demoDuration = !shots && !sleep && isDemoScriptSelected() ? getDemoCoreDurationMinutes(state.customScript) : null;
-            timeInput.min = demoDuration ?? definition?.min ?? (shots ? 1 : 1);
-            timeInput.max = definition?.max ?? (shots ? 20 : sleep ? 10 : 7);
-            timeInput.step = definition?.step ?? (shots ? 1 : 0.5);
-            const activeValue = shots ? state.timeShot : sleep ? state.timeSleepStage : state.timePerChakra;
-            timeInput.value = activeValue;
-            const pct = ((activeValue - Number(timeInput.min)) / (Number(timeInput.max) - Number(timeInput.min)) * 100).toFixed(1) + '%';
-            timeInput.style.setProperty('--range-fill', pct);
-            setText('time-display', shots ? `${Number(activeValue).toFixed(0)} secs` : `${Number(activeValue).toFixed(1)} mins`);
-            const rangeControl = timeInput.closest('.range-control');
-            if (rangeControl) {
-                const maximum = rangeControl.querySelector('.range-max');
-                if (maximum) maximum.textContent = timeInput.max;
-                const increment = rangeControl.querySelector('.range-increment');
-                const decrement = rangeControl.querySelector('.range-decrement');
-                if (increment) increment.disabled = Number(timeInput.value) >= Number(timeInput.max);
-                if (decrement) decrement.disabled = Number(timeInput.value) <= Number(timeInput.min);
-            }
-        }
-        const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
-        const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
-            : intimateService ? 'ui.beginIntimateService'
-                : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
-                    : state.selectedChakras.length === 0 && getChecked('hooponopono-experience-toggle') ? 'ui.beginHooponopono'
-                        : 'ui.beginJourney';
-        if (startMeditationBtn) startMeditationBtn.textContent = t(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
-        document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
-        refreshRangeControlDisplays();
-        syncDroneDurationModeControls();
-        updateDroneDurationSummary();
     }
 
     // Initial call

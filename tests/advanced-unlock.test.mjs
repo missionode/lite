@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const source=fs.readFileSync('app.js','utf8');
+const visibilityView=fs.readFileSync('modules/lobby-experience-visibility.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
 const block=source.slice(source.indexOf('    const intimateServiceToggles = ['),source.indexOf('    function isIntimateServiceToggle('));
 const approvedDigest=Uint8Array.from('5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3'.match(/.{2}/g).map(value=>parseInt(value,16))).buffer;
@@ -98,7 +99,7 @@ assert.equal(setup().get('shots-control').hidden,true,'New page locks Shots agai
 assert.equal(setup().get('sleep-mode-control').hidden,true,'New page locks Sleep Mode again');
 assert.equal(setup().get('yoga-mode-control').hidden,true,'New page locks Yoga Experience again');
 assert.equal(app.get('intimate-service-panel').listeners.click,undefined,'Panel itself is no longer an unlock target');
-assert.match(source,/element.hidden = shots \|\| \(id === 'intimate-service-panel' && !intimateServiceUnlocked\)/,'Mode changes preserve the lock');
+assert.match(visibilityView,/element.hidden = shots \|\| \(id === 'intimate-service-panel' && !intimateServiceUnlocked\)/,'Mode changes preserve the lock');
 for(const locale of ['en','ml','ru','hi']) {
     const ui=JSON.parse(fs.readFileSync(`locales/${locale}.json`,'utf8')).ui;
     for(const key of ['aboutApp','appVersion','advancedFeatures','advancedUnlockRemaining','advancedFeaturesEnabled','advancedFeaturesDisabled','advancedPasswordPrompt','advancedPasswordIncorrect']) assert.ok(ui[key]);

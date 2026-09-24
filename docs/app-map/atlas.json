@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "a549650 baseline + uncommitted CP-MOD-022",
-    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with drone-duration Settings radio/note rendering extracted on the active checkpoint branch, pending integration. Mood & Relaxation view, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "456d636 baseline + uncommitted CP-MOD-023",
+    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with Lobby experience-visibility rendering extracted on the active checkpoint branch, pending integration. Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -329,7 +329,7 @@
           [
             "next",
             "Queued extraction work",
-            "All practice lifecycles, shared screen navigation, Lobby session estimates and Mood & Relaxation ambience settings rendering are integrated; drone-duration Settings radio/note synchronization is extracted on the active checkpoint. Remaining Settings/UI controllers and deferred AudioEngine buses continue before measured delivery changes."
+            "All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation settings rendering and drone-duration Settings presentation are integrated; central Lobby experience visibility is extracted on the active checkpoint. Remaining Settings/UI controllers and deferred AudioEngine buses continue before measured delivery changes."
           ]
         ],
         [
@@ -767,7 +767,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, and dispatch priority.",
-      "source": "modules/journey-routing.js:1; app.js:5633; app.js:7940; app.js:7963",
+      "source": "modules/journey-routing.js:1; modules/lobby-experience-visibility.js:1; app.js:5633; app.js:7940; app.js:7963",
       "rows": [
         [
           [
