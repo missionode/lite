@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-030 — Session-only mode reset ownership
+
+App-load cleanup of retired Box Breathing, Ho’oponopono, Music Only, High Energy and Sleep mode keys and checkbox defaults now has a dedicated owner. Yoga mode/setup restoration remains app-owned; persisted care/pose preferences are not cleared. This is eager ownership-only work, with no performance claim.
+
 ## CP-MOD-029 — Automatic journey voice profile ownership
 
 The existing High Energy, feminine-voice Shringara and default soft profile branch has moved to a direct-testable module. Preserve profile values, storage keys, saved settings, control/preset synchronization and optional audio tuning behavior. This remains an eager ownership extraction, not a performance optimization. Device listening/quality validation is not claimed.
