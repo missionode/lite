@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
@@ -22,7 +23,7 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
 }
 assert.match(app, /function persistChakraSelection\(\)[\s\S]*?localStorage\.setItem\('chakra_selected'/, 'Room selection should persist immediately');
 assert.match(app, /querySelectorAll\('#chakra-selection input\[type="checkbox"\]'\)[\s\S]*?addEventListener\('change', persistChakraSelection\)/, 'Room selection should update the active state on change');
-assert.match(app, /const hideForShots = \[[^\]]*'chakra-selection-panel'/, 'Chakra selection should be hidden when Shots is active');
+assert.match(lobbyVisibility, /const hideForShots = \[[^\]]*'chakra-selection-panel'/, 'Chakra selection should be hidden when Shots is active');
 for (const locale of [en, ml]) {
     assert.ok(locale.ui.chakraJourney?.trim(), 'Chakra Journey label is required');
     assert.ok(locale.ui.chakraSelectionHelp?.trim(), 'Chakra selection guidance is required');

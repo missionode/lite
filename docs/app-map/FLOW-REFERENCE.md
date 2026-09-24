@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: ad3d49b baseline + uncommitted CP-MOD-025 · 2026-09-25.
+Source snapshot: f531002 baseline + uncommitted CP-MOD-026 · 2026-09-25.
 
-Source-reviewed application behavior at the latest modularize integration baseline with Yoga Experience Settings ownership integrated and shared range-control ownership extracted on the active checkpoint branch, pending integration. Lobby experience visibility, Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed application behavior at the latest modularize integration baseline with shared range controls integrated and the localized journey roadmap extracted on the active checkpoint branch, pending integration. Yoga Experience Settings, Lobby experience visibility, Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -24,22 +24,23 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 14. [Sound Shots](#shots)
 15. [Experiment activities](#experiments)
 16. [Ordered Chakra Journey add-ons](#journey-addons)
-17. [Pause, stop and live controls](#controls)
-18. [Optional Lobby video introduction](#restart)
-19. [Completion, statistics and external handoff](#completion)
-20. [Scripts, language and timing](#content)
-21. [Narration and fallback](#narration)
-22. [Audio signal architecture](#audio)
-23. [Sound options and live suppression](#sound-options)
-24. [Visuals and browser lifecycle](#visuals)
-25. [Earth observer reference and atmosphere](#earth-atmosphere)
-26. [Thematic solar containment glow](#solar-containment)
-27. [Persistence, caching and network](#storage)
-28. [Failure and recovery map](#recovery)
-29. [Isolated checkpoint delivery](#delivery-workflow)
-30. [Settings backup and restore](#settings-backup)
-31. [Operator-led chakra assessment](#assessment-tournament)
-32. [Frequency repertory handoff](#repertory)
+17. [Lobby journey roadmap](#journey-roadmap)
+18. [Pause, stop and live controls](#controls)
+19. [Optional Lobby video introduction](#restart)
+20. [Completion, statistics and external handoff](#completion)
+21. [Scripts, language and timing](#content)
+22. [Narration and fallback](#narration)
+23. [Audio signal architecture](#audio)
+24. [Sound options and live suppression](#sound-options)
+25. [Visuals and browser lifecycle](#visuals)
+26. [Earth observer reference and atmosphere](#earth-atmosphere)
+27. [Thematic solar containment glow](#solar-containment)
+28. [Persistence, caching and network](#storage)
+29. [Failure and recovery map](#recovery)
+30. [Isolated checkpoint delivery](#delivery-workflow)
+31. [Settings backup and restore](#settings-backup)
+32. [Operator-led chakra assessment](#assessment-tournament)
+33. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -143,7 +144,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/mood-ambience-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mood-ambience-settings-view.js:1), [modules/drone-duration-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/drone-duration-settings-view.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/yoga-experience-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/yoga-experience-settings.js:1), [modules/range-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/range-controls.js:1), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [tests/session-estimate.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-estimate.test.mjs:1), [tests/mood-ambience-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mood-ambience-settings-view.test.mjs:1), [tests/drone-duration-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/drone-duration-settings-view.test.mjs:1), [tests/lobby-experience-visibility.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/lobby-experience-visibility.test.mjs:1), [tests/yoga-experience-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/yoga-experience-settings.test.mjs:1), [tests/range-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/range-controls.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/mood-ambience-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mood-ambience-settings-view.js:1), [modules/drone-duration-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/drone-duration-settings-view.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/yoga-experience-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/yoga-experience-settings.js:1), [modules/range-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/range-controls.js:1), [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [tests/session-estimate.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-estimate.test.mjs:1), [tests/mood-ambience-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mood-ambience-settings-view.test.mjs:1), [tests/drone-duration-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/drone-duration-settings-view.test.mjs:1), [tests/lobby-experience-visibility.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/lobby-experience-visibility.test.mjs:1), [tests/yoga-experience-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/yoga-experience-settings.test.mjs:1), [tests/range-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/range-controls.test.mjs:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -192,7 +193,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Queued extraction work | All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation and drone-duration Settings views, Lobby experience visibility, Yoga Experience settings, and shared range-control UI are integrated; remaining cohesive Settings/UI owners and deferred AudioEngine buses continue before measured delivery changes. |
+| Queued extraction work | All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation and drone-duration Settings views, Lobby experience visibility, Yoga Experience settings, shared range-control UI and localized Lobby roadmap are integrated; remaining cohesive Settings/UI owners and deferred AudioEngine buses continue before measured delivery changes. |
 | PLANNED · Measure baseline | Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners. |
 | PLANNED · Approve feature bundles | Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity. |
 | PLANNED · Cache without execution | Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them. |
@@ -811,6 +812,71 @@ flowchart TD
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
 - Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Box Breathing execution lives in `modules/box-breathing-practice.js`; Visualization blackout/audio/narration/return timing in `modules/visualization-practice.js`; Ho’oponopono phrase-cycle timing and visual setup in `modules/hooponopono-practice.js`; Undo & Unlearn phase/scene lifecycle in `modules/undo-unlearn-practice.js`; Dharana in `modules/dharana-practice.js`; Body Scan in `modules/body-scan-practice.js`; Guided Noting in `modules/guided-noting-practice.js`. The controller supplies localized narration, timing and existing screen/audio/session services. Box Breathing preserves its four-step/four-cycle order, 100 ms pause accounting and music fades. Visualization preserves optional ambience/error fallback, ducked narration, waits, selected duration, silence wake prompt, return-screen fades, ambience stop and music restoration. Ho’oponopono preserves the three four-phrase cycles, configured pauses and closing fade handoff; journey placement remains after the chakra sequence. Undo & Unlearn preserves the selected duration, translated content-free phases and active-session guards, and always hides the scene/releases body mode even if its fade wait rejects. The Lobby estimate owner preserves mode priority, timing/default inputs and the standard add-on formula while app.js refreshes its text and roadmap. Dharana preserves selected anchor shape/color, duration-based CSS timing plus an active-session shrink clock for reduced-motion mode, the four-second narrated release and cleanup. Guided Noting preserves its selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages.
+
+<a id="journey-roadmap"></a>
+
+## Lobby journey roadmap
+
+Localized, display-only summary of the currently selected Lobby route.
+
+Sources: [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [app.js:726](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:726).
+
+```mermaid
+flowchart TD
+  refresh["Refresh preview"]
+  priority["Resolve current route"]
+  music["Music Only"]
+  care["Intimate Service"]
+  yoga["Yoga"]
+  sleep["Sleep"]
+  hrim["HRIM"]
+  standalone["Standalone preparation"]
+  guided["Standard guided journey"]
+  video["Optional introduction"]
+  render["Render"]
+  noTarget["Roadmap unavailable"]
+  refresh -->|"Read current state"| priority
+  priority -->|"Music Only"| music
+  priority -->|"Care selection"| care
+  priority -->|"Yoga selected"| yoga
+  priority -->|"Sleep selected"| sleep
+  priority -->|"HRIM selected"| hrim
+  priority -->|"No chakras + selected practice"| standalone
+  priority -->|"Fallback / chakra selection"| guided
+  music -->|"Video enabled"| video
+  care -->|"Video enabled"| video
+  yoga -->|"Video enabled"| video
+  sleep -->|"Video enabled"| video
+  hrim -->|"Video enabled"| video
+  standalone -->|"Video enabled"| video
+  guided -->|"Video enabled"| video
+  music -->|"Video off"| render
+  care -->|"Video off"| render
+  yoga -->|"Video off"| render
+  sleep -->|"Video off"| render
+  hrim -->|"Video off"| render
+  standalone -->|"Video off"| render
+  guided -->|"Video off"| render
+  video -->|"Prefix label"| render
+  render -->|"No element"| noTarget
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Refresh preview | Lobby mode, add-on, chakra, returning-journey or video-prelude changes request a label recalculation. The preview itself never starts a journey or saves selections. |
+| Resolve current route | Music Only → any Intimate Service choice → Yoga → Sleep → HRIM → standalone preparation when no chakras are selected and at least one standalone practice is chosen → standard chakra path. |
+| Music Only | One Music Only label. |
+| Intimate Service | Only selected care stages, preserving Perineal Care → Massage → Assisted Bathing label order. |
+| Yoga | Optional Corpse Pose → optional Bath → Rest Before Yoga → Yoga. |
+| Sleep | Sleep → Drowsiness → Light Sleep → True Sleep → Deep Sleep → REM Rest. |
+| HRIM | Intention → HRIM → Closing. |
+| Standalone preparation | Box → Visualization → Focused Attention → Body Scan → Guided Noting → Ho’oponopono → Undo & Unlearn; only selected stages are included. |
+| Standard guided journey | Arrival or Returning → Intention → Chakras, with selected preparation labels inserted in their established order and optional integration stages before Closing. |
+| Optional introduction | When the Lobby video preference is enabled, prepend the translated Video Introduction label; this preview label does not play the video. |
+| Render | Resolve every label through the current display-language translator and join with the existing » separator. |
+| Roadmap unavailable | If the preview element is absent, return without changing anything. |
+
+- The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility.
 
 <a id="controls"></a>
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const rangeControls = fs.readFileSync(new URL('../modules/range-controls.js', import.meta.url), 'utf8');
 const moodAmbienceView = fs.readFileSync(new URL('../modules/mood-ambience-settings-view.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
@@ -43,10 +44,10 @@ assert.match(html, /id="mood-relaxation-ambience-level"[^>]*min="0\.2"[^>]*max="
 const ambienceControl = html.match(/<div id="mood-relaxation-ambience-level-control"[\s\S]*?<\/div>\s*<\/div>/)?.[0] || '';
 assert.equal((ambienceControl.match(/class="range-meta"/g) || []).length, 1, 'the ambience control should contain one metadata row');
 assert.match(ambienceControl, /range-decrement[\s\S]*range-min[\s\S]*range-current[\s\S]*range-max[\s\S]*range-increment/, 'the ambience metadata row should keep both step buttons inline');
-assert.match(app, /const existingMeta = container\.querySelector\(':scope > \.range-meta'\)/, 'range enhancement should reuse an existing metadata row');
-assert.match(app, /if \(current\.parentElement !== meta\) meta\.appendChild\(current\)/, 'generated range values should be moved into the metadata row before insertion');
-assert.match(app, /if \(input\.id === 'mood-relaxation-ambience-level'\) return `\$\{value\.toFixed\(1\)\}%`/, 'the ambience value should remain a percentage in the shared range row');
-assert.match(app, /if \(!minimum\.dataset\.i18n\) minimum\.textContent = input\.min/, 'localized range labels should not be overwritten by range updates');
+assert.match(rangeControls, /const existingMeta = container\.querySelector\(':scope > \.range-meta'\)/, 'range enhancement should reuse an existing metadata row');
+assert.match(rangeControls, /if \(current\.parentElement !== meta\) meta\.appendChild\(current\)/, 'generated range values should be moved into the metadata row before insertion');
+assert.match(rangeControls, /if \(input\.id === 'mood-relaxation-ambience-level'\) return `\$\{value\.toFixed\(1\)\}%`/, 'the ambience value should remain a percentage in the shared range row');
+assert.match(rangeControls, /if \(!minimum\.dataset\.i18n\) minimum\.textContent = input\.min/, 'localized range labels should not be overwritten by range updates');
 assert.doesNotMatch(css, /#mood-relaxation-ambience-level-control \.range-meta/, 'the ambience control should use the shared five-column range layout');
 assert.match(app, /const PLEASURE_AMBIENCE_MAX_GAIN = 0\.07/, 'the ambience engine should enforce the 7.0% maximum');
 assert.match(app, /const PLEASURE_AMBIENCE_CONFIRM_THRESHOLD = 0\.05/, 'the ambience engine should require confirmation above 5.0%');

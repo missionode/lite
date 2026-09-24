@@ -74,6 +74,7 @@ const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
 const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
 const yogaExperienceSettings = window.ChakraYogaExperienceSettings;
 const rangeControls = window.ChakraRangeControls;
+const journeyRoadmap = window.ChakraJourneyRoadmap;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -89,6 +90,7 @@ if (!droneDurationSettingsView) throw new Error('Drone duration settings view mo
 if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility module is unavailable.');
 if (!yogaExperienceSettings) throw new Error('Yoga experience settings module is unavailable.');
 if (!rangeControls) throw new Error('Range controls module is unavailable.');
+if (!journeyRoadmap) throw new Error('Journey roadmap module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -722,75 +724,11 @@ function shouldRefreshLocalizedIntention(value, previousLanguage) {
 }
 
 function getJourneyRoadmapLabels() {
-    const withOptionalVideo = labels => state.journeyVideoPreludeEnabled
-        ? [t('ui.roadmapVideoIntroduction'), ...labels]
-        : labels;
-    if (getChecked('music-only-toggle')) return withOptionalVideo([t('ui.roadmapMusicOnly')]);
-
-    if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
-        const labels = [];
-        if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
-        if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassageReverse'));
-        if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
-        return withOptionalVideo(labels);
-    }
-
-    if (getChecked('yoga-experience-toggle')) {
-        const labels = [];
-        if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
-        if (getChecked('bath-session-toggle')) {
-            labels.push(t('ui.roadmapBath'));
-            labels.push(t('ui.roadmapRestBeforeYoga'));
-        }
-        labels.push(t('ui.roadmapYoga'));
-        return withOptionalVideo(labels);
-    }
-
-    if (getChecked('sleep-mode-toggle')) {
-        return withOptionalVideo([t('ui.roadmapSleep'), t('ui.roadmapDrowsiness'), t('ui.roadmapLightSleep'), t('ui.roadmapTrueSleep'), t('ui.roadmapDeepSleep'), t('ui.roadmapRemRest')]);
-    }
-
-    if (getChecked('high-energy-toggle')) {
-        return withOptionalVideo([t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')]);
-    }
-
-    // With no chakra selected, preparation selections are complete standalone
-    // sessions. Keep the Lobby roadmap aligned with the focused-session route.
-    if (state.selectedChakras.length === 0) {
-        const standalone = [];
-        if (getChecked('box-breathing-experience-toggle')) standalone.push(t('ui.roadmapBoxBreathing'));
-        if (getChecked('visualization-addon-toggle')) standalone.push(t('ui.roadmapVisualization'));
-        if (getChecked('dharana-addon-toggle')) standalone.push(t('ui.roadmapDharana'));
-        if (getChecked('body-scan-addon-toggle')) standalone.push(t('ui.roadmapBodyScan'));
-        if (getChecked('noting-addon-toggle')) standalone.push(t('ui.roadmapNoting'));
-        if (getChecked('hooponopono-experience-toggle')) standalone.push(t('ui.roadmapHooponopono'));
-        if (getChecked('undo-unlearn-addon-toggle')) standalone.push(t('ui.roadmapUndoUnlearn'));
-        if (standalone.length) return withOptionalVideo(standalone);
-    }
-
-    const labels = [
-        t(state.returningJourney ? 'ui.roadmapReturning' : 'ui.roadmapArrival'),
-        t('ui.roadmapIntention')
-    ];
-    labels.push(t('ui.roadmapChakras'));
-    if (getChecked('box-breathing-experience-toggle')) labels.splice(0, 0, t('ui.roadmapBoxBreathing'));
-    let preparationIndex = getChecked('box-breathing-experience-toggle') ? 1 : 0;
-    if (getChecked('visualization-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapVisualization'));
-    if (getChecked('dharana-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapDharana'));
-    if (getChecked('body-scan-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapBodyScan'));
-    if (getChecked('body-scan-addon-toggle')) preparationIndex++;
-    if (getChecked('noting-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapNoting'));
-    if (getChecked('hooponopono-experience-toggle')) labels.push(t('ui.roadmapHooponopono'));
-    if (getChecked('undo-unlearn-addon-toggle')) labels.push(t('ui.roadmapUndoUnlearn'));
-
-    labels.push(t('ui.roadmapClosing'));
-    return withOptionalVideo(labels);
+    return journeyRoadmap.resolveLabels({ state, isChecked: getChecked, translate: t });
 }
 
 function updateJourneyRoadmap() {
-    const roadmap = document.getElementById('journey-roadmap');
-    if (!roadmap) return;
-    roadmap.textContent = getJourneyRoadmapLabels().join(' » ');
+    journeyRoadmap.render({ document, state, isChecked: getChecked, translate: t });
 }
 
 function applyLocaleUI() {

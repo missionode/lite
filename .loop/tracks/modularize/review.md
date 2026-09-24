@@ -4,10 +4,12 @@
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-control, integration-contract, offline-delivery and syntax evidence.
 
-- Extracts value formatting, idempotent range enhancement, bounded step buttons, disabled boundary state and display refresh into `modules/range-controls.js`. App retains timing configuration and state/persistence ownership.
 - `modules/range-controls.js` owns input-value formatting, idempotent DOM enhancement, min/max step-button behavior and display refresh. The app retains timing-config application and all state/persistence handlers.
 - The direct mock-DOM test covers chakra/Sleep/ambience/time formatting, increments and decrements, min/max clamps, disabled boundary states, bubbled `input` updates, idempotent control creation, value refresh, startup order and offline precache. Range tests plus all practice lifecycle/version contracts, Yoga and Lobby settings views, Settings backup, Advanced unlock, journey routing, session estimate, thermal, and Hindi/Malayalam/Russian tests pass. Syntax checks and `git diff --check` pass.
 - Atlas regenerated at 32 maps / 295 nodes / 340 edges; the build surfaced and corrected two stale `app.js` source-line references in the mode map. The visual Playwright verifier cannot start because Playwright is absent from this worktree. The unrelated `tests/drone-duration.test.mjs` remains blocked by owner-managed `docs/dot.json`; neither limitation is reported as passing. No visual/device/performance outcome is claimed; the module remains eager and offline-pre-cached.
+- Integrated via PR #44 at `f531002`; production unchanged.
+
+Next: CP-MOD-026 extracts the localized, display-only Lobby journey roadmap while keeping start validation and dispatch in the app.
 
 ## CP-MOD-024 — Yoga Experience settings ownership
 
@@ -17,7 +19,17 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct behavior, inte
 - The direct contract covers Corpse Pose/Bath toggles, checked pose collection, exact state/storage values, disabled/ARIA reset, row display defaults, startup order and offline precache. Yoga Experience, Lobby visibility, session estimate, Settings backup, Advanced unlock, routing, focused-practice, thermal and Hindi/Malayalam/Russian contracts, syntax and diff checks passed.
 - Atlas regenerated at 32 maps / 295 nodes / 340 edges. Playwright is absent from the isolated worktree; `tests/drone-duration.test.mjs` remains blocked by the absent owner-managed `docs/dot.json`. Neither is counted as passing. No performance, browser/device or audio claim; module remains eager/offline-pre-cached.
 
-Next: integrate CP-MOD-025; continue remaining cohesive Settings/UI boundaries and audit the AudioEngine gate. Lazy loading remains pending extraction parity plus measured cold/warm/offline evidence.
+Integrated via PR #43 at `ad3d49b`; CP-MOD-025 then integrated via PR #44. Production unchanged.
+
+## CP-MOD-026 — Lobby journey roadmap
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct route-contract, locale-key, integration, offline-delivery, atlas-build and syntax evidence.
+
+- `modules/journey-roadmap.js` owns localized display-only route-label resolution and DOM rendering; app compatibility wrappers remain. Begin validation and actual dispatch stay in their existing owners. No roadmap behavior is intentionally changed.
+- Direct contract covers Music Only, care combinations/order, Yoga, Sleep, HRIM, standalone practices, full guided/returning stages, optional-video prefix, separator/rendering, missing-target no-op, delivery order and offline precache. Every used roadmap key is confirmed in English, Malayalam, Hindi and Russian. All 59 runnable `tests/*.test.mjs` contracts pass, including the extracted roadmap and adjacent route/UI contracts; two owner-fixture tests (`content-safety` and `drone-duration`) are excluded because `docs/dot.json` is absent from the isolated worktree. Prior UI owners, range settings, routing, estimate, Settings backup, Advanced unlock, thermal, practice lifecycle, syntax and diff checks pass.
+- Atlas builder passes at 33 maps / 307 nodes / 364 edges, including a distinct display-only roadmap map. Visual Playwright verification cannot start because Playwright is missing. The two fixture-dependent test exclusions and visual-verifier limitation are not counted as passes. No user-interface browser, device, performance or audio claim; module remains eager/offline-pre-cached.
+
+Next: integrate CP-MOD-026, then continue only cohesive Settings/controller seams and audit the approved AudioEngine checkpoint gate. Lazy loading remains blocked on remaining extraction parity and repeatable cold/warm/offline evidence.
 
 ## CP-MOD-020 — Lobby session-estimate view-model
 
