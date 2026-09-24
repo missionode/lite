@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-24",
-    "commit": "d50f515 baseline + uncommitted CP-MOD-018",
-    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with Undo & Unlearn lifecycle ownership extracted on the active checkpoint branch, pending integration. Ho’oponopono, Visualization, Box Breathing, Dharana, Guided Noting and Body Scan ownership are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "date": "2026-09-25",
+    "commit": "6440f65 baseline + uncommitted CP-MOD-019",
+    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with shared screen navigation extracted on the active checkpoint branch, pending integration. All journey practices, including Undo & Unlearn, are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; app.js:4880; tests/journey-routing.test.mjs:1; tests/body-scan-practice.test.mjs:1; tests/guided-noting-practice.test.mjs:1; tests/dharana-practice.test.mjs:1; tests/box-breathing-practice.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Queued extraction work",
-            "Journey preparation planning/execution and Box Breathing, Visualization, Ho’oponopono, Undo & Unlearn, Dharana, Body Scan and Guided Noting ownership extracted; deferred AudioEngine buses → UI controllers remain. Complete parity before delivery changes."
+            "Journey preparation planning/execution and all practice lifecycles extracted; shared screen navigation is the active seam; deferred AudioEngine buses → remaining UI controllers remain. Complete parity before delivery changes."
           ]
         ],
         [
@@ -474,7 +474,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff. App controllers inject localization and existing screen/audio/session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. Earlier CP-MOD-012 measurements showed about 1.4 KiB net local uncompressed body growth for its one eager practice module, with timing differences within single-run noise. No performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff; visualization-practice owns blackout, audio/narration timing and gradual return; hooponopono-practice owns its phrase cycles and closing handoff; undo-unlearn-practice owns phase sequencing and guaranteed black-scene cleanup; screen-navigation owns shared screen visibility, static-sky decoration guards, decorationchange notification and scroll resets. App controllers inject localization and existing screen/audio/session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. Earlier CP-MOD-012 measurements showed about 1.4 KiB net local uncompressed body growth for its one eager practice module, with timing differences within single-run noise. No performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset."
       ]
     },
     {
@@ -482,7 +482,7 @@
       "group": "Start here",
       "title": "Startup and first visit",
       "subtitle": "Loading order and optional browser capabilities.",
-      "source": "app.js:946; app.js:3394; app.js:6748; index.html:148",
+      "source": "modules/screen-navigation.js:1; app.js:6181; app.js:6506; app.js:6524; index.html:148",
       "rows": [
         [
           [

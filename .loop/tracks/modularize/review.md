@@ -1,5 +1,25 @@
 # Review
 
+## CP-MOD-019 — Shared screen navigation ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/screen-navigation.js` owns shared visible-screen switching, the static decorative-sky guard, the `decorationchange` event and section/document/window scroll resets. All existing callers remain behind the `showScreen` compatibility wrapper.
+- Direct tests cover Lobby/Settings dynamic-background exception, hidden/visible transitions, scroll reset, decoration notification, null destination and module delivery. Lobby-scroll, all journey practice modules, thermal, settings and four-language checks pass.
+- Eager script/offline precache remain. No behavior or performance change is claimed. Browser/device evidence is not claimed; graph topology did not change.
+
+Next: extract Settings and remaining UI controller ownership, then capture measured loading baselines after parity.
+
+## CP-MOD-018 — Undo & Unlearn practice lifecycle
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/undo-unlearn-practice.js` owns black-scene setup, translated title/opening/phases/closing, selected-duration interval calculation, active-session checks and fade cleanup. Existing content-free private-reflection wording and stage placement are unchanged.
+- The direct API test verifies phase order and spacing, cancellation, narration failure, fade-wait rejection, and guaranteed hiding/body-mode cleanup. All practice owners, focused-practice, routing, audio transition, stage-fade, thermal, settings backup and Hindi/Malayalam/Russian contracts passed.
+- Eager script/offline delivery remains. Existing timings are unchanged; no performance gain is claimed. Browser/device evidence was not run.
+
+Next: extract shared screen navigation.
+
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
