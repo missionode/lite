@@ -62,9 +62,11 @@ if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unava
 const journeyRouting = window.ChakraJourneyRouting;
 const bodyScanPractice = window.ChakraBodyScanPractice;
 const guidedNotingPractice = window.ChakraGuidedNotingPractice;
+const dharanaPractice = window.ChakraDharanaPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
+if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -4882,51 +4884,25 @@ class MeditationController {
         const focusAnchor = document.getElementById('focus-anchor');
         const focusVeil = document.getElementById('focus-veil');
         const container = document.getElementById('chakra-container');
-        const shapes = { 'indigo-circle': '●', 'gold-dot': '•', 'violet-triangle': '▲' };
-        const colors = { 'indigo-circle': '#818cf8', 'gold-dot': '#fbbf24', 'violet-triangle': '#c084fc' };
-        showScreen(meditationScreen);
-        document.body.classList.add('dharana-active');
-        this.visual.stop();
-        if (container) container.classList.remove('presence-ready');
-        if (symbol) symbol.style.visibility = 'hidden';
-        if (focusVeil) { focusVeil.hidden = false; void focusVeil.offsetWidth; focusVeil.classList.add('is-active'); }
-        if (focusAnchor) {
-            focusAnchor.textContent = shapes[anchor];
-            focusAnchor.style.color = colors[anchor];
-            focusAnchor.style.setProperty('--focus-anchor-duration', `${Math.max(1, minutes * 60)}s`);
-            focusAnchor.classList.remove('is-focusing');
-            focusAnchor.hidden = false;
-            void focusAnchor.offsetWidth;
-            focusAnchor.classList.add('is-focusing');
-        }
-        setText('mantra-display', journeyT('ui.dharanaTitle'));
-        try {
-        await this.narrate(journeyT('ui.dharanaFocusGuidance'), false);
-            const totalSeconds = Math.max(1, minutes * 60);
-            let remaining = totalSeconds;
-            while (remaining-- > 0 && this.isMeditationActive) {
-                // Static-decoration mode intentionally cancels CSS animation;
-                // update the real focus scale from the session clock instead.
-                if (focusAnchor) {
-                    const progress = (totalSeconds - remaining) / totalSeconds;
-                    focusAnchor.style.transform = `scale(${1 - progress * 0.58})`;
-                }
-                await this.pauseAwareSleep(1000);
-            }
-            if (this.isMeditationActive) {
-                focusAnchor?.classList.add('is-releasing');
-                focusVeil?.classList.add('is-releasing');
-                await Promise.all([
-                    this.narrate(journeyT('ui.dharanaClosing'), false),
-                    this.pauseAwareSleep(4000)
-                ]);
-            }
-        } finally {
-            if (focusAnchor) { focusAnchor.hidden = true; focusAnchor.classList.remove('is-focusing', 'is-releasing'); focusAnchor.style.transform = ''; }
-            if (focusVeil) { focusVeil.classList.remove('is-active', 'is-releasing'); focusVeil.hidden = true; }
-            document.body.classList.remove('dharana-active');
-            if (symbol) symbol.style.visibility = '';
-        }
+        await dharanaPractice.run({
+            anchor,
+            minutes,
+            body: document.body,
+            meditationScreen,
+            symbol,
+            focusAnchor,
+            focusVeil,
+            container,
+            guidance: journeyT('ui.dharanaFocusGuidance'),
+            title: journeyT('ui.dharanaTitle'),
+            closing: journeyT('ui.dharanaClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runBodyScan() {

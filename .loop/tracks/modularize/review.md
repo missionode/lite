@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-014 — Dharana focus scene ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/dharana-practice.js` owns anchor/veil setup, selected shape/color, reduced-motion-compatible one-second shrink progression, closing narration with the existing four-second visual tail, cancellation and cleanup. The app supplies localized copy, selected duration and existing screen/audio/session services.
+- The direct lifecycle contract covers all 60 active-time updates for a one-minute practice, starting/final scales, release timing, cancellation, narration error cleanup and optional scene elements. Focused-practice, Guided Noting, settings delivery and Hindi module-cache contracts pass.
+- Eager script order/offline precache are retained. No performance gain is claimed. Browser layout/console and device playback/thermal checks were not run; reduced-motion behavior is source/unit evidence only.
+- Bounded dependency map used symbol/reference lookup because no JavaScript AST parser is available in the local dependency set; public boundaries and syntax were verified directly.
+
+Next: extract remaining preparation-stage lifecycles, then UI ownership; only after parity start repeated cold/warm/offline loading measurements.
+
 ## CP-MOD-013 — Guided Noting stage ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas source and syntax evidence.
