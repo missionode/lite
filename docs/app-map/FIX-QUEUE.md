@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-031 — Mixer preference hydration
+
+The ordered 19-item mapping from app-owned mixer settings into Lobby/Settings controls has a dedicated tested owner. Preserve duplicate mirror controls and its current loadPreferences position; it does not own persistent state or audio-engine tuning.
+
 ## CP-MOD-030 — Session-only mode reset ownership
 
 App-load cleanup of retired Box Breathing, Ho’oponopono, Music Only, High Energy and Sleep mode keys and checkbox defaults now has a dedicated owner. Yoga mode/setup restoration remains app-owned; persisted care/pose preferences are not cleared. This is eager ownership-only work, with no performance claim.

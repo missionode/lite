@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 17a42f0 baseline + uncommitted CP-MOD-030 · 2026-09-25.
+Source snapshot: 2662379 baseline + uncommitted CP-MOD-031 · 2026-09-25.
 
-Source-reviewed behavior at the latest modularize integration baseline with timing configuration and automatic journey voice-profile application integrated. The active checkpoint extracts session-only journey-mode hydration while app retains persistent Yoga setup. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the latest modularize integration baseline with timing configuration, automatic journey voice profile and session-only mode hydration integrated. The active checkpoint extracts mixer control hydration while app remains state and audio owner. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -42,9 +42,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 32. [Timing configuration and saved values](#timing-configuration)
 33. [Automatic journey voice profile](#journey-voice-profile)
 34. [Session-only journey-mode hydration](#session-mode-hydration)
-35. [Settings backup and restore](#settings-backup)
-36. [Operator-led chakra assessment](#assessment-tournament)
-37. [Frequency repertory handoff](#repertory)
+35. [Mixer preference control hydration](#mixer-preference-hydration)
+36. [Settings backup and restore](#settings-backup)
+37. [Operator-led chakra assessment](#assessment-tournament)
+38. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1579,6 +1580,34 @@ flowchart TD
 | Restore Yoga setup | Keep persisted Corpse Pose, Bath, pose and care setup. Do not restore the session-only Yoga mode toggle. |
 
 - Only the retired mode keys listed in code are removed. No stored configuration or in-progress journey is restored/cleared by this owner. It remains synchronous, eager and offline-pre-cached.
+
+<a id="mixer-preference-hydration"></a>
+
+## Mixer preference control hydration
+
+Copies already-loaded preference state into audio and ambience controls in established order.
+
+Sources: [modules/mixer-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-preference-hydration.js:1), [tests/mixer-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-preference-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  mixer["Lobby mixer controls"]
+  tuning["Voice and spatial controls"]
+  settings["Settings mirrors"]
+  state -->|"Existing state ready"| mixer
+  mixer -->|"Mixer controls in order"| tuning
+  tuning -->|"Voice controls in order"| settings
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the sole owner of stored mixer values and calls this renderer during loadPreferences. |
+| Lobby mixer controls | Hydrate voice, drone, bell, mantra, music, video, visualization ambience and ambience selection controls. |
+| Voice and spatial controls | Hydrate clarity, warmth, pace, voice/music echo and both spatial-mode controls. |
+| Settings mirrors | Hydrate the five duplicate Settings volume controls using the same values. |
+
+- Preserve all 19 ordered control/state pairs and duplicate mirrors. The app retains persistence, the value-sync helper and audio behavior. This eager mapping is not a performance optimization.
 
 <a id="settings-backup"></a>
 

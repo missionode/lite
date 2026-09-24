@@ -20,7 +20,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regr
 - Direct tests cover exact retired keys, checkbox reset defaults, call/event ordering, repeatable reset and invalid dependencies. All 63 runnable Node test files and 11 model-router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
 - Atlas builder passes at 37 maps / 326 nodes / 381 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery only; no performance or device claim.
 
-Next: integrate CP-MOD-030, then assess the larger saved-preference hydration owner. AudioEngine bus work remains behind its reset gate; measured lazy loading remains after extraction parity.
+Integrated via PR #49 at `2662379`; production unchanged.
+
+## CP-MOD-031 — Mixer preference-control hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integrated regression, offline-delivery, atlas-build and syntax evidence.
+
+- Extract the 19 saved mixer/audio setting to control-value synchronizations from `loadPreferences` without taking ownership of app state, timing, journey choices or audio effects.
+- Preserve repeated mirror controls, exact sequence and placement in the overall preference hydration flow. Keep classic script and offline cache delivery.
+- Direct tests cover all 19 ordered pairs, duplicate mirrors, neighboring hydration order, classic-script/offline delivery and missing dependencies. All 64 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
+- Atlas builder passes at 38 maps / 330 nodes / 384 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. This is a small ownership boundary; no performance benefit is claimed.
+
+Next: validate and integrate CP-MOD-031, then continue with other cohesive preference-hydration groups before the measured-loading gate.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 
