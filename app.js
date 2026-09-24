@@ -67,6 +67,7 @@ const boxBreathingPractice = window.ChakraBoxBreathingPractice;
 const visualizationPractice = window.ChakraVisualizationPractice;
 const hooponoponoPractice = window.ChakraHooponoponoPractice;
 const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
+const screenNavigationModule = window.ChakraScreenNavigation;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -75,6 +76,7 @@ if (!boxBreathingPractice) throw new Error('Box Breathing practice module is una
 if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
 if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
+if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -299,6 +301,15 @@ const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
 const icebreakerScreen = document.getElementById('icebreaker-screen');
 const newcomerTutorialScreen = document.getElementById('newcomer-tutorial-screen');
+const screenNavigation = screenNavigationModule.create({
+    body: document.body,
+    document,
+    window,
+    screens: [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    lobbyScreen,
+    configScreen,
+    dispatchDecorationChange: () => document.dispatchEvent(new Event('decorationchange'))
+});
 const icebreakerTimer = document.getElementById('icebreaker-timer');
 
 const NEWCOMER_MARKER_ANCHORS = Object.freeze({
@@ -6511,20 +6522,7 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    document.body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
-    document.dispatchEvent(new Event('decorationchange'));
-    [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen].forEach(s => {
-        if (s) s.classList.add('hidden');
-    });
-    if (screen) {
-        screen.classList.remove('hidden');
-        // Screen sections can be taller than a desktop viewport. Reset both
-        // possible scroll containers so returning to the Lobby never leaves
-        // the header and controls above Core Practice Duration out of view.
-        screen.scrollTop = 0;
-        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
-        if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
-    }
+    screenNavigation.showScreen(screen);
 }
 
 function attachEventListeners() {
