@@ -1,14 +1,23 @@
 # Review
 
+## CP-MOD-025 — Shared range-control UI ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-control, integration-contract, offline-delivery and syntax evidence.
+
+- Extracts value formatting, idempotent range enhancement, bounded step buttons, disabled boundary state and display refresh into `modules/range-controls.js`. App retains timing configuration and state/persistence ownership.
+- `modules/range-controls.js` owns input-value formatting, idempotent DOM enhancement, min/max step-button behavior and display refresh. The app retains timing-config application and all state/persistence handlers.
+- The direct mock-DOM test covers chakra/Sleep/ambience/time formatting, increments and decrements, min/max clamps, disabled boundary states, bubbled `input` updates, idempotent control creation, value refresh, startup order and offline precache. Range tests plus all practice lifecycle/version contracts, Yoga and Lobby settings views, Settings backup, Advanced unlock, journey routing, session estimate, thermal, and Hindi/Malayalam/Russian tests pass. Syntax checks and `git diff --check` pass.
+- Atlas regenerated at 32 maps / 295 nodes / 340 edges; the build surfaced and corrected two stale `app.js` source-line references in the mode map. The visual Playwright verifier cannot start because Playwright is absent from this worktree. The unrelated `tests/drone-duration.test.mjs` remains blocked by owner-managed `docs/dot.json`; neither limitation is reported as passing. No visual/device/performance outcome is claimed; the module remains eager and offline-pre-cached.
+
 ## CP-MOD-024 — Yoga Experience settings ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct behavior, integration-contract, offline-delivery and syntax evidence.
 
-- `modules/yoga-experience-settings.js` owns checked-setting snapshots, immediate and Save-time persistence under the existing keys, and timing-row/accessibility synchronization. App-state hydration and Yoga validation/session execution remain app-owned. The existing Lobby timing-row CSS display defaults are preserved.
-- The direct contract covers Corpse Pose/Bath toggles, checked pose collection, exact state/storage values, disabled/ARIA reset, row display defaults, module startup order and offline precache. Yoga Experience, Lobby visibility, session estimate, Settings backup, Advanced unlock, routing, focused-practice, thermal, Hindi/Malayalam/Russian tests, JavaScript syntax and `git diff --check` pass.
-- Atlas regenerated at 32 maps / 295 nodes / 340 edges, with CP-MOD-024 ownership/source links. Browser atlas verification is unavailable because Playwright is not installed in the isolated worktree. `tests/drone-duration.test.mjs` remains excluded because its owner-managed `docs/dot.json` fixture is absent; no performance, browser/device or audio claim is made. This module remains eager and offline-pre-cached.
+- Integrated via PR #43 at `ad3d49b`. `modules/yoga-experience-settings.js` owns checked-setting snapshots, immediate and Save-time persistence under existing keys, and timing-row/accessibility synchronization. App-state hydration and Yoga validation/session execution remain app-owned.
+- The direct contract covers Corpse Pose/Bath toggles, checked pose collection, exact state/storage values, disabled/ARIA reset, row display defaults, startup order and offline precache. Yoga Experience, Lobby visibility, session estimate, Settings backup, Advanced unlock, routing, focused-practice, thermal and Hindi/Malayalam/Russian contracts, syntax and diff checks passed.
+- Atlas regenerated at 32 maps / 295 nodes / 340 edges. Playwright is absent from the isolated worktree; `tests/drone-duration.test.mjs` remains blocked by the absent owner-managed `docs/dot.json`. Neither is counted as passing. No performance, browser/device or audio claim; module remains eager/offline-pre-cached.
 
-Next: integrate CP-MOD-024, then continue with the next cohesive remaining Settings/controller owner. AudioEngine bus construction stays behind its approved weekly-reset gate; lazy loading still requires parity and measured cold/warm/offline benefit.
+Next: integrate CP-MOD-025; continue remaining cohesive Settings/UI boundaries and audit the AudioEngine gate. Lazy loading remains pending extraction parity plus measured cold/warm/offline evidence.
 
 ## CP-MOD-020 — Lobby session-estimate view-model
 
