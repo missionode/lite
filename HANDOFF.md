@@ -1,5 +1,13 @@
 # Chakra Meditation — Active Handoff
 
+### CP-MOD-012 — Body Scan implementation ownership (checkpoint branch)
+
+- Branch `codex/modularize-cp-012`, based on clean `modularize` commit `63d0dd6`. The local Loop router classified this as reasoning / `gpt-5.6-sol` high (`PLANNED`); no model-specific child was dispatched or model switch claimed because this small extraction touches the shared app/atlas integration boundary.
+- `modules/body-scan-practice.js` owns timed region narration, session-active sequencing, and black-scene/fade cleanup. The existing controller injects the language, audio, screen and session services. Delivery stays eager and offline-pre-cached.
+- Direct Body Scan, focused-practice, settings-backup/shell, Hindi and syntax checks pass. Same local Chromium harness before/after: 13→14 eager scripts, about +1.4 KiB net uncompressed script body bytes; cold/warm timing deltas are within single-run noise. No speedup is claimed. Browser page errors: zero; two blocked-font console errors are harness-generated. No device audio or thermal evidence.
+- Lazy loading has not been implemented. Next work should continue extracting stage/UI ownership, then repeat cold/warm/offline measurements before approving any optional dynamic-import boundary. AudioEngine construction remains deferred per the existing weekly-reset gate.
+- Remaining in this checkpoint: regenerate/verify atlas, run applicable regression suite, commit and open focused PR to `modularize`; after approved integration, run combined checks. Production remains untouched.
+
 ### COMPLETE LOCALLY — CP-MOD-011: preparation execution and measured-loading baseline
 
 - Isolated implementation on `codex/modularize-cp-011`, based on clean `modularize` commit `f98c43b`. The frozen journey-routing module now executes the canonical preparation callbacks sequentially and stops between stages when the session is no longer active; original practice implementations remain in `app.js`.

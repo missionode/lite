@@ -1,5 +1,15 @@
 # Review
 
+## CP-MOD-012 — Body Scan stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regression, atlas and local-browser evidence.
+
+- Timed eight-region narration, session-active sequencing and black-scene/fade cleanup now belong to frozen `modules/body-scan-practice.js`; the controller injects existing localization, audio, screen, sleep and session services.
+- Direct tests cover ordering and proportional pauses, cancellation guards, final scene tail and cleanup after narration failure. Focused-practice and settings/offline delivery contracts pass.
+- The shell adds one eager script. Same-harness single cold/warm samples show about 1.4 KiB net additional uncompressed JS body bytes; timing differences are within run-to-run noise. No startup/performance gain is claimed. Google Fonts are blocked and responses uncompressed; not production/device evidence.
+- Browser page errors: 0. Two console errors were expected font requests blocked by the measurement harness. Device playback/thermal behavior was not tested.
+- No dynamic/lazy loading is implemented. Continue bounded ownership extraction before revisiting the measured-loading gate.
+
 ## CP-MOD-011 — preparation-stage execution seam
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regression, atlas and local-browser evidence.

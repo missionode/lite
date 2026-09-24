@@ -60,7 +60,9 @@ if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
+const bodyScanPractice = window.ChakraBodyScanPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
+if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -4908,24 +4910,22 @@ class MeditationController {
         const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
         const scene = document.getElementById('body-scan-scene');
         const regions = journeyT('ui.bodyScanRegions');
-        const regionNarrations = Array.isArray(regions) ? regions : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('body-scan-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.bodyScanTitle'));
-        try {
-            await this.narrate(journeyT('ui.bodyScanOpening'), false);
-            const pauseSeconds = Math.max(2, Math.floor((minutes * 60) / Math.max(1, regionNarrations.length)));
-            for (let index = 0; index < regionNarrations.length && this.isMeditationActive; index++) {
-                await this.narrate(regionNarrations[index], false);
-                await this.pauseAwareSleep(pauseSeconds * 1000);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.bodyScanClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('body-scan-active');
-        }
+        await bodyScanPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            regions,
+            opening: journeyT('ui.bodyScanOpening'),
+            title: journeyT('ui.bodyScanTitle'),
+            closing: journeyT('ui.bodyScanClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runNoting() {
