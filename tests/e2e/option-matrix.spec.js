@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { unlockAdvancedFeatures } = require('./helpers');
 
 const fastProfile = '/?timingProfile=fast-test';
 
@@ -36,6 +37,7 @@ const intimateServiceCombinations = [
 for (const combination of intimateServiceCombinations) {
   test(`intimate service: ${combination.name}`, async ({ page }) => {
     await openSettings(page);
+    await unlockAdvancedFeatures(page);
     await page.locator('#save-config').click();
     await setChecked(page, 'massage-toggle', combination.massage);
     await setChecked(page, 'perineal-care-toggle', combination.perineal);

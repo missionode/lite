@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### MID — Release-gate failures resolved (local, modularize)
+
+- Corrected E2E setup/expectations to match the actual selectors, script JSON schema, non-zero voice-volume minimum, session-only HRIM selection and immediate restart behavior. Advanced-only test cases now unlock through a test-only WebCrypto stub; no password secret was added.
+- Fixed actual flow gaps: standalone preparation choices (including Box Breathing, Ho’oponopono and Undo & Unlearn) are accepted, dispatched, estimated and shown as standalone Lobby roadmaps when no chakra is selected. The active-session reveal strip no longer intercepts controls after revealing them.
+- Fresh evidence: `npm run test:e2e` passed 26/26; `node docs/app-map/verify-atlas.mjs` passed 32 maps with zero page errors; targeted rerun of the revised roadmap passed. Current task changes remain uncommitted on `modularize`; production has not been updated in this local checkpoint.
+- Browser server `BrokenPipeError` messages occur when Chromium aborts its test media request; they are harness-side cancellations, not browser page errors. Device/audio thermal behavior was not tested.
+
 ### CP-MOD-012 — Body Scan implementation ownership (checkpoint branch)
 
 - Branch `codex/modularize-cp-012`, based on clean `modularize` commit `63d0dd6`. The local Loop router classified this as reasoning / `gpt-5.6-sol` high (`PLANNED`); no model-specific child was dispatched or model switch claimed because this small extraction touches the shared app/atlas integration boundary.

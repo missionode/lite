@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Production release E2E gate corrections — local validation complete
+
+Standalone preparation choices now launch without chakra selection, execute in the shown order, receive a matching standalone roadmap and include their durations in the session countdown. During an active journey, once mouse movement reveals the controls, the bottom reveal area yields pointer interaction to the controls. E2E checks were corrected for current selectors, script JSON fields, voice minimum and session-only HRIM mode. Full browser suite: 26/26 passed; atlas: 32 maps verified. Production publication remains a separate approved action; device playback/thermal validation is not claimed.
+
 ## Measured lazy loading — after extraction parity
 
 The CP-MOD-011 baseline is a single indicative local cold Chromium sample: 13 classic scripts execute before Lobby (about 849 KiB encoded JS bodies), 6.7–7.5 MB reported JS heap and 0.73–1.07 s ScriptDuration. The local server does not compress; the harness blocks Google Fonts. Re-run the same cold/warm/offline and journey-start profile after extraction. These figures do not yet justify a specific dynamic-import boundary or establish a production performance gain. Preserve the small eager shell and choose cohesive optional bundles only after parity; defer implementing lazy loading until stable ownership, offline/error paths and cleanup contracts are testable.
