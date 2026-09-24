@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Measured lazy loading — after extraction parity
+
+The CP-MOD-011 baseline is a single indicative local cold Chromium sample: 13 classic scripts execute before Lobby (about 849 KiB encoded JS bodies), 6.7–7.5 MB reported JS heap and 0.73–1.07 s ScriptDuration. The local server does not compress; the harness blocks Google Fonts. Re-run the same cold/warm/offline and journey-start profile after extraction. These figures do not yet justify a specific dynamic-import boundary or establish a production performance gain. Preserve the small eager shell and choose cohesive optional bundles only after parity; defer implementing lazy loading until stable ownership, offline/error paths and cleanup contracts are testable.
+
+## CP-MOD-011 — ordered preparation execution ownership
+
+Journey routing now executes the existing stage callbacks in canonical order and checks session activity before each stage. The stage implementations and their UI/audio/narration ownership stay in `app.js`; no user-visible flow is intended to change. Atlas map `modularization` records the boundary and `journey-addons` records the cancellation guard.
+
 ## Content-free Undo & Unlearn integration — release 3.51 candidate
 
 Added an optional 5/8/12-minute pitch-black integration after Ho’oponopono. It requires no recall, answer, speech, typing, examples or contact; separates three forgiveness possibilities; preserves responsibility/boundaries; and never claims another person has forgiven the meditator. Four-language source coverage and sequence guards are required; device listening remains open.

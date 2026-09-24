@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: f3933aa baseline + CP-WORKFLOW-003 routing correction · 2026-09-24.
+Source snapshot: f98c43b baseline + CP-MOD-011 uncommitted · 2026-09-24.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

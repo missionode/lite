@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-011 — preparation-stage execution seam
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, regression, atlas and local-browser evidence.
+
+- Sequential execution and the between-stage session-active guard now belong to the frozen `modules/journey-routing.js` API. The controller still owns the five original practice methods and supplies their callbacks.
+- Tests cover canonical order, cancellation before the next stage, empty plan completion, missing-handler rejection and runner-error propagation.
+- No stage timing, narration, visuals, audio, route selection or lifecycle behavior is intentionally changed. Service-worker cache and module URL versions are rotated for offline updates.
+- Pre/post startup samples use the same local Chromium harness: both load 13 classic scripts before Lobby and about 849 KiB uncompressed JavaScript bodies. Post cold sample: DOMContentLoaded 592 ms, load 1,770 ms, ScriptDuration 0.731 s, TaskDuration 1.993 s, heap 6.71 MB; warm sample: DOMContentLoaded 255 ms, load 466 ms, ScriptDuration 0.473 s, TaskDuration 1.267 s, heap 6.65 MB. The prior baseline varied across cold attempts (DOMContentLoaded 510–1,390 ms, load 1,110–2,916 ms, ScriptDuration 0.73–1.07 s, TaskDuration 1.78–3.15 s, heap 6.7–7.5 MB). The post cold reading falls inside baseline variability; this code change is not a startup optimization and makes no speedup claim. The server is uncompressed and Google Fonts are intentionally blocked; these are not production wire/device results.
+- Browser harness observed 0 page errors and two expected blocked-font console errors. `docs/app-map/verify-atlas.mjs` passes all 33 maps, template fallback, node selections, bounds, mobile overflow, keyboard, print and SVG download.
+- Next: continue stage implementation/UI ownership extraction before approving any dynamic-import boundary. AudioEngine bus construction remains owner-deferred until weekly reset.
+
 ## CP-MOD-010 — post-parity loading and lifecycle plan
 
 Status: `PLAN_SYNC PASS`; implementation remains queued.
