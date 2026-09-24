@@ -21,7 +21,7 @@ for (const key of ['chakra_box_meditation', 'chakra_hooponopono']) {
 }
 
 assert.match(app, /getFocusedExperience\(\) \{[\s\S]*?journeyRouting\.resolveFocusedExperience[\s\S]*?yoga-experience-toggle[\s\S]*?assisted-bathing-toggle[\s\S]*?noting-addon-toggle/, 'Focused experience inputs should be delegated to the journey-routing owner');
-assert.match(app, /focusedExperience === 'preparation'\) await this\.runPreparationStages\(\)/, 'Standalone preparation should use the shared ordered stage runner');
+assert.match(app, /focusedExperience === 'preparation'\) \{[\s\S]*?runPreparationStages\(\{ includeBox: true \}\)[\s\S]*?getChecked\('hooponopono-experience-toggle'\)[\s\S]*?runHooponopono\(\)[\s\S]*?getChecked\('undo-unlearn-addon-toggle'\)[\s\S]*?runUndoUnlearn\(\)/, 'Standalone preparation should use the ordered runner and include selected integration practices');
 assert.match(app, /runGratitude\(this\.isHighEnergy\);[\s\S]*?runPreparationStages\(\{ includeBox: true, highEnergy: this\.isHighEnergy \}\)[\s\S]*?runSequence\(\)/, 'Journey preparation should run through the shared plan before chakras');
 assert.match(app, /async runPreparationStages[\s\S]*?buildPreparationStagePlan[\s\S]*?runBoxBreathing[\s\S]*?runVisualization[\s\S]*?runDharana[\s\S]*?runBodyScan[\s\S]*?runNoting/, 'The controller should map each planned preparation stage to its existing runtime method');
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');

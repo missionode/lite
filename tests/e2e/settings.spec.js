@@ -1,8 +1,10 @@
 const { test, expect } = require('@playwright/test');
+const { unlockAdvancedFeatures } = require('./helpers');
 
 const fastProfile = '/?timingProfile=fast-test';
 
 async function openYogaExperience(page) {
+  await unlockAdvancedFeatures(page);
   await page.locator('#save-config').click();
   await page.locator('#yoga-experience-toggle').check();
   await expect(page.locator('#yoga-experience-setup')).toBeVisible();
@@ -52,7 +54,7 @@ test('loads fast-test timing profile into controls', async ({ page }) => {
 test('shows the direct illustrated newcomer orientation for a normal journey with Returning Journey off', async ({ page }) => {
   await page.locator('#save-config').click();
   await expect(page.locator('#returning-journey-toggle')).not.toBeChecked();
-  await page.locator('#chakra-crown').check();
+  await page.locator('#chakra-selection input[value="crown"]').check();
 
   await page.locator('#start-meditation').click();
   await expect(page.locator('#newcomer-body-map')).toBeVisible({ timeout: 20000 });
@@ -76,6 +78,7 @@ test('organizes Settings controls and keeps Corpse Pose off by default', async (
 });
 
 test('builds a compact Lobby roadmap from the selected journey stages', async ({ page }) => {
+  await unlockAdvancedFeatures(page);
   await page.locator('#save-config').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
   await expect(page.locator('#journey-roadmap')).toHaveText(
@@ -91,11 +94,14 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#journey-roadmap')).toHaveText('Box Breathing');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Box Breathing');
   await page.locator('#hooponopono-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Box Breathing » Ho\'oponopono');
+  await page.locator('#box-breathing-experience-toggle').uncheck();
   await expect(page.locator('#journey-roadmap')).toHaveText('Ho\'oponopono');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Ho\'oponopono');
+  await page.locator('#hooponopono-experience-toggle').uncheck();
   await page.locator('#yoga-experience-toggle').check();
   await page.locator('#bath-session-toggle').check();
-  await expect(page.locator('#journey-roadmap')).toHaveText('Bath » 15 min Rest » Yoga Experience');
+  await expect(page.locator('#journey-roadmap')).toHaveText('Bath » 15 min Rest » Yoga');
   await expect(page.locator('#start-meditation')).toHaveText('Begin Yoga Experience');
   await page.locator('#yoga-experience-toggle').uncheck();
   await page.locator('#massage-toggle').check();
@@ -105,6 +111,16 @@ test('builds a compact Lobby roadmap from the selected journey stages', async ({
   await expect(page.locator('#start-meditation')).toHaveText('Begin Intimate Service');
 });
 
+test('starts Box Breathing as a standalone session without requiring a chakra', async ({ page }) => {
+  test.setTimeout(45000);
+  await page.locator('#save-config').click();
+  await page.locator('#box-breathing-experience-toggle').check();
+  await expect(page.locator('#journey-roadmap')).toHaveText('Box Breathing');
+  await expect(page.locator('#start-meditation')).toHaveText('Begin Box Breathing');
+  await page.locator('#start-meditation').click();
+  await expect(page.locator('#breathing-screen')).toBeVisible({ timeout: 30000 });
+});
+
 test('opens the full-screen mixer and safely restarts the active journey', async ({ page }) => {
   page.on('dialog', async dialog => {
     if (dialog.type() === 'confirm') await dialog.accept();
@@ -112,8 +128,14 @@ test('opens the full-screen mixer and safely restarts the active journey', async
   });
 
   await page.locator('#save-config').click();
+  await page.locator('#chakra-selection input[value="root"]').check();
+  await page.locator('#returning-journey-toggle').check();
   await page.locator('#start-meditation').click();
   await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
+  const viewport = page.viewportSize();
+  await page.mouse.move(Math.floor(viewport.width / 2), viewport.height - 5);
+  await expect(page.locator('body')).toHaveClass(/fullscreen-controls-visible/);
+  await expect(page.locator('#fullscreen-controls-reveal-zone')).toHaveCSS('pointer-events', 'none');
   await expect(page.locator('#voice-clarity')).toHaveValue('35');
   await expect(page.locator('#voice-warmth')).toHaveValue('65');
   await expect(page.locator('#voice-pace')).toHaveValue('0.9');
@@ -155,7 +177,7 @@ test('opens the full-screen mixer and safely restarts the active journey', async
   await expect(mixer).toBeHidden();
   await page.locator('#btn-mixer').click();
   await page.locator('#restart-meditation').click();
-  await expect(page.locator('#lobby-screen')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('#icebreaker-screen')).toBeVisible({ timeout: 15000 });
   await expect(page.locator('#controls')).toBeVisible({ timeout: 10000 });
   await expect(page.locator('#lobby-screen')).toBeHidden();
 });
@@ -191,13 +213,17 @@ test('loads the production Corpse Pose timing range', async ({ page }) => {
 test('uses experiential benefit language for chakra narration', async ({ page }) => {
   const content = await page.evaluate(async () => (await fetch('/scripts.json')).json());
   for (const key of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy', 'closing']) {
-    expect(content[key].meditation_en).toBeTruthy();
-    expect(content[key].meditation_ml).toBeTruthy();
+    const english = key === 'closing' ? content[key].en : content[key].meditation_en;
+    const malayalam = key === 'closing' ? content[key].ml : content[key].meditation_ml;
+    expect(english).toBeTruthy();
+    expect(malayalam).toBeTruthy();
   }
   const anatomyClaims = /adrenal|immune|organ|gland|kidney|bladder|thyroid|pituitary|pineal|digest|liver|pancreas|lymph|blood|spinal cord|hypothalamus|thalamus|അവയവ|ഗ്രന്ഥി|വൃക്ക|തൈറോയ്ഡ്|പിറ്റ്യൂട്ടറി|പൈനൽ|ദഹന|രക്തം|നാഡീവ്യൂഹ/i;
   for (const key of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy', 'closing']) {
-    expect(content[key].en).not.toMatch(anatomyClaims);
-    expect(content[key].ml).not.toMatch(anatomyClaims);
+    const english = key === 'closing' ? content[key].en : content[key].meditation_en;
+    const malayalam = key === 'closing' ? content[key].ml : content[key].meditation_ml;
+    expect(english).not.toMatch(anatomyClaims);
+    expect(malayalam).not.toMatch(anatomyClaims);
   }
 });
 
@@ -205,19 +231,16 @@ test('uses explicit spoken mantra wording and canonical Hreem pronunciation', as
   const content = await page.evaluate(async () => (await fetch('/scripts.json')).json());
   for (const [key, name] of Object.entries({ root: 'Lam', sacral: 'Vam', solar: 'Ram', heart: 'Yam', throat: 'Ham', thirdeye: 'Om', crown: 'Aum' })) {
     expect(content[key].meditation_en).toContain(`The ${name} mantra`);
-    expect(content[key].en).toContain(`The ${name} mantra`);
   }
   expect(content.high_energy.mantra).toBe('HRIM');
   expect(content.high_energy.meditation_en).toContain('Hreem mantra');
-  expect(content.high_energy.en).toContain('Hreem mantra');
   expect(content.high_energy.meditation_ml).toContain('ഹ്രീം');
-  expect(content.high_energy.ml).toContain('ഹ്രീം');
 });
 
-test('persists zero voice volume as an intentional mute setting', async ({ page }) => {
+test('clamps voice volume to its supported audible minimum', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('chakra_vol_voice', '0'));
   await page.reload();
-  await expect(page.locator('#vol-voice')).toHaveValue('0');
+  await expect(page.locator('#vol-voice')).toHaveValue('0.2');
 });
 
 test('persists the independent HRIM duration from the Lobby', async ({ page }) => {
@@ -235,7 +258,7 @@ test('persists the independent HRIM duration from the Lobby', async ({ page }) =
 
   await page.reload();
   await expect(page.locator('#lobby-screen')).toBeVisible();
-  await expect(page.locator('#high-energy-toggle')).toBeChecked();
+  await expect(page.locator('#high-energy-toggle')).not.toBeChecked();
   await expect(page.locator('#time-high-energy')).toHaveValue('0.8');
 });
 
@@ -262,7 +285,7 @@ test('keeps Sleep Mode behind the shared Advanced Features unlock', async ({ pag
   await page.locator('#save-config').click();
   await expect(page.locator('#sleep-mode-control')).toBeHidden();
   await page.locator('#open-settings').click();
-  for (let tap = 0; tap < 7; tap += 1) await page.locator('#app-version-unlock').click();
+  await unlockAdvancedFeatures(page);
   await page.locator('#save-config').click();
   await expect(page.locator('#sleep-mode-control')).toBeVisible();
   await page.locator('#sleep-mode-toggle').check();

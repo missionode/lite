@@ -61,8 +61,10 @@ const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const bodyScanPractice = window.ChakraBodyScanPractice;
+const guidedNotingPractice = window.ChakraGuidedNotingPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
+if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -813,6 +815,20 @@ function getJourneyRoadmapLabels() {
 
     if (getChecked('high-energy-toggle')) {
         return withOptionalVideo([t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')]);
+    }
+
+    // With no chakra selected, preparation selections are complete standalone
+    // sessions. Keep the Lobby roadmap aligned with the focused-session route.
+    if (state.selectedChakras.length === 0) {
+        const standalone = [];
+        if (getChecked('box-breathing-experience-toggle')) standalone.push(t('ui.roadmapBoxBreathing'));
+        if (getChecked('visualization-addon-toggle')) standalone.push(t('ui.roadmapVisualization'));
+        if (getChecked('dharana-addon-toggle')) standalone.push(t('ui.roadmapDharana'));
+        if (getChecked('body-scan-addon-toggle')) standalone.push(t('ui.roadmapBodyScan'));
+        if (getChecked('noting-addon-toggle')) standalone.push(t('ui.roadmapNoting'));
+        if (getChecked('hooponopono-experience-toggle')) standalone.push(t('ui.roadmapHooponopono'));
+        if (getChecked('undo-unlearn-addon-toggle')) standalone.push(t('ui.roadmapUndoUnlearn'));
+        if (standalone.length) return withOptionalVideo(standalone);
     }
 
     const labels = [
@@ -4006,11 +4022,14 @@ class MeditationController {
             return 4 * 60 * 1000;
         }
         if (focusedExperience === 'preparation') {
+            const boxSeconds = getChecked('box-breathing-experience-toggle') ? state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60 : 0;
             const visualizationMinutes = getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0;
             const dharanaMinutes = getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0;
             const bodyScanMinutes = getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0;
             const notingMinutes = getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0;
-            return Math.max(1, (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes) * 60) * 1000;
+            const hooponoponoSeconds = getChecked('hooponopono-experience-toggle') ? 4 * 60 : 0;
+            const undoSeconds = getChecked('undo-unlearn-addon-toggle') ? Number(document.getElementById('undo-unlearn-duration')?.value || 8) * 60 : 0;
+            return Math.max(1, boxSeconds + (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes) * 60 + hooponoponoSeconds + undoSeconds) * 1000;
         }
         if (focusedExperience === 'yoga') {
             const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
@@ -4631,7 +4650,11 @@ class MeditationController {
                 this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
                 if (focusedExperience === 'yoga') await this.runYogaSession();
                 else if (focusedExperience === 'intimate') await this.runIntimateService();
-                else if (focusedExperience === 'preparation') await this.runPreparationStages();
+                else if (focusedExperience === 'preparation') {
+                    await this.runPreparationStages({ includeBox: true });
+                    if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runHooponopono();
+                    if (this.isMeditationActive && getChecked('undo-unlearn-addon-toggle')) await this.runUndoUnlearn();
+                }
                 if (this.isMeditationActive) this.finish();
                 return;
             }
@@ -4932,25 +4955,22 @@ class MeditationController {
         const minutes = Number(document.getElementById('noting-duration')?.value || 4);
         const scene = document.getElementById('noting-scene');
         const reminders = journeyT('ui.notingReminders');
-        const prompts = Array.isArray(reminders) ? reminders : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('noting-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.notingTitle'));
-        try {
-            await this.narrate(journeyT('ui.notingOpening'), false);
-            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, prompts.length)));
-            for (const prompt of prompts) {
-                if (!this.isMeditationActive) break;
-                await this.pauseAwareSleep(pauseSeconds * 1000);
-                if (this.isMeditationActive) await this.narrate(prompt, false);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.notingClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('noting-active');
-        }
+        await guidedNotingPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            reminders,
+            opening: journeyT('ui.notingOpening'),
+            title: journeyT('ui.notingTitle'),
+            closing: journeyT('ui.notingClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runVisualization() {
@@ -5645,7 +5665,7 @@ class MeditationController {
             yogaSelected: getChecked('yoga-experience-toggle'),
             intimateSelected: getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle'),
             selectedChakraCount: state.selectedChakras.length,
-            preparationSelected: getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle')
+            preparationSelected: getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('undo-unlearn-addon-toggle') || getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle')
         });
     }
 
@@ -7320,7 +7340,11 @@ function attachEventListeners() {
         const musicOnly = getChecked('music-only-toggle');
         const sleep = getChecked('sleep-mode-toggle');
         const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
-        const focusedExperience = getChecked('yoga-experience-toggle') || intimateService;
+        const standalonePreparation = state.selectedChakras.length === 0 && [
+            'box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle',
+            'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle', 'noting-addon-toggle'
+        ].some(id => getChecked(id));
+        const focusedExperience = getChecked('yoga-experience-toggle') || intimateService || standalonePreparation;
         const dharanaOptions = document.getElementById('dharana-options');
         if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
         const visualizationOptions = document.getElementById('visualization-options');
@@ -7400,7 +7424,11 @@ function attachEventListeners() {
         }
         const shotType = document.getElementById('shot-type-select')?.value;
         const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
-        const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience' : intimateService ? 'ui.beginIntimateService' : 'ui.beginJourney';
+        const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
+            : intimateService ? 'ui.beginIntimateService'
+                : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
+                    : state.selectedChakras.length === 0 && getChecked('hooponopono-experience-toggle') ? 'ui.beginHooponopono'
+                        : 'ui.beginJourney';
         if (startMeditationBtn) startMeditationBtn.textContent = t(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
         document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
         refreshRangeControlDisplays();

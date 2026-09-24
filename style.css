@@ -1324,6 +1324,10 @@ body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden) 
     pointer-events: auto;
 }
 
+body.journey-controls-active.fullscreen-controls-visible #fullscreen-controls-reveal-zone {
+    pointer-events: none;
+}
+
 .icon-btn {
     background: rgba(124, 58, 237, 0.08);
     border: 1px solid rgba(251, 191, 36, 0.15);
