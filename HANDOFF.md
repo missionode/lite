@@ -1,11 +1,11 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-021: Mood & Relaxation settings view ownership
+### NOW — CP-MOD-022: Drone-duration Settings view
 
-- Active isolated branch `codex/modularize-cp-021`, based on modularize integration commit `e20ac01` (CP-MOD-020 merged via PR #39). The checkpoint extracts only the Mood & Relaxation ambience controls' DOM synchronization; live state, localization, audio lifecycle and the app compatibility wrapper remain in `app.js`.
-- CP-MOD-021 direct tests cover Advanced Features visibility, enabled/hidden controls, No Frequency disabling, missing-audio recovery, slider values/fill and output formatting, module startup order, service-worker precache and invalid API input. Atlas sources and generated references are synchronized at 32 maps / 295 nodes / 340 edges; a stale Yoga source reference was refreshed.
-- Fresh settings, ambience, advanced unlock, journey routing, navigation, all seven practice-module, thermal-budget, Hindi/Malayalam/Russian, syntax and diff checks pass. Browser atlas verification could not run because Playwright is absent in this worktree. The drone-duration test still needs owner-managed `docs/dot.json`, missing from isolated worktrees. No device/audio/thermal or runtime-performance claim. Production is unchanged and not authorized by this modularization request.
-- Next: finish checkpoint PR integration; then continue Settings/UI ownership before measuring optional loading boundaries.
+- Active isolated branch `codex/modularize-cp-022`, based on modularize integration commit `a549650` (CP-MOD-021 merged via PR #40). This checkpoint extracts only drone-duration Settings radio/note synchronization; timing calculations, active-mode selection, localized summary and persistence remain in `app.js`.
+- CP-MOD-022 direct tests cover standard/HRIM/Sleep selection, HRIM Beginner restriction, contextual note visibility, script startup order and service-worker precache. Preserve the app's duration math and saved preference behavior. Atlas is regenerated at 32 maps / 295 nodes / 340 edges.
+- Fresh direct view, Mood & Relaxation view, settings backup, Advanced Features unlock, background music, session estimate, journey routing, screen navigation, syntax and diff checks pass. `tests/drone-duration.test.mjs` cannot start without owner-managed `docs/dot.json`; browser atlas verification is unavailable because Playwright is not installed. No performance/device/audio claim; production unchanged.
+- Next: finish this focused checkpoint, then continue Settings/UI owners before measuring optional loading boundaries.
 - Local integration baseline has earlier CP-MOD-020 work; preserve unrelated root `.DS_Store`, `.codex/` and backup-audio changes. Owner-managed `docs/dot.json` is absent from isolated worktrees, so the drone-duration contract cannot run there. Keep this limitation explicit.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
