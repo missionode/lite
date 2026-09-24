@@ -65,12 +65,14 @@ const guidedNotingPractice = window.ChakraGuidedNotingPractice;
 const dharanaPractice = window.ChakraDharanaPractice;
 const boxBreathingPractice = window.ChakraBoxBreathingPractice;
 const visualizationPractice = window.ChakraVisualizationPractice;
+const hooponoponoPractice = window.ChakraHooponoponoPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
 if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.');
 if (!boxBreathingPractice) throw new Error('Box Breathing practice module is unavailable.');
 if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
+if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -5511,40 +5513,22 @@ class MeditationController {
 
     async runHooponopono() {
         const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
-            aura.style.opacity = '1';
-        }
         const symbolEl = document.getElementById('chakra-symbol');
-        if (symbolEl) symbolEl.style.opacity = '0.1';
-        
-        setText('mantra-display', '✦');
-
-        // Intro: "Repeat each phrase gently in your heart" - Keep music playing
-        await this.narrate(localized(this.scripts.hooponopono.intro), false);
-        await this.pauseAwareSleep(timing('transitions', 'hooponoponoIntroPause') * 1000);
-
-        // 3 cycles of the 4 phrases
         const phrases = localized(this.scripts.hooponopono.phrases);
-        for (let cycle = 0; cycle < 3; cycle++) {
-            if (!this.isMeditationActive) return;
-            for (let i = 0; i < phrases.length; i++) {
-                if (!this.isMeditationActive) return;
-                const phrase = phrases[i];
-                
-                // Keep music for all phrases, fade out only on the very last phrase of the last cycle
-                const isLast = (cycle === 2 && i === phrases.length - 1);
-                await this.narrate(phrase, false); // Keep music for phrases
-                await this.pauseAwareSleep(timing('transitions', 'hooponoponoPhrasePause') * 1000);
-            }
-        }
-
-        // Closing breath - Final fade out
-        await this.narrate(localized(this.scripts.hooponopono.closing), true);
-
-        // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
-        // to fade out completely into a peaceful silence.
-        await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
+        await hooponoponoPractice.run({
+            aura,
+            symbol: symbolEl,
+            intro: localized(this.scripts.hooponopono.intro),
+            phrases,
+            closing: localized(this.scripts.hooponopono.closing),
+            introPauseSeconds: timing('transitions', 'hooponoponoIntroPause'),
+            phrasePauseSeconds: timing('transitions', 'hooponoponoPhrasePause'),
+            finalRestSeconds: timing('transitions', 'hooponoponoFinalRest'),
+            setTitle: text => setText('mantra-display', text),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runUndoUnlearn() {

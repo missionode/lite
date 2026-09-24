@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.262';
+const CACHE_NAME = 'chakra-v5.263';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -31,6 +31,7 @@ const ASSETS = [
   './modules/dharana-practice.js?v=1.0',
   './modules/box-breathing-practice.js?v=1.0',
   './modules/visualization-practice.js?v=1.0',
+  './modules/hooponopono-practice.js?v=1.0',
   './manifest.json',
   './Splash-v2.png',
   './scripts.json',
