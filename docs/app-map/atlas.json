@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-24",
-    "commit": "f98c43b baseline + CP-MOD-011 uncommitted",
-    "scope": "Source-reviewed application behavior plus delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment foundation continues in its isolated branch, followed by resumed modularization; the Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented."
+    "commit": "modularize 4f18cd5 baseline + assessment sync 807e17e",
+    "scope": "Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament integrated from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -142,7 +142,7 @@
           [
             "lobby",
             "Meditation Room",
-            "Main mode selection, chakra choices, intention, duration and consultation."
+            "Main mode selection, chakra choices, intention, duration and assessment entry point."
           ]
         ],
         [
@@ -163,8 +163,8 @@
           ],
           [
             "consult",
-            "Consultation / repertory",
-            "Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot."
+            "Separate operator tools",
+            "Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot."
           ]
         ],
         [
@@ -234,11 +234,6 @@
           "Begin"
         ],
         [
-          "lobby",
-          "consult",
-          "Open page"
-        ],
-        [
           "journeys",
           "runtime",
           "Selected path"
@@ -275,7 +270,7 @@
         ]
       ],
       "notes": [
-        "Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries."
+        "The operator assessment is a separate document opened directly; no Lobby assessment CTA is currently provided. Assessment is separate from journey start and manual planning remains with the operator. Runtime behavior takes precedence over older HANDOFF entries."
       ]
     },
     {
@@ -625,8 +620,8 @@
         [
           [
             "assessment",
-            "Complete assessment",
-            "Deliver the separately planned standalone assessment with its existing translation contract."
+            "Assessment delivered",
+            "The standalone operator assessment is implemented and synchronized; operator acceptance remains a tracked follow-up."
           ]
         ],
         [
@@ -3835,266 +3830,73 @@
       ]
     },
     {
-      "id": "assessment-tournament-planned",
+      "id": "assessment-tournament",
       "group": "Supporting pages",
-      "title": "ACTIVE PLAN · Operator-led chakra assessment tournament",
-      "subtitle": "Owner-authorized next isolated checkpoint; current consultation remains runtime truth until replacement validation passes.",
-      "source": ".loop/tracks/assessment-tournament/spec.md:1; .loop/tracks/assessment-tournament/plan.md:1; docs/app-map/FIX-QUEUE.md:1",
-      "rows": [
-        [
-          [
-            "gate",
-            "Isolated implementation gate",
-            "Implement in codex/assessment-tournament before modularization resumes. Current consultation remains authoritative until replacement validation passes."
-          ]
-        ],
-        [
-          [
-            "open",
-            "Open standalone assessment",
-            "Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. Existing Google Translate remains the multilingual path."
-          ],
-          [
-            "load",
-            "Load English versioned question JSON",
-            "Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned."
-          ]
-        ],
-        [
-          [
-            "ask",
-            "Show one neutral question",
-            "Two answer cards plus Equal and Skip. Record the stable question ID immediately."
-          ],
-          [
-            "ledger",
-            "No-repeat ledger",
-            "Answered, equal and skipped IDs can never re-enter this assessment."
-          ]
-        ],
-        [
-          [
-            "values",
-            "Value-priority bracket",
-            "Ask “Which of these two do you prioritize more?” across Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism."
-          ],
-          [
-            "pairs",
-            "Balanced unseen pairs",
-            "Counter card position; never repeat the same unordered value pair. Equal/Skip remain valid."
-          ]
-        ],
-        [
-          [
-            "coverage",
-            "Balance seven-chakra evidence",
-            "Prioritize under-measured chakras; use only genuinely new questions."
-          ],
-          [
-            "tiebreak",
-            "Unused tie-breakers",
-            "Ask new cards only when confidence is insufficient or chakra scores are close."
-          ]
-        ],
-        [
-          [
-            "score",
-            "Normalize seven chakra statuses",
-            "Calculate relative Root through Crown strength/status plus evidence confidence."
-          ],
-          [
-            "archetypes",
-            "Aggregate friendly archetypes",
-            "Display only the approved positive, participant-acceptable names."
-          ]
-        ],
-        [
-          [
-            "dot",
-            "Render one unlabelled dot",
-            "Small green solid, orange half-filled or red outlined dot only. Orange until several consistent independent signals exist; no text, percentage or action."
-          ]
-        ],
-        [
-          [
-            "result",
-            "Operator result",
-            "Seven chakra statuses, archetype names and the dot. No recommendation, journey handoff, Advanced Features controls or automatic service action."
-          ]
-        ],
-        [
-          [
-            "clear",
-            "Clear for New Client",
-            "Explicitly remove current assessment state before the next client."
-          ],
-          [
-            "verify",
-            "Replacement gate",
-            "Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence."
-          ]
-        ]
-      ],
-      "edges": [
-        [
-          "gate",
-          "open",
-          "Authorized"
-        ],
-        [
-          "open",
-          "load",
-          "Start"
-        ],
-        [
-          "load",
-          "ask",
-          "Valid"
-        ],
-        [
-          "load",
-          "verify",
-          "Invalid → safe failure"
-        ],
-        [
-          "ask",
-          "ledger",
-          "Answer / equal / skip"
-        ],
-        [
-          "ledger",
-          "coverage",
-          "Chakra evidence"
-        ],
-        [
-          "ledger",
-          "values",
-          "Value round"
-        ],
-        [
-          "values",
-          "pairs",
-          "Present pair"
-        ],
-        [
-          "pairs",
-          "ledger",
-          "Unique response"
-        ],
-        [
-          "coverage",
-          "ask",
-          "More coverage"
-        ],
-        [
-          "coverage",
-          "tiebreak",
-          "Minimum reached"
-        ],
-        [
-          "tiebreak",
-          "ask",
-          "New tie-breaker"
-        ],
-        [
-          "tiebreak",
-          "score",
-          "Resolved / limit reached"
-        ],
-        [
-          "score",
-          "archetypes",
-          "Summarize"
-        ],
-        [
-          "archetypes",
-          "dot",
-          "Independent signals"
-        ],
-        [
-          "dot",
-          "result",
-          "Display"
-        ],
-        [
-          "result",
-          "clear",
-          "Next client"
-        ],
-        [
-          "clear",
-          "open",
-          "Fresh state"
-        ],
-        [
-          "result",
-          "verify",
-          "Validate replacement"
-        ]
-      ],
-      "notes": [
-        "PLANNED until implementation passes. Questions, value cards and hidden weights/signals live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds live in code. Preserve the current internet-dependent Google Translate widget for all dynamic content. The dot is an operator interpretation aid, not consent; no single answer can determine it."
-      ]
-    },
-    {
-      "id": "consultation",
-      "group": "Supporting pages",
-      "title": "Consultation flow",
-      "subtitle": "Seven cards, 35 responses, local notes and consultant review.",
-      "source": "docs/assesment.html:503; docs/assesment.html:611; docs/assesment.html:726",
+      "title": "Operator-led chakra assessment",
+      "subtitle": "Adaptive one-question/two-choice tournament → seven chakra statuses, positive archetypes and one private operator dot.",
+      "source": "docs/assesment.html:1; modules/assessment-tournament.js:1; modules/assessment-persistence.js:1; data/assessment-questions.json:1; sw.js:1",
       "rows": [
         [
           [
             "lobby",
-            "Begin Session Consultation",
-            "Navigate to docs/assesment.html."
+            "Open assessment",
+            "The operator opens docs/assesment.html directly; no Lobby CTA is currently provided. The page is not connected to journey start or recommendations."
           ]
         ],
         [
           [
             "restore",
-            "Restore local responses",
-            "chakraAnswers and chakraAssessmentNotes; malformed stored object falls back to empty."
+            "Restore current client",
+            "Resume only sanitized, version-compatible local state. Invalid or stale state starts fresh; storage denial continues in memory."
           ]
         ],
         [
           [
-            "answer",
-            "Seven chakra cards",
-            "Five questions each; choose aligned, unsure or a concern direction. Optional per-card notes."
+            "interview",
+            "One prompt at a time",
+            "Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated."
           ]
         ],
         [
           [
-            "save",
-            "Save and update",
-            "Every response/note change saves locally and updates evaluations."
+            "coverage",
+            "Adaptive coverage",
+            "Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing."
           ]
         ],
         [
           [
-            "card",
-            "Completed card insight",
-            "After all questions in a card: strengths, patterns, uncertainties, follow-up and meditation consideration."
+            "result",
+            "Assessment complete",
+            "Show seven relative chakra statuses/confidence and up to three positive archetypes. This is an operator reflection aid, not diagnosis or automatic recommendation."
           ]
         ],
         [
           [
-            "review",
-            "All 35 answered",
-            "Show combined consultant review, recurring themes and follow-up prompts. Partial answers show progress."
+            "dot",
+            "Private service-fit signal",
+            "Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. It does not activate or promise service."
           ]
         ],
         [
-          [
-            "manual",
-            "Manual session planning",
-            "Review with client; navigate back to Lite and choose session settings manually. No automatic prescription handoff."
-          ],
           [
             "clear",
             "Clear for New Client",
-            "Confirmation required; accepted → delete answers/notes and reload. Cancel preserves current record."
+            "Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client."
+          ]
+        ],
+        [
+          [
+            "translate",
+            "Translate dynamically rendered content",
+            "Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required."
+          ]
+        ],
+        [
+          [
+            "failure",
+            "Failure and exit",
+            "Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress."
           ]
         ]
       ],
@@ -4106,36 +3908,26 @@
         ],
         [
           "restore",
-          "answer",
-          "Continue"
+          "interview",
+          "Valid / fresh"
         ],
         [
-          "answer",
-          "save",
-          "Input"
+          "interview",
+          "coverage",
+          "Answer / equal / skip"
         ],
         [
-          "save",
-          "card",
-          "Card complete"
+          "coverage",
+          "interview",
+          "More evidence; exclude consumed IDs"
         ],
         [
-          "save",
-          "answer",
-          "More responses"
+          "coverage",
+          "result",
+          "Evidence complete"
         ],
         [
-          "card",
-          "review",
-          "All complete"
-        ],
-        [
-          "review",
-          "manual",
-          "Consultant reviews"
-        ],
-        [
-          "answer",
+          "result",
           "clear",
           "New client"
         ],
@@ -4143,10 +3935,30 @@
           "clear",
           "restore",
           "Confirmed reset"
+        ],
+        [
+          "interview",
+          "translate",
+          "Prompt render"
+        ],
+        [
+          "result",
+          "translate",
+          "Result render"
+        ],
+        [
+          "restore",
+          "failure",
+          "Invalid stored data"
+        ],
+        [
+          "failure",
+          "interview",
+          "Safe fresh state"
         ]
       ],
       "notes": [
-        "Font-size controls persist a separate scale. EN/Malayalam translation uses an external Google Translate widget, unlike the app’s native locale bundles. Answers and notes persist on the same browser until cleared."
+        "The JSON bank owns English questions, answer-card labels, chakra/value weights and positive archetype strings; the pure engine owns scheduling, uniqueness, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Chromium verified English, Malayalam, Hindi and Russian dynamic prompt rendering, desktop/mobile layout, resume, completion and reset. Google Translate requires a network connection. Trained-operator content acceptance remains a follow-up, not a software test."
       ]
     },
     {

@@ -1,26 +1,23 @@
 # Review
 
-## CP-ASSESS-PLAN-003 — value-priority bracket
+## CP-ASSESS-IMPL-002 — tournament UI, persistence and offline delivery
 
-Status: `APPROVED`; implementation is now authorized as the next isolated checkpoint.
+Status: implemented and locally browser-verified; trained-operator acceptance is the CP-ASSESS-IMPL-003 follow-up.
 
-- Add the participant-facing neutral prompt “Which of these two do you prioritize more?” with eight approved values: Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism.
-- Multiple balanced, non-repeating and position-countered comparisons may contribute conservative evidence to the existing unlabelled operator dot. A single choice never determines the dot, consent, service activation or a participant-facing conclusion.
-- The value bracket remains JSON-owned English content translated through the existing Google Translate path and clears with New Client state.
+- Replaced the legacy review with one question and two answer cards at a time, Equal/Skip, progress, private results and deliberate Clear for New Client.
+- Versioned English question data, the deterministic engine and sanitized persistence are separate owners. Generated text uses text nodes, not HTML injection.
+- Results show seven relative chakra statuses/confidence, positive archetypes and one patterned unlabelled dot. No journey is configured or started.
+- Google Translate dynamically translates future prompts/results; it needs a network connection. Browser evidence covered English, Malayalam, Hindi and Russian, desktop/mobile, resume, completion and reset.
+- The PWA shell includes the page, JSON and modules. Focused engine, persistence and page contracts pass. The synchronized atlas and browser verifier are required again after this merge.
+- Duplicate implementation was removed with the old page: the question bank, scoring, results and legacy key writes now have single owners.
 
-## CP-ASSESS-PLAN-002 — Google Translate multilingual contract
+## CP-ASSESS-IMPL-001 — schema and engine
 
-Status at this planning checkpoint: `PLAN_SYNC PASS`; the old reset gate is superseded by CP-ASSESS-PLAN-003 owner authorization.
+Status: implemented and integrated.
 
-- The assessment keeps one operator-approved English JSON question bank and the existing Google Translate widget.
-- Generated questions, answer cards, progress, archetype names and results must remain translatable after dynamic rendering.
-- Translation remains internet-dependent, matching the current page. Separate native assessment locale bundles are out of scope.
+- The versioned question bank covers seven chakras and eight approved values. The frozen engine owns validation, adaptive coverage, no-repeat scheduling, balanced unique value pairs, counterbalancing, confidence, archetypes and conservative dot thresholds.
+- Contracts cover malformed data, complete evidence, no-repeat after answer/Equal/Skip, balanced pairings, resume sanitation and the rule that a single answer cannot produce green or red.
 
-## CP-ASSESS-PLAN-001 — approved tournament assessment plan
+## CP-ASSESS-IMPL-003 — operator acceptance
 
-Status at this planning checkpoint: `PLAN_SYNC PASS`; implementation is now active under CP-ASSESS-PLAN-003.
-
-- The current consultation remains the source of truth until replacement behavior passes validation.
-- The planned feature is standalone and does not alter journey selection or modularization runtime.
-- Question content is JSON-owned; deterministic no-repeat, scoring, confidence, archetypes and the conservative unlabelled dot are code-owned.
-- The atlas labels this future state as planned, not delivered.
+Pending trained-operator review of wording and practical interpretation. This follow-up does not authorize diagnosis, consent inference, sales language, service activation or automatic recommendations.

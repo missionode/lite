@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: f98c43b baseline + CP-MOD-011 uncommitted · 2026-09-24.
+Source snapshot: modularize 4f18cd5 baseline + assessment sync 807e17e · 2026-09-24.
 
-Source-reviewed application behavior plus delivered modularization checkpoints, explicitly labelled future plans and the approved automatically tiered isolated delivery workflow. Assessment foundation continues in its isolated branch, followed by resumed modularization; the Cosmic Observatory redesign follows both and relocates the dynamic sky to a Settings-linked Sky page. Existing runtime behavior remains authoritative until each plan is implemented.
+Source-reviewed application behavior with modularization checkpoints and the operator-led assessment tournament integrated from production. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -38,9 +38,8 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 28. [Failure and recovery map](#recovery)
 29. [Isolated checkpoint delivery](#delivery-workflow)
 30. [Settings backup and restore](#settings-backup)
-31. [ACTIVE PLAN · Operator-led chakra assessment tournament](#assessment-tournament-planned)
-32. [Consultation flow](#consultation)
-33. [Frequency repertory handoff](#repertory)
+31. [Operator-led chakra assessment](#assessment-tournament)
+32. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -100,7 +99,7 @@ flowchart TD
   manage["Manage Settings"]
   experiments["Experiments"]
   journeys["Journey dispatcher"]
-  consult["Consultation / repertory"]
+  consult["Separate operator tools"]
   runtime["Active experience"]
   support["Supporting systems"]
   complete["Completion"]
@@ -113,7 +112,6 @@ flowchart TD
   manage -->|"Back"| settings
   settings -->|"Experiment Mode"| experiments
   lobby -->|"Begin"| journeys
-  lobby -->|"Open page"| consult
   journeys -->|"Selected path"| runtime
   support -->|"Provides services"| runtime
   runtime -->|"finish()"| complete
@@ -127,17 +125,17 @@ flowchart TD
 | --- | --- |
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
 | Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts. |
-| Meditation Room | Main mode selection, chakra choices, intention, duration and consultation. |
+| Meditation Room | Main mode selection, chakra choices, intention, duration and assessment entry point. |
 | Manage Settings | Public settings import and Advanced Features-protected export. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
-| Consultation / repertory | Separate HTML pages. Consultation produces a review; repertory can prepare a custom Shot. |
+| Separate operator tools | Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot. |
 | Active experience | Shared timer, audio, narration, visuals, mixer, pause and stop. |
 | Supporting systems | JSON scripts, language bundles, Web Audio, Piper worker, localStorage and service worker. |
 | Completion | Guided and Sleep flows update local stats; return to room or eligible Earn link. |
 | Other exits | Shot completion reloads; Music Only stops manually; experiments return to their screen. |
 
-- Use each detailed map for guards, optional stages and failure branches. Runtime behavior takes precedence over older HANDOFF entries.
+- The operator assessment is a separate document opened directly; no Lobby assessment CTA is currently provided. Assessment is separate from journey start and manual planning remains with the operator. Runtime behavior takes precedence over older HANDOFF entries.
 
 <a id="modularization"></a>
 
@@ -264,7 +262,7 @@ Sources: [.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1](/Users/le
 
 ```mermaid
 flowchart TD
-  assessment["Complete assessment"]
+  assessment["Assessment delivered"]
   modules["Complete modularization"]
   reference["Approved visual reference"]
   contract["Preserve all requirements"]
@@ -292,7 +290,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Complete assessment | Deliver the separately planned standalone assessment with its existing translation contract. |
+| Assessment delivered | The standalone operator assessment is implemented and synchronized; operator acceptance remains a tracked follow-up. |
 | Complete modularization | Resume the existing migration and measured loading review. Theme work does not reorder these checkpoints. |
 | Approved visual reference | See docs/design/lite-cosmic-observatory/approved-concept-v1.png: midnight panels, ivory text, champagne actions and cosmic setting. |
 | Preserve all requirements | Keep every option, default, gate, translation, navigation, timing, audio and persistence contract. Mockup omissions and sample values are illustrative. |
@@ -1431,113 +1429,51 @@ flowchart TD
 
 - Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.
 
-<a id="assessment-tournament-planned"></a>
+<a id="assessment-tournament"></a>
 
-## ACTIVE PLAN · Operator-led chakra assessment tournament
+## Operator-led chakra assessment
 
-Owner-authorized next isolated checkpoint; current consultation remains runtime truth until replacement validation passes.
+Adaptive one-question/two-choice tournament → seven chakra statuses, positive archetypes and one private operator dot.
 
-Sources: [.loop/tracks/assessment-tournament/spec.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/spec.md:1), [.loop/tracks/assessment-tournament/plan.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/assessment-tournament/plan.md:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
-
-```mermaid
-flowchart TD
-  gate["Isolated implementation gate"]
-  open["Open standalone assessment"]
-  load["Load English versioned question JSON"]
-  ask["Show one neutral question"]
-  ledger["No-repeat ledger"]
-  values["Value-priority bracket"]
-  pairs["Balanced unseen pairs"]
-  coverage["Balance seven-chakra evidence"]
-  tiebreak["Unused tie-breakers"]
-  score["Normalize seven chakra statuses"]
-  archetypes["Aggregate friendly archetypes"]
-  dot["Render one unlabelled dot"]
-  result["Operator result"]
-  clear["Clear for New Client"]
-  verify["Replacement gate"]
-  gate -->|"Authorized"| open
-  open -->|"Start"| load
-  load -->|"Valid"| ask
-  load -->|"Invalid → safe failure"| verify
-  ask -->|"Answer / equal / skip"| ledger
-  ledger -->|"Chakra evidence"| coverage
-  ledger -->|"Value round"| values
-  values -->|"Present pair"| pairs
-  pairs -->|"Unique response"| ledger
-  coverage -->|"More coverage"| ask
-  coverage -->|"Minimum reached"| tiebreak
-  tiebreak -->|"New tie-breaker"| ask
-  tiebreak -->|"Resolved / limit reached"| score
-  score -->|"Summarize"| archetypes
-  archetypes -->|"Independent signals"| dot
-  dot -->|"Display"| result
-  result -->|"Next client"| clear
-  clear -->|"Fresh state"| open
-  result -->|"Validate replacement"| verify
-```
-
-| Step | Current behavior |
-| --- | --- |
-| Isolated implementation gate | Implement in codex/assessment-tournament before modularization resumes. Current consultation remains authoritative until replacement validation passes. |
-| Open standalone assessment | Operator opens /docs/assesment.html. No journey configuration or Lobby state is changed. Existing Google Translate remains the multilingual path. |
-| Load English versioned question JSON | Validate unique IDs, two choices, chakra weights, archetype signals and tournament metadata. Algorithm remains code-owned. |
-| Show one neutral question | Two answer cards plus Equal and Skip. Record the stable question ID immediately. |
-| No-repeat ledger | Answered, equal and skipped IDs can never re-enter this assessment. |
-| Value-priority bracket | Ask “Which of these two do you prioritize more?” across Sensual Joy, Luxury, Independence, Spontaneity, Commitment, Social Approval, Emotional Safety and Romantic Idealism. |
-| Balanced unseen pairs | Counter card position; never repeat the same unordered value pair. Equal/Skip remain valid. |
-| Balance seven-chakra evidence | Prioritize under-measured chakras; use only genuinely new questions. |
-| Unused tie-breakers | Ask new cards only when confidence is insufficient or chakra scores are close. |
-| Normalize seven chakra statuses | Calculate relative Root through Crown strength/status plus evidence confidence. |
-| Aggregate friendly archetypes | Display only the approved positive, participant-acceptable names. |
-| Render one unlabelled dot | Small green solid, orange half-filled or red outlined dot only. Orange until several consistent independent signals exist; no text, percentage or action. |
-| Operator result | Seven chakra statuses, archetype names and the dot. No recommendation, journey handoff, Advanced Features controls or automatic service action. |
-| Clear for New Client | Explicitly remove current assessment state before the next client. |
-| Replacement gate | Schema, no-repeat, balance, tie-breaker, simulated profiles, persistence/reset, responsive and operator-review evidence. |
-
-- PLANNED until implementation passes. Questions, value cards and hidden weights/signals live in one English versioned JSON file; validation, adaptive selection, no-repeat logic, scoring, confidence, archetypes and conservative dot thresholds live in code. Preserve the current internet-dependent Google Translate widget for all dynamic content. The dot is an operator interpretation aid, not consent; no single answer can determine it.
-
-<a id="consultation"></a>
-
-## Consultation flow
-
-Seven cards, 35 responses, local notes and consultant review.
-
-Sources: [docs/assesment.html:503](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:503), [docs/assesment.html:611](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:611), [docs/assesment.html:726](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:726).
+Sources: [docs/assesment.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:1), [modules/assessment-tournament.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-tournament.js:1), [modules/assessment-persistence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-persistence.js:1), [data/assessment-questions.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/data/assessment-questions.json:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
-  lobby["Begin Session Consultation"]
-  restore["Restore local responses"]
-  answer["Seven chakra cards"]
-  save["Save and update"]
-  card["Completed card insight"]
-  review["All 35 answered"]
-  manual["Manual session planning"]
+  lobby["Open assessment"]
+  restore["Restore current client"]
+  interview["One prompt at a time"]
+  coverage["Adaptive coverage"]
+  result["Assessment complete"]
+  dot["Private service-fit signal"]
   clear["Clear for New Client"]
+  translate["Translate dynamically rendered content"]
+  failure["Failure and exit"]
   lobby -->|"Open"| restore
-  restore -->|"Continue"| answer
-  answer -->|"Input"| save
-  save -->|"Card complete"| card
-  save -->|"More responses"| answer
-  card -->|"All complete"| review
-  review -->|"Consultant reviews"| manual
-  answer -->|"New client"| clear
+  restore -->|"Valid / fresh"| interview
+  interview -->|"Answer / equal / skip"| coverage
+  coverage -->|"More evidence; exclude consumed IDs"| interview
+  coverage -->|"Evidence complete"| result
+  result -->|"New client"| clear
   clear -->|"Confirmed reset"| restore
+  interview -->|"Prompt render"| translate
+  result -->|"Result render"| translate
+  restore -->|"Invalid stored data"| failure
+  failure -->|"Safe fresh state"| interview
 ```
 
 | Step | Current behavior |
 | --- | --- |
-| Begin Session Consultation | Navigate to docs/assesment.html. |
-| Restore local responses | chakraAnswers and chakraAssessmentNotes; malformed stored object falls back to empty. |
-| Seven chakra cards | Five questions each; choose aligned, unsure or a concern direction. Optional per-card notes. |
-| Save and update | Every response/note change saves locally and updates evaluations. |
-| Completed card insight | After all questions in a card: strengths, patterns, uncertainties, follow-up and meditation consideration. |
-| All 35 answered | Show combined consultant review, recurring themes and follow-up prompts. Partial answers show progress. |
-| Manual session planning | Review with client; navigate back to Lite and choose session settings manually. No automatic prescription handoff. |
-| Clear for New Client | Confirmation required; accepted → delete answers/notes and reload. Cancel preserves current record. |
+| Open assessment | The operator opens docs/assesment.html directly; no Lobby CTA is currently provided. The page is not connected to journey start or recommendations. |
+| Restore current client | Resume only sanitized, version-compatible local state. Invalid or stale state starts fresh; storage denial continues in memory. |
+| One prompt at a time | Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. |
+| Adaptive coverage | Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing. |
+| Assessment complete | Show seven relative chakra statuses/confidence and up to three positive archetypes. This is an operator reflection aid, not diagnosis or automatic recommendation. |
+| Private service-fit signal | Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. It does not activate or promise service. |
+| Clear for New Client | Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client. |
+| Translate dynamically rendered content | Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required. |
+| Failure and exit | Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress. |
 
-- Font-size controls persist a separate scale. EN/Malayalam translation uses an external Google Translate widget, unlike the app’s native locale bundles. Answers and notes persist on the same browser until cleared.
+- The JSON bank owns English questions, answer-card labels, chakra/value weights and positive archetype strings; the pure engine owns scheduling, uniqueness, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Chromium verified English, Malayalam, Hindi and Russian dynamic prompt rendering, desktop/mobile layout, resume, completion and reset. Google Translate requires a network connection. Trained-operator content acceptance remains a follow-up, not a software test.
 
 <a id="repertory"></a>
 

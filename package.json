@@ -34,7 +34,7 @@
     "test:drone-duration": "node tests/drone-duration.test.mjs",
     "test:drone-quality": "node tests/drone-quality.test.mjs",
     "test:repertory": "node tests/frequency-repertory.test.mjs",
-    "test:assessment": "node tests/chakra-assessment.test.mjs",
+    "test:assessment": "node tests/chakra-assessment.test.mjs && node tests/assessment-tournament.test.mjs && node tests/assessment-persistence.test.mjs",
     "test:handoff": "node tests/journey-completion-handoff.test.mjs",
     "test:hrim-time": "node tests/hrim-time-window.test.mjs",
     "test:splash": "node tests/splash-screen.test.mjs",

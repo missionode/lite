@@ -1,8 +1,8 @@
 # Screen and control inventory
 
-Source snapshot: f98c43b baseline + CP-MOD-011 uncommitted · 2026-09-24.
+Source snapshot: modularize 4f18cd5 baseline + assessment sync 807e17e · 2026-09-24.
 
-This inventories static UI declarations in the three meditation HTML entry pages. Dynamic consultation radio answers/notes, translated option lists, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
+This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
 ## index.html
 
@@ -159,16 +159,18 @@ This inventories static UI declarations in the three meditation HTML entry pages
 
 | Source | Element | Identifier / label | Choices / bounds / destination |
 | --- | --- | --- | --- |
-| [244](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:244) | button | fontDown |  |
-| [245](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:245) | button | fontReset |  |
-| [246](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:246) | button | fontUp |  |
-| [249](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:249) | button | translateBtn |  |
-| [257](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:257) | a | Back to meditation lobby | href=../index.html |
-| [270](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:270) | button | newAssessment | type=button |
-| [271](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:271) | a | lobbyLink | href=../index.html |
-| [696](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:696) | input | ${c.id}-${qi} | type=radio · value=aligned |
-| [701](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:701) | input | ${c.id}-${qi} | type=radio · value=concern-${oi} |
-| [706](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:706) | input | ${c.id}-${qi} | type=radio · value=unsure |
+| [99](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:99) | button | fontDown | type=button |
+| [100](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:100) | button | fontReset | type=button |
+| [101](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:101) | button | fontUp | type=button |
+| [104](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:104) | button | translateBtn | type=button |
+| [111](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:111) | a | ← Meditation Room | href=../index.html |
+| [122](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:122) | button | retryButton | type=button |
+| [129](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:129) | button | choiceLeft | type=button |
+| [130](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:130) | button | choiceRight | type=button |
+| [133](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:133) | button | equalChoice | type=button |
+| [134](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:134) | button | skipChoice | type=button |
+| [148](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:148) | button | newAssessment | type=button |
+| [149](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:149) | a | Return to Meditation Room | href=../index.html |
 
 ## docs/repertory.html
 
@@ -185,7 +187,7 @@ This inventories static UI declarations in the three meditation HTML entry pages
 - Yoga setup is declared in Settings markup, then moved into the Lobby Yoga panel by attachEventListeners.
 - Language/voice selects and Experiment activity choices receive generated options. See content, narration and experiments maps.
 - Range controls receive decrement/increment buttons; source bounds may be overridden by timing configuration, profile or demo.
-- Consultation generates seven cards with five question groups each, response choices and a notes textarea per card. It persists each response immediately.
+- Assessment loads the validated versioned tournament bank, displays one question and two choices at a time, then builds seven chakra result cards and archetype chips. State resumes locally and Clear for New Client removes it.
 - Repertory generates a Prepare Shot anchor for each validated catalog row and filters the rows during search.
 - Guide Continue is one shared control whose label and availability change with care/Yoga stage.
 - Completion Earn link is revealed after a timer only for eligible meditation languages.
@@ -193,4 +195,4 @@ This inventories static UI declarations in the three meditation HTML entry pages
 
 ## Screen and overlay inventory
 
-Six switchable application screens: config-screen, experiment-screen, lobby-screen, icebreaker-screen, breathing-screen and meditation-screen. Additional surfaces: splash-screen, settings-help-modal, journey-video-prelude, volume-mixer, completion-modal and session-overlay. Consultation and repertory are separate documents with their own navigation and persistent state.
+Six switchable application screens: config-screen, experiment-screen, lobby-screen, icebreaker-screen, breathing-screen and meditation-screen. Additional surfaces: splash-screen, settings-help-modal, journey-video-prelude, volume-mixer, completion-modal and session-overlay. Assessment and repertory are separate documents with their own navigation and persistent state.
