@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-015 — Box Breathing practice ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/box-breathing-practice.js` owns tutorial/cycle sequencing, pause-aware elapsed-time accounting, completion narration and music handoff. Existing translated narration, timing configuration and audio/session services are injected by the app controller.
+- Direct tests cover the preparation and tutorial transitions, 4×4 breathing order, 100 ms tick cadence, pause behavior, cancellation and completion handoff. Localized step arrays remain validated by the four-language focused-practice contract.
+- Eager classic-script and service-worker delivery remain. The 100 ms timer cadence is preserved; this is not a performance improvement. Browser/device audio/thermal evidence was not run.
+- Bounded dependency map used source-symbol/reference inspection because an AST parser is unavailable in the local dependency set. Syntax and direct API behavior were checked.
+
+Next: extract Visualization while preserving audio fade/loop/error/cancel behavior; then complete UI ownership before measured loading.
+
 ## CP-MOD-014 — Dharana focus scene ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.

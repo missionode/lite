@@ -1,10 +1,15 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-014: Dharana focus scene ownership
+### NOW — CP-MOD-015: Box Breathing practice ownership
 
-- Active isolated branch `codex/modularize-cp-014`, based on modularize integration commit `a093fb3` (CP-MOD-013 merged). The checkpoint moves the existing Dharana setup, progress/shrink clock, release and cleanup into frozen `modules/dharana-practice.js`; localization and existing services remain injected by the controller.
-- Direct tests cover selected anchor shape/color, all 60 one-minute scale updates, cancellation, closing narration/four-second tail and cleanup after narration failure. Focused-practice, settings, Guided Noting and Hindi cache tests pass so far. Eager startup/offline precache remain; no speedup is claimed.
-- Atlas regeneration and full applicable validation remain before checkpoint review/PR. Browser/device playback and thermal evidence are not claimed. Production publication is separate and is not authorized by this modularization request.
+- Active isolated branch `codex/modularize-cp-015`, based on modularize integration commit `7c432ee` (CP-MOD-014 merged). The checkpoint moves Box Breathing's tutorial, four-step/four-cycle execution, pause accounting, completion narration and music handoff into frozen `modules/box-breathing-practice.js`; the app supplies translated content, settings, audio and session services.
+- Direct tests cover sequencing, 100 ms timer cadence, pause behavior, stop and audio handoff. Eager startup and offline precache are retained; the high-frequency timer loop is unchanged, so no CPU improvement is claimed.
+- Direct Box Breathing, focused practices, Dharana, Guided Noting, Body Scan, journey-routing, video-prelude, newcomer tutorial, hypnosis, language, settings-backup, English chakra qualities, Malayalam, Hindi, Russian and thermal-budget checks pass; syntax and `git diff --check` pass. Atlas regenerated to 32 maps / 295 nodes / 340 edges, with static source-reference assertions passing. Browser verifier/device audio/thermal evidence are not claimed. Production publication is separate and is not authorized by this modularization request.
+
+### COMPLETE — CP-MOD-014: Dharana focus scene ownership
+
+- Integrated via [PR #33](https://github.com/missionode/lite/pull/33) at `7c432ee`. Frozen `modules/dharana-practice.js` owns the anchor/veil lifecycle and active-session shrink clock; the controller supplies localized text and app services.
+- Direct tests verify all one-minute progress updates, selected shape/color, four-second narrated release, cancellation and cleanup on failure. Focused, settings, language, routing and predecessor module tests passed. Eager delivery remains; no performance gain is claimed. Browser/device audio/thermal evidence remains open.
 
 ### COMPLETE — CP-MOD-013: Guided Noting implementation ownership
 

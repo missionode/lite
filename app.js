@@ -63,10 +63,12 @@ const journeyRouting = window.ChakraJourneyRouting;
 const bodyScanPractice = window.ChakraBodyScanPractice;
 const guidedNotingPractice = window.ChakraGuidedNotingPractice;
 const dharanaPractice = window.ChakraDharanaPractice;
+const boxBreathingPractice = window.ChakraBoxBreathingPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
 if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.');
+if (!boxBreathingPractice) throw new Error('Box Breathing practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -4988,77 +4990,34 @@ class MeditationController {
     }
 
     async runBoxBreathing() {
-        const screen = document.getElementById('breathing-screen');
         const breathingStep = this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBreathing;
-        const tutorial = document.getElementById('breathing-tutorial');
-        const instruction = document.getElementById('breathing-instruction');
-        const circle = document.getElementById('breathing-circle');
-        const timer = document.getElementById('breathing-timer');
-        
-        showScreen(screen);
-        tutorial.classList.remove('hidden');
-        tutorial.style.opacity = "1";
-
-        const tutTitle = document.getElementById('tutorial-title');
-        tutTitle.textContent = journeyT('ui.preparation');
-        const text = contentT('system.centeringBreath');
-        // Fade out music before box meditation
-        this.audio.fadeOutBackgroundMusic(4);
-
-        // Narrate the preparation instruction with keepSilence = true
-        await this.narrate(text, false, true);
-
-        for (let s = timing('transitions', 'breathingPreparation'); s > 0; s--) {
-            if (!this.isMeditationActive) return;
-            await this.pauseAwareSleep(1000);
-        }
-        
-        tutorial.style.opacity = "0";
-        await this.pauseAwareSleep(timing('transitions', 'breathingTutorialFade') * 1000);
-        tutorial.classList.add('hidden');
-
-        const steps = contentT('system.breathingSteps');
-
-        for (let cycle = 0; cycle < 4; cycle++) {
-            for (const step of steps) {
-                if (!this.isMeditationActive) return;
-                
-                instruction.textContent = step.text;
-                // Sync visual timing with configurable breathing duration
-                circle.style.transition = `transform ${breathingStep}s linear`;
-                circle.style.transform = `scale(${step.scale})`;
-                
-                this.narrateSoft(step.text);
-
-                for (let s = breathingStep; s > 0; s--) {
-                    if (!this.isMeditationActive) return;
-                    timer.textContent = s.toString().padStart(2, '0');
-                    
-                    // More responsive pause: check every 100ms
-                    let elapsed = 0;
-                    while (elapsed < 1000) {
-                        if (!this.isMeditationActive) return;
-                        if (!this.isPaused) {
-                            elapsed += 100;
-                        }
-                        await new Promise(r => setTimeout(r, 100));
-                    }
-                }
-            }
-        }
-
-        // Intimate Completion
-        if (this.isMeditationActive) {
-            instruction.textContent = journeyT('ui.breathingComplete');
-            const completeText = contentT('system.breathingComplete');
-            await this.narrate(completeText, false, true);
-            
-            // Fade music back in after box meditation
-            this.audio.fadeInBackgroundMusic(4, false);
-
-            instruction.textContent = journeyT('ui.prepare');
-            await this.pauseAwareSleep(timing('transitions', 'breathingCompletion') * 1000);
-        }
+        const screen = document.getElementById('breathing-screen');
+        await boxBreathingPractice.run({
+            breathingStep,
+            breathingPreparationSeconds: timing('transitions', 'breathingPreparation'),
+            tutorialFadeSeconds: timing('transitions', 'breathingTutorialFade'),
+            completionSeconds: timing('transitions', 'breathingCompletion'),
+            screen,
+            tutorial: document.getElementById('breathing-tutorial'),
+            titleElement: document.getElementById('tutorial-title'),
+            instruction: document.getElementById('breathing-instruction'),
+            circle: document.getElementById('breathing-circle'),
+            timer: document.getElementById('breathing-timer'),
+            title: journeyT('ui.preparation'),
+            preparationNarration: contentT('system.centeringBreath'),
+            steps: contentT('system.breathingSteps'),
+            completionLabel: journeyT('ui.breathingComplete'),
+            completionNarration: contentT('system.breathingComplete'),
+            prepareLabel: journeyT('ui.prepare'),
+            showScreen,
+            narrate: (text, keepSilence) => this.narrate(text, false, keepSilence),
+            narrateSoft: text => this.narrateSoft(text),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive,
+            isPaused: () => this.isPaused,
+            fadeMusicOut: seconds => this.audio.fadeOutBackgroundMusic(seconds),
+            fadeMusicIn: (seconds, immediate) => this.audio.fadeInBackgroundMusic(seconds, immediate)
+        });
     }
 
     async runCorpsePose() {

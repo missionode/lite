@@ -32,6 +32,7 @@
     "test:body-scan": "node tests/body-scan-practice.test.mjs",
     "test:guided-noting": "node tests/guided-noting-practice.test.mjs",
     "test:dharana": "node tests/dharana-practice.test.mjs",
+    "test:box-breathing": "node tests/box-breathing-practice.test.mjs",
     "test:yoga-experience": "node tests/yoga-experience.test.mjs",
     "test:advanced-unlock": "node tests/advanced-unlock.test.mjs",
     "test:drone-duration": "node tests/drone-duration.test.mjs",
