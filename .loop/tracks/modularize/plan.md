@@ -28,6 +28,8 @@ CP-MOD-016 extracts Visualization's blackout, narration, silence wake prompt, am
 
 CP-MOD-017 extracts Ho’oponopono's localized opening, three cycles of the four phrases, configured pauses, closing fade handoff and visual setup behind a frozen direct-test API. The app continues to own integration-stage placement, script localization, audio/narration and session timing services; preserve the current order and behavior.
 
+CP-MOD-018 extracts Undo & Unlearn's black-scene setup, localized phase sequencing, active-session guards and fade cleanup behind a frozen direct-test API. Preserve its content-free private-reflection contract and existing timing. Guarantee DOM/body cleanup even if the scene-release delay rejects; leave integration placement, copy and session services in the app.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.

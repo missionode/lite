@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-018 — Undo & Unlearn practice lifecycle
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/undo-unlearn-practice.js` owns black-scene setup, translated title/opening/phases/closing, selected-duration interval calculation, active-session checks and fade cleanup. Existing content-free private-reflection wording and stage placement are unchanged.
+- The direct API test verifies phase order and spacing, cancellation, narration failure, fade-wait rejection, and guaranteed hiding/body-mode cleanup. All practice owners, focused-practice, routing, audio transition, stage-fade, thermal, settings backup and Hindi/Malayalam/Russian contracts pass.
+- Eager script/offline delivery remains. Existing timings are unchanged; no performance gain is claimed. Browser/device playback/thermal evidence is not claimed.
+- Atlas regenerated to 32 maps / 295 nodes / 340 edges; static source/ownership assertions and syntax checks pass. Browser atlas verification is unavailable because Playwright is not installed in the isolated worktree.
+
+Next: extract remaining UI controller ownership; then measure optional loading boundaries after parity.
+
 ## CP-MOD-015 — Box Breathing practice ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
