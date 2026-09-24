@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '685a38d baseline + uncommitted CP-MOD-034', scope: 'Source-reviewed behavior at modularize integration baseline 685a38d. Timing-control presentation hydration is integrated; the active checkpoint extracts only appearance preference hydration while app retains saved state and visual rendering. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: 'f2d8827 baseline + uncommitted CP-MOD-035', scope: 'Source-reviewed behavior at modularize integration baseline f2d8827. Timing and appearance preference control hydration are integrated; the active checkpoint extracts script-selector and custom-script status presentation while app retains state, loading, validation and demo timing decisions. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -392,7 +392,7 @@ add('timing-preference-hydration','Systems','Timing preference control hydration
  [['core','Core duration controls','Set chakra and High Energy duration slider values, apply the existing percentage fill and format minute labels.']],
  [['drone','Drone duration controls','App synchronizes drone duration mode and summary after core duration hydration.']],
  [['journey','Journey and care timing controls','Synchronize arrival, emergence, breathing, corpse, interval, yoga prep/pose and care durations in the existing order; care labels use floored whole minutes.']],
- [['remaining','Other preferences','Brightness, script, range controls and voice-selection hydration remain app-owned.']]
+ [['remaining','Other preferences','Appearance hydration owns visual-effect and brightness controls; script controls have their own map; range and voice selection remain app-owned.']]
 ],[['core','drone','Core timing labels ready'],['drone','journey','Mode callback completed'],['journey','remaining','Additional timing labels ready']],['This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization.']);
 
 add('appearance-preference-hydration','Systems','Appearance preference control hydration','Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.','modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:5973',[
@@ -401,5 +401,13 @@ add('appearance-preference-hydration','Systems','Appearance preference control h
  [['brightness','Restore brightness','Synchronize the brightness control and set the existing #app brightness property.']],
  [['continue','Continue preference hydration','Script selection, custom-script status and voice selection remain app-owned.']]
 ],[['state','effect','Preferences loaded'],['effect','brightness','Existing effect applied'],['brightness','continue','Display values restored']],['Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim.']);
+
+add('script-preference-hydration','Systems','Script preference control hydration','Restores the selected script source and updates the custom-script presentation without owning script loading.','modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:5973',[
+ [['state','Loaded app state','The app remains the owner of script source and loaded custom-script content.']],
+ [['source','Restore source selector','Synchronize the saved default/custom source choice.']],
+ [['panel','Custom-script visibility','Show the custom-script panel only when the saved source is custom.']],
+ [['status','Restore status message','For an available custom script, retain the existing demo-timing or ready copy; if no script is loaded, leave the prior status untouched.']],
+ [['continue','Continue startup','Range display refresh and voice auto-selection remain in the app.']]
+],[['state','source','Preferences loaded'],['source','panel','Source selected'],['panel','status','Visibility applied'],['status','continue','Status and panel hydrated']],['The app injects demo-script detection and timing copy; actual script loading, validation and persistence remain app-owned. Eager and offline-pre-cached; no performance claim.']);
 
 export { graphs };

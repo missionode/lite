@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 685a38d baseline + uncommitted CP-MOD-034 · 2026-09-25.
+Source snapshot: f2d8827 baseline + uncommitted CP-MOD-035 · 2026-09-25.
 
-Source-reviewed behavior at modularize integration baseline 685a38d. Timing-control presentation hydration is integrated; the active checkpoint extracts only appearance preference hydration while app retains saved state and visual rendering. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at modularize integration baseline f2d8827. Timing and appearance preference control hydration are integrated; the active checkpoint extracts script-selector and custom-script status presentation while app retains state, loading, validation and demo timing decisions. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -46,9 +46,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 36. [Journey selection preference hydration](#journey-selection-hydration)
 37. [Timing preference control hydration](#timing-preference-hydration)
 38. [Appearance preference control hydration](#appearance-preference-hydration)
-39. [Settings backup and restore](#settings-backup)
-40. [Operator-led chakra assessment](#assessment-tournament)
-41. [Frequency repertory handoff](#repertory)
+39. [Script preference control hydration](#script-preference-hydration)
+40. [Settings backup and restore](#settings-backup)
+41. [Operator-led chakra assessment](#assessment-tournament)
+42. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1667,7 +1668,7 @@ flowchart TD
 | Core duration controls | Set chakra and High Energy duration slider values, apply the existing percentage fill and format minute labels. |
 | Drone duration controls | App synchronizes drone duration mode and summary after core duration hydration. |
 | Journey and care timing controls | Synchronize arrival, emergence, breathing, corpse, interval, yoga prep/pose and care durations in the existing order; care labels use floored whole minutes. |
-| Other preferences | Brightness, script, range controls and voice-selection hydration remain app-owned. |
+| Other preferences | Appearance hydration owns visual-effect and brightness controls; script controls have their own map; range and voice selection remain app-owned. |
 
 - This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization.
 
@@ -1698,6 +1699,37 @@ flowchart TD
 | Continue preference hydration | Script selection, custom-script status and voice selection remain app-owned. |
 
 - Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim.
+
+<a id="script-preference-hydration"></a>
+
+## Script preference control hydration
+
+Restores the selected script source and updates the custom-script presentation without owning script loading.
+
+Sources: [modules/script-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/script-preference-hydration.js:1), [tests/script-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/script-preference-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  source["Restore source selector"]
+  panel["Custom-script visibility"]
+  status["Restore status message"]
+  continue["Continue startup"]
+  state -->|"Preferences loaded"| source
+  source -->|"Source selected"| panel
+  panel -->|"Visibility applied"| status
+  status -->|"Status and panel hydrated"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the owner of script source and loaded custom-script content. |
+| Restore source selector | Synchronize the saved default/custom source choice. |
+| Custom-script visibility | Show the custom-script panel only when the saved source is custom. |
+| Restore status message | For an available custom script, retain the existing demo-timing or ready copy; if no script is loaded, leave the prior status untouched. |
+| Continue startup | Range display refresh and voice auto-selection remain in the app. |
+
+- The app injects demo-script detection and timing copy; actual script loading, validation and persistence remain app-owned. Eager and offline-pre-cached; no performance claim.
 
 <a id="settings-backup"></a>
 
