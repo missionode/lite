@@ -46,4 +46,4 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - No journey recommendation, Lobby handoff, automatic session configuration, service activation or sales prompt.
 - No Advanced Features assessment settings panel.
 - No separate native Malayalam, Hindi or Russian assessment bundles in this feature; multilingual readiness uses the existing Google Translate integration.
-- No implementation before the weekly usage reset; this approved plan is the next feature before modularization resumes.
+- The software implementation is delivered and synchronized into `modularize`; trained-operator acceptance remains a separate follow-up and does not block modularization.
