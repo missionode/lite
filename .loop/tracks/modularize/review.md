@@ -19,7 +19,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focu
 - Direct tests cover Lobby/Settings dynamic-background exception, hidden/visible transitions, scroll reset, decoration notification, null destination and module delivery. Lobby-scroll, all journey practice modules, thermal, settings and four-language checks pass.
 - Eager script/offline precache remain. No behavior or performance change is claimed. Browser/device evidence is not claimed; graph topology did not change.
 
-Next: CP-MOD-020 extracts the Lobby estimate view-model; then continue Settings and UI ownership before measured loading.
+Next: CP-MOD-021 extracts the Mood & Relaxation ambience settings renderer; then continue cohesive Settings/UI ownership before measured loading.
+
+## CP-MOD-021 — Mood & Relaxation ambience settings view
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integration, offline-delivery and syntax evidence.
+
+- `modules/mood-ambience-settings-view.js` owns DOM synchronization for the Advanced Features Lobby ambience section, intensity and URL controls, blur settings, bounded gain slider and unavailable-source status. `app.js` retains the compatibility wrapper and injects live state, audio availability, localized message and existing formatter.
+- Direct behavior tests cover locked/unlocked display, option visibility, No Frequency disabling, unavailable audio recovery, slider values/fills, output text and API validation. HTML startup order and service-worker precache are asserted. Atlas sources and generated references are synchronized at 32 maps / 295 nodes / 340 edges. A stale Yoga source reference discovered during generation was corrected.
+- Fresh checks passed: mood view, settings backup, Advanced Features unlock, background music/ambience, session estimate, journey routing, screen navigation, Guided Noting, Dharana, Box Breathing, Visualization, Ho’oponopono, Undo & Unlearn, thermal budget, Hindi/Malayalam/Russian contracts, JavaScript syntax and `git diff --check`.
+- Browser atlas verification could not run because Playwright is not installed in this worktree. Device/audio/thermal evidence is not claimed. The unrelated drone-duration test requires owner-managed `docs/dot.json`, absent from isolated worktrees. No execution/performance benefit is claimed; module remains eager and offline-precached.
+
+Next: integrate this validated boundary, then continue with the next cohesive Settings/UI owner. Keep measured lazy loading gated until extraction parity and repeatable cold/warm/offline data.
 
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 

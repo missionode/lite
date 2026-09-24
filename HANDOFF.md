@@ -1,10 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-020: Lobby session-estimate ownership
+### NOW — CP-MOD-021: Mood & Relaxation settings view ownership
 
-- Active isolated branch `codex/modularize-cp-020`, based on modularize integration commit `d90e81d` (CP-MOD-019 merged). This checkpoint extracts deterministic Lobby session-estimate precedence and calculation into `modules/session-estimate.js`; UI rendering and roadmap refresh remain in app.js.
-- CP-MOD-019 is complete via [PR #38](https://github.com/missionode/lite/pull/38), merged to `modularize` at `d90e81d`. Direct screen navigation and Lobby-scroll, all journey practice owners, thermal, settings, and four-language tests passed; atlas/source checks remain at 32 maps / 295 nodes / 340 edges. Browser verifier unavailable (Playwright absent); device evidence not claimed. Production remains unchanged.
-- CP-MOD-020 direct tests cover mode precedence, all standalone estimates, intimate care, Yoga, Sleep, HRIM, standard chakra/add-on formula, and demo timing. Focused modes, Sleep-duration routing, all practice/navigation owners, thermal, settings, and Hindi/Malayalam/Russian checks pass. Atlas has been updated to 32 maps / 295 nodes / 340 edges with static owner assertions. Existing text, keys, defaults and roadmap-refresh point remain unchanged. Browser verifier unavailable (Playwright absent); device evidence is not claimed. Production publication remains unauthorized by this modularization request.
+- Active isolated branch `codex/modularize-cp-021`, based on modularize integration commit `e20ac01` (CP-MOD-020 merged via PR #39). The checkpoint extracts only the Mood & Relaxation ambience controls' DOM synchronization; live state, localization, audio lifecycle and the app compatibility wrapper remain in `app.js`.
+- CP-MOD-021 direct tests cover Advanced Features visibility, enabled/hidden controls, No Frequency disabling, missing-audio recovery, slider values/fill and output formatting, module startup order, service-worker precache and invalid API input. Atlas sources and generated references are synchronized at 32 maps / 295 nodes / 340 edges; a stale Yoga source reference was refreshed.
+- Fresh settings, ambience, advanced unlock, journey routing, navigation, all seven practice-module, thermal-budget, Hindi/Malayalam/Russian, syntax and diff checks pass. Browser atlas verification could not run because Playwright is absent in this worktree. The drone-duration test still needs owner-managed `docs/dot.json`, missing from isolated worktrees. No device/audio/thermal or runtime-performance claim. Production is unchanged and not authorized by this modularization request.
+- Next: finish checkpoint PR integration; then continue Settings/UI ownership before measuring optional loading boundaries.
+- Local integration baseline has earlier CP-MOD-020 work; preserve unrelated root `.DS_Store`, `.codex/` and backup-audio changes. Owner-managed `docs/dot.json` is absent from isolated worktrees, so the drone-duration contract cannot run there. Keep this limitation explicit.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 
