@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-016: Visualization practice ownership
+### NOW — CP-MOD-017: Ho’oponopono practice ownership
 
-- Active isolated branch `codex/modularize-cp-016`, based on modularize integration commit `f669a3e` (CP-MOD-015 merged). This checkpoint moves Visualization's blackout/audio/narration/re-entry lifecycle into frozen `modules/visualization-practice.js`; the controller injects translated text and existing screen/audio/session services.
-- CP-MOD-015 Box Breathing is complete via [PR #34](https://github.com/missionode/lite/pull/34), merged to `modularize` at `f669a3e`; direct and neighboring language/settings/routing/thermal tests passed. Atlas records 32 maps / 295 nodes / 340 edges. Browser/device playback/thermal evidence are not claimed. Production remains unchanged.
-- For CP-MOD-016, direct lifecycle, cancellation, ambience-fallback, fades and integration checks are being run. Existing pause-aware sleeps and fade intervals remain unchanged; no performance improvement is claimed. Browser/device playback and thermal evidence are not claimed. Production publication is separate and is not authorized by this modularization request.
+- Active isolated branch `codex/modularize-cp-017`, based on modularize integration commit `f122f28` (CP-MOD-016 merged). This checkpoint extracts Ho’oponopono's existing visual setup, localized narration sequence, three four-phrase cycles, configured pauses and final fade/rest; chakra-journey placement remains in the controller.
+- CP-MOD-016 Visualization is complete via [PR #35](https://github.com/missionode/lite/pull/35), merged to `modularize` at `f122f28`. Direct score/silence/error/cancellation/timing/fade tests and focused practice, audio transition, routing, fade, thermal, settings, and four-language checks passed; the atlas was regenerated to 32 maps / 295 nodes / 340 edges with static source assertions. Browser verifier could not run because Playwright was unavailable; no device playback/thermal evidence is claimed. Production remains unchanged.
+- CP-MOD-017 is implemented and locally validated: direct tests cover the 12 phrase turns, configured pauses, cancellation, final narration handoff and module delivery. Focused practice, predecessor modules, routing, audio transitions, fades, thermal budget, settings, and Hindi/Malayalam/Russian narration checks pass. Atlas is regenerated to 32 maps / 295 nodes / 340 edges and static ownership assertions pass. Browser verifier cannot run because Playwright is absent from this worktree; no device playback or thermal evidence is claimed. Existing timing and narration behavior remain unchanged. Production publication is separate and is not authorized by this modularization request.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

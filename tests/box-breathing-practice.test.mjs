@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const boxBreathingPractice = window\.ChakraBoxBreathingPractice/);
 assert.match(app, /if \(!boxBreathingPractice\) throw new Error\('Box Breathing practice module is unavailable\.'\)/);
 assert.match(app, /async runBoxBreathing\(\) \{[\s\S]*?boxBreathingPractice\.run\(/, 'the controller should delegate Box Breathing to its lifecycle owner');
-assert.match(html, /modules\/box-breathing-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.67/, 'the module should load before app.js with a refreshed app version');
-assert.match(serviceWorker, /chakra-v5\.262[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
+assert.match(html, /modules\/box-breathing-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.68/, 'the module should load before app.js with a refreshed app version');
+assert.match(serviceWorker, /chakra-v5\.263[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

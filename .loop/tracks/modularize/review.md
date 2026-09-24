@@ -9,7 +9,7 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focu
 - Eager classic-script and service-worker delivery remain. The 100 ms timer cadence is preserved; this is not a performance improvement. Browser/device audio/thermal evidence was not run.
 - Bounded dependency map used source-symbol/reference inspection because an AST parser is unavailable in the local dependency set. Syntax and direct API behavior were checked.
 
-Next: CP-MOD-016 extracts Visualization while preserving audio fade/loop/error/cancel behavior; then complete UI ownership before measured loading.
+Next: CP-MOD-017 extracts Ho’oponopono's existing phrase-cycle lifecycle; then extract remaining practice/controller seams before measured loading.
 
 ## CP-MOD-016 — Visualization practice lifecycle
 
@@ -20,7 +20,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focu
 - Eager script/offline delivery remain. Existing wait/fade intervals and pause-aware sleep are preserved; no performance gain is claimed. Browser fade/render, device playback and thermal evidence were not run.
 - Dependency mapping used focused symbol/reference inspection; syntax and direct API behavior were checked.
 
-Next: extract remaining UI controller ownership, then measure candidate lazy-loading boundaries only after parity.
+Next: extract the remaining integration practice and UI controller ownership, then measure candidate lazy-loading boundaries only after parity.
+
+## CP-MOD-017 — Ho’oponopono practice lifecycle
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/hooponopono-practice.js` owns the existing aura/symbol setup, localized opening, three ordered cycles of the four phrases, configured inter-phrase pauses, closing narration with its final fade flag, and final rest. The app still localizes script data and retains integration-stage placement.
+- Direct tests cover exact 12-phrase order, all configured pauses, closing handoff, cancellation before the first phrase, narration failure propagation, and script/offline integration. Focused-practice, all predecessor practice contracts, routing, audio transition, stage-fade, thermal, settings and four-language narration contracts pass.
+- Eager script/offline delivery remains. Existing narration and timing are unchanged; no performance improvement is claimed. Browser/device audio or thermal evidence was not run.
+- Atlas regenerated to 32 maps / 295 nodes / 340 edges; static source/ownership assertions and syntax checks pass. The browser verifier is unavailable because Playwright is not installed in this isolated worktree.
+
+Next: extract Undo & Unlearn lifecycle and remaining UI controller ownership, then measure optional loading boundaries after parity.
 
 ## CP-MOD-014 — Dharana focus scene ownership
 
