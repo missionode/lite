@@ -58,6 +58,8 @@ CP-MOD-031 extracts the ordered mixer/preference control-value synchronization f
 
 CP-MOD-032 extracts hydration of selected chakras, the defaulted intention and the returning/video/audio-filter toggles. Keep selection state, default intention policy, validation and journey start in the app; inject current state and existing UI helpers. Preserve selection order, fallback behavior and position before frequency/session-mode controls. Eager delivery remains; this is not a performance optimization.
 
+CP-MOD-033 extracts core and auxiliary timing-control hydration: core duration range fills/labels and the ordered journey-duration values/labels. Preserve existing slider fill percentages, minute/second formatting, order, timing defaults, duration calculations and drone-mode callbacks. App retains config, state and estimate owners. Eager delivery remains; this is not a performance optimization.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.

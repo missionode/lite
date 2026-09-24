@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const droneDurationSettingsView = window\.ChakraDroneDurationSettingsView/);
 assert.match(app, /function syncDroneDurationModeControls\(\)\s*\{[\s\S]*?droneDurationSettingsView\.sync\(/);
-assert.match(html, /modules\/drone-duration-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.83/);
-assert.match(serviceWorker, /chakra-v5\.278[\s\S]*?modules\/drone-duration-settings-view\.js\?v=1\.0/);
+assert.match(html, /modules\/drone-duration-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.84/);
+assert.match(serviceWorker, /chakra-v5\.279[\s\S]*?modules\/drone-duration-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-033 — Timing control presentation hydration
+
+Core and auxiliary duration values are copied into current controls with their existing range-fill and unit labels. Stored timing defaults/clamping, duration calculations and drone-duration selection remain in their current owners.
+
 ## CP-MOD-032 — Journey-selection hydration
 
 Selected chakras, the existing intention fallback and returning/video/audio-filter control state are applied by a tested owner. The app still owns stored state, validation, mode gates and journey dispatch; no route or saved preference semantics change.
