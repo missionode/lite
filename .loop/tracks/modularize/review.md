@@ -1,5 +1,15 @@
 # Review
 
+## CP-MOD-024 — Yoga Experience settings ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct behavior, integration-contract, offline-delivery and syntax evidence.
+
+- `modules/yoga-experience-settings.js` owns checked-setting snapshots, immediate and Save-time persistence under the existing keys, and timing-row/accessibility synchronization. App-state hydration and Yoga validation/session execution remain app-owned. The existing Lobby timing-row CSS display defaults are preserved.
+- The direct contract covers Corpse Pose/Bath toggles, checked pose collection, exact state/storage values, disabled/ARIA reset, row display defaults, module startup order and offline precache. Yoga Experience, Lobby visibility, session estimate, Settings backup, Advanced unlock, routing, focused-practice, thermal, Hindi/Malayalam/Russian tests, JavaScript syntax and `git diff --check` pass.
+- Atlas regenerated at 32 maps / 295 nodes / 340 edges, with CP-MOD-024 ownership/source links. Browser atlas verification is unavailable because Playwright is not installed in the isolated worktree. `tests/drone-duration.test.mjs` remains excluded because its owner-managed `docs/dot.json` fixture is absent; no performance, browser/device or audio claim is made. This module remains eager and offline-pre-cached.
+
+Next: integrate CP-MOD-024, then continue with the next cohesive remaining Settings/controller owner. AudioEngine bus construction stays behind its approved weekly-reset gate; lazy loading still requires parity and measured cold/warm/offline benefit.
+
 ## CP-MOD-020 — Lobby session-estimate view-model
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
@@ -46,11 +56,13 @@ Next: CP-MOD-023 extracts the Lobby experience-visibility controller; preserve a
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct route-contract, integration, offline-delivery, locale and syntax evidence.
 
-- Move `updateExperienceModeVisibility()` to a frozen controller module; `app.js` keeps its compatibility call-site and injects current state, selection, translation, timing, setting and refresh services.
-- Direct contracts exercise standalone preparation, normal chakra setup, Sleep, HRIM, Shot gating/custom frequency, Intimate Service, Yoga and range/control presentation. Advanced Features lock preservation, focused practices, session estimates, Settings views, journey routing, all practice owners, thermal budget and Hindi/Malayalam/Russian contracts pass. HTML order and precache, JavaScript syntax and `git diff --check` pass.
-- Atlas sources and generated references remain 32 maps / 295 nodes / 340 edges. Browser atlas verification could not run because Playwright is absent from this worktree; no browser claim. The unrelated `tests/drone-duration.test.mjs` requires owner-managed `docs/dot.json`, absent from this worktree. This is recorded as a missing-fixture limitation, not a pass. Modules remain eager/precached; no runtime-performance or device/audio evidence claimed.
+- Moved `updateExperienceModeVisibility()` to a frozen controller module; `app.js` retains its compatibility call-site and injects current state, selection, translation, timing, setting and refresh services.
+- Direct contracts exercise standalone preparation, normal chakra setup, Sleep, HRIM, Shot gating/custom frequency, Intimate Service, Yoga and range/control presentation. Advanced Features lock preservation, focused practices, session estimates, Settings views, journey routing, all practice owners, thermal budget and Hindi/Malayalam/Russian contracts passed. HTML order and precache, JavaScript syntax and `git diff --check` passed.
+- Atlas was synchronized at 32 maps / 295 nodes / 340 edges. Browser atlas verification is unavailable because Playwright is absent from the isolated worktree; no browser claim. The unrelated `tests/drone-duration.test.mjs` requires owner-managed `docs/dot.json`, absent from this worktree. This remains a missing-fixture limitation, not a pass. Modules remain eager/precached; no runtime-performance or device/audio evidence claimed.
 
-Next: integrate CP-MOD-023; proceed through the remaining cohesive controller seams, then take the AudioEngine checkpoint only after its approved weekly-reset gate, and measure cold/warm/offline delivery after behavior parity.
+- Integrated on `modularize` via PR #42 at `a46333d`; production unchanged.
+
+Next: CP-MOD-024 extracts Yoga Experience settings selection persistence and timing-row visibility without moving preference hydration or session execution.
 
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 

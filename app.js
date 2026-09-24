@@ -72,6 +72,7 @@ const sessionEstimate = window.ChakraSessionEstimate;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
 const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
 const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
+const yogaExperienceSettings = window.ChakraYogaExperienceSettings;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -85,6 +86,7 @@ if (!sessionEstimate) throw new Error('Session estimate module is unavailable.')
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
 if (!droneDurationSettingsView) throw new Error('Drone duration settings view module is unavailable.');
 if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility module is unavailable.');
+if (!yogaExperienceSettings) throw new Error('Yoga experience settings module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -6526,9 +6528,7 @@ function attachEventListeners() {
         syncChecked('yoga-experience-toggle', false);
         state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
-        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
-        state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
+        yogaExperienceSettings.persist({ document, state, storage: localStorage });
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         state.visualEffect = normalizeMeditationVisualEffect(document.getElementById('visual-effect-select')?.value);
@@ -6540,10 +6540,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_visual_effect', state.visualEffect);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
-        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.removeItem('chakra_yoga_bridge');
-        localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         localStorage.setItem('chakra_script_source', state.scriptSource);
 
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
@@ -6558,39 +6555,11 @@ function attachEventListeners() {
 
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
-        const corpseEnabled = getChecked('corpse-pose-toggle');
-        const bathEnabled = getChecked('bath-session-toggle');
-
-        const toggleDisplay = (id, show) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            // Let the component's CSS choose its layout when visible. This is
-            // important for enhanced range rows, which use grid rather than flex.
-            el.style.display = show ? '' : 'none';
-        };
-
-        const bathToggle = document.getElementById('bath-session-toggle');
-        if (bathToggle) {
-            bathToggle.disabled = false;
-            bathToggle.setAttribute('aria-disabled', 'false');
-        }
-        toggleDisplay('row-breathing', false);
-        toggleDisplay('row-corpse', corpseEnabled);
-        toggleDisplay('row-yoga-prep', true);
-        toggleDisplay('row-yoga-pose', true);
-        toggleDisplay('row-bath', bathEnabled);
-        
-        const yogaSubOptions = document.getElementById('yoga-sub-options');
-        if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
+        yogaExperienceSettings.syncTimingRows({ document, getChecked });
     }
 
     function persistYogaExperienceSetup() {
-        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
-        state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(input => input.value);
-        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
-        localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
+        yogaExperienceSettings.persist({ document, state, storage: localStorage });
     }
 
     function persistIntimateServiceSetup() {
