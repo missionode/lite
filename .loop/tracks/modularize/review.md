@@ -40,7 +40,17 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, inte
 - Direct tests cover standard, HRIM and Sleep modes, Beginner eligibility, note visibility, script order and offline precache. Fresh settings-view, Mood & Relaxation view, settings backup, Advanced Features unlock, background music, session estimate, navigation and journey routing contracts pass. JavaScript syntax and `git diff --check` pass.
 - Atlas sources and generated references are synchronized at 32 maps / 295 nodes / 340 edges. Browser verification could not run because Playwright is absent from this worktree. `tests/drone-duration.test.mjs` cannot start because owner-managed `docs/dot.json` is missing; this is an explicit baseline limitation, not a pass. No runtime-performance or device/audio claim; modules remain eager and precached.
 
-Next: integrate this boundary; continue with the next independently testable UI/controller seam while preserving duration math, mode priority and lifecycle behavior. Lazy loading remains gated by parity plus repeatable cold/warm/offline measurements.
+Next: CP-MOD-023 extracts the Lobby experience-visibility controller; preserve all route gates and control defaults through direct behavior tests. Lazy loading remains gated by parity plus repeatable cold/warm/offline measurements.
+
+## CP-MOD-023 — Lobby experience visibility controller
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct route-contract, integration, offline-delivery, locale and syntax evidence.
+
+- Move `updateExperienceModeVisibility()` to a frozen controller module; `app.js` keeps its compatibility call-site and injects current state, selection, translation, timing, setting and refresh services.
+- Direct contracts exercise standalone preparation, normal chakra setup, Sleep, HRIM, Shot gating/custom frequency, Intimate Service, Yoga and range/control presentation. Advanced Features lock preservation, focused practices, session estimates, Settings views, journey routing, all practice owners, thermal budget and Hindi/Malayalam/Russian contracts pass. HTML order and precache, JavaScript syntax and `git diff --check` pass.
+- Atlas sources and generated references remain 32 maps / 295 nodes / 340 edges. Browser atlas verification could not run because Playwright is absent from this worktree; no browser claim. The unrelated `tests/drone-duration.test.mjs` requires owner-managed `docs/dot.json`, absent from this worktree. This is recorded as a missing-fixture limitation, not a pass. Modules remain eager/precached; no runtime-performance or device/audio evidence claimed.
+
+Next: integrate CP-MOD-023; proceed through the remaining cohesive controller seams, then take the AudioEngine checkpoint only after its approved weekly-reset gate, and measure cold/warm/offline delivery after behavior parity.
 
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 

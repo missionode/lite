@@ -1,11 +1,11 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-022: Drone-duration Settings view
+### NOW — CP-MOD-023: Lobby experience visibility controller
 
-- Active isolated branch `codex/modularize-cp-022`, based on modularize integration commit `a549650` (CP-MOD-021 merged via PR #40). This checkpoint extracts only drone-duration Settings radio/note synchronization; timing calculations, active-mode selection, localized summary and persistence remain in `app.js`.
-- CP-MOD-022 direct tests cover standard/HRIM/Sleep selection, HRIM Beginner restriction, contextual note visibility, script startup order and service-worker precache. Preserve the app's duration math and saved preference behavior. Atlas is regenerated at 32 maps / 295 nodes / 340 edges.
-- Fresh direct view, Mood & Relaxation view, settings backup, Advanced Features unlock, background music, session estimate, journey routing, screen navigation, syntax and diff checks pass. `tests/drone-duration.test.mjs` cannot start without owner-managed `docs/dot.json`; browser atlas verification is unavailable because Playwright is not installed. No performance/device/audio claim; production unchanged.
-- Next: finish this focused checkpoint, then continue Settings/UI owners before measuring optional loading boundaries.
+- Active isolated branch `codex/modularize-cp-023`, based on modularize integration commit `456d636` (CP-MOD-022 merged via PR #41). This checkpoint extracts the Lobby experience-visibility controller; call sites remain behind the nested app compatibility function.
+- The controller governs standalone preparation defaults, mode-gated panels, Advanced Features and No Frequency Shot restrictions, duration control values/labels, Intimate Service/Yoga/Shot visibility and adjacent refresh callbacks. Direct route matrix and neighboring Settings, lock, route, practice, thermal and four-locale checks pass; eager/offline load assertions pass.
+- Atlas sources/generated references are synchronized at 32 maps / 295 nodes / 340 edges. Browser atlas verification remains unavailable because Playwright is absent. Owner-managed `docs/dot.json` is absent, blocking `tests/drone-duration.test.mjs`; the focused renderer contract passes independently. No performance/device/audio claims; production unchanged.
+- Next: integrate CP-MOD-023, continue cohesive controller ownership, respect the approved AudioEngine weekly-reset gate, and measure optional loading only after behavior parity.
 - Local integration baseline has earlier CP-MOD-020 work; preserve unrelated root `.DS_Store`, `.codex/` and backup-audio changes. Owner-managed `docs/dot.json` is absent from isolated worktrees, so the drone-duration contract cannot run there. Keep this limitation explicit.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership

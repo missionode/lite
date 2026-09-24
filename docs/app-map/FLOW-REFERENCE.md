@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: a549650 baseline + uncommitted CP-MOD-022 · 2026-09-25.
+Source snapshot: 456d636 baseline + uncommitted CP-MOD-023 · 2026-09-25.
 
-Source-reviewed application behavior at the latest modularize integration baseline with drone-duration Settings radio/note rendering extracted on the active checkpoint branch, pending integration. Mood & Relaxation view, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed application behavior at the latest modularize integration baseline with Lobby experience-visibility rendering extracted on the active checkpoint branch, pending integration. Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -192,7 +192,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Queued extraction work | All practice lifecycles, shared screen navigation, Lobby session estimates and Mood & Relaxation ambience settings rendering are integrated; drone-duration Settings radio/note synchronization is extracted on the active checkpoint. Remaining Settings/UI controllers and deferred AudioEngine buses continue before measured delivery changes. |
+| Queued extraction work | All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation settings rendering and drone-duration Settings presentation are integrated; central Lobby experience visibility is extracted on the active checkpoint. Remaining Settings/UI controllers and deferred AudioEngine buses continue before measured delivery changes. |
 | PLANNED · Measure baseline | Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners. |
 | PLANNED · Approve feature bundles | Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity. |
 | PLANNED · Cache without execution | Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them. |
@@ -310,7 +310,7 @@ flowchart TD
 
 Mutual exclusion, validation, and dispatch priority.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [app.js:5633](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5633), [app.js:7940](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7940), [app.js:7963](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7963).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:5633](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5633), [app.js:7940](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7940), [app.js:7963](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7963).
 
 ```mermaid
 flowchart TD
