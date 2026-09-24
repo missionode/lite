@@ -66,6 +66,7 @@ const dharanaPractice = window.ChakraDharanaPractice;
 const boxBreathingPractice = window.ChakraBoxBreathingPractice;
 const visualizationPractice = window.ChakraVisualizationPractice;
 const hooponoponoPractice = window.ChakraHooponoponoPractice;
+const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -73,6 +74,7 @@ if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.')
 if (!boxBreathingPractice) throw new Error('Box Breathing practice module is unavailable.');
 if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
 if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
+if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -5535,25 +5537,22 @@ class MeditationController {
         const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
         const scene = document.getElementById('undo-unlearn-scene');
         const phases = journeyT('ui.undoUnlearnPhases');
-        const narrations = Array.isArray(phases) ? phases : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('undo-unlearn-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.undoUnlearnTitle'));
-        try {
-            await this.narrate(journeyT('ui.undoUnlearnOpening'), false);
-            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, narrations.length)));
-            for (const narration of narrations) {
-                if (!this.isMeditationActive) break;
-                await this.narrate(narration, false);
-                if (this.isMeditationActive) await this.pauseAwareSleep(pauseSeconds * 1000);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.undoUnlearnClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('undo-unlearn-active');
-        }
+        await undoUnlearnPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            phases,
+            opening: journeyT('ui.undoUnlearnOpening'),
+            title: journeyT('ui.undoUnlearnTitle'),
+            closing: journeyT('ui.undoUnlearnClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runIntimateService() {

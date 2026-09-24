@@ -6,6 +6,7 @@ const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.
 const dharanaPractice = fs.readFileSync(new URL('../modules/dharana-practice.js', import.meta.url), 'utf8');
 const boxBreathingPractice = fs.readFileSync(new URL('../modules/box-breathing-practice.js', import.meta.url), 'utf8');
 const visualizationPractice = fs.readFileSync(new URL('../modules/visualization-practice.js', import.meta.url), 'utf8');
+const undoUnlearnPractice = fs.readFileSync(new URL('../modules/undo-unlearn-practice.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -48,7 +49,8 @@ assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selec
 assert.match(app, /async runNoting\(\)[\s\S]*?notingReminders[\s\S]*?notingOpening[\s\S]*?notingClosing/, 'Guided Noting should narrate its explanation, reminders and release');
 assert.match(html, /hooponopono-experience-toggle[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?id="undo-unlearn-duration"[\s\S]*?value="5"[\s\S]*?value="8" selected[\s\S]*?value="12"/, 'Undo & Unlearn should follow Ho’oponopono and offer 5, 8 and 12 minutes');
 assert.match(app, /hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?runUndoUnlearn\(\)[\s\S]*?handleSilence/, 'Undo & Unlearn should run after Ho’oponopono and before final silence');
-assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPhases[\s\S]*?undoUnlearnOpening[\s\S]*?undoUnlearnClosing/, 'Undo & Unlearn should narrate its content-free release flow');
+assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPractice\.run\(/, 'Undo & Unlearn should delegate its lifecycle to the module owner');
+assert.match(undoUnlearnPractice, /for \(const narration of narrations\)[\s\S]*?narrate\(narration, false\)[\s\S]*?narrate\(closing, false\)/, 'Undo & Unlearn should preserve its guided phase narration flow');
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
 assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
 assert.match(mediaLifecycle, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
