@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '2662379 baseline + uncommitted CP-MOD-031', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration, automatic journey voice profile and session-only mode hydration integrated. The active checkpoint extracts mixer control hydration while app remains state and audio owner. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '9711f0e baseline + uncommitted CP-MOD-032', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration, journey voice profile, session-only mode and mixer preference hydration integrated. The active checkpoint extracts journey-selection hydration while app retains state, copy policy and validation/dispatch. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -379,5 +379,13 @@ add('mixer-preference-hydration','Systems','Mixer preference control hydration',
  [['tuning','Voice and spatial controls','Hydrate clarity, warmth, pace, voice/music echo and both spatial-mode controls.']],
  [['settings','Settings mirrors','Hydrate the five duplicate Settings volume controls using the same values.']]
 ],[['state','mixer','Existing state ready'],['mixer','tuning','Mixer controls in order'],['tuning','settings','Voice controls in order']],['Preserve all 19 ordered control/state pairs and duplicate mirrors. The app retains persistence, the value-sync helper and audio behavior. This eager mapping is not a performance optimization.']);
+
+add('journey-selection-hydration','Systems','Journey selection preference hydration','Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.','modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:5973',[
+ [['state','Read app selection state','Read selected chakras, intention, returning journey, video prelude and audio-filter preference from app-owned state.']],
+ [['chakra','Restore selected chakras','Mark only the matching Chakra-selection inputs checked.']],
+ [['intention','Restore intention','Keep the saved intention; when blank/whitespace, use the existing app default intention.']],
+ [['toggles','Restore journey controls','Synchronize returning journey, optional video prelude and audio filters.']],
+ [['continue','Continue preference hydration','Frequency, session-only mode reset, Beginner/Advanced gating, and Begin validation remain with the app.']]
+],[['state','chakra','Preferences loaded'],['chakra','intention','Checkboxes restored'],['intention','toggles','Value restored'],['toggles','continue','Display state ready']],['This is display hydration only; it does not change settings persistence, selected-chakra validation, journey eligibility or dispatch. It loads eagerly and is offline-pre-cached, not a performance optimization.']);
 
 export { graphs };

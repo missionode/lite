@@ -1,12 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-031: Mixer preference-control hydration
+### NOW — CP-MOD-032: Journey selection preference hydration
 
-- Active isolated branch `codex/modularize-cp-031`, based on modularize integration commit `2662379` (CP-MOD-030 merged via PR #49). `modules/mixer-preference-hydration.js` owns the ordered mapping from existing app state to mixer and settings slider/selector controls; state and sync helper remain app-owned.
-- Preserve all 19 mappings, mirrored controls and neighboring hydration order. Eager/offline-pre-cached, with no performance claim.
-- Local `modularize` is synchronized at `2662379`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
-- CP-MOD-031: all 64 runnable Node test files and 11 Loop router Python tests pass; two owner-fixture tests remain excluded because `docs/dot.json` is absent. Atlas builder passes at 38 maps / 330 nodes / 384 edges; browser verification cannot start because Playwright is unavailable. Syntax and diff checks pass. No browser/device/performance claim.
-- Next: integrate CP-MOD-031, then continue cohesive preference-hydration groups before measured lazy loading. Keep AudioEngine bus work behind the approved weekly-reset gate.
+- Active isolated branch `codex/modularize-cp-032`, based on modularize integration commit `9711f0e` (CP-MOD-031 merged via PR #50). `modules/journey-selection-hydration.js` paints selected chakra checks, stored/default intention, and returning/video/audio-filter toggle values; app retains state and all validation/dispatch.
+- Preserve selection and fallback behavior and position before frequency/session-mode controls. Module is eager/offline-pre-cached, with no performance claim.
+- Local `modularize` is synchronized at `9711f0e`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
+- CP-MOD-032: all 65 runnable Node test files and 11 Loop router Python tests pass; two owner-fixture tests remain excluded because `docs/dot.json` is absent. Atlas builder passes at 39 maps / 335 nodes / 388 edges; browser verification cannot start because Playwright is unavailable. Syntax and diff checks pass. No browser/device/performance claim.
+- Next: integrate CP-MOD-032, then continue remaining cohesive preference-hydration boundaries before measured lazy loading. Keep AudioEngine bus work behind the approved weekly-reset gate.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

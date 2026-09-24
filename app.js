@@ -80,6 +80,7 @@ const timingSettings = window.ChakraTimingSettings;
 const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
 const sessionModeHydration = window.ChakraSessionModeHydration;
 const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
+const journeySelectionHydration = window.ChakraJourneySelectionHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -91,6 +92,7 @@ if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is una
 if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
 if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
 if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
+if (!journeySelectionHydration) throw new Error('Journey selection hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -6001,15 +6003,7 @@ function loadPreferences() {
 
     setText('stat-journeys', state.stats.journeys);
     setText('stat-time', state.stats.time);
-    document.querySelectorAll('#chakra-selection input').forEach(cb => {
-        cb.checked = state.selectedChakras.includes(cb.value);
-    });
-    if (!state.intention.trim()) state.intention = defaultIntention();
-    syncValue('intention-input', state.intention);
-    
-    syncChecked('returning-journey-toggle', state.returningJourney);
-    syncChecked('journey-video-prelude-toggle', state.journeyVideoPreludeEnabled);
-    syncChecked('audio-filters-toggle', state.audioFilters);
+    journeySelectionHydration.hydrate({ state, document, syncValue, syncChecked, defaultIntention });
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
     // Experience modes are session-only; retired selection keys are cleared

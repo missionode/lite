@@ -56,6 +56,8 @@ CP-MOD-030 extracts page-load reset of session-only Box Breathing, Ho'oponopono,
 
 CP-MOD-031 extracts the ordered mixer/preference control-value synchronization from loadPreferences. Keep the app as state owner and inject its existing syncValue helper. Preserve all 19 control/value pairs, duplicate Lobby/Settings mirrors and relative placement after drone-duration setup and before session statistics/chakra selections. Eager delivery remains; this is not a performance optimization.
 
+CP-MOD-032 extracts hydration of selected chakras, the defaulted intention and the returning/video/audio-filter toggles. Keep selection state, default intention policy, validation and journey start in the app; inject current state and existing UI helpers. Preserve selection order, fallback behavior and position before frequency/session-mode controls. Eager delivery remains; this is not a performance optimization.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.
