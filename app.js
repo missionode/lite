@@ -77,6 +77,7 @@ const rangeControls = window.ChakraRangeControls;
 const journeyRoadmap = window.ChakraJourneyRoadmap;
 const localeUiRenderer = window.ChakraLocaleUiRenderer;
 const timingSettings = window.ChakraTimingSettings;
+const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -85,6 +86,7 @@ if (!boxBreathingPractice) throw new Error('Box Breathing practice module is una
 if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
 if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
+if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -5930,33 +5932,15 @@ function autoSelectVoice() {
 }
 
 function applyJourneyVoiceProfile(isHighEnergy) {
-    const shringaraVoice = !isHighEnergy && isFeminineNarrationVoice();
-    const profile = isHighEnergy
-        ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
-        : shringaraVoice
-            ? { clarity: 28, warmth: 82, pace: 0.92, echo: 'light' }
-            : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
-
-    state.voiceClarity = profile.clarity;
-    state.voiceWarmth = profile.warmth;
-    state.voicePace = profile.pace;
-    state.voiceEcho = profile.echo;
-    localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-    localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-    localStorage.setItem('chakra_voice_pace', state.voicePace);
-    localStorage.setItem('chakra_voice_echo', state.voiceEcho);
-    syncValue('voice-clarity', state.voiceClarity);
-    syncValue('voice-warmth', state.voiceWarmth);
-    syncValue('voice-pace', state.voicePace);
-    syncValue('voice-echo', state.voiceEcho);
-    syncValue('music-echo', state.musicEcho);
-    syncValue('spatial-mode', state.spatialMode);
-    syncValue('mixer-spatial-mode', state.spatialMode);
-    document.querySelectorAll('[data-voice-preset]').forEach(button => {
-        button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : shringaraVoice ? 'shringara' : 'soft'));
+    journeyVoiceProfile.apply({
+        isHighEnergy,
+        isFeminineVoice: !isHighEnergy && isFeminineNarrationVoice(),
+        state,
+        storage: localStorage,
+        syncValue,
+        document,
+        audio
     });
-    if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
-    if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
 }
 
 async function testVoice() {

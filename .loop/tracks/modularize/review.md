@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-029 — Journey voice-profile application
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integrated regression, offline-delivery, atlas-build and syntax evidence.
+
+- Extract the existing High Energy / Shringara / soft profile choice, saved voice settings, associated control/preset synchronization and audio tuning into `modules/journey-voice-profile.js`.
+- Keep gender/voice registry detection in the app and inject it, app state, storage, UI synchronization, DOM and audio services. Preserve values, storage keys and side-effect order.
+- Direct contract tests cover all three profile branches, saved values, UI controls, audio tuning, absent optional audio methods and invalid dependencies. All 62 runnable Node contract files and 11 model-router Python tests pass. `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent.
+- Atlas builder passes at 36 maps / 321 nodes / 377 edges. Atlas browser verification cannot start because Playwright is unavailable. Syntax checks and `git diff --check` pass. Module stays eager and precached; no performance, browser, device or audio claim.
+
+Next: integrate CP-MOD-029, then reassess Settings preference hydration as a larger stateful boundary. AudioEngine bus work remains behind the reset gate; measured lazy loading remains after extraction parity.
+
 ## CP-MOD-025 — Shared range-control UI ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-control, integration-contract, offline-delivery and syntax evidence.
@@ -46,14 +57,14 @@ Integrated via PR #46 at `519bbed`; production unchanged.
 
 ## CP-MOD-028 — Timing configuration and preference application
 
-Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct contract and regression level; awaiting integration.
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct contract and regression level.
 
 - Extract timing fallback resolution, named profile overlay, control bounds, configured defaults, persisted-value clamping and fetch fallback into `modules/timing-settings.js`. Keep app compatibility accessors and the demo preset as an injected callback.
 - Preserve the current shallow per-section profile merge, storage keys, values/units and load → profile → bounds → preference → demo callback order.
 - All 61 runnable `tests/*.test.mjs` pass, including timing, estimates, Yoga, Settings backup and locale renderer contracts. `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. Syntax checks and `git diff --check` pass.
 - Atlas builder passes at 35 maps / 316 nodes / 373 edges and includes timing configuration. `verify-atlas.mjs` cannot start because Playwright is unavailable; do not treat that as a pass. No UI/browser, device, performance or audio claim. Keep classic-script/offline delivery eager; this is not a performance change.
 
-Next: integrate CP-MOD-028, then assess remaining cohesive Settings ownership. AudioEngine bus construction remains deferred until the approved weekly reset; lazy loading remains gated on parity and repeated cold/warm/offline evidence.
+Integrated via PR #47 at `6261a08`; production unchanged.
 
 ## CP-MOD-020 — Lobby session-estimate view-model
 

@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 519bbed baseline + uncommitted CP-MOD-028 · 2026-09-25.
+Source snapshot: 6261a08 baseline + uncommitted CP-MOD-029 · 2026-09-25.
 
-Source-reviewed behavior at the latest modularize integration baseline with practice owners, screen navigation, estimates, Settings/Lobby views, localized roadmap and display-language UI renderer integrated. The active checkpoint extracts timing configuration and preference application while app-level timing accessors and demo preset remain. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the latest modularize integration baseline with timing configuration and preference application integrated. The active checkpoint extracts automatic journey voice-profile application while app retains voice/gender recognition and injects current services. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -40,9 +40,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 30. [Isolated checkpoint delivery](#delivery-workflow)
 31. [Display-language UI renderer](#locale-ui-renderer)
 32. [Timing configuration and saved values](#timing-configuration)
-33. [Settings backup and restore](#settings-backup)
-34. [Operator-led chakra assessment](#assessment-tournament)
-35. [Frequency repertory handoff](#repertory)
+33. [Automatic journey voice profile](#journey-voice-profile)
+34. [Settings backup and restore](#settings-backup)
+35. [Operator-led chakra assessment](#assessment-tournament)
+36. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1515,6 +1516,37 @@ flowchart TD
 | Apply demo preset | Only after timingConfig has been assigned and preferences are normalized, run the existing demo core-duration preset callback. |
 
 - The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization.
+
+<a id="journey-voice-profile"></a>
+
+## Automatic journey voice profile
+
+Chooses and applies the established voice profile at journey start.
+
+Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:5934](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5934), [app.js:7386](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7386).
+
+```mermaid
+flowchart TD
+  start["Select route"]
+  values["Apply existing tuning"]
+  persist["Persist voice tuning"]
+  controls["Synchronize mixer"]
+  audio["Apply audio engine tuning"]
+  start -->|"Selected profile"| values
+  values -->|"Profile assigned"| persist
+  persist -->|"Values saved"| controls
+  controls -->|"Controls synchronized"| audio
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Select route | High Energy uses the balanced profile. Other journeys use Shringara only when the app identifies a feminine narration voice; otherwise use soft. |
+| Apply existing tuning | Update clarity, warmth, pace and voice echo using the unchanged profile values. |
+| Persist voice tuning | Write the existing chakra_voice_* values. |
+| Synchronize mixer | Refresh voice sliders, music echo and both spatial-mode controls; activate the selected preset button. |
+| Apply audio engine tuning | Set voice warmth/clarity and voice echo when the corresponding audio methods are available. |
+
+- Voice/gender detection and journey dispatch remain app-owned. The module is eager classic-script code and offline-pre-cached. This is an ownership extraction only; no audio-quality, device, or performance improvement is claimed.
 
 <a id="settings-backup"></a>
 

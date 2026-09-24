@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '519bbed baseline + uncommitted CP-MOD-028', scope: 'Source-reviewed behavior at the latest modularize integration baseline with practice owners, screen navigation, estimates, Settings/Lobby views, localized roadmap and display-language UI renderer integrated. The active checkpoint extracts timing configuration and preference application while app-level timing accessors and demo preset remain. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '6261a08 baseline + uncommitted CP-MOD-029', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration and preference application integrated. The active checkpoint extracts automatic journey voice-profile application while app retains voice/gender recognition and injects current services. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -356,5 +356,13 @@ add('timing-configuration','Systems','Timing configuration and saved values','Th
  [['preferences','Resolve saved practice time','If the existing localStorage key is absent, use the configured default or built-in fallback. Preserve stored values where present, then clamp against the active configured bounds and persist a changed clamp.']],
  [['demo','Apply demo preset','Only after timingConfig has been assigned and preferences are normalized, run the existing demo core-duration preset callback.']]
 ],[['fetch','profile','Fetch succeeds'],['fetch','bounds','Fetch falls back'],['profile','bounds','Optional named profile'],['bounds','preferences','Controls updated'],['preferences','demo','Apply final demo override']],['The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization.']);
+
+add('journey-voice-profile','Systems','Automatic journey voice profile','Chooses and applies the established voice profile at journey start.','modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:5934; app.js:7386',[
+ [['start','Select route','High Energy uses the balanced profile. Other journeys use Shringara only when the app identifies a feminine narration voice; otherwise use soft.']],
+ [['values','Apply existing tuning','Update clarity, warmth, pace and voice echo using the unchanged profile values.']],
+ [['persist','Persist voice tuning','Write the existing chakra_voice_* values.']],
+ [['controls','Synchronize mixer','Refresh voice sliders, music echo and both spatial-mode controls; activate the selected preset button.']],
+ [['audio','Apply audio engine tuning','Set voice warmth/clarity and voice echo when the corresponding audio methods are available.']]
+],[['start','values','Selected profile'],['values','persist','Profile assigned'],['persist','controls','Values saved'],['controls','audio','Controls synchronized']],['Voice/gender detection and journey dispatch remain app-owned. The module is eager classic-script code and offline-pre-cached. This is an ownership extraction only; no audio-quality, device, or performance improvement is claimed.']);
 
 export { graphs };
