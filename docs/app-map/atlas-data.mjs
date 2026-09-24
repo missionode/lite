@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: 'f2d8827 baseline + uncommitted CP-MOD-035', scope: 'Source-reviewed behavior at modularize integration baseline f2d8827. Timing and appearance preference control hydration are integrated; the active checkpoint extracts script-selector and custom-script status presentation while app retains state, loading, validation and demo timing decisions. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '9aec136 baseline + uncommitted CP-MOD-036', scope: 'Source-reviewed behavior at modularize integration baseline 9aec136. Timing, appearance and script preference controls are integrated; the active checkpoint extracts only three personal-care checkbox restorations while app retains state and gating. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -409,5 +409,12 @@ add('script-preference-hydration','Systems','Script preference control hydration
  [['status','Restore status message','For an available custom script, retain the existing demo-timing or ready copy; if no script is loaded, leave the prior status untouched.']],
  [['continue','Continue startup','Range display refresh and voice auto-selection remain in the app.']]
 ],[['state','source','Preferences loaded'],['source','panel','Source selected'],['panel','status','Visibility applied'],['status','continue','Status and panel hydrated']],['The app injects demo-script detection and timing copy; actual script loading, validation and persistence remain app-owned. Eager and offline-pre-cached; no performance claim.']);
+
+add('care-preference-hydration','Systems','Personal-care preference control hydration','Restores saved personal-care toggle values without changing session authorization or care execution.','modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:5973',[
+ [['state','Loaded preferences','The app owns saved care state and determines when the care experience is available.']],
+ [['bath','Restore Bath setting','The existing Yoga settings owner restores Bath independently.']],
+ [['care','Restore care controls','Copy perineal-care, assisted-bathing and massage values to their checkboxes in the existing order.']],
+ [['gates','Continue startup','Session-only mode reset, Advanced Features visibility and care execution remain unchanged.']]
+],[['state','bath','Saved care state ready'],['bath','care','Continue established order'],['care','gates','Controls synchronized']],['The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.']);
 
 export { graphs };

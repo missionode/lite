@@ -76,7 +76,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extracti
 - Direct contract covers saved source selection, custom panel visibility, demo/custom status branches, unchanged status when no custom script exists, startup order and offline delivery. All 68 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
 - Atlas builder passes at 42 maps / 348 nodes / 398 edges. Browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery remains; no browser/device/performance claim.
 
-Next: integrate CP-MOD-035, then continue only with cohesive preference UI boundaries before measured loading.
+Integrated via PR #54 at `9aec136`; production unchanged.
+
+## CP-MOD-036 — Personal-care preference control hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extraction.
+
+- Extract exactly three saved care-control values (perineal care, assisted bathing, massage) from `loadPreferences`.
+- Preserve order after Bath hydration. Keep persisted state, Advanced Features/session gates, care configuration and execution in their existing owners.
+- Direct contract covers exact checkbox/state mapping, order, app integration and offline delivery. All 69 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
+- Atlas builder passes at 43 maps / 352 nodes / 401 edges. Browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery remains; no browser/device/performance claim.
+
+Next: integrate CP-MOD-036. Then inspect the remaining startup hydrator for a coherent extraction boundary; declare eager modularization parity only after that audit, then proceed to measurement-gated lazy loading.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 

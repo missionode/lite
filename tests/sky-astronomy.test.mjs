@@ -25,7 +25,7 @@ assert.ok(noon.stars.every(s => Number.isFinite(s.altitude) && s.azimuth >= 0 &&
 assert.equal(noon.stars.find(s => s.name === 'Sirius').magnitude, -1.44);
 const morningMoon = sky.snapshot(new Date('2000-01-01T12:00:00Z'), fixture.observer);
 assert.ok(morningMoon.sunAltitude > 0 && morningMoon.bodies.find(b => b.name === 'Moon').altitude > 0, 'Daylight must retain a visible Moon');
-const farAway = sky.snapshot(new Date('2026-09-17T06:30:00Z'), { latitude: -33.86, longitude: 151.21 });
+const farAway = sky.snapshot(new Date('2026-09-17T06:30:00Z'), { latitude: -33.87, longitude: 151.21 });
 assert.notEqual(noon.bodies[1].altitude, farAway.bodies[1].altitude, 'Lunar coordinates must depend on observer');
 for (const [w, h] of [[1440, 900], [390, 844]]) {
     assert.equal(sky.project(90, 0, w, h).y, h * 0.88, 'Horizon and projection agree');
