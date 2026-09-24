@@ -69,6 +69,7 @@ const hooponoponoPractice = window.ChakraHooponoponoPractice;
 const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
 const screenNavigationModule = window.ChakraScreenNavigation;
 const sessionEstimate = window.ChakraSessionEstimate;
+const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -79,6 +80,7 @@ if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unav
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
+if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -6092,68 +6094,13 @@ function restorePreDemoCoreDuration() {
 }
 
 function syncPleasureAmbienceControl() {
-    const section = document.getElementById('mood-relaxation-ambience-section');
-    const toggle = document.getElementById('mood-relaxation-intention-toggle');
-    const control = document.getElementById('mood-relaxation-ambience-level-control');
-    const intensityControl = document.getElementById('pleasure-ambience-intensity-control');
-    const intensitySelect = document.getElementById('pleasure-ambience-intensity');
-    const urlControl = document.getElementById('pleasure-ambience-url-control');
-    const urlInput = document.getElementById('pleasure-ambience-url');
-    const blurControl = document.getElementById('pleasure-ambience-blur-control');
-    const blurToggle = document.getElementById('pleasure-ambience-blur-toggle');
-    const blurLevel = document.getElementById('pleasure-ambience-blur-level-control');
-    const blurLevelInput = document.getElementById('pleasure-ambience-blur-level');
-    const blurLevelOutput = document.getElementById('pleasure-ambience-blur-level-value');
-    const slider = document.getElementById('mood-relaxation-ambience-level');
-    const output = document.getElementById('mood-relaxation-ambience-level-value');
-    const status = document.getElementById('pleasure-ambience-url-status');
-    const audioUnavailable = audio.pleasureAudioAvailable === false;
-    // Optional local ambience files can be absent in a deployed build. Keep
-    // this recovery surface visible so a guide can supply a URL; hiding it
-    // would make the missing local source impossible to replace on mobile.
-    if (section) section.hidden = !state.advancedFeaturesUnlocked;
-    if (toggle) toggle.disabled = state.noFrequencyMode;
-    if (control) control.hidden = !state.moodRelaxationIntentionEnabled;
-    if (intensityControl) intensityControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (intensitySelect) {
-        intensitySelect.value = state.pleasureAmbienceIntensity;
-        intensitySelect.disabled = state.noFrequencyMode;
-    }
-    if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (urlInput) {
-        urlInput.disabled = state.noFrequencyMode;
-        urlInput.value = state.pleasureAmbienceUrl;
-    }
-    if (blurControl) blurControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (blurToggle) {
-        blurToggle.checked = state.pleasureAmbienceBlur;
-        blurToggle.disabled = state.noFrequencyMode;
-    }
-    if (blurLevel) blurLevel.hidden = !state.moodRelaxationIntentionEnabled;
-    if (blurLevelInput) {
-        blurLevelInput.disabled = state.noFrequencyMode;
-        blurLevelInput.value = (state.pleasureAmbienceBlurAmount * 100).toFixed(0);
-        const pct = ((Number(blurLevelInput.value) - Number(blurLevelInput.min)) / (Number(blurLevelInput.max) - Number(blurLevelInput.min)) * 100).toFixed(1) + '%';
-        blurLevelInput.style.setProperty('--range-fill', pct);
-    }
-    if (blurLevelOutput) blurLevelOutput.textContent = `${Math.round(state.pleasureAmbienceBlurAmount * 100)}%`;
-    if (slider) {
-        slider.disabled = state.noFrequencyMode || audioUnavailable;
-        slider.value = (state.pleasureAmbienceGain * 100).toFixed(1);
-        const pct = ((Number(slider.value) - Number(slider.min)) / (Number(slider.max) - Number(slider.min)) * 100).toFixed(1) + '%';
-        slider.style.setProperty('--range-fill', pct);
-    }
-    if (output) output.textContent = formatPleasureAmbienceLevel(state.pleasureAmbienceGain);
-    if (status && audioUnavailable && state.moodRelaxationIntentionEnabled) {
-        status.dataset.availability = 'unavailable';
-        status.textContent = t('ui.pleasureAmbienceSourceUnavailable');
-        status.hidden = false;
-        status.style.color = '#fbbf24';
-    } else if (status?.dataset.availability === 'unavailable') {
-        delete status.dataset.availability;
-        status.hidden = true;
-        status.textContent = '';
-    }
+    moodAmbienceSettingsView.sync({
+        document,
+        state,
+        audioUnavailable: audio.pleasureAudioAvailable === false,
+        formatLevel: formatPleasureAmbienceLevel,
+        unavailableMessage: t('ui.pleasureAmbienceSourceUnavailable')
+    });
 }
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────

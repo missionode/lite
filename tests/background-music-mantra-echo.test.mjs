@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const moodAmbienceView = fs.readFileSync(new URL('../modules/mood-ambience-settings-view.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -54,9 +55,9 @@ assert.match(app, /const PLEASURE_AMBIENCE_MIN_GAIN = 0\.002/, 'the ambience eng
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience selection must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience selection must not be saved to local storage');
 assert.match(app, /this\.pleasureLoops\.forEach\(loop => loop\.stop\(Math\.max\(0, fadeTime\)\)\)/, 'all ambience layers should use the same smooth fade');
-assert.match(app, /if \(section\) section\.hidden = !state\.advancedFeaturesUnlocked;/, 'the ambience section should be available only while Advanced Features is unlocked, including when optional local audio is missing');
-assert.match(app, /if \(urlControl\) urlControl\.hidden = !state\.moodRelaxationIntentionEnabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
-assert.match(app, /t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable source message');
+assert.match(moodAmbienceView, /if \(section\) section\.hidden = !state\.advancedFeaturesUnlocked;/, 'the ambience section should be available only while Advanced Features is unlocked, including when optional local audio is missing');
+assert.match(moodAmbienceView, /if \(urlControl\) urlControl\.hidden = !enabled;/, 'a selected ambience should retain its URL recovery control when local audio is missing');
+assert.match(app, /unavailableMessage: t\('ui\.pleasureAmbienceSourceUnavailable'\)/, 'missing local ambience should show a recoverable localized source message');
 assert.doesNotMatch(app, /pleasureAudioAvailable = false;\s*state\.moodRelaxationIntentionEnabled = false;/, 'a missing optional asset must not clear the selected ambience state');
 for (const [id, min] of [['vol-voice', '0\.2'], ['vol-drone', '0\.02'], ['vol-bell', '0\.02'], ['vol-mantra', '0\.005'], ['vol-music', '0\.02']]) {
     assert.match(html, new RegExp(`id="${id}"[^>]*min="${min}"`), `${id} should retain a non-zero safety minimum`);
