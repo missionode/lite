@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -32,10 +33,10 @@ assert.match(app, /while \(remaining-- > 0 && this\.isMeditationActive\)[\s\S]*?
 assert.match(app, /--focus-anchor-duration[\s\S]*?is-focusing/, 'Focused Attention should slowly settle the anchor over the selected duration');
 assert.match(html, /box-breathing-experience-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?dharana-addon-toggle[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?chakra-selection-panel/, 'Lobby preparation controls should match the approved runtime order');
 assert.match(html, /id="body-scan-duration"[\s\S]*?value="3"[\s\S]*?value="5" selected[\s\S]*?value="8"/, 'Body Scan should offer 3, 5 and 8 minute durations');
-assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'Body Scan should narrate opening, head-to-toe regions and grounded closing');
+assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanPractice\.run[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'The controller should pass localized Body Scan content into its practice owner');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.body-scan-scene[\s\S]*?background:\s*#000/, 'Body Scan should use a pitch-black fade');
 assert.doesNotMatch(html, /body-scan-figure|body-scan-light/, 'Body Scan must not display a body figure or scanning light');
-assert.doesNotMatch(app.slice(app.indexOf('async runBodyScan()'), app.indexOf('async runVisualization()')), /requestAnimationFrame|setInterval/, 'Body Scan must not add a recurring visual loop');
+assert.doesNotMatch(bodyScanPractice, /requestAnimationFrame|setInterval/, 'Body Scan must not add a recurring visual loop');
 assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selected[\s\S]*?value="6"/, 'Guided Noting should offer 2, 4 and 6 minute durations');
 assert.match(app, /async runNoting\(\)[\s\S]*?notingReminders[\s\S]*?notingOpening[\s\S]*?notingClosing/, 'Guided Noting should narrate its explanation, reminders and release');
 assert.match(html, /hooponopono-experience-toggle[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?id="undo-unlearn-duration"[\s\S]*?value="5"[\s\S]*?value="8" selected[\s\S]*?value="12"/, 'Undo & Unlearn should follow Ho’oponopono and offer 5, 8 and 12 minutes');
