@@ -9,7 +9,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focu
 - Eager classic-script and service-worker delivery remain. The 100 ms timer cadence is preserved; this is not a performance improvement. Browser/device audio/thermal evidence was not run.
 - Bounded dependency map used source-symbol/reference inspection because an AST parser is unavailable in the local dependency set. Syntax and direct API behavior were checked.
 
-Next: extract Visualization while preserving audio fade/loop/error/cancel behavior; then complete UI ownership before measured loading.
+Next: CP-MOD-016 extracts Visualization while preserving audio fade/loop/error/cancel behavior; then complete UI ownership before measured loading.
+
+## CP-MOD-016 — Visualization practice lifecycle
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, focused regression, atlas-source and syntax evidence.
+
+- Frozen `modules/visualization-practice.js` owns the ordered blackout scene, music fade, optional ambience start/error fallback, ducked narration, focus/guidance timing, timed visualization, silence wake prompt, return narration, gradual screen reveal, ambience stop and music restoration. The app injects translated and existing runtime services.
+- Direct tests cover one-minute active duration, score and silence paths, missing ambience fallback, narration/audio handoffs, return fades, blackout cleanup and cancellation at the opening guard. Existing focused-practice and audio-transition contracts remain required.
+- Eager script/offline delivery remain. Existing wait/fade intervals and pause-aware sleep are preserved; no performance gain is claimed. Browser fade/render, device playback and thermal evidence were not run.
+- Dependency mapping used focused symbol/reference inspection; syntax and direct API behavior were checked.
+
+Next: extract remaining UI controller ownership, then measure candidate lazy-loading boundaries only after parity.
 
 ## CP-MOD-014 — Dharana focus scene ownership
 

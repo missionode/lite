@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-015: Box Breathing practice ownership
+### NOW — CP-MOD-016: Visualization practice ownership
 
-- Active isolated branch `codex/modularize-cp-015`, based on modularize integration commit `7c432ee` (CP-MOD-014 merged). The checkpoint moves Box Breathing's tutorial, four-step/four-cycle execution, pause accounting, completion narration and music handoff into frozen `modules/box-breathing-practice.js`; the app supplies translated content, settings, audio and session services.
-- Direct tests cover sequencing, 100 ms timer cadence, pause behavior, stop and audio handoff. Eager startup and offline precache are retained; the high-frequency timer loop is unchanged, so no CPU improvement is claimed.
-- Direct Box Breathing, focused practices, Dharana, Guided Noting, Body Scan, journey-routing, video-prelude, newcomer tutorial, hypnosis, language, settings-backup, English chakra qualities, Malayalam, Hindi, Russian and thermal-budget checks pass; syntax and `git diff --check` pass. Atlas regenerated to 32 maps / 295 nodes / 340 edges, with static source-reference assertions passing. Browser verifier/device audio/thermal evidence are not claimed. Production publication is separate and is not authorized by this modularization request.
+- Active isolated branch `codex/modularize-cp-016`, based on modularize integration commit `f669a3e` (CP-MOD-015 merged). This checkpoint moves Visualization's blackout/audio/narration/re-entry lifecycle into frozen `modules/visualization-practice.js`; the controller injects translated text and existing screen/audio/session services.
+- CP-MOD-015 Box Breathing is complete via [PR #34](https://github.com/missionode/lite/pull/34), merged to `modularize` at `f669a3e`; direct and neighboring language/settings/routing/thermal tests passed. Atlas records 32 maps / 295 nodes / 340 edges. Browser/device playback/thermal evidence are not claimed. Production remains unchanged.
+- For CP-MOD-016, direct lifecycle, cancellation, ambience-fallback, fades and integration checks are being run. Existing pause-aware sleeps and fade intervals remain unchanged; no performance improvement is claimed. Browser/device playback and thermal evidence are not claimed. Production publication is separate and is not authorized by this modularization request.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

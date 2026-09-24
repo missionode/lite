@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-24",
-    "commit": "7c432ee baseline + uncommitted CP-MOD-015",
-    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with Box Breathing execution extracted on the active checkpoint branch, pending integration. Dharana, Guided Noting and Body Scan ownership are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "f669a3e baseline + uncommitted CP-MOD-016",
+    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with Visualization lifecycle ownership extracted on the active checkpoint branch, pending integration. Box Breathing, Dharana, Guided Noting and Body Scan ownership are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -329,7 +329,7 @@
           [
             "next",
             "Queued extraction work",
-            "Journey preparation planning/execution, Body Scan, Guided Noting, Dharana and Box Breathing ownership extracted; Visualization remains in app.js, then deferred AudioEngine buses → UI controllers. Complete parity before delivery changes."
+            "Journey preparation planning/execution and Box Breathing, Visualization, Dharana, Body Scan and Guided Noting ownership extracted; deferred AudioEngine buses → UI controllers remain. Complete parity before delivery changes."
           ]
         ],
         [
@@ -2121,7 +2121,7 @@
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
       "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.",
-      "source": "modules/journey-routing.js:1; modules/box-breathing-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; app.js:4772; app.js:4880; app.js:4908; app.js:4930; app.js:4952; app.js:4992; index.html:322",
+      "source": "modules/journey-routing.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; app.js:4956; app.js:4984; app.js:5470; index.html:322",
       "rows": [
         [
           [
