@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "ad3d49b baseline + uncommitted CP-MOD-025",
-    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with Yoga Experience Settings ownership integrated and shared range-control ownership extracted on the active checkpoint branch, pending integration. Lobby experience visibility, Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "f531002 baseline + uncommitted CP-MOD-026",
+    "scope": "Source-reviewed application behavior at the latest modularize integration baseline with shared range controls integrated and the localized journey roadmap extracted on the active checkpoint branch, pending integration. Yoga Experience Settings, Lobby experience visibility, Mood & Relaxation and drone-duration views, shared screen navigation, Lobby session estimates and all journey practices are integrated. Assessment remains a standalone operator aid; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Queued extraction work",
-            "All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation and drone-duration Settings views, Lobby experience visibility, Yoga Experience settings, and shared range-control UI are integrated; remaining cohesive Settings/UI owners and deferred AudioEngine buses continue before measured delivery changes."
+            "All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation and drone-duration Settings views, Lobby experience visibility, Yoga Experience settings, shared range-control UI and localized Lobby roadmap are integrated; remaining cohesive Settings/UI owners and deferred AudioEngine buses continue before measured delivery changes."
           ]
         ],
         [
@@ -2176,6 +2176,208 @@
       ],
       "notes": [
         "Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Box Breathing execution lives in `modules/box-breathing-practice.js`; Visualization blackout/audio/narration/return timing in `modules/visualization-practice.js`; Ho’oponopono phrase-cycle timing and visual setup in `modules/hooponopono-practice.js`; Undo & Unlearn phase/scene lifecycle in `modules/undo-unlearn-practice.js`; Dharana in `modules/dharana-practice.js`; Body Scan in `modules/body-scan-practice.js`; Guided Noting in `modules/guided-noting-practice.js`. The controller supplies localized narration, timing and existing screen/audio/session services. Box Breathing preserves its four-step/four-cycle order, 100 ms pause accounting and music fades. Visualization preserves optional ambience/error fallback, ducked narration, waits, selected duration, silence wake prompt, return-screen fades, ambience stop and music restoration. Ho’oponopono preserves the three four-phrase cycles, configured pauses and closing fade handoff; journey placement remains after the chakra sequence. Undo & Unlearn preserves the selected duration, translated content-free phases and active-session guards, and always hides the scene/releases body mode even if its fade wait rejects. The Lobby estimate owner preserves mode priority, timing/default inputs and the standard add-on formula while app.js refreshes its text and roadmap. Dharana preserves selected anchor shape/color, duration-based CSS timing plus an active-session shrink clock for reduced-motion mode, the four-second narrated release and cleanup. Guided Noting preserves its selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages."
+      ]
+    },
+    {
+      "id": "journey-roadmap",
+      "group": "Journeys",
+      "title": "Lobby journey roadmap",
+      "subtitle": "Localized, display-only summary of the currently selected Lobby route.",
+      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; app.js:726",
+      "rows": [
+        [
+          [
+            "refresh",
+            "Refresh preview",
+            "Lobby mode, add-on, chakra, returning-journey or video-prelude changes request a label recalculation. The preview itself never starts a journey or saves selections."
+          ]
+        ],
+        [
+          [
+            "priority",
+            "Resolve current route",
+            "Music Only → any Intimate Service choice → Yoga → Sleep → HRIM → standalone preparation when no chakras are selected and at least one standalone practice is chosen → standard chakra path."
+          ]
+        ],
+        [
+          [
+            "music",
+            "Music Only",
+            "One Music Only label."
+          ],
+          [
+            "care",
+            "Intimate Service",
+            "Only selected care stages, preserving Perineal Care → Massage → Assisted Bathing label order."
+          ],
+          [
+            "yoga",
+            "Yoga",
+            "Optional Corpse Pose → optional Bath → Rest Before Yoga → Yoga."
+          ],
+          [
+            "sleep",
+            "Sleep",
+            "Sleep → Drowsiness → Light Sleep → True Sleep → Deep Sleep → REM Rest."
+          ],
+          [
+            "hrim",
+            "HRIM",
+            "Intention → HRIM → Closing."
+          ],
+          [
+            "standalone",
+            "Standalone preparation",
+            "Box → Visualization → Focused Attention → Body Scan → Guided Noting → Ho’oponopono → Undo & Unlearn; only selected stages are included."
+          ],
+          [
+            "guided",
+            "Standard guided journey",
+            "Arrival or Returning → Intention → Chakras, with selected preparation labels inserted in their established order and optional integration stages before Closing."
+          ]
+        ],
+        [
+          [
+            "video",
+            "Optional introduction",
+            "When the Lobby video preference is enabled, prepend the translated Video Introduction label; this preview label does not play the video."
+          ],
+          [
+            "render",
+            "Render",
+            "Resolve every label through the current display-language translator and join with the existing » separator."
+          ],
+          [
+            "noTarget",
+            "Roadmap unavailable",
+            "If the preview element is absent, return without changing anything."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "refresh",
+          "priority",
+          "Read current state"
+        ],
+        [
+          "priority",
+          "music",
+          "Music Only"
+        ],
+        [
+          "priority",
+          "care",
+          "Care selection"
+        ],
+        [
+          "priority",
+          "yoga",
+          "Yoga selected"
+        ],
+        [
+          "priority",
+          "sleep",
+          "Sleep selected"
+        ],
+        [
+          "priority",
+          "hrim",
+          "HRIM selected"
+        ],
+        [
+          "priority",
+          "standalone",
+          "No chakras + selected practice"
+        ],
+        [
+          "priority",
+          "guided",
+          "Fallback / chakra selection"
+        ],
+        [
+          "music",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "care",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "yoga",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "sleep",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "hrim",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "standalone",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "guided",
+          "video",
+          "Video enabled"
+        ],
+        [
+          "music",
+          "render",
+          "Video off"
+        ],
+        [
+          "care",
+          "render",
+          "Video off"
+        ],
+        [
+          "yoga",
+          "render",
+          "Video off"
+        ],
+        [
+          "sleep",
+          "render",
+          "Video off"
+        ],
+        [
+          "hrim",
+          "render",
+          "Video off"
+        ],
+        [
+          "standalone",
+          "render",
+          "Video off"
+        ],
+        [
+          "guided",
+          "render",
+          "Video off"
+        ],
+        [
+          "video",
+          "render",
+          "Prefix label"
+        ],
+        [
+          "render",
+          "noTarget",
+          "No element"
+        ]
+      ],
+      "notes": [
+        "The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility."
       ]
     },
     {

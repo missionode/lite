@@ -1,13 +1,13 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-025: Shared range-control UI ownership
+### NOW — CP-MOD-026: Lobby journey roadmap
 
-- Active isolated branch `codex/modularize-cp-025`, based on modularize integration commit `ad3d49b` (CP-MOD-024 merged via PR #43). This checkpoint extracts shared range formatting, idempotent DOM enhancement, bounded step controls and display refresh; timing configuration and persistence remain app-owned.
-- Direct behavior test covers time/ambience value formatting, min/max clamping, disabled boundary controls, bubbling input updates, idempotence, refresh and offline module order.
-- Atlas regenerated at 32 maps / 295 nodes / 340 edges; two stale mode-map source line references were corrected. The builder passes; visual Playwright verification cannot start because that package is not installed. Owner-managed `docs/dot.json` remains absent and its dependent drone-duration suite is excluded. No performance/device/audio claim; production unchanged.
-- CP-MOD-025 direct range tests and selected adjacent Settings, practice, localization, routing, thermal and version-delivery contracts pass; app/module/service-worker syntax and diff checks pass.
-- CP-MOD-024 is integrated via PR #43. Preserve unrelated local `.DS_Store`, `.codex/` and backup-audio files.
-- Next: finish CP-MOD-025 review/integration, then continue cohesive Settings/UI ownership and honor the approved AudioEngine weekly-reset gate before measurement/lazy loading.
+- Active isolated branch `codex/modularize-cp-026`, based on modularize integration commit `f531002` (CP-MOD-025 merged via PR #44). Extract the Lobby's localized, display-only journey roadmap while leaving journey start validation and dispatch in their existing owners.
+- Direct contract covers exclusive and standard modes, selected-stage ordering, standalone practices, optional video prefix, label localization/separator, missing target and classic-script/offline order.
+- Atlas source and generated references are synchronized at 33 maps / 307 nodes / 364 edges, including the dedicated roadmap map. The builder passes; Playwright verification cannot start because Playwright is absent. All 59 runnable test files pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. No performance/device/audio claim; production unchanged.
+- CP-MOD-026 direct mode/order/render and English/Malayalam/Hindi/Russian key-coverage tests pass, along with adjacent regression, JavaScript syntax and diff checks.
+- CP-MOD-025 is integrated via PR #44. Preserve unrelated local `.DS_Store`, `.codex/` and backup-audio changes.
+- Next: finish CP-MOD-026 validation/integration, continue only justified cohesive UI seams, respect the AudioEngine weekly-reset gate, and then evaluate extraction parity and measured lazy-loading criteria.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

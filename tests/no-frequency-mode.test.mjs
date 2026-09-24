@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
@@ -44,7 +45,7 @@ assert.match(app, /function setNoFrequencyMode\(enabled\)[\s\S]*?meditation\.can
 const noFrequencySetter = app.slice(app.indexOf('function setNoFrequencyMode(enabled)'), app.indexOf('function setNoMantraMode(enabled)'));
 assert.doesNotMatch(noFrequencySetter, /audio\.stopMantraTrack\(\)/, 'No Frequency Mode must leave mantra playback available');
 assert.match(app, /function setNoMantraMode\(enabled\)[\s\S]*?audio\.stopDrone\(\);[\s\S]*?audio\.stopMantraTrack\(\)/, 'No Mantra Mode should stop both mantra and its matching drone');
-assert.match(app, /shotsToggle\.disabled = noFrequencyMode/, 'Shots should be unavailable in the Lobby while the setting is active');
+assert.match(lobbyVisibility, /shotsToggle\.disabled = noFrequencyMode/, 'Shots should be unavailable in the Lobby while the setting is active');
 assert.match(app, /if \(state\.noFrequencyMode\) \{\s*alert\(t\('ui\.noFrequencyShotsUnavailable'\)\);\s*return;/, 'direct Shot activation should also be rejected');
 assert.match(app, /audio\.startBackgroundMusic\(/, 'background music remains part of normal journeys');
 assert.match(app, /this\.narrate\(/, 'narration remains part of normal journeys');

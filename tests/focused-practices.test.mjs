@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const journeyRoadmap = fs.readFileSync(new URL('../modules/journey-roadmap.js', import.meta.url), 'utf8');
 const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.js', import.meta.url), 'utf8');
 const dharanaPractice = fs.readFileSync(new URL('../modules/dharana-practice.js', import.meta.url), 'utf8');
 const boxBreathingPractice = fs.readFileSync(new URL('../modules/box-breathing-practice.js', import.meta.url), 'utf8');
@@ -68,7 +69,7 @@ const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app
 assert.match(dharanaPractice, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
 assert.match(app, /journeyRouting\.buildChakraOrder\([\s\S]*?focusedExperience[\s\S]*?massage-toggle[\s\S]*?selectedChakras/, 'Guided starts should delegate chakra-order selection to the journey-routing owner');
-assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
+assert.match(journeyRoadmap, /labels\.splice\(0, 0, translate\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(translate\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
 for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['dharanaFocusGuidance', 'dharanaClosing', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationSilenceWakePrompt', 'visualizationReturn']) {
