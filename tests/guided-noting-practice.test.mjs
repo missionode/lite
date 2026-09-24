@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const guidedNotingPractice = window\.ChakraGuidedNotingPractice/);
 assert.match(app, /if \(!guidedNotingPractice\) throw new Error\('Guided Noting practice module is unavailable\.'\)/);
 assert.match(app, /async runNoting\(\) \{[\s\S]*?guidedNotingPractice\.run\(/, 'the existing controller should delegate Guided Noting to its lifecycle owner');
-assert.match(html, /modules\/guided-noting-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.83/, 'the module should load before app.js with a refreshed app version');
-assert.match(serviceWorker, /chakra-v5\.278[\s\S]*?modules\/guided-noting-practice\.js\?v=1\.0/, 'the offline shell should precache the same module version');
+assert.match(html, /modules\/guided-noting-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.84/, 'the module should load before app.js with a refreshed app version');
+assert.match(serviceWorker, /chakra-v5\.279[\s\S]*?modules\/guided-noting-practice\.js\?v=1\.0/, 'the offline shell should precache the same module version');
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const practice = context.ChakraGuidedNotingPractice;

@@ -81,6 +81,7 @@ const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
 const sessionModeHydration = window.ChakraSessionModeHydration;
 const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
 const journeySelectionHydration = window.ChakraJourneySelectionHydration;
+const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -93,6 +94,7 @@ if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unava
 if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
 if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
 if (!journeySelectionHydration) throw new Error('Journey selection hydration module is unavailable.');
+if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -5980,22 +5982,7 @@ function loadPreferences() {
     syncValue('language-select', state.language);
     syncValue('display-language-select', state.displayLanguage);
     
-    const timeSlider = document.getElementById('time-per-chakra');
-    if (timeSlider) {
-        timeSlider.value = state.timePerChakra;
-        const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
-        timeSlider.style.setProperty('--range-fill', pctInit);
-    }
-    
-    setText('time-display', `${state.timePerChakra.toFixed(1)} mins`);
-
-    const highEnergyTimeSlider = document.getElementById('time-high-energy');
-    if (highEnergyTimeSlider) {
-        highEnergyTimeSlider.value = state.timeHighEnergy;
-        const pctHigh = ((highEnergyTimeSlider.value - highEnergyTimeSlider.min) / (highEnergyTimeSlider.max - highEnergyTimeSlider.min) * 100).toFixed(1) + '%';
-        highEnergyTimeSlider.style.setProperty('--range-fill', pctHigh);
-    }
-    setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
+    timingPreferenceHydration.hydrateCore({ state, document, setText });
     syncDroneDurationModeControls();
     updateDroneDurationSummary();
     
@@ -6040,33 +6027,7 @@ function loadPreferences() {
     syncValue('visual-effect-select', state.visualEffect);
     visual.applyImageEffect();
 
-    // Sync Journey Timings Sliders
-    syncValue('time-icebreaker', state.timeIcebreaker);
-    setText('display-icebreaker', state.timeIcebreaker + 's');
-    syncValue('time-emergence', state.timeEmergence);
-    setText('display-emergence', state.timeEmergence + 's');
-    
-    syncValue('time-breathing', state.timeBreathing);
-    setText('display-breathing', state.timeBreathing + 's');
-    
-    syncValue('time-corpse', state.timeCorpse);
-    setText('display-corpse', state.timeCorpse + 's');
-    
-    syncValue('time-interval', state.timeInterval);
-    setText('display-interval', state.timeInterval + 's');
-
-    syncValue('time-yoga-prep', state.timeYogaPrep);
-    setText('display-yoga-prep', state.timeYogaPrep + 's');
-
-    syncValue('time-yoga-pose', state.timeYogaPose);
-    setText('display-yoga-pose', state.timeYogaPose + 's');
-
-    syncValue('time-bath', state.timeBath);
-    setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
-    syncValue('time-perineal-care', state.timePerinealCare);
-    setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
-    syncValue('time-assisted-bathing', state.timeAssistedBathing);
-    setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
+    timingPreferenceHydration.hydrateJourney({ state, syncValue, setText });
     
     syncValue('brightness-slider', state.brightness);
     document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));

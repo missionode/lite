@@ -42,7 +42,19 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, inte
 - Direct contracts cover checked/unchecked chakra inputs, saved and blank intentions, all three journey toggles, service validation and startup order. All 65 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
 - Atlas builder passes at 39 maps / 335 nodes / 388 edges. The browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. No performance or browser claim.
 
-Next: validate and integrate CP-MOD-032, then continue with remaining cohesive preference hydration before measuring optional loading.
+Integrated via PR #51 at `05485a3`; production unchanged.
+
+## CP-MOD-033 — Timing preference control hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extraction.
+
+- Extract core-duration slider fill/labels and all auxiliary journey timing slider/label synchronization from `loadPreferences`.
+- Keep timing config resolution, stored values, duration estimation and drone-duration callbacks app-owned. Preserve existing display strings, range-fill math and hydration sequence.
+- Add direct tests for range presentation, all mapped durations and module delivery; refresh atlas. This remains eager ownership work, not a performance optimization.
+- Direct contract, syntax checks and `git diff --check` pass. All 66 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
+- Atlas builder passes at 40 maps / 339 nodes / 391 edges. Browser verifier cannot start because Playwright is unavailable. No browser/device/performance claim.
+
+Next: integrate CP-MOD-033, then continue cohesive settings/UI hydration boundaries before measured loading.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 
