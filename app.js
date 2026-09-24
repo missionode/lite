@@ -70,6 +70,7 @@ const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
 const screenNavigationModule = window.ChakraScreenNavigation;
 const sessionEstimate = window.ChakraSessionEstimate;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
+const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -81,6 +82,7 @@ if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is una
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
+if (!droneDurationSettingsView) throw new Error('Drone duration settings view module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -777,14 +779,7 @@ function syncDroneDurationModeControls() {
     const highEnergy = getChecked('high-energy-toggle');
     const sleep = getChecked('sleep-mode-toggle');
     const activeMode = highEnergy ? state.hrimDroneDurationMode : (sleep ? state.sleepDroneDurationMode : state.droneDurationMode);
-    document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
-        input.disabled = highEnergy && input.value === 'beginner';
-        input.checked = input.value === activeMode;
-    });
-    const hrimNote = document.getElementById('drone-duration-hrim-note');
-    if (hrimNote) hrimNote.hidden = !highEnergy;
-    const sleepNote = document.getElementById('drone-duration-sleep-note');
-    if (sleepNote) sleepNote.hidden = !sleep;
+    droneDurationSettingsView.sync({ document, highEnergy, sleep, activeMode });
 }
 
 function defaultIntention(language = state.language) {

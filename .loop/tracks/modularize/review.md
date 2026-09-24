@@ -30,7 +30,17 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, inte
 - Fresh checks passed: mood view, settings backup, Advanced Features unlock, background music/ambience, session estimate, journey routing, screen navigation, Guided Noting, Dharana, Box Breathing, Visualization, Ho’oponopono, Undo & Unlearn, thermal budget, Hindi/Malayalam/Russian contracts, JavaScript syntax and `git diff --check`.
 - Browser atlas verification could not run because Playwright is not installed in this worktree. Device/audio/thermal evidence is not claimed. The unrelated drone-duration test requires owner-managed `docs/dot.json`, absent from isolated worktrees. No execution/performance benefit is claimed; module remains eager and offline-precached.
 
-Next: integrate this validated boundary, then continue with the next cohesive Settings/UI owner. Keep measured lazy loading gated until extraction parity and repeatable cold/warm/offline data.
+Next: CP-MOD-022 extracts drone-duration Settings radio/note synchronization while app-owned duration calculation remains unchanged. Keep measured lazy loading gated until extraction parity and repeatable cold/warm/offline data.
+
+## CP-MOD-022 — Drone-duration Settings view
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integration, offline-delivery and syntax evidence.
+
+- `modules/drone-duration-settings-view.js` owns only radio checked/disabled state plus HRIM/Sleep contextual note visibility. App retains mode choice, duration math, localized summary text and localStorage persistence.
+- Direct tests cover standard, HRIM and Sleep modes, Beginner eligibility, note visibility, script order and offline precache. Fresh settings-view, Mood & Relaxation view, settings backup, Advanced Features unlock, background music, session estimate, navigation and journey routing contracts pass. JavaScript syntax and `git diff --check` pass.
+- Atlas sources and generated references are synchronized at 32 maps / 295 nodes / 340 edges. Browser verification could not run because Playwright is absent from this worktree. `tests/drone-duration.test.mjs` cannot start because owner-managed `docs/dot.json` is missing; this is an explicit baseline limitation, not a pass. No runtime-performance or device/audio claim; modules remain eager and precached.
+
+Next: integrate this boundary; continue with the next independently testable UI/controller seam while preserving duration math, mode priority and lifecycle behavior. Lazy loading remains gated by parity plus repeatable cold/warm/offline measurements.
 
 ## CP-MOD-018 — Undo & Unlearn practice lifecycle
 

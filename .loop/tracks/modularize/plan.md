@@ -6,7 +6,7 @@
 4. Extract content and localization services. Complete: lookup, fallback, localized shapes and script validation. Timing controls remain with UI until their ownership boundary.
 5. Separate narration and audio lifecycle owners. Partially complete: deterministic media primitives delivered in CP-MOD-005, Piper lifecycle in CP-MOD-006, and shared effect-route retirement in CP-MOD-007. AudioEngine bus construction is explicitly deferred until the next weekly reset.
 6. Convert journey orchestration into reusable stage contracts. In progress: CP-MOD-008 owns deterministic focused-mode selection, launch priority, prelude-safe chakra validation and chakra-order selection; CP-MOD-009 owns the ordered preparation-stage plan; CP-MOD-011 owns sequential execution and the between-stage active-session guard; CP-MOD-012 through CP-MOD-018 own the Body Scan, Guided Noting, Dharana, Box Breathing, Visualization, Ho’oponopono and Undo & Unlearn practice lifecycles. CP-MOD-019 owns shared screen navigation; CP-MOD-020 owns Lobby session estimates.
-7. Split Lobby, Settings, Advanced Features and session UI controllers. CP-MOD-021 extracts the Mood & Relaxation ambience settings renderer while preserving the Advanced Features gate and recovery affordances.
+7. Split Lobby, Settings, Advanced Features and session UI controllers. CP-MOD-021 extracts the Mood & Relaxation ambience settings renderer while preserving the Advanced Features gate and recovery affordances. CP-MOD-022 extracts drone-duration radio/note synchronization; app retains all timing calculations and selection persistence.
 8. Introduce measured feature-level lazy loading only after extraction parity:
    - Capture startup script/heap cost, journey-start latency, active worker/audio/animation resources and offline behavior before changing delivery.
    - Keep the essential shell eager: state/settings, localization, Lobby controls, journey routing and core lifecycle safety.
@@ -35,6 +35,8 @@ CP-MOD-019 extracts the shared screen-visibility/static-sky/scroll-reset behavio
 CP-MOD-020 extracts the ordered Lobby session-duration estimate calculation into a directly tested view-model. Preserve every focused-mode priority, default duration, translation key, timing-config input, demo adjustment, and selected-chakra/add-on formula. App retains the rendering and roadmap refresh.
 
 CP-MOD-021 extracts rendering/synchronization of the Mood & Relaxation ambience controls from the Settings/Lobby view logic into a frozen UI module. Preserve the Advanced Features visibility gate, session-only selection, No Frequency disabling, missing-source recovery message and all existing slider formatting. This is eager-loaded and precached ownership work, not a performance optimization.
+
+CP-MOD-022 extracts only drone-duration option and contextual-note synchronization. Preserve app-owned mode selection, HRIM's Beginner restriction, Sleep/standard eligibility and the existing duration summary calculation. This is eager-loaded and precached ownership work, not a performance optimization.
 
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
