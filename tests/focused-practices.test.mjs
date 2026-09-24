@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.js', import.meta.url), 'utf8');
 const dharanaPractice = fs.readFileSync(new URL('../modules/dharana-practice.js', import.meta.url), 'utf8');
+const boxBreathingPractice = fs.readFileSync(new URL('../modules/box-breathing-practice.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -28,6 +29,9 @@ assert.match(app, /async runPreparationStages[\s\S]*?buildPreparationStagePlan[\
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
 assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
 assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');
+assert.match(app, /boxBreathingPractice\.run\(/, 'Box Breathing should delegate its lifecycle to its owner');
+assert.match(boxBreathingPractice, /for \(let cycle = 0; cycle < 4; cycle\+\+\)/, 'Box Breathing should preserve its four-cycle sequence');
+assert.match(boxBreathingPractice, /elapsed < 1000[\s\S]*?if \(!isPaused\(\)\) elapsed \+= 100/, 'Box Breathing should preserve its pause-aware elapsed-time contract');
 assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated visible anchor layer rather than text inside the chakra image');
 assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\([\s\S]*?dharanaFocusGuidance[\s\S]*?dharanaClosing/, 'The controller should inject localized copy into the Dharana owner');
 assert.match(dharanaPractice, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
