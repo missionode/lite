@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
 assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/);
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-037 offline shell cache parity
+
+The local browser baseline found that versioned `app.js`/`style.css` requests did not match unversioned service-worker precache entries, breaking offline reload. Cache entries now match the exact `index.html` URLs, and the opt-in Chromium test covers cold, warm and offline startup without starting audio. The next approved investigation is selected-only practice-module loading, gated on route parity, offline cache behavior and failure/retry coverage. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/plan.md`.
+
 ## CP-MOD-036 — Personal-care preference hydration
 
 Perineal-care, assisted-bathing and massage controls display their already-loaded preference values. Session authorization and execution are unchanged.

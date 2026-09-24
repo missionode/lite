@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const hooponoponoPractice = window\.ChakraHooponoponoPractice/);
 assert.match(app, /async runHooponopono\(\) \{[\s\S]*?hooponoponoPractice\.run\(/);
 assert.match(html, /modules\/hooponopono-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/);
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?modules\/hooponopono-practice\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/hooponopono-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

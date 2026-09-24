@@ -10,7 +10,7 @@ assert.match(app, /const dharanaPractice = window\.ChakraDharanaPractice/);
 assert.match(app, /if \(!dharanaPractice\) throw new Error\('Dharana practice module is unavailable\.'\)/);
 assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\(/, 'the controller should delegate Dharana lifecycle to its owner');
 assert.match(html, /modules\/dharana-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/, 'the module should load before app.js with a refreshed app version');
-assert.match(serviceWorker, /chakra-v5\.282[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/, 'the offline shell should precache the same module version');
+assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/, 'the offline shell should precache the same module version');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
