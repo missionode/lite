@@ -79,6 +79,7 @@ const localeUiRenderer = window.ChakraLocaleUiRenderer;
 const timingSettings = window.ChakraTimingSettings;
 const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
 const sessionModeHydration = window.ChakraSessionModeHydration;
+const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -89,6 +90,7 @@ if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unav
 if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
 if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
 if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
+if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -5995,28 +5997,7 @@ function loadPreferences() {
     syncDroneDurationModeControls();
     updateDroneDurationSummary();
     
-    // Sync Mixer Sliders
-    syncValue('vol-voice', state.volVoice);
-    syncValue('vol-drone', state.volDrone);
-    syncValue('vol-bell', state.volBell);
-    syncValue('vol-mantra', state.volMantra);
-    syncValue('vol-music', state.volMusic);
-    syncValue('settings-vol-video', state.volVideo);
-    syncValue('settings-vol-visualization', state.volVisualizationAmbience);
-    syncValue('vol-visualization', state.volVisualizationAmbience);
-    syncValue('visualization-ambience', state.visualizationAmbience);
-    syncValue('voice-clarity', state.voiceClarity);
-    syncValue('voice-warmth', state.voiceWarmth);
-    syncValue('voice-pace', state.voicePace);
-    syncValue('voice-echo', state.voiceEcho);
-    syncValue('music-echo', state.musicEcho);
-
-    // Sync Settings Sliders
-    syncValue('settings-vol-voice', state.volVoice);
-    syncValue('settings-vol-drone', state.volDrone);
-    syncValue('settings-vol-bell', state.volBell);
-    syncValue('settings-vol-mantra', state.volMantra);
-    syncValue('settings-vol-music', state.volMusic);
+    mixerPreferenceHydration.hydrate({ state, syncValue });
 
     setText('stat-journeys', state.stats.journeys);
     setText('stat-time', state.stats.time);

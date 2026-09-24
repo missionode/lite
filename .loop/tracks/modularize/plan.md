@@ -54,6 +54,8 @@ CP-MOD-029 extracts automatic journey voice-profile selection/application. Prese
 
 CP-MOD-030 extracts page-load reset of session-only Box Breathing, Ho'oponopono, Music Only, High Energy and Sleep selections plus cleanup of their retired localStorage keys. Preserve exact ordering around persisted controls and existing Yoga setup restoration; Yoga mode/legacy-key handling remains app-owned in this slice. Preserve all storage keys, checkbox ids and reset defaults. Eager delivery remains; this is not a performance optimization.
 
+CP-MOD-031 extracts the ordered mixer/preference control-value synchronization from loadPreferences. Keep the app as state owner and inject its existing syncValue helper. Preserve all 19 control/value pairs, duplicate Lobby/Settings mirrors and relative placement after drone-duration setup and before session statistics/chakra selections. Eager delivery remains; this is not a performance optimization.
+
 CP-MOD-011/012 use identical local Chromium measurements as indicative comparisons, not production wire-size or device evidence: the local server does not compress responses and the harness blocks Google Fonts. CP-MOD-012 adds one eagerly loaded practice module; sampled response bodies grow about 1.4 KiB net, while timing deltas remain within single-run noise. This extraction is not a performance optimization. Select lazy boundaries only after extraction parity and repeatable cold/warm/offline comparisons.
 
 After this track and the assessment are complete, proceed to the separate approved Cosmic Observatory visual redesign, CP-THEME-PLAN-001. Its reference and behavior-preservation contract live in `.loop/tracks/cosmic-observatory-theme/`; it does not alter the extraction sequence above.

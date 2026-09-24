@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '17a42f0 baseline + uncommitted CP-MOD-030', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration and automatic journey voice-profile application integrated. The active checkpoint extracts session-only journey-mode hydration while app retains persistent Yoga setup. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '2662379 baseline + uncommitted CP-MOD-031', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration, automatic journey voice profile and session-only mode hydration integrated. The active checkpoint extracts mixer control hydration while app remains state and audio owner. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -372,5 +372,12 @@ add('session-mode-hydration','Systems','Session-only journey-mode hydration','Ap
  [['modes','Reset exclusive modes','Clear retired Music Only/High Energy/Sleep keys and turn those session-only toggles off.']],
  [['yoga','Restore Yoga setup','Keep persisted Corpse Pose, Bath, pose and care setup. Do not restore the session-only Yoga mode toggle.']]
 ],[['startup','prep','App initialization'],['prep','preferences','Established sequence'],['preferences','modes','Persistent controls restored'],['modes','yoga','Exclusive modes reset']],['Only the retired mode keys listed in code are removed. No stored configuration or in-progress journey is restored/cleared by this owner. It remains synchronous, eager and offline-pre-cached.']);
+
+add('mixer-preference-hydration','Systems','Mixer preference control hydration','Copies already-loaded preference state into audio and ambience controls in established order.','modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:5973',[
+ [['state','Loaded app state','The app remains the sole owner of stored mixer values and calls this renderer during loadPreferences.']],
+ [['mixer','Lobby mixer controls','Hydrate voice, drone, bell, mantra, music, video, visualization ambience and ambience selection controls.']],
+ [['tuning','Voice and spatial controls','Hydrate clarity, warmth, pace, voice/music echo and both spatial-mode controls.']],
+ [['settings','Settings mirrors','Hydrate the five duplicate Settings volume controls using the same values.']]
+],[['state','mixer','Existing state ready'],['mixer','tuning','Mixer controls in order'],['tuning','settings','Voice controls in order']],['Preserve all 19 ordered control/state pairs and duplicate mirrors. The app retains persistence, the value-sync helper and audio behavior. This eager mapping is not a performance optimization.']);
 
 export { graphs };
