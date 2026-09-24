@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## CP-MOD-035 — Script preference hydration
+
+The current saved script source selects the default/custom UI, and loaded custom scripts keep their existing status copy. Loading, validation and demo-timing decisions remain app-owned.
+
 ## CP-MOD-034 — Appearance preference hydration
 
 Visual-effect and brightness control presentation follows the existing saved state and app-owned image renderer. Script selection, status messaging and voice selection remain in `loadPreferences`.

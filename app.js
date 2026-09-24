@@ -83,6 +83,7 @@ const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
 const journeySelectionHydration = window.ChakraJourneySelectionHydration;
 const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
 const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration;
+const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
 if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
@@ -97,6 +98,7 @@ if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration modul
 if (!journeySelectionHydration) throw new Error('Journey selection hydration module is unavailable.');
 if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
 if (!appearancePreferenceHydration) throw new Error('Appearance preference hydration module is unavailable.');
+if (!scriptPreferenceHydration) throw new Error('Script preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
@@ -6032,20 +6034,13 @@ function loadPreferences() {
     
     appearancePreferenceHydration.hydrateBrightness({ state, syncValue, document });
 
-    // Sync Script Selection
-    syncValue('script-source-select', state.scriptSource);
-    const customScriptUI = document.getElementById('custom-script-ui');
-    if (customScriptUI) {
-        customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
-    }
-    if (state.customScript) {
-        const statusEl = document.getElementById('script-status');
-        if (statusEl) {
-            statusEl.textContent = isDemoScriptSelected() ? getDemoScriptTimingMessage() : "Custom script loaded and ready.";
-            statusEl.style.display = 'block';
-            statusEl.style.color = '#4ade80';
-        }
-    }
+    scriptPreferenceHydration.hydrate({
+        state,
+        syncValue,
+        document,
+        isDemoScriptSelected,
+        getDemoScriptTimingMessage
+    });
 
     refreshRangeControlDisplays();
     

@@ -65,7 +65,18 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extracti
 - Direct contract covers effect selection/application order, brightness UI/CSS synchronization, placement around journey timing, classic-script delivery and offline precache. All 67 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in the worktree.
 - Atlas builder passes at 41 maps / 343 nodes / 394 edges. Browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery remains; no browser/device/performance claim.
 
-Next: integrate CP-MOD-034, then inspect remaining cohesive preference hydration boundaries before measured loading.
+Integrated via PR #53 at `f2d8827`; production unchanged.
+
+## CP-MOD-035 — Script preference control hydration
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the bounded extraction.
+
+- Extract the script-source selector, optional custom-script panel visibility and existing status copy from `loadPreferences`.
+- Keep state, demo-script detection/timing, actual loading and validation app-owned; preserve placement before range refresh and voice selection.
+- Direct contract covers saved source selection, custom panel visibility, demo/custom status branches, unchanged status when no custom script exists, startup order and offline delivery. All 68 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is unavailable in this worktree.
+- Atlas builder passes at 42 maps / 348 nodes / 398 edges. Browser verifier cannot start because Playwright is unavailable. Syntax and `git diff --check` pass. Eager delivery remains; no browser/device/performance claim.
+
+Next: integrate CP-MOD-035, then continue only with cohesive preference UI boundaries before measured loading.
 
 ## CP-MOD-025 — Shared range-control UI ownership
 
