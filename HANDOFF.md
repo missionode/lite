@@ -1,12 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-033: Timing preference control hydration
+### NOW — CP-MOD-034: Appearance preference control hydration
 
-- Active isolated branch `codex/modularize-cp-033`, based on modularize integration commit `05485a3` (CP-MOD-032 merged via PR #51). `modules/timing-preference-hydration.js` owns core duration range fills/labels and ordered auxiliary timing control/value display; app retains configuration, state, estimates and drone selection.
-- Preserve slider-fill formula, displayed units/rounding and call order. Eager/offline-pre-cached; no performance claim.
-- Local `modularize` is synchronized at `05485a3`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
-- CP-MOD-033 direct contract, syntax and diff checks pass; all 66 runnable Node test files and 11 Loop router Python tests pass. Two owner-fixture tests remain excluded because `docs/dot.json` is absent. Atlas builder passes at 40 maps / 339 nodes / 391 edges; browser verification cannot start because Playwright is unavailable. No browser/device/performance claim.
-- Next: integrate CP-MOD-033, then continue cohesive settings/UI hydration boundaries before measured lazy loading. Keep AudioEngine bus work behind its approved reset gate.
+- Active isolated branch `codex/modularize-cp-034`, based on modularize integration commit `685a38d` (CP-MOD-033 merged via PR #52). `modules/appearance-preference-hydration.js` owns the existing visual-effect and brightness control/display synchronization; app retains persisted state and image-effect rendering.
+- Preserve effect-before-journey-timing and brightness-after-journey-timing ordering. Eager/offline-pre-cached; no performance claim.
+- Local `modularize` is synchronized at `685a38d`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
+- CP-MOD-034 direct contract, syntax and diff checks pass; all 67 runnable Node test files and 11 Loop router Python tests pass. Two owner-fixture tests remain excluded because `docs/dot.json` is absent. Atlas builder passes at 41 maps / 343 nodes / 394 edges; browser verification cannot start because Playwright is unavailable. No browser/device/performance claim.
+- Next: integrate CP-MOD-034, then continue cohesive preference hydration only while contracts stay small. AudioEngine bus remains behind its approved weekly-reset gate; measured lazy loading remains after extraction parity.
 
 ### COMPLETE — CP-MOD-014: Dharana focus scene ownership
 

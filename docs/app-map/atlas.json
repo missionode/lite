@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "05485a3 baseline + uncommitted CP-MOD-033",
-    "scope": "Source-reviewed behavior at the latest modularize integration baseline with timing configuration, journey voice profile, session-only mode, mixer preference and journey selection hydration integrated. The active checkpoint extracts timing-control presentation while app retains timing configuration, state, estimates and drone-mode callbacks. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "685a38d baseline + uncommitted CP-MOD-034",
+    "scope": "Source-reviewed behavior at modularize integration baseline 685a38d. Timing-control presentation hydration is integrated; the active checkpoint extracts only appearance preference hydration while app retains saved state and visual rendering. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -4373,6 +4373,63 @@
       ],
       "notes": [
         "This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization."
+      ]
+    },
+    {
+      "id": "appearance-preference-hydration",
+      "group": "Systems",
+      "title": "Appearance preference control hydration",
+      "subtitle": "Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.",
+      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:5973",
+      "rows": [
+        [
+          [
+            "state",
+            "Loaded app state",
+            "The app remains the sole owner of saved visual effect and brightness values."
+          ]
+        ],
+        [
+          [
+            "effect",
+            "Restore visual effect",
+            "Synchronize the existing effect selector, then invoke the app-owned visual effect application."
+          ]
+        ],
+        [
+          [
+            "brightness",
+            "Restore brightness",
+            "Synchronize the brightness control and set the existing #app brightness property."
+          ]
+        ],
+        [
+          [
+            "continue",
+            "Continue preference hydration",
+            "Script selection, custom-script status and voice selection remain app-owned."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "state",
+          "effect",
+          "Preferences loaded"
+        ],
+        [
+          "effect",
+          "brightness",
+          "Existing effect applied"
+        ],
+        [
+          "brightness",
+          "continue",
+          "Display values restored"
+        ]
+      ],
+      "notes": [
+        "Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim."
       ]
     },
     {

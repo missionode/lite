@@ -1,5 +1,5 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
-export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '05485a3 baseline + uncommitted CP-MOD-033', scope: 'Source-reviewed behavior at the latest modularize integration baseline with timing configuration, journey voice profile, session-only mode, mixer preference and journey selection hydration integrated. The active checkpoint extracts timing-control presentation while app retains timing configuration, state, estimates and drone-mode callbacks. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
+export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-25', commit: '685a38d baseline + uncommitted CP-MOD-034', scope: 'Source-reviewed behavior at modularize integration baseline 685a38d. Timing-control presentation hydration is integrated; the active checkpoint extracts only appearance preference hydration while app retains saved state and visual rendering. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.' };
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
@@ -394,5 +394,12 @@ add('timing-preference-hydration','Systems','Timing preference control hydration
  [['journey','Journey and care timing controls','Synchronize arrival, emergence, breathing, corpse, interval, yoga prep/pose and care durations in the existing order; care labels use floored whole minutes.']],
  [['remaining','Other preferences','Brightness, script, range controls and voice-selection hydration remain app-owned.']]
 ],[['core','drone','Core timing labels ready'],['drone','journey','Mode callback completed'],['journey','remaining','Additional timing labels ready']],['This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization.']);
+
+add('appearance-preference-hydration','Systems','Appearance preference control hydration','Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.','modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:5973',[
+ [['state','Loaded app state','The app remains the sole owner of saved visual effect and brightness values.']],
+ [['effect','Restore visual effect','Synchronize the existing effect selector, then invoke the app-owned visual effect application.']],
+ [['brightness','Restore brightness','Synchronize the brightness control and set the existing #app brightness property.']],
+ [['continue','Continue preference hydration','Script selection, custom-script status and voice selection remain app-owned.']]
+],[['state','effect','Preferences loaded'],['effect','brightness','Existing effect applied'],['brightness','continue','Display values restored']],['Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim.']);
 
 export { graphs };

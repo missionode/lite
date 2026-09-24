@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 05485a3 baseline + uncommitted CP-MOD-033 · 2026-09-25.
+Source snapshot: 685a38d baseline + uncommitted CP-MOD-034 · 2026-09-25.
 
-Source-reviewed behavior at the latest modularize integration baseline with timing configuration, journey voice profile, session-only mode, mixer preference and journey selection hydration integrated. The active checkpoint extracts timing-control presentation while app retains timing configuration, state, estimates and drone-mode callbacks. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at modularize integration baseline 685a38d. Timing-control presentation hydration is integrated; the active checkpoint extracts only appearance preference hydration while app retains saved state and visual rendering. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -45,9 +45,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 35. [Mixer preference control hydration](#mixer-preference-hydration)
 36. [Journey selection preference hydration](#journey-selection-hydration)
 37. [Timing preference control hydration](#timing-preference-hydration)
-38. [Settings backup and restore](#settings-backup)
-39. [Operator-led chakra assessment](#assessment-tournament)
-40. [Frequency repertory handoff](#repertory)
+38. [Appearance preference control hydration](#appearance-preference-hydration)
+39. [Settings backup and restore](#settings-backup)
+40. [Operator-led chakra assessment](#assessment-tournament)
+41. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1669,6 +1670,34 @@ flowchart TD
 | Other preferences | Brightness, script, range controls and voice-selection hydration remain app-owned. |
 
 - This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization.
+
+<a id="appearance-preference-hydration"></a>
+
+## Appearance preference control hydration
+
+Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.
+
+Sources: [modules/appearance-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/appearance-preference-hydration.js:1), [tests/appearance-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/appearance-preference-hydration.test.mjs:1), [app.js:5973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5973).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  effect["Restore visual effect"]
+  brightness["Restore brightness"]
+  continue["Continue preference hydration"]
+  state -->|"Preferences loaded"| effect
+  effect -->|"Existing effect applied"| brightness
+  brightness -->|"Display values restored"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the sole owner of saved visual effect and brightness values. |
+| Restore visual effect | Synchronize the existing effect selector, then invoke the app-owned visual effect application. |
+| Restore brightness | Synchronize the brightness control and set the existing #app brightness property. |
+| Continue preference hydration | Script selection, custom-script status and voice selection remain app-owned. |
+
+- Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim.
 
 <a id="settings-backup"></a>
 

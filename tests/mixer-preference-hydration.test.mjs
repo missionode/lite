@@ -11,8 +11,8 @@ assert.match(app, /mixerPreferenceHydration\.hydrate\(\{ state, syncValue \}\)/)
 const loadPreferences = app.slice(app.indexOf('function loadPreferences()'), app.indexOf('function checkFirstTime()'));
 assert.ok(loadPreferences.indexOf('updateDroneDurationSummary();') < loadPreferences.indexOf('mixerPreferenceHydration.hydrate('));
 assert.ok(loadPreferences.indexOf('mixerPreferenceHydration.hydrate(') < loadPreferences.indexOf("setText('stat-journeys'"));
-assert.match(html, /modules\/mixer-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.84/);
-assert.match(serviceWorker, /chakra-v5\.279[\s\S]*?modules\/mixer-preference-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/mixer-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.85/);
+assert.match(serviceWorker, /chakra-v5\.280[\s\S]*?modules\/mixer-preference-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:mixer-preference-hydration'], 'node tests/mixer-preference-hydration.test.mjs');
 
 const context = vm.createContext({});
