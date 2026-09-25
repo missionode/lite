@@ -28,7 +28,7 @@ const stopBinaural = method('stopBinaural()', 'stopDrone()');
 const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
 const mantra = method('async playMantraTrack(key)', 'stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {})');
 const bowlStart = app.indexOf('    playSingingBowl()');
-const bowlEnd = app.indexOf('\n}\n\n// Visual Engine', bowlStart);
+const bowlEnd = app.indexOf('\n}\n\n// Meditation Controller', bowlStart);
 assert.ok(bowlStart >= 0 && bowlEnd > bowlStart, 'playSingingBowl() must remain readable');
 const bowl = app.slice(bowlStart, bowlEnd);
 

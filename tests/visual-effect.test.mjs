@@ -5,6 +5,7 @@ const html = readFileSync('index.html', 'utf8');
 const app = readFileSync('app.js', 'utf8');
 const sky = readFileSync('night-sky.js', 'utf8');
 const particleField = readFileSync('modules/ambient-particle-field.js', 'utf8');
+const visualEngine = readFileSync('modules/visual-engine.js', 'utf8');
 const styles = readFileSync('style.css', 'utf8');
 const en = JSON.parse(readFileSync('locales/en.json', 'utf8'));
 const ml = JSON.parse(readFileSync('locales/ml.json', 'utf8'));
@@ -37,8 +38,14 @@ assert.match(particleField, /this\.ctx\.save\(\);\s*this\.ctx\.shadowBlur = 0;\s
     'Only the label backing is blurred; text rendering restores its sharp state.');
 assert.match(html, /night-sky\.js\?v=[^\"]+[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.0[\s\S]*?app\.js\?v=/,
     'The cached sky dependencies and extracted renderer must load before the app controller.');
+assert.match(html, /modules\/ambient-particle-field\.js\?v=1\.0[\s\S]*?modules\/visual-engine\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.93/,
+    'The shared visual-effect owner must load after sky dependencies and before the app.');
+assert.match(readFileSync('sw.js', 'utf8'), /chakra-v5\.289[\s\S]*?modules\/visual-engine\.js\?v=1\.0/,
+    'The visual-effect module must be precached for offline sessions.');
 assert.match(app, /new window\.AmbientParticleField\(\)/,
     'The app should construct the same one shared particle-field owner from its extracted module.');
+assert.match(app, /new window\.VisualEngine\(audio\)/,
+    'The app should construct the same single visual-effect owner with the existing audio engine.');
 assert.match(sky, /this\.twinklingStars\.length < 110/,
     'Only a bounded subset of bright stars should be animated.');
 assert.match(particleField, /nextMeteorAt = time \+ 25 \+ Math\.random\(\) \* 45/,
@@ -51,9 +58,9 @@ assert.match(app, /const MEDITATION_VISUAL_EFFECTS = new Set\(\['natural', 'aura
     'Runtime should normalize the supported visual effect modes.');
 assert.match(app, /localStorage\.setItem\('chakra_visual_effect', state\.visualEffect\)/,
     'The selected visual effect should be saved with Settings.');
-assert.match(app, /classList\.add\(`visual-effect-\$\{effect\}`\)[\s\S]*?classList\.toggle\('visual-effect-active', active\)/,
+assert.match(visualEngine, /classList\.add\(`visual-effect-\$\{effect\}`\)[\s\S]*?classList\.toggle\('visual-effect-active', active\)/,
     'The image container should receive the normalized visual effect class.');
-assert.match(app, /const active = effect !== 'natural' && !state\.eyesCloseMode/,
+assert.match(visualEngine, /const active = effect !== 'natural' && !state\.eyesCloseMode/,
     'Eyes Close Mode should suppress decorative visual effects.');
 assert.match(styles, /#chakra-container\.visual-effect-holographic::after[\s\S]*?animation:\s*holographicShimmer 12s ease-in-out infinite alternate/,
     'Holographic mode should use a slow CSS-only shimmer.');
@@ -63,9 +70,9 @@ assert.doesNotMatch(styles, /@keyframes nebulaDrift/,
     'The natural sky should not contain drifting colored cloud volumes.');
 assert.match(styles, /#app:fullscreen[\s\S]*?background:\s*transparent/,
     'The fullscreen app shell should not cover the ambient background.');
-assert.match(app, /const cycleSeconds = 8 \+ Math\.random\(\) \* 8/,
+assert.match(visualEngine, /const cycleSeconds = 8 \+ Math\.random\(\) \* 8/,
     'Image breathing should use a slow randomized cycle per chakra.');
-assert.match(app, /classList\.toggle\('image-breathe-active', breatheActive\)/,
+assert.match(visualEngine, /classList\.toggle\('image-breathe-active', breatheActive\)/,
     'The image breathing effect should cover symbols and deity images without relying on visual mode.');
 const breathingFrames = styles.slice(styles.indexOf('@keyframes imageLightBreath'), styles.indexOf('#chakra-container.visual-effect-active::before'));
 assert.doesNotMatch(breathingFrames, /opacity:/, 'Image breathing must not fade the artwork.');

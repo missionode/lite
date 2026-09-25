@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-043 chakra visual-effect controller ownership
+
+The existing `VisualEngine` now lives in `modules/visual-engine.js` and is eagerly loaded/cached before the app. The same single instance still receives the existing `AudioEngine`; effect modes, Eyes Close handling, chakra glow, slow image breathing and stop cleanup are unchanged. CSS and persisted settings remain in their existing owners. This improves code ownership only; startup JS is effectively unchanged and no device/thermal gain is claimed. See the modularization review and active handoff.
+
 ## Completed — CP-MOD-042 observational sky renderer ownership
 
 The existing `AmbientParticleField` renderer is now owned by `modules/ambient-particle-field.js` and loaded eagerly after its astronomy dependencies. The app still creates one instance and uses the same callbacks; canvas drawing, observer location/time, Earth/Moon/Sun/planet/star visibility, atmosphere, protective illustration, reduced-motion/static journey behavior and cleanup are unchanged. The module is included in the exact offline shell cache. This extraction improves ownership only; it does not claim startup, CPU or thermal gains. See the modularization review and active handoff.
