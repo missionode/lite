@@ -12,15 +12,17 @@ await withAudioStageFade(audio, 10, async () => { assert.equal(audio.stageFadeWi
 assert.equal(audio.stageFadeWindow,undefined);
 await assert.rejects(withAudioStageFade(audio,10,async()=>{throw new Error('cancelled');}));
 assert.equal(audio.stageFadeWindow,undefined,'Failure cannot leak a stage fade cap');
-const source = app.slice(app.indexOf('    stopMantraTrack('),app.indexOf('    async startBackgroundMusic('));
-const stop = vm.runInNewContext('({' + source + '})', {MANTRA_FADE_SECONDS:8,MANTRA_REVERB_TAIL_SECONDS:7,state:{volDrone:.2}}).stopMantraTrack;
+const source = fs.readFileSync('modules/audio-mantra-playback.js', 'utf8');
+const mantraContext = vm.createContext({ window: {} });
+vm.runInContext(source, mantraContext);
+const stop = mantraContext.window.ChakraAudioMantraPlayback.stop;
 function run(stageWindow) {
     const events=[]; let fade, retirement;
     const engine={ctx:{currentTime:20},mantraRequestId:0,elementalNodes:[],
         mantraLoop:{stop(seconds){fade=seconds;}},
         mantraTailWetGain:{gain:{value:.26,cancelAndHoldAtTime(){},setValueAtTime(v,t){events.push([v,t]);},linearRampToValueAtTime(v,t){events.push([v,t]);}}},
         setConvolverActive(...args){retirement=args.at(-1);},restoreBackgroundMusicAfterMantra(){}};
-    stop.call(engine,{stageWindow}); return {fade,retirement,events};
+    stop(engine,{stageWindow},{state:{volDrone:.2},fadeSeconds:8,tailSeconds:7}); return {fade,retirement,events};
 }
 assert.equal(run(null).fade,8,'Session ending retains long fade');
 assert.equal(run(null).retirement,15.1);

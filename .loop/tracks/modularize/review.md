@@ -576,3 +576,13 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static ev
 - The focused stop/start, Audio transitions and No Frequency contracts pass. Full Node suite: 79/81 pass; `content-safety` and `drone-duration` cannot begin assertions because owner-managed `docs/dot.json` is absent from this isolated worktree.
 - Loop routing unit suite: 11 pass. Atlas build: 43 maps / 353 nodes / 405 edges. Browser atlas verification did not run because Playwright is unavailable in this worktree; browser checks remain opt-in. No device listening or audible, CPU, memory, thermal or performance improvement is claimed.
 - Cache/app versions are `chakra-v5.301` / `4.05`. The shutdown lifecycle remains eager and offline cached. This is ownership/testability work only.
+## CP-MOD-055 — recorded mantra playback ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused unit/static evidence.
+
+- Recorded mantra startup and shutdown now live in `modules/audio-mantra-playback.js`; AudioEngine keeps its stable public methods and all background-music bus/profile policy.
+- Preserved the No Mantra guard, cached decode, stale-request cancellation, delayed music mute until decode is ready, seamless-loop fades, reverb-tail cutoff, LFO disposal, drone/master duck, elemental-bed ramps and same-window music restoration on failure/stop.
+- Direct contract, stage-fade, background-music/mantra, No Frequency and hypnosis journey tests pass. Node syntax checks pass. Test assertions now follow module ownership rather than depending on implementation text staying in `app.js`.
+- App/cache versions are `4.06` / `chakra-v5.302`; the module is eager and service-worker precached. No sound quality or performance improvement is claimed; device listening remains open.
+- Full Node suite: 80/82 pass; `content-safety` and `drone-duration` stop before assertions because the isolated worktree lacks owner-managed `docs/dot.json`. Loop router tests: 11 pass. Atlas regenerated at 43 maps / 353 nodes / 405 edges; browser atlas verification could not start because Playwright is unavailable in this worktree. `git diff --check` and syntax checks pass.
+- No browser/device listening, audio-quality, CPU, memory or thermal evidence is claimed. Module stays eager and offline cached; assessment/theme remain future checkpoints.
