@@ -13,7 +13,7 @@ assert.ok(Object.isFrozen(controls));
 assert.ok(Object.keys(controls).length === 6);
 assert.match(app, /fadeOutBackgroundMusic\(duration = 4\) \{\s*return audioBackgroundMusicControls\.fadeOut\(this, duration\)/);
 assert.match(app, /muteBackgroundMusicForMantra\(duration = MANTRA_MUSIC_FADE_SECONDS\) \{\s*return audioBackgroundMusicControls\.muteForMantra\(this, duration\)/);
-assert.ok(html.indexOf('modules/audio-background-music-controls.js?v=1.0') < html.indexOf('app.js?v=4.10'));
+assert.ok(html.indexOf('modules/audio-background-music-controls.js?v=1.0') < html.indexOf('app.js?v=4.11'));
 assert.match(sw, /\.\/modules\/audio-background-music-controls\.js\?v=1\.0/);
 
 function param(value = 0.4, modern = true) {

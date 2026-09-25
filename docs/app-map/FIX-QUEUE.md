@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-060 Guided opening and Gratitude stage ownership
+
+The shared opening/Gratitude stage now lives in `modules/journey-opening-stage.js`. Preparation-safety guidance, optional Arrival induction, Moon/Returning branch, Gratitude, personal intention, HRIM opening, and optional Arrival readiness retain their original order and guards. No behavior or performance change is claimed.
+
 ## Completed — CP-MOD-059 Arrival and Emergence wrapper ownership
 
 The optional Arrival/Arrival-readiness cues and Emergence sequence now live in `modules/journey-hypnosis-wrapper.js`. App adapters retain journey behavior, stage order, frequency/no-frequency branches, configured timing, fade windows and cancellation guards. This changes ownership only.

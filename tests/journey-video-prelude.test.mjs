@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const openingStage = fs.readFileSync(new URL('../modules/journey-opening-stage.js', import.meta.url), 'utf8');
 const prelude = fs.readFileSync(new URL('../modules/journey-video-prelude.js', import.meta.url), 'utf8');
 const journeyChrome = fs.readFileSync(new URL('../modules/journey-chrome.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -94,8 +95,8 @@ for (const locale of locales) {
 }
 
 assert.match(app, /function journeyT\(path\) \{\s*return t\(path, state\.language\);\s*\}/, 'journey labels should resolve against Meditation Language rather than Display Language');
-assert.match(app, /tutTitle\.textContent = journeyT\('ui\.preparation'\);/, 'the Preparation stage should use the narrated language');
-assert.match(app, /journeyT\('ui\.moon'\)[\s\S]*?journeyT\('ui\.gratitude'\)[\s\S]*?journeyT\('ui\.intention'\)/, 'all reflective journey headings should use the narrated language');
+assert.match(openingStage, /title\.textContent = journeyT\('ui\.preparation'\);/, 'the Preparation stage should use the narrated language');
+assert.match(openingStage, /journeyT\('ui\.moon'\)[\s\S]*?journeyT\('ui\.gratitude'\)[\s\S]*?journeyT\('ui\.intention'\)/, 'all reflective journey headings should use the narrated language');
 assert.match(app, /journeyT\('ui\.corpsePose'\)[\s\S]*?journeyT\('ui\.purification'\)[\s\S]*?journeyT\('ui\.guideReadyForNextSession'\)[\s\S]*?journeyT\('ui\.yoga'\)/, 'focused in-journey titles should use the narrated language');
 
 console.log('Journey video prelude contract passed.');

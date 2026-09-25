@@ -81,6 +81,8 @@ const audioMusicEcho = window.ChakraAudioMusicEcho;
 if (!audioMusicEcho) throw new Error('Audio music-echo module is unavailable.');
 const journeyHypnosisWrapper = window.ChakraJourneyHypnosisWrapper;
 if (!journeyHypnosisWrapper) throw new Error('Journey hypnosis-wrapper module is unavailable.');
+const journeyOpeningStage = window.ChakraJourneyOpeningStage;
+if (!journeyOpeningStage) throw new Error('Journey opening-stage module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -2243,66 +2245,9 @@ class MeditationController {
     }
 
     async runGratitude(isHighEnergy = false) {
-        const screen = document.getElementById('breathing-screen');
-        const tutorial = document.getElementById('breathing-tutorial');
-        const tutTitle = document.getElementById('tutorial-title');
-
-        showScreen(screen);
-        tutorial.classList.remove('hidden');
-        tutorial.style.opacity = "1";
-
-        const aura = document.getElementById('aura-bg');
-        aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
-        aura.style.opacity = "1";
-
-        // Keep one short, app-owned preparation for every guided path,
-        // including custom scripts and HRIM. Activity-specific guidance stays
-        // with Yoga, bathing, massage, and assisted-care stages.
-        tutTitle.textContent = journeyT('ui.preparation');
-        const prePracticeSafety = contentT('system.prePracticeSafety');
-        await this.narrate(prePracticeSafety, false);
-        if (!this.isMeditationActive) return;
-
-        await this.runArrivalInduction();
-        if (!this.isMeditationActive) return;
-
-        // Moon-phase and returning sea openings belong to the reflective
-        // journey. HRIM begins directly with its activation intention.
-        if (!isHighEnergy) {
-            const isReturningVisitor = state.returningJourney;
-            const phase = getMoonPhase();
-            const moonText = localized(this.scripts.intro.moon[phase]) ||
-                this.scripts.intro.moon[`${phase}_${state.language}`];
-            const openingText = isReturningVisitor
-                ? localized(this.scripts.intro, 'returning')
-                : moonText;
-            if (openingText && this.isMeditationActive) {
-                tutTitle.textContent = isReturningVisitor ? journeyT('ui.returning') : journeyT('ui.moon');
-                await this.narrate(openingText, false); // Keep music playing
-                await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
-            }
-        }
-
-        // Main gratitude + body scan. HRIM uses its own activation-oriented
-        // intention framing while the normal journey keeps the existing text.
-        if (!this.isMeditationActive) return;
-        tutTitle.textContent = isHighEnergy ? journeyT('ui.intention') : journeyT('ui.gratitude');
-        const text = isHighEnergy
-            ? localized(this.scripts.high_energy, 'intention')
-            : localized(this.scripts.intro, 'gratitude');
-        const personalIntention = state.intention && state.intention.trim();
-        if (isHighEnergy) {
-            const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
-            await this.narrateIntentionWithFrequency(intentionText, 'hrim');
-        } else if (personalIntention) {
-            await this.narrate(text, false); // Still keep music playing for next part
-            const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
-            tutTitle.textContent = journeyT('ui.intention');
-            await this.narrateIntentionWithFrequency(intentionText); // Keep music playing seamlessly into breathing
-        } else {
-            await this.narrate(text, false); // No intention? Still keep music playing.
-        }
-        if (!isHighEnergy && this.isMeditationActive) await this.runArrivalReadiness();
+        return journeyOpeningStage.run(this, isHighEnergy, {
+            document, showScreen, journeyT, contentT, state, getMoonPhase, localized, defaultIntention, timing
+        });
     }
 
     async runDharana() {

@@ -569,7 +569,7 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence 
 - Browser/device evidence was not requested and is not claimed.
 ## CP-MOD-054 — drone shutdown ownership
 
-Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence; browser evidence not run.
 
 - `stopBinaural()` and `stopDrone()` now delegate to `modules/audio-drone-stop.js`; public AudioEngine APIs and existing call order remain stable.
 - Preserved pre-context reset, AudioParam detection, `cancelAndHoldAtTime` fallback, 5-second fades, 5.1-second source retirement, oscillator/resource cleanup, grounding anchor reset and elemental-layer retirement.
@@ -621,3 +621,11 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static ev
 - Preserved ordinary non-demo wrapper guard, 432/528 Hz tones at half the selected drone-duration exposure (minimum 1 second), configured leading/trailing gaps, music handoff fades, No Frequency quiet gaps, Emergence bowl/narration/timing fade, and session-stop exits.
 - Direct wrapper, hypnosis journey, routing, session-estimate, audio-transition and focused practice contracts pass. Full Node suite: 84/86; `content-safety` and `drone-duration` cannot begin because owner-managed `docs/dot.json` is absent. Loop router: 11 pass. Syntax and diff checks pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verification is unavailable because Playwright is not installed.
 - App/cache versions are `4.10` / `chakra-v5.306`; module is eager/offline precached. No performance, audio-quality, browser playback or device claim.
+
+## CP-MOD-060 — guided opening/Gratitude stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- The shared preparation-safety, Arrival induction, Moon/Returning opening, Gratitude/intention and Arrival-readiness sequence now lives in `modules/journey-opening-stage.js`; `MeditationController.runGratitude()` remains the stable adapter.
+- Preserved initial screen/tutorial/aura setup, Moon vs Returning copy, no opening branch for HRIM, selected-language narration, optional personal intention, HRIM-specific intention/frequency and all active-session guards.
+- Direct opening-stage, focused-practices, hypnosis-journey, session-estimate and video-prelude contracts pass. Full Node suite is 85/87; `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuild succeeds at 43 maps / 353 nodes / 405 edges and source references are reconciled; the atlas browser verifier is unavailable because Playwright is not installed. `node --check` and `git diff --check` pass. App/cache versions are `4.11` / `chakra-v5.308`; module is eager and offline cached. No performance, narration-quality, browser, device playback or thermal claim.

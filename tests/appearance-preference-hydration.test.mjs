@@ -9,8 +9,8 @@ const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /appearancePreferenceHydration\.hydrateEffect\(/);
 assert.match(app, /appearancePreferenceHydration\.hydrateBrightness\(/);
-assert.match(html, /modules\/appearance-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.10/);
-assert.match(sw, /chakra-v5\.306[\s\S]*?modules\/appearance-preference-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/appearance-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.11/);
+assert.match(sw, /chakra-v5\.308[\s\S]*?modules\/appearance-preference-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:appearance-preference-hydration'], 'node tests/appearance-preference-hydration.test.mjs');
 
 const context = vm.createContext({});

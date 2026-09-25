@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-059: Arrival and Emergence journey wrapper ownership
+### NOW — CP-MOD-060: Guided opening/Gratitude stage ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-059/lite`, based on local CP-MOD-058 commit `12465f0` (CP-057/058 not yet published). Optional Arrival/Arrival-readiness and Emergence orchestration moved into `modules/journey-hypnosis-wrapper.js`; app callbacks preserve the journey controller interface.
-- App/cache versions are `4.10` / `chakra-v5.306`. Direct tests cover cue order/timing, No Frequency pacing, stage fade and cancellation. Full Node suite is 84/86; two tests stop before assertions because `docs/dot.json` is absent. Loop router 11 pass; atlas builds at 43/353/405 with valid source references; browser verifier unavailable because Playwright is not installed. No audio-quality/performance gain or device playback is claimed.
-- CP-056 is merged via PR #75 at `eef41bc`; CP-057/058 remain committed locally in isolated branches but await explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-059/lite`, based on CP-MOD-059 commit `dab13fa` (CP-057–059 remain local and unpublished). The shared opening/Gratitude stage moved into `modules/journey-opening-stage.js`; `runGratitude()` preserves its public adapter.
+- App/cache versions are `4.11` / `chakra-v5.308`. Direct opening-stage, focused-practices, hypnosis, session-estimate and video-prelude tests pass. Full Node suite is 85/87; only `content-safety` and `drone-duration` cannot start because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuilt with 43 maps / 353 nodes / 405 edges and source references reconciled; browser verifier not run (Playwright unavailable). Syntax and diff checks pass. No performance, narration-quality, browser, device playback or thermal claim.
+- CP-056 is merged via PR #75 at `eef41bc`; CP-057–059 await explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

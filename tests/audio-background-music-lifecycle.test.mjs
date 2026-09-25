@@ -18,7 +18,7 @@ const lifecycle = context.window.ChakraAudioBackgroundMusicLifecycle;
 assert.ok(Object.isFrozen(lifecycle));
 assert.match(app, /startBackgroundMusic\(\) \{\s*return audioBackgroundMusicLifecycle\.start\(this/);
 assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS\) \{\s*return audioBackgroundMusicLifecycle\.stop\(this/);
-assert.ok(html.indexOf('modules/audio-background-music-lifecycle.js?v=1.0') < html.indexOf('app.js?v=4.10'));
+assert.ok(html.indexOf('modules/audio-background-music-lifecycle.js?v=1.0') < html.indexOf('app.js?v=4.11'));
 assert.match(sw, /\.\/modules\/audio-background-music-lifecycle\.js\?v=1\.0/);
 
 function param(value = 1) {

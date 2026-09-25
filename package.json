@@ -30,6 +30,7 @@
     "test:audio-background-music-controls": "node tests/audio-background-music-controls.test.mjs",
     "test:audio-music-echo": "node tests/audio-music-echo.test.mjs",
     "test:journey-hypnosis-wrapper": "node tests/journey-hypnosis-wrapper.test.mjs",
+    "test:journey-opening-stage": "node tests/journey-opening-stage.test.mjs",
     "test:journey-routing": "node tests/journey-routing.test.mjs",
     "test:audio-transitions": "node tests/audio-transitions.test.mjs",
     "test:long-narration": "node tests/long-narration.test.mjs",
