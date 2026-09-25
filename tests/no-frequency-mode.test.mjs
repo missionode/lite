@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -40,7 +41,7 @@ assert.match(stopDrone, /if \(!this\.ctx\)[\s\S]*?return;/, 'No Frequency Mode s
 assert.doesNotMatch(mantra, /if \(state\.noFrequencyMode\) return;/, 'No Frequency Mode must not disable recorded mantra tracks');
 assert.match(mantra, /if \(state\.noMantraMode\) return;/, 'mantra tracks should have their own independent disable mode');
 assert.match(bowl, /state\.noFrequencyMode/, 'singing-bowl tones should be silent in No Frequency Mode');
-assert.match(app, /if \(state\.eyesCloseMode && !state\.noFrequencyMode\)/, 'Eyes Close anchoring should not create a 40 Hz tone in No Frequency Mode');
+assert.match(audioInitialization, /if \(state\.eyesCloseMode && !state\.noFrequencyMode\)/, 'Eyes Close anchoring should not create a 40 Hz tone in No Frequency Mode');
 assert.match(app, /function setNoFrequencyMode\(enabled\)[\s\S]*?meditation\.cancelDroneTimer\(\);[\s\S]*?audio\.stopDrone\(\);[\s\S]*?audio\.stopFrequencyShot\(\);/, 'enabling the setting during a journey should stop active frequency audio');
 const noFrequencySetter = app.slice(app.indexOf('function setNoFrequencyMode(enabled)'), app.indexOf('function setNoMantraMode(enabled)'));
 assert.doesNotMatch(noFrequencySetter, /audio\.stopMantraTrack\(\)/, 'No Frequency Mode must leave mantra playback available');

@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-047: Newcomer marker layout lifecycle ownership
+### NOW — CP-MOD-048: AudioEngine initialization graph ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-047/lite`, based on merged `modularize` commit `2899bbafa364c52778904d967d16056f251ff2e9` (CP-MOD-046 / PR #65). Move the unchanged newcomer chakra marker geometry and resize/image/frame lifecycle into `modules/newcomer-marker-layout.js`.
-- The seven normalized anchors, curve equations, tutorial narration and route ordering remain unchanged. App/cache versions are `3.97` / `chakra-v5.293`; direct geometry/lifecycle contracts pass. 72/74 direct Node files pass; two owner-managed `docs/dot.json` fixture tests are unavailable. All 11 router tests pass. The atlas builds and validates 43 maps / 353 nodes / 405 edges; interactive Playwright verification remains opt-in and was not run.
-- CP-MOD-047 implementation and quality review pass. Next: commit the isolated checkpoint, open/attach PR targeting `modularize`, merge there only, synchronize the main integration checkout without touching its unrelated dirty files, and proceed to the next safe extraction. Production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-048/lite`, based on merged `modularize` commit `4377b81` (CP-MOD-047 / PR #66). Extract only the AudioEngine's one-time Web Audio graph initializer; retain the public controller entry point and exact graph topology/settings.
+- The initialization body matches the baseline after explicit AudioContext injection. Direct mock-node, spatial/effects/lifecycle tests pass. App/cache versions are `3.98` / `chakra-v5.294`. 73/75 Node files pass; two require owner-managed `docs/dot.json`, absent from the isolated worktree. All 11 router tests pass; the atlas builds at 43 maps / 353 nodes / 405 edges. Audio listening and device/thermal evidence are not claimed.
+- CP-MOD-047 merged into `modularize` via PR #66; local integration branch is synchronized at `4377b81`. The main checkout's unrelated `.DS_Store`, `.codex/` and backup audio remain untouched. CP-MOD-048 is ready for PR/integration into `modularize` only; then proceed with the next safe extraction. Production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

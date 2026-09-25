@@ -3,10 +3,11 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync('app.js', 'utf8');
+const audioInitialization = fs.readFileSync('modules/audio-engine-initialization.js', 'utf8');
 const appStateModule = fs.readFileSync('modules/app-state.js', 'utf8');
 
 assert.match(
-  app,
+  audioInitialization,
   /typeof this\.ctx\.setSinkId === 'function'[\s\S]*?await this\.ctx\.setSinkId\('default'\)/,
   'AudioContext should prefer the system default loudspeaker output when supported',
 );
