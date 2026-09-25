@@ -60,7 +60,8 @@ assert.match(html, /id="session-countdown-layer"[\s\S]*?id="session-countdown-ri
 assert.doesNotMatch(html, /id="timer-display"/, 'The legacy text timer should be removed');
 assert.doesNotMatch(html, /data-session-countdown-value/, 'The circular countdown should not contain a numeric ticker');
 assert.match(app, /startSessionCountdown\(totalMs\)/, 'The meditation controller should start one journey-level countdown');
-assert.match(app, /this\.sessionCountdownRemainingMs/, 'The journey countdown should retain continuous remaining time');
+assert.match(app, /isActive: \(\) => this\.isMeditationActive[\s\S]*?isPaused: \(\) => this\.isPaused/,
+    'The countdown owner should read live journey-active and pause state.');
 assert.match(app, /this\.startSessionCountdown\(this\.getSessionDurationMs\(focusedExperience\)\)/, 'The main journey should initialize its total duration once');
 assert.doesNotMatch(app, /setSessionCountdown\(remaining, chantDurationMs\)/, 'The circular countdown must not reset for each chakra');
 assert.doesNotMatch(app, /setSessionCountdown\(remaining, activeMs\)/, 'The circular countdown must not reset for each shot stage');

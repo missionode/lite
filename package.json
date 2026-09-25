@@ -38,6 +38,7 @@
     "test:undo-unlearn": "node tests/undo-unlearn-practice.test.mjs",
     "test:screen-navigation": "node tests/screen-navigation.test.mjs",
     "test:session-estimate": "node tests/session-estimate.test.mjs",
+    "test:session-countdown": "node tests/session-countdown.test.mjs",
     "test:mood-ambience-view": "node tests/mood-ambience-settings-view.test.mjs",
     "test:drone-duration-view": "node tests/drone-duration-settings-view.test.mjs",
     "test:lobby-experience-visibility": "node tests/lobby-experience-visibility.test.mjs",

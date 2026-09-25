@@ -2588,10 +2588,15 @@ class MeditationController {
         this.experimentDuration = null;
         this.dndReminderAcknowledged = false;
         this.sessionStartedAt = null;
-        this.sessionCountdownTotalMs = 0;
-        this.sessionCountdownRemainingMs = 0;
-        this.sessionCountdownLastTickAt = 0;
-        this.sessionCountdownTicker = null;
+        this.sessionCountdown = new window.ChakraSessionCountdown({
+            now: () => Date.now(),
+            setIntervalFn: (callback, delay) => window.setInterval(callback, delay),
+            clearIntervalFn: timer => window.clearInterval(timer),
+            isActive: () => this.isMeditationActive,
+            isPaused: () => this.isPaused,
+            render: (remainingMs, totalMs) => setSessionCountdown(remainingMs, totalMs),
+            hide: () => hideSessionCountdown()
+        });
         this.droneTimerGeneration = 0;
         this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
@@ -2649,42 +2654,15 @@ class MeditationController {
     }
 
     startSessionCountdown(totalMs) {
-        this.stopSessionCountdown();
-        const total = Number(totalMs);
-        if (!Number.isFinite(total) || total <= 0) return;
-
-        this.sessionCountdownTotalMs = total;
-        this.sessionCountdownRemainingMs = total;
-        this.sessionCountdownLastTickAt = Date.now();
-        this.renderSessionCountdown();
-        this.sessionCountdownTicker = window.setInterval(() => {
-            const now = Date.now();
-            if (!this.isMeditationActive || this.isPaused) {
-                this.sessionCountdownLastTickAt = now;
-                return;
-            }
-            this.sessionCountdownRemainingMs = Math.max(
-                0,
-                this.sessionCountdownRemainingMs - Math.max(0, now - this.sessionCountdownLastTickAt)
-            );
-            this.sessionCountdownLastTickAt = now;
-            this.renderSessionCountdown();
-        }, 250);
+        this.sessionCountdown.start(totalMs);
     }
 
     renderSessionCountdown() {
-        setSessionCountdown(this.sessionCountdownRemainingMs, this.sessionCountdownTotalMs);
+        this.sessionCountdown.render();
     }
 
     stopSessionCountdown() {
-        if (this.sessionCountdownTicker !== null) {
-            window.clearInterval(this.sessionCountdownTicker);
-            this.sessionCountdownTicker = null;
-        }
-        this.sessionCountdownTotalMs = 0;
-        this.sessionCountdownRemainingMs = 0;
-        this.sessionCountdownLastTickAt = 0;
-        hideSessionCountdown();
+        this.sessionCountdown.stop();
     }
 
     async pauseAwareSleep(ms) {
