@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-046: Session countdown lifecycle ownership
+### NOW — CP-MOD-047: Newcomer marker layout lifecycle ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-046/lite`, based on CP-MOD-045 integration commit `2f55f94`. Move the countdown ticker and elapsed-time accounting to `modules/session-countdown.js`; preserve controller entry points and the exact tick/paused behavior.
-- CP-MOD-045 is integrated locally and remotely to `modularize` at `2f55f94` (PR #64); production is unchanged. CP-MOD-046 app/cache versions are `3.96` / `chakra-v5.292`.
-- Record fresh validation and any missing fixtures in `.loop/tracks/modularize/review.md`; keep the flow atlas synchronized. User working files in the main checkout must remain untouched.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-047/lite`, based on merged `modularize` commit `2899bbafa364c52778904d967d16056f251ff2e9` (CP-MOD-046 / PR #65). Move the unchanged newcomer chakra marker geometry and resize/image/frame lifecycle into `modules/newcomer-marker-layout.js`.
+- The seven normalized anchors, curve equations, tutorial narration and route ordering remain unchanged. App/cache versions are `3.97` / `chakra-v5.293`; direct geometry/lifecycle contracts pass. 72/74 direct Node files pass; two owner-managed `docs/dot.json` fixture tests are unavailable. All 11 router tests pass. The atlas builds and validates 43 maps / 353 nodes / 405 edges; interactive Playwright verification remains opt-in and was not run.
+- CP-MOD-047 implementation and quality review pass. Next: commit the isolated checkpoint, open/attach PR targeting `modularize`, merge there only, synchronize the main integration checkout without touching its unrelated dirty files, and proceed to the next safe extraction. Production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

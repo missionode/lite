@@ -16,6 +16,10 @@ The exact standard chakra-journey duration calculation now belongs to `modules/s
 
 The exact countdown ticker state and 250 ms lifecycle now live in `modules/session-countdown.js`; the controller injects active/paused state, browser timers, clock and existing show/hide display callbacks. Controller call sites, route behavior, and estimate formulas are unchanged. Direct fake-clock tests cover elapsed-time accounting, paused/inactive time, restart, invalid durations, zero clamping and cleanup. Eager delivery adds no performance or thermal claim.
 
+## Completed — CP-MOD-047 newcomer marker layout lifecycle ownership
+
+The seven normalized chakra anchors, responsive SVG connector geometry, frame coalescing, image-load and resize triggers, and explicit cleanup now live in `modules/newcomer-marker-layout.js`. The newcomer screen, labels, narration, placement formulas and journey order remain unchanged. Direct deterministic geometry/lifecycle contracts and the existing newcomer journey checks cover parity. Eager delivery adds no visual, startup, CPU, memory or thermal claim.
+
 ## Completed — CP-MOD-042 observational sky renderer ownership
 
 The existing `AmbientParticleField` renderer is now owned by `modules/ambient-particle-field.js` and loaded eagerly after its astronomy dependencies. The app still creates one instance and uses the same callbacks; canvas drawing, observer location/time, Earth/Moon/Sun/planet/star visibility, atmosphere, protective illustration, reduced-motion/static journey behavior and cleanup are unchanged. The module is included in the exact offline shell cache. This extraction improves ownership only; it does not claim startup, CPU or thermal gains. See the modularization review and active handoff.

@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-047 — Newcomer marker layout lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for unchanged geometry/lifecycle contracts, newcomer integration, the applicable direct test suite, Loop router checks, and generated atlas source validation. Interactive browser verification remains opt-in and was not run.
+
+- The seven normalized chakra anchors and existing geometry equations have moved into `modules/newcomer-marker-layout.js`. It owns the same SVG viewBox/path measurements, one-frame coalescing, image-load and ResizeObserver triggers, and explicit listener/observer/frame disposal. `app.js` constructs the owner eagerly and still requests a sync at the same newcomer-orientation point.
+- Direct deterministic checks pass for unchanged anchor values, left/right connector geometry, incomplete-image preservation, load/resize coalescing and destroy cleanup. Existing newcomer tutorial and countdown lifecycle contracts also pass.
+- App/cache advance to `3.97` / `chakra-v5.293`; the module is ordered before `app.js` and included in the exact offline shell. Browser visual proof has not been run (browser verification is opt-in); device readability is not claimed.
+- Of 74 direct Node test files, 72 pass. `content-safety` and `drone-duration` cannot run because owner-managed `docs/dot.json` is absent from this worktree; this is the same fixture limitation recorded on earlier checkpoints. All 11 Loop model-router tests pass.
+- Atlas regenerated successfully with 43 maps / 353 nodes / 405 edges; source-reference validation in the builder passes. The interactive Playwright atlas verifier and app/browser run were not performed because browser testing is opt-in. Syntax checks and `git diff --check` pass.
+- Error surface for the executed non-browser work has no untriaged exceptions beyond the two missing-fixture failures. No visual, startup, CPU, memory or thermal gain is claimed; production and device evidence are not claimed.
+
 ## CP-MOD-046 — Session countdown lifecycle ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for deterministic timer lifecycle, controller integration, offline caching, full applicable Node suite and atlas/browser checks.

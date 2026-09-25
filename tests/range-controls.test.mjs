@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const rangeControls = window\.ChakraRangeControls/);
 assert.match(app, /function enhanceRangeControls\(\)\s*\{\s*rangeControls\.enhance\(/);
 assert.match(app, /function refreshRangeControlDisplays\(\)\s*\{\s*rangeControls\.refresh\(/);
-assert.match(html, /modules\/range-controls\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.96/);
-assert.match(serviceWorker, /chakra-v5\.292[\s\S]*?modules\/range-controls\.js\?v=1\.0/);
+assert.match(html, /modules\/range-controls\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.97/);
+assert.match(serviceWorker, /chakra-v5\.293[\s\S]*?modules\/range-controls\.js\?v=1\.0/);
 
 const context = vm.createContext({ Event: class { constructor(type, options) { this.type = type; this.bubbles = options.bubbles; } } });
 vm.runInContext(source, context);

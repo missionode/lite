@@ -334,42 +334,11 @@ const screenNavigation = screenNavigationModule.create({
 });
 const icebreakerTimer = document.getElementById('icebreaker-timer');
 
-const NEWCOMER_MARKER_ANCHORS = Object.freeze({
-    crown: [0.5, 0.065], thirdeye: [0.5, 0.123], throat: [0.5, 0.205],
-    heart: [0.5, 0.297], solar: [0.5, 0.385], sacral: [0.5, 0.465], root: [0.5, 0.548]
+const newcomerMarkerStage = document.querySelector('.newcomer-body-map-stage');
+const newcomerMarkerLayout = new window.ChakraNewcomerMarkerLayout({
+    stage: newcomerMarkerStage,
+    svg: document.getElementById('newcomer-marker-connectors')
 });
-let newcomerConnectorFrame = null;
-function syncNewcomerMarkerConnectors() {
-    newcomerConnectorFrame = null;
-    const stage = document.querySelector('.newcomer-body-map-stage');
-    const image = stage?.querySelector('img');
-    const svg = document.getElementById('newcomer-marker-connectors');
-    if (!stage || !image || !svg || !image.complete) return;
-    const stageRect = stage.getBoundingClientRect();
-    const imageRect = image.getBoundingClientRect();
-    if (!stageRect.width || !imageRect.width) return;
-    svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
-    Object.entries(NEWCOMER_MARKER_ANCHORS).forEach(([marker, [x, y]]) => {
-        const label = stage.querySelector(`[data-marker="${marker}"]`);
-        const path = svg.querySelector(`path[data-marker="${marker}"]`);
-        if (!label || !path) return;
-        const labelRect = label.getBoundingClientRect();
-        const targetX = imageRect.left - stageRect.left + imageRect.width * x;
-        const targetY = imageRect.top - stageRect.top + imageRect.height * y;
-        const labelOnLeft = labelRect.left + labelRect.width / 2 < imageRect.left + imageRect.width / 2;
-        const startX = (labelOnLeft ? labelRect.right : labelRect.left) - stageRect.left;
-        const startY = Math.max(labelRect.top, Math.min(targetY + stageRect.top, labelRect.bottom)) - stageRect.top;
-        const bend = (targetX - startX) * 0.42;
-        path.setAttribute('d', `M ${startX} ${startY} C ${startX + bend} ${startY}, ${targetX - bend} ${targetY}, ${targetX} ${targetY}`);
-    });
-}
-function scheduleNewcomerMarkerSync() {
-    if (newcomerConnectorFrame !== null) return;
-    newcomerConnectorFrame = requestAnimationFrame(syncNewcomerMarkerConnectors);
-}
-const newcomerMapImage = document.querySelector('.newcomer-body-map-stage img');
-newcomerMapImage?.addEventListener('load', scheduleNewcomerMarkerSync);
-new ResizeObserver(scheduleNewcomerMarkerSync).observe(document.querySelector('.newcomer-body-map-stage'));
 
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
@@ -3070,7 +3039,7 @@ class MeditationController {
     async runNewcomerGuidedOrientation() {
         const status = document.getElementById('newcomer-guided-status');
         showScreen(newcomerTutorialScreen);
-        scheduleNewcomerMarkerSync();
+        newcomerMarkerLayout.schedule();
         newcomerTutorialScreen?.classList.add('is-guided');
         if (status) {
             status.hidden = false;
