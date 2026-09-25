@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.289';
+const CACHE_NAME = 'chakra-v5.290';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -13,7 +13,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './style.css?v=2.03',
-  './app.js?v=3.93',
+  './app.js?v=3.94',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.0',

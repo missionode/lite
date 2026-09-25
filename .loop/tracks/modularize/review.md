@@ -1,5 +1,15 @@
 # Review
 
+## CP-MOD-044 — Standard journey duration-estimate ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source parity, direct estimator contracts, applicable regression suite, shell-cache startup and atlas verification.
+
+- The full standard chakra-journey seconds formula now lives in the existing `modules/session-estimate.js`. `MeditationController.estimateStandardJourneySeconds()` remains as a thin adapter supplying the same script/state, selected-chakra order, locale, timing, narration-duration, drone-duration, DOM-value and system-narration services. Session mode priority and legacy countdown fallback branches are unchanged.
+- Direct tests exercise missing scripts, no selected chakras, positive rounded estimates, Box Breathing/Visualization duration contribution and dependency validation. Existing hypnosis duration and narration/session-countdown contracts pass.
+- App/cache URLs advance to `3.94` / `chakra-v5.290`; the estimator remains eagerly loaded and in the offline shell cache. One local Chromium cold/warm/offline startup test passes. The atlas was regenerated and browser-verified: 43 maps, 353 nodes, 405 edges; all node selections, label bounds, mobile overflow, keyboard use, print, SVG export and template fallback pass with no page errors.
+- Direct Node suite: 70 of 72 test files pass. `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. All 11 Loop model-router tests pass. A broader 4-case optional-loading browser run encountered a refused local test-server connection; the cache/startup browser case was rerun alone and passed. No unrelated browser behavior is inferred from that failed run.
+- This is a cohesive ownership/testability extraction only. The module remains eager; no startup, memory, CPU or thermal improvement is claimed. No manual device/audio evidence or production verification is claimed.
+
 ## CP-MOD-043 — Chakra VisualEngine ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for verbatim ownership move, app construction, direct visual/preference contracts, offline delivery and atlas/browser checks.

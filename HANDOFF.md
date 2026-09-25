@@ -1,11 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-043: Chakra visual-effect controller ownership
+### NOW — CP-MOD-044: Standard journey duration-estimate ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-043/lite`, based on merged CP-MOD-042 commit `078b983` (PR #61). Move only the existing `VisualEngine` owner to `modules/visual-engine.js`; preserve all effect settings, styling, audio attachment and timing.
-- The class matches the `078b983` implementation verbatim (apart from its export wrapper); the app constructs the same single instance. App/cache versions are `3.93` / `chakra-v5.289`. All 70 applicable Node tests pass (two owner-fixture skips), 11 router tests pass, four modularization Chromium scenarios pass, and atlas verification passes at 43 / 353 / 405.
-- One local browser sample has 35 scripts / 879,838 encoded JS bytes versus CP42's 34 / 879,812. App.js is about 2.3 KiB smaller, but total startup JS is effectively unchanged; this is ownership work only, not a performance/thermal claim. PR target is `modularize`, never production.
-- The dedicated sky browser assertion failed identically on the unmodified CP42 parent and is not part of this visual-effect extraction. No production push.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-044/lite`, based on CP-MOD-043 integration commit `854d8df`. Move exact standard chakra-journey duration calculation into the existing `modules/session-estimate.js`; preserve its controller entry point and countdown behavior.
+- App/cache versions are `3.94` / `chakra-v5.290`. The module is eager and already precached; this improves ownership/testability only, not startup or thermal performance. Target is `modularize`, never production.
+- Current checkpoint validation and PR/merge status are recorded in `.loop/tracks/modularize/review.md`; retain the two fixture-dependent test exclusions (`docs/dot.json` absent) and use fresh evidence after edits.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

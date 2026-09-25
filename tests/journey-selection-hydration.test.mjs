@@ -11,8 +11,8 @@ assert.match(app, /journeySelectionHydration\.hydrate\(\{ state, document, syncV
 const loadPreferences = app.slice(app.indexOf('function loadPreferences()'), app.indexOf('function checkFirstTime()'));
 assert.ok(loadPreferences.indexOf("setText('stat-time'") < loadPreferences.indexOf('journeySelectionHydration.hydrate('));
 assert.ok(loadPreferences.indexOf('journeySelectionHydration.hydrate(') < loadPreferences.indexOf("syncChecked('mixer-no-frequency-mode-toggle'"));
-assert.match(html, /modules\/journey-selection-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.93/);
-assert.match(serviceWorker, /chakra-v5\.289[\s\S]*?modules\/journey-selection-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/journey-selection-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.94/);
+assert.match(serviceWorker, /chakra-v5\.290[\s\S]*?modules\/journey-selection-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:journey-selection-hydration'], 'node tests/journey-selection-hydration.test.mjs');
 
 const context = vm.createContext({});

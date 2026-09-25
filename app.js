@@ -2612,66 +2612,23 @@ class MeditationController {
     }
 
     estimateStandardJourneySeconds() {
-        if (!this.scripts || this.isHighEnergy || isDemoScriptSelected()) return null;
-
-        const narration = (text, transition = 'none') => {
-            if (!text) return 0;
-            return estimateNarrationDurationSeconds(text) + (transition === 'mantra' ? 0 : timing('narration', 'exitGap'));
-        };
-        const tone = (afterGap) => {
-            const sharedDuration = Math.max(1000, Math.round(
-                getDroneDurationMs(state.timePerChakra, state.droneDurationMode) / 2
-            ));
-            const audibleToneSeconds = state.noFrequencyMode ? 0 : (sharedDuration / 1000) + 1.1;
-            return timing('transitions', 'arrivalToneLeadGap') + audibleToneSeconds + afterGap;
-        };
-        const selected = this.chakraOrder.map(key => [key, this.scripts[key]]).filter(([, chakra]) => chakra);
-        if (!selected.length) return null;
-
-        const phase = getMoonPhase();
-        const opening = state.returningJourney
-            ? localized(this.scripts.intro, 'returning')
-            : localized(this.scripts.intro?.moon?.[phase]) || this.scripts.intro?.moon?.[`${phase}_${state.language}`];
-        const intention = contentT('system.intention').replace('{{intention}}', state.intention?.trim() || defaultIntention(state.language));
-        let seconds = state.timeIcebreaker + timing('transitions', 'initialSettle');
-        seconds += narration(contentT('system.prePracticeSafety'));
-        seconds += narration(this.getJourneySystemNarration('arrivalInduction'));
-        seconds += tone(timing('transitions', 'arrivalToneExitGap'));
-        seconds += narration(opening) + timing('transitions', 'openingPause');
-        seconds += narration(localized(this.scripts.intro, 'gratitude'));
-        seconds += narration(intention);
-        seconds += narration(this.getJourneySystemNarration('arrivalReadiness'));
-        seconds += tone(timing('transitions', 'arrivalReadinessGap'));
-        if (getChecked('box-breathing-experience-toggle')) seconds += state.timeBreathing * 16;
-        if (getChecked('visualization-addon-toggle')) seconds += Number(document.getElementById('visualization-duration')?.value || 2) * 60;
-        if (getChecked('dharana-addon-toggle')) seconds += Number(document.getElementById('dharana-duration')?.value || 2) * 60;
-        if (getChecked('body-scan-addon-toggle')) seconds += Number(document.getElementById('body-scan-duration')?.value || 5) * 60;
-        if (getChecked('noting-addon-toggle')) seconds += Number(document.getElementById('noting-duration')?.value || 4) * 60;
-        seconds += timing('transitions', 'postBreathing');
-
-        selected.forEach(([key, chakra], index) => {
-            seconds += narration(localized(chakra, 'meditation'), 'mantra');
-            seconds += Math.max(0, state.timePerChakra * 60 - timing('transitions', 'chakraLeadOut'));
-            seconds += timing('transitions', 'chakraPostMantra');
-            seconds += narration(localized(chakra, 'affirmation'));
-            if (index < selected.length - 1) {
-                const intervalNarration = narration(contentT('system.breatheInterval'));
-                seconds += timing('transitions', 'intervalPreparation') + Math.max(state.timeInterval, intervalNarration);
-            }
+        return window.ChakraSessionEstimate.estimateStandardJourneySeconds({
+            scripts: this.scripts,
+            isHighEnergy: this.isHighEnergy,
+            isDemoScriptSelected,
+            estimateNarrationDurationSeconds,
+            timing,
+            getDroneDurationMs,
+            state,
+            chakraOrder: this.chakraOrder,
+            localized,
+            contentT,
+            getMoonPhase,
+            defaultIntention,
+            isChecked: getChecked,
+            readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
+            getJourneySystemNarration: key => this.getJourneySystemNarration(key)
         });
-
-        if (getChecked('hooponopono-experience-toggle')) seconds += 4 * 60;
-        if (getChecked('undo-unlearn-addon-toggle')) seconds += Number(document.getElementById('undo-unlearn-duration')?.value || 8) * 60;
-
-        seconds += timing('transitions', 'finalSilence');
-        seconds += narration(localized(this.scripts.closing));
-        seconds += timing('transitions', 'closingFirstPause');
-        seconds += narration(localized(this.scripts.closing, 'affirmation'));
-        seconds += timing('transitions', 'closingSecondPause');
-        seconds += timing('transitions', 'emergenceBellSettle');
-        seconds += narration(this.getJourneySystemNarration('emergence'));
-        seconds += state.timeEmergence + timing('transitions', 'emergenceFinalQuiet');
-        return Math.ceil(seconds);
     }
 
     getSessionDurationMs(focusedExperience = null) {
