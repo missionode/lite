@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-040 — Shared journey chrome ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct interaction contract, app wiring, offline delivery, adjacent journey browser routes and atlas evidence.
+
+- `JourneyChromeController` now owns the existing fullscreen, hover/touch/focus reveal, idle cursor, mixer visibility and cleanup listeners in `modules/journey-chrome.js`; the app constructs one instance at app lifetime, independently of the video-prelude class. The module is loaded before `app.js` and is included in the versioned shell cache.
+- Direct coverage preserves the current 180 ms control hide and 3 s cursor/touch timing, keyboard focus protection, mixer keep-visible behavior and exit cleanup. Eager loading remains deliberate because all journeys use it; this is ownership work, not a startup optimization.
+- Direct timer/interaction test, video prelude, routing and Settings/cache contracts pass; all 70 applicable Node tests pass, with the same two owner-fixture tests omitted because `docs/dot.json` is absent. All 11 Loop router tests pass.
+- Three Chromium modularization checks pass: cold/warm/offline cache baseline, selected-practice offline start, and optional video request. The baseline records 33 initial scripts / 891,328 encoded JS bytes; app.js is 371,492 bytes and sky scripts remain 409,508 bytes. Relative to CP-MOD-039, the extracted helper adds 723 bytes net to the total initial JS and one request, while moving ~5.2 KiB out of app.js. This is an ownership tradeoff, not a performance win.
+- Atlas rebuilt and browser verified at 43 maps / 353 nodes / 405 edges; labels, bounds, keyboard, mobile overflow, print, SVG and template fallback pass, with no page errors. The test-only video abort and deliberately blocked external fonts produce only expected `ERR_FAILED` console lines; no other console or page errors. JS syntax and `git diff --check` pass.
+- Local Chromium evidence only; no device visual, thermal, audio playback or production benefit is claimed. The new module is eager by design and leaves video, audio, narration, timing and sky behavior unchanged.
+
 ## CP-MOD-039 — Optional video media request
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source, request-level Chromium, offline route and atlas evidence.
