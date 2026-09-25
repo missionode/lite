@@ -5,7 +5,8 @@
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-065/lite`, based on CP-MOD-064 `1e65281`; branch `codex/modularize-cp-065`. Extracted the seven journey-preparation selection listeners and nested option-row visibility to `modules/journey-preparation-selection.js`. Journey routing still owns standalone/no-chakra validation and start dispatch.
 - Updated the `modes` map source references and FIX-QUEUE. Direct selection tests cover all seven add-ons, option-row expand/collapse, exclusivity clearing order, Box/Ho’oponopono flags and both update calls; standalone selection remains independent of chakra prerequisites. Journey routing and roadmap tests pass. Full Node sweep: 90 pass; `content-safety` and `drone-duration` fail before assertions due to absent `docs/dot.json`. Syntax/diff checks and atlas build pass (43 maps / 353 nodes / 405 edges). No browser evidence or performance claim.
 - No remote publication, PR, merge or production update. Root integration checkout and unrelated local changes remain untouched.
-- Next: inspect the final diff and commit CP-065 locally, then continue the ownership audit and measured-loading investigation.
+- CP-065 is committed locally at `d8fe487` on `codex/modularize-cp-065`; no remote publication, PR, merge or production update.
+- Next: continue the remaining ownership audit and measured-loading investigation, preserving the full integration and browser-evidence gates.
 
 ### NOW — CP-MOD-064: Audio effects settings view ownership
 
