@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const moodAmbienceSettingsView = window\.ChakraMoodAmbienceSettingsView/);
 assert.match(app, /function syncPleasureAmbienceControl\(\)\s*\{\s*moodAmbienceSettingsView\.sync\(/);
-assert.match(html, /modules\/mood-ambience-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.01/);
-assert.match(serviceWorker, /chakra-v5\.297[\s\S]*?modules\/mood-ambience-settings-view\.js\?v=1\.0/);
+assert.match(html, /modules\/mood-ambience-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.02/);
+assert.match(serviceWorker, /chakra-v5\.298[\s\S]*?modules\/mood-ambience-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

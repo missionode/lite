@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
+const audioTonePlayback = fs.readFileSync(new URL('../modules/audio-tone-playback.js', import.meta.url), 'utf8');
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -35,7 +36,7 @@ const bowl = app.slice(bowlStart, bowlEnd);
 
 assert.match(drone, /this\.stopDrone\(\);[\s\S]*?if \(state\.noFrequencyMode\) return;/, 'chakra and HRIM drones should stop or skip in No Frequency Mode');
 assert.match(sleepDrone, /this\.stopDrone\(\);[\s\S]*?if \(state\.noFrequencyMode\) return;/, 'sleep-stage drones should stop or skip in No Frequency Mode');
-assert.match(shot, /if \(state\.noFrequencyMode\)[\s\S]*?frequency-only Shots/, 'frequency-only Shots should be rejected at the audio boundary');
+assert.match(audioTonePlayback, /if \(state\.noFrequencyMode\)[\s\S]*?frequency-only Shots/, 'frequency-only Shots should be rejected at the audio boundary');
 assert.match(stopBinaural, /if \(!this\.ctx\)[\s\S]*?this\.binauralNodes = \[\];[\s\S]*?return;/, 'stopping binaural audio before Web Audio initialization should be safe');
 assert.match(stopDrone, /if \(!this\.ctx\)[\s\S]*?return;/, 'No Frequency Mode should safely stop an uninitialized drone graph');
 assert.doesNotMatch(mantra, /if \(state\.noFrequencyMode\) return;/, 'No Frequency Mode must not disable recorded mantra tracks');

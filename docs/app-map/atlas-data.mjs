@@ -3,7 +3,7 @@ export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-2
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
-add('overview','Start here','The whole application','Navigation, journey families, supporting systems, and exits.','app.js:5196; app.js:5987; index.html:248',[
+add('overview','Start here','The whole application','Navigation, journey families, supporting systems, and exits.','app.js:5196; app.js:5917; index.html:248',[
  [['launch','Open app','Browser or installed PWA; local preferences and cached assets influence startup.']],
  [['settings','Settings','First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts.'],['lobby','Meditation Room','Main mode selection, chakra choices, intention, duration and assessment entry point.']],
  [['manage','Manage Settings','Public settings import and Advanced Features-protected export.'],['experiments','Experiments','Settings → isolated activity → return to Experiment screen. See Experiments map.'],['journeys','Journey dispatcher','Shots → Music Only → Sleep → focused or standard guided start. See mode map.'],['consult','Separate operator tools','Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot.']],
@@ -130,7 +130,7 @@ add('shots','Journeys','Sound Shots','Six types, confirmation, frequency validat
  [['reload','Natural completion','Stop sound, hide controls, release wake lock, show Lobby then reload page.'],['abort','Manual stop / failure','Manual Stop uses shared stop; activation failure alerts and uses stopShot. No stats increment.']]
 ],[['enable','type','Confirmed'],['type','med','Meditation'],['type','sleep','Sleep'],['type','single','Other'],['med','run','Valid'],['sleep','run','Valid'],['single','run','Valid'],['run','gaps','More stages'],['gaps','run','Next'],['run','reload','Last stage done'],['run','abort','Stop / error']],['Single-frequency default is 1 second; multi-stage default 7 seconds; selected duration range 1–20 seconds. Displayed total active seconds excludes inter-stage gaps; countdown includes them.']);
 
-add('experiments','Journeys','Experiment activities','Isolated activities and return behavior.','app.js:3700; app.js:5982; index.html:210',[
+add('experiments','Journeys','Experiment activities','Isolated activities and return behavior.','app.js:3700; app.js:5475; index.html:210',[
  [['settings','Settings','Open Experiment Mode.']],
  [['pick','Pick one activity','Seven individual chakras, HRIM, Box, Ho’oponopono and Corpse Pose are always available. Perineal Care, Bath and Assisted Bath are absent from the native activity picker until the shared seven-tap-and-password Advanced Features unlock. Relocking removes care options, resets a selected care activity to Root and refreshes duration controls. Reload starts locked.']],
  [['duration','Configure duration','Chakra/HRIM use minutes; Box uses seconds per step; care and Corpse routines consume seconds.']],
@@ -146,7 +146,7 @@ add('controls','Live session','Pause, stop and live controls','Shared interactio
  [['wait','Guide waiting','Continue is accepted only when active and not paused; Stop releases the pending wait.'],['fullscreen','User fullscreen','Track fullscreen on app container. Bottom controls share normal-journey hover/touch/keyboard behavior; fullscreen top timers still follow the reveal state.']]
 ],[['active','pause','Pause'],['pause','resume','Play'],['resume','active','Continue'],['active','mixer','Mixer'],['mixer','active','Close'],['active','stop','Stop'],['stop','return','Cleanup'],['active','image','Image tap'],['image','active','Keep playing'],['active','wait','Care / Yoga gate'],['wait','active','Guide continues'],['wait','stop','Stop'],['active','fullscreen','Fullscreen change']],['The app no longer requests or exits fullscreen automatically. Browser-speech cancellation and Piper buffer suspension are different pause mechanisms. Re-enable No Mantra does not immediately restart a previously skipped mantra stage.']);
 
-add('restart','Live session','Optional Lobby video introduction','An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.','modules/journey-video-prelude.js:1; app.js:4705; app.js:5729; app.js:5947; sw.js:1',[
+add('restart','Live session','Optional Lobby video introduction','An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.','modules/journey-video-prelude.js:1; app.js:4705; app.js:5729; app.js:5759; sw.js:1',[
  [['lobby','Lobby → Include video introduction','The option carries a localized “Cosmic Consciousness Introduction” subtitle. Its persisted choice defaults OFF and appears in the roadmap for every supported journey family. A normal journey with no selected chakras is rejected at the original Begin click, before video preparation.']],
  [['buffer','Prepare and buffer','Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check.']],
  [['ready','Begin introduction','Reveal button when ready OR after the 90-second bounded wait. Explicit user action required.']],
@@ -418,16 +418,17 @@ add('care-preference-hydration','Systems','Personal-care preference control hydr
  [['gates','Continue startup','Session-only mode reset, Advanced Features visibility and care execution remain unchanged.']]
 ],[['state','bath','Saved care state ready'],['bath','care','Continue established order'],['care','gates','Controls synchronized']],['The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.']);
 
-// CP-MOD-048/049/050/051 update ownership references without changing flow nodes or edges.
+// CP-MOD-048/049/050/051/052 update ownership references without changing flow nodes or edges.
 const audioMap = graphs.find(graph => graph.id === 'audio');
-audioMap.source = 'modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1078';
+audioMap.source = 'modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1084; app.js:1222';
 audioMap.notes.push('CP-MOD-048 moves only the one-time Web Audio graph construction into `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the stable adapter and runtime source/effect lifecycles stay with the existing owners. The graph and settings are unchanged; mock-node tests are not device listening evidence.');
 audioMap.notes.push('CP-MOD-049 moves the existing distortion curve and impulse/noise buffer generation helpers into `modules/audio-signal-design.js`; AudioEngine helper adapters preserve call order and cached-noise lifetime. No sound or performance change is claimed.');
 audioMap.notes.push('CP-MOD-050 moves only panner creation and generic position interpolation into `modules/audio-spatial-geometry.js`; AudioEngine retains adapters and mode-specific spatial profiles. No spatial behavior or performance change is claimed.');
 audioMap.notes.push('CP-MOD-051 moves elemental noise-bed node creation and cleanup into `modules/audio-elemental-layer.js`; `startElementalLayer()` remains the AudioEngine adapter and cached-noise ownership stays unchanged. No audio/performance change is claimed.');
+audioMap.notes.push('CP-MOD-052 moves generated Shot and guided transition-tone oscillator lifecycles into `modules/audio-tone-playback.js`; the AudioEngine compatibility methods, frequency guards and fade envelopes remain. No audio/performance change is claimed.');
 
 const modularizationMap = graphs.find(graph => graph.id === 'modularization');
-modularizationMap.source += '; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1';
+modularizationMap.source += '; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1';
 const remainingNode = modularizationMap.rows.flat().find(node => node[0] === 'next');
 remainingNode[2] = remainingNode[2].replace('defer AudioEngine bus internals until the approved reset.', 'CP-MOD-050 extracts generic spatial geometry; continue with scoped runtime AudioEngine ownership and measured lazy-loading boundaries.');
 remainingNode[2] = remainingNode[2].replace('CP-MOD-048 extracts the one-time initialization graph; continue with remaining explicit ownership seams and keep runtime AudioEngine state/lifecycle extraction separate.', 'CP-MOD-050 extracts generic spatial geometry; continue with scoped runtime AudioEngine ownership and measured lazy-loading boundaries.');
@@ -435,5 +436,6 @@ modularizationMap.notes.push('CP-MOD-048 moves the original AudioEngine initiali
 modularizationMap.notes.push('CP-MOD-049 extracts pure signal-buffer construction with AudioContext/randomness passed explicitly; AudioEngine keeps its compatibility adapters and cached-noise ownership. The new eager module is precached for offline playback. This changes ownership only.');
 modularizationMap.notes.push('CP-MOD-050 extracts only generic spatial-panner construction and movement; spatial mode configuration and orchestration remain app-owned. The eager module is precached. This changes ownership only.');
 modularizationMap.notes.push('CP-MOD-051 extracts elemental noise-layer lifecycle, preserving the seven index profiles, audio values and cleanup. `AudioEngine` retains its compatibility method and all higher-level drone lifecycle decisions. This changes ownership only.');
+modularizationMap.notes.push('CP-MOD-052 extracts frequency-only Shot and guided cue audio lifecycles with app state injected explicitly. Public AudioEngine method names and live-session routing remain stable. No audible or performance benefit is implied.');
 
 export { graphs };

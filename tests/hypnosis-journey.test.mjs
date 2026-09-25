@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const audioTonePlayback = fs.readFileSync(new URL('../modules/audio-tone-playback.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const timing = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 const locales = ['en', 'ml', 'ru', 'hi'].map((language) => JSON.parse(
@@ -25,7 +26,7 @@ assert.match(app, /async runArrivalReadiness\(\)[\s\S]*?getJourneySystemNarratio
 assert.match(app, /const halfDuration = Math\.max\(1000, Math\.round\(totalDuration \/ 2\)\)/, 'The two Arrival cues must share one Drone Duration exposure budget.');
 assert.match(app, /async runGuidedTransitionTone[\s\S]*?fadeInBackgroundMusic\(1\.2, 0\.08\)[\s\S]*?stopGuidedTransitionTone\(1\.1\)[\s\S]*?fadeInBackgroundMusic\(2\.4, true\)/, 'Each Arrival cue should duck and restore music with explicit fades.');
 assert.match(app, /if \(state\.noFrequencyMode\) \{[\s\S]*?if \(afterGap > 0\) await this\.pauseAwareSleep/, 'No Frequency Mode should retain quiet pacing while omitting generated cues.');
-assert.match(app, /startGuidedTransitionTone\(frequency, durationMs\) \{\s*if \(state\.noFrequencyMode\) return false;/, 'No Frequency Mode must reject Arrival transition tones at the audio boundary.');
+assert.match(audioTonePlayback, /if \(state\.noFrequencyMode\) return false;/, 'No Frequency Mode must reject Arrival transition tones at the audio boundary.');
 assert.match(app, /startTimedDrone\(baseFrequency, elementalIndex, practiceMinutes, durationMode = state\.droneDurationMode\) \{\s*if \(state\.noFrequencyMode \|\| state\.noMantraMode\) return;/, 'No Mantra Mode must still suppress the paired chakra drone.');
 assert.match(app, /async playMantraTrack\(key\) \{\s*if \(state\.noMantraMode\) return;/, 'No Mantra Mode must still suppress recorded mantra playback.');
 assert.doesNotMatch(app.slice(app.indexOf('    async runGuidedTransitionTone'), app.indexOf('    async runArrivalInduction')), /noMantraMode/, 'No Mantra Mode should not suppress non-mantra Arrival cues.');

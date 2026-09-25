@@ -1,5 +1,13 @@
 # Review
 
+## CP-MOD-052 — Generated tone playback lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for input validation, exact gain/time envelopes, generated-tone suppression, direct lifecycle tests, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source validation. PR review and integration sync are pending.
+
+- Shot and guided transition-tone creation/stopping moved to `modules/audio-tone-playback.js`; AudioEngine method names remain stable adapters. User-selected state, public call sites and AudioContext routing are unchanged.
+- Direct checks cover volume caps/mute, invalid frequencies, No Frequency behavior, Shot fade-out, transition fade-in/steady/fade-out, disposal and state clearing. Existing drone-quality, No Frequency, Arrival/Emergence and journey-duration contracts pass.
+- App/cache advance to `4.02` / `chakra-v5.298`; new module is eager and precached. 77/79 Node files pass; two require owner-managed `docs/dot.json`, unavailable in this worktree. All 11 router tests pass; atlas validates 43 maps / 353 nodes / 405 edges. Device listening and performance/thermal claims are not made.
+
 ## CP-MOD-051 — Elemental audio-layer lifecycle ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for preserved layer profiles, exact node/value ordering, replacement and stop cleanup, direct fake-node tests, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source validation. PR review and integration sync are pending.
