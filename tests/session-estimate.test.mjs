@@ -8,13 +8,62 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
-assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.94/);
-assert.match(serviceWorker, /chakra-v5\.290[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.95/);
+assert.match(serviceWorker, /chakra-v5\.291[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const estimate = context.ChakraSessionEstimate;
 assert.ok(Object.isFrozen(estimate));
+
+function makeDuration({ experience = null, checks = [], overrides = {}, scripts = {}, poses = 0, measured = 30, highEnergy = false, demo = false } = {}) {
+    const selectedChecks = new Set(checks);
+    const state = {
+        bgMusicMode: false, sleepMode: false, timeBreathing: 30, timeYogaPrep: 60,
+        timeYogaPose: 30, timeCorpse: 30, timeBath: 60, corpsePoseEnabled: false,
+        bathSessionEnabled: false, perinealCareEnabled: false, massageEnabled: false,
+        assistedBathingEnabled: false, timePerinealCare: 120, timeAssistedBathing: 60,
+        timePerChakra: 10, timeIcebreaker: 60, timeEmergence: 120, timeSleepStage: 8,
+        timeHighEnergy: 12, ...overrides
+    };
+    const timingValues = {
+        'estimate.boxBreathingOverhead': 1, 'estimate.yogaPoseTransitionEstimate': 10,
+        'estimate.chakraStageOverhead': 0, 'estimate.baseOverhead': 0,
+        'estimate.normalExtra': 0, 'estimate.hypnosisTransitionToneSeconds': 15,
+        'estimate.hypnosisNarrationSeconds': 40, 'estimate.highEnergyExtra': 2,
+        'transitions.bathToYogaRest': 20
+    };
+    return estimate.resolveDurationMs({
+        focusedExperience: experience, state, timing: (section, key) => timingValues[`${section}.${key}`] || 0,
+        sleepStageCount: 5, scripts, isHighEnergy: highEnergy, isDemoScriptSelected: () => demo,
+        isChecked: id => selectedChecks.has(id), readNumber: (id, fallback) => Number(overrides[id] ?? fallback),
+        countYogaPoses: () => poses, estimateStandardJourneySeconds: () => highEnergy ? null : measured, chakraCount: 7
+    });
+}
+
+assert.equal(makeDuration({ overrides: { bgMusicMode: true }, experience: 'preparation' }), 0, 'Music Only keeps no countdown.');
+assert.equal(makeDuration({ experience: 'box' }), 540000, 'Focused Box duration includes configured Box overhead.');
+assert.equal(makeDuration({ experience: 'hooponopono' }), 240000, 'Focused Ho’oponopono remains four minutes.');
+assert.equal(makeDuration({ experience: 'preparation', checks: [
+    'box-breathing-experience-toggle', 'visualization-addon-toggle', 'dharana-addon-toggle',
+    'body-scan-addon-toggle', 'noting-addon-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle'
+], overrides: { 'visualization-duration': 3, 'dharana-duration': 2, 'body-scan-duration': 5, 'noting-duration': 4, 'undo-unlearn-duration': 6 } }),
+1980000, 'Combined preparation includes each selected duration and existing Box, Ho’oponopono and Undo & Unlearn values.');
+assert.equal(makeDuration({ experience: 'preparation' }), 1000, 'Empty preparation retains the one-second floor.');
+assert.equal(makeDuration({ experience: 'yoga', poses: 2, overrides: { corpsePoseEnabled: true, bathSessionEnabled: true } }), 250000,
+    'Yoga includes selected poses, transitions, optional Corpse Pose and Bath.');
+assert.equal(makeDuration({ experience: 'intimate', overrides: { perinealCareEnabled: true, assistedBathingEnabled: true } }), 180000,
+    'Intimate-care stage durations remain additive.');
+assert.equal(makeDuration({ experience: 'intimate', overrides: { massageEnabled: true } }), 4260000,
+    'Massage duration retains its seven-chakra formula.');
+assert.equal(makeDuration({ overrides: { sleepMode: true }, scripts: { sleep_mode: { intervalSeconds: 5 } } }), 2432000,
+    'Sleep includes five stages, four configured intervals and its final twelve seconds.');
+assert.equal(makeDuration({ measured: 47 }), 47000, 'The measured standard-script duration remains first choice.');
+assert.equal(makeDuration({ highEnergy: true }), 900000, 'HRIM fallback retains its selected-duration formula.');
+assert.equal(makeDuration({ demo: true, measured: null }), 4260000, 'Demo fallback omits the optional hypnosis wrapper.');
+assert.equal(makeDuration({ measured: null }), 4440000, 'Normal fallback includes the configured hypnosis wrapper.');
+assert.throws(() => estimate.resolveDurationMs({}), /requires mode, timing/);
 
 function makeStandardJourney({ checks = [], selected = ['root', 'heart'], overrides = {} } = {}) {
     const selectedChecks = new Set(checks);
@@ -111,4 +160,4 @@ assert.equal(make({ checks: ['high-energy-toggle'] }), '~ 15 min session');
 assert.equal(make({ demo: true }), '~ 31 min session', 'Demo scripts omit the default hypnosis wrapper estimate');
 assert.throws(() => estimate.resolve({}), /requires current mode/);
 
-console.log('Session estimate contract passed: exclusive priority, every focused route, standard add-ons, Yoga/Sleep/HRIM and demo timing.');
+console.log('Session estimate contract passed: display priority, exact focused and fallback durations, selected add-ons, Yoga/Sleep/HRIM, and narration-based standard timing.');

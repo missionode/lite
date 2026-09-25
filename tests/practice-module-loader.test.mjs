@@ -11,7 +11,7 @@ const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', '
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 const selectionSource = app.slice(app.indexOf('function selectedPracticeModuleIds()'), app.indexOf('startMeditationBtn.addEventListener', app.indexOf('function selectedPracticeModuleIds()')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.94/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.95/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);

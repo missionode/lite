@@ -41,8 +41,8 @@ assert.doesNotMatch(app.slice(app.indexOf('    finish() {'), app.indexOf('    st
 assert.equal(timing.estimate.hypnosisNarrationSeconds, 40, 'The estimate should include the two Arrival narration blocks.');
 assert.match(app, /estimateStandardJourneySeconds\(\)\s*\{\s*return window\.ChakraSessionEstimate\.estimateStandardJourneySeconds\(/,
     'The controller should delegate the standard-session duration contract to its tested owner module.');
-assert.match(app, /const measuredStandardSeconds = !focusedExperience[\s\S]*?this\.estimateStandardJourneySeconds\(\)[\s\S]*?return measuredStandardSeconds \* 1000/,
-    'The measured content duration should take precedence over the legacy fixed-minute estimate when a standard script is loaded.');
+assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/,
+    'Session countdown duration selection should delegate to the tested estimate owner.');
 for (const locale of locales) {
     assert.ok(locale.system.arrivalInduction?.trim(), 'Every supported language needs Arrival induction guidance.');
     assert.ok(locale.system.arrivalReadiness?.trim(), 'Every supported language needs Arrival readiness guidance.');

@@ -8,9 +8,9 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const dharanaPractice = await practiceModuleLoader\.load\('dharana'\)/);
 assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\(/, 'the controller should delegate Dharana lifecycle to its owner');
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.94/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.95/);
 assert.doesNotMatch(html, /modules\/dharana-practice\.js/);
-assert.match(serviceWorker, /chakra-v5\.290[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.291[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

@@ -87,6 +87,85 @@
         return Math.ceil(seconds);
     }
 
+    function resolveDurationMs({
+        focusedExperience,
+        state,
+        timing,
+        sleepStageCount,
+        scripts,
+        isHighEnergy,
+        isDemoScriptSelected,
+        isChecked,
+        readNumber,
+        countYogaPoses,
+        estimateStandardJourneySeconds,
+        chakraCount
+    }) {
+        if (!state || typeof timing !== 'function' || typeof isChecked !== 'function' ||
+            typeof readNumber !== 'function' || typeof countYogaPoses !== 'function' ||
+            typeof isDemoScriptSelected !== 'function' || typeof estimateStandardJourneySeconds !== 'function' ||
+            !Number.isFinite(chakraCount) || !Number.isFinite(sleepStageCount)) {
+            throw new TypeError('Session duration requires mode, timing, selection and estimate services');
+        }
+        if (state.bgMusicMode) return 0;
+
+        if (focusedExperience === 'box') {
+            return Math.max(1, state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60) * 1000;
+        }
+        if (focusedExperience === 'hooponopono') return 4 * 60 * 1000;
+        if (focusedExperience === 'preparation') {
+            const boxSeconds = isChecked('box-breathing-experience-toggle')
+                ? state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60 : 0;
+            const visualizationMinutes = isChecked('visualization-addon-toggle') ? readNumber('visualization-duration', 2) : 0;
+            const dharanaMinutes = isChecked('dharana-addon-toggle') ? readNumber('dharana-duration', 2) : 0;
+            const bodyScanMinutes = isChecked('body-scan-addon-toggle') ? readNumber('body-scan-duration', 5) : 0;
+            const notingMinutes = isChecked('noting-addon-toggle') ? readNumber('noting-duration', 4) : 0;
+            const hooponoponoSeconds = isChecked('hooponopono-experience-toggle') ? 4 * 60 : 0;
+            const undoSeconds = isChecked('undo-unlearn-addon-toggle') ? readNumber('undo-unlearn-duration', 8) * 60 : 0;
+            return Math.max(1, boxSeconds + (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes) * 60 + hooponoponoSeconds + undoSeconds) * 1000;
+        }
+        if (focusedExperience === 'yoga') {
+            let seconds = state.timeYogaPrep + countYogaPoses() * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
+            if (state.corpsePoseEnabled) seconds += state.timeCorpse;
+            if (state.bathSessionEnabled) seconds += state.timeBath + timing('transitions', 'bathToYogaRest');
+            return Math.max(1, seconds) * 1000;
+        }
+        if (focusedExperience === 'intimate') {
+            let seconds = 0;
+            if (state.perinealCareEnabled) seconds += state.timePerinealCare;
+            if (state.massageEnabled) {
+                const massageChakras = 7;
+                seconds += (massageChakras * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
+            }
+            if (state.assistedBathingEnabled) seconds += state.timeAssistedBathing;
+            return Math.max(1, Math.round(seconds)) * 1000;
+        }
+        if (state.sleepMode) {
+            const stageSeconds = state.timeSleepStage * sleepStageCount * 60;
+            const intervalSeconds = Math.max(0, sleepStageCount - 1) * Number(scripts?.sleep_mode?.intervalSeconds || 3);
+            return Math.max(1, stageSeconds + intervalSeconds + 12) * 1000;
+        }
+
+        const measuredStandardSeconds = !focusedExperience && !state.sleepMode && !state.bgMusicMode
+            ? estimateStandardJourneySeconds()
+            : null;
+        if (Number.isFinite(measuredStandardSeconds)) return measuredStandardSeconds * 1000;
+
+        const hypnosisWrapperMinutes = !isHighEnergy && !focusedExperience && !state.sleepMode &&
+            !state.bgMusicMode && !isDemoScriptSelected()
+            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
+            : 0;
+        const estimateMinutes = isHighEnergy
+            ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
+            : chakraCount * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                + (state.timeIcebreaker / 60)
+                + timing('estimate', 'baseOverhead')
+                + timing('estimate', 'normalExtra')
+                + hypnosisWrapperMinutes;
+        return Math.max(1, Math.round(estimateMinutes)) * 60 * 1000;
+    }
+
     function resolve({
         isChecked,
         state,
@@ -169,5 +248,5 @@
         return `~ ${estimate} min session`;
     }
 
-    global.ChakraSessionEstimate = Object.freeze({ resolve, estimateStandardJourneySeconds });
+    global.ChakraSessionEstimate = Object.freeze({ resolve, estimateStandardJourneySeconds, resolveDurationMs });
 })(typeof window === 'undefined' ? globalThis : window);
