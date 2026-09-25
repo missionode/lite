@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-048: AudioEngine initialization graph ownership
+### NOW — CP-MOD-049: Audio signal design helper ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-048/lite`, based on merged `modularize` commit `4377b81` (CP-MOD-047 / PR #66). Extract only the AudioEngine's one-time Web Audio graph initializer; retain the public controller entry point and exact graph topology/settings.
-- The initialization body matches the baseline after explicit AudioContext injection. Direct mock-node, spatial/effects/lifecycle tests pass. App/cache versions are `3.98` / `chakra-v5.294`. 73/75 Node files pass; two require owner-managed `docs/dot.json`, absent from the isolated worktree. All 11 router tests pass; the atlas builds at 43 maps / 353 nodes / 405 edges. Audio listening and device/thermal evidence are not claimed.
-- CP-MOD-047 merged into `modularize` via PR #66; local integration branch is synchronized at `4377b81`. The main checkout's unrelated `.DS_Store`, `.codex/` and backup audio remain untouched. CP-MOD-048 is ready for PR/integration into `modularize` only; then proceed with the next safe extraction. Production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-049/lite`, based on merged `modularize` commit `51ac5d8` (CP-MOD-048 / PR #67). Extract pure signal-buffer construction to `modules/audio-signal-design.js`, keeping AudioEngine adapters and cached noise state.
+- App/cache versions are `3.99` / `chakra-v5.295`. The module's direct deterministic contracts pass. 74/76 Node files pass; two require owner-managed `docs/dot.json`, unavailable in the isolated worktree. All 11 router tests pass; atlas build validates 43 maps / 353 nodes / 405 edges. Audio listening and device/thermal evidence are not claimed.
+- CP-MOD-048 merged into `modularize` via PR #67; local integration branch synchronized at `51ac5d8`. Existing unrelated main-checkout `.DS_Store`, `.codex/` and backup audio remain untouched. CP-MOD-049 is ready for PR/integration into `modularize` only; production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

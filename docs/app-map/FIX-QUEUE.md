@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-049 Audio signal design helpers
+
+Soft-clipping curve, seeded diffuse reverb, stochastic impulse response and white-noise buffer generation are implemented in `modules/audio-signal-design.js`. AudioEngine retains its public adapters and cached-noise state; existing call order and algorithm inputs are preserved. The module is eager and offline-cached. No sound-quality or performance improvement is claimed. See the modularization review and active handoff.
+
 ## Completed — CP-MOD-048 AudioEngine initialization graph ownership
 
 The one-time Web Audio graph construction now lives in `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the public adapter and passes existing state/constants explicitly. Node topology, parameter values, output-selection fallback and call order are preserved and directly mock-tested. The new module remains eager and offline-cached; this is ownership/testability work only, with no audio-quality or performance gain claimed. See the modularization review and active handoff.

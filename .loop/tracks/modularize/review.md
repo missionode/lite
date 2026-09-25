@@ -1,5 +1,14 @@
 # Review
 
+## CP-MOD-049 — Audio signal design helper ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for algorithm parity, direct helper tests, all runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.
+
+- Existing curve, stochastic impulse, seeded diffuse impulse and noise-buffer algorithms moved to `modules/audio-signal-design.js`; AudioEngine public methods remain adapters and `_cachedNoise` remains instance-owned.
+- Direct tests cover lengths, representative samples, deterministic repeatability/decorrelated channels, and adapter/script/cache wiring. Existing AudioEngine graph-initialization and other app contracts remain covered.
+- App/cache advance to `3.99` / `chakra-v5.295`; the helper is loaded before the app and precached. Audio quality/listening and performance/thermal improvement are not claimed.
+- 74/76 direct Node files pass; `content-safety` and `drone-duration` require owner-managed `docs/dot.json`, absent from the isolated worktree. All 11 Loop router tests pass. Atlas builds and validates 43 maps / 353 nodes / 405 edges. Browser/device listening was not performed.
+
 ## CP-MOD-048 — AudioEngine initialization graph ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for initializer parity, direct mock-node coverage, all runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.
