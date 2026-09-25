@@ -1,11 +1,20 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-041: Lazy video-introduction controller
+### NOW — CP-MOD-042: Observational sky renderer ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-041/lite`, based on merged integration commit `b7b2365` (CP-MOD-040 merged via PR #59). Scope: defer the video-introduction controller until opt-in or explicit Settings preview; preserve all current video/audio flow behavior and the dynamic sky.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-042/lite`, based on merged integration commit `dd9f033` (CP-MOD-041 merged via PR #60). Scope: move the unchanged `AmbientParticleField` owner into an eager module; preserve the current astronomy/render behavior and dynamic sky exactly.
+- Its ~670-line class is now in `modules/ambient-particle-field.js`; `app.js` creates the same shared instance via `window.AmbientParticleField`. Script order is after astronomy/night-sky dependencies and before app. Module URL is cached offline; app URL/cache generation advance to `3.92` / `chakra-v5.288`.
+- The class is verified verbatim against baseline `dd9f033`. All 70 applicable Node tests, 11 Loop router tests, four modularization Chromium scenarios and atlas verification pass (43 maps / 353 nodes / 405 edges). Two fixture-dependent tests remain skipped because `docs/dot.json` is absent.
+- `tests/night-sky-browser.mjs` fails at the Earth/mantra clearance assertion identically on the unmodified `dd9f033` baseline; this checkpoint does not alter the class or layout. Logged in `.loop/tracks/modularize/review.md`; manual device sky review remains open.
+- One local sample has 34 scripts / 879,812 encoded JS bytes (CP41 sample: 33 / 879,754). This is an ownership/maintainability extraction, not a performance, CPU, heat or memory gain. PR/merge is pending; target is `modularize`, not production.
+- Merge target is `modularize`, not production. Preserve the unrelated root `.DS_Store`, `.codex/` and backup audio files.
+
+### COMPLETE — CP-MOD-041: Lazy video-introduction controller
+
+- CP-MOD-041 merged via PR #60 at `dd9f033`, based on CP-MOD-040 at `b7b2365`. Scope: defer the video-introduction controller until opt-in or explicit Settings preview; preserve all current video/audio flow behavior and the dynamic sky.
 - The class has moved to `modules/journey-video-prelude.js`. App loader deduplicates concurrent requests, constructs on first demand, and clears its promise after failure. App URL is `3.91`; shell cache is `chakra-v5.287`; the controller remains precached, but the 7.3 MB media remains uncached.
-- Validation is in progress. The root integration branch is `modularize`; do not push to production. Preserve the root's unrelated `.DS_Store`, `.codex/` and backup audio changes.
-- After tests and atlas pass, open a focused PR to `modularize`, merge and sync the root workspace, then continue the remaining modularization review. AudioEngine bus internals remain owner-deferred until the next weekly reset.
+- All applicable unit, Loop router, four Chromium and atlas checks passed; local suite skip reasons and sample limitations are retained below.
+- Root integration branch was fast-forwarded to `dd9f033`; preserve its unrelated `.DS_Store`, `.codex/` and backup audio changes. AudioEngine bus internals remain owner-deferred until the next weekly reset.
 
 ### COMPLETE — CP-MOD-040: Shared journey chrome ownership
 

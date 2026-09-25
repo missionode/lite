@@ -46,13 +46,20 @@ console.log('Natural sky behavior passed: deterministic field, bounded draw work
 // Exercise the actual lunar renderer without a browser. Its pixel buffer is
 // inspectable: a new Moon must paint nothing and quarter phases swap sides.
 const app=readFileSync('app.js','utf8');
+const particleFieldModule=readFileSync('modules/ambient-particle-field.js','utf8');
+const html=readFileSync('index.html','utf8');
+const serviceWorker=readFileSync('sw.js','utf8');
+assert.ok(html.indexOf('night-sky.js?v=1.1') < html.indexOf('modules/ambient-particle-field.js?v=1.0'));
+assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.0') < html.indexOf('app.js?v=3.92'));
+assert.match(serviceWorker,/chakra-v5\.288[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.0/,
+    'The sky module must remain available from the exact offline shell cache.');
 for (const localeName of ['en', 'ml', 'hi', 'ru']) {
     const locale = JSON.parse(readFileSync(`locales/${localeName}.json`, 'utf8'));
     for (const name of ['Sirius', 'Canopus', 'Capella', 'Rigel', 'Procyon', 'Achernar', 'Aldebaran', 'Spica', 'Antares']) {
         assert.ok(locale.ui[`celestial${name}`], `${localeName} must localize ${name}`);
     }
 }
-assert.match(app, /deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
+assert.match(particleFieldModule, /deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
     'The Advanced Features black-hole illustration must be visible on either Lobby/Settings sky, stay off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
     const locale = JSON.parse(readFileSync(`locales/${language}.json`, 'utf8'));
@@ -62,8 +69,11 @@ for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമ�
         assert.ok(locale.ui[`celestial${planet}`], `${language} must localize ${planet}`);
     }
 }
-vm.runInContext(app.slice(app.indexOf('class AmbientParticleField {'),app.indexOf('// Visual Engine'))+
-    '\nglobalThis.field = Object.create(AmbientParticleField.prototype);',sandbox);
+sandbox.window=sandbox;
+sandbox.state={displayLanguage:'en'};
+sandbox.t=key=>key;
+sandbox.CELESTIAL_LABEL_KEYS={Earth:'ui.celestialEarth'};
+vm.runInContext(particleFieldModule+'\nglobalThis.field = Object.create(AmbientParticleField.prototype);',sandbox);
 const field=sandbox.field;
 const frozen=Object.create(Object.getPrototypeOf(field));
 frozen.observer={latitude:0,longitude:0};frozen.skySnapshot=positions;
