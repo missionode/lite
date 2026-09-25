@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-057: Background music controls ownership
+### NOW — CP-MOD-058: Music echo profile ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-057/lite`, based on merged `modularize` commit `eef41bc` (CP-MOD-056 / PR #75). Fade/gain/duck/mute/restore controls moved into `modules/audio-background-music-controls.js`; AudioEngine keeps compatibility methods, echo preset selection and bus construction.
-- App/cache versions are `4.08` / `chakra-v5.304`. Direct tests cover stage limits, silent-role preservation, volume updates, mantra suppression, tail-gate ramps and AudioParam fallbacks. Full suite has 82 passes plus two fixture-blocked tests (`docs/dot.json` absent). Atlas/PR validation pending; no audio-quality/performance gain or device listening is claimed.
-- CP-MOD-056 merged via PR #75; integration checkout was synchronized at `eef41bc`; unrelated local files remain untouched. CP-MOD-057 is isolated for integration into `modularize` only; production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-058/lite`, based on local CP-MOD-057 commit `782c562` (not yet published). Music echo profile selection and parameter application moved into `modules/audio-music-echo.js`; AudioEngine keeps its stable adapter, graph ownership, voice echo and persistence.
+- App/cache versions are `4.09` / `chakra-v5.305`. Direct tests cover all profiles, fallback, no-graph guard, 250 ms ramps and tail deadline. The full Node suite is 83/85; only the two fixture-dependent tests are blocked by absent `docs/dot.json`. Loop router: 11 pass. Atlas builds at 43/353/405 with source-reference checks; browser verifier unavailable because Playwright is not installed. No audio-quality/performance gain or device listening is claimed.
+- CP-MOD-056 is merged via PR #75 at `eef41bc`; CP-MOD-057 is committed locally on its isolated branch but awaits explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

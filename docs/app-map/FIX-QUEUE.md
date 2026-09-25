@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-058 Music echo preset ownership
+
+The existing music echo profiles and parameter ramps now live in `modules/audio-music-echo.js`; the AudioEngine method and settings persistence stay stable. Preset values, invalid-mode fallback, 250 ms ramps and convolver-tail timing are unchanged. No performance claim is made.
+
 ## Completed — CP-MOD-057 Background-music gain and fade controls
 
 Background-music fades, volume-role preservation, stage ducking, mantra mute/restore, tail-gate automation and restore-timer cancellation now live in `modules/audio-background-music-controls.js`. Stable AudioEngine methods, journey callers and cache delivery remain intact. No performance claim is made.

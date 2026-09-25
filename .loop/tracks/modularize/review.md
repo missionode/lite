@@ -603,3 +603,12 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static ev
 - Preserved zero-safe linear fades, protected entry-fade window, intentional silence during slider updates, no reopening during mantra suppression, `cancelAndHoldAtTime` fallback behavior and matched music/tail-gate envelopes.
 - Focused controls, zero-volume, audio-effects, mantra/echo, lifecycle, stage-fade, No Frequency and relevant journey tests pass. Full Node suite: 82/84 pass; `content-safety` and `drone-duration` cannot start because `docs/dot.json` is absent from this worktree (the same owner-managed fixture limitation as prior checkpoints). Loop router suite: 11 pass. Atlas build: 43 maps / 353 nodes / 405 edges; source references validate. Atlas browser verification cannot run because Playwright is not installed in this isolated worktree; browser checks remain opt-in.
 - App/cache versions: `4.08` / `chakra-v5.304`; eager and offline precached. Browser verification remains opt-in and Playwright is unavailable. No browser/device playback, sound-quality, startup, CPU, heap or thermal improvement is claimed.
+
+## CP-MOD-058 — music echo profile ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- The existing music echo profile lookup, invalid-mode fallback and AudioParam ramps now live in `modules/audio-music-echo.js`; AudioEngine keeps its public `setMusicEcho()` adapter, graph ownership, voice echo, and settings persistence.
+- Preserved off/light/spacious values, fallback to light, 250 ms delay/send/wet/filter ramps, convolver tail deadline (`MUSIC_REVERB_TAIL_SECONDS + 0.3`) and no-op behavior before graph readiness.
+- Direct profile, background-music/mantra, audio-effects, zero-volume, loop lifecycle and graph initialization tests pass. Full Node suite: 83/85 pass; `content-safety` and `drone-duration` cannot begin because `docs/dot.json` is absent from the isolated worktree. Loop router suite: 11 pass. Syntax and `git diff --check` pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verifier cannot run because Playwright is not installed.
+- App/cache versions are `4.09` / `chakra-v5.305`; module remains eager and offline precached. No browser playback, audio quality, CPU, memory or thermal improvement is claimed.

@@ -13,7 +13,7 @@ const playback = context.window.ChakraAudioMantraPlayback;
 assert.ok(Object.isFrozen(playback));
 assert.match(app, /playMantraTrack\(key\) \{\s*return audioMantraPlayback\.play\(this, key/);
 assert.match(app, /stopMantraTrack\(\{ restoreMusic = true, invalidate = true, stageWindow = null \} = \{\}\) \{\s*return audioMantraPlayback\.stop\(this/);
-assert.ok(html.indexOf('modules/audio-mantra-playback.js?v=1.0') < html.indexOf('app.js?v=4.08'));
+assert.ok(html.indexOf('modules/audio-mantra-playback.js?v=1.0') < html.indexOf('app.js?v=4.09'));
 assert.match(sw, /\.\/modules\/audio-mantra-playback\.js\?v=1\.0/);
 assert.match(source, /owner\.muteBackgroundMusicForMantra\(musicFadeSeconds\)[\s\S]*?owner\.mantraLoop\.start\(musicFadeSeconds\)/);
 assert.match(source, /if \(requestId !== owner\.mantraRequestId \|\| state\.noMantraMode\) return;/);

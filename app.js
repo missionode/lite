@@ -77,6 +77,8 @@ const audioBackgroundMusicLifecycle = window.ChakraAudioBackgroundMusicLifecycle
 if (!audioBackgroundMusicLifecycle) throw new Error('Audio background-music lifecycle module is unavailable.');
 const audioBackgroundMusicControls = window.ChakraAudioBackgroundMusicControls;
 if (!audioBackgroundMusicControls) throw new Error('Audio background-music controls module is unavailable.');
+const audioMusicEcho = window.ChakraAudioMusicEcho;
+if (!audioMusicEcho) throw new Error('Audio music-echo module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -995,26 +997,7 @@ class AudioEngine {
     }
 
     setMusicEcho(mode = 'light') {
-        if (!this.ctx || !this.musicEchoSend || !this.musicEchoDelay || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
-        const settings = {
-            off: { delay: 0.018, wet: 0, filter: 2800 },
-            light: { delay: 0.018, wet: 0.12, filter: 2800 },
-            spacious: { delay: 0.035, wet: 0.18, filter: 3400 }
-        }[mode] || { delay: 0.018, wet: 0.12, filter: 2800 };
-        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, settings.wet > 0, MUSIC_REVERB_TAIL_SECONDS + 0.3);
-        const now = this.ctx.currentTime;
-        this.musicEchoDelay.delayTime.cancelScheduledValues(now);
-        this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
-        this.musicEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
-        this.musicEchoSend.gain.cancelScheduledValues(now);
-        this.musicEchoSend.gain.setValueAtTime(this.musicEchoSend.gain.value, now);
-        this.musicEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
-        this.musicEchoWetGain.gain.cancelScheduledValues(now);
-        this.musicEchoWetGain.gain.setValueAtTime(this.musicEchoWetGain.gain.value, now);
-        this.musicEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
-        this.musicEchoFilter.frequency.cancelScheduledValues(now);
-        this.musicEchoFilter.frequency.setValueAtTime(this.musicEchoFilter.frequency.value, now);
-        this.musicEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
+        return audioMusicEcho.setMusicEcho(this, mode, MUSIC_REVERB_TAIL_SECONDS);
     }
 
     toggleEyesCloseMode(enabled) {
