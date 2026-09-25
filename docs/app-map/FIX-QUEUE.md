@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-038 selected guided-practice loading
+
+Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn scripts are cached offline but excluded from eager page scripts. Begin loads only selected modules, before video/audio; a failed load blocks session start, displays a localized retry message and permits another attempt. Existing route/lifecycle contracts remain active. Local Chromium confirms zero practice scripts initially and only Box Breathing loads from cache after selecting it and starting offline. The observed initial-JavaScript body reduction is ~13.1 KiB in this harness; device/thermal gains are unproven. See the modularization review/handoff.
+
 ## Completed — CP-MOD-037 offline shell cache parity
 
 The local browser baseline found that versioned `app.js`/`style.css` requests did not match unversioned service-worker precache entries, breaking offline reload. Cache entries now match the exact `index.html` URLs, and the opt-in Chromium test covers cold, warm and offline startup without starting audio. The next approved investigation is selected-only practice-module loading, gated on route parity, offline cache behavior and failure/retry coverage. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/plan.md`.

@@ -60,13 +60,7 @@ if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
-const bodyScanPractice = window.ChakraBodyScanPractice;
-const guidedNotingPractice = window.ChakraGuidedNotingPractice;
-const dharanaPractice = window.ChakraDharanaPractice;
-const boxBreathingPractice = window.ChakraBoxBreathingPractice;
-const visualizationPractice = window.ChakraVisualizationPractice;
-const hooponoponoPractice = window.ChakraHooponoponoPractice;
-const undoUnlearnPractice = window.ChakraUndoUnlearnPractice;
+const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
 const sessionEstimate = window.ChakraSessionEstimate;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
@@ -86,13 +80,7 @@ const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration
 const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
 const carePreferenceHydration = window.ChakraCarePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
-if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
-if (!guidedNotingPractice) throw new Error('Guided Noting practice module is unavailable.');
-if (!dharanaPractice) throw new Error('Dharana practice module is unavailable.');
-if (!boxBreathingPractice) throw new Error('Box Breathing practice module is unavailable.');
-if (!visualizationPractice) throw new Error('Visualization practice module is unavailable.');
-if (!hooponoponoPractice) throw new Error('Ho\'oponopono practice module is unavailable.');
-if (!undoUnlearnPractice) throw new Error('Undo & Unlearn practice module is unavailable.');
+if (!practiceModuleLoader) throw new Error('Guided practice module loader is unavailable.');
 if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
 if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
 if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
@@ -4605,6 +4593,7 @@ class MeditationController {
     }
 
     async runDharana() {
+        const dharanaPractice = await practiceModuleLoader.load('dharana');
         const anchor = document.getElementById('dharana-anchor')?.value || 'indigo-circle';
         const minutes = Number(document.getElementById('dharana-duration')?.value || 2);
         const symbol = document.getElementById('chakra-symbol');
@@ -4633,6 +4622,7 @@ class MeditationController {
     }
 
     async runBodyScan() {
+        const bodyScanPractice = await practiceModuleLoader.load('body-scan');
         const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
         const scene = document.getElementById('body-scan-scene');
         const regions = journeyT('ui.bodyScanRegions');
@@ -4655,6 +4645,7 @@ class MeditationController {
     }
 
     async runNoting() {
+        const guidedNotingPractice = await practiceModuleLoader.load('guided-noting');
         const minutes = Number(document.getElementById('noting-duration')?.value || 4);
         const scene = document.getElementById('noting-scene');
         const reminders = journeyT('ui.notingReminders');
@@ -4677,6 +4668,7 @@ class MeditationController {
     }
 
     async runVisualization() {
+        const visualizationPractice = await practiceModuleLoader.load('visualization');
         const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
         const blackout = document.getElementById('visualization-blackout');
         await visualizationPractice.run({
@@ -4705,6 +4697,7 @@ class MeditationController {
     }
 
     async runBoxBreathing() {
+        const boxBreathingPractice = await practiceModuleLoader.load('box-breathing');
         const breathingStep = this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBreathing;
         const screen = document.getElementById('breathing-screen');
         await boxBreathingPractice.run({
@@ -5233,6 +5226,7 @@ class MeditationController {
     }
 
     async runHooponopono() {
+        const hooponoponoPractice = await practiceModuleLoader.load('hooponopono');
         const aura = document.getElementById('aura-bg');
         const symbolEl = document.getElementById('chakra-symbol');
         const phrases = localized(this.scripts.hooponopono.phrases);
@@ -5253,6 +5247,7 @@ class MeditationController {
     }
 
     async runUndoUnlearn() {
+        const undoUnlearnPractice = await practiceModuleLoader.load('undo-unlearn');
         const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
         const scene = document.getElementById('undo-unlearn-scene');
         const phases = journeyT('ui.undoUnlearnPhases');
@@ -7254,8 +7249,36 @@ function attachEventListeners() {
         return true;
     }
 
+    function selectedPracticeModuleIds() {
+        return [
+            ['body-scan-addon-toggle', 'body-scan'],
+            ['noting-addon-toggle', 'guided-noting'],
+            ['dharana-addon-toggle', 'dharana'],
+            ['box-breathing-experience-toggle', 'box-breathing'],
+            ['visualization-addon-toggle', 'visualization'],
+            ['hooponopono-experience-toggle', 'hooponopono'],
+            ['undo-unlearn-addon-toggle', 'undo-unlearn']
+        ].filter(([toggleId]) => getChecked(toggleId)).map(([, moduleId]) => moduleId);
+    }
+
     startMeditationBtn.addEventListener('click', async () => {
         if (!validateLobbyStartBeforePrelude()) return;
+        if (startMeditationBtn.dataset.practiceLoading === 'true') return;
+        const selectedModules = selectedPracticeModuleIds();
+        if (selectedModules.length) {
+            startMeditationBtn.dataset.practiceLoading = 'true';
+            startMeditationBtn.disabled = true;
+            try {
+                await practiceModuleLoader.loadMany(selectedModules);
+            } catch (error) {
+                console.error('Selected guided practice could not load:', error);
+                alert(journeyT('ui.practiceLoadFailed'));
+                return;
+            } finally {
+                delete startMeditationBtn.dataset.practiceLoading;
+                startMeditationBtn.disabled = false;
+            }
+        }
         if (state.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce) {
             startMeditationBtn.disabled = true;
             startMeditationBtn.style.opacity = '0.5';

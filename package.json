@@ -54,6 +54,7 @@
     "test:appearance-preference-hydration": "node tests/appearance-preference-hydration.test.mjs",
     "test:script-preference-hydration": "node tests/script-preference-hydration.test.mjs",
     "test:care-preference-hydration": "node tests/care-preference-hydration.test.mjs",
+    "test:practice-module-loader": "node tests/practice-module-loader.test.mjs",
     "test:yoga-experience": "node tests/yoga-experience.test.mjs",
     "test:advanced-unlock": "node tests/advanced-unlock.test.mjs",
     "test:drone-duration": "node tests/drone-duration.test.mjs",
@@ -70,7 +71,7 @@
     "test:sky-astronomy": "node tests/sky-astronomy.test.mjs",
     "test:model-routing": "python3 -m unittest Loop/tests/test_codex_model_router.py",
     "test:e2e": "playwright test",
-    "test:e2e:modularization-baseline": "playwright test tests/e2e/modularization-baseline.spec.js",
+    "test:e2e:modularization-baseline": "playwright test tests/e2e/modularization-baseline.spec.js tests/e2e/practice-modules-lazy-load.spec.js",
     "test:e2e:ui": "playwright test --ui"
   },
   "devDependencies": {

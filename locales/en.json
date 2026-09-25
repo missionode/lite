@@ -112,7 +112,8 @@
     "piperReady": "Piper voice ready for offline narration.",
     "piperFallback": "Piper unavailable — using browser voice.",
     "piperLoadFailed": "Piper could not load — using browser voice.",
-    "piperPreviewFailed": "Piper preview failed — choose a browser fallback voice."
+    "piperPreviewFailed": "Piper preview failed — choose a browser fallback voice.",
+    "practiceLoadFailed": "A selected guided practice could not load. Please check your connection and try again."
     ,"journeys": "Journeys"
     ,"totalTime": "Total Time"
     ,"minutes": "mins"
