@@ -83,6 +83,8 @@ const journeyHypnosisWrapper = window.ChakraJourneyHypnosisWrapper;
 if (!journeyHypnosisWrapper) throw new Error('Journey hypnosis-wrapper module is unavailable.');
 const journeyOpeningStage = window.ChakraJourneyOpeningStage;
 if (!journeyOpeningStage) throw new Error('Journey opening-stage module is unavailable.');
+const journeyContentLoader = window.ChakraJourneyContentLoader;
+if (!journeyContentLoader) throw new Error('Journey content-loader module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1995,36 +1997,39 @@ class MeditationController {
             showScreen(icebreakerScreen);
             document.getElementById('completion-modal').classList.add('hidden');
             
-            // Script Loading Strategy
-            if (!this.scripts || this.scriptsLanguage !== state.language) {
-                if (state.scriptSource === 'custom' && state.customScript) {
-                    console.log("Loading Custom Script from local storage...");
-                    this.scripts = state.customScript;
-                } else {
-                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
-                    console.log(`Loading Language Content (${state.language}): ${contentSource}...`);
-                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
-                    this.scripts = await response.json();
+            // Keep content source selection, validation timing and session-state
+            // snapshot aligned with the existing start sequence.
+            const loadedContent = await journeyContentLoader.loadAndValidate({
+                scripts: this.scripts,
+                scriptsLanguage: this.scriptsLanguage,
+                language: state.language,
+                scriptSource: state.scriptSource,
+                customScript: state.customScript,
+                getContentSource: () => getLanguageConfig().contentSource || 'scripts.json',
+                onResolved: (scripts, language) => {
+                    this.scripts = scripts;
+                    this.scriptsLanguage = language;
+                },
+                validate: validateScriptBundle,
+                getValidationContext: () => {
+                    const focusedExperience = this.getFocusedExperience();
+                    return {
+                        value: focusedExperience,
+                        options: {
+                            allowLanguageFallback: state.scriptSource === 'custom',
+                            highEnergy: getChecked('high-energy-toggle'),
+                            corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
+                            bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
+                            perinealCare: focusedExperience === 'intimate' && state.perinealCareEnabled,
+                            assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
+                            massage: false,
+                            yoga: focusedExperience === 'yoga',
+                            hooponopono: getChecked('hooponopono-experience-toggle')
+                        }
+                    };
                 }
-                this.scriptsLanguage = state.language;
-            }
-
-            const focusedExperience = this.getFocusedExperience();
-            const scriptCheck = validateScriptBundle(this.scripts, {
-                allowLanguageFallback: state.scriptSource === 'custom',
-                highEnergy: getChecked('high-energy-toggle'),
-                corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
-                bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
-                perinealCare: focusedExperience === 'intimate' && state.perinealCareEnabled,
-                assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
-                massage: false,
-                yoga: focusedExperience === 'yoga',
-                hooponopono: getChecked('hooponopono-experience-toggle')
             });
-            if (!scriptCheck.valid) {
-                throw new Error(`Script has missing or invalid required sections: ${scriptCheck.missing.slice(0, 5).join(', ')}`);
-            }
+            const focusedExperience = loadedContent.context;
 
             await this.audio.init();
             // Start background music looping silently immediately

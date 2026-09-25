@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /this\.sessionCountdown = new window\.ChakraSessionCountdown/);
 assert.match(app, /startSessionCountdown\(totalMs\)\s*\{\s*this\.sessionCountdown\.start\(totalMs\);/);
-assert.match(html, /modules\/session-countdown\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.11/);
-assert.match(serviceWorker, /chakra-v5\.308[\s\S]*?modules\/session-countdown\.js\?v=1\.0/);
+assert.match(html, /modules\/session-countdown\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
+assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/session-countdown\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

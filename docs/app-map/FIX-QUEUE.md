@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-061 Journey content loading and validation ownership
+
+Start-time script source selection, cache reuse, fetch and required-bundle validation now live in `modules/journey-content-loader.js`. The app retains script/session state; the resolved bundle is committed before validation, validation context is captured at the same point relative to asynchronous loading, and fetch URLs and failure messaging are unchanged. No behavior or performance change is claimed.
+
 ## Completed — CP-MOD-060 Guided opening and Gratitude stage ownership
 
 The shared opening/Gratitude stage now lives in `modules/journey-opening-stage.js`. Preparation-safety guidance, optional Arrival induction, Moon/Returning branch, Gratitude, personal intention, HRIM opening, and optional Arrival readiness retain their original order and guards. No behavior or performance change is claimed.

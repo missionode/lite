@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-060: Guided opening/Gratitude stage ownership
+### NOW — CP-MOD-061: Journey content loading and validation ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-059/lite`, based on CP-MOD-059 commit `dab13fa` (CP-057–059 remain local and unpublished). The shared opening/Gratitude stage moved into `modules/journey-opening-stage.js`; `runGratitude()` preserves its public adapter.
-- App/cache versions are `4.11` / `chakra-v5.308`. Direct opening-stage, focused-practices, hypnosis, session-estimate and video-prelude tests pass. Full Node suite is 85/87; only `content-safety` and `drone-duration` cannot start because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuilt with 43 maps / 353 nodes / 405 edges and source references reconciled; browser verifier not run (Playwright unavailable). Syntax and diff checks pass. No performance, narration-quality, browser, device playback or thermal claim.
-- CP-056 is merged via PR #75 at `eef41bc`; CP-057–059 await explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-061/lite`, based on CP-MOD-060 commit `fb8e1d4`. CP-061 moves start-time language/custom script selection, same-language cache reuse, fetch and bundle validation behind `modules/journey-content-loader.js`; session context, narration and start order remain app-owned.
+- App/cache versions are `4.12` / `chakra-v5.309`. Direct loader, localization, demo, journey-opening/wrapper/routing, Settings and video-prelude tests pass. Full Node suite is 86/88; `content-safety` and `drone-duration` cannot start because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuild passes at 43 maps / 353 nodes / 405 edges; source links are refreshed. Syntax and diff checks pass. Browser/Playwright was not run (opt-in); one existing Node module-type warning from Piper is recorded, with no other untriaged test errors.
+- CP-060 is committed locally in its own checkpoint branch, not pushed. CP-057–059 still await explicit remote-push approval. CP-056 is merged via PR #75 at `eef41bc`. Production remains unchanged; root-checkout unrelated files remain preserved. No performance or device claim.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 
