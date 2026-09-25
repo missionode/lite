@@ -22,6 +22,7 @@
     "test:audio-signal-design": "node tests/audio-signal-design.test.mjs",
     "test:audio-spatial-geometry": "node tests/audio-spatial-geometry.test.mjs",
     "test:audio-elemental-layer": "node tests/audio-elemental-layer.test.mjs",
+    "test:audio-tone-playback": "node tests/audio-tone-playback.test.mjs",
     "test:journey-routing": "node tests/journey-routing.test.mjs",
     "test:audio-transitions": "node tests/audio-transitions.test.mjs",
     "test:long-narration": "node tests/long-narration.test.mjs",

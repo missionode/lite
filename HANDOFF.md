@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-051: Elemental audio-layer lifecycle ownership
+### NOW — CP-MOD-052: Generated tone playback lifecycle ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-051/lite`, based on merged `modularize` commit `3300196` (CP-MOD-050 / PR #69). Extract the elemental noise layer lifecycle while keeping AudioEngine's cached-noise buffer and adapter.
-- App/cache versions are `4.01` / `chakra-v5.297`. Direct elemental-layer, audio transition and drone quality contracts pass. 76/78 Node files pass; two need owner-managed `docs/dot.json`, absent from the isolated checkout. All 11 router tests pass; atlas validates 43 maps / 353 nodes / 405 edges. No audio listening or device/thermal evidence is claimed.
-- CP-MOD-050 merged into `modularize` via PR #69; local integration checkout is synchronized to `3300196`; unrelated local files remain untouched. CP-MOD-051 is ready for PR/integration against `modularize` only; production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-052/lite`, based on merged `modularize` commit `3ad63a0` (CP-MOD-051 / PR #70). Extract generated Shot and guided transition-tone lifecycle while keeping the public AudioEngine methods and app-owned state.
+- App/cache versions are `4.02` / `chakra-v5.298`. Tone, drone-quality, No Frequency and journey handoff contracts pass. 77/79 Node files pass; two need owner-managed `docs/dot.json`, absent from the isolated checkout. All 11 router tests pass; atlas validates 43 maps / 353 nodes / 405 edges. Device listening is not claimed.
+- CP-MOD-051 merged into `modularize` via PR #70; local integration checkout is synchronized to `3ad63a0`; unrelated local files remain untouched. CP-MOD-052 proceeds to PR/integration against `modularize` only; production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

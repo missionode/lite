@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-052 Generated tone playback lifecycle
+
+Frequency-only Shot and guided transition-tone generation, validation, fades and disposal now live in `modules/audio-tone-playback.js`. AudioEngine method names remain compatibility adapters; UI call paths, No Frequency behavior, volume caps and routing are unchanged. The module is eagerly available and precached for offline journeys. This is ownership/testability only.
+
 ## Completed — CP-MOD-051 Elemental audio-layer lifecycle
 
 Elemental noise-bed generation, per-chakra filter selection and source/LFO cleanup now live in `modules/audio-elemental-layer.js`. AudioEngine retains the public adapter and noise-buffer cache; chakra-index routing, settings and journey call order are unchanged. The module is loaded eagerly and precached offline. No audio quality or performance improvement is claimed. See the modularization review and active handoff.
