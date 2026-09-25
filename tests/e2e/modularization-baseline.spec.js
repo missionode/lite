@@ -55,7 +55,7 @@ test('records cold, warm and offline startup baseline without starting playback'
   await page.evaluate(() => navigator.serviceWorker.register('./sw.js'));
   await page.evaluate(() => navigator.serviceWorker.ready);
   const shellCache = await page.evaluate(async () => {
-    const cache = await caches.open('chakra-v5.309');
+    const cache = await caches.open('chakra-v5.310');
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
       appEntryPresent: urls.includes('/app.js?v=4.12'),

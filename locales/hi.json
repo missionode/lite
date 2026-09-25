@@ -141,6 +141,7 @@
     "advancedUnlockRemaining": "उन्नत सुविधाएँ चालू करने के लिए {{remaining}} बार और टैप करें।",
     "advancedFeaturesEnabled": "उन्नत सुविधाएँ चालू हैं।",
     "advancedFeaturesDisabled": "उन्नत सुविधाएँ बंद हैं।",
+    "operatorAssessmentUnavailable": "इस ब्राउज़र सत्र में आकलन की पहुँच तैयार नहीं हो सकी।",
     "advancedPasswordPrompt": "उन्नत सुविधाओं का पासवर्ड दर्ज करें।",
     "previewVisualizationAmbience": "कल्पना पृष्ठभूमि संगीत सुनें",
     "dharanaFocusGuidance": "अपना ध्यान केवल इस केंद्र पर टिकने दें। बाकी सबको धीरे-धीरे पृष्ठभूमि में धुंधला होने दें। मन भटके तो धीरे से इस एक स्पष्ट बिंदु पर लौट आएँ।",

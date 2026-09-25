@@ -13,7 +13,7 @@ assert.ok(Object.isFrozen(wrapper));
 assert.match(app, /shouldRunHypnosisWrapper\(\) \{\s*return journeyHypnosisWrapper\.shouldRun\(this\)/);
 assert.match(app, /runGuidedTransitionTone\(frequency, durationMs,[\s\S]*?journeyHypnosisWrapper\.runGuidedTransitionTone\(this, frequency/);
 assert.ok(html.indexOf('modules/journey-hypnosis-wrapper.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(sw, /chakra-v5.309[\s\S]*?\.\/modules\/journey-hypnosis-wrapper\.js\?v=1\.0/);
+assert.match(sw, /chakra-v5.310[\s\S]*?\.\/modules\/journey-hypnosis-wrapper\.js\?v=1\.0/);
 
 const events = [];
 const owner = {

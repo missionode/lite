@@ -13,7 +13,7 @@ assert.ok(app.indexOf('bindTransitionDurationControls(') < app.indexOf("scriptSo
     && app.indexOf("scriptSourceSelect.addEventListener('change'") < app.indexOf('bindCareDurationControls('),
 'transition and care listener attachment stay on their original sides of custom-script handlers');
 assert.ok(html.indexOf('modules/timing-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(serviceWorker, /chakra-v5\.309[\s\S]*?modules\/timing-settings-view\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.310[\s\S]*?modules\/timing-settings-view\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:timing-settings-view'], 'node tests/timing-settings-view.test.mjs');
 
 const context = vm.createContext({});

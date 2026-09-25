@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Integrated locally — CP-ASSESS-ADV-UNDO-RAPPORT-001
+
+The Lobby’s “Begin Session Consultation” CTA is the sole in-app assessment entry point; the duplicate Settings link is removed. It is available only while Advanced Features is unlocked. A 15-minute same-tab grant gates assessment-page startup before question-bank loading and is revoked on relock. Undo removes the latest response; results add a confidence-gated chakra-only conversation cue and a client-led icebreaker. It does not predict character or behavior and excludes value-priority answers and the private dot. Focused assessment and unlock tests pass, and the atlas rebuild resolves graph edges. Browser atlas verification could not launch Chromium in this environment; browser visual review remains pending. No production publication is implied until release approval.
+
+## Fixed locally — consultation CTA Advanced Features visibility
+
+`Begin Session Consultation` now starts hidden and disabled in static Lobby markup, becomes visible only through the shared Advanced Features unlock, hides and disables again on relock, and rejects direct click activation while locked. The service-worker shell cache is bumped so installed/local clients receive the changed `index.html` and `app.js`; cache-version assertions follow it. The overview atlas reflects the gated Lobby path. The standalone assessment URL itself is not protected by server authentication; this correction gates the in-app CTA only. Focused Advanced Features regression test and atlas rebuild pass; no browser test or publication is claimed.
+
 ## Completed — CP-MOD-066 Timing duration settings view ownership
 
 Seven transition-duration and three care-duration input handlers now live in `modules/timing-settings-view.js`. Preserve integer parsing, shared state updates, localized display helper calls, saved `chakra_time_*` keys, update order, listener attachment positions and the existing estimate/roadmap refresh. Mode-sensitive chakra/Sleep/Shot and High Energy duration controls remain app-owned. Eager delivery is an ownership/testability extraction, not a performance gain.

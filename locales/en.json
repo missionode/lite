@@ -141,6 +141,7 @@
     ,"advancedUnlockRemaining": "{{remaining}} more taps to enable advanced features."
     ,"advancedFeaturesEnabled": "Advanced features enabled."
     ,"advancedFeaturesDisabled": "Advanced features disabled."
+    ,"operatorAssessmentUnavailable": "Assessment access could not be prepared in this browser session."
     ,"advancedPasswordPrompt": "Enter the Advanced Features password."
     ,"previewVisualizationAmbience": "Preview Visualization Ambience"
     ,"dharanaFocusGuidance": "Let your attention rest only on this anchor. Allow everything else to soften into the background. When the mind wanders, notice gently and return to this one clear point."

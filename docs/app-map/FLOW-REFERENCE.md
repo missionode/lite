@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 46d9c9e CP-MOD-066 source baseline · 2026-09-25.
+Source snapshot: 46d9c9e CP-MOD-066 baseline + uncommitted consultation CTA/cache correction · 2026-09-26.
 
-Source-reviewed behavior through CP-MOD-066 on the local modularize checkpoint chain. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior through CP-MOD-066 on the local modularize checkpoint chain, plus an uncommitted consultation CTA visibility and service-worker cache correction. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -110,7 +110,7 @@ flowchart TD
   manage["Manage Settings"]
   experiments["Experiments"]
   journeys["Journey dispatcher"]
-  consult["Separate operator tools"]
+  consult["Session consultation"]
   runtime["Active experience"]
   support["Supporting systems"]
   complete["Completion"]
@@ -122,6 +122,8 @@ flowchart TD
   settings -->|"Manage Settings"| manage
   manage -->|"Back"| settings
   settings -->|"Experiment Mode"| experiments
+  lobby -->|"Advanced Features unlocked only"| consult
+  consult -->|"Return"| lobby
   lobby -->|"Begin"| journeys
   journeys -->|"Selected path"| runtime
   support -->|"Provides services"| runtime
@@ -129,24 +131,23 @@ flowchart TD
   runtime -->|"Stop / special finish"| other
   experiments -->|"Run activity"| runtime
   complete -->|"Return"| lobby
-  consult -->|"Return / prepare Shot"| lobby
 ```
 
 | Step | Current behavior |
 | --- | --- |
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
-| Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts. |
-| Meditation Room | Main mode selection, chakra choices, intention, duration and assessment entry point. |
+| Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools. |
+| Meditation Room | Main mode selection, chakra choices, intention and duration. Consultation entry is hidden and disabled until Advanced Features is unlocked. |
 | Manage Settings | Public settings import and Advanced Features-protected export. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
-| Separate operator tools | Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot. |
+| Session consultation | Single entry point: Lobby “Begin Session Consultation” CTA, available only after Advanced Features unlock. It establishes a short same-tab assessment handoff; Settings has no assessment link. |
 | Active experience | Shared timer, audio, narration, visuals, mixer, pause and stop. |
 | Supporting systems | JSON scripts, language bundles, Web Audio, Piper worker, localStorage and service worker. |
 | Completion | Guided and Sleep flows update local stats; return to room or eligible Earn link. |
 | Other exits | Shot completion reloads; Music Only stops manually; experiments return to their screen. |
 
-- The operator assessment is a separate document opened directly; no Lobby assessment CTA is currently provided. Assessment is separate from journey start and manual planning remains with the operator. Runtime behavior takes precedence over older HANDOFF entries.
+- Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. Direct entry without a handoff shows a locked view without fetching the question bank. Client-side feature gate, not server authentication.
 
 <a id="modularization"></a>
 
@@ -1841,26 +1842,43 @@ flowchart TD
 
 ## Operator-led chakra assessment
 
-Adaptive one-question/two-choice tournament → seven chakra statuses, positive archetypes and one private operator dot.
+Single Lobby entry point, Advanced Features-gated interview with answer undo and a cautious chakra-evidence rapport cue plus icebreaker.
 
-Sources: [docs/assesment.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:1), [modules/assessment-tournament.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-tournament.js:1), [modules/assessment-persistence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-persistence.js:1), [data/assessment-questions.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/data/assessment-questions.json:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [index.html:515](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:515), [app.js:4008](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4008), [docs/assesment.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:1), [modules/assessment-tournament.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-tournament.js:1), [data/assessment-questions.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/data/assessment-questions.json:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
-  lobby["Open assessment"]
+  entry["Lobby consultation CTA"]
+  gate["Advanced Features gate"]
+  locked["Access required"]
+  handoff["Short same-tab handoff"]
   restore["Restore current client"]
   interview["One prompt at a time"]
+  undo["Undo last response"]
   coverage["Adaptive coverage"]
   result["Assessment complete"]
+  rapport["Conversation cue"]
+  icebreaker["Gentle icebreaker"]
   dot["Private service-fit signal"]
   clear["Clear for New Client"]
   translate["Translate dynamically rendered content"]
   failure["Failure and exit"]
-  lobby -->|"Open"| restore
+  entry -->|"CTA click when unlocked"| gate
+  entry -->|"CTA unavailable while locked"| locked
+  gate -->|"Advanced Features unlocked"| handoff
+  gate -->|"Relocked / grant unavailable"| locked
+  locked -->|"Return to Lobby"| entry
+  handoff -->|"Open assessment"| restore
   restore -->|"Valid / fresh"| interview
   interview -->|"Answer / equal / skip"| coverage
+  interview -->|"Undo requested"| undo
+  undo -->|"Correction re-presented"| interview
   coverage -->|"More evidence; exclude consumed IDs"| interview
   coverage -->|"Evidence complete"| result
+  result -->|"Full-confidence chakra result"| rapport
+  result -->|"Insufficient chakra evidence"| icebreaker
+  rapport -->|"Review result"| clear
+  icebreaker -->|"Review result"| clear
   result -->|"New client"| clear
   clear -->|"Confirmed reset"| restore
   interview -->|"Prompt render"| translate
@@ -1871,17 +1889,23 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Open assessment | The operator opens docs/assesment.html directly; no Lobby CTA is currently provided. The page is not connected to journey start or recommendations. |
+| Lobby consultation CTA | The one entry point is Lobby → Begin Session Consultation. No duplicate assessment link appears in Settings. |
+| Advanced Features gate | The Lobby CTA becomes available only after the shared password unlock. Relock clears any pending grant. |
+| Access required | If opened without a valid same-tab grant, show a locked message and offer return to the Lobby. |
+| Short same-tab handoff | A valid entry writes a 15-minute sessionStorage grant. Direct access without a current grant stays locked and does not fetch the question bank. Client-side only; not server authentication. |
 | Restore current client | Resume only sanitized, version-compatible local state. Invalid or stale state starts fresh; storage denial continues in memory. |
-| One prompt at a time | Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. |
+| One prompt at a time | Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. Chronological history supports one-step undo. |
+| Undo last response | Remove the latest answer or value-pair response and deliberately offer that item again; reconstruct response order for legacy saved state. |
 | Adaptive coverage | Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing. |
-| Assessment complete | Show seven relative chakra statuses/confidence and up to three positive archetypes. This is an operator reflection aid, not diagnosis or automatic recommendation. |
+| Assessment complete | Show seven relative chakra statuses/confidence and up to three positive archetypes. Operator reflection aid, not diagnosis or automatic recommendation. |
+| Conversation cue | If full-confidence chakra evidence exists, show a tentative topic based only on chakra answers; explicitly not a character/behavior prediction. Never use values or the private dot. |
+| Gentle icebreaker | Pair the topic with an open question inviting the client to choose what feels useful. Insufficient evidence receives a generic client-led question. |
 | Private service-fit signal | Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. It does not activate or promise service. |
 | Clear for New Client | Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client. |
 | Translate dynamically rendered content | Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required. |
 | Failure and exit | Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress. |
 
-- The JSON bank owns English questions, answer-card labels, chakra/value weights and positive archetype strings; the pure engine owns scheduling, uniqueness, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Chromium verified English, Malayalam, Hindi and Russian dynamic prompt rendering, desktop/mobile layout, resume, completion and reset. Google Translate requires a network connection. Trained-operator content acceptance remains a follow-up, not a software test.
+- The JSON bank owns English questions, answer-card labels, chakra/value weights, positive archetypes and neutral conversation topics; the pure engine owns scheduling, uniqueness, chronological undo, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. The conversation cue is confidence-gated and derived only from chakra answers, never value preferences or the private dot. It starts a conversation and does not predict traits. Google Translate requires a network connection. The handoff is same-tab UI gating, not server authentication. Exactly one entry point is the Lobby CTA; Settings contains no assessment link.
 
 <a id="repertory"></a>
 

@@ -64,6 +64,39 @@ const serialized = JSON.stringify(state);
 const restored = engine.restoreState(bank, JSON.parse(serialized));
 assert.deepEqual(restored, state, 'serialized assessment state should resume deterministically');
 assert.equal(engine.selectNext(bank, restored).id, engine.selectNext(bank, state).id, 'resume should preserve the next tournament item');
+const legacyState = JSON.parse(serialized);
+delete legacyState.history;
+const legacyRestored = engine.restoreState(bank, legacyState);
+assert.deepEqual(legacyRestored.history, state.history,
+    'state persisted before the history field was introduced should reconstruct chronological undo history');
+const resultWithValues = engine.buildResult(bank, state);
+const chakraOnlyResult = engine.buildResult(bank, { ...state, valueHistory: [] });
+assert.ok(resultWithValues.rapportCue?.topic, 'sufficient chakra evidence should produce a tentative conversation cue');
+assert.equal(resultWithValues.rapportCue.topic, chakraOnlyResult.rapportCue.topic,
+    'rapport topics must come from chakra answers, never value/intimate-service signals');
+
+let undoQuestionState = engine.createState(bank);
+const firstQuestion = engine.selectNext(bank, undoQuestionState);
+undoQuestionState = engine.answerItem(bank, undoQuestionState, firstQuestion, firstQuestion.choices[0].id);
+const secondQuestion = engine.selectNext(bank, undoQuestionState);
+undoQuestionState = engine.answerItem(bank, undoQuestionState, secondQuestion, secondQuestion.choices[0].id);
+const afterUndoQuestion = engine.undoLast(bank, undoQuestionState);
+assert.equal(afterUndoQuestion.answeredIds.includes(secondQuestion.id), false, 'undo should remove the most recent chakra answer');
+assert.equal(engine.selectNext(bank, afterUndoQuestion).id, secondQuestion.id, 'the undone question should be offered again for correction');
+assert.equal(afterUndoQuestion.history.at(-1).id, firstQuestion.id, 'undo should preserve the earlier response history');
+
+let undoValueState = engine.createState(bank);
+while (engine.selectNext(bank, undoValueState).kind === 'question') {
+    const question = engine.selectNext(bank, undoValueState);
+    undoValueState = engine.answerItem(bank, undoValueState, question, question.choices[0].id);
+}
+const undoFirstValue = engine.selectNext(bank, undoValueState);
+undoValueState = engine.answerItem(bank, undoValueState, undoFirstValue, undoFirstValue.left.id);
+const undoSecondValue = engine.selectNext(bank, undoValueState);
+undoValueState = engine.answerItem(bank, undoValueState, undoSecondValue, undoSecondValue.right.id);
+const afterUndoValue = engine.undoLast(bank, undoValueState);
+assert.equal(afterUndoValue.valueHistory.length, 1, 'undo should remove the latest value-pair response only');
+assert.equal(engine.selectNext(bank, afterUndoValue).pairId, undoSecondValue.pairId, 'undo should reopen the last value pair without disturbing earlier responses');
 
 const invalidRestore = engine.restoreState(bank, {
     ...state,

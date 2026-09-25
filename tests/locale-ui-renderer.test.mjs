@@ -98,6 +98,6 @@ assert.deepEqual(order, ['roadmap', 'drone-summary'], 'adjacent app-owned summar
 assert.match(app, /const localeUiRenderer = window\.ChakraLocaleUiRenderer/);
 assert.match(app, /function applyLocaleUI\(\)\s*\{[\s\S]*?particleField\.updateSkyLocationStatus\(\)[\s\S]*?localeUiRenderer\.render\([\s\S]*?refreshJourneyRoadmap: updateJourneyRoadmap[\s\S]*?refreshDroneDurationSummary: updateDroneDurationSummary/);
 assert.match(html, /modules\/locale-ui-renderer\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/locale-ui-renderer\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/locale-ui-renderer\.js\?v=1\.0/);
 assert.throws(() => renderer.render({}), /requires document, translation and text services/);
 console.log('Locale UI renderer contract passed: display text, stale-bundle fallback, controls, aria labels and refresh ordering.');

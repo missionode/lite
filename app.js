@@ -4008,7 +4008,13 @@ function attachEventListeners() {
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
         state.advancedFeaturesUnlocked = !isLocked;
+        if (beginConsultationBtn) {
+            beginConsultationBtn.hidden = isLocked;
+            beginConsultationBtn.disabled = isLocked;
+            beginConsultationBtn.setAttribute('aria-disabled', String(isLocked));
+        }
         if (isLocked) {
+            try { sessionStorage.removeItem('chakra_assessment_access_until'); } catch (error) { /* optional session handoff */ }
             state.moodRelaxationIntentionEnabled = false;
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);
@@ -4781,7 +4787,13 @@ function attachEventListeners() {
         if (activity) meditation.startExperiment(activity);
     });
     beginConsultationBtn?.addEventListener('click', () => {
-        window.location.href = './docs/assesment.html';
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            sessionStorage.setItem('chakra_assessment_access_until', String(Date.now() + 15 * 60 * 1000));
+            window.location.href = './docs/assesment.html';
+        } catch (error) {
+            showUnlockToast(t('ui.operatorAssessmentUnavailable'));
+        }
     });
 
     const settingsHelpModal = document.getElementById('settings-help-modal');

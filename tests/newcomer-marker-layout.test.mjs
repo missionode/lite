@@ -9,7 +9,7 @@ const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /new window\.ChakraNewcomerMarkerLayout\([\s\S]*?stage: newcomerMarkerStage[\s\S]*?svg:/);
 assert.match(app, /newcomerMarkerLayout\.schedule\(\)/);
 assert.match(html, /modules\/newcomer-marker-layout\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(sw, /chakra-v5.309[\s\S]*?modules\/newcomer-marker-layout\.js\?v=1\.0/);
+assert.match(sw, /chakra-v5.310[\s\S]*?modules\/newcomer-marker-layout\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
