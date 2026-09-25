@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "b7b2365 baseline + uncommitted CP-MOD-041",
-    "scope": "Source-reviewed behavior at modularize integration baseline b7b2365. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin. CP-MOD-039 defers the optional 7.3 MB video URL until explicit preview or video-introduction selection; the clip is not precached. CP-MOD-040 moves shared fullscreen/idle-cursor controls into an eager owner module without behavior change. CP-MOD-041 defers optional controller code until video opt-in or preview; its code stays precached but is not parsed at startup. These do not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "dd9f033 baseline + uncommitted CP-MOD-042",
+    "scope": "Source-reviewed behavior at modularize integration baseline dd9f033. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin. CP-MOD-039 defers the optional 7.3 MB video URL until explicit preview or video-introduction selection; the clip is not precached. CP-MOD-040 moves shared fullscreen/idle-cursor controls into an eager owner module without behavior change. CP-MOD-041 defers optional controller code until video opt-in or preview; its code stays precached but is not parsed at startup. CP-MOD-042 moves the unchanged observational sky renderer into its own eager, cached owner module; no sky behavior or visual changes. These do not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:5867; app.js:7243; index.html:248",
+      "source": "app.js:5196; app.js:6572; index.html:248",
       "rows": [
         [
           [
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:5374; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:4703; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Remaining modularization work",
-            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate."
+            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate."
           ]
         ],
         [
@@ -482,7 +482,7 @@
       "group": "Start here",
       "title": "Startup and first visit",
       "subtitle": "Loading order and optional browser capabilities.",
-      "source": "modules/screen-navigation.js:1; app.js:5864; app.js:6189; app.js:6207; index.html:148",
+      "source": "modules/screen-navigation.js:1; app.js:5193; app.js:5518; app.js:5536; index.html:148",
       "rows": [
         [
           [
@@ -767,7 +767,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, selected practice loading, and dispatch priority.",
-      "source": "modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; app.js:5288; app.js:6935; app.js:7263",
+      "source": "modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; app.js:4617; app.js:6264; app.js:6592",
       "rows": [
         [
           [
@@ -955,7 +955,7 @@
       "group": "Journeys",
       "title": "Standard chakra journey",
       "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
-      "source": "app.js:4084; app.js:4395; app.js:4424; app.js:5240; index.html:448",
+      "source": "app.js:3413; app.js:3724; app.js:3753; app.js:4569; index.html:448",
       "rows": [
         [
           [
@@ -1154,7 +1154,7 @@
       "group": "Journeys",
       "title": "Inside one chakra",
       "subtitle": "Narration, audio handoff, bounded exposure, and loop transitions.",
-      "source": "app.js:5205; app.js:2712; app.js:3897; app.js:20",
+      "source": "app.js:4534; modules/ambient-particle-field.js:136; app.js:3226; app.js:20",
       "rows": [
         [
           [
@@ -1289,7 +1289,7 @@
       "group": "Journeys",
       "title": "HRIM activation",
       "subtitle": "A dedicated high-energy journey using one stage.",
-      "source": "app.js:4275; app.js:4443; app.js:5186",
+      "source": "app.js:3604; app.js:3772; app.js:4515",
       "rows": [
         [
           [
@@ -1382,7 +1382,7 @@
       "group": "Journeys",
       "title": "Sleep and Music Only",
       "subtitle": "Two independent narration-free experiences.",
-      "source": "app.js:3999; app.js:4712; app.js:2496; scripts.json:1",
+      "source": "app.js:3328; app.js:4041; app.js:2496; scripts.json:1",
       "rows": [
         [
           [
@@ -1503,7 +1503,7 @@
       "group": "Journeys",
       "title": "Box breathing and Ho’oponopono",
       "subtitle": "Standalone practices launched through shared guided startup.",
-      "source": "app.js:4281; app.js:4499; app.js:5114",
+      "source": "app.js:3610; app.js:3828; app.js:4443",
       "rows": [
         [
           [
@@ -1617,7 +1617,7 @@
       "group": "Journeys",
       "title": "Yoga experience",
       "subtitle": "Advanced Features-gated rest, bathing and selected poses.",
-      "source": "app.js:6163; app.js:6304; index.html:448; timing-config.json:1",
+      "source": "app.js:5492; app.js:5633; index.html:448; timing-config.json:1",
       "rows": [
         [
           [
@@ -1766,7 +1766,7 @@
       "group": "Journeys",
       "title": "Intimate Service and massage",
       "subtitle": "All seven nonempty combinations follow this ordered composition.",
-      "source": "app.js:6555; app.js:5270",
+      "source": "app.js:5884; app.js:4599",
       "rows": [
         [
           [
@@ -1906,7 +1906,7 @@
       "group": "Journeys",
       "title": "Sound Shots",
       "subtitle": "Six types, confirmation, frequency validation, and distinct finish behavior.",
-      "source": "app.js:4216; app.js:6555; app.js:6800; index.html:257",
+      "source": "app.js:3545; app.js:5884; app.js:6129; index.html:257",
       "rows": [
         [
           [
@@ -2032,7 +2032,7 @@
       "group": "Journeys",
       "title": "Experiment activities",
       "subtitle": "Isolated activities and return behavior.",
-      "source": "app.js:4371; app.js:7164; index.html:210",
+      "source": "app.js:3700; app.js:6493; index.html:210",
       "rows": [
         [
           [
@@ -2148,7 +2148,7 @@
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
       "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.",
-      "source": "modules/journey-routing.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/session-estimate.js:1; app.js:4628; app.js:4656; app.js:5142; app.js:5184; app.js:5204; app.js:7045; index.html:322",
+      "source": "modules/journey-routing.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/session-estimate.js:1; app.js:3957; app.js:3985; app.js:4471; app.js:4513; app.js:4533; app.js:6374; index.html:322",
       "rows": [
         [
           [
@@ -2412,7 +2412,7 @@
       "group": "Live session",
       "title": "Pause, stop and live controls",
       "subtitle": "Shared interaction and cancellation behavior.",
-      "source": "modules/journey-chrome.js:1; modules/journey-video-prelude.js:1; app.js:3433; app.js:3486; app.js:3505",
+      "source": "modules/journey-chrome.js:1; modules/journey-video-prelude.js:1; app.js:2762; app.js:2815; app.js:2834",
       "rows": [
         [
           [
@@ -2544,7 +2544,7 @@
       "group": "Live session",
       "title": "Optional Lobby video introduction",
       "subtitle": "An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.",
-      "source": "modules/journey-video-prelude.js:1; app.js:5376; app.js:6973; app.js:7296; sw.js:1",
+      "source": "modules/journey-video-prelude.js:1; app.js:4705; app.js:6302; app.js:6625; sw.js:1",
       "rows": [
         [
           [
@@ -2662,7 +2662,7 @@
       "group": "Live session",
       "title": "Completion, statistics and external handoff",
       "subtitle": "Different end states are intentionally visible here.",
-      "source": "app.js:5496; app.js:550; index.html:659",
+      "source": "app.js:4825; app.js:550; index.html:659",
       "rows": [
         [
           [
@@ -2751,7 +2751,7 @@
       "group": "Systems",
       "title": "Scripts, language and timing",
       "subtitle": "Content selection, validation, fallback and demo behavior.",
-      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:641; app.js:944; app.js:1160; app.js:6859; scripts.json:1; language-manifest.json:1",
+      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:641; app.js:944; app.js:1160; app.js:6188; scripts.json:1; language-manifest.json:1",
       "rows": [
         [
           [
@@ -2872,7 +2872,7 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; app.js:5056; app.js:5775; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; app.js:4385; app.js:5104; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
       "rows": [
         [
           [
@@ -3015,7 +3015,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:59; app.js:1047; app.js:2150; app.js:2276; app.js:2627",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:59; app.js:1047; app.js:2150; app.js:2276; modules/ambient-particle-field.js:51",
       "rows": [
         [
           [
@@ -3117,7 +3117,7 @@
       "group": "Systems",
       "title": "Sound options and live suppression",
       "subtitle": "What changes when sound settings are toggled.",
-      "source": "app.js:7041; app.js:2891; app.js:3008; app.js:2253",
+      "source": "app.js:6370; modules/ambient-particle-field.js:315; modules/ambient-particle-field.js:432; app.js:2253",
       "rows": [
         [
           [
@@ -3228,7 +3228,7 @@
       "group": "Systems",
       "title": "Visuals and browser lifecycle",
       "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
-      "source": "modules/journey-video-prelude.js:1; sky-astronomy.js:1; night-sky.js:1; style.css:1; celestial-presence.js:1",
+      "source": "modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; sky-astronomy.js:1; night-sky.js:1; style.css:1; celestial-presence.js:1",
       "rows": [
         [
           [
@@ -3369,7 +3369,7 @@
       "group": "Systems",
       "title": "Earth observer reference and atmosphere",
       "subtitle": "A permanent centered observer anchor below the horizon.",
-      "source": "modules/journey-video-prelude.js:1; app.js:3409; app.js:3442; app.js:3477",
+      "source": "modules/ambient-particle-field.js:162; modules/ambient-particle-field.js:195; modules/ambient-particle-field.js:230",
       "rows": [
         [
           [
@@ -3441,7 +3441,7 @@
       "group": "Systems",
       "title": "Thematic solar containment glow",
       "subtitle": "A visual-only warm containment layer surrounding the daytime Sun.",
-      "source": "app.js:3317; app.js:3500",
+      "source": "modules/ambient-particle-field.js:70; modules/ambient-particle-field.js:253",
       "rows": [
         [
           [
@@ -3486,7 +3486,7 @@
       "group": "Systems",
       "title": "Persistence, caching and network",
       "subtitle": "Local state and the actual service-worker request routing.",
-      "source": "modules/app-state.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/journey-video-prelude.js:1; sw.js:1; app.js:5376; piper-models.json:1",
+      "source": "modules/app-state.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; sw.js:1; app.js:4705; piper-models.json:1",
       "rows": [
         [
           [
@@ -3542,7 +3542,7 @@
           [
             "offline",
             "Offline outcome",
-            "Only matching cached requests can work offline. App/CSS shell URLs, the eager journey-chrome helper and all seven selected-practice script URLs match their exact precache requests. A selected practice can therefore load offline after selection. If a required script is not cached, the app stays on the Lobby and gives a localized retry message. The optional 7.3 MB video is not precached; its URL is not attached until explicit preview or opted-in introduction. Offline playback therefore follows the existing unavailable-video fallback."
+            "Only matching cached requests can work offline. App/CSS shell URLs, eager journey/sky owner modules and all seven selected-practice script URLs match their exact precache requests. A selected practice can therefore load offline after selection. If a required script is not cached, the app stays on the Lobby and gives a localized retry message. The optional 7.3 MB video is not precached; its URL is not attached until explicit preview or opted-in introduction. Offline playback therefore follows the existing unavailable-video fallback."
           ]
         ]
       ],
@@ -4086,7 +4086,7 @@
       "group": "Systems",
       "title": "Automatic journey voice profile",
       "subtitle": "Chooses and applies the established voice profile at journey start.",
-      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:5590; app.js:7069",
+      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:4919; app.js:6398",
       "rows": [
         [
           [
@@ -4155,7 +4155,7 @@
       "group": "Systems",
       "title": "Session-only journey-mode hydration",
       "subtitle": "App-load behavior for session-only mode controls and retired selection keys.",
-      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4224,7 +4224,7 @@
       "group": "Systems",
       "title": "Mixer preference control hydration",
       "subtitle": "Copies already-loaded preference state into audio and ambience controls in established order.",
-      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4281,7 +4281,7 @@
       "group": "Systems",
       "title": "Journey selection preference hydration",
       "subtitle": "Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.",
-      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4350,7 +4350,7 @@
       "group": "Systems",
       "title": "Timing preference control hydration",
       "subtitle": "Restores timing slider values and their associated display labels without owning timing configuration.",
-      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4407,7 +4407,7 @@
       "group": "Systems",
       "title": "Appearance preference control hydration",
       "subtitle": "Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.",
-      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4464,7 +4464,7 @@
       "group": "Systems",
       "title": "Script preference control hydration",
       "subtitle": "Restores the selected script source and updates the custom-script presentation without owning script loading.",
-      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4533,7 +4533,7 @@
       "group": "Systems",
       "title": "Personal-care preference control hydration",
       "subtitle": "Restores saved personal-care toggle values without changing session authorization or care execution.",
-      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:5629",
+      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:4958",
       "rows": [
         [
           [
@@ -4590,7 +4590,7 @@
       "group": "Supporting pages",
       "title": "Settings backup and restore",
       "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.",
-      "source": "modules/settings-backup.js:1; app.js:6170; index.html:215",
+      "source": "modules/settings-backup.js:1; app.js:5499; index.html:215",
       "rows": [
         [
           [
@@ -4835,7 +4835,7 @@
       "group": "Supporting pages",
       "title": "Frequency repertory handoff",
       "subtitle": "Searchable reference → prepared custom Shot → explicit activation.",
-      "source": "docs/repertory.html:153; app.js:6800",
+      "source": "docs/repertory.html:153; app.js:6129",
       "rows": [
         [
           [

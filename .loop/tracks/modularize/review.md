@@ -1,5 +1,17 @@
 # Review
 
+## CP-MOD-042 — Observational sky renderer ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for behavior-preserving ownership, direct sky contracts, cache/offline delivery and atlas/browser structure. Pending PR review and merge.
+
+- The original `AmbientParticleField` implementation is mechanically moved into an eager module, retaining one app-level instance and all current call sites. Its class uses the same global lexical dependencies, including `state`, `t` and `CELESTIAL_LABEL_KEYS`.
+- Existing direct contracts now load the standalone module; the service worker precaches it, and the index loads it after astronomy/night-sky dependencies and before `app.js`.
+- All 70 applicable Node test files pass; two fixture-dependent tests are skipped because owner-managed `docs/dot.json` is absent. All 11 Loop router tests pass. Four Chromium modularization scenarios pass: cold/warm/offline baseline, selected preparation offline, Lobby opt-in and Settings preview. The renderer is requested at startup and its exact versioned URL is present in the service-worker cache.
+- The renderer class compares byte-for-byte with its original `dd9f033` implementation (excluding the new export wrapper/comment). Atlas verification passes: 43 maps / 353 nodes / 405 edges, labels, keyboard navigation, mobile overflow, print and SVG export, with no page errors. `git diff --check` and source syntax checks pass.
+- The current local Chromium baseline records 34 scripts / 879,812 encoded JS bytes, versus CP-MOD-041's single sample of 33 / 879,754: one additional request and 58 more encoded bytes in this harness. The extraction reduces `app.js` by about 35 KiB but does not reduce aggregate startup JS; this is strictly an ownership/maintainability change, not a performance, CPU or thermal gain.
+- `tests/night-sky-browser.mjs` reaches an Earth/mantra clearance assertion failure. The same test fails on the unmodified `dd9f033` integration baseline with the identical assertion, and the extracted renderer is byte-identical, so it is recorded as a pre-existing visual-test failure; no unrelated layout change was made. Manual device sky review remains unperformed.
+- CP-MOD-042 changes no sky visuals, observer calculations, routes or runtime branching. The dedicated sky browser assertion is a known baseline issue; it must be addressed in a separate scoped visual correction if the owner wants that layout changed.
+
 ## CP-MOD-041 — Lazy video-introduction controller
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source/unit, offline cache and Chromium entry-point evidence.
