@@ -5,7 +5,8 @@
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-063/lite`, based on CP-MOD-062 `27ff391`; branch `codex/modularize-cp-063`. Extracted seven audio volume slider handlers into `modules/audio-volume-settings-view.js`; settings key strings, mirrored controls and existing audio gain APIs are preserved. Audio effects/spatial behavior and audio graph ownership are explicitly out of scope.
 - Updated `sound-options` atlas references/description and FIX-QUEUE. CP-063 evidence: 88 Node test files pass; `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent. Direct tests verify all seven controls, mirror synchronization, saved keys, active gains and previous music gain; mixer hydration and background-music contracts pass. `node --check` and `git diff --check` pass. Atlas build passes (43 maps / 353 nodes / 405 edges); browser atlas verification remains unavailable because Playwright is absent. No performance gain claimed.
 - No remote branch publication, PR, merge or production update. Root integration branch and its unrelated local changes remain untouched.
-- Next: review and commit CP-063 locally, then continue the remaining app-owner audit and final measured-loading gate when browser tooling is permitted and available.
+- CP-063 is committed locally at `3c174ab` on `codex/modularize-cp-063`. No PR, push, integration merge, production update, browser run or device performance claim.
+- Next: continue the remaining app-owner audit and final measured-loading gate when browser tooling is permitted and available; keep this checkpoint chain local until remote review/push is authorized.
 
 ### COMPLETE LOCALLY — CP-MOD-062: Settings manager view ownership
 
