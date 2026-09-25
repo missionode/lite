@@ -4,6 +4,7 @@ import vm from 'node:vm';
 
 const source = fs.readFileSync('app.js', 'utf8');
 const moduleSource = fs.readFileSync('modules/settings-backup.js', 'utf8');
+const managerViewSource = fs.readFileSync('modules/settings-manager-view.js', 'utf8');
 
 function storageFrom(entries) {
     const values = new Map(entries);
@@ -109,7 +110,9 @@ assert.match(html, /id="import-settings"/, 'The manager needs import.');
 assert.match(html, /id="settings-export-control"[^>]* hidden/, 'Export controls must start hidden until Advanced Features is unlocked.');
 assert.doesNotMatch(html, /id="settings-import-control"[^>]* hidden/, 'Import controls must remain available without Advanced Features.');
 assert.match(source, /settingsExportControl\.hidden = isLocked/, 'Export controls must follow the shared Advanced Features lock.');
-assert.match(source, /document\.getElementById\('export-settings'\)\?\.addEventListener\('click', \(\) => \{\s*if \(!state\.advancedFeaturesUnlocked\) return;/, 'Export must reject locked direct calls.');
+assert.match(managerViewSource, /getElementById\('export-settings'\)\?\.addEventListener\('click', \(\) => \{\s*if \(!advancedFeaturesUnlocked\(\)\) return;/, 'Export must reject locked direct calls.');
+assert.match(source, /ChakraSettingsManagerView\.bind\([\s\S]*?advancedFeaturesUnlocked: \(\) => state\.advancedFeaturesUnlocked/,
+    'The app must provide the live session-only unlock state to the settings manager view.');
 for (const locale of ['en', 'ml', 'ru', 'hi']) {
     const ui = JSON.parse(fs.readFileSync(`locales/${locale}.json`, 'utf8')).ui;
     for (const key of ['manageSettings', 'exportSettings', 'importSettings', 'settingsImportConfirm']) assert.ok(ui[key], `${locale} needs ${key}`);

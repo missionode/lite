@@ -376,14 +376,6 @@ const startMeditationBtn = document.getElementById('start-meditation');
 const openSettingsBtn = document.getElementById('open-settings');
 const beginConsultationBtn = document.getElementById('begin-consultation');
 
-const {
-    FORMAT: SETTINGS_BACKUP_FORMAT,
-    VERSION: SETTINGS_BACKUP_VERSION,
-    collectManagedSettings,
-    parseSettingsBackup,
-    replaceManagedSettings
-} = window.ChakraSettingsBackup;
-
 // ── UTILS (Defensive Element Access) ──────────────────────────────────────────
 const getChecked = (id) => {
     const el = document.getElementById(id);
@@ -4134,43 +4126,15 @@ function attachEventListeners() {
         showUnlockToast(t('ui.advancedFeaturesDisabled'));
     });
 
-    const settingsManagerButton = document.getElementById('open-settings-manager');
-    const settingsManagerStatus = document.getElementById('settings-manager-status');
-    const showSettingsManagerStatus = (message) => { if (settingsManagerStatus) settingsManagerStatus.textContent = message; };
-    settingsManagerButton?.addEventListener('click', () => {
-        showSettingsManagerStatus('');
-        showScreen(settingsManagerScreen);
-    });
-    document.getElementById('close-settings-manager')?.addEventListener('click', () => showScreen(configScreen));
-    document.getElementById('export-settings')?.addEventListener('click', () => {
-        if (!state.advancedFeaturesUnlocked) return;
-        const backup = JSON.stringify({
-            format: SETTINGS_BACKUP_FORMAT,
-            version: SETTINGS_BACKUP_VERSION,
-            exportedAt: new Date().toISOString(),
-            settings: collectManagedSettings()
-        }, null, 2);
-        const url = URL.createObjectURL(new Blob([backup], { type: 'application/json' }));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'chakra-meditation-settings.json';
-        link.click();
-        URL.revokeObjectURL(url);
-        showSettingsManagerStatus(t('ui.settingsExported'));
-    });
-    document.getElementById('import-settings')?.addEventListener('click', async () => {
-        const input = document.getElementById('import-settings-file');
-        const file = input?.files?.[0];
-        if (!file) { showSettingsManagerStatus(t('ui.settingsImportChooseFile')); return; }
-        try {
-            const settings = parseSettingsBackup(await file.text());
-            if (!window.confirm(t('ui.settingsImportConfirm'))) return;
-            replaceManagedSettings(settings);
-            showSettingsManagerStatus(t('ui.settingsImported'));
-            window.location.reload();
-        } catch (error) {
-            showSettingsManagerStatus(error.message || t('ui.settingsImportInvalid'));
-        }
+    window.ChakraSettingsManagerView.bind({
+        document,
+        window,
+        configScreen,
+        settingsManagerScreen,
+        showScreen,
+        advancedFeaturesUnlocked: () => state.advancedFeaturesUnlocked,
+        backup: window.ChakraSettingsBackup,
+        t
     });
 
     function isIntimateServiceToggle(target) {

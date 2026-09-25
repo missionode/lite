@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5315](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5315), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5294](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5294), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -780,7 +780,7 @@ flowchart TD
 
 Isolated activities and return behavior.
 
-Sources: [app.js:3533](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3533), [app.js:5308](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5308), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
+Sources: [app.js:2149](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2149), [app.js:3533](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3533), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
 
 ```mermaid
 flowchart TD
@@ -1798,9 +1798,9 @@ flowchart TD
 
 ## Settings backup and restore
 
-Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.
+Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [app.js:4132](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4132), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/settings-manager-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-manager-view.js:1), [app.js:4132](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4132), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
 ```mermaid
 flowchart TD
@@ -1834,7 +1834,7 @@ flowchart TD
 | Replace saved app settings | Remove existing chakra_ keys only, restore validated preferences including Visualization ambience choice and volume, then reload. Other site/extension storage is untouched. |
 | Show error | Invalid/missing/oversized file preserves existing settings. |
 
-- Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.
+- Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state. `settings-manager-view.js` owns navigation and view-event wiring; `settings-backup.js` owns validation and managed storage.
 
 <a id="assessment-tournament"></a>
 

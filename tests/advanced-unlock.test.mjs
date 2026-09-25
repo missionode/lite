@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const source=fs.readFileSync('app.js','utf8');
 const visibilityView=fs.readFileSync('modules/lobby-experience-visibility.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
-const block=source.slice(source.indexOf('    const intimateServiceToggles = ['),source.indexOf('    function isIntimateServiceToggle('));
+const block=source.slice(source.indexOf('    const intimateServiceToggles = ['),source.indexOf('    window.ChakraSettingsManagerView.bind('));
 const approvedDigest=Uint8Array.from('5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3'.match(/.{2}/g).map(value=>parseInt(value,16))).buffer;
 function setup(noFrequencyMode=false,passwordAccepted=true) {
     let now=0,id=0; const timers=new Map(), elements=new Map();

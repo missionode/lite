@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:3514; app.js:5029; app.js:5315; index.html:248",
+      "source": "app.js:3514; app.js:5029; app.js:5294; index.html:248",
       "rows": [
         [
           [
@@ -2049,7 +2049,7 @@
       "group": "Journeys",
       "title": "Experiment activities",
       "subtitle": "Isolated activities and return behavior.",
-      "source": "app.js:3533; app.js:5308; index.html:210",
+      "source": "app.js:2149; app.js:3533; index.html:210",
       "rows": [
         [
           [
@@ -4617,8 +4617,8 @@
       "id": "settings-backup",
       "group": "Supporting pages",
       "title": "Settings backup and restore",
-      "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.",
-      "source": "modules/settings-backup.js:1; app.js:4132; index.html:215",
+      "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.",
+      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; app.js:4132; index.html:215",
       "rows": [
         [
           [
@@ -4723,7 +4723,7 @@
         ]
       ],
       "notes": [
-        "Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state."
+        "Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state. `settings-manager-view.js` owns navigation and view-event wiring; `settings-backup.js` owns validation and managed storage."
       ]
     },
     {

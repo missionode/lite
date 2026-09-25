@@ -24,6 +24,7 @@ const ASSETS = [
   './night-sky.js?v=1.1',
   './celestial-presence.js?v=1.2',
   './modules/settings-backup.js?v=1.0',
+  './modules/settings-manager-view.js?v=1.0',
   './modules/app-state.js?v=1.1',
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.0',
