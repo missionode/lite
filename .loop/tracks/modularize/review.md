@@ -1,5 +1,13 @@
 # Review
 
+## CP-MOD-051 — Elemental audio-layer lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for preserved layer profiles, exact node/value ordering, replacement and stop cleanup, direct fake-node tests, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source validation. PR review and integration sync are pending.
+
+- `startElementalLayer(index)` now delegates to `modules/audio-elemental-layer.js`. AudioEngine retains its cached-noise buffer and public adapter, while `startDrone()` order and all seven index-specific filter profiles remain unchanged.
+- Direct checks pass for every index, gain/LFO values, node connections, one random draw, replacement stop and ended cleanup. Existing audio-transition/drone-quality tests pass.
+- App/cache advance to `4.01` / `chakra-v5.297`; the module loads before app and is precached. 76/78 direct Node files pass; two require owner-managed `docs/dot.json`, absent from the worktree. 11 Loop router tests pass. Atlas validates 43 maps / 353 nodes / 405 edges. No audio/performance gain is claimed.
+
 ## CP-MOD-050 — Audio spatial geometry ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for unchanged panner defaults/movement, direct module and app integration contracts, runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.

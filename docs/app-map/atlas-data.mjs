@@ -3,7 +3,7 @@ export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-2
 const graphs = [];
 const add = (id, group, title, subtitle, source, rows, edges, notes = []) => graphs.push({id, group, title, subtitle, source, rows, edges, notes});
 
-add('overview','Start here','The whole application','Navigation, journey families, supporting systems, and exits.','app.js:5196; app.js:6040; index.html:248',[
+add('overview','Start here','The whole application','Navigation, journey families, supporting systems, and exits.','app.js:5196; app.js:5987; index.html:248',[
  [['launch','Open app','Browser or installed PWA; local preferences and cached assets influence startup.']],
  [['settings','Settings','First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts.'],['lobby','Meditation Room','Main mode selection, chakra choices, intention, duration and assessment entry point.']],
  [['manage','Manage Settings','Public settings import and Advanced Features-protected export.'],['experiments','Experiments','Settings → isolated activity → return to Experiment screen. See Experiments map.'],['journeys','Journey dispatcher','Shots → Music Only → Sleep → focused or standard guided start. See mode map.'],['consult','Separate operator tools','Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot.']],
@@ -418,20 +418,22 @@ add('care-preference-hydration','Systems','Personal-care preference control hydr
  [['gates','Continue startup','Session-only mode reset, Advanced Features visibility and care execution remain unchanged.']]
 ],[['state','bath','Saved care state ready'],['bath','care','Continue established order'],['care','gates','Controls synchronized']],['The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.']);
 
-// CP-MOD-048/049/050 update ownership references without changing flow nodes or edges.
+// CP-MOD-048/049/050/051 update ownership references without changing flow nodes or edges.
 const audioMap = graphs.find(graph => graph.id === 'audio');
-audioMap.source = 'modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1076';
+audioMap.source = 'modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1078';
 audioMap.notes.push('CP-MOD-048 moves only the one-time Web Audio graph construction into `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the stable adapter and runtime source/effect lifecycles stay with the existing owners. The graph and settings are unchanged; mock-node tests are not device listening evidence.');
 audioMap.notes.push('CP-MOD-049 moves the existing distortion curve and impulse/noise buffer generation helpers into `modules/audio-signal-design.js`; AudioEngine helper adapters preserve call order and cached-noise lifetime. No sound or performance change is claimed.');
 audioMap.notes.push('CP-MOD-050 moves only panner creation and generic position interpolation into `modules/audio-spatial-geometry.js`; AudioEngine retains adapters and mode-specific spatial profiles. No spatial behavior or performance change is claimed.');
+audioMap.notes.push('CP-MOD-051 moves elemental noise-bed node creation and cleanup into `modules/audio-elemental-layer.js`; `startElementalLayer()` remains the AudioEngine adapter and cached-noise ownership stays unchanged. No audio/performance change is claimed.');
 
 const modularizationMap = graphs.find(graph => graph.id === 'modularization');
-modularizationMap.source += '; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1';
+modularizationMap.source += '; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1';
 const remainingNode = modularizationMap.rows.flat().find(node => node[0] === 'next');
 remainingNode[2] = remainingNode[2].replace('defer AudioEngine bus internals until the approved reset.', 'CP-MOD-050 extracts generic spatial geometry; continue with scoped runtime AudioEngine ownership and measured lazy-loading boundaries.');
 remainingNode[2] = remainingNode[2].replace('CP-MOD-048 extracts the one-time initialization graph; continue with remaining explicit ownership seams and keep runtime AudioEngine state/lifecycle extraction separate.', 'CP-MOD-050 extracts generic spatial geometry; continue with scoped runtime AudioEngine ownership and measured lazy-loading boundaries.');
 modularizationMap.notes.push('CP-MOD-048 moves the original AudioEngine initialization graph behind an explicit dependency API without changing node creation order, routes or gain/filter/tail defaults. Runtime playback, spatial setters and source cleanup remain with AudioEngine for separately scoped checkpoints. No audible, startup, CPU, heap or thermal gain is implied.');
 modularizationMap.notes.push('CP-MOD-049 extracts pure signal-buffer construction with AudioContext/randomness passed explicitly; AudioEngine keeps its compatibility adapters and cached-noise ownership. The new eager module is precached for offline playback. This changes ownership only.');
 modularizationMap.notes.push('CP-MOD-050 extracts only generic spatial-panner construction and movement; spatial mode configuration and orchestration remain app-owned. The eager module is precached. This changes ownership only.');
+modularizationMap.notes.push('CP-MOD-051 extracts elemental noise-layer lifecycle, preserving the seven index profiles, audio values and cleanup. `AudioEngine` retains its compatibility method and all higher-level drone lifecycle decisions. This changes ownership only.');
 
 export { graphs };
