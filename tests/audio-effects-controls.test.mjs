@@ -2,9 +2,15 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const app = fs.readFileSync('app.js','utf8');
+const audioInitialization = fs.readFileSync('modules/audio-engine-initialization.js','utf8');
+const backgroundMusicControls = fs.readFileSync('modules/audio-background-music-controls.js','utf8');
+const spatialGeometrySource = fs.readFileSync('modules/audio-spatial-geometry.js','utf8');
+const spatialGeometryContext = vm.createContext({ Math, Object, window: {} });
+vm.runInContext(spatialGeometrySource, spatialGeometryContext);
+const audioSpatialGeometry = spatialGeometryContext.window.ChakraAudioSpatialGeometry;
 const modes = ['off','stereo','headphones','room'];
 const method = (name,next) => vm.runInNewContext(`({${app.slice(app.indexOf(`    ${name}(`),app.indexOf(`    ${next}(`))}})`, {
-    VOICE_REVERB_TAIL_SECONDS:3.2, DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off'
+    VOICE_REVERB_TAIL_SECONDS:3.2, DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off', audioSpatialGeometry
 })[name];
 const parameter = () => ({value:0, cancelScheduledValues(){}, setValueAtTime(v){this.value=v;}, linearRampToValueAtTime(v){this.value=v;}});
 const node = () => ({gain:parameter(),delayTime:parameter(),frequency:parameter(),panningModel:'equalpower'});
@@ -46,10 +52,10 @@ const position=method('setSpatialPosition','schedulePleasureSpatialApproach');
 const fallback=node(); fallback.pan=parameter();
 position.call(engine,fallback,{x:1,y:0,z:-1},10);
 assert.ok(Math.abs(fallback.pan.value-.5)<1e-8,'Fallback follows the same 45-degree bearing');
-assert.match(app,/bgMusicEQ\.type = 'peaking'/);
-assert.match(app,/const targetEQ = factor < 1\.0 \? -3 : 0/);
+assert.match(audioInitialization,/bgMusicEQ\.type = 'peaking'/);
+assert.match(backgroundMusicControls,/const targetEQ = factor < 1\.0 \? -3 : 0/);
 assert.doesNotMatch(app,/reverbGain|reverbWet|reverbFilter|triggerReverbSwell/);
-assert.equal((app.match(/this\.exciter\.connect\(this\.presenceFilter\)/g)||[]).length,1);
-assert.match(app,/voiceEchoConvolver\.connect\(this\.voiceEchoFilter\)/);
-assert.match(app,/musicEchoConvolver\.connect\(this\.musicEchoFilter\)/);
+assert.equal((audioInitialization.match(/this\.exciter\.connect\(this\.presenceFilter\)/g)||[]).length,1);
+assert.match(audioInitialization,/voiceEchoConvolver\.connect\(this\.voiceEchoFilter\)/);
+assert.match(audioInitialization,/musicEchoConvolver\.connect\(this\.musicEchoFilter\)/);
 console.log('Audio effects control matrix passed: 12 combinations, fallbacks and shared routing.');

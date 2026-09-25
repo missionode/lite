@@ -1,19 +1,117 @@
 # Chakra Meditation — Active Handoff
 
-### MID — Release-gate failures resolved (local, modularize)
+### NOW — CP-MOD-066: Timing duration settings view ownership
 
-- Corrected E2E setup/expectations to match the actual selectors, script JSON schema, non-zero voice-volume minimum, session-only HRIM selection and immediate restart behavior. Advanced-only test cases now unlock through a test-only WebCrypto stub; no password secret was added.
-- Fixed actual flow gaps: standalone preparation choices (including Box Breathing, Ho’oponopono and Undo & Unlearn) are accepted, dispatched, estimated and shown as standalone Lobby roadmaps when no chakra is selected. The active-session reveal strip no longer intercepts controls after revealing them.
-- Fresh evidence: `npm run test:e2e` passed 26/26; `node docs/app-map/verify-atlas.mjs` passed 32 maps with zero page errors; targeted rerun of the revised roadmap passed. Current task changes remain uncommitted on `modularize`; production has not been updated in this local checkpoint.
-- Browser server `BrokenPipeError` messages occur when Chromium aborts its test media request; they are harness-side cancellations, not browser page errors. Device/audio thermal behavior was not tested.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-066/lite`, branch `codex/modularize-cp-066`, based on CP-MOD-065 `083294a`. Extracted seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; mode-sensitive chakra/Sleep/Shot and High Energy durations remain app-owned.
+- Preserved the exact two binding positions around custom-script controls, integer parsing, state → display → storage → session-estimate ordering, all ten existing storage keys/labels, and error propagation. App-level estimate continues to refresh the roadmap. Eager/offline-pre-cached ownership only; no performance claim.
+- Atlas `timing-configuration` source references and notes plus `FIX-QUEUE.md` are updated. Router read-only audit ran via Loop’s automatic high-reasoning route; child review recommended the same ten-control boundary and explicitly excluded the mode-sensitive controls. Route evidence is recorded under `.codex/loop-routing/lite-mod-cp066-audit.json`.
+- Validation: all ten focused tests pass (`timing-settings-view`, `timing-settings`, `timing-preference-hydration`, `range-controls`, `session-estimate`, `lobby-experience-visibility`, `drone-duration-view`, `yoga-experience-settings`, `demo-script`, `journey-roadmap`). Full non-browser Node sweep: 91/93 pass; `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent. `node --check` and `git diff --check` pass. Atlas rebuilt: 43 maps / 353 nodes / 405 edges; graph topology is unchanged, source reference `timing-preference-hydration → app.js:3664` corrected, and timing ownership references refreshed. Atlas header now identifies a local source baseline rather than implying production. Browser/E2E and screenshots are intentionally omitted for owner review; atlas visual confirmation remains open. No performance claim.
+- Routing: automatic router dispatched read-only audit to `gpt-6-astra` / high effort; its bounded dependency review recommended the same ten-control boundary and named coupling guards. Supervisor made and validated the implementation directly. No remote publication, PR, merge or production update.
+- CP-MOD-066 implementation/test checkpoint is locally committed at `46d9c9e`. A documentation follow-up regenerates the atlas against that source commit; it does not change application behavior. The router decision record remains untracked under `.codex/loop-routing/` and is intentionally excluded from source commits.
 
-### CP-MOD-012 — Body Scan implementation ownership (checkpoint branch)
+### NEXT — CP-MOD-067: Custom script selection and upload flow ownership (deferred)
 
-- Branch `codex/modularize-cp-012`, based on clean `modularize` commit `63d0dd6`. The local Loop router classified this as reasoning / `gpt-5.6-sol` high (`PLANNED`); no model-specific child was dispatched or model switch claimed because this small extraction touches the shared app/atlas integration boundary.
-- `modules/body-scan-practice.js` owns timed region narration, session-active sequencing, and black-scene/fade cleanup. The existing controller injects the language, audio, screen and session services. Delivery stays eager and offline-pre-cached.
-- Direct Body Scan, focused-practice, settings-backup/shell, Hindi and syntax checks pass. Same local Chromium harness before/after: 13→14 eager scripts, about +1.4 KiB net uncompressed script body bytes; cold/warm timing deltas are within single-run noise. No speedup is claimed. Browser page errors: zero; two blocked-font console errors are harness-generated. No device audio or thermal evidence.
-- Lazy loading has not been implemented. Next work should continue extracting stage/UI ownership, then repeat cold/warm/offline measurements before approving any optional dynamic-import boundary. AudioEngine construction remains deferred per the existing weekly-reset gate.
-- Remaining in this checkpoint: regenerate/verify atlas, run applicable regression suite, commit and open focused PR to `modularize`; after approved integration, run combined checks. Production remains untouched.
+- Parked at the safe CP-066 boundary for the next weekly usage reset. No CP-067 implementation is included in this release.
+- Planned scope: extract the existing custom-script selector, demo-timing coordination, file upload and URL-fetch handlers as one cohesive UI/controller seam. Keep `state`, localStorage, `validateScriptBundle`, session-estimate updates and cached `meditation.scripts` lifecycle authoritative in their current owners; preserve event-binding positions and success/error ordering.
+- Before implementation, define stale/concurrent URL-load behavior, duplicate `highEnergy` validation option cleanup only if covered as a separately approved behavior change, and failure atomicity: malformed uploads, HTTP/JSON/schema failures and rejected validation must preserve the previously active custom script/settings/cache. Empty URL remains a no-op.
+- Required tests: defaults/source selection; valid and malformed upload; URL success, HTTP/JSON/schema failures and empty input; demo preset exact-match/restore timing; custom source readiness; cache reuse/reload; language and feature-option fallback; concurrent URL requests. Extend the `script-preference-hydration` atlas map to show selector, upload, fetch, validation, success, failure, cache invalidation and cancellation/race behavior only after executable behavior is settled; regenerate and verify atlas.
+- This is a parked proposal, not delivered behavior. Resume only after the approved weekly token reset; do not start CP-068 or lazy-loading redesign before CP-067 validation and review.
+
+### COMPLETE LOCALLY — CP-MOD-065: Journey preparation selection ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-065/lite`, based on CP-MOD-064 `1e65281`; branch `codex/modularize-cp-065`. Extracted the seven journey-preparation selection listeners and nested option-row visibility to `modules/journey-preparation-selection.js`. Journey routing still owns standalone/no-chakra validation and start dispatch.
+- Updated the `modes` map source references and FIX-QUEUE. Direct selection tests cover all seven add-ons, option-row expand/collapse, exclusivity clearing order, Box/Ho’oponopono flags and both update calls; standalone selection remains independent of chakra prerequisites. Journey routing and roadmap tests pass. Full Node sweep: 90 pass; `content-safety` and `drone-duration` fail before assertions due to absent `docs/dot.json`. Syntax/diff checks and atlas build pass (43 maps / 353 nodes / 405 edges). No browser evidence or performance claim.
+- No remote publication, PR, merge or production update. Root integration checkout and unrelated local changes remain untouched.
+- CP-065 is committed locally at `d8fe487` on `codex/modularize-cp-065`; no remote publication, PR, merge or production update.
+- Next: continue the remaining ownership audit and measured-loading investigation, preserving the full integration and browser-evidence gates.
+
+### NOW — CP-MOD-064: Audio effects settings view ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-064/lite`, based on CP-MOD-063 `3f0c12e`; branch `codex/modularize-cp-064`. Extracted voice tuning, echo, spatial-mode and voice-preset input handlers to `modules/audio-effects-settings-view.js`. The mixer still delegates volume changes to CP-063’s `audio-volume-settings-view.js`.
+- Updated the `sound-options` map and FIX-QUEUE. Audio graph/DSP behavior, defaults, persistence keys and hydration order remain unchanged. Targeted effects-view, background-music/echo, DSP-controls and spatial-audio tests pass. Full Node sweep: 89 pass; `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent. `node --check`, `git diff --check` and atlas build pass (43 maps / 353 nodes / 405 edges). Atlas browser verification is unavailable without Playwright; no browser or device evidence and no performance claim.
+- No remote push, PR, merge or production publication. Keep the root integration checkout and unrelated files untouched.
+- CP-064 is committed locally at `6ff6945` on `codex/modularize-cp-064`; no PR, push, integration merge or production update.
+- Next: check local browser/tool availability and continue the app-owner and measured-loading audit. Do not report the migration complete without integration reconciliation and the remaining load-evidence gate.
+
+### NOW — CP-MOD-063: Audio volume settings view ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-063/lite`, based on CP-MOD-062 `27ff391`; branch `codex/modularize-cp-063`. Extracted seven audio volume slider handlers into `modules/audio-volume-settings-view.js`; settings key strings, mirrored controls and existing audio gain APIs are preserved. Audio effects/spatial behavior and audio graph ownership are explicitly out of scope.
+- Updated `sound-options` atlas references/description and FIX-QUEUE. CP-063 evidence: 88 Node test files pass; `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent. Direct tests verify all seven controls, mirror synchronization, saved keys, active gains and previous music gain; mixer hydration and background-music contracts pass. `node --check` and `git diff --check` pass. Atlas build passes (43 maps / 353 nodes / 405 edges); browser atlas verification remains unavailable because Playwright is absent. No performance gain claimed.
+- No remote branch publication, PR, merge or production update. Root integration branch and its unrelated local changes remain untouched.
+- CP-063 is committed locally at `3c174ab` on `codex/modularize-cp-063`. No PR, push, integration merge, production update, browser run or device performance claim.
+- Next: continue the remaining app-owner audit and final measured-loading gate when browser tooling is permitted and available; keep this checkpoint chain local until remote review/push is authorized.
+
+### COMPLETE LOCALLY — CP-MOD-062: Settings manager view ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-062/lite`, based on CP-MOD-061 `d039784`; branch `codex/modularize-cp-062`. Extracted Settings → Manage Settings navigation, status, import/export interaction and Advanced Features export gate to `modules/settings-manager-view.js`; `settings-backup.js` retains backup validation and managed-storage replacement.
+- Acceptance: import remains available without Advanced Features; export is rechecked at click time; cancellation, invalid-input, local-only backup scope, download behavior and reload-after-import remain unchanged. Atlas `settings-backup` map and FIX-QUEUE updated.
+- CP-062 evidence: 87/89 Node tests pass; `content-safety` and `drone-duration` fail before assertions because owner-managed `docs/dot.json` is absent. Settings view and backup tests pass, including locked-export rejection, public import, cancel, invalid-file and accepted replacement paths. `node --check` for app/module and `git diff --check` pass. Atlas build passes (43 maps / 353 nodes / 405 edges); `verify-atlas.mjs` cannot start because this worktree lacks the Playwright package. No browser/manual/device evidence.
+- CP-061’s loading measurement remains static only (51 local scripts / 892,805 encoded source bytes after CP-061), not a performance claim. Remote branch publication, PR, integration merge and production update remain unapproved; the root checkout’s unrelated local files remain untouched.
+- CP-062 is committed locally at `af0a3bf` on `codex/modularize-cp-062`. Remote publication, PR, integration merge and production update are not part of this checkpoint.
+- Next: continue the remaining justified app-owned journey/UI seam audit, then perform the cold/warm/offline and selected/offline/retry loading gate when a permitted browser runner is available. Do not call modularization complete before that evidence and integration reconciliation.
+
+### NOW — CP-MOD-061: Journey content loading and validation ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-061/lite`, based on CP-MOD-060 commit `fb8e1d4`. CP-061 moves start-time language/custom script selection, same-language cache reuse, fetch and bundle validation behind `modules/journey-content-loader.js`; session context, narration and start order remain app-owned.
+- CP-061 is committed locally at `12b418b`; app/cache versions are `4.12` / `chakra-v5.309`. Direct loader, localization, demo, journey-opening/wrapper/routing, Settings and video-prelude tests pass. Full Node suite is 86/88; `content-safety` and `drone-duration` cannot start because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuild passes at 43 maps / 353 nodes / 405 edges; source links are refreshed. Syntax and diff checks pass. Browser/Playwright was not run; its package is unavailable. One existing Node module-type warning from Piper is non-fatal.
+- Static shell comparison against CP-060: 50 → 51 local script tags; source-file sum 890,408 → 892,805 bytes (+2,397 bytes). This is an eager ownership extraction, not a performance improvement; no startup, heap, CPU, thermal or device claim. Final cold/warm/offline browser gate is still outstanding.
+- CP-060 is committed locally in its own checkpoint branch, not pushed. CP-057–059 still await explicit remote-push approval. CP-056 is merged via PR #75 at `eef41bc`. Production remains unchanged; root-checkout unrelated files remain preserved. Next: obtain a usable local browser-test runner and the pending authorization to publish the isolated checkpoint stack, then run combined cold/warm/offline and selected/offline/retry journey checks before completion.
+
+### COMPLETE — CP-MOD-042: Observational sky renderer ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-042/lite`, based on merged integration commit `dd9f033` (CP-MOD-041 merged via PR #60). Scope: move the unchanged `AmbientParticleField` owner into an eager module; preserve the current astronomy/render behavior and dynamic sky exactly.
+- Its ~670-line class is now in `modules/ambient-particle-field.js`; `app.js` creates the same shared instance via `window.AmbientParticleField`. Script order is after astronomy/night-sky dependencies and before app. Module URL is cached offline; app URL/cache generation advance to `3.92` / `chakra-v5.288`.
+- The class is verified verbatim against baseline `dd9f033`. All 70 applicable Node tests, 11 Loop router tests, four modularization Chromium scenarios and atlas verification pass (43 maps / 353 nodes / 405 edges). Two fixture-dependent tests remain skipped because `docs/dot.json` is absent.
+- `tests/night-sky-browser.mjs` fails at the Earth/mantra clearance assertion identically on the unmodified `dd9f033` baseline; this checkpoint does not alter the class or layout. Logged in `.loop/tracks/modularize/review.md`; manual device sky review remains open.
+- One local sample has 34 scripts / 879,812 encoded JS bytes (CP41 sample: 33 / 879,754). This is an ownership/maintainability extraction, not a performance, CPU, heat or memory gain.
+- CP42 merged via PR #61; the local `modularize` root is synchronized at `078b983`. Preserve the unrelated root `.DS_Store`, `.codex/` and backup audio files.
+
+### COMPLETE — CP-MOD-041: Lazy video-introduction controller
+
+- CP-MOD-041 merged via PR #60 at `dd9f033`, based on CP-MOD-040 at `b7b2365`. Scope: defer the video-introduction controller until opt-in or explicit Settings preview; preserve all current video/audio flow behavior and the dynamic sky.
+- The class has moved to `modules/journey-video-prelude.js`. App loader deduplicates concurrent requests, constructs on first demand, and clears its promise after failure. App URL is `3.91`; shell cache is `chakra-v5.287`; the controller remains precached, but the 7.3 MB media remains uncached.
+- All applicable unit, Loop router, four Chromium and atlas checks passed; local suite skip reasons and sample limitations are retained below.
+- Root integration branch was fast-forwarded to `dd9f033`; preserve its unrelated `.DS_Store`, `.codex/` and backup audio changes. AudioEngine bus internals remain owner-deferred until the next weekly reset.
+
+### COMPLETE — CP-MOD-040: Shared journey chrome ownership
+
+- CP-MOD-040 merged via PR #59 at `b7b2365`, based on CP-MOD-039 at `9a77086`. Scope: extract fullscreen/idle-cursor journey controls only; preserve all interaction timings and keep the current dynamic sky unchanged.
+- `modules/journey-chrome.js` owns the prior `JourneyVideoPrelude` control listeners and methods. The app constructs one independent app-lifetime controller. It remains eager for every journey and is precached for offline use. App/cache IDs advance to `3.90` / `chakra-v5.286`.
+- The direct interaction contracts and 70-test applicable suite pass (2 owner-fixture tests excluded: absent `docs/dot.json`); 11 router tests pass. Three Chromium modularization checks pass, including cache/offline routes and no initial intro-video request. Browser baseline: 33 scripts / 891,328 encoded JS bytes; extracted module moves ~5.2 KiB out of app.js but adds ~723 bytes net and one request, so no performance gain is claimed. Atlas verification: 43 maps / 353 nodes / 405 edges, no page errors. Only expected test-abort/external-font `ERR_FAILED` console entries; no other console/page errors.
+- Root integration still contains only the owner’s unrelated `.DS_Store`, `.codex/` and backup audio changes; merge target is `modularize`, never production.
+- Merged via PR #59 at `b7b2365`; browser, test-suite and atlas evidence retained below in checkpoint history.
+
+### COMPLETE — CP-MOD-039: Optional video media request
+
+- Merged via PR #58 at `9a77086`. The optional 7.3 MB clip is not requested until explicit preview or opt-in; initial load proves zero clip requests, opt-in proves one. The clip remains uncached; unavailable offline flow is preserved. 70 Node tests, 11 Loop router tests, 3 Chromium checks and the 43-map/353-node/405-edge atlas verification passed; two tests excluded due to absent owner-managed `docs/dot.json`. No CPU/thermal/device claim.
+
+### COMPLETE — CP-MOD-038: Selected guided-practice loading
+
+- Integrated via PR #57 at `f0a5b2e`. Only selected guided-practice scripts load on Begin; exact assets remain precached for offline use. Local sample reduced encoded initial JavaScript by ~13.1 KiB (~1.4%); timings noisy, no CPU/thermal/device claim. Full CP38 validation and its missing-fixture exclusions are retained in `.loop/tracks/modularize/review.md`.
+
+### COMPLETE — CP-MOD-036: Personal-care preference control hydration
+
+- Active isolated branch `codex/modularize-cp-036`, based on modularize integration commit `9aec136` (CP-MOD-035 merged via PR #54). `modules/care-preference-hydration.js` owns only perineal-care, assisted-bathing and massage checkbox hydration; app retains state, authorization/gates and care execution.
+- Preserve their original order after Bath preference restoration. Eager/offline-pre-cached; no performance claim.
+- Local `modularize` is synchronized at `9aec136`; preserve unrelated `.DS_Store`, `.codex/` and backup-audio files.
+- CP-MOD-036 direct contract and complete applicable suite pass: 69 runnable Node test files plus 11 Loop router Python tests. Two owner-fixture tests remain excluded because `docs/dot.json` is absent. Atlas builder passes at 43 maps / 352 nodes / 401 edges; browser verification cannot start because Playwright is unavailable. No browser/device/performance claim.
+- Next: integrate CP-MOD-036, audit remaining startup hydration for a real boundary, then begin lazy-loading measurement only if browser/offline route checks can be run. AudioEngine bus remains behind its approved weekly-reset gate.
+
+### COMPLETE — CP-MOD-014: Dharana focus scene ownership
+
+- Integrated via [PR #33](https://github.com/missionode/lite/pull/33) at `7c432ee`. Frozen `modules/dharana-practice.js` owns the anchor/veil lifecycle and active-session shrink clock; the controller supplies localized text and app services.
+- Direct tests verify all one-minute progress updates, selected shape/color, four-second narrated release, cancellation and cleanup on failure. Focused, settings, language, routing and predecessor module tests passed. Eager delivery remains; no performance gain is claimed. Browser/device audio/thermal evidence remains open.
+
+### COMPLETE — CP-MOD-013: Guided Noting implementation ownership
+
+- Integrated via [PR #32](https://github.com/missionode/lite/pull/32) at `a093fb3`. `modules/guided-noting-practice.js` owns timed reminder sequencing, active-session checks and black-scene cleanup; the controller supplies localized copy and existing services. Eager startup/offline precache remain.
+- Direct lifecycle, Body Scan, focused-practice, journey-routing, video-prelude, hypnosis, language, settings-backup, all four locale and thermal checks passed. Atlas regenerated to 32 maps and a static ownership/source assertion passed. Browser verifier was not run because Playwright was unavailable in the isolated worktree; this checkpoint did not change graph topology. Device playback/thermal validation remains open.
+- PR also synchronized the already-published production release-gate commit to `modularize`. Production itself was not changed by this merge. Lazy loading remains gated by parity and measured evidence; AudioEngine construction remains subject to its existing weekly-reset gate.
+
+### COMPLETE — CP-MOD-012: Body Scan implementation ownership
+
+- Integrated on `origin/modularize` at `eaec373` (PR #31). `modules/body-scan-practice.js` owns timed region narration, session-active sequencing and black-scene/fade cleanup. The controller injects localized copy, audio, screen and session services; delivery remains eager and offline-pre-cached.
+- Direct Body Scan, focused-practice, settings/shell, Hindi and syntax checks passed. Its one eager script added about 1.4 KiB net local uncompressed response bytes in a single comparison; timing deltas were within noise, so no performance gain was claimed. Device audio/thermal validation remains open.
 
 ### COMPLETE LOCALLY — CP-MOD-011: preparation execution and measured-loading baseline
 

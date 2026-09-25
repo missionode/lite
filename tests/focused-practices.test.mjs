@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const journeyRoadmap = fs.readFileSync(new URL('../modules/journey-roadmap.js', import.meta.url), 'utf8');
 const bodyScanPractice = fs.readFileSync(new URL('../modules/body-scan-practice.js', import.meta.url), 'utf8');
+const dharanaPractice = fs.readFileSync(new URL('../modules/dharana-practice.js', import.meta.url), 'utf8');
+const boxBreathingPractice = fs.readFileSync(new URL('../modules/box-breathing-practice.js', import.meta.url), 'utf8');
+const visualizationPractice = fs.readFileSync(new URL('../modules/visualization-practice.js', import.meta.url), 'utf8');
+const undoUnlearnPractice = fs.readFileSync(new URL('../modules/undo-unlearn-practice.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -27,10 +32,14 @@ assert.match(app, /async runPreparationStages[\s\S]*?buildPreparationStagePlan[\
 assert.match(html, /id="visualization-addon-toggle"[\s\S]*?id="visualization-duration"[\s\S]*?id="visualization-ambience"/, 'Visualization should expose its optional duration and score choice');
 assert.match(html, /id="settings-vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Settings should allow the approved higher Visualization ambience ceiling');
 assert.match(html, /id="vol-visualization"[^>]*min="0\.02"[^>]*max="0\.5"/, 'Journey Tuning should match the Visualization ambience ceiling');
+assert.match(app, /boxBreathingPractice\.run\(/, 'Box Breathing should delegate its lifecycle to its owner');
+assert.match(boxBreathingPractice, /for \(let cycle = 0; cycle < 4; cycle\+\+\)/, 'Box Breathing should preserve its four-cycle sequence');
+assert.match(boxBreathingPractice, /elapsed < 1000[\s\S]*?if \(!isPaused\(\)\) elapsed \+= 100/, 'Box Breathing should preserve its pause-aware elapsed-time contract');
 assert.match(html, /id="focus-anchor"/, 'Focused Attention needs a dedicated visible anchor layer rather than text inside the chakra image');
-assert.match(app, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
-assert.match(app, /while \(remaining-- > 0 && this\.isMeditationActive\)[\s\S]*?dharanaClosing[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');
-assert.match(app, /--focus-anchor-duration[\s\S]*?is-focusing/, 'Focused Attention should slowly settle the anchor over the selected duration');
+assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\([\s\S]*?dharanaFocusGuidance[\s\S]*?dharanaClosing/, 'The controller should inject localized copy into the Dharana owner');
+assert.match(dharanaPractice, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
+assert.match(dharanaPractice, /while \(remaining-- > 0 && isActive\(\)\)[\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');
+assert.match(dharanaPractice, /--focus-anchor-duration[\s\S]*?is-focusing[\s\S]*?focusAnchor\.style\.transform = `scale\(/, 'Focused Attention should slowly settle the anchor over selected active-session time');
 assert.match(html, /box-breathing-experience-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?dharana-addon-toggle[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?chakra-selection-panel/, 'Lobby preparation controls should match the approved runtime order');
 assert.match(html, /id="body-scan-duration"[\s\S]*?value="3"[\s\S]*?value="5" selected[\s\S]*?value="8"/, 'Body Scan should offer 3, 5 and 8 minute durations');
 assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanPractice\.run[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'The controller should pass localized Body Scan content into its practice owner');
@@ -41,12 +50,13 @@ assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selec
 assert.match(app, /async runNoting\(\)[\s\S]*?notingReminders[\s\S]*?notingOpening[\s\S]*?notingClosing/, 'Guided Noting should narrate its explanation, reminders and release');
 assert.match(html, /hooponopono-experience-toggle[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?id="undo-unlearn-duration"[\s\S]*?value="5"[\s\S]*?value="8" selected[\s\S]*?value="12"/, 'Undo & Unlearn should follow Ho’oponopono and offer 5, 8 and 12 minutes');
 assert.match(app, /hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?undo-unlearn-addon-toggle[\s\S]*?runUndoUnlearn\(\)[\s\S]*?handleSilence/, 'Undo & Unlearn should run after Ho’oponopono and before final silence');
-assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPhases[\s\S]*?undoUnlearnOpening[\s\S]*?undoUnlearnClosing/, 'Undo & Unlearn should narrate its content-free release flow');
+assert.match(app, /async runUndoUnlearn\(\)[\s\S]*?undoUnlearnPractice\.run\(/, 'Undo & Unlearn should delegate its lifecycle to the module owner');
+assert.match(undoUnlearnPractice, /for \(const narration of narrations\)[\s\S]*?narrate\(narration, false\)[\s\S]*?narrate\(closing, false\)/, 'Undo & Unlearn should preserve its guided phase narration flow');
 assert.match(app, /VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS = 8[\s\S]*?VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS = 10/, 'Visualization score should retain deliberate entry and exit fades');
 assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx\.currentTime\)[\s\S]*?new SeamlessLoop\(this\.ctx, this\.visualizationAmbienceBuffer, this\.visualizationAmbienceGain, state\.volVisualizationAmbience/, 'Visualization score should start audibly without a volume-slider interaction');
 assert.match(mediaLifecycle, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
-assert.match(app, /if \(state\.visualizationAmbience === 'silence'\)[\s\S]*?visualizationSilenceWakePrompt[\s\S]*?pauseAwareSleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
-assert.match(app, /setVisualizationAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\([\s\S]*?setVisualizationAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
+assert.match(visualizationPractice, /ambience === 'silence'[\s\S]*?silenceWakePrompt[\s\S]*?sleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
+assert.match(visualizationPractice, /setAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\(focusPrompt[\s\S]*?setAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
 assert.match(app, /async runSequence[\s\S]*?hooponopono-experience-toggle[\s\S]*?runHooponopono\(\)[\s\S]*?handleSilence[\s\S]*?runClosing[\s\S]*?runEmergence/, 'Ho’oponopono should run after chakras and before closing/emergence');
 assert.match(app, /clearFocusedExperiences\(target\)/, 'Standalone Experience Modes should remain mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');
@@ -56,10 +66,10 @@ const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app
     for (const feature of ['boxBreathing', 'hooponopono', 'dharana', 'visualization', 'bodyScan', 'noting', 'undoUnlearn']) {
     assert.match(addonClearBody, new RegExp(feature, 'i'), `Exclusive modes must still clear ${feature}`);
 }
-assert.match(app, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?dharanaClosing[\s\S]*?pauseAwareSleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
+assert.match(dharanaPractice, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
 assert.match(app, /journeyRouting\.buildChakraOrder\([\s\S]*?focusedExperience[\s\S]*?massage-toggle[\s\S]*?selectedChakras/, 'Guided starts should delegate chakra-order selection to the journey-routing owner');
-assert.match(app, /labels\.splice\(0, 0, t\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(t\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
+assert.match(journeyRoadmap, /labels\.splice\(0, 0, translate\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(translate\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
 
 for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['dharanaFocusGuidance', 'dharanaClosing', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationSilenceWakePrompt', 'visualizationReturn']) {

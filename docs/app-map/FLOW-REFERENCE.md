@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: modularize 63d0dd6 baseline + uncommitted CP-MOD-012 · 2026-09-24.
+Source snapshot: 46d9c9e CP-MOD-066 source baseline · 2026-09-25.
 
-Source-reviewed application behavior with the production assessment integrated and Body Scan execution extracted on the active checkpoint branch, pending integration. The assessment is a standalone operator aid independent of journey routing; trained-operator acceptance is a follow-up. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior through CP-MOD-066 on the local modularize checkpoint chain. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -24,22 +24,33 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 14. [Sound Shots](#shots)
 15. [Experiment activities](#experiments)
 16. [Ordered Chakra Journey add-ons](#journey-addons)
-17. [Pause, stop and live controls](#controls)
-18. [Optional Lobby video introduction](#restart)
-19. [Completion, statistics and external handoff](#completion)
-20. [Scripts, language and timing](#content)
-21. [Narration and fallback](#narration)
-22. [Audio signal architecture](#audio)
-23. [Sound options and live suppression](#sound-options)
-24. [Visuals and browser lifecycle](#visuals)
-25. [Earth observer reference and atmosphere](#earth-atmosphere)
-26. [Thematic solar containment glow](#solar-containment)
-27. [Persistence, caching and network](#storage)
-28. [Failure and recovery map](#recovery)
-29. [Isolated checkpoint delivery](#delivery-workflow)
-30. [Settings backup and restore](#settings-backup)
-31. [Operator-led chakra assessment](#assessment-tournament)
-32. [Frequency repertory handoff](#repertory)
+17. [Lobby journey roadmap](#journey-roadmap)
+18. [Pause, stop and live controls](#controls)
+19. [Optional Lobby video introduction](#restart)
+20. [Completion, statistics and external handoff](#completion)
+21. [Scripts, language and timing](#content)
+22. [Narration and fallback](#narration)
+23. [Audio signal architecture](#audio)
+24. [Sound options and live suppression](#sound-options)
+25. [Visuals and browser lifecycle](#visuals)
+26. [Earth observer reference and atmosphere](#earth-atmosphere)
+27. [Thematic solar containment glow](#solar-containment)
+28. [Persistence, caching and network](#storage)
+29. [Failure and recovery map](#recovery)
+30. [Isolated checkpoint delivery](#delivery-workflow)
+31. [Display-language UI renderer](#locale-ui-renderer)
+32. [Timing configuration and saved values](#timing-configuration)
+33. [Automatic journey voice profile](#journey-voice-profile)
+34. [Session-only journey-mode hydration](#session-mode-hydration)
+35. [Mixer preference control hydration](#mixer-preference-hydration)
+36. [Journey selection preference hydration](#journey-selection-hydration)
+37. [Timing preference control hydration](#timing-preference-hydration)
+38. [Appearance preference control hydration](#appearance-preference-hydration)
+39. [Script preference control hydration](#script-preference-hydration)
+40. [Personal-care preference control hydration](#care-preference-hydration)
+41. [Settings backup and restore](#settings-backup)
+42. [Operator-led chakra assessment](#assessment-tournament)
+43. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -89,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:6184](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6184), [app.js:7553](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7553), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5104](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5104), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -143,7 +154,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [app.js:4908](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4908), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/body-scan-practice.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/body-scan-practice.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/session-countdown.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-countdown.js:1), [modules/newcomer-marker-layout.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/newcomer-marker-layout.js:1), [modules/mood-ambience-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mood-ambience-settings-view.js:1), [modules/drone-duration-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/drone-duration-settings-view.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/yoga-experience-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/yoga-experience-settings.js:1), [modules/range-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/range-controls.js:1), [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [modules/ambient-particle-field.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:1), [modules/visual-engine.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visual-engine.js:1), [tests/journey-chrome.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-chrome.test.mjs:1), [tests/practice-module-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/practice-module-loader.test.mjs:1), [tests/e2e/modularization-baseline.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/modularization-baseline.spec.js:1), [tests/e2e/practice-modules-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/practice-modules-lazy-load.spec.js:1), [tests/e2e/optional-video-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/optional-video-lazy-load.spec.js:1), [tests/journey-video-prelude.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-video-prelude.test.mjs:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:4536](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4536), [index.html:769](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:769), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [tests/session-estimate.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-estimate.test.mjs:1), [tests/session-countdown.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-countdown.test.mjs:1), [tests/newcomer-marker-layout.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/newcomer-marker-layout.test.mjs:1), [tests/mood-ambience-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mood-ambience-settings-view.test.mjs:1), [tests/drone-duration-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/drone-duration-settings-view.test.mjs:1), [tests/lobby-experience-visibility.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/lobby-experience-visibility.test.mjs:1), [tests/yoga-experience-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/yoga-experience-settings.test.mjs:1), [tests/range-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/range-controls.test.mjs:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1), [modules/audio-engine-initialization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-engine-initialization.js:1), [tests/audio-engine-initialization.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-engine-initialization.test.mjs:1), [modules/audio-signal-design.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-signal-design.js:1), [tests/audio-signal-design.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-signal-design.test.mjs:1), [modules/audio-spatial-geometry.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-spatial-geometry.js:1), [tests/audio-spatial-geometry.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-spatial-geometry.test.mjs:1), [modules/audio-elemental-layer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-elemental-layer.js:1), [tests/audio-elemental-layer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-elemental-layer.test.mjs:1), [modules/audio-tone-playback.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-tone-playback.js:1), [tests/audio-tone-playback.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-tone-playback.test.mjs:1), [modules/audio-drone-start.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-drone-start.js:1), [tests/audio-drone-start.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-drone-start.test.mjs:1), [modules/audio-drone-stop.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-drone-stop.js:1), [tests/audio-drone-stop.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-drone-stop.test.mjs:1), [modules/audio-mantra-playback.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-mantra-playback.js:1), [tests/audio-mantra-playback.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-mantra-playback.test.mjs:1), [modules/audio-background-music-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-background-music-lifecycle.js:1), [tests/audio-background-music-lifecycle.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-background-music-lifecycle.test.mjs:1), [modules/audio-background-music-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-background-music-controls.js:1), [tests/audio-background-music-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-background-music-controls.test.mjs:1), [modules/audio-music-echo.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-music-echo.js:1), [tests/audio-music-echo.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-music-echo.test.mjs:1), [modules/journey-hypnosis-wrapper.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-hypnosis-wrapper.js:1), [tests/journey-hypnosis-wrapper.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-hypnosis-wrapper.test.mjs:1), [modules/journey-opening-stage.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-opening-stage.js:1), [tests/journey-opening-stage.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-opening-stage.test.mjs:1), [modules/journey-content-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-content-loader.js:1), [tests/journey-content-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-content-loader.test.mjs:1).
 
 ```mermaid
 flowchart TD
@@ -154,13 +165,13 @@ flowchart TD
   test["Targeted parity check"]
   maps["Refresh affected maps"]
   checkpoint["Validated checkpoint"]
-  next["Queued extraction work"]
-  measure["PLANNED · Measure baseline"]
-  partition["PLANNED · Approve feature bundles"]
-  cache["PLANNED · Cache without execution"]
-  preload["PLANNED · Preload on intent"]
-  activate["PLANNED · Activate selected feature"]
-  release["PLANNED · Release resources"]
+  next["Remaining modularization work"]
+  measure["Baseline measured · CP-MOD-037"]
+  partition["Bounded optional bundle"]
+  cache["Offline bytes, not execution"]
+  preload["Begin after selection"]
+  activate["Selected module only"]
+  release["Lifecycle cleanup remains gated"]
   verify["PLANNED · Evidence gate"]
   atlas -->|"Define scope"| boundary
   atlas -->|"Protect behavior"| baseline
@@ -192,16 +203,30 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Queued extraction work | Journey preparation planning/execution and Body Scan ownership extracted; remaining stage implementations → deferred AudioEngine buses → UI controllers. Complete parity before delivery changes. |
-| PLANNED · Measure baseline | Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners. |
-| PLANNED · Approve feature bundles | Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity. |
-| PLANNED · Cache without execution | Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them. |
-| PLANNED · Preload on intent | Selection or clear intent starts one deduplicated import; Begin awaits only unfinished preparation. |
-| PLANNED · Activate selected feature | Load failure is safe and localized; unselected features remain inactive. |
-| PLANNED · Release resources | Stop workers, buffers, AudioNodes, media, animation/WebGL, observers, timers and listeners where safe. |
+| Remaining modularization work | CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers optional video media until preview or opted-in introduction. CP-MOD-040 separates shared journey chrome; CP-MOD-041 defers the optional prelude controller; CP-MOD-042/043 isolate the observational sky and visual engine; CP-MOD-044/045 centralize session estimates and countdown durations; CP-MOD-046/047 isolate the countdown ticker and newcomer marker geometry. CP-MOD-048–054 isolate audio graph setup, signal design, spatial geometry, elemental bed, transition tones and drone start/stop; CP-MOD-055 isolates mantra playback; CP-MOD-056 isolates background-music loop start/stop; CP-MOD-057 isolates gain/fade/duck/mute/restore controls; CP-MOD-058 isolates music echo profiles; CP-MOD-059 isolates optional Arrival/Emergence; CP-MOD-060 isolates the guided opening/Gratitude stage. Remaining: audit the start dispatcher and controller for justified ownership seams, then finish the measured cold/warm/offline and browser evidence gate before declaring modularization complete. |
+| Baseline measured · CP-MOD-037 | Cold/warm/offline script count, encoded resource bytes, transfer sizes, cache control and page errors; CPU/heap snapshots are indicative only. |
+| Bounded optional bundle | Seven selected guided-practice scripts are the first bundle; measured initial-JS reduction is modest (~13.1 KiB locally). |
+| Offline bytes, not execution | Service worker precaches the seven practice script URLs, while the eager shell includes only the small loader. |
+| Begin after selection | The selected Lobby toggles map to exact module IDs and one deduplicated loadMany call before video/audio startup. |
+| Selected module only | Each practice runner ensures its own module is loaded; failed loads clear pending state and the localized alert lets the user retry. |
+| Lifecycle cleanup remains gated | Stop workers, buffers, AudioNodes, media, animation/WebGL, observers, timers and listeners where safe. |
 | PLANNED · Evidence gate | Cold/warm/offline, PWA update, route, cancellation/restart and device/browser performance evidence must show net benefit. |
 
-- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup while the app injects localization, audio, screen and session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. CP-MOD-012 measured one indicative local cold/warm run before and after extraction: startup still eagerly loads the same feature set plus one small practice module; response bodies grow by about 1.4 KiB net. Timing differences fall within single-run noise, so no performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset.
+- Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff; visualization-practice owns blackout, audio/narration timing and gradual return; hooponopono-practice owns its phrase cycles and closing handoff; undo-unlearn-practice owns phase sequencing and guaranteed black-scene cleanup; screen-navigation owns shared screen visibility, static-sky decoration guards, decorationchange notification and scroll resets. The eager shell loads `practice-module-loader.js`, not these seven APIs. The loader injects only selected classic scripts on Begin, deduplicates concurrent loads, and clears failures so a localized failure can be retried; their exact URLs remain precached for offline use. The first local comparison reduces startup JavaScript bodies by ~13.1 KiB with navigation timing variability, so only this byte reduction is claimed; CPU, heap, thermal, compressed production and device effects remain unproven. AudioEngine bus construction remains owner-deferred until the next weekly reset.
+- CP-MOD-048 moves the original AudioEngine initialization graph behind an explicit dependency API without changing node creation order, routes or gain/filter/tail defaults. Runtime playback, spatial setters and source cleanup remain with AudioEngine for separately scoped checkpoints. No audible, startup, CPU, heap or thermal gain is implied.
+- CP-MOD-049 extracts pure signal-buffer construction with AudioContext/randomness passed explicitly; AudioEngine keeps its compatibility adapters and cached-noise ownership. The new eager module is precached for offline playback. This changes ownership only.
+- CP-MOD-050 extracts only generic spatial-panner construction and movement; spatial mode configuration and orchestration remain app-owned. The eager module is precached. This changes ownership only.
+- CP-MOD-051 extracts elemental noise-layer lifecycle, preserving the seven index profiles, audio values and cleanup. `AudioEngine` retains its compatibility method and all higher-level drone lifecycle decisions. This changes ownership only.
+- CP-MOD-052 extracts frequency-only Shot and guided cue audio lifecycles with app state injected explicitly. Public AudioEngine method names and live-session routing remain stable. No audible or performance benefit is implied.
+- CP-MOD-053 extracts chakra/HRIM and sleep drone startup, preserving all exact frequency and support-oscillator behavior. AudioEngine retains its stable methods and all drone shutdown state. This is ownership/testing work only.
+- CP-MOD-054 extracts drone stop/fade cleanup while preserving the AudioEngine compatibility API and its original source retirement order. This is lifecycle ownership work only.
+- CP-MOD-055 extracts mantra play/stop orchestration, retaining AudioEngine compatibility adapters and background music policy. Cancellation, fade, reverb and cached decode behavior are preserved. Ownership/testability only.
+- CP-MOD-056 extracts background music loop start/stop with AudioEngine adapters, preserving decoded buffer reuse, live-loop continuity, delayed restart retirement, echo setup order and stop-tail cleanup. Ownership/testability only.
+- CP-MOD-057 extracts background-music fades, gain role preservation, stage ducking, mantra mute/restore, reverb-tail gating and timer cancellation behind stable AudioEngine adapters. Eager/offline delivery and behavior are preserved; ownership/testability only.
+- CP-MOD-058 extracts music-echo preset selection and its 250 ms AudioParam ramps behind the existing AudioEngine method. Preset values, invalid-mode fallback, convolver tail lifecycle and eager/offline availability remain unchanged; ownership/testability only.
+- CP-MOD-059 extracts optional Arrival and Emergence orchestration behind app adapters; the standard journey graph, cue frequencies/timings, localized narration source, No Frequency pacing and stop guards remain unchanged. Eager/offline delivery; ownership/testability only.
+- CP-MOD-060 extracts the opening/Gratitude stage behind an app adapter. Existing safety narration, Moon/Returning choice, optional private intention and HRIM-specific opening remain unchanged; ownership/testability only.
+- CP-MOD-061 extracts language/custom source selection, same-language cache reuse, fetch and script validation behind an app adapter. App cache state is committed before validation as before; validation context timing, failure text and startup ordering remain unchanged. Eager/offline delivery; ownership/testability only.
 
 <a id="startup"></a>
 
@@ -209,7 +234,7 @@ flowchart TD
 
 Loading order and optional browser capabilities.
 
-Sources: [app.js:946](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:946), [app.js:3394](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3394), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
+Sources: [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:3526](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3526), [app.js:3731](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3731), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
 
 ```mermaid
 flowchart TD
@@ -250,7 +275,7 @@ flowchart TD
 | Register service worker | Registration is inside a window load listener added after awaited startup work. Registration timing deserves verification. |
 | Hide splash | 2.5-second delay begins after async initialization reaches its end. |
 
-- Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. This does not establish complete offline readiness.
+- Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. The small practice loader is eager, but its seven guided-practice scripts are not parsed until selected on Begin; see Mode Selection and the modularization map. This does not establish complete offline readiness.
 
 <a id="cosmic-theme-planned"></a>
 
@@ -308,9 +333,9 @@ flowchart TD
 
 ## Mode selection and start routing
 
-Mutual exclusion, validation, and dispatch priority.
+Mutual exclusion, validation, selected practice loading, and dispatch priority.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [app.js:5633](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5633), [app.js:7940](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7940), [app.js:7963](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7963).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/journey-preparation-selection.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-preparation-selection.js:1), [tests/journey-preparation-selection.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-preparation-selection.test.mjs:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:4450](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4450), [app.js:4918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4918), [app.js:4941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4941), [modules/journey-content-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-content-loader.js:1), [tests/journey-content-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-content-loader.test.mjs:1).
 
 ```mermaid
 flowchart TD
@@ -320,6 +345,7 @@ flowchart TD
   shots["Enable Shots?"]
   sleepgate["Enable Sleep?"]
   begin["Press Begin"]
+  preload["Preload selected practices"]
   shot["Shots"]
   music["Music Only"]
   sleep["Sleep"]
@@ -334,11 +360,15 @@ flowchart TD
   care -->|"Ready"| begin
   shots -->|"Accepted"| begin
   sleepgate -->|"Enabled"| begin
+  begin -->|"Valid + practices selected"| preload
   begin -->|"1 · Shots"| shot
   begin -->|"2 · Music"| music
   begin -->|"3 · Sleep"| sleep
   begin -->|"4 · Standalone"| focused
   begin -->|"5 · Guided / add-ons"| guided
+  preload -->|"Scripts ready"| focused
+  preload -->|"Scripts ready"| guided
+  preload -->|"Load failed · retry"| lobby
   focused -->|"Valid"| start
   guided -->|"Valid"| start
 ```
@@ -351,6 +381,7 @@ flowchart TD
 | Enable Shots? | Hidden and disabled until the shared seven-tap-and-password unlock. No Frequency still blocks it. Confirmation is required; cancel restores normal mode and Shots clear all journey add-ons. |
 | Enable Sleep? | Hidden and disabled until the shared seven-tap-and-password unlock. Relock clears it; direct locked start is rejected. |
 | Press Begin | Actual dispatcher tests Shots first; then derives Sleep and focused experience. |
+| Preload selected practices | After start validation, only checked preparation/integration practices are loaded before video or audio startup. No selected practice means no practice script request. A load error is localized, leaves the session unstarted, and allows retry. |
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
 | Sleep | Load and validate five stages; start silent narration-free journey. |
@@ -358,7 +389,7 @@ flowchart TD
 | Guided meditation | HRIM bypasses chakra selection; standard requires chakras unless a standalone preparation practice is selected. |
 | Shared guided start | DND reminder, scripts, validation, audio, Piper warmup, wake lock, timers, selected routine. |
 
-- Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose.
+- Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose. Selected guided-practice scripts load only after Begin validation and before an optional video/audio start; failed loading returns to the Lobby before a session starts.
 
 <a id="standard"></a>
 
@@ -366,7 +397,7 @@ flowchart TD
 
 Selected chakras in Root → Crown order; returning, newcomer and demo branches included.
 
-Sources: [app.js:4429](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4429), [app.js:4740](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4740), [app.js:4769](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4769), [app.js:5585](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5585), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448).
+Sources: [modules/journey-hypnosis-wrapper.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-hypnosis-wrapper.js:1), [tests/journey-hypnosis-wrapper.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-hypnosis-wrapper.test.mjs:1), [modules/journey-opening-stage.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-opening-stage.js:1), [tests/journey-opening-stage.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-opening-stage.test.mjs:1), [app.js:1709](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1709), [app.js:1724](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1724), [app.js:1728](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1728), [app.js:1732](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1732), [app.js:1736](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1736), [app.js:2245](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2245), [app.js:3246](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3246), [app.js:3557](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3557), [app.js:3586](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3586), [app.js:4402](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4402), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448), [modules/journey-content-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-content-loader.js:1), [tests/journey-content-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-content-loader.test.mjs:1).
 
 ```mermaid
 flowchart TD
@@ -407,7 +438,7 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Press Begin | First validate a normal journey has one or more chakras selected; reject immediately if not. If valid and the persisted Lobby Video Introduction option is selected, play the explicit video introduction; otherwise continue directly. Remaining mode-specific guards and first-time eligibility run in the dispatcher after the optional prelude. |
-| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration has fixed English chakra names and leader lines embedded in the artwork. Its separate language-specific names, locations and curved arrowheads remain responsive but are deliberately faded to supporting guidance. A ResizeObserver geometry pass measures the rendered image and label boxes, then draws each arrowhead to normalized coordinates for the matching marker after image load and resize. Its spoken orientation follows the Meditation Language before Arriving. |
+| Newcomer orientation | Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration has fixed English chakra names and leader lines embedded in the artwork. Its separate language-specific names, locations and curved arrowheads remain responsive but are deliberately faded to supporting guidance. `modules/newcomer-marker-layout.js` owns the ResizeObserver/image-load measurements, normalized anchors, coalesced frame updates and listener/observer cleanup; the spoken orientation follows the Meditation Language before Arriving. |
 | Audio + warmup | Background music starts silently; optional ambience; Piper warms during Arriving; wake lock requested. |
 | Arriving countdown | Configured 10–300 seconds, default 60. Music entry uses 20% of the selected period capped at 3s (10s → 2s); the settling timer remains unchanged. |
 | Preparation | Initial settle → pre-practice guidance. In English, Malayalam, Hindi and Russian: Sacral includes wholesome fun and everyday happiness; Solar frames a kind, realistic deep-work period; Third Eye includes concentration, attention management, intelligence as an ordinary learning skill, and unforced deep work. These are reflective practices, not outcome guarantees. |
@@ -422,6 +453,9 @@ flowchart TD
 | Completion | Stop audio / visuals, update stats and show completion choices. |
 
 - Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps. Returning Journey is an explicit preference, not a record of prior sessions.
+- CP-MOD-059 moves the optional 432/528 Hz Arrival cues and Emergence sequence into `modules/journey-hypnosis-wrapper.js`. This is source ownership only: the standard journey order, wrapper eligibility, narration, pause timing, No Frequency quiet gaps and stop checks remain as mapped; no journey or performance change is claimed.
+- CP-MOD-060 moves the existing shared guided-opening/Gratitude stage into `modules/journey-opening-stage.js`; preparation safety, optional Moon/Returning opening, Gratitude, private-intention narration, HRIM routing and Arrival readiness retain their prior order and guards. This is source ownership only.
+- CP-MOD-061 moves the existing start-time content source and validation work behind `modules/journey-content-loader.js`; custom/default selection, same-language reuse, cache-before-validation order, validation context timing and failure exits remain unchanged. Source ownership only.
 
 <a id="chakra"></a>
 
@@ -429,7 +463,7 @@ flowchart TD
 
 Narration, audio handoff, bounded exposure, and loop transitions.
 
-Sources: [app.js:5550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5550), [app.js:2712](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2712), [app.js:4242](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4242), [app.js:20](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:20).
+Sources: [app.js:4367](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4367), [modules/ambient-particle-field.js:136](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:136), [app.js:3059](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3059), [app.js:20](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:20).
 
 ```mermaid
 flowchart TD
@@ -477,7 +511,7 @@ flowchart TD
 
 A dedicated high-energy journey using one stage.
 
-Sources: [app.js:4620](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4620), [app.js:4788](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4788), [app.js:5531](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5531).
+Sources: [app.js:3437](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3437), [app.js:3605](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3605), [app.js:4348](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4348).
 
 ```mermaid
 flowchart TD
@@ -514,7 +548,7 @@ flowchart TD
 
 Two independent narration-free experiences.
 
-Sources: [app.js:4344](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4344), [app.js:5057](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5057), [app.js:2496](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2496), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1).
+Sources: [app.js:3161](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3161), [app.js:3874](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3874), [app.js:2329](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2329), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1).
 
 ```mermaid
 flowchart TD
@@ -559,7 +593,7 @@ flowchart TD
 
 Standalone practices launched through shared guided startup.
 
-Sources: [app.js:4626](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4626), [app.js:4844](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4844), [app.js:5459](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5459).
+Sources: [app.js:3443](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3443), [app.js:3661](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3661), [app.js:4276](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4276).
 
 ```mermaid
 flowchart TD
@@ -602,7 +636,7 @@ flowchart TD
 
 Advanced Features-gated rest, bathing and selected poses.
 
-Sources: [app.js:5129](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5129), [app.js:7400](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7400), [app.js:8146](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:8146), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
+Sources: [app.js:3927](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3927), [app.js:3957](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3957), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
 
 ```mermaid
 flowchart TD
@@ -652,7 +686,7 @@ flowchart TD
 
 All seven nonempty combinations follow this ordered composition.
 
-Sources: [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app.js:5615](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5615).
+Sources: [app.js:4550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4550), [app.js:4432](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4432).
 
 ```mermaid
 flowchart TD
@@ -700,7 +734,7 @@ flowchart TD
 
 Six types, confirmation, frequency validation, and distinct finish behavior.
 
-Sources: [app.js:4561](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4561), [app.js:6872](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6872), [app.js:7117](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7117), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
+Sources: [app.js:3378](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3378), [app.js:4976](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4976), [app.js:4978](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4978), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
 
 ```mermaid
 flowchart TD
@@ -746,7 +780,7 @@ flowchart TD
 
 Isolated activities and return behavior.
 
-Sources: [app.js:4716](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4716), [app.js:7481](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7481), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
+Sources: [app.js:2149](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2149), [app.js:3533](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3533), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
 
 ```mermaid
 flowchart TD
@@ -787,9 +821,9 @@ flowchart TD
 
 ## Ordered Chakra Journey add-ons
 
-Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
+Box → Visualization → Dharana → Body Scan → Guided Noting → chakras; the same selected route drives its displayed estimate and countdown.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [app.js:4772](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4772), [app.js:4908](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4908), [app.js:5180](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5180), [app.js:5389](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5389), [app.js:5443](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5443), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/journey-opening-stage.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-opening-stage.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [app.js:2231](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2231), [app.js:3857](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3857), [app.js:4941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4941), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
 
 ```mermaid
 flowchart TD
@@ -810,7 +844,72 @@ flowchart TD
 | Integration add-ons | After the final chakra, optional Ho’oponopono runs first, then optional Undo & Unlearn, before silence, Closing and Emergence. Undo & Unlearn offers 5/8/12 minutes and never asks the meditator to identify, recall, speak, type or mentally answer anything. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
 
-- Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Body Scan execution lives in `modules/body-scan-practice.js`; the controller injects localized narration and existing screen/audio/session services. Other stage implementations remain in the controller. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages.
+- Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Box Breathing execution lives in `modules/box-breathing-practice.js`; Visualization blackout/audio/narration/return timing in `modules/visualization-practice.js`; Ho’oponopono phrase-cycle timing and visual setup in `modules/hooponopono-practice.js`; Undo & Unlearn phase/scene lifecycle in `modules/undo-unlearn-practice.js`; Dharana in `modules/dharana-practice.js`; Body Scan in `modules/body-scan-practice.js`; Guided Noting in `modules/guided-noting-practice.js`. The controller supplies localized narration, timing and existing screen/audio/session services. Box Breathing preserves its four-step/four-cycle order, 100 ms pause accounting and music fades. Visualization preserves optional ambience/error fallback, ducked narration, waits, selected duration, silence wake prompt, return-screen fades, ambience stop and music restoration. Ho’oponopono preserves the three four-phrase cycles, configured pauses and closing fade handoff; journey placement remains after the chakra sequence. Undo & Unlearn preserves the selected duration, translated content-free phases and active-session guards, and always hides the scene/releases body mode even if its fade wait rejects. The Lobby estimate owner preserves mode priority, timing/default inputs and the standard add-on formula while app.js refreshes its text and roadmap. Dharana preserves selected anchor shape/color, duration-based CSS timing plus an active-session shrink clock for reduced-motion mode, the four-second narrated release and cleanup. Guided Noting preserves its selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages.
+
+<a id="journey-roadmap"></a>
+
+## Lobby journey roadmap
+
+Localized, display-only summary of the currently selected Lobby route.
+
+Sources: [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [app.js:726](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:726).
+
+```mermaid
+flowchart TD
+  refresh["Refresh preview"]
+  priority["Resolve current route"]
+  music["Music Only"]
+  care["Intimate Service"]
+  yoga["Yoga"]
+  sleep["Sleep"]
+  hrim["HRIM"]
+  standalone["Standalone preparation"]
+  guided["Standard guided journey"]
+  video["Optional introduction"]
+  render["Render"]
+  noTarget["Roadmap unavailable"]
+  refresh -->|"Read current state"| priority
+  priority -->|"Music Only"| music
+  priority -->|"Care selection"| care
+  priority -->|"Yoga selected"| yoga
+  priority -->|"Sleep selected"| sleep
+  priority -->|"HRIM selected"| hrim
+  priority -->|"No chakras + selected practice"| standalone
+  priority -->|"Fallback / chakra selection"| guided
+  music -->|"Video enabled"| video
+  care -->|"Video enabled"| video
+  yoga -->|"Video enabled"| video
+  sleep -->|"Video enabled"| video
+  hrim -->|"Video enabled"| video
+  standalone -->|"Video enabled"| video
+  guided -->|"Video enabled"| video
+  music -->|"Video off"| render
+  care -->|"Video off"| render
+  yoga -->|"Video off"| render
+  sleep -->|"Video off"| render
+  hrim -->|"Video off"| render
+  standalone -->|"Video off"| render
+  guided -->|"Video off"| render
+  video -->|"Prefix label"| render
+  render -->|"No element"| noTarget
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Refresh preview | Lobby mode, add-on, chakra, returning-journey or video-prelude changes request a label recalculation. The preview itself never starts a journey or saves selections. |
+| Resolve current route | Music Only → any Intimate Service choice → Yoga → Sleep → HRIM → standalone preparation when no chakras are selected and at least one standalone practice is chosen → standard chakra path. |
+| Music Only | One Music Only label. |
+| Intimate Service | Only selected care stages, preserving Perineal Care → Massage → Assisted Bathing label order. |
+| Yoga | Optional Corpse Pose → optional Bath → Rest Before Yoga → Yoga. |
+| Sleep | Sleep → Drowsiness → Light Sleep → True Sleep → Deep Sleep → REM Rest. |
+| HRIM | Intention → HRIM → Closing. |
+| Standalone preparation | Box → Visualization → Focused Attention → Body Scan → Guided Noting → Ho’oponopono → Undo & Unlearn; only selected stages are included. |
+| Standard guided journey | Arrival or Returning → Intention → Chakras, with selected preparation labels inserted in their established order and optional integration stages before Closing. |
+| Optional introduction | When the Lobby video preference is enabled, prepend the translated Video Introduction label; this preview label does not play the video. |
+| Render | Resolve every label through the current display-language translator and join with the existing » separator. |
+| Roadmap unavailable | If the preview element is absent, return without changing anything. |
+
+- The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility.
 
 <a id="controls"></a>
 
@@ -818,7 +917,7 @@ flowchart TD
 
 Shared interaction and cancellation behavior.
 
-Sources: [app.js:3778](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3778), [app.js:3831](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3831), [app.js:3850](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3850).
+Sources: [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/session-countdown.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-countdown.js:1), [tests/session-countdown.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-countdown.test.mjs:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:2595](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2595), [app.js:2648](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2648), [app.js:2667](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2667).
 
 ```mermaid
 flowchart TD
@@ -866,7 +965,7 @@ flowchart TD
 
 An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
 
-Sources: [app.js:3778](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3778), [app.js:3831](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3831), [app.js:62](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:62).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:3425](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3425), [app.js:4918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4918), [app.js:4941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4941), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -901,7 +1000,7 @@ flowchart TD
 | Unavailable video | Missing media, preparation failure, media error or rejected play: unavailable result; error path fades 1.2 seconds. |
 | Begin journey | Continue through the current Lobby mode selection exactly once. Restart bypasses this optional prelude and relaunches directly. |
 
-- No skip control and no automatic fullscreen. A buffer countdown reports seconds of media still needed, not a measured wall-clock download ETA. Settings audio preview is separate: play 8 seconds, fade and reset without starting a journey.
+- No skip control and no automatic fullscreen. The video URL is absent at initial page load and attached only when this opted-in introduction starts. A buffer countdown reports seconds of media still needed, not a measured wall-clock download ETA. Settings audio preview is separate and also opts into loading the video: play 8 seconds, fade and reset without starting a journey.
 
 <a id="completion"></a>
 
@@ -909,7 +1008,7 @@ flowchart TD
 
 Different end states are intentionally visible here.
 
-Sources: [app.js:5840](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5840), [app.js:550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:550), [index.html:659](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:659).
+Sources: [app.js:4658](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4658), [app.js:550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:550), [index.html:659](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:659).
 
 ```mermaid
 flowchart TD
@@ -946,7 +1045,7 @@ flowchart TD
 
 Content selection, validation, fallback and demo behavior.
 
-Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:7176](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7176), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
+Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:4507](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4507), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
 
 ```mermaid
 flowchart TD
@@ -979,7 +1078,7 @@ flowchart TD
 | Demo metadata? | Recognized demo bundle applies demo timing preset; switching away restores earlier core duration. |
 | Start-time validation | Shared guided start validates sections needed for selected practice; custom allows language fallback. |
 | Resolve narration | Meditation language → configured fallback language → English / available localized value. Custom system overrides are optional. |
-| Resolve UI labels | Settings/Lobby use display language; journey labels and sky names use meditation language. |
+| Resolve UI labels | Settings/Lobby labels, placeholders and accessibility names are painted by the locale UI renderer in display language; journey labels and sky names retain their existing language owners. |
 | Resolve voice | Matching browser voice or supported configured Piper voice; Hindi has no default Piper voice. |
 | Timing layers | Built-in defaults → timing-config → optional named query profile → saved preferences; demo changes selected core duration. |
 
@@ -991,7 +1090,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [app.js:5401](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5401), [app.js:6092](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6092), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [app.js:4218](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4218), [app.js:4937](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4937), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
 
 ```mermaid
 flowchart TD
@@ -1041,7 +1140,7 @@ flowchart TD
 
 Logical buses; shared filters are expanded in selected-node details.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [app.js:59](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:59), [app.js:1047](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1047), [app.js:2150](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2150), [app.js:2276](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2276), [app.js:2627](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2627).
+Sources: [modules/audio-engine-initialization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-engine-initialization.js:1), [modules/audio-signal-design.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-signal-design.js:1), [modules/audio-spatial-geometry.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-spatial-geometry.js:1), [modules/audio-elemental-layer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-elemental-layer.js:1), [modules/audio-tone-playback.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-tone-playback.js:1), [modules/audio-drone-start.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-drone-start.js:1), [modules/audio-drone-stop.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-drone-stop.js:1), [modules/audio-mantra-playback.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-mantra-playback.js:1), [modules/audio-background-music-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-background-music-lifecycle.js:1), [modules/audio-background-music-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-background-music-controls.js:1), [modules/audio-music-echo.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-music-echo.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [app.js:39](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:39), [app.js:896](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:896), [app.js:963](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:963), [app.js:1086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1086), [app.js:1124](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1124), [app.js:1142](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1142), [app.js:997](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:997), [app.js:1408](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1408).
 
 ```mermaid
 flowchart TD
@@ -1076,6 +1175,17 @@ flowchart TD
 | Browser speech | Separate speechSynthesis output; not processed by the shared Web Audio graph. |
 
 - Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Native loops do not depend on JavaScript timers and keep one source per layer; prepared overlap PCM is reused by original buffer and overlap length via WeakMap. Overlap remains bounded to half the buffer. Source cleanup follows audio time through pause and explicit exit fades. Elemental exit stops both noise and its modulator; source end disconnects filters and modulation gains. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. PCM/mock tests do not establish device audibility, lack of silence inside recordings, or uninterrupted playback if the OS suspends audio.
+- CP-MOD-048 moves only the one-time Web Audio graph construction into `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the stable adapter and runtime source/effect lifecycles stay with the existing owners. The graph and settings are unchanged; mock-node tests are not device listening evidence.
+- CP-MOD-049 moves the existing distortion curve and impulse/noise buffer generation helpers into `modules/audio-signal-design.js`; AudioEngine helper adapters preserve call order and cached-noise lifetime. No sound or performance change is claimed.
+- CP-MOD-050 moves only panner creation and generic position interpolation into `modules/audio-spatial-geometry.js`; AudioEngine retains adapters and mode-specific spatial profiles. No spatial behavior or performance change is claimed.
+- CP-MOD-051 moves elemental noise-bed node creation and cleanup into `modules/audio-elemental-layer.js`; `startElementalLayer()` remains the AudioEngine adapter and cached-noise ownership stays unchanged. No audio/performance change is claimed.
+- CP-MOD-052 moves generated Shot and guided transition-tone oscillator lifecycles into `modules/audio-tone-playback.js`; the AudioEngine compatibility methods, frequency guards and fade envelopes remain. No audio/performance change is claimed.
+- CP-MOD-053 moves chakra/HRIM and sleep drone generation into `modules/audio-drone-start.js`; the public AudioEngine methods and shutdown owner remain stable. Preserve No Frequency guards and existing binaural/drone envelopes; no audio or performance change is claimed.
+- CP-MOD-054 moves binaural and drone stop/fade cleanup into `modules/audio-drone-stop.js`; public AudioEngine methods remain adapters, including pre-context reset and AudioParam discrimination. No audio/performance improvement is claimed.
+- CP-MOD-055 moves recorded mantra startup/stop orchestration into `modules/audio-mantra-playback.js`; AudioEngine keeps compatibility methods and music bus/profile policy. Async decode cancellation, reverb tails, transitions, and restoration semantics remain explicit. No audible or performance improvement is claimed.
+- CP-MOD-056 moves background music loop startup/retirement into `modules/audio-background-music-lifecycle.js`; gain/duck/restore and echo policy remain app-owned. Buffer caching, restart waits and fade/tail timing are preserved. No audio/performance benefit is claimed.
+- CP-MOD-057 moves background music fade/gain/duck/mute/restore and timer cancellation into `modules/audio-background-music-controls.js`; AudioEngine keeps stable methods, echo profile selection and bus ownership. Zero-volume, stage window, slider-role, mantra suppression and tail-gate behavior are preserved. No audio/performance benefit is claimed.
+- CP-MOD-058 moves music-echo preset resolution and parameter ramps into `modules/audio-music-echo.js`; AudioEngine keeps the stable adapter, graph ownership, voice echo and settings persistence. Profile values, invalid-mode fallback, 250 ms ramps and reverb tail timing are preserved. No audio/performance benefit is claimed.
 
 <a id="sound-options"></a>
 
@@ -1083,7 +1193,7 @@ flowchart TD
 
 What changes when sound settings are toggled.
 
-Sources: [app.js:7358](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7358), [app.js:2891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2891), [app.js:3008](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3008), [app.js:2253](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2253).
+Sources: [modules/audio-volume-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-volume-settings-view.js:1), [tests/audio-volume-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-volume-settings-view.test.mjs:1), [modules/audio-effects-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-effects-settings-view.js:1), [tests/audio-effects-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-effects-settings-view.test.mjs:1), [app.js:4719](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4719), [modules/ambient-particle-field.js:315](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:315), [modules/ambient-particle-field.js:432](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:432), [app.js:2086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2086).
 
 ```mermaid
 flowchart TD
@@ -1108,7 +1218,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Settings / Journey Tuning | Shared suppression settings, volume controls and comfort controls. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
+| Settings / Journey Tuning | Shared suppression settings, voice tuning/pace, echo, spatial mode, voice presets, live paired volume sliders, and comfort controls. `audio-effects-settings-view.js` owns setting interactions; `audio-volume-settings-view.js` synchronizes persisted levels and updates existing audio gains. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
 | No Frequency ON | Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
@@ -1126,7 +1236,7 @@ flowchart TD
 
 Natural sky, chakra imagery, immersion and optional capabilities.
 
-Sources: [app.js:3394](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3394), [sky-astronomy.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sky-astronomy.js:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/ambient-particle-field.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:1), [modules/visual-engine.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visual-engine.js:1), [sky-astronomy.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sky-astronomy.js:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
 
 ```mermaid
 flowchart TD
@@ -1177,7 +1287,7 @@ flowchart TD
 
 A permanent centered observer anchor below the horizon.
 
-Sources: [app.js:3635](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3635), [app.js:3754](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3754), [app.js:3787](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3787), [app.js:3822](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3822).
+Sources: [modules/ambient-particle-field.js:162](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:162), [modules/ambient-particle-field.js:195](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:195), [modules/ambient-particle-field.js:230](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:230).
 
 ```mermaid
 flowchart TD
@@ -1209,7 +1319,7 @@ flowchart TD
 
 A visual-only warm containment layer surrounding the daytime Sun.
 
-Sources: [app.js:3662](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3662), [app.js:3845](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3845).
+Sources: [modules/ambient-particle-field.js:70](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:70), [modules/ambient-particle-field.js:253](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:253).
 
 ```mermaid
 flowchart TD
@@ -1234,7 +1344,7 @@ flowchart TD
 
 Local state and the actual service-worker request routing.
 
-Sources: [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:6748](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6748), [app.js:7073](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7073), [app.js:7186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7186), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
+Sources: [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/ambient-particle-field.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:1), [modules/visual-engine.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visual-engine.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:4538](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4538), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
 
 ```mermaid
 flowchart TD
@@ -1269,9 +1379,9 @@ flowchart TD
 | Optional ambience | Manifest and matching pleasure files use network no-store, despite manifest appearing in precache. |
 | Piper / language | Cache-first, fetch on miss, cache successful response. Piper recognizes local assets and Hugging Face voice URLs. |
 | Other requests | Exact caches.match(request), otherwise network; ordinary misses are not added to cache. |
-| Offline outcome | Only matching cached requests can work offline. Timestamped content and versioned shell requests may miss unversioned precache entries. |
+| Offline outcome | Only matching cached requests can work offline. App/CSS shell URLs, eager journey, sky and visual owner modules and all seven selected-practice script URLs match their exact precache requests. A selected practice can therefore load offline after selection. If a required script is not cached, the app stays on the Lobby and gives a localized retry message. The optional 7.3 MB video is not precached; its URL is not attached until explicit preview or opted-in introduction. Offline playback therefore follows the existing unavailable-video fallback. |
 
-- Video is not precached. Browsing tests disable service workers. Offline startup and upgrades are verification priorities; the PWA label alone does not prove offline journey operation.
+- CP-MOD-037 verifies service-worker-controlled cold/warm/offline reloads; CP-MOD-038 verifies one selected preparation module loads from the precache while offline; CP-MOD-039 verifies the optional video is not requested initially and is not precached. No full audio-session/device operation is claimed.
 
 <a id="recovery"></a>
 
@@ -1279,7 +1389,7 @@ flowchart TD
 
 Implemented fallback destinations and open verification areas.
 
-Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [app.js:3463](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3463), [app.js:3477](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3477), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -1387,13 +1497,311 @@ flowchart TD
 
 - Caveman Mode is deliberately primitive: smallest context, one direct agent, no sub-agents and the smallest deterministic check. A worktree consumes disk space, not model tokens. Effective savings come from bounded AST neighborhoods, unified diffs, fresh sessions, targeted checks, one owner and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order.
 
+<a id="locale-ui-renderer"></a>
+
+## Display-language UI renderer
+
+Paints current display-language labels without owning language selection, sky redraws, journey routing or settings persistence.
+
+Sources: [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:734](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:734).
+
+```mermaid
+flowchart TD
+  language["Language change"]
+  paint["Paint UI"]
+  fallback["Stale locale bundle"]
+  summaries["Refresh previews"]
+  language -->|"Current locale"| paint
+  paint -->|"Missing translation"| fallback
+  paint -->|"Text pass completes"| summaries
+  fallback -->|"Fallback retained"| summaries
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Language change | App selects display language and updates the document language; before rendering, it refreshes sky location/celestial labels and invalidates the cached celestial label layer. |
+| Paint UI | Update title, app labels, group labels, session-stat captions, placeholders, data-i18n text, ARIA labels and text nodes attached to selectable controls. |
+| Stale locale bundle | If a key is missing and lookup returns the key itself, preserve the readable HTML fallback for ordinary data-i18n elements. |
+| Refresh previews | After label painting, call the existing roadmap refresh first, then the drone-duration summary refresh. Both remain app-owned. |
+
+- The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module.
+
+<a id="timing-configuration"></a>
+
+## Timing configuration and saved values
+
+The ordered setup path for timing-config.json, named profiles, slider bounds, persisted durations and duration-control event handling.
+
+Sources: [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [modules/timing-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings-view.js:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [tests/timing-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings-view.test.mjs:1), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1), [app.js:514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:514), [app.js:4437](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4437), [app.js:4556](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4556).
+
+```mermaid
+flowchart TD
+  fetch["Load configuration"]
+  profile["Apply optional profile"]
+  bounds["Apply range bounds"]
+  preferences["Resolve saved practice time"]
+  demo["Apply demo preset"]
+  fetch -->|"Fetch succeeds"| profile
+  fetch -->|"Fetch falls back"| bounds
+  profile -->|"Optional named profile"| bounds
+  bounds -->|"Controls updated"| preferences
+  preferences -->|"Apply final demo override"| demo
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Load configuration | Fetch timing-config.json; on an unavailable response, retain the built-in empty config and warn once. |
+| Apply optional profile | If the timingProfile query value names an available profile, shallow-merge journey/transitions/narration/estimate sections and report the selected profile. |
+| Apply range bounds | Update configured min/max/step for the mapped Settings controls, then enhance shared range controls. |
+| Resolve saved practice time | If the existing localStorage key is absent, use the configured default or built-in fallback. Preserve stored values where present, then clamp against the active configured bounds and persist a changed clamp. |
+| Apply demo preset | Only after timingConfig has been assigned and preferences are normalized, run the existing demo core-duration preset callback. |
+
+- The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization.
+- CP-MOD-066 moves the seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; integer parsing, state/display/storage/estimate order and attachment positions are preserved. Mode-sensitive chakra/Sleep/Shot duration and High Energy controls remain app-owned.
+
+<a id="journey-voice-profile"></a>
+
+## Automatic journey voice profile
+
+Chooses and applies the established voice profile at journey start.
+
+Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:4993](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4993).
+
+```mermaid
+flowchart TD
+  start["Select route"]
+  values["Apply existing tuning"]
+  persist["Persist voice tuning"]
+  controls["Synchronize mixer"]
+  audio["Apply audio engine tuning"]
+  start -->|"Selected profile"| values
+  values -->|"Profile assigned"| persist
+  persist -->|"Values saved"| controls
+  controls -->|"Controls synchronized"| audio
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Select route | High Energy uses the balanced profile. Other journeys use Shringara only when the app identifies a feminine narration voice; otherwise use soft. |
+| Apply existing tuning | Update clarity, warmth, pace and voice echo using the unchanged profile values. |
+| Persist voice tuning | Write the existing chakra_voice_* values. |
+| Synchronize mixer | Refresh voice sliders, music echo and both spatial-mode controls; activate the selected preset button. |
+| Apply audio engine tuning | Set voice warmth/clarity and voice echo when the corresponding audio methods are available. |
+
+- Voice/gender detection and journey dispatch remain app-owned. The module is eager classic-script code and offline-pre-cached. This is an ownership extraction only; no audio-quality, device, or performance improvement is claimed.
+
+<a id="session-mode-hydration"></a>
+
+## Session-only journey-mode hydration
+
+App-load behavior for session-only mode controls and retired selection keys.
+
+Sources: [modules/session-mode-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-mode-hydration.js:1), [tests/session-mode-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-mode-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  startup["Startup"]
+  prep["Reset preparation choices"]
+  preferences["Restore saved preferences"]
+  modes["Reset exclusive modes"]
+  yoga["Restore Yoga setup"]
+  startup -->|"App initialization"| prep
+  prep -->|"Established sequence"| preferences
+  preferences -->|"Persistent controls restored"| modes
+  modes -->|"Exclusive modes reset"| yoga
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Startup | Enter loadPreferences and apply the existing ordered setup. |
+| Reset preparation choices | Clear retired reverse/Box Breathing/Ho’oponopono keys and uncheck those preparation selections. |
+| Restore saved preferences | Persistent language, timing, audio and care setup remain app-owned and are still restored. |
+| Reset exclusive modes | Clear retired Music Only/High Energy/Sleep keys and turn those session-only toggles off. |
+| Restore Yoga setup | Keep persisted Corpse Pose, Bath, pose and care setup. Do not restore the session-only Yoga mode toggle. |
+
+- Only the retired mode keys listed in code are removed. No stored configuration or in-progress journey is restored/cleared by this owner. It remains synchronous, eager and offline-pre-cached.
+
+<a id="mixer-preference-hydration"></a>
+
+## Mixer preference control hydration
+
+Copies already-loaded preference state into audio and ambience controls in established order.
+
+Sources: [modules/mixer-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-preference-hydration.js:1), [tests/mixer-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-preference-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  mixer["Lobby mixer controls"]
+  tuning["Voice and spatial controls"]
+  settings["Settings mirrors"]
+  state -->|"Existing state ready"| mixer
+  mixer -->|"Mixer controls in order"| tuning
+  tuning -->|"Voice controls in order"| settings
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the sole owner of stored mixer values and calls this renderer during loadPreferences. |
+| Lobby mixer controls | Hydrate voice, drone, bell, mantra, music, video, visualization ambience and ambience selection controls. |
+| Voice and spatial controls | Hydrate clarity, warmth, pace, voice/music echo and both spatial-mode controls. |
+| Settings mirrors | Hydrate the five duplicate Settings volume controls using the same values. |
+
+- Preserve all 19 ordered control/state pairs and duplicate mirrors. The app retains persistence, the value-sync helper and audio behavior. This eager mapping is not a performance optimization.
+
+<a id="journey-selection-hydration"></a>
+
+## Journey selection preference hydration
+
+Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.
+
+Sources: [modules/journey-selection-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-selection-hydration.js:1), [tests/journey-selection-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-selection-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  state["Read app selection state"]
+  chakra["Restore selected chakras"]
+  intention["Restore intention"]
+  toggles["Restore journey controls"]
+  continue["Continue preference hydration"]
+  state -->|"Preferences loaded"| chakra
+  chakra -->|"Checkboxes restored"| intention
+  intention -->|"Value restored"| toggles
+  toggles -->|"Display state ready"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Read app selection state | Read selected chakras, intention, returning journey, video prelude and audio-filter preference from app-owned state. |
+| Restore selected chakras | Mark only the matching Chakra-selection inputs checked. |
+| Restore intention | Keep the saved intention; when blank/whitespace, use the existing app default intention. |
+| Restore journey controls | Synchronize returning journey, optional video prelude and audio filters. |
+| Continue preference hydration | Frequency, session-only mode reset, Beginner/Advanced gating, and Begin validation remain with the app. |
+
+- This is display hydration only; it does not change settings persistence, selected-chakra validation, journey eligibility or dispatch. It loads eagerly and is offline-pre-cached, not a performance optimization.
+
+<a id="timing-preference-hydration"></a>
+
+## Timing preference control hydration
+
+Restores timing slider values and their associated display labels without owning timing configuration.
+
+Sources: [modules/timing-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-preference-hydration.js:1), [tests/timing-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-preference-hydration.test.mjs:1), [app.js:3664](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3664).
+
+```mermaid
+flowchart TD
+  core["Core duration controls"]
+  drone["Drone duration controls"]
+  journey["Journey and care timing controls"]
+  remaining["Other preferences"]
+  core -->|"Core timing labels ready"| drone
+  drone -->|"Mode callback completed"| journey
+  journey -->|"Additional timing labels ready"| remaining
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Core duration controls | Set chakra and High Energy duration slider values, apply the existing percentage fill and format minute labels. |
+| Drone duration controls | App synchronizes drone duration mode and summary after core duration hydration. |
+| Journey and care timing controls | Synchronize arrival, emergence, breathing, corpse, interval, yoga prep/pose and care durations in the existing order; care labels use floored whole minutes. |
+| Other preferences | Appearance hydration owns visual-effect and brightness controls; script controls have their own map; range and voice selection remain app-owned. |
+
+- This module only paints app-owned values. Timing config resolution, storage/default/clamping, duration estimates and drone-mode selection remain in their existing owners. Eager delivery is not a performance optimization.
+
+<a id="appearance-preference-hydration"></a>
+
+## Appearance preference control hydration
+
+Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.
+
+Sources: [modules/appearance-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/appearance-preference-hydration.js:1), [tests/appearance-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/appearance-preference-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  effect["Restore visual effect"]
+  brightness["Restore brightness"]
+  continue["Continue preference hydration"]
+  state -->|"Preferences loaded"| effect
+  effect -->|"Existing effect applied"| brightness
+  brightness -->|"Display values restored"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the sole owner of saved visual effect and brightness values. |
+| Restore visual effect | Synchronize the existing effect selector, then invoke the app-owned visual effect application. |
+| Restore brightness | Synchronize the brightness control and set the existing #app brightness property. |
+| Continue preference hydration | Script selection, custom-script status and voice selection remain app-owned. |
+
+- Calls remain at their original positions in loadPreferences. The app owns saved state and the visual engine; this small module only owns display hydration. It is eager and offline-pre-cached, with no performance claim.
+
+<a id="script-preference-hydration"></a>
+
+## Script preference control hydration
+
+Restores the selected script source and updates the custom-script presentation without owning script loading.
+
+Sources: [modules/script-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/script-preference-hydration.js:1), [tests/script-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/script-preference-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  state["Loaded app state"]
+  source["Restore source selector"]
+  panel["Custom-script visibility"]
+  status["Restore status message"]
+  continue["Continue startup"]
+  state -->|"Preferences loaded"| source
+  source -->|"Source selected"| panel
+  panel -->|"Visibility applied"| status
+  status -->|"Status and panel hydrated"| continue
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded app state | The app remains the owner of script source and loaded custom-script content. |
+| Restore source selector | Synchronize the saved default/custom source choice. |
+| Custom-script visibility | Show the custom-script panel only when the saved source is custom. |
+| Restore status message | For an available custom script, retain the existing demo-timing or ready copy; if no script is loaded, leave the prior status untouched. |
+| Continue startup | Range display refresh and voice auto-selection remain in the app. |
+
+- The app injects demo-script detection and timing copy; actual script loading, validation and persistence remain app-owned. Eager and offline-pre-cached; no performance claim.
+
+<a id="care-preference-hydration"></a>
+
+## Personal-care preference control hydration
+
+Restores saved personal-care toggle values without changing session authorization or care execution.
+
+Sources: [modules/care-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/care-preference-hydration.js:1), [tests/care-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/care-preference-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+
+```mermaid
+flowchart TD
+  state["Loaded preferences"]
+  bath["Restore Bath setting"]
+  care["Restore care controls"]
+  gates["Continue startup"]
+  state -->|"Saved care state ready"| bath
+  bath -->|"Continue established order"| care
+  care -->|"Controls synchronized"| gates
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Loaded preferences | The app owns saved care state and determines when the care experience is available. |
+| Restore Bath setting | The existing Yoga settings owner restores Bath independently. |
+| Restore care controls | Copy perineal-care, assisted-bathing and massage values to their checkboxes in the existing order. |
+| Continue startup | Session-only mode reset, Advanced Features visibility and care execution remain unchanged. |
+
+- The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.
+
 <a id="settings-backup"></a>
 
 ## Settings backup and restore
 
-Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.
+Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [app.js:7620](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7620), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/settings-manager-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-manager-view.js:1), [app.js:4129](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4129), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
 ```mermaid
 flowchart TD
@@ -1427,7 +1835,7 @@ flowchart TD
 | Replace saved app settings | Remove existing chakra_ keys only, restore validated preferences including Visualization ambience choice and volume, then reload. Other site/extension storage is untouched. |
 | Show error | Invalid/missing/oversized file preserves existing settings. |
 
-- Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state.
+- Import is available without Advanced Features. This is a convenience backup, not encrypted credential storage. The browser download destination is chosen by the user/browser. Export is operator-protected; import is intentionally an explicit, destructive preferences replacement and does not restore session-only journey/Advanced Features state. `settings-manager-view.js` owns navigation and view-event wiring; `settings-backup.js` owns validation and managed storage.
 
 <a id="assessment-tournament"></a>
 
@@ -1481,7 +1889,7 @@ flowchart TD
 
 Searchable reference → prepared custom Shot → explicit activation.
 
-Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:7117](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7117).
+Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:4976](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4976).
 
 ```mermaid
 flowchart TD

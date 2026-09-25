@@ -59,10 +59,72 @@ const piperLifecycle = window.ChakraPiperLifecycle;
 if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
+const audioSignalDesign = window.ChakraAudioSignalDesign;
+if (!audioSignalDesign) throw new Error('Audio signal design module is unavailable.');
+const audioSpatialGeometry = window.ChakraAudioSpatialGeometry;
+if (!audioSpatialGeometry) throw new Error('Audio spatial geometry module is unavailable.');
+const audioElementalLayer = window.ChakraAudioElementalLayer;
+if (!audioElementalLayer) throw new Error('Audio elemental-layer module is unavailable.');
+const audioTonePlayback = window.ChakraAudioTonePlayback;
+if (!audioTonePlayback) throw new Error('Audio tone-playback module is unavailable.');
+const audioDroneStart = window.ChakraAudioDroneStart;
+if (!audioDroneStart) throw new Error('Audio drone-start module is unavailable.');
+const audioDroneStop = window.ChakraAudioDroneStop;
+if (!audioDroneStop) throw new Error('Audio drone-stop module is unavailable.');
+const audioMantraPlayback = window.ChakraAudioMantraPlayback;
+if (!audioMantraPlayback) throw new Error('Audio mantra-playback module is unavailable.');
+const audioBackgroundMusicLifecycle = window.ChakraAudioBackgroundMusicLifecycle;
+if (!audioBackgroundMusicLifecycle) throw new Error('Audio background-music lifecycle module is unavailable.');
+const audioBackgroundMusicControls = window.ChakraAudioBackgroundMusicControls;
+if (!audioBackgroundMusicControls) throw new Error('Audio background-music controls module is unavailable.');
+const audioMusicEcho = window.ChakraAudioMusicEcho;
+if (!audioMusicEcho) throw new Error('Audio music-echo module is unavailable.');
+const journeyHypnosisWrapper = window.ChakraJourneyHypnosisWrapper;
+if (!journeyHypnosisWrapper) throw new Error('Journey hypnosis-wrapper module is unavailable.');
+const journeyOpeningStage = window.ChakraJourneyOpeningStage;
+if (!journeyOpeningStage) throw new Error('Journey opening-stage module is unavailable.');
+const journeyContentLoader = window.ChakraJourneyContentLoader;
+if (!journeyContentLoader) throw new Error('Journey content-loader module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
-const bodyScanPractice = window.ChakraBodyScanPractice;
+const practiceModuleLoader = window.ChakraPracticeModuleLoader;
+const screenNavigationModule = window.ChakraScreenNavigation;
+const sessionEstimate = window.ChakraSessionEstimate;
+const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
+const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
+const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
+const yogaExperienceSettings = window.ChakraYogaExperienceSettings;
+const rangeControls = window.ChakraRangeControls;
+const journeyRoadmap = window.ChakraJourneyRoadmap;
+const localeUiRenderer = window.ChakraLocaleUiRenderer;
+const timingSettings = window.ChakraTimingSettings;
+const journeyVoiceProfile = window.ChakraJourneyVoiceProfile;
+const sessionModeHydration = window.ChakraSessionModeHydration;
+const mixerPreferenceHydration = window.ChakraMixerPreferenceHydration;
+const journeySelectionHydration = window.ChakraJourneySelectionHydration;
+const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
+const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration;
+const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
+const carePreferenceHydration = window.ChakraCarePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
-if (!bodyScanPractice) throw new Error('Body Scan practice module is unavailable.');
+if (!practiceModuleLoader) throw new Error('Guided practice module loader is unavailable.');
+if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
+if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
+if (!mixerPreferenceHydration) throw new Error('Mixer preference hydration module is unavailable.');
+if (!journeySelectionHydration) throw new Error('Journey selection hydration module is unavailable.');
+if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
+if (!appearancePreferenceHydration) throw new Error('Appearance preference hydration module is unavailable.');
+if (!scriptPreferenceHydration) throw new Error('Script preference hydration module is unavailable.');
+if (!carePreferenceHydration) throw new Error('Care preference hydration module is unavailable.');
+if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
+if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
+if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
+if (!droneDurationSettingsView) throw new Error('Drone duration settings view module is unavailable.');
+if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility module is unavailable.');
+if (!yogaExperienceSettings) throw new Error('Yoga experience settings module is unavailable.');
+if (!rangeControls) throw new Error('Range controls module is unavailable.');
+if (!journeyRoadmap) throw new Error('Journey roadmap module is unavailable.');
+if (!localeUiRenderer) throw new Error('Locale UI renderer module is unavailable.');
+if (!timingSettings) throw new Error('Timing settings module is unavailable.');
 
 function stageFadeSeconds(durationSeconds) {
     return mediaLifecycle.stageFadeSeconds(durationSeconds);
@@ -287,44 +349,22 @@ const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
 const icebreakerScreen = document.getElementById('icebreaker-screen');
 const newcomerTutorialScreen = document.getElementById('newcomer-tutorial-screen');
+const screenNavigation = screenNavigationModule.create({
+    body: document.body,
+    document,
+    window,
+    screens: [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    lobbyScreen,
+    configScreen,
+    dispatchDecorationChange: () => document.dispatchEvent(new Event('decorationchange'))
+});
 const icebreakerTimer = document.getElementById('icebreaker-timer');
 
-const NEWCOMER_MARKER_ANCHORS = Object.freeze({
-    crown: [0.5, 0.065], thirdeye: [0.5, 0.123], throat: [0.5, 0.205],
-    heart: [0.5, 0.297], solar: [0.5, 0.385], sacral: [0.5, 0.465], root: [0.5, 0.548]
+const newcomerMarkerStage = document.querySelector('.newcomer-body-map-stage');
+const newcomerMarkerLayout = new window.ChakraNewcomerMarkerLayout({
+    stage: newcomerMarkerStage,
+    svg: document.getElementById('newcomer-marker-connectors')
 });
-let newcomerConnectorFrame = null;
-function syncNewcomerMarkerConnectors() {
-    newcomerConnectorFrame = null;
-    const stage = document.querySelector('.newcomer-body-map-stage');
-    const image = stage?.querySelector('img');
-    const svg = document.getElementById('newcomer-marker-connectors');
-    if (!stage || !image || !svg || !image.complete) return;
-    const stageRect = stage.getBoundingClientRect();
-    const imageRect = image.getBoundingClientRect();
-    if (!stageRect.width || !imageRect.width) return;
-    svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
-    Object.entries(NEWCOMER_MARKER_ANCHORS).forEach(([marker, [x, y]]) => {
-        const label = stage.querySelector(`[data-marker="${marker}"]`);
-        const path = svg.querySelector(`path[data-marker="${marker}"]`);
-        if (!label || !path) return;
-        const labelRect = label.getBoundingClientRect();
-        const targetX = imageRect.left - stageRect.left + imageRect.width * x;
-        const targetY = imageRect.top - stageRect.top + imageRect.height * y;
-        const labelOnLeft = labelRect.left + labelRect.width / 2 < imageRect.left + imageRect.width / 2;
-        const startX = (labelOnLeft ? labelRect.right : labelRect.left) - stageRect.left;
-        const startY = Math.max(labelRect.top, Math.min(targetY + stageRect.top, labelRect.bottom)) - stageRect.top;
-        const bend = (targetX - startX) * 0.42;
-        path.setAttribute('d', `M ${startX} ${startY} C ${startX + bend} ${startY}, ${targetX - bend} ${targetY}, ${targetX} ${targetY}`);
-    });
-}
-function scheduleNewcomerMarkerSync() {
-    if (newcomerConnectorFrame !== null) return;
-    newcomerConnectorFrame = requestAnimationFrame(syncNewcomerMarkerConnectors);
-}
-const newcomerMapImage = document.querySelector('.newcomer-body-map-stage img');
-newcomerMapImage?.addEventListener('load', scheduleNewcomerMarkerSync);
-new ResizeObserver(scheduleNewcomerMarkerSync).observe(document.querySelector('.newcomer-body-map-stage'));
 
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
@@ -335,14 +375,6 @@ const timeDisplay = document.getElementById('time-display');
 const startMeditationBtn = document.getElementById('start-meditation');
 const openSettingsBtn = document.getElementById('open-settings');
 const beginConsultationBtn = document.getElementById('begin-consultation');
-
-const {
-    FORMAT: SETTINGS_BACKUP_FORMAT,
-    VERSION: SETTINGS_BACKUP_VERSION,
-    collectManagedSettings,
-    parseSettingsBackup,
-    replaceManagedSettings
-} = window.ChakraSettingsBackup;
 
 // ── UTILS (Defensive Element Access) ──────────────────────────────────────────
 const getChecked = (id) => {
@@ -478,232 +510,37 @@ let timingConfig = {
     narration: {},
     estimate: {}
 };
-const timingFallbacks = {
-    'transitions.initialSettle': 2,
-    'transitions.openingPause': 1,
-    'transitions.postBreathing': 3,
-    'transitions.breathingPreparation': 5,
-    'transitions.breathingTutorialFade': 1,
-    'transitions.breathingCompletion': 5,
-    'transitions.corpseTransitionAt': 60,
-    'transitions.corpseFinalSettle': 3,
-    'transitions.bathToYogaRest': 900,
-    'transitions.yogaPoseGap': 5,
-    'transitions.yogaFinalSettle': 5,
-    'transitions.chakraPostMantra': 4,
-    'transitions.chakraLeadOut': 15,
-    'transitions.intervalPreparation': 2,
-    'transitions.closingFirstPause': 2,
-    'transitions.closingSecondPause': 3,
-    'transitions.hooponoponoIntroPause': 2,
-    'transitions.hooponoponoPhrasePause': 2,
-    'transitions.hooponoponoFinalRest': 15,
-    'transitions.finalSilence': 60,
-    'narration.piperLeadIn': 1.2,
-    'narration.sentenceGap': 1.5,
-    'narration.exitGap': 2,
-    'narration.fadeOutPause': 2.5,
-    'narration.browserSafetyPerCharacter': 200,
-    'narration.browserSafetyBuffer': 3000,
-    'estimate.baseOverhead': 5,
-    'estimate.normalExtra': 7,
-    'estimate.highEnergyExtra': 3,
-    'estimate.boxBreathingOverhead': 4,
-    'estimate.hooponoponoOverhead': 3,
-    'estimate.chakraStageOverhead': 2,
-    'estimate.yogaPoseTransitionEstimate': 15
-};
 
 function timing(section, key, fallback = 0) {
-    const value = timingConfig[section]?.[key];
-    return value == null ? (timingFallbacks[`${section}.${key}`] ?? fallback) : value;
+    return timingSettings.resolve(timingConfig, section, key, fallback);
 }
 
 function timingDefault(key, fallback) {
-    return timingConfig.journey?.[key]?.default ?? fallback;
-}
-
-function mergeTimingProfile(base, profile) {
-    return ['journey', 'transitions', 'narration', 'estimate'].reduce((merged, section) => {
-        merged[section] = { ...(base[section] || {}), ...(profile[section] || {}) };
-        return merged;
-    }, { schemaVersion: base.schemaVersion });
-}
-
-function formatRangeControlValue(input) {
-    const value = Number(input.value);
-    if (!Number.isFinite(value)) return input.value;
-    if (input.id === 'time-per-chakra') return document.getElementById('shots-toggle')?.checked
-        ? `${value.toFixed(0)} secs`
-        : `${value.toFixed(1)} mins`;
-    if (input.id === 'mood-relaxation-ambience-level') return `${value.toFixed(1)}%`;
-    if (input.id === 'pleasure-ambience-blur-level') return `${Math.round(value)}%`;
-    if (input.id === 'time-high-energy') return `${value} mins`;
-    if (['time-bath', 'time-perineal-care', 'time-assisted-bathing'].includes(input.id)) {
-        return `${Math.floor(value / 60)}m`;
-    }
-    if (input.id.startsWith('time-')) return `${value}s`;
-    return input.step && Number(input.step) < 1 ? value.toFixed(2) : String(value);
+    return timingSettings.resolveJourneyDefault(timingConfig, key, fallback);
 }
 
 function enhanceRangeControls() {
-    document.querySelectorAll('input[type="range"]').forEach(input => {
-        const container = input.closest('.mixer-row, .time-selector') || input.parentElement;
-        if (!container || container.dataset.rangeEnhanced === 'true') return;
-
-        container.dataset.rangeEnhanced = 'true';
-        container.classList.add('range-control');
-
-        const existingMeta = container.querySelector(':scope > .range-meta');
-        let current = existingMeta?.querySelector('.range-current') || container.querySelector(':scope > span');
-        if (!current) {
-            current = document.createElement('span');
-            container.appendChild(current);
-        }
-        current.classList.add('range-current');
-
-        const meta = existingMeta || document.createElement('div');
-        if (!existingMeta) {
-            meta.className = 'range-meta';
-            container.appendChild(meta);
-        }
-        // A generated range starts with its current value beside the input;
-        // move it into the metadata row before using it as an insertion anchor.
-        if (current.parentElement !== meta) meta.appendChild(current);
-
-        const createStepButton = (className, label, text) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = `range-step ${className}`;
-            button.setAttribute('aria-label', label);
-            button.textContent = text;
-            return button;
-        };
-        let decrement = meta.querySelector('.range-decrement');
-        if (!decrement) {
-            decrement = createStepButton('range-decrement', 'Decrease value', '−');
-            meta.prepend(decrement);
-        }
-        let increment = meta.querySelector('.range-increment');
-        if (!increment) {
-            increment = createStepButton('range-increment', 'Increase value', '+');
-            meta.appendChild(increment);
-        }
-        let minimum = meta.querySelector('.range-min');
-        if (!minimum) {
-            minimum = document.createElement('span');
-            minimum.className = 'range-min';
-            meta.insertBefore(minimum, current);
-        }
-        let maximum = meta.querySelector('.range-max');
-        if (!maximum) {
-            maximum = document.createElement('span');
-            maximum.className = 'range-max';
-            meta.insertBefore(maximum, increment);
-        }
-        const adjust = direction => {
-            const step = Number(input.step) || 1;
-            const precision = (String(step).split('.')[1] || '').length;
-            const next = Math.min(Number(input.max), Math.max(Number(input.min), Number(input.value) + (direction * step)));
-            input.value = precision ? next.toFixed(precision) : String(next);
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        };
-        decrement.addEventListener('click', () => adjust(-1));
-        increment.addEventListener('click', () => adjust(1));
-
-        const update = () => {
-            if (!minimum.dataset.i18n) minimum.textContent = input.min;
-            if (!maximum.dataset.i18n) maximum.textContent = input.max;
-            current.textContent = formatRangeControlValue(input);
-            decrement.disabled = Number(input.value) <= Number(input.min);
-            increment.disabled = Number(input.value) >= Number(input.max);
-        };
-        input.addEventListener('input', update);
-        update();
-    });
+    rangeControls.enhance({ document, EventConstructor: window.Event });
 }
 
 function refreshRangeControlDisplays() {
-    document.querySelectorAll('.range-control').forEach(container => {
-        const input = container.querySelector('input[type="range"]');
-        const current = container.querySelector('.range-current');
-        if (input && current) current.textContent = formatRangeControlValue(input);
-    });
-}
-
-function applyTimingControls() {
-    const controls = {
-        'time-per-chakra': 'timePerChakra',
-        'time-high-energy': 'timeHighEnergy',
-        'time-icebreaker': 'icebreaker',
-        'time-emergence': 'emergence',
-        'time-breathing': 'breathingStep',
-        'time-corpse': 'corpsePose',
-        'time-interval': 'interval',
-        'time-yoga-prep': 'yogaPreparation',
-        'time-yoga-pose': 'yogaPose',
-        'time-bath': 'bath',
-        'time-perineal-care': 'perinealCare',
-        'time-assisted-bathing': 'assistedBathing'
-    };
-    Object.entries(controls).forEach(([id, key]) => {
-        const input = document.getElementById(id);
-        const definition = timingConfig.journey?.[key];
-        if (!input || !definition) return;
-        ['min', 'max', 'step'].forEach(attribute => {
-            if (definition[attribute] != null) input.setAttribute(attribute, definition[attribute]);
-        });
-    });
-    enhanceRangeControls();
+    rangeControls.refresh({ document });
 }
 
 async function loadTimingConfig() {
-    try {
-        const response = await fetch('timing-config.json');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        timingConfig = await response.json();
-        const profileName = new URLSearchParams(window.location.search).get('timingProfile');
-        if (profileName && timingConfig.profiles?.[profileName]) {
-            timingConfig = mergeTimingProfile(timingConfig, timingConfig.profiles[profileName]);
-            console.info(`[Timing] Using profile: ${profileName}`);
-        }
-    } catch (error) {
-        console.warn('Timing configuration unavailable; using built-in timing defaults.', error);
-    }
-    applyTimingControls();
-    if (typeof state !== 'undefined') {
-        const persisted = (key) => localStorage.getItem(key) !== null;
-        const defaults = {
-            timePerChakra: ['chakra_time', 'timePerChakra', 5],
-            timeHighEnergy: ['chakra_time_high_energy', 'timeHighEnergy', 5],
-            timeSleepStage: ['chakra_time_sleep_stage', 'sleepStageDuration', 5],
-            timeShot: ['chakra_time_shot', 'shotDuration', 7],
-            timeIcebreaker: ['chakra_time_icebreaker', 'icebreaker', 60],
-            timeEmergence: ['chakra_time_emergence', 'emergence', 60],
-            timeBreathing: ['chakra_time_breathing', 'breathingStep', 8],
-            timeCorpse: ['chakra_time_corpse', 'corpsePose', 300],
-            timeInterval: ['chakra_time_interval', 'interval', 10],
-            timeYogaPrep: ['chakra_time_yoga_prep', 'yogaPreparation', 60],
-            timeYogaPose: ['chakra_time_yoga_pose', 'yogaPose', 60],
-            timeBath: ['chakra_time_bath', 'bath', 600],
-            timePerinealCare: ['chakra_time_perineal_care', 'perinealCare', 300],
-            timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600]
-        };
-        Object.entries(defaults).forEach(([stateKey, [storageKey, configKey, fallback]]) => {
-            if (!persisted(storageKey)) state[stateKey] = timingDefault(configKey, fallback);
-            const definition = timingConfig.journey?.[configKey];
-            if (definition) {
-                const minimum = Number(definition.min);
-                const maximum = Number(definition.max);
-                const bounded = Math.min(maximum, Math.max(minimum, Number(state[stateKey])));
-                if (Number.isFinite(bounded) && bounded !== state[stateKey]) {
-                    state[stateKey] = bounded;
-                    localStorage.setItem(storageKey, String(bounded));
-                }
-            }
-        });
-        applyDemoCoreDurationPreset();
-    }
+    timingConfig = await timingSettings.loadAndApply({
+        initialConfig: timingConfig,
+        fetchConfig: path => fetch(path),
+        search: window.location.search,
+        storage: localStorage,
+        state,
+        document,
+        enhanceRangeControls,
+        applyDemoCoreDurationPreset,
+        onConfig: config => { timingConfig = config; },
+        onProfile: profileName => console.info(`[Timing] Using profile: ${profileName}`),
+        onWarning: (message, error) => console.warn(message, error)
+    });
 }
 
 function getLanguageConfig(language = state.language) {
@@ -750,14 +587,7 @@ function syncDroneDurationModeControls() {
     const highEnergy = getChecked('high-energy-toggle');
     const sleep = getChecked('sleep-mode-toggle');
     const activeMode = highEnergy ? state.hrimDroneDurationMode : (sleep ? state.sleepDroneDurationMode : state.droneDurationMode);
-    document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
-        input.disabled = highEnergy && input.value === 'beginner';
-        input.checked = input.value === activeMode;
-    });
-    const hrimNote = document.getElementById('drone-duration-hrim-note');
-    if (hrimNote) hrimNote.hidden = !highEnergy;
-    const sleepNote = document.getElementById('drone-duration-sleep-note');
-    if (sleepNote) sleepNote.hidden = !sleep;
+    droneDurationSettingsView.sync({ document, highEnergy, sleep, activeMode });
 }
 
 function defaultIntention(language = state.language) {
@@ -783,75 +613,11 @@ function shouldRefreshLocalizedIntention(value, previousLanguage) {
 }
 
 function getJourneyRoadmapLabels() {
-    const withOptionalVideo = labels => state.journeyVideoPreludeEnabled
-        ? [t('ui.roadmapVideoIntroduction'), ...labels]
-        : labels;
-    if (getChecked('music-only-toggle')) return withOptionalVideo([t('ui.roadmapMusicOnly')]);
-
-    if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
-        const labels = [];
-        if (getChecked('perineal-care-toggle')) labels.push(t('ui.roadmapPerineal'));
-        if (getChecked('massage-toggle')) labels.push(t('ui.roadmapMassageReverse'));
-        if (getChecked('assisted-bathing-toggle')) labels.push(t('ui.roadmapAssistedBathing'));
-        return withOptionalVideo(labels);
-    }
-
-    if (getChecked('yoga-experience-toggle')) {
-        const labels = [];
-        if (getChecked('corpse-pose-toggle')) labels.push(t('ui.roadmapCorpse'));
-        if (getChecked('bath-session-toggle')) {
-            labels.push(t('ui.roadmapBath'));
-            labels.push(t('ui.roadmapRestBeforeYoga'));
-        }
-        labels.push(t('ui.roadmapYoga'));
-        return withOptionalVideo(labels);
-    }
-
-    if (getChecked('sleep-mode-toggle')) {
-        return withOptionalVideo([t('ui.roadmapSleep'), t('ui.roadmapDrowsiness'), t('ui.roadmapLightSleep'), t('ui.roadmapTrueSleep'), t('ui.roadmapDeepSleep'), t('ui.roadmapRemRest')]);
-    }
-
-    if (getChecked('high-energy-toggle')) {
-        return withOptionalVideo([t('ui.roadmapIntention'), t('ui.roadmapHrim'), t('ui.roadmapClosing')]);
-    }
-
-    // With no chakra selected, preparation selections are complete standalone
-    // sessions. Keep the Lobby roadmap aligned with the focused-session route.
-    if (state.selectedChakras.length === 0) {
-        const standalone = [];
-        if (getChecked('box-breathing-experience-toggle')) standalone.push(t('ui.roadmapBoxBreathing'));
-        if (getChecked('visualization-addon-toggle')) standalone.push(t('ui.roadmapVisualization'));
-        if (getChecked('dharana-addon-toggle')) standalone.push(t('ui.roadmapDharana'));
-        if (getChecked('body-scan-addon-toggle')) standalone.push(t('ui.roadmapBodyScan'));
-        if (getChecked('noting-addon-toggle')) standalone.push(t('ui.roadmapNoting'));
-        if (getChecked('hooponopono-experience-toggle')) standalone.push(t('ui.roadmapHooponopono'));
-        if (getChecked('undo-unlearn-addon-toggle')) standalone.push(t('ui.roadmapUndoUnlearn'));
-        if (standalone.length) return withOptionalVideo(standalone);
-    }
-
-    const labels = [
-        t(state.returningJourney ? 'ui.roadmapReturning' : 'ui.roadmapArrival'),
-        t('ui.roadmapIntention')
-    ];
-    labels.push(t('ui.roadmapChakras'));
-    if (getChecked('box-breathing-experience-toggle')) labels.splice(0, 0, t('ui.roadmapBoxBreathing'));
-    let preparationIndex = getChecked('box-breathing-experience-toggle') ? 1 : 0;
-    if (getChecked('visualization-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapVisualization'));
-    if (getChecked('dharana-addon-toggle')) labels.splice(preparationIndex++, 0, t('ui.roadmapDharana'));
-    if (getChecked('body-scan-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapBodyScan'));
-    if (getChecked('body-scan-addon-toggle')) preparationIndex++;
-    if (getChecked('noting-addon-toggle')) labels.splice(preparationIndex, 0, t('ui.roadmapNoting'));
-    if (getChecked('hooponopono-experience-toggle')) labels.push(t('ui.roadmapHooponopono'));
-    if (getChecked('undo-unlearn-addon-toggle')) labels.push(t('ui.roadmapUndoUnlearn'));
-
-    labels.push(t('ui.roadmapClosing'));
-    return withOptionalVideo(labels);
+    return journeyRoadmap.resolveLabels({ state, isChecked: getChecked, translate: t });
 }
 
 function updateJourneyRoadmap() {
-    const roadmap = document.getElementById('journey-roadmap');
-    if (!roadmap) return;
-    roadmap.textContent = getJourneyRoadmapLabels().join(' » ');
+    journeyRoadmap.render({ document, state, isChecked: getChecked, translate: t });
 }
 
 function applyLocaleUI() {
@@ -859,76 +625,16 @@ function applyLocaleUI() {
     particleField.celestialLayerKey = null;
     if (particleField.started) particleField.draw(performance.now(), false);
     document.documentElement.lang = getLanguageConfig(state.displayLanguage).locale || state.displayLanguage;
-    document.title = t('ui.chakraMeditation');
-    setText('app-title', t('ui.chakraMeditation'));
-    const configSubtitle = document.querySelector('#config-screen > .subtitle');
-    if (configSubtitle) configSubtitle.textContent = t('ui.settingsSubtitle');
-    const languageLabel = document.querySelector('label[for="language-select"]');
-    if (languageLabel) languageLabel.textContent = t('ui.meditationLanguage');
-    const displayLanguageLabel = document.querySelector('label[for="display-language-select"]');
-    if (displayLanguageLabel) displayLanguageLabel.textContent = t('ui.displayLanguage');
-    if (testVoiceBtn) testVoiceBtn.textContent = t('ui.previewVoice');
-    if (openSettingsBtn) openSettingsBtn.textContent = t('ui.settings');
-    if (beginConsultationBtn) beginConsultationBtn.textContent = t('ui.beginConsultation');
-    setText('lobby-title', t('ui.meditationRoom'));
-    setText('completion-title', t('ui.journeyComplete'));
-    setText('completion-message', t('ui.meditationCompleted'));
-    setText('continue-to-earn', t('ui.continueToEarn'));
-    setText('close-completion', t('ui.returnToRoom'));
-    setText('returning-journey-label', t('ui.returningJourney'));
-    setText('save-config', t('ui.startMeditation'));
-    setText('start-meditation', t('ui.beginJourney'));
-    const experimentGuidedGroup = document.getElementById('experiment-guided-group');
-    const experimentCareGroup = document.getElementById('experiment-care-group');
-    if (experimentGuidedGroup) experimentGuidedGroup.label = t('ui.experimentGuidedPractice');
-    if (experimentCareGroup) experimentCareGroup.label = t('ui.experimentCare');
-    document.querySelectorAll('.stat-lbl').forEach((element) => {
-        element.textContent = t('ui.sessionTime');
+    localeUiRenderer.render({
+        document,
+        translate: t,
+        setText,
+        testVoiceButton: testVoiceBtn,
+        settingsButton: openSettingsBtn,
+        consultationButton: beginConsultationBtn,
+        refreshJourneyRoadmap: updateJourneyRoadmap,
+        refreshDroneDurationSummary: updateDroneDurationSummary
     });
-    const intentionInput = document.getElementById('intention-input');
-    if (intentionInput) intentionInput.placeholder = t('ui.intentionPlaceholder');
-    const pleasureAmbienceUrlInput = document.getElementById('pleasure-ambience-url');
-    if (pleasureAmbienceUrlInput) pleasureAmbienceUrlInput.placeholder = t('ui.pleasureAmbienceUrlPlaceholder');
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-        const path = element.dataset.i18n;
-        const translation = path ? t(path) : null;
-        // A stale cached language bundle can be temporarily behind a newly
-        // deployed interface. Keep the readable HTML fallback in that case
-        // instead of replacing it with a raw `ui.*` lookup key.
-        if (translation && translation !== path) element.textContent = translation;
-    });
-    document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
-        const path = element.dataset.i18nAriaLabel;
-        if (path) element.setAttribute('aria-label', t(path));
-    });
-
-    const controlLabels = {
-        'audio-filters-toggle': 'ui.audioFilters',
-        'box-breathing-experience-toggle': 'ui.boxBreathingExperience',
-        'hooponopono-experience-toggle': 'ui.hooponoponoExperience',
-        'no-frequency-mode-toggle': 'ui.noFrequencyMode',
-        'no-mantra-mode-toggle': 'ui.noMantraMode',
-        'eyes-close-mode-toggle': 'ui.eyesCloseMode',
-        'music-only-toggle': 'ui.musicOnlyMode',
-        'sleep-mode-toggle': 'ui.sleepMode',
-        'corpse-pose-toggle': 'ui.corpsePoseOption',
-        'yoga-experience-toggle': 'ui.yogaExperience',
-        'bath-session-toggle': 'ui.bathSession',
-        'perineal-care-toggle': 'ui.perinealCare',
-        'assisted-bathing-toggle': 'ui.assistedBathing',
-        'massage-toggle': 'ui.massage',
-        'high-energy-toggle': 'ui.highEnergy',
-        'returning-journey-toggle': 'ui.returningJourney'
-    };
-    Object.entries(controlLabels).forEach(([inputId, path]) => {
-        const input = document.getElementById(inputId);
-        const label = input && input.closest('label');
-        if (!label) return;
-        const textNode = Array.from(label.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-        if (textNode) textNode.textContent = ` ${t(path)}`;
-    });
-    updateJourneyRoadmap();
-    updateDroneDurationSummary();
 }
 
 async function loadLanguageManifest() {
@@ -1147,420 +853,27 @@ class AudioEngine {
     }
 
     async init() {
-        if (this.isInitialized) {
-            if (this.ctx && this.ctx.state === 'suspended') await this.ctx.resume();
-            return;
-        }
-        
-        // Upgrade 1: Optimize context for playback fidelity
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)({
-            latencyHint: 'playback',
-            sampleRate: 44100
-        });
-
-        // Prefer the system default output on mobile so Web Audio follows the
-        // loudspeaker route instead of an earpiece-specific route when the
-        // browser exposes AudioContext.setSinkId. Unsupported browsers keep
-        // their normal platform audio routing and must not block startup.
-        if (typeof this.ctx.setSinkId === 'function') {
-            try {
-                await this.ctx.setSinkId('default');
-            } catch (error) {
-                console.warn('Default loudspeaker output selection unavailable:', error);
-            }
-        }
-
-        // Crucial for mobile: Resume context on user gesture
-        if (this.ctx.state === 'suspended') await this.ctx.resume();
-        
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.value = state.volDrone; 
-
-        this.voiceGain = this.ctx.createGain();
-        this.voiceGain.gain.value = state.volVoice;
-
-        // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
-        // Only enabled in 'Open' mode for crispness. Disabled in 'Closed' for warmth.
-        this.exciter = this.ctx.createWaveShaper();
-        if (!state.eyesCloseMode) {
-            this.exciter.curve = this.makeDistortionCurve(0.002); 
-        } else {
-            // Straight line curve = no distortion
-            this.exciter.curve = new Float32Array([-1, 1]);
-        }
-        
-        // Upgrade 4: Frequency Carving Filter. Keep the nodes in the graph
-        // even when disabled so the mixer can safely change the setting live.
-        this.voiceCarveFilter = this.ctx.createBiquadFilter();
-        this.voiceCarveFilter.type = 'peaking';
-        this.voiceCarveFilter.frequency.setValueAtTime(2500, this.ctx.currentTime);
-        this.voiceCarveFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
-        this.voiceCarveFilter.gain.setValueAtTime(0, this.ctx.currentTime);
-
-        this.presenceFilter = this.ctx.createBiquadFilter();
-        this.presenceFilter.type = 'highshelf';
-        this.presenceFilter.frequency.setValueAtTime(4000, this.ctx.currentTime);
-        this.presenceFilter.gain.setValueAtTime(state.audioFilters ? (state.eyesCloseMode ? -6 : -3) : 0, this.ctx.currentTime);
-
-        // Voice-only tone controls. These sit before the shared comfort chain
-        // so tuning narration does not recolor the background music.
-        this.voiceWarmthFilter = this.ctx.createBiquadFilter();
-        this.voiceWarmthFilter.type = 'lowshelf';
-        this.voiceWarmthFilter.frequency.setValueAtTime(220, this.ctx.currentTime);
-        this.voiceWarmthFilter.gain.setValueAtTime(0, this.ctx.currentTime);
-
-        this.voiceClarityFilter = this.ctx.createBiquadFilter();
-        this.voiceClarityFilter.type = 'peaking';
-        this.voiceClarityFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
-        this.voiceClarityFilter.Q.setValueAtTime(0.8, this.ctx.currentTime);
-        this.voiceClarityFilter.gain.setValueAtTime(0, this.ctx.currentTime);
-
-        // Voice Space is a diffuse filtered reverb, not a repeating echo. A
-        // deterministic impulse makes the tail consistent on every device.
-        this.voiceEchoSend = this.ctx.createGain();
-        this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.voiceEchoDelay = this.ctx.createDelay(0.5);
-        // Fixed pre-delay separates consonants from ambience without pitch
-        // modulation when switching presets during a spoken phrase.
-        this.voiceEchoDelay.delayTime.setValueAtTime(0.035, this.ctx.currentTime);
-        this.voiceEchoLowCut = this.ctx.createBiquadFilter();
-        this.voiceEchoLowCut.type = 'highpass';
-        this.voiceEchoLowCut.frequency.setValueAtTime(180, this.ctx.currentTime);
-        this.voiceEchoLowCut.Q.setValueAtTime(0.707, this.ctx.currentTime);
-        this.voiceEchoConvolver = this.ctx.createConvolver();
-        this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(
+        return window.ChakraAudioEngineInitialization.initialize(this, {
+            audioWindow: window,
+            state,
             VOICE_REVERB_TAIL_SECONDS,
             VOICE_REVERB_TAIL_DECAY,
-            731
-        );
-        this.voiceEchoFilter = this.ctx.createBiquadFilter();
-        this.voiceEchoFilter.type = 'lowpass';
-        this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
-        this.voiceEchoWetGain = this.ctx.createGain();
-        this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.voiceEchoSend.connect(this.voiceEchoLowCut);
-        this.voiceEchoLowCut.connect(this.voiceEchoDelay);
-        this.voiceEchoDelay.connect(this.voiceEchoConvolver);
-        this.voiceEchoConvolver.connect(this.voiceEchoFilter);
-        this.voiceEchoFilter.connect(this.voiceEchoWetGain);
-
-        this.lowCutFilter = this.ctx.createBiquadFilter();
-        this.lowCutFilter.type = 'highpass';
-        // Grounding: Allow deeper frequencies in Closed mode (40Hz vs 80Hz)
-        this.lowCutFilter.frequency.setValueAtTime(state.eyesCloseMode ? 40 : 80, this.ctx.currentTime);
-        this.lowCutFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
-
-        // Eyes Close Mode Filter
-        this.eyesCloseFilter = this.ctx.createBiquadFilter();
-        this.eyesCloseFilter.type = 'lowpass';
-        // Keep the voice warm without removing Malayalam consonant detail.
-        // The previous 2.2kHz ceiling was too dark for neural narration.
-        this.eyesCloseFilter.frequency.setValueAtTime(
-            state.eyesCloseMode ? 3200 : 5200,
-            this.ctx.currentTime
-        );
-        this.eyesCloseFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
-        this.eyesCloseFilter.gain.setValueAtTime(0, this.ctx.currentTime);
-
-        this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
-        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(3.0, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime); 
-        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
-
-        // Final safety stage: catch short peaks from narration, bells, and
-        // overlapping crossfades without changing the musical compressor.
-        this.masterLimiter = this.ctx.createDynamicsCompressor();
-        this.masterLimiter.threshold.setValueAtTime(-1.0, this.ctx.currentTime);
-        this.masterLimiter.knee.setValueAtTime(0, this.ctx.currentTime);
-        this.masterLimiter.ratio.setValueAtTime(20, this.ctx.currentTime);
-        this.masterLimiter.attack.setValueAtTime(0.001, this.ctx.currentTime);
-        this.masterLimiter.release.setValueAtTime(0.1, this.ctx.currentTime);
-
-        this.bgMusicGain = this.ctx.createGain();
-        this.bgMusicGain.gain.value = 0;
-        
-        // Deep Spectrum Carving
-        this.bgMusicEQ = this.ctx.createBiquadFilter();
-        this.bgMusicEQ.type = 'peaking';
-        this.bgMusicEQ.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.bgMusicEQ.frequency.setValueAtTime(2500, this.ctx.currentTime); 
-        this.bgMusicEQ.Q.setValueAtTime(1.5, this.ctx.currentTime);
-
-        this.bgMusicLPF = this.ctx.createBiquadFilter();
-        this.bgMusicLPF.type = 'lowpass';
-        this.bgMusicLPF.frequency.setValueAtTime(state.audioFilters ? 1200 : 20000, this.ctx.currentTime);
-
-        // Anti-Hum Filter: Targets the resonant "drone/hum" frequency
-        this.bgMusicHumFilter = this.ctx.createBiquadFilter();
-        this.bgMusicHumFilter.type = 'peaking'; // Peaking allows us to gently dip specific mid-frequencies
-        this.bgMusicHumFilter.frequency.setValueAtTime(450, this.ctx.currentTime); 
-        this.bgMusicHumFilter.gain.setValueAtTime(0, this.ctx.currentTime); 
-
-        this.bgMusicSmoothGain = this.ctx.createGain();
-        this.bgMusicSmoothGain.gain.value = state.eyesCloseMode ? 0.7 : 1.0;
-
-        // Background Music Space uses the same non-repeating diffuse design.
-        // Its send is placed after the dry music tone shaping below.
-        this.musicEchoSend = this.ctx.createGain();
-        this.musicEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.musicEchoDelay = this.ctx.createDelay(0.5);
-        this.musicEchoDelay.delayTime.setValueAtTime(0.018, this.ctx.currentTime);
-        this.musicEchoConvolver = this.ctx.createConvolver();
-        this.musicEchoConvolver.buffer = this.createDiffuseReverbImpulse(
             MUSIC_REVERB_TAIL_SECONDS,
             MUSIC_REVERB_TAIL_DECAY,
-            1777
-        );
-        this.musicEchoFilter = this.ctx.createBiquadFilter();
-        this.musicEchoFilter.type = 'lowpass';
-        this.musicEchoFilter.frequency.setValueAtTime(2800, this.ctx.currentTime);
-        this.musicEchoWetGain = this.ctx.createGain();
-        this.musicEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        // Stop new music from entering reverb at a transition while allowing
-        // the already-created diffuse tail to settle naturally.
-        this.musicEchoTailGate = this.ctx.createGain();
-        this.musicEchoTailGate.gain.setValueAtTime(1, this.ctx.currentTime);
-        this.musicEchoTailGate.connect(this.musicEchoSend);
-        this.musicEchoSend.connect(this.musicEchoDelay);
-        this.musicEchoDelay.connect(this.musicEchoConvolver);
-        this.musicEchoConvolver.connect(this.musicEchoFilter);
-        this.musicEchoFilter.connect(this.musicEchoWetGain);
-
-        // The dry-music and reverb-tail gates are deliberately separate. A
-        // mantra handoff ends new music input but preserves its soft decay.
-        this.bgMusicBusGain = this.ctx.createGain();
-        this.bgMusicBusGain.gain.setValueAtTime(1, this.ctx.currentTime);
-
-        // Create the spatial buses before any source is connected to them.
-        // Some browsers reject AudioNode.connect() when the destination is
-        // still null, which would prevent the entire audio context starting.
-        this.spatialMusicPanner = this.createSpatialPanner();
-
-        this.bgMusicGain.connect(this.bgMusicEQ);
-        this.bgMusicEQ.connect(this.bgMusicLPF);
-        this.bgMusicLPF.connect(this.bgMusicHumFilter);
-        this.bgMusicHumFilter.connect(this.bgMusicSmoothGain);
-        this.bgMusicSmoothGain.connect(this.bgMusicBusGain);
-        this.bgMusicSmoothGain.connect(this.musicEchoTailGate);
-        this.musicEchoWetGain.connect(this.spatialMusicPanner);
-        this.bgMusicBusGain.connect(this.spatialMusicPanner);
-        this.spatialMusicPanner.connect(this.lowCutFilter);
-        this.visualizationAmbienceGain = this.ctx.createGain();
-        this.visualizationAmbienceGain.gain.setValueAtTime(1, this.ctx.currentTime);
-        this.visualizationAmbienceGain.connect(this.spatialMusicPanner);
-
-        // The optional pleasure ambience bypasses the background-music bus so
-        // mantra muting cannot accidentally cut or reopen it. Keep the source
-        // at unity so its parallel harmonic layer can work on the original
-        // signal before both paths are reduced to the barely-audible mix level.
-        this.pleasureSourceGain = this.ctx.createGain();
-        this.pleasureSourceGain.gain.setValueAtTime(1, this.ctx.currentTime);
-        this.pleasureGain = this.ctx.createGain();
-        this.pleasureGain.gain.setValueAtTime(state.pleasureAmbienceGain, this.ctx.currentTime);
-
-        // Parallel harmonic enrichment: the original ambience stays clean,
-        // while a very quiet oversampled soft-clip path adds gentle presence.
-        // This is dedicated to pleasure.mp3 and cannot colour narration,
-        // mantras, drones, or background music.
-        this.pleasureEnhancer = this.ctx.createWaveShaper();
-        this.pleasureEnhancer.curve = this.makeDistortionCurve(0.12);
-        this.pleasureEnhancer.oversample = '2x';
-        this.pleasureEnhancerGain = this.ctx.createGain();
-        this.pleasureEnhancerGain.gain.setValueAtTime(
-            state.pleasureAmbienceGain * PLEASURE_AMBIENCE_HARMONIC_MIX,
-            this.ctx.currentTime
-        );
-        this.pleasureBlurFilter = this.ctx.createBiquadFilter();
-        this.pleasureBlurFilter.type = 'lowpass';
-        this.pleasureBlurFilter.frequency.setValueAtTime(2400, this.ctx.currentTime);
-        this.pleasureBlurFilter.Q.setValueAtTime(0.35, this.ctx.currentTime);
-        this.pleasureBlurConvolver = this.ctx.createConvolver();
-        this.pleasureBlurConvolver.buffer = this.createImpulseResponse(0.9, 4.5);
-        this.pleasureBlurDryGain = this.ctx.createGain();
-        this.pleasureBlurWetGain = this.ctx.createGain();
-        const blurMix = getPleasureBlurMix(state.pleasureAmbienceBlur);
-        this.pleasureBlurDryGain.gain.setValueAtTime(blurMix.dry, this.ctx.currentTime);
-        this.pleasureBlurWetGain.gain.setValueAtTime(blurMix.wet, this.ctx.currentTime);
-        this.spatialPleasurePanner = this.createSpatialPanner();
-        if ('distanceModel' in this.spatialPleasurePanner) {
-            this.spatialPleasurePanner.distanceModel = 'inverse';
-            this.spatialPleasurePanner.refDistance = 1;
-            this.spatialPleasurePanner.maxDistance = 100;
-            this.spatialPleasurePanner.rolloffFactor = 0.55;
-        }
-        this.pleasureSpatialDepthGain = this.ctx.createGain();
-        this.pleasureSpatialDepthGain.gain.setValueAtTime(1, this.ctx.currentTime);
-        this.pleasureSourceGain.connect(this.pleasureGain);
-        this.pleasureSourceGain.connect(this.pleasureEnhancer);
-        this.pleasureEnhancer.connect(this.pleasureEnhancerGain);
-        this.pleasureGain.connect(this.pleasureBlurDryGain);
-        this.pleasureGain.connect(this.pleasureBlurFilter);
-        this.pleasureEnhancerGain.connect(this.pleasureBlurDryGain);
-        this.pleasureEnhancerGain.connect(this.pleasureBlurFilter);
-        this.pleasureBlurFilter.connect(this.pleasureBlurConvolver);
-        this.pleasureBlurDryGain.connect(this.pleasureSpatialDepthGain);
-        this.pleasureBlurConvolver.connect(this.pleasureBlurWetGain);
-        this.pleasureBlurWetGain.connect(this.pleasureSpatialDepthGain);
-        this.pleasureSpatialDepthGain.connect(this.spatialPleasurePanner);
-        this.spatialPleasurePanner.connect(this.lowCutFilter);
-
-        this.bellGain = this.ctx.createGain();
-        this.bellGain.gain.value = state.volBell;
-        this.bellGain.connect(this.masterLimiter);
-
-        this.pannerNode = this.ctx.createStereoPanner();
-        
-        const pannerLfo = this.ctx.createOscillator();
-        const pannerLfoGain = this.ctx.createGain();
-        pannerLfo.type = 'sine';
-        pannerLfo.frequency.setValueAtTime(0.018, this.ctx.currentTime);
-        pannerLfoGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        this.spatialPanLfoGain = pannerLfoGain;
-        pannerLfo.connect(pannerLfoGain);
-        pannerLfoGain.connect(this.pannerNode.pan);
-        pannerLfo.start();
-
-        // Keep the source buses separate until after their spatial treatment.
-        // A PannerNode can render HRTF positioning for headphones; ordinary
-        // speakers receive a safe stereo/equal-power fallback.
-        this.spatialDronePanner = this.createSpatialPanner();
-        this.spatialMantraPanner = this.createSpatialPanner();
-
-        this.delayNode = this.ctx.createDelay();
-        this.delayNode.delayTime.value = 0.8;
-        this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.45;
-
-        this.delayNode.connect(this.delayFeedback);
-        this.delayFeedback.connect(this.delayNode);
-
-        this.masterGain.connect(this.delayNode);
-        this.masterGain.connect(this.pannerNode);
-        this.delayNode.connect(this.pannerNode);
-        this.pannerNode.connect(this.spatialDronePanner);
-        this.spatialDronePanner.connect(this.lowCutFilter);
-
-        // Local Piper narration enters the same clarity/comfort chain as the
-        // existing voice mix without being coupled to the drone gain.
-        this.voiceGain.connect(this.voiceWarmthFilter);
-        this.voiceWarmthFilter.connect(this.voiceClarityFilter);
-        this.voiceClarityFilter.connect(this.lowCutFilter);
-        this.voiceClarityFilter.connect(this.voiceEchoSend);
-        this.voiceEchoWetGain.connect(this.lowCutFilter);
-        
-        let lastNode = this.lowCutFilter;
-        // Inject Eyes Close Filter
-        lastNode.connect(this.eyesCloseFilter);
-        lastNode = this.eyesCloseFilter;
-
-        if (this.voiceCarveFilter) {
-            lastNode.connect(this.voiceCarveFilter);
-            lastNode = this.voiceCarveFilter;
-        }
-        lastNode.connect(this.exciter);
-        
-        // One shared output path. Space comes only from the dedicated
-        // voice, music and mantra convolution returns, not a filtered duplicate.
-        if (this.presenceFilter) {
-            this.exciter.connect(this.presenceFilter);
-            this.presenceFilter.connect(this.masterCompressor);
-        } else {
-            this.exciter.connect(this.masterCompressor);
-        }
-        
-        this.masterCompressor.connect(this.masterLimiter);
-        this.masterLimiter.connect(this.ctx.destination);
-
-        // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
-        if (state.eyesCloseMode && !state.noFrequencyMode) {
-            const anchorOsc = this.ctx.createOscillator();
-            const anchorGain = this.ctx.createGain();
-            anchorOsc.type = 'sine';
-            anchorOsc.frequency.setValueAtTime(40, this.ctx.currentTime); // Root-level 40Hz anchor
-            anchorGain.gain.setValueAtTime(0, this.ctx.currentTime);
-            // Feeble but permanent physical presence
-            anchorGain.gain.linearRampToValueAtTime(0.005, this.ctx.currentTime + 10);
-            anchorOsc.connect(anchorGain);
-            anchorGain.connect(this.masterGain);
-            anchorOsc.start();
-            this.groundingAnchor = { osc: anchorOsc, gain: anchorGain };
-        }
-
-        this.mantraGain = this.ctx.createGain();
-        this.mantraGain.gain.value = 0;
-        
-        this.mantraFilter = this.ctx.createBiquadFilter();
-        this.mantraFilter.type = 'lowpass';
-        this.mantraFilter.frequency.setValueAtTime(state.audioFilters ? 2200 : 20000, this.ctx.currentTime);
-        // Mantras receive their own long, filtered tail. It is spatialized
-        // with the mantra rather than being sent through narration or music.
-        this.mantraTailConvolver = this.ctx.createConvolver();
-        this.mantraTailConvolver.buffer = this.createImpulseResponse(
             MANTRA_REVERB_TAIL_SECONDS,
-            MANTRA_REVERB_TAIL_DECAY
-        );
-        this.mantraTailFilter = this.ctx.createBiquadFilter();
-        this.mantraTailFilter.type = 'lowpass';
-        this.mantraTailFilter.frequency.setValueAtTime(4200, this.ctx.currentTime);
-        this.mantraTailWetGain = this.ctx.createGain();
-        this.mantraTailWetGain.gain.setValueAtTime(MANTRA_REVERB_TAIL_WET, this.ctx.currentTime);
-        this.mantraGain.connect(this.mantraFilter);
-        this.mantraFilter.connect(this.spatialMantraPanner);
-        this.mantraFilter.connect(this.mantraTailConvolver);
-        this.mantraTailConvolver.connect(this.mantraTailFilter);
-        this.mantraTailFilter.connect(this.mantraTailWetGain);
-        this.mantraTailWetGain.connect(this.spatialMantraPanner);
-        this.spatialMantraPanner.connect(this.lowCutFilter);
-
-        // Apply initial Eyes Close state
-        this.toggleEyesCloseMode(state.eyesCloseMode);
-
-        this.isInitialized = true;
-        this.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
-        this.setVoiceEcho(state.voiceEcho);
-        this.setMusicEcho(state.musicEcho);
-        this.setSpatialMode(state.spatialMode);
-        this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
+            MANTRA_REVERB_TAIL_DECAY,
+            MANTRA_REVERB_TAIL_WET,
+            PLEASURE_AMBIENCE_HARMONIC_MIX,
+            getPleasureBlurMix
+        });
     }
 
     createSpatialPanner() {
-        if (this.ctx?.createPanner) {
-            const panner = this.ctx.createPanner();
-            panner.distanceModel = 'inverse';
-            panner.refDistance = 1;
-            panner.maxDistance = 10000;
-            panner.rolloffFactor = 0;
-            panner.panningModel = 'equalpower';
-            if (panner.positionX) {
-                panner.positionX.value = 0;
-                panner.positionY.value = 0;
-                panner.positionZ.value = -1;
-            } else if (typeof panner.setPosition === 'function') {
-                panner.setPosition(0, 0, -1);
-            }
-            return panner;
-        }
-        return this.ctx.createStereoPanner();
+        return audioSpatialGeometry.createPanner(this.ctx);
     }
 
     setSpatialPosition(node, position, now) {
-        if (!node) return;
-        if (node.positionX && node.positionY && node.positionZ) {
-            [['x', node.positionX], ['y', node.positionY], ['z', node.positionZ]].forEach(([axis, param]) => {
-                if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
-                else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
-                param.linearRampToValueAtTime(position[axis], now + 1.2);
-            });
-        } else if (node.pan) {
-            if (node.pan.cancelAndHoldAtTime) node.pan.cancelAndHoldAtTime(now);
-            else { node.pan.cancelScheduledValues(now); node.pan.setValueAtTime(node.pan.value, now); }
-            const pan = Math.atan2(position.x, Math.max(0.1, Math.abs(position.z))) / (Math.PI / 2);
-            node.pan.linearRampToValueAtTime(Math.max(-1, Math.min(1, pan)), now + 1.2);
-        } else if (typeof node.setPosition === 'function') {
-            node.setPosition(position.x, position.y, position.z);
-        }
+        return audioSpatialGeometry.setPosition(node, position, now);
     }
 
     schedulePleasureSpatialApproach(fromCurrent = false) {
@@ -1682,26 +995,7 @@ class AudioEngine {
     }
 
     setMusicEcho(mode = 'light') {
-        if (!this.ctx || !this.musicEchoSend || !this.musicEchoDelay || !this.musicEchoConvolver || !this.musicEchoWetGain) return;
-        const settings = {
-            off: { delay: 0.018, wet: 0, filter: 2800 },
-            light: { delay: 0.018, wet: 0.12, filter: 2800 },
-            spacious: { delay: 0.035, wet: 0.18, filter: 3400 }
-        }[mode] || { delay: 0.018, wet: 0.12, filter: 2800 };
-        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, settings.wet > 0, MUSIC_REVERB_TAIL_SECONDS + 0.3);
-        const now = this.ctx.currentTime;
-        this.musicEchoDelay.delayTime.cancelScheduledValues(now);
-        this.musicEchoDelay.delayTime.setValueAtTime(this.musicEchoDelay.delayTime.value, now);
-        this.musicEchoDelay.delayTime.linearRampToValueAtTime(settings.delay, now + 0.25);
-        this.musicEchoSend.gain.cancelScheduledValues(now);
-        this.musicEchoSend.gain.setValueAtTime(this.musicEchoSend.gain.value, now);
-        this.musicEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
-        this.musicEchoWetGain.gain.cancelScheduledValues(now);
-        this.musicEchoWetGain.gain.setValueAtTime(this.musicEchoWetGain.gain.value, now);
-        this.musicEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
-        this.musicEchoFilter.frequency.cancelScheduledValues(now);
-        this.musicEchoFilter.frequency.setValueAtTime(this.musicEchoFilter.frequency.value, now);
-        this.musicEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
+        return audioMusicEcho.setMusicEcho(this, mode, MUSIC_REVERB_TAIL_SECONDS);
     }
 
     toggleEyesCloseMode(enabled) {
@@ -1757,598 +1051,85 @@ class AudioEngine {
     }
 
     makeDistortionCurve(amount) {
-        const n_samples = 44100;
-        const curve = new Float32Array(n_samples);
-        for (let i = 0; i < n_samples; ++i) {
-            const x = (i * 2) / n_samples - 1;
-            // Standard Sigmoid Soft Clipping
-            curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
-        }
-        return curve;
+        return audioSignalDesign.makeDistortionCurve(amount);
     }
 
     createImpulseResponse(duration, decay) {
-        const sampleRate = this.ctx.sampleRate;
-        const length = sampleRate * duration;
-        const buffer = this.ctx.createBuffer(2, length, sampleRate);
-        for (let channel = 0; channel < 2; channel++) {
-            const data = buffer.getChannelData(channel);
-            for (let i = 0; i < length; i++) {
-                const envelope = Math.pow(1 - i / length, decay);
-                data[i] = (Math.random() * 2 - 1) * envelope;
-            }
-        }
-        return buffer;
+        return audioSignalDesign.createImpulseResponse(this.ctx, duration, decay);
     }
 
     createDiffuseReverbImpulse(duration, decay, seed) {
-        const sampleRate = this.ctx.sampleRate;
-        const length = Math.max(1, Math.floor(sampleRate * duration));
-        const buffer = this.ctx.createBuffer(2, length, sampleRate);
-        for (let channel = 0; channel < 2; channel++) {
-            const data = buffer.getChannelData(channel);
-            let randomState = (seed + (channel * 104729)) >>> 0;
-            for (let i = 0; i < length; i++) {
-                // Deterministic decorrelated noise produces a diffuse tail,
-                // with no periodic feedback repeats and no session-to-session
-                // character change.
-                randomState = (1664525 * randomState + 1013904223) >>> 0;
-                const noise = (randomState / 4294967296) * 2 - 1;
-                const envelope = Math.pow(1 - (i / length), decay);
-                data[i] = noise * envelope;
-            }
-        }
-        return buffer;
+        return audioSignalDesign.createDiffuseReverbImpulse(this.ctx, duration, decay, seed);
     }
 
     createNoiseBuffer() {
         if (this._cachedNoise) return this._cachedNoise;
-        const bufferSize = this.ctx.sampleRate * 2;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        this._cachedNoise = buffer;
-        return buffer;
+        this._cachedNoise = audioSignalDesign.createNoiseBuffer(this.ctx);
+        return this._cachedNoise;
     }
 
     startElementalLayer(index) {
-        this.elementalNodes.forEach(n => {
-            try { n.lfo.stop(); } catch(e) {}
-            try { n.src.stop(); } catch(e) {}
-        });
-        this.elementalNodes = [];
-
-        const noiseSrc = this.ctx.createBufferSource();
-        noiseSrc.buffer = this.createNoiseBuffer();
-        noiseSrc.loop = true;
-
-        const filter = this.ctx.createBiquadFilter();
-        const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.012, this.ctx.currentTime + 5); // Reduced noise floor
-
-        const breezeLfo = this.ctx.createOscillator();
-        breezeLfo.type = 'sine';
-        breezeLfo.frequency.setValueAtTime(0.02 + (Math.random() * 0.02), this.ctx.currentTime); 
-
-        const breezeGainMod = this.ctx.createGain();
-        breezeGainMod.gain.setValueAtTime(0.004, this.ctx.currentTime); 
-        
-        const breezeFreqMod = this.ctx.createGain();
-        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1200 : 400, this.ctx.currentTime); 
-
-        breezeLfo.connect(breezeGainMod);
-        breezeGainMod.connect(gain.gain);
-        
-        breezeLfo.connect(breezeFreqMod);
-        breezeFreqMod.connect(filter.frequency);
-        breezeLfo.start();
-
-        if (index === 0 || index === 1) {
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(index === 0 ? 100 : 250, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.2, this.ctx.currentTime);
-        } else if (index === 2 || index === 3) {
-            filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(index === 2 ? 700 : 1200, this.ctx.currentTime);
-            filter.Q.setValueAtTime(1.5, this.ctx.currentTime); 
-        } else {
-            filter.type = 'highpass';
-            filter.frequency.setValueAtTime(3500 + (index * 300), this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.4, this.ctx.currentTime);
-        }
-
-        noiseSrc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.masterGain);
-        noiseSrc.start();
-        
-        noiseSrc.onended = () => {
-            try { breezeLfo.stop(); } catch (error) {}
-            for (const node of [noiseSrc, filter, gain, breezeLfo, breezeGainMod, breezeFreqMod]) node.disconnect();
-        };
-        this.elementalNodes.push({ src: noiseSrc, gain: gain, lfo: breezeLfo });
+        return audioElementalLayer.start(this, index);
     }
 
     startDrone(baseFreq, index = 0) {
-        this.stopDrone();
-        if (state.noFrequencyMode) return;
-        if (!this.ctx) return;
-        
-        this.startElementalLayer(index);
-
-        // Reject malformed custom-script values at the audio boundary as a
-        // final safeguard.
-        const requestedFrequency = Number(baseFreq);
-        const safeBaseFrequency = Number.isFinite(requestedFrequency) && requestedFrequency >= 1
-            ? Math.min(requestedFrequency, 20000)
-            : 110;
-        // Preserve the configured chakra/HRIM frequency exactly. Higher
-        // frequencies must not be octave-shifted for comfort; the JSON value
-        // is the authoritative main-drone pitch.
-        const droneFreq = safeBaseFrequency;
-        
-        // Keep one restrained main tone. The previous half-frequency lower
-        // oscillator was intentionally removed so the drone stays clean.
-        const mainOscillator = this.ctx.createOscillator();
-        const mainDroneGain = this.ctx.createGain();
-        mainOscillator.type = 'sine';
-        mainOscillator.frequency.setValueAtTime(droneFreq, this.ctx.currentTime);
-        const mainDroneFilter = this.ctx.createBiquadFilter();
-        mainDroneFilter.type = 'lowpass';
-        mainDroneFilter.frequency.setValueAtTime(Math.min(droneFreq * 4, this.ctx.sampleRate * 0.45), this.ctx.currentTime);
-        mainDroneFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
-        mainDroneGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        mainDroneGain.gain.linearRampToValueAtTime(0.06, this.ctx.currentTime + 6);
-        mainOscillator.connect(mainDroneFilter);
-        mainDroneFilter.connect(mainDroneGain);
-        mainDroneGain.connect(this.masterGain);
-        mainOscillator.start();
-        mainOscillator.onended = () => {
-            mainOscillator.disconnect(); mainDroneFilter.disconnect(); mainDroneGain.disconnect();
-        };
-        this.droneOscillators.push({ osc: mainOscillator, gain: mainDroneGain });
-
-        // Fixed: Lowered carrier to 80Hz for deep comfort
-        const binauralCarrier = Math.min(droneFreq, 80); 
-
-        const leftOsc = this.ctx.createOscillator();
-        const rightOsc = this.ctx.createOscillator();
-        const leftPanner = this.ctx.createStereoPanner();
-        const rightPanner = this.ctx.createStereoPanner();
-        const binauralGain = this.ctx.createGain();
-
-        leftPanner.pan.setValueAtTime(-1, this.ctx.currentTime);
-        rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
-        
-        leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
-        // Grounding: Add 2Hz Delta pulse in Closed mode to relax forehead
-        const drift = state.eyesCloseMode ? 2.0 : 0;
-        rightOsc.frequency.setValueAtTime(binauralCarrier + drift, this.ctx.currentTime);
-        
-        binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        // Drastically reduced volume (0.002) for a "feeble" background effect
-        binauralGain.gain.linearRampToValueAtTime(0.002, this.ctx.currentTime + 10); 
-
-        leftOsc.connect(leftPanner);
-        rightOsc.connect(rightPanner);
-        leftPanner.connect(binauralGain);
-        rightPanner.connect(binauralGain);
-        binauralGain.connect(this.masterGain);
-
-        leftOsc.start();
-        rightOsc.start();
-        let remaining = 2;
-        const finishSupport = osc => () => {
-            osc.disconnect();
-            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
-        };
-        leftOsc.onended = finishSupport(leftOsc);
-        rightOsc.onended = finishSupport(rightOsc);
-        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+        return audioDroneStart.startDrone(this, baseFreq, index, state);
     }
 
     startSleepDrone(beatFrequency) {
-        this.stopDrone();
-        if (state.noFrequencyMode) return;
-        if (!this.ctx) return;
-
-        const requestedBeat = Number(beatFrequency);
-        const beat = Number.isFinite(requestedBeat) ? Math.min(20000, Math.max(0.1, requestedBeat)) : 6;
-        const now = this.ctx.currentTime;
-        const carrier = 80;
-
-        // Sleep targets are script-defined and are played directly as the
-        // main oscillator, including very low values such as 2 Hz. A gentle
-        // stereo 80 Hz support pair remains available for the beat texture.
-        const mainOscillator = this.ctx.createOscillator();
-        const mainGain = this.ctx.createGain();
-        const mainFilter = this.ctx.createBiquadFilter();
-        mainOscillator.type = 'sine';
-        mainOscillator.frequency.setValueAtTime(beat, now);
-        mainFilter.type = 'lowpass';
-        mainFilter.frequency.setValueAtTime(220, now);
-        mainFilter.Q.setValueAtTime(0.5, now);
-        mainGain.gain.setValueAtTime(0, now);
-        mainGain.gain.linearRampToValueAtTime(0.06, now + 6);
-        mainOscillator.connect(mainFilter);
-        mainFilter.connect(mainGain);
-        mainGain.connect(this.masterGain);
-        mainOscillator.start(now);
-        mainOscillator.onended = () => {
-            mainOscillator.disconnect(); mainFilter.disconnect(); mainGain.disconnect();
-        };
-        this.droneOscillators.push({ osc: mainOscillator, gain: mainGain });
-
-        const leftOsc = this.ctx.createOscillator();
-        const rightOsc = this.ctx.createOscillator();
-        const leftPanner = this.ctx.createStereoPanner();
-        const rightPanner = this.ctx.createStereoPanner();
-        const binauralGain = this.ctx.createGain();
-        leftPanner.pan.setValueAtTime(-1, now);
-        rightPanner.pan.setValueAtTime(1, now);
-        leftOsc.frequency.setValueAtTime(carrier, now);
-        rightOsc.frequency.setValueAtTime(carrier + beat, now);
-        binauralGain.gain.setValueAtTime(0, now);
-        binauralGain.gain.linearRampToValueAtTime(0.002, now + 10);
-        leftOsc.connect(leftPanner);
-        rightOsc.connect(rightPanner);
-        leftPanner.connect(binauralGain);
-        rightPanner.connect(binauralGain);
-        binauralGain.connect(this.masterGain);
-        leftOsc.start(now);
-        rightOsc.start(now);
-        let remaining = 2;
-        const finishSupport = osc => () => {
-            osc.disconnect();
-            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
-        };
-        leftOsc.onended = finishSupport(leftOsc);
-        rightOsc.onended = finishSupport(rightOsc);
-        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+        return audioDroneStart.startSleepDrone(this, beatFrequency, state);
     }
 
     startFrequencyShot(frequency) {
-        this.stopFrequencyShot();
-        if (state.noFrequencyMode) {
-            throw new Error('No Frequency Mode prevents frequency-only Shots.');
-        }
-        const requested = Number(frequency);
-        if (!this.ctx || !Number.isFinite(requested) || requested <= 0 || requested > 20000) {
-            throw new Error('Shot frequency must be between 0 and 20,000 Hz.');
-        }
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(requested, now);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(Math.max(0, Math.min(0.2, Number(state.volDrone) || 0)), now + 0.08);
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start(now);
-        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
-        this.shotOscillator = osc;
-        this.shotGain = gain;
+        return audioTonePlayback.startShot(this, frequency, state);
     }
 
     startGuidedTransitionTone(frequency, durationMs) {
-        if (state.noFrequencyMode) return false;
-        const requested = Number(frequency);
-        if (!this.ctx || !Number.isFinite(requested) || requested <= 0 || requested > 20000) return false;
-
-        this.stopGuidedTransitionTone(0.05);
-        const now = this.ctx.currentTime;
-        if (!Number.isFinite(Number(durationMs)) || Number(durationMs) <= 0) return false;
-        const durationSeconds = Math.max(1, Number(durationMs) / 1000);
-        const fadeSeconds = Math.min(1.5, Math.max(0.35, durationSeconds * 0.25));
-        const steadyUntil = Math.max(now + fadeSeconds, now + durationSeconds - fadeSeconds);
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        // This is a brief guided transition cue, not the public Shot path.
-        // Keep it below the main drone ceiling even when the user raises that
-        // mixer control for ordinary mantra work.
-        const peak = Math.min(Math.max(0, (Number(state.volDrone) || 0) * 0.5), 0.025);
-        if (peak === 0) return false;
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(requested, now);
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(peak, now + fadeSeconds);
-        gain.gain.setValueAtTime(peak, steadyUntil);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start(now);
-        osc.stop(now + durationSeconds + 0.05);
-        osc.onended = () => {
-            osc.disconnect(); gain.disconnect();
-            if (this.guidedTransitionTone?.osc === osc) this.guidedTransitionTone = null;
-        };
-        this.guidedTransitionTone = { osc, gain };
-        return true;
+        return audioTonePlayback.startTransitionTone(this, frequency, durationMs, state);
     }
 
     stopGuidedTransitionTone(fadeSeconds = 1) {
-        if (!this.ctx || !this.guidedTransitionTone) return;
-        const { osc, gain } = this.guidedTransitionTone;
-        this.guidedTransitionTone = null;
-        const now = this.ctx.currentTime;
-        try {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.05, fadeSeconds));
-            osc.stop(now + Math.max(0.1, fadeSeconds) + 0.05);
-        } catch (error) {}
+        return audioTonePlayback.stopTransitionTone(this, fadeSeconds);
     }
 
     stopFrequencyShot() {
-        if (!this.ctx || !this.shotOscillator || !this.shotGain) return;
-        const now = this.ctx.currentTime;
-        const osc = this.shotOscillator;
-        const gain = this.shotGain;
-        this.shotOscillator = null;
-        this.shotGain = null;
-        try {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(Math.max(0, gain.gain.value), now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.08);
-            osc.stop(now + 0.1);
-        } catch (error) {}
+        return audioTonePlayback.stopShot(this);
     }
 
     stopBinaural() {
-        if (!this.ctx) {
-            this.binauralNodes = [];
-            return;
-        }
-        const now = this.ctx.currentTime;
-        this.binauralNodes.forEach(node => {
-            if (typeof AudioParam !== 'undefined' && node instanceof AudioParam) return;
-            try { 
-                if (node.gain) {
-                    node.gain.cancelScheduledValues(now);
-                    node.gain.setValueAtTime(node.gain.value, now);
-                    node.gain.linearRampToValueAtTime(0, now + 5);
-                } else {
-                    node.stop(now + 5); 
-                }
-            } catch(e) {}
-        });
-        this.binauralNodes = [];
+        return audioDroneStop.stopBinaural(this);
     }
 
     stopDrone() {
-        if (!this.ctx) {
-            this.binauralNodes = [];
-            this.droneOscillators = [];
-            this.groundingAnchor = null;
-            this.elementalNodes = [];
-            this.vibrationLFO = null;
-            return;
-        }
-        this.stopBinaural();
-        const now = this.ctx.currentTime;
-        
-        if (this.vibrationLFO) {
-            try { this.vibrationLFO.stop(now + 5); } catch(e) {}
-            this.vibrationLFO = null;
-        }
-        this.droneOscillators.forEach(({ osc, gain }) => {
-            const currentVal = gain.gain.value;
-            if (gain.gain.cancelAndHoldAtTime) gain.gain.cancelAndHoldAtTime(now);
-            else { gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(currentVal, now); }
-            gain.gain.linearRampToValueAtTime(0, now + 5);
-            try { osc.stop(now + 5.1); } catch(e) {}
-        });
-        this.droneOscillators = [];
-
-        if (this.groundingAnchor) {
-            const currentVal = this.groundingAnchor.gain.gain.value;
-            this.groundingAnchor.gain.gain.cancelScheduledValues(now);
-            this.groundingAnchor.gain.gain.setValueAtTime(currentVal, now);
-            this.groundingAnchor.gain.gain.linearRampToValueAtTime(0, now + 5);
-            const anchorOsc = this.groundingAnchor.osc;
-            try { anchorOsc.stop(now + 5.1); } catch(e) {}
-            this.groundingAnchor = null;
-        }
-
-        this.elementalNodes.forEach(({ src, gain, lfo }) => {
-            const currentVal = gain.gain.value;
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(currentVal, now);
-            gain.gain.linearRampToValueAtTime(0, now + 5);
-            try { src.stop(now + 5.1); } catch(e) {}
-            try { lfo.stop(now + 5.1); } catch(e) {}
-        });
-        this.elementalNodes = [];
+        return audioDroneStop.stopDrone(this);
     }
 
     async playMantraTrack(key) {
-        if (state.noMantraMode) return;
-        const filePath = MANTRA_AUDIO_MAP[key];
-        if (!filePath) return;
-
-        const requestId = ++this.mantraRequestId;
-        this.stopMantraTrack({ restoreMusic: false, invalidate: false });
-
-        try {
-            if (!this.mantraBuffer[key]) {
-                const response = await fetch(filePath);
-                if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${filePath}`);
-                const arrayBuffer = await response.arrayBuffer();
-                this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
-            }
-
-            // Keep the already-ducked music bed alive while a first-use
-            // mantra file is loading. Starting this mute before decoding could
-            // create an avoidable silent gap on slower devices. The dedicated
-            // gates silence dry music and stop new tail input while allowing
-            // the already-created diffuse tail to settle naturally.
-            if (requestId !== this.mantraRequestId || state.noMantraMode) return;
-            this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
-
-            // Standardized to 3.0s crossfade
-            this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, true);
-            this.mantraTailWetGain.gain.cancelScheduledValues(this.ctx.currentTime);
-            this.mantraTailWetGain.gain.setValueAtTime(MANTRA_REVERB_TAIL_WET, this.ctx.currentTime);
-            this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 1, 3.0);
-            this.mantraLoop.start(MANTRA_MUSIC_FADE_SECONDS);
-
-            // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
-            const lfo = this.ctx.createOscillator();
-            lfo.type = 'sine';
-            lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
-            const lfoGain = this.ctx.createGain();
-            lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
-            lfo.connect(lfoGain);
-            lfoGain.connect(this.mantraFilter.frequency);
-            lfo.start();
-            this.mantraPresenceLFO = lfo;
-            this.mantraPresenceLFOGain = lfoGain;
-            lfo.onended = () => { lfo.disconnect(); lfoGain.disconnect(); };
-
-            const now = this.ctx.currentTime;
-            this.mantraGain.gain.cancelScheduledValues(now);
-            // Entry belongs to the new loop, never zero the shared bus: an
-            // outgoing mantra may still be fading through it.
-            this.mantraGain.gain.setValueAtTime(state.volMantra, now);
-
-            if (this.masterGain) {
-                this.masterGain.gain.cancelScheduledValues(now);
-                this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-                // Deeper ducking (to 15%) to create a "cradle" for the voice
-                this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
-            }
-
-            // Explicitly fade out any elemental noise during mantra
-            this.elementalNodes.forEach(({ gain }) => {
-                gain.gain.cancelScheduledValues(now);
-                gain.gain.setValueAtTime(gain.gain.value, now);
-                gain.gain.linearRampToValueAtTime(0, now + 5);
-            });
-        } catch (e) {
-            // SOFT FAIL: Log error but don't crash the journey. 
-            // This prevents the "Stable Connection" alert if a specific file fails.
-            console.error(`Audio Load Error (${key}):`, e);
-            if (requestId === this.mantraRequestId) this.restoreBackgroundMusicAfterMantra();
-        }
+        return audioMantraPlayback.play(this, key, {
+            state,
+            mantraAudioMap: MANTRA_AUDIO_MAP,
+            SeamlessLoop,
+            musicFadeSeconds: MANTRA_MUSIC_FADE_SECONDS,
+            tailWet: MANTRA_REVERB_TAIL_WET
+        });
     }
 
     stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {}) {
-        const fadeSeconds = stageWindow === null ? MANTRA_FADE_SECONDS : Math.min(MANTRA_FADE_SECONDS, Math.max(0, Number(stageWindow) || 0) / 2);
-        const tailSeconds = stageWindow === null ? MANTRA_REVERB_TAIL_SECONDS : Math.min(MANTRA_REVERB_TAIL_SECONDS, fadeSeconds);
-        this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, false, fadeSeconds + tailSeconds + 0.1);
-        if (invalidate) this.mantraRequestId += 1;
-        if (!this.mantraLoop) {
-            if (restoreMusic) this.restoreBackgroundMusicAfterMantra();
-            return;
-        }
-        const now = this.ctx.currentTime;
-
-        if (stageWindow !== null && this.mantraTailWetGain) {
-            const wet = this.mantraTailWetGain.gain;
-            if (wet.cancelAndHoldAtTime) wet.cancelAndHoldAtTime(now);
-            else { wet.cancelScheduledValues(now); wet.setValueAtTime(wet.value, now); }
-            wet.setValueAtTime(wet.value, now + fadeSeconds);
-            wet.linearRampToValueAtTime(0, now + fadeSeconds + tailSeconds);
-        }
-
-        if (this.mantraPresenceLFO) {
-            const modulation = this.mantraPresenceLFOGain?.gain;
-            if (modulation) {
-                if (modulation.cancelAndHoldAtTime) modulation.cancelAndHoldAtTime(now);
-                else { modulation.cancelScheduledValues(now); modulation.setValueAtTime(modulation.value, now); }
-                modulation.linearRampToValueAtTime(0, now + fadeSeconds);
-            }
-            try { this.mantraPresenceLFO.stop(now + fadeSeconds + 0.02); } catch(e) {}
-            this.mantraPresenceLFO = null;
-            this.mantraPresenceLFOGain = null;
-        }
-
-        // The retiring loop owns the exit envelope (no second bus fade).
-
-        if (this.masterGain) {
-            this.masterGain.gain.cancelScheduledValues(now);
-            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 6);
-        }
-
-        // Restore elemental layer subtly after mantra
-        this.elementalNodes.forEach(({ gain }) => {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(gain.gain.value, now);
-            gain.gain.linearRampToValueAtTime(0.015, now + 4);
+        return audioMantraPlayback.stop(this, { restoreMusic, invalidate, stageWindow }, {
+            state,
+            fadeSeconds: MANTRA_FADE_SECONDS,
+            tailSeconds: MANTRA_REVERB_TAIL_SECONDS
         });
-
-        this.mantraLoop.stop(fadeSeconds);
-        this.mantraLoop = null;
-
-        // Bring the bed back during the outgoing mantra, not after silence.
-        if (restoreMusic) {
-            this.restoreBackgroundMusicAfterMantra(fadeSeconds);
-        }
     }
 
     async startBackgroundMusic() {
-        this.setMusicEcho(state.musicEcho);
-        if (!this.bgMusicBuffer) {
-            const response = await fetch(BACKGROUND_MUSIC_URL, { cache: 'reload' });
-            const arrayBuffer = await response.arrayBuffer();
-            this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-        }
-
-        // Reusing the active loop preserves its timeline and avoids an
-        // audible restart when an experience enters another stage.
-        if (this.bgMusicLoop?.isRunning) {
-            return;
-        }
-
-        // Do not overlap a freshly started journey with the previous
-        // journey's retiring loop. The prior stop is allowed to finish its
-        // own fade before a new slow entry begins.
-        if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
-
-        // A stopped loop that is still referenced has not entered the normal
-        // retirement path yet. Retire it before creating a replacement.
-        if (this.bgMusicLoop) {
-            this.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
-            if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
-        }
-
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        // A stopped loop leaves the shared outer gain at its previous target.
-        // Reset it before creating the replacement so a restart cannot bypass
-        // the deliberate entry fade through stale gain state.
-        if (this.bgMusicGain) {
-            const now = this.ctx.currentTime;
-            this.bgMusicGain.gain.cancelScheduledValues(now);
-            this.bgMusicGain.gain.setValueAtTime(0, now);
-        }
-        if (this.bgMusicBusGain) {
-            const now = this.ctx.currentTime;
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(1, now);
-        }
-        if (this.musicEchoTailGate) {
-            const now = this.ctx.currentTime;
-            this.musicEchoTailGate.gain.cancelScheduledValues(now);
-            this.musicEchoTailGate.gain.setValueAtTime(1, now);
-        }
-
-        // The bus owns entry fading; the loop duration controls repeats only.
-        this.setMusicEcho(state.musicEcho);
-        this.bgMusicLoop = new SeamlessLoop(
-            this.ctx,
-            this.bgMusicBuffer,
-            this.bgMusicGain,
-            1.0,
-            BACKGROUND_MUSIC_ENTRY_FADE_SECONDS
-        );
-        this.bgMusicLoop.start();
-        this.bgMusicEntryEndsAt = this.ctx.currentTime + BACKGROUND_MUSIC_ENTRY_FADE_SECONDS;
+        return audioBackgroundMusicLifecycle.start(this, {
+            state,
+            SeamlessLoop,
+            url: BACKGROUND_MUSIC_URL,
+            entryFadeSeconds: BACKGROUND_MUSIC_ENTRY_FADE_SECONDS,
+            stopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS
+        });
     }
 
     async loadPleasureAmbienceBuffers() {
@@ -2576,70 +1357,11 @@ class AudioEngine {
     }
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
-        if (!this.bgMusicLoop || !this.ctx) return;
-        if (this.stageFadeWindow) duration = Math.min(duration, this.stageFadeWindow.limit);
-        
-        // Support for boolean (legacy) and numeric (fine-tuned) volume levels
-        // Whisper Quality: Keep narration clearly in front of a very quiet
-        // atmospheric bed without muting the room completely.
-        let factor = 1.0;
-        if (isDucked === true) factor = 0.15;
-        else if (typeof isDucked === 'number') factor = isDucked;
-
-        const targetVol = state.volMusic * factor;
-        const targetEQ = factor < 1.0 ? -3 : 0; // Gentle, effective midrange cut under guidance
-        this.bgMusicTargetVolume = targetVol;
-        this.bgMusicTargetEQ = targetEQ;
-        
-        const now = this.ctx.currentTime;
-        
-        const liveGain = this.bgMusicGain.gain.value;
-        if (this.bgMusicGain.gain.cancelAndHoldAtTime) this.bgMusicGain.gain.cancelAndHoldAtTime(now);
-        else {
-            this.bgMusicGain.gain.cancelScheduledValues(now);
-            this.bgMusicGain.gain.setValueAtTime(liveGain, now);
-        }
-        if (targetVol <= 0) {
-            // Zero is a supported user setting. Linear ramps may end at zero,
-            // keeping playback muted without aborting the journey.
-            this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
-        } else {
-            // Linear entry avoids spending most of a long fade near silence.
-            this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration);
-        }
-        
-        this.bgMusicEQ.gain.cancelScheduledValues(now);
-        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
-        
-        // Loop level is independent of the immutable overlap envelopes.
-        if (now >= this.bgMusicEntryEndsAt) this.bgMusicLoop.setGain(1.0);
-
-        // A narration request during the mantra fade may update the desired
-        // level, but must not reopen the music bus until the mantra is done.
-        if (this.bgMusicSuppressedByMantra) return;
-        if (this.bgMusicBusGain) {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-            this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + duration);
-        }
+        return audioBackgroundMusicControls.fadeIn(this, duration, isDucked, state);
     }
 
     fadeOutBackgroundMusic(duration = 4) {
-        if (!this.bgMusicLoop) return;
-        // A manual volume adjustment must not revive a deliberately silent
-        // practice such as Box Breathing. Mark this bus as intentionally
-        // muted before the envelope reaches zero.
-        this.bgMusicTargetVolume = 0;
-        this.bgMusicTargetEQ = 0;
-        const now = this.ctx.currentTime;
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicEQ.gain.cancelScheduledValues(now);
-
-        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
-        this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
-        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
+        return audioBackgroundMusicControls.fadeOut(this, duration);
     }
 
     async startVisualizationAmbience(fadeSeconds = VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS, force = false) {
@@ -2688,100 +1410,23 @@ class AudioEngine {
     }
 
     setBackgroundMusicVolume(level, previousLevel = level) {
-        if (!this.ctx || !this.bgMusicGain || !this.bgMusicLoop) return;
-        const nextLevel = Number(level);
-        const previous = Number(previousLevel);
-        const currentTarget = Number(this.bgMusicTargetVolume);
-        if (!Number.isFinite(nextLevel) || !Number.isFinite(previous) || previous <= 0 || !Number.isFinite(currentTarget)) return;
-
-        // Preserve the current role of music (full bed, narration duck, or
-        // intentional silence) instead of replacing the envelope with the
-        // slider's full value. A zero target deliberately remains silent.
-        const roleFactor = Math.max(0, Math.min(1, currentTarget / previous));
-        const nextTarget = nextLevel * roleFactor;
-        this.bgMusicTargetVolume = nextTarget;
-        if (roleFactor === 0) return;
-
-        const now = this.ctx.currentTime;
-        const currentGain = this.bgMusicGain.gain.value;
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(currentGain, now);
-        // Do not wake a bus that is still intentionally at silence during a
-        // fade; the next explicit fade-in remains responsible for that start.
-        if (currentGain <= 0.0001) return;
-        this.bgMusicGain.gain.linearRampToValueAtTime(nextTarget, now + 0.25);
+        return audioBackgroundMusicControls.setVolume(this, level, previousLevel);
     }
 
     cancelBackgroundMusicRestore() {
-        if (this.bgMusicRestoreTimer) {
-            clearTimeout(this.bgMusicRestoreTimer);
-            this.bgMusicRestoreTimer = null;
-        }
+        return audioBackgroundMusicControls.cancelRestore(this);
     }
 
     muteBackgroundMusicForMantra(duration = MANTRA_MUSIC_FADE_SECONDS) {
-        if (!this.ctx || !this.bgMusicBusGain) return;
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = true;
-        const now = this.ctx.currentTime;
-        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
-            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
-        } else {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-        }
-        const fadeDuration = Math.max(0, duration);
-        this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + fadeDuration);
-        if (this.musicEchoTailGate) {
-            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
-                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
-            } else {
-                this.musicEchoTailGate.gain.cancelScheduledValues(now);
-                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
-            }
-            this.musicEchoTailGate.gain.linearRampToValueAtTime(0, now + fadeDuration);
-        }
-        return { startedAt: now, duration: fadeDuration };
+        return audioBackgroundMusicControls.muteForMantra(this, duration);
     }
 
     restoreBackgroundMusicAfterMantra(duration = BACKGROUND_MUSIC_RESTORE_FADE_SECONDS) {
-        if (!this.ctx || !this.bgMusicBusGain) return;
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        const now = this.ctx.currentTime;
-        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
-            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
-        } else {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-        }
-        this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
-        if (this.musicEchoTailGate) {
-            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
-                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
-            } else {
-                this.musicEchoTailGate.gain.cancelScheduledValues(now);
-                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
-            }
-            this.musicEchoTailGate.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
-        }
+        return audioBackgroundMusicControls.restoreAfterMantra(this, duration);
     }
 
     stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {
-        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, false, Math.max(0, fadeTime) + MUSIC_REVERB_TAIL_SECONDS + 0.1);
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        if (this.bgMusicLoop) {
-            const retirementSeconds = Math.max(0, fadeTime);
-            this.bgMusicLoop.stop(retirementSeconds);
-            this.bgMusicLoop = null;
-            this.bgMusicEntryEndsAt = 0;
-            const retirement = new Promise(resolve => setTimeout(resolve, (retirementSeconds + 0.1) * 1000));
-            this.bgMusicRetirePromise = retirement;
-            void retirement.then(() => {
-                if (this.bgMusicRetirePromise === retirement) this.bgMusicRetirePromise = null;
-            });
-        }
+        return audioBackgroundMusicLifecycle.stop(this, fadeTime, MUSIC_REVERB_TAIL_SECONDS);
     }
 
     prepareJourneyVideoPrelude(media) {
@@ -2852,1061 +1497,6 @@ class AudioEngine {
     }
 }
 
-// Lightweight ambient star field. Most stars are tiny and cheap to redraw;
-// only the brighter foreground stars receive independent scintillation so the
-// sky feels alive without turning the meditation background into a spectacle.
-class AmbientParticleField {
-    constructor() {
-        this.canvas = document.getElementById('particle-canvas');
-        this.ctx = this.canvas?.getContext('2d', { alpha: true }) || null;
-        this.particles = [];
-        this.meteors = [];
-        this.nextMeteorAt = 0;
-        this.sky = new NaturalNightSky();
-        this.celestialLayer = document.createElement('canvas');
-        this.celestialLayerKey = null;
-        this.renderTimer = null;
-        this.lastCelestialRefresh = 0;
-        this.cachedMoonPhase = null;
-        this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-        this.observer = null;
-        this.celestialBodies = [];
-        this.deepSkyBlackHoleEnabled = false;
-        this.moonBuffer = document.createElement('canvas');
-        this.moonBuffer.width = 128;
-        this.moonBuffer.height = 128;
-        this.moonBufferContext = this.moonBuffer.getContext('2d');
-        // Populate an approximate sky immediately; a successful location
-        // permission replaces this with the real observer position.
-        this.setFallbackObserver();
-        this.frame = 0;
-        this.lastFrameAt = 0;
-        this.resize = this.resize.bind(this);
-        this.render = this.render.bind(this);
-        this.handleVisibility = this.handleVisibility.bind(this);
-        this.handleMotionChange = this.handleMotionChange.bind(this);
-        this.layoutFrame = 0;
-        this.invalidateSkyLayout = () => {
-            this.celestialLayerKey = null;
-            if (!this.started || document.hidden || this.layoutFrame) return;
-            // One redraw for an actual layout event, never an idle loop.
-            this.layoutFrame = requestAnimationFrame(() => {
-                this.layoutFrame = 0;
-                if (!document.hidden) this.draw(performance.now(), false);
-            });
-        };
-    }
-
-    start() {
-        if (!this.canvas || !this.ctx || this.started) return;
-        this.started = true;
-        window.addEventListener('resize', this.resize, { passive: true });
-        document.addEventListener('visibilitychange', this.handleVisibility);
-        document.addEventListener('decorationchange', this.handleMotionChange);
-        this.motionPreference.addEventListener('change', this.handleMotionChange);
-        this.layoutObserver = new MutationObserver(this.invalidateSkyLayout);
-        const mantra = document.getElementById('mantra-display');
-        if (mantra) this.layoutObserver.observe(mantra, { childList: true, characterData: true, subtree: true });
-        for (const element of document.querySelectorAll('.screen, #controls, body')) {
-            this.layoutObserver.observe(element, { attributes: true, attributeFilter: ['class'] });
-        }
-        this.resize();
-        this.requestObserverLocation();
-        if (!this.motionPreference.matches && !document.hidden) {
-            this.frame = requestAnimationFrame(this.render);
-        } else {
-            this.draw(performance.now(), false);
-        }
-    }
-
-    setFallbackObserver() {
-        this.observer = { latitude: 51.4779, longitude: 0, height: 0, approximate: true };
-    }
-
-    requestObserverLocation() {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition(
-            ({ coords }) => {
-                if (!Number.isFinite(coords.latitude) || !Number.isFinite(coords.longitude)) return;
-                this.observer = { latitude: coords.latitude, longitude: coords.longitude, height: Number.isFinite(coords.altitude) ? coords.altitude : 0, approximate: false };
-                this.refreshCelestialBodies();
-                this.draw(performance.now(), false);
-            },
-            () => { /* Keep the approximate fallback sky when declined. */ },
-            { enableHighAccuracy: false, maximumAge: 900000, timeout: 8000 }
-        );
-    }
-
-    refreshCelestialBodies(date = new Date()) {
-        if (!this.observer) return;
-        if (this.skySnapshot && document.body.classList.contains('static-decorations')) return;
-        // Bound retries as well as successful updates; a failed engine must
-        // never turn into a per-frame calculation/error loop.
-        this.lastCelestialRefresh = performance.now();
-        try {
-            const sky = SkyAstronomy.snapshot(date, this.observer);
-            this.skySnapshot = sky;
-            this.skyFailed = false;
-            this.celestialDaylight = sky.sunAltitude > -6;
-            this.celestialNightVisible = !this.celestialDaylight;
-            this.celestialBodies = [...sky.stars.filter(star => star.name), ...sky.bodies];
-            if (this.sky.width) this.sky.resize(this.sky.width, this.sky.height, this.sky.dpr, sky.stars, sky.sunAltitude);
-            this.updateSkyLocationStatus();
-        } catch (error) {
-            this.celestialBodies = [];
-            this.skySnapshot = null;
-            this.skyFailed = true;
-            this.celestialDaylight = false;
-            if (this.sky.width) this.sky.resize(this.sky.width, this.sky.height, this.sky.dpr);
-            this.updateSkyLocationStatus();
-            console.warn('Sky position calculation unavailable.', error);
-        }
-    }
-
-    updateSkyLocationStatus() {
-        const element = document.getElementById('sky-location-status');
-        if (!element || typeof state === 'undefined') return;
-        const key = this.skyFailed ? 'ui.skyUnavailable' : this.observer?.approximate ? 'ui.skyReference' : 'ui.skyLocal';
-        element.textContent = t(key, state.displayLanguage);
-    }
-
-    resize() {
-        if (!this.canvas || !this.ctx) return;
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        const sizeKey = `${window.innerWidth}:${window.innerHeight}:${dpr}`;
-        if (this.sizeKey === sizeKey) return;
-        this.sizeKey = sizeKey;
-        this.canvas.width = Math.round(window.innerWidth * dpr);
-        this.canvas.height = Math.round(window.innerHeight * dpr);
-        this.canvas.style.width = `${window.innerWidth}px`;
-        this.canvas.style.height = `${window.innerHeight}px`;
-        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (!this.skySnapshot) this.refreshCelestialBodies();
-        this.sky.resize(window.innerWidth, window.innerHeight, dpr, this.skySnapshot?.stars || [], this.skySnapshot?.sunAltitude ?? -18);
-        this.particles = this.sky.stars;
-        this.draw(performance.now(), false);
-    }
-
-    handleMotionChange() {
-        clearTimeout(this.renderTimer);
-        this.renderTimer = null;
-        cancelAnimationFrame(this.frame);
-        this.frame = 0;
-        this.meteors = [];
-        this.nextMeteorAt = 0;
-        this.lastFrameAt = 0;
-        if (!document.hidden) {
-            if (this.motionPreference.matches || document.body.classList.contains('static-decorations')) this.draw(performance.now(), false);
-            else this.frame = requestAnimationFrame(this.render);
-        }
-    }
-
-    handleVisibility() {
-        if (document.hidden) {
-            cancelAnimationFrame(this.layoutFrame);
-            this.layoutFrame = 0;
-            clearTimeout(this.renderTimer);
-            this.renderTimer = null;
-            cancelAnimationFrame(this.frame);
-            this.frame = 0;
-            this.meteors = [];
-            this.nextMeteorAt = 0;
-        } else if (document.body.classList.contains('static-decorations')) {
-            this.draw(performance.now(), false);
-        } else if (!this.motionPreference.matches && !this.frame && !this.renderTimer) {
-            this.lastFrameAt = 0;
-            this.frame = requestAnimationFrame(this.render);
-        } else if (this.motionPreference.matches) {
-            this.refreshCelestialBodies();
-            this.draw(performance.now(), false);
-        }
-    }
-
-    render(timestamp) {
-        this.frame = 0;
-        if (document.hidden || this.motionPreference.matches || document.body.classList.contains('static-decorations')) { this.frame = 0; return; }
-        if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
-            this.draw(timestamp, true);
-            this.lastFrameAt = timestamp;
-        }
-        // Sleep between draws instead of waking on every 60/120 Hz refresh.
-        this.renderTimer = setTimeout(() => {
-            this.renderTimer = null;
-            if (!document.hidden && !this.motionPreference.matches) {
-                this.frame = requestAnimationFrame(this.render);
-            }
-        }, 33);
-    }
-
-    draw(timestamp, animate) {
-        if (!this.ctx) return;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        if (this.observer && !document.body.classList.contains('static-decorations') && timestamp - this.lastCelestialRefresh >= 10000) {
-            this.refreshCelestialBodies();
-            this.lastCelestialRefresh = timestamp;
-        }
-        this.ctx.clearRect(0, 0, width, height);
-        const time = timestamp * 0.001;
-        this.sky.draw(this.ctx, timestamp, animate);
-        if (animate) this.drawMeteors(time, width, height);
-        this.drawCachedCelestialBodies(width, height);
-        this.ctx.shadowBlur = 0;
-    }
-
-    drawCachedCelestialBodies(width, height) {
-        // Positions refresh at most once per ten seconds while animating.
-        // Static journey screens have no timer. Reuse expensive gradients,
-        // text measurement and blurred backings between those updates.
-        const key = `${this.canvas.width}:${this.canvas.height}:${state.displayLanguage}:${this.deepSkyBlackHoleEnabled}:${document.body.classList.contains('static-decorations')}:${document.fonts?.status}`;
-        if (this.celestialLayerKey !== key || this.cachedBodies !== this.celestialBodies) {
-            const layer = this.celestialLayer;
-            layer.width = this.canvas.width;
-            layer.height = this.canvas.height;
-            const target = this.ctx;
-            const cached = layer.getContext('2d');
-            if (!cached) { this.drawCelestialBodies(width, height); return; }
-            cached.setTransform(layer.width / width, 0, 0, layer.height / height, 0, 0);
-            try {
-                this.ctx = cached;
-                this.drawCelestialBodies(width, height);
-            } finally { this.ctx = target; }
-            this.celestialLayerKey = key;
-            this.cachedBodies = this.celestialBodies;
-        }
-        this.ctx.drawImage(this.celestialLayer, 0, 0, width, height);
-    }
-
-    drawCelestialBodies(width, height) {
-        if (this.celestialDaylight) {
-            // Cached once per celestial refresh: a transparent indigo wash
-            // keeps the application’s space identity while softening the
-            // procedural field beneath the calculated daytime Sun.
-            const wash = this.ctx.createLinearGradient(0, 0, 0, height);
-            wash.addColorStop(0, 'rgba(35, 48, 124, 0.34)');
-            wash.addColorStop(0.5, 'rgba(50, 66, 148, 0.18)');
-            wash.addColorStop(1, 'rgba(5, 8, 28, 0.08)');
-            this.ctx.fillStyle = wash;
-            this.ctx.fillRect(0, 0, width, height);
-        }
-        this.drawCelestialHorizon(width, height);
-        this.drawEarthIllustration(width, height);
-        if (this.deepSkyBlackHoleEnabled && !document.body.classList.contains('static-decorations')) {
-            this.drawDeepSkyBlackHole(width, height);
-        }
-        const labelBounds = [];
-        this.celestialBodies.forEach((body) => {
-            if (body.altitude < 0) return;
-            const { x, y } = SkyAstronomy.project(body.azimuth, body.altitude, width, height);
-            const moonPixelDiameter = Math.max(8, (height * 0.88 - 20) * (body.angularDiameter || 0.52) / 90);
-            const size = body.kind === 'sun'
-                ? moonPixelDiameter / 2
-                : body.kind === 'moon'
-                ? moonPixelDiameter / 2
-                : body.kind === 'planet'
-                    ? Math.min(1.65, Math.max(0.8, moonPixelDiameter * (body.angularDiameter / 0.52) * 0.4))
-                    : Math.max(0.75, 1.65 - body.magnitude * 0.22);
-            const [red, green, blue] = body.color;
-            this.ctx.save();
-            if (body.kind === 'star') this.ctx.globalAlpha = Math.max(0.10, Math.min(1, (2 - this.skySnapshot.sunAltitude) / 20));
-            if (body.kind === 'moon') this.drawEarthMoonGuide(x, y, width, height);
-            const illumination = body.kind === 'moon' ? body.illumination : 1;
-            const haloRadius = body.kind === 'sun' ? size * 6 : body.kind === 'moon' ? size * 3.5 : size * 4;
-            const halo = this.ctx.createRadialGradient(x, y, Math.max(0.4, size * 0.35), x, y, haloRadius);
-            halo.addColorStop(0, `rgba(${red}, ${green}, ${blue}, ${body.kind === 'sun' ? 0.27 : body.kind === 'moon' ? illumination * 0.1 : 0.12})`);
-            halo.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
-            this.ctx.fillStyle = halo;
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.shadowBlur = body.kind === 'moon' ? 0 : 3;
-            this.ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${body.kind === 'moon' ? 0.52 : 0.72})`;
-            if (body.kind === 'moon') {
-                this.drawMoonWithBooleanMask(x, y, size, body.phase ?? 0.5, body.lightAngle, body.illumination);
-            } else if (body.kind === 'sun') {
-                this.drawSolarProtectionLayer(x, y, size);
-                const sunGradient = this.ctx.createRadialGradient(x - size * 0.28, y - size * 0.28, Math.max(0.5, size * 0.08), x, y, size);
-                // A soft, balanced daylight palette: warm enough to feel
-                // alive, not white-hot or orange-heavy.
-                sunGradient.addColorStop(0, 'rgba(255, 250, 230, 1)');
-                sunGradient.addColorStop(0.42, 'rgba(255, 235, 184, 0.96)');
-                sunGradient.addColorStop(1, 'rgba(255, 196, 118, 0.82)');
-                this.ctx.fillStyle = sunGradient;
-                this.ctx.beginPath();
-                this.ctx.arc(x, y, size, 0, Math.PI * 2);
-                this.ctx.fill();
-            } else {
-                const planetGradient = this.ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, Math.max(0.25, size * 0.12), x, y, Math.max(0.6, size));
-                planetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
-                planetGradient.addColorStop(0.24, `rgba(${red}, ${green}, ${blue}, 0.96)`);
-                planetGradient.addColorStop(1, `rgba(${Math.round(red * 0.52)}, ${Math.round(green * 0.52)}, ${Math.round(blue * 0.52)}, 0.82)`);
-                this.ctx.fillStyle = planetGradient;
-                this.ctx.beginPath();
-                this.ctx.arc(x, y, size, 0, Math.PI * 2);
-                this.ctx.fill();
-            }
-            const labelKey = CELESTIAL_LABEL_KEYS[body.name];
-            const translatedLabel = labelKey ? t(labelKey, state.displayLanguage) : body.name;
-            // Never expose an untranslated implementation key such as
-            // "ui.celestialEarth" while locale files are loading.
-            const label = !translatedLabel || translatedLabel === labelKey || translatedLabel.startsWith('ui.') ? body.name : translatedLabel;
-            const shouldShowLabel = body.kind === 'sun' || body.kind === 'planet' || (body.kind === 'star' && body.magnitude < 1);
-            if (label && shouldShowLabel) {
-                this.ctx.textAlign = 'left';
-                // Labels remain compact and deliberately translucent. The
-                // light backing only lifts them from busy star fields instead
-                // of reading as an interface layer over the night sky.
-                this.ctx.font = '500 11px Inter, Manjari, sans-serif';
-                const metrics = this.ctx.measureText(label);
-                const paddingX = 4;
-                const labelWidth = metrics.width + paddingX * 2;
-                const placement = this.placeCelestialLabel(x, y, size, labelWidth, width, height, labelBounds);
-                const labelLeft = placement.left, labelX = labelLeft + paddingX, labelY = placement.top + 12;
-                if (Math.abs(labelY - y - 4) > 8) {
-                    // Only labels move. A fine leader retains the exact body
-                    // position when several objects are close on mobile.
-                    this.ctx.save();
-                    this.ctx.shadowBlur = 0;
-                    this.ctx.strokeStyle = 'rgba(200, 219, 243, 0.18)';
-                    this.ctx.lineWidth = 0.5;
-                    this.ctx.beginPath(); this.ctx.moveTo(x, y);
-                    this.ctx.lineTo(Math.max(labelLeft, Math.min(labelLeft + labelWidth, x)), labelY - 4);
-                    this.ctx.stroke(); this.ctx.restore();
-                }
-                // Soften only the backing; restore before drawing crisp text.
-                this.ctx.save();
-                this.ctx.shadowBlur = 0;
-                this.ctx.filter = 'blur(3px)';
-                this.ctx.fillStyle = 'rgba(2, 4, 9, 0.20)';
-                this.ctx.fillRect(labelLeft, labelY - 12, labelWidth, 16);
-                this.ctx.restore();
-                this.ctx.lineWidth = 1.4;
-                this.ctx.strokeStyle = 'rgba(2, 4, 9, 0.20)';
-                this.ctx.strokeText(label, labelX, labelY);
-                this.ctx.fillStyle = `rgba(${Math.max(red, 220)}, ${Math.max(green, 220)}, ${Math.max(blue, 220)}, 0.40)`;
-                this.ctx.fillText(label, labelX, labelY);
-            }
-            this.ctx.restore();
-        });
-    }
-
-    placeCelestialLabel(x, y, size, labelWidth, width, height, occupied) {
-        const right = x + size + 4, left = x - size - labelWidth - 4;
-        const sides = x > width * 0.82 ? [left, right] : [right, left];
-        let fallback;
-        for (const offset of [0, -18, 18, -36, 36, -54, 54, -72, 72, -90, 90]) {
-            for (const side of sides) {
-                const box = {left: Math.max(4, Math.min(width - labelWidth - 4, side)),
-                    top: Math.max(4, Math.min(height * 0.88 - 20, y - 8 + offset)), width: labelWidth, height: 16};
-                fallback ||= box;
-                if (occupied.some(b => box.left < b.left + b.width + 2 && box.left + box.width + 2 > b.left &&
-                    box.top < b.top + b.height + 2 && box.top + box.height + 2 > b.top)) continue;
-                occupied.push(box);
-                return box;
-            }
-        }
-        occupied.push(fallback);
-        return fallback;
-    }
-
-    drawEarthIllustration(width, height) {
-        // Below the observed horizon: artwork, never a fabricated sky position.
-        const key = CELESTIAL_LABEL_KEYS.Earth, name = t(key, state.displayLanguage);
-        const label = name && name !== key ? name : 'Earth';
-        this.ctx.save();
-        this.ctx.font = '500 11px Inter, Manjari, sans-serif';
-        const placement = this.earthReferenceLayout(width, height, [], this.ctx.measureText(label).width);
-        this.earthReferencePlacement = placement;
-        const { x, y, size } = placement;
-        this.drawEarthAtmosphericLayers(x, y, size);
-        const surface = this.ctx.createRadialGradient(x - size * 0.3, y - size * 0.4, 0, x, y, size);
-        surface.addColorStop(0, 'rgba(183, 231, 247, 1)');
-        surface.addColorStop(0.5, 'rgba(44, 138, 194, 1)');
-        surface.addColorStop(0.85, 'rgba(17, 67, 114, 1)');
-        surface.addColorStop(1, 'rgba(6, 23, 49, 0.98)');
-        this.ctx.fillStyle = surface;
-        this.ctx.beginPath(); this.ctx.arc(x, y, size, 0, Math.PI * 2); this.ctx.fill();
-        this.ctx.fillStyle = 'rgba(99, 172, 128, 0.72)';
-        this.ctx.beginPath();
-        this.ctx.ellipse(x - size * 0.25, y - size * 0.2, size * 0.38, size * 0.22, -0.6, 0, Math.PI * 2);
-        this.ctx.ellipse(x + size * 0.26, y + size * 0.2, size * 0.19, size * 0.38, -0.5, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.filter = 'blur(0.7px)';
-        this.ctx.fillStyle = 'rgba(237, 251, 255, 0.32)';
-        this.ctx.beginPath();
-        this.ctx.ellipse(x - size * 0.13, y - size * 0.39, size * 0.63, size * 0.12, -0.3, 0, Math.PI * 2);
-        this.ctx.ellipse(x + size * 0.08, y + size * 0.37, size * 0.60, size * 0.09, -0.3, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.filter = 'none';
-        this.ctx.textAlign = 'left'; this.ctx.fillStyle = 'rgba(225, 242, 255, 0.7)';
-        this.ctx.fillText(label, x + size * 1.5, y + 4);
-        this.ctx.restore();
-    }
-
-    earthReferenceLayout(width, height, obstacles = [], labelWidth = 40) {
-        const x = width / 2, top = height * 0.88 + 22, bottom = height - 8;
-        const widthKey = Math.round(width);
-        if (this.earthReferenceSizeWidth !== widthKey) {
-            // Choose one size for this viewport width and retain it while the
-            // page scrolls. Mobile browser chrome can also change innerHeight
-            // during a scroll, so cap the sizing height by the stable width.
-            // Foreground content may move the Earth or hide it, but must not
-            // make the globe pulse between fallback sizes.
-            const sizingHeight = Math.min(height, width * 2);
-            const sizingTop = sizingHeight * 0.88 + 22;
-            const sizingBottom = sizingHeight - 8;
-            this.earthReferenceSize = [Math.min(14, sizingHeight * 0.016), 10, 8, 6, 4, 3]
-                .find(size => sizingTop + size * 2.8 <= sizingBottom - size * 2.8) || 3;
-            this.earthReferenceSizeWidth = widthKey;
-        }
-        const size = this.earthReferenceSize;
-        const radius = size * 2.8;
-        const minimumY = top + radius;
-        const maximumY = Math.max(minimumY, bottom - radius);
-        const y = Math.max(minimumY, Math.min(maximumY, height * 0.943));
-        const bounds = { left: x - radius, right: x + Math.max(radius, size * 1.5 + labelWidth),
-            top: y - radius, bottom: y + radius };
-        return { x, y, size, bounds };
-    }
-
-    drawEarthMoonGuide(moonX, moonY, width, height) {
-        const earth = this.earthReferencePlacement;
-        const horizonY = height * 0.88;
-        if (!earth || moonY > horizonY) return;
-        const startX = earth.x;
-        const startY = earth.y - earth.size * 1.05;
-        const controlX = startX + (moonX - startX) * 0.52;
-        const controlY = Math.min(horizonY - 8, moonY + (horizonY - moonY) * 0.42);
-        this.ctx.save();
-        this.ctx.globalCompositeOperation = 'screen';
-        this.ctx.strokeStyle = 'rgba(190, 214, 245, 0.14)';
-        this.ctx.lineWidth = 0.65;
-        this.ctx.setLineDash([2, 6]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(startX, startY);
-        this.ctx.quadraticCurveTo(controlX, controlY, moonX, moonY);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-        this.ctx.restore();
-        this.moonObserverPlacement = { earthX: startX, earthY: startY, moonX, moonY };
-    }
-
-    drawEarthAtmosphericLayers(x, y, size) {
-        // Owner-retained design: five merged protective atmosphere volumes.
-        // The nearest layer uses a cool aqua 26°C comfort palette: artwork,
-        // not a measured/simulated temperature or radiation-shielding claim.
-        // Keep the visible band outside the opaque disc, even on tiny markers.
-        // Preserve this and the Sun shield unless the owner requests removal.
-        const layers = [
-            [1.50, '112, 232, 244', 0.90], // Troposphere: cool aqua comfort.
-            [1.82, '96, 190, 255', 0.58],  // Stratosphere.
-            [2.13, '126, 160, 246', 0.38], // Mesosphere.
-            [2.47, '102, 212, 235', 0.24], // Thermosphere.
-            [2.80, '166, 202, 255', 0.16]  // Exosphere: soft outer dissolve.
-        ];
-        this.ctx.save();
-        this.ctx.globalCompositeOperation = 'screen';
-        layers.forEach(([scale, rgb, alpha]) => {
-            const radius = size * scale;
-            const gradient = this.ctx.createRadialGradient(x, y, size * 0.98, x, y, radius);
-            gradient.addColorStop(0, `rgba(${rgb}, ${alpha})`);
-            gradient.addColorStop(0.18, `rgba(${rgb}, ${alpha * 0.92})`);
-            gradient.addColorStop(0.60, `rgba(${rgb}, ${alpha * 0.40})`);
-            gradient.addColorStop(1, `rgba(${rgb}, 0)`);
-            this.ctx.fillStyle = gradient;
-            this.ctx.fillRect(x - radius * 1.1, y - radius * 1.1, radius * 2.2, radius * 2.2);
-        });
-        this.ctx.restore();
-    }
-
-    drawSolarProtectionLayer(x, y, size) {
-        // Owner-retained feature; see AGENTS.md and docs/SKY-ACCURACY.md.
-        // Visual-only shield: a soft circular rim inside the diffuse glow.
-        // It is not a claim about filtering real radiation or energy transfer.
-        const radius = size * 4.2;
-        const gradient = this.ctx.createRadialGradient(x, y, size * 0.72, x, y, radius);
-        gradient.addColorStop(0, 'rgba(255, 248, 214, 0.16)');
-        gradient.addColorStop(0.34, 'rgba(255, 224, 149, 0.13)');
-        gradient.addColorStop(0.66, 'rgba(255, 190, 112, 0.075)');
-        gradient.addColorStop(1, 'rgba(255, 184, 104, 0)');
-        this.ctx.save();
-        this.ctx.globalCompositeOperation = 'screen';
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-        const shield = this.ctx.createRadialGradient(x, y, size * 1.15, x, y, size * 2.8);
-        shield.addColorStop(0, 'rgba(255, 241, 190, 0)');
-        shield.addColorStop(0.38, 'rgba(255, 236, 177, 0.025)');
-        shield.addColorStop(0.56, 'rgba(255, 245, 207, 0.24)');
-        shield.addColorStop(0.72, 'rgba(255, 231, 170, 0.04)');
-        shield.addColorStop(1, 'rgba(255, 231, 170, 0)');
-        this.ctx.fillStyle = shield;
-        this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-        this.ctx.restore();
-    }
-
-    setDeepSkyBlackHoleEnabled(enabled) {
-        this.deepSkyBlackHoleEnabled = Boolean(enabled);
-        this.celestialLayerKey = null;
-        if (!document.hidden) this.draw(performance.now(), false);
-    }
-
-    drawDeepSkyBlackHole(width, height) {
-        // A deliberately illustrative deep-sky object: fixed, subtle and
-        // cached with the celestial layer rather than animated or positioned
-        // as an observed astronomical body.
-        const x = width * 0.76;
-        const y = height * 0.27;
-        const radius = Math.max(7, Math.min(14, Math.min(width, height) * 0.014));
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(-0.34);
-        const outer = this.ctx.createRadialGradient(0, 0, radius * 0.35, 0, 0, radius * 3.4);
-        outer.addColorStop(0, 'rgba(0, 0, 0, 0.92)');
-        outer.addColorStop(0.24, 'rgba(8, 8, 18, 0.88)');
-        outer.addColorStop(0.35, 'rgba(182, 128, 222, 0.18)');
-        outer.addColorStop(0.56, 'rgba(118, 184, 255, 0.11)');
-        outer.addColorStop(1, 'rgba(16, 10, 38, 0)');
-        this.ctx.fillStyle = outer;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, radius * 3.1, radius * 0.82, 0, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.strokeStyle = 'rgba(214, 180, 255, 0.34)';
-        this.ctx.lineWidth = Math.max(0.55, radius * 0.08);
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, radius * 1.75, radius * 0.38, 0, 0, Math.PI * 2);
-        this.ctx.stroke();
-        this.ctx.fillStyle = 'rgba(0, 0, 4, 0.96)';
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius * 0.56, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.restore();
-    }
-
-    drawCelestialHorizon(width, height) {
-        // This is the same 0° baseline used by the altitude projection below.
-        // Keep it deliberately quiet: it is a spatial reference, not a new
-        // landscape layer over the night-sky experience. It is drawn into the
-        // cached celestial canvas, so it creates no repeating frame work.
-        const horizonY = height * 0.88;
-        const glow = this.ctx.createLinearGradient(0, horizonY, width, horizonY);
-        glow.addColorStop(0, 'rgba(154, 181, 234, 0)');
-        glow.addColorStop(0.2, 'rgba(154, 181, 234, 0.08)');
-        glow.addColorStop(0.5, 'rgba(214, 224, 255, 0.18)');
-        glow.addColorStop(0.8, 'rgba(154, 181, 234, 0.08)');
-        glow.addColorStop(1, 'rgba(154, 181, 234, 0)');
-        this.ctx.save();
-        this.ctx.strokeStyle = glow;
-        this.ctx.lineWidth = 1;
-        this.ctx.shadowColor = 'rgba(173, 196, 255, 0.18)';
-        this.ctx.shadowBlur = 7;
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, horizonY);
-        this.ctx.lineTo(width, horizonY);
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
-        this.ctx.font = '500 10px Inter, Manjari, sans-serif';
-        this.ctx.fillStyle = 'rgba(209, 224, 247, 0.48)';
-        for (const [az, key] of [[0, 'skyNorth'], [90, 'skyEast'], [180, 'skySouth'], [270, 'skyWest']]) {
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(t(`ui.${key}`, state.displayLanguage), SkyAstronomy.project(az, 0, width, height).x, horizonY + 15);
-        }
-        this.ctx.restore();
-    }
-
-    drawMoonWithBooleanMask(x, y, size, phase, lightAngle, fraction = (1 - Math.cos(phase * Math.PI * 2)) / 2) {
-        const buffer = this.moonBuffer;
-        const bufferContext = this.moonBufferContext;
-        if (!bufferContext) return;
-        // Cache a lit sphere, including the curved terminator. Pixel alpha is
-        // the illumination mask, so the unlit side never paints a dark disc.
-        // Surface features are procedural texture, not a surveyed lunar map.
-        const phaseKey = `${Math.round(fraction * 10000)}:${phase < 0.5}`;
-        if (phaseKey !== this.cachedMoonPhase) {
-            const pixels = bufferContext.createImageData(128, 128);
-            const lightZ = 2 * fraction - 1;
-            const lightX = Math.sqrt(Math.max(0, 1 - lightZ * lightZ)) * (phase < 0.5 ? 1 : -1);
-            const maria = [[-0.26,-0.24,0.27,0.32],[0.18,-0.38,0.29,0.18],
-                [0.38,-0.02,0.23,0.29],[-0.47,0.08,0.15,0.3],[0.01,0.16,0.2,0.16]];
-            const random = this.sky.random(93827);
-            const craters = Array.from({length:48}, () => ({x:random()*1.7-0.85,y:random()*1.7-0.85,r:0.016+random()*0.062}));
-            for (let py=0;py<128;py++) {
-                for (let px=0;px<128;px++) {
-                    const nx=(px-63.5)/61, ny=(py-63.5)/61;
-                    const squared=nx*nx+ny*ny;
-                    if (squared>=1) continue;
-                    const nz=Math.sqrt(1-squared);
-                    const incidence=nx*lightX+nz*lightZ;
-                    if (incidence<=0) continue;
-                    let surface=0.84+this.sky.noise(nx*32+8,ny*32+8)*0.14;
-                    for (const [mx,my,rx,ry] of maria) {
-                        surface-=Math.exp(-((nx-mx)**2/rx**2+(ny-my)**2/ry**2)*1.5)*0.22;
-                    }
-                    for (const crater of craters) {
-                        const distance=Math.hypot(nx-crater.x,ny-crater.y)/crater.r;
-                        if (distance<1.3) surface+=distance<0.75?-0.065:0.07;
-                    }
-                    const lighting=0.24+0.76*Math.pow(incidence,0.42);
-                    const value=Math.min(255,Math.max(0,255*surface*lighting));
-                    const i=(py*128+px)*4;
-                    pixels.data[i]=value;
-                    pixels.data[i+1]=value*0.985;
-                    pixels.data[i+2]=value*0.95;
-                    pixels.data[i+3]=255*Math.min(1,incidence*28)*Math.min(1,(1-squared)*65);
-                }
-            }
-            bufferContext.putImageData(pixels,0,0);
-            this.cachedMoonPhase=phaseKey;
-        }
-        this.ctx.save();
-        this.ctx.shadowBlur = 0;
-        this.ctx.globalCompositeOperation = 'source-over';
-        if (Number.isFinite(lightAngle)) {
-            this.ctx.translate(x, y);
-            this.ctx.rotate(lightAngle - (phase < 0.5 ? 0 : Math.PI));
-            x = 0; y = 0;
-        }
-        this.ctx.drawImage(buffer, x - size, y - size, size * 2, size * 2);
-        this.ctx.restore();
-    }
-
-    drawMeteors(time, width, height) {
-        if (!this.nextMeteorAt) this.nextMeteorAt = time + 5 + Math.random() * 4;
-        if (time >= this.nextMeteorAt && this.meteors.length < 1) {
-            // On wide screens use exposed sky beside the central controls.
-            const leftSide = Math.random() < 0.5;
-            const startX = width > 900
-                ? width * (leftSide ? 0.12 : 0.86)
-                : width * (0.55 + Math.random() * 0.3);
-            const startY = height * (0.05 + Math.random() * 0.12);
-            this.meteors.push({
-                startX,
-                startY,
-                angle: Math.PI * (width > 900 && leftSide ? 0.28 + Math.random() * 0.1 : 0.62 + Math.random() * 0.1),
-                length: Math.min(width * 0.24, 65 + Math.random() * 65),
-                speed: Math.min(width * 0.75, 360 + Math.random() * 160),
-                bornAt: time,
-                lifetime: 0.75 + Math.random() * 0.3,
-                brightness: 0.55 + Math.random() * 0.2
-            });
-            this.nextMeteorAt = time + 25 + Math.random() * 45;
-        }
-        // No allocation or drawing at all between these occasional events.
-        const meteor = this.meteors[0];
-        if (!meteor) return;
-        if (!this.meteorSprite) {
-            this.meteorSprite = document.createElement('canvas');
-            this.meteorSprite.width = 256;
-            this.meteorSprite.height = 12;
-            const ctx = this.meteorSprite.getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 256, 0);
-            gradient.addColorStop(0, 'rgba(205,225,255,0)');
-            gradient.addColorStop(0.65, 'rgba(220,234,255,0.3)');
-            gradient.addColorStop(1, 'rgba(255,255,255,1)');
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 1.8;
-            ctx.shadowBlur = 2;
-            ctx.shadowColor = 'rgba(205,225,255,0.5)';
-            ctx.beginPath(); ctx.moveTo(0,6); ctx.lineTo(256,6); ctx.stroke();
-        }
-            const age = time - meteor.bornAt;
-            if (age >= meteor.lifetime + 0.18) { this.meteors.length = 0; return; }
-            const progress = age / meteor.lifetime;
-            const distance = Math.min(age, meteor.lifetime) * meteor.speed;
-            const headX = meteor.startX + Math.cos(meteor.angle) * distance;
-            const headY = meteor.startY + Math.sin(meteor.angle) * distance;
-            const tailLength = Math.min(meteor.length, distance);
-            // Quick emergence, restrained peak, then a faint 180 ms residual trail.
-            const alpha = Math.min(1, progress / 0.12) * Math.pow(Math.max(0, 1 - age / (meteor.lifetime + 0.18)), 0.65) * meteor.brightness;
-            this.ctx.save();
-            this.ctx.translate(headX, headY);
-            this.ctx.rotate(meteor.angle);
-            this.ctx.globalAlpha = alpha;
-            this.ctx.drawImage(this.meteorSprite, -tailLength, -6, tailLength, 12);
-            this.ctx.restore();
-    }
-}
-
-// Visual Engine
-class VisualEngine {
-    constructor(audioEngine) {
-        this.container = document.getElementById('chakra-container');
-        this.symbolImg = document.getElementById('chakra-symbol');
-        this.glow = document.getElementById('glow-effect');
-        this.presence = this.container && this.symbolImg && window.CelestialPresence
-            ? new window.CelestialPresence(this.container, this.symbolImg) : null;
-        this.presence?.setAudio(audioEngine);
-    }
-    applyImageEffect(color = null) {
-        if (!this.container) return;
-        const effect = normalizeMeditationVisualEffect(state.visualEffect);
-        const active = effect !== 'natural' && !state.eyesCloseMode;
-        this.container.classList.remove(
-            'visual-effect-natural',
-            'visual-effect-aura',
-            'visual-effect-holographic',
-            'visual-effect-depth',
-            'visual-effect-active'
-        );
-        this.container.classList.add(`visual-effect-${effect}`);
-        const breatheActive = !state.eyesCloseMode;
-        this.container.classList.toggle('visual-effect-active', active);
-        this.container.classList.toggle('image-breathe-active', breatheActive);
-        if (breatheActive) {
-            const cycleSeconds = 8 + Math.random() * 8;
-            this.container.style.setProperty('--image-breathe-duration', `${cycleSeconds.toFixed(2)}s`);
-            this.container.style.setProperty('--image-breathe-delay', `${(-Math.random() * cycleSeconds).toFixed(2)}s`);
-        }
-        if (color) this.container.style.setProperty('--chakra-visual-color', color);
-        this.presence?.setActive(effect === 'depth' && active, color);
-    }
-    startPulsing(color) {
-        this.applyImageEffect(color);
-        if (state.eyesCloseMode) return; // Absolute Blackout
-        this.glow.style.background = `radial-gradient(circle, ${color}66 0%, transparent 70%)`;
-    }
-    stop() {
-        this.presence?.setActive(false);
-        if (this.container) this.container.classList.remove('visual-effect-active', 'image-breathe-active');
-        if (this.glow) this.glow.style.background = 'transparent';
-    }
-}
-
-class JourneyVideoPrelude {
-    constructor(audioEngine) {
-        this.audio = audioEngine;
-        this.overlay = document.getElementById('journey-video-prelude');
-        this.media = document.getElementById('journey-video-prelude-media');
-        this.meditatorImage = this.overlay?.querySelector('.journey-video-prelude-meditator');
-        this.playButton = document.getElementById('play-journey-video-prelude');
-        this.loadingStatus = document.getElementById('journey-video-prelude-loading');
-        this.bufferCountdown = document.getElementById('journey-video-prelude-buffer-countdown');
-        this.fullscreenTarget = document.getElementById('app');
-        this.controls = document.getElementById('controls');
-        this.revealZone = document.getElementById('fullscreen-controls-reveal-zone');
-        this.fullscreenChromeHideTimer = null;
-        this.cursorHideTimer = null;
-        this.journeyChromeActive = false;
-        this.mixer = document.getElementById('volume-mixer');
-        this.previewTimer = null;
-        this.activePlayback = null;
-        try { this.media?.load(); } catch (error) {}
-        this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
-        document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
-        this.chromeObserver = new MutationObserver(this.syncFullscreenJourneyChrome);
-        if (this.controls) this.chromeObserver.observe(this.controls, { attributes: true, attributeFilter: ['class'] });
-        if (this.mixer) this.chromeObserver.observe(this.mixer, { attributes: true, attributeFilter: ['class'] });
-        document.addEventListener('pointermove', event => {
-            if (event.pointerType !== 'touch') this.wakeJourneyCursor();
-        }, { passive: true });
-        document.addEventListener('keydown', () => {
-            clearTimeout(this.cursorHideTimer);
-            document.body.classList.remove('journey-cursor-hidden');
-        });
-        document.addEventListener('visibilitychange', () => this.syncFullscreenJourneyChrome());
-        this.revealZone?.addEventListener('pointerdown', event => {
-            if (event.pointerType === 'touch' || event.pointerType === 'pen') {
-                event.preventDefault();
-                this.setFullscreenChromeVisible(true);
-                this.scheduleFullscreenChromeHide(3000);
-            }
-        });
-        this.revealZone?.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') this.setFullscreenChromeVisible(true); });
-        this.revealZone?.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') this.scheduleFullscreenChromeHide(); });
-        this.controls?.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') this.setFullscreenChromeVisible(true); });
-        this.controls?.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') this.scheduleFullscreenChromeHide(); });
-        this.controls?.addEventListener('pointerdown', event => { if (event.pointerType !== 'mouse') this.scheduleFullscreenChromeHide(3000); });
-        this.controls?.addEventListener('focusin', () => {
-            if (this.controls.querySelector(':focus-visible')) this.setFullscreenChromeVisible(true);
-        });
-        this.controls?.addEventListener('focusout', () => this.scheduleFullscreenChromeHide());
-    }
-
-    syncFullscreenJourneyChrome() {
-        const isJourneyFullscreen = document.fullscreenElement === this.fullscreenTarget;
-        document.body.classList.toggle('journey-fullscreen-active', isJourneyFullscreen);
-        const active = Boolean(this.controls && !this.controls.classList.contains('hidden'));
-        const changed = active !== this.journeyChromeActive;
-        this.journeyChromeActive = active;
-        document.body.classList.toggle('journey-controls-active', active);
-        if (!active || document.hidden) {
-            clearTimeout(this.cursorHideTimer);
-            clearTimeout(this.fullscreenChromeHideTimer);
-            document.body.classList.remove('journey-cursor-hidden', 'fullscreen-controls-visible');
-            return;
-        }
-        if (changed) this.setFullscreenChromeVisible(false);
-        if (this.mixer && !this.mixer.classList.contains('hidden')) this.setFullscreenChromeVisible(true);
-        else this.scheduleFullscreenChromeHide();
-        this.wakeJourneyCursor();
-    }
-
-    wakeJourneyCursor() {
-        if (!this.journeyChromeActive || document.hidden) return;
-        document.body.classList.remove('journey-cursor-hidden');
-        clearTimeout(this.cursorHideTimer);
-        this.cursorHideTimer = setTimeout(() => {
-            if (this.journeyChromeActive && !document.hidden &&
-                (!this.mixer || this.mixer.classList.contains('hidden')) &&
-                !this.controls?.querySelector(':focus-visible')) {
-                document.body.classList.add('journey-cursor-hidden');
-            }
-        }, 3000);
-    }
-
-    setFullscreenChromeVisible(isVisible) {
-        if (this.fullscreenChromeHideTimer) {
-            clearTimeout(this.fullscreenChromeHideTimer);
-            this.fullscreenChromeHideTimer = null;
-        }
-        document.body.classList.toggle('fullscreen-controls-visible', Boolean(isVisible) && this.journeyChromeActive);
-    }
-
-    scheduleFullscreenChromeHide(delay = 180) {
-        if (this.fullscreenChromeHideTimer) clearTimeout(this.fullscreenChromeHideTimer);
-        this.fullscreenChromeHideTimer = setTimeout(() => {
-            const controlsHovered = delay < 3000 && this.controls?.matches(':hover');
-            const controlsFocused = this.controls?.querySelector(':focus-visible');
-            const mixerOpen = this.mixer && !this.mixer.classList.contains('hidden');
-            const revealHovered = delay < 3000 && this.revealZone?.matches(':hover');
-            if (!controlsHovered && !controlsFocused && !mixerOpen && !revealHovered) this.setFullscreenChromeVisible(false);
-        }, delay);
-    }
-
-    getVideoBufferTargetSeconds() {
-        const connection = typeof navigator !== 'undefined' ? navigator.connection : null;
-        if (connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType)) {
-            return JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS;
-        }
-        if (Number.isFinite(connection?.downlink)) {
-            if (connection.downlink < 3) return 8;
-            if (connection.downlink < 8) return 6;
-        }
-        return JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS;
-    }
-
-    getBufferedAheadSeconds() {
-        if (!this.media) return 0;
-        for (let index = 0; index < this.media.buffered.length; index += 1) {
-            const start = this.media.buffered.start(index);
-            const end = this.media.buffered.end(index);
-            if (this.media.currentTime >= start && this.media.currentTime <= end) {
-                return Math.max(0, end - this.media.currentTime);
-            }
-        }
-        return 0;
-    }
-
-    async bufferVideoToSafePoint() {
-        if (!this.media) return false;
-        const requiredSeconds = Math.min(
-            this.getVideoBufferTargetSeconds(),
-            Number.isFinite(this.media.duration) ? Math.max(2, this.media.duration) : JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS
-        );
-        const hasSafeBuffer = () => {
-            if (this.media.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) return false;
-            return this.getBufferedAheadSeconds() >= requiredSeconds;
-        };
-        if (hasSafeBuffer()) return true;
-        return new Promise(resolve => {
-            let settled = false;
-            let timeout = null;
-            let stableSince = 0;
-            const check = () => {
-                if (!hasSafeBuffer()) {
-                    stableSince = 0;
-                    return;
-                }
-                if (!stableSince) stableSince = performance.now();
-                if (performance.now() - stableSince >= JOURNEY_VIDEO_PRELUDE_BUFFER_STABILITY_MS) finish(true);
-            };
-            const finish = (result) => {
-                if (settled) return;
-                settled = true;
-                if (timeout) clearTimeout(timeout);
-                if (interval) clearInterval(interval);
-                ['progress', 'canplay', 'canplaythrough', 'loadeddata', 'durationchange'].forEach(event => {
-                    this.media.removeEventListener(event, check);
-                });
-                resolve(result);
-            };
-            const interval = setInterval(check, 250);
-            // Slow first-use delivery is not a media failure. Let the guide
-            // continue after the bounded wait; a real media error still uses
-            // the dedicated `error` event and safe fallback path.
-            timeout = setTimeout(() => finish(true), 90000);
-            ['progress', 'canplay', 'canplaythrough', 'loadeddata', 'durationchange'].forEach(event => {
-                this.media.addEventListener(event, check);
-            });
-            try { this.media.load(); } catch (error) { finish(false); }
-            check();
-        });
-    }
-
-    async previewAudio() {
-        if (!this.media) return;
-        if (!this.audio.isInitialized) await this.audio.init();
-        if (!this.audio.prepareJourneyVideoPrelude(this.media)) return;
-        if (this.previewTimer) clearTimeout(this.previewTimer);
-        this.media.pause();
-        try { this.media.currentTime = 0; } catch (error) {}
-        this.media.muted = false;
-        this.media.volume = 1;
-        this.audio.fadeJourneyVideoPrelude(0, 0);
-        try {
-            await this.media.play();
-            this.audio.fadeJourneyVideoPrelude(state.volVideo, 0.25);
-            this.previewTimer = setTimeout(() => {
-                this.audio.fadeJourneyVideoPrelude(0, 0.8);
-                setTimeout(() => { this.media.pause(); try { this.media.currentTime = 0; } catch (error) {} }, 850);
-            }, 8000);
-        } catch (error) { console.warn('Video audio preview unavailable:', error); }
-    }
-
-    async play() {
-        if (this.activePlayback) return this.activePlayback;
-        if (!this.overlay || !this.media) return 'unavailable';
-
-        // Restart happens from an active journey, so the context is normally
-        // ready within the click gesture. Keep the fallback for recovery.
-        if (!this.audio.isInitialized) await this.audio.init();
-        if (!this.audio.prepareJourneyVideoPrelude(this.media)) return 'unavailable';
-
-        this.activePlayback = new Promise((resolve) => {
-            let settled = false;
-            let exitPromise = null;
-            let hasStarted = false;
-            let playDelayTimer = null;
-            let isWaitingForBuffer = false;
-            let bufferCountdownTimer = null;
-            const cleanup = () => {
-                this.media.removeEventListener('timeupdate', onTimeUpdate);
-                this.media.removeEventListener('progress', onProgress);
-                this.media.removeEventListener('canplay', onProgress);
-                this.media.removeEventListener('waiting', onWaiting);
-                this.media.removeEventListener('stalled', onWaiting);
-                this.media.removeEventListener('ended', onEnded);
-                this.media.removeEventListener('error', onError);
-                this.playButton?.removeEventListener('click', onPlay);
-                if (playDelayTimer) clearTimeout(playDelayTimer);
-                if (bufferCountdownTimer) clearInterval(bufferCountdownTimer);
-            };
-            const beginExit = (duration) => {
-                if (exitPromise) return exitPromise;
-                this.overlay.classList.add('is-leaving');
-                this.audio.fadeJourneyVideoPrelude(0, duration);
-                exitPromise = new Promise(done => setTimeout(done, Math.max(0, duration) * 1000));
-                return exitPromise;
-            };
-            const complete = async (reason, duration) => {
-                if (settled) return;
-                settled = true;
-                cleanup();
-                await beginExit(duration);
-                this.media.pause();
-                try { this.media.currentTime = 0; } catch (error) {}
-                this.overlay.classList.remove('is-visible', 'is-leaving', 'is-playing');
-                this.overlay.classList.add('hidden');
-                if (this.playButton) this.playButton.hidden = true;
-                if (this.loadingStatus) this.loadingStatus.hidden = true;
-                resolve(reason);
-            };
-            const onTimeUpdate = () => {
-                if (!hasStarted) return;
-                const remaining = this.media.duration - this.media.currentTime;
-                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS) {
-                    void beginExit(JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS);
-                    return;
-                }
-                // Do not enter recovery during the final rebuffer window. A
-                // short clip cannot ever accumulate a four-second reserve
-                // when less than two seconds remain, which would otherwise
-                // leave the media paused forever near the end.
-                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS) return;
-                if (!isWaitingForBuffer && this.getBufferedAheadSeconds() < JOURNEY_VIDEO_PRELUDE_REBUFFER_SECONDS) {
-                    isWaitingForBuffer = true;
-                    this.media.pause();
-                }
-            };
-            const onEnded = () => { void complete('ended', JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS); };
-            const onError = () => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); };
-            const onWaiting = () => {
-                if (!hasStarted || settled) return;
-                const remaining = this.media.duration - this.media.currentTime;
-                if (Number.isFinite(remaining) && remaining <= JOURNEY_VIDEO_PRELUDE_FADE_OUT_SECONDS) return;
-                isWaitingForBuffer = true;
-            };
-            const onProgress = () => {
-                const resumeTarget = Math.min(
-                    JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS,
-                    Number.isFinite(this.media.duration)
-                        ? Math.max(0.5, this.media.duration - this.media.currentTime)
-                        : JOURNEY_VIDEO_PRELUDE_RESUME_BUFFER_SECONDS
-                );
-                if (!isWaitingForBuffer || this.getBufferedAheadSeconds() < resumeTarget) return;
-                isWaitingForBuffer = false;
-                void this.media.play().catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
-            };
-            const onPlay = () => {
-                if (hasStarted || settled) return;
-                hasStarted = true;
-                this.overlay.classList.add('is-playing', 'is-meditator');
-                playDelayTimer = setTimeout(() => {
-                    this.overlay.classList.remove('is-meditator');
-                    this.overlay.classList.add('is-video');
-                    const playback = this.media.play();
-                    Promise.resolve(playback).then(() => {
-                        this.audio.fadeJourneyVideoPrelude(state.volVideo, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS);
-                    }).catch(() => { void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS); });
-                }, JOURNEY_VIDEO_PRELUDE_MEDITATOR_HOLD_SECONDS * 1000);
-            };
-
-            this.media.addEventListener('timeupdate', onTimeUpdate);
-            this.media.addEventListener('progress', onProgress);
-            this.media.addEventListener('canplay', onProgress);
-            this.media.addEventListener('waiting', onWaiting);
-            this.media.addEventListener('stalled', onWaiting);
-            this.media.addEventListener('ended', onEnded);
-            this.media.addEventListener('error', onError);
-            this.playButton?.addEventListener('click', onPlay, { once: true });
-            this.overlay.classList.remove('hidden', 'is-leaving', 'is-playing', 'is-meditator', 'is-video');
-            this.overlay.classList.add('is-meditator');
-            if (this.playButton) this.playButton.hidden = true;
-            if (this.loadingStatus) this.loadingStatus.hidden = false;
-            const updateBufferCountdown = () => {
-                if (!this.bufferCountdown) return;
-                const target = Math.min(
-                    this.getVideoBufferTargetSeconds(),
-                    Number.isFinite(this.media.duration) ? Math.max(2, this.media.duration) : JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS
-                );
-                const remaining = Math.max(0, Math.ceil(target - this.getBufferedAheadSeconds()));
-                this.bufferCountdown.textContent = remaining > 0 ? ` (${remaining}s remaining)` : '';
-            };
-            updateBufferCountdown();
-            bufferCountdownTimer = setInterval(updateBufferCountdown, 500);
-            requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
-            this.media.muted = false;
-            this.media.volume = 1;
-            this.media.pause();
-            try { this.media.currentTime = 0; } catch (error) {}
-            this.audio.fadeJourneyVideoPrelude(0, 0);
-            void this.bufferVideoToSafePoint().then((isReady) => {
-                if (settled) return;
-                if (!isReady) {
-                    void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS);
-                    return;
-                }
-                if (this.playButton) {
-                    this.playButton.hidden = false;
-                    this.playButton.focus();
-                }
-                if (this.loadingStatus) this.loadingStatus.hidden = true;
-            });
-        }).finally(() => { this.activePlayback = null; });
-
-        return this.activePlayback;
-    }
-}
-
 // Meditation Controller
 class MeditationController {
     constructor(audio, visual) {
@@ -3924,10 +1514,15 @@ class MeditationController {
         this.experimentDuration = null;
         this.dndReminderAcknowledged = false;
         this.sessionStartedAt = null;
-        this.sessionCountdownTotalMs = 0;
-        this.sessionCountdownRemainingMs = 0;
-        this.sessionCountdownLastTickAt = 0;
-        this.sessionCountdownTicker = null;
+        this.sessionCountdown = new window.ChakraSessionCountdown({
+            now: () => Date.now(),
+            setIntervalFn: (callback, delay) => window.setInterval(callback, delay),
+            clearIntervalFn: timer => window.clearInterval(timer),
+            isActive: () => this.isMeditationActive,
+            isPaused: () => this.isPaused,
+            render: (remainingMs, totalMs) => setSessionCountdown(remainingMs, totalMs),
+            hide: () => hideSessionCountdown()
+        });
         this.droneTimerGeneration = 0;
         this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
@@ -3948,170 +1543,52 @@ class MeditationController {
     }
 
     estimateStandardJourneySeconds() {
-        if (!this.scripts || this.isHighEnergy || isDemoScriptSelected()) return null;
-
-        const narration = (text, transition = 'none') => {
-            if (!text) return 0;
-            return estimateNarrationDurationSeconds(text) + (transition === 'mantra' ? 0 : timing('narration', 'exitGap'));
-        };
-        const tone = (afterGap) => {
-            const sharedDuration = Math.max(1000, Math.round(
-                getDroneDurationMs(state.timePerChakra, state.droneDurationMode) / 2
-            ));
-            const audibleToneSeconds = state.noFrequencyMode ? 0 : (sharedDuration / 1000) + 1.1;
-            return timing('transitions', 'arrivalToneLeadGap') + audibleToneSeconds + afterGap;
-        };
-        const selected = this.chakraOrder.map(key => [key, this.scripts[key]]).filter(([, chakra]) => chakra);
-        if (!selected.length) return null;
-
-        const phase = getMoonPhase();
-        const opening = state.returningJourney
-            ? localized(this.scripts.intro, 'returning')
-            : localized(this.scripts.intro?.moon?.[phase]) || this.scripts.intro?.moon?.[`${phase}_${state.language}`];
-        const intention = contentT('system.intention').replace('{{intention}}', state.intention?.trim() || defaultIntention(state.language));
-        let seconds = state.timeIcebreaker + timing('transitions', 'initialSettle');
-        seconds += narration(contentT('system.prePracticeSafety'));
-        seconds += narration(this.getJourneySystemNarration('arrivalInduction'));
-        seconds += tone(timing('transitions', 'arrivalToneExitGap'));
-        seconds += narration(opening) + timing('transitions', 'openingPause');
-        seconds += narration(localized(this.scripts.intro, 'gratitude'));
-        seconds += narration(intention);
-        seconds += narration(this.getJourneySystemNarration('arrivalReadiness'));
-        seconds += tone(timing('transitions', 'arrivalReadinessGap'));
-        if (getChecked('box-breathing-experience-toggle')) seconds += state.timeBreathing * 16;
-        if (getChecked('visualization-addon-toggle')) seconds += Number(document.getElementById('visualization-duration')?.value || 2) * 60;
-        if (getChecked('dharana-addon-toggle')) seconds += Number(document.getElementById('dharana-duration')?.value || 2) * 60;
-        if (getChecked('body-scan-addon-toggle')) seconds += Number(document.getElementById('body-scan-duration')?.value || 5) * 60;
-        if (getChecked('noting-addon-toggle')) seconds += Number(document.getElementById('noting-duration')?.value || 4) * 60;
-        seconds += timing('transitions', 'postBreathing');
-
-        selected.forEach(([key, chakra], index) => {
-            seconds += narration(localized(chakra, 'meditation'), 'mantra');
-            seconds += Math.max(0, state.timePerChakra * 60 - timing('transitions', 'chakraLeadOut'));
-            seconds += timing('transitions', 'chakraPostMantra');
-            seconds += narration(localized(chakra, 'affirmation'));
-            if (index < selected.length - 1) {
-                const intervalNarration = narration(contentT('system.breatheInterval'));
-                seconds += timing('transitions', 'intervalPreparation') + Math.max(state.timeInterval, intervalNarration);
-            }
+        return window.ChakraSessionEstimate.estimateStandardJourneySeconds({
+            scripts: this.scripts,
+            isHighEnergy: this.isHighEnergy,
+            isDemoScriptSelected,
+            estimateNarrationDurationSeconds,
+            timing,
+            getDroneDurationMs,
+            state,
+            chakraOrder: this.chakraOrder,
+            localized,
+            contentT,
+            getMoonPhase,
+            defaultIntention,
+            isChecked: getChecked,
+            readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
+            getJourneySystemNarration: key => this.getJourneySystemNarration(key)
         });
-
-        if (getChecked('hooponopono-experience-toggle')) seconds += 4 * 60;
-        if (getChecked('undo-unlearn-addon-toggle')) seconds += Number(document.getElementById('undo-unlearn-duration')?.value || 8) * 60;
-
-        seconds += timing('transitions', 'finalSilence');
-        seconds += narration(localized(this.scripts.closing));
-        seconds += timing('transitions', 'closingFirstPause');
-        seconds += narration(localized(this.scripts.closing, 'affirmation'));
-        seconds += timing('transitions', 'closingSecondPause');
-        seconds += timing('transitions', 'emergenceBellSettle');
-        seconds += narration(this.getJourneySystemNarration('emergence'));
-        seconds += state.timeEmergence + timing('transitions', 'emergenceFinalQuiet');
-        return Math.ceil(seconds);
     }
 
     getSessionDurationMs(focusedExperience = null) {
-        if (state.bgMusicMode) return 0;
-
-        if (focusedExperience === 'box') {
-            return Math.max(1, state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60) * 1000;
-        }
-        if (focusedExperience === 'hooponopono') {
-            return 4 * 60 * 1000;
-        }
-        if (focusedExperience === 'preparation') {
-            const boxSeconds = getChecked('box-breathing-experience-toggle') ? state.timeBreathing * 16 + timing('estimate', 'boxBreathingOverhead') * 60 : 0;
-            const visualizationMinutes = getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0;
-            const dharanaMinutes = getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0;
-            const bodyScanMinutes = getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0;
-            const notingMinutes = getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0;
-            const hooponoponoSeconds = getChecked('hooponopono-experience-toggle') ? 4 * 60 : 0;
-            const undoSeconds = getChecked('undo-unlearn-addon-toggle') ? Number(document.getElementById('undo-unlearn-duration')?.value || 8) * 60 : 0;
-            return Math.max(1, boxSeconds + (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes) * 60 + hooponoponoSeconds + undoSeconds) * 1000;
-        }
-        if (focusedExperience === 'yoga') {
-            const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
-            let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
-            if (state.corpsePoseEnabled) seconds += state.timeCorpse;
-            if (state.bathSessionEnabled) {
-                seconds += state.timeBath;
-                seconds += timing('transitions', 'bathToYogaRest');
-            }
-            return Math.max(1, seconds) * 1000;
-        }
-        if (focusedExperience === 'intimate') {
-            let seconds = 0;
-            if (state.perinealCareEnabled) seconds += state.timePerinealCare;
-            if (state.massageEnabled) {
-                const massageChakras = 7;
-                seconds += (massageChakras * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
-                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
-            }
-            if (state.assistedBathingEnabled) seconds += state.timeAssistedBathing;
-            return Math.max(1, Math.round(seconds)) * 1000;
-        }
-        if (state.sleepMode) {
-            const stageSeconds = state.timeSleepStage * SLEEP_STAGE_COUNT * 60;
-            const intervalSeconds = Math.max(0, SLEEP_STAGE_COUNT - 1) * Number(this.scripts?.sleep_mode?.intervalSeconds || 3);
-            return Math.max(1, stageSeconds + intervalSeconds + 12) * 1000;
-        }
-
-        const measuredStandardSeconds = !focusedExperience && !state.sleepMode && !state.bgMusicMode
-            ? this.estimateStandardJourneySeconds()
-            : null;
-        if (Number.isFinite(measuredStandardSeconds)) return measuredStandardSeconds * 1000;
-
-        const hypnosisWrapperMinutes = !this.isHighEnergy && !focusedExperience && !state.sleepMode &&
-            !state.bgMusicMode && !isDemoScriptSelected()
-            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
-            : 0;
-        const estimateMinutes = this.isHighEnergy
-            ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
-            : this.chakraOrder.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
-                + (state.timeIcebreaker / 60)
-                + timing('estimate', 'baseOverhead')
-                + timing('estimate', 'normalExtra')
-                + hypnosisWrapperMinutes;
-        return Math.max(1, Math.round(estimateMinutes)) * 60 * 1000;
+        return window.ChakraSessionEstimate.resolveDurationMs({
+            focusedExperience,
+            state,
+            timing,
+            sleepStageCount: SLEEP_STAGE_COUNT,
+            scripts: this.scripts,
+            isHighEnergy: this.isHighEnergy,
+            isDemoScriptSelected,
+            isChecked: getChecked,
+            readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
+            countYogaPoses: () => document.querySelectorAll('#yoga-pose-selection input:checked').length,
+            estimateStandardJourneySeconds: () => this.estimateStandardJourneySeconds(),
+            chakraCount: this.chakraOrder.length
+        });
     }
 
     startSessionCountdown(totalMs) {
-        this.stopSessionCountdown();
-        const total = Number(totalMs);
-        if (!Number.isFinite(total) || total <= 0) return;
-
-        this.sessionCountdownTotalMs = total;
-        this.sessionCountdownRemainingMs = total;
-        this.sessionCountdownLastTickAt = Date.now();
-        this.renderSessionCountdown();
-        this.sessionCountdownTicker = window.setInterval(() => {
-            const now = Date.now();
-            if (!this.isMeditationActive || this.isPaused) {
-                this.sessionCountdownLastTickAt = now;
-                return;
-            }
-            this.sessionCountdownRemainingMs = Math.max(
-                0,
-                this.sessionCountdownRemainingMs - Math.max(0, now - this.sessionCountdownLastTickAt)
-            );
-            this.sessionCountdownLastTickAt = now;
-            this.renderSessionCountdown();
-        }, 250);
+        this.sessionCountdown.start(totalMs);
     }
 
     renderSessionCountdown() {
-        setSessionCountdown(this.sessionCountdownRemainingMs, this.sessionCountdownTotalMs);
+        this.sessionCountdown.render();
     }
 
     stopSessionCountdown() {
-        if (this.sessionCountdownTicker !== null) {
-            window.clearInterval(this.sessionCountdownTicker);
-            this.sessionCountdownTicker = null;
-        }
-        this.sessionCountdownTotalMs = 0;
-        this.sessionCountdownRemainingMs = 0;
-        this.sessionCountdownLastTickAt = 0;
-        hideSessionCountdown();
+        this.sessionCountdown.stop();
     }
 
     async pauseAwareSleep(ms) {
@@ -4226,7 +1703,7 @@ class MeditationController {
     }
 
     shouldRunHypnosisWrapper() {
-        return this.isHypnosisJourney && this.isMeditationActive;
+        return journeyHypnosisWrapper.shouldRun(this);
     }
 
     getJourneySystemNarration(key) {
@@ -4241,68 +1718,19 @@ class MeditationController {
     }
 
     async runGuidedTransitionTone(frequency, durationMs, { beforeGap = 0, afterGap = 0 } = {}) {
-        if (!this.isMeditationActive) return;
-        if (beforeGap > 0) await this.pauseAwareSleep(beforeGap * 1000);
-        if (!this.isMeditationActive) return;
-        if (state.noFrequencyMode) {
-            // Preserve the same quiet breathing space when generated sound is
-            // intentionally disabled; only the tone itself is omitted.
-            if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
-            return;
-        }
-        // Make a small, explicit space for the tone, then return the music to
-        // its normal narration duck before the next spoken section.
-        this.audio.fadeInBackgroundMusic(1.2, 0.08);
-        const started = this.audio.startGuidedTransitionTone(frequency, durationMs);
-        if (!started) return;
-        await this.pauseAwareSleep(durationMs);
-        this.audio.stopGuidedTransitionTone(1.1);
-        await this.pauseAwareSleep(1100);
-        if (!this.isMeditationActive) return;
-        this.audio.fadeInBackgroundMusic(2.4, true);
-        if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
+        return journeyHypnosisWrapper.runGuidedTransitionTone(this, frequency, durationMs, { beforeGap, afterGap }, { state });
     }
 
     async runArrivalInduction() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        const text = this.getJourneySystemNarration('arrivalInduction');
-        if (text) await this.narrate(text, false);
-        if (!this.isMeditationActive) return;
-        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
-        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
-        await this.runGuidedTransitionTone(432, halfDuration, {
-            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
-            afterGap: timing('transitions', 'arrivalToneExitGap')
-        });
+        return journeyHypnosisWrapper.runArrivalInduction(this, { state, getDroneDurationMs, timing });
     }
 
     async runArrivalReadiness() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        const text = this.getJourneySystemNarration('arrivalReadiness');
-        if (text) await this.narrate(text, false);
-        if (!this.isMeditationActive) return;
-        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
-        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
-        await this.runGuidedTransitionTone(528, halfDuration, {
-            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
-            afterGap: timing('transitions', 'arrivalReadinessGap')
-        });
+        return journeyHypnosisWrapper.runArrivalReadiness(this, { state, getDroneDurationMs, timing });
     }
 
     async runEmergence() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        setText('mantra-display', '✦');
-        // No Frequency Mode removes sound generators, while preserving the
-        // guide's gentle reorientation narration below.
-        if (!state.noFrequencyMode) this.audio.playSingingBowl();
-        await this.pauseAwareSleep(timing('transitions', 'emergenceBellSettle') * 1000);
-        if (!this.isMeditationActive) return;
-        const text = this.getJourneySystemNarration('emergence');
-        if (text) await withAudioStageFade(this.audio, state.timeEmergence, () => this.narrate(text, false));
-        if (!this.isMeditationActive) return;
-        await this.pauseAwareSleep(state.timeEmergence * 1000);
-        if (!this.isMeditationActive) return;
-        await this.pauseAwareSleep(timing('transitions', 'emergenceFinalQuiet') * 1000);
+        return journeyHypnosisWrapper.runEmergence(this, { state, timing, withAudioStageFade, setMantraDisplay: value => setText('mantra-display', value) });
     }
 
     async runSleepJourney() {
@@ -4519,7 +1947,7 @@ class MeditationController {
     async runNewcomerGuidedOrientation() {
         const status = document.getElementById('newcomer-guided-status');
         showScreen(newcomerTutorialScreen);
-        scheduleNewcomerMarkerSync();
+        newcomerMarkerLayout.schedule();
         newcomerTutorialScreen?.classList.add('is-guided');
         if (status) {
             status.hidden = false;
@@ -4561,36 +1989,39 @@ class MeditationController {
             showScreen(icebreakerScreen);
             document.getElementById('completion-modal').classList.add('hidden');
             
-            // Script Loading Strategy
-            if (!this.scripts || this.scriptsLanguage !== state.language) {
-                if (state.scriptSource === 'custom' && state.customScript) {
-                    console.log("Loading Custom Script from local storage...");
-                    this.scripts = state.customScript;
-                } else {
-                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
-                    console.log(`Loading Language Content (${state.language}): ${contentSource}...`);
-                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
-                    this.scripts = await response.json();
+            // Keep content source selection, validation timing and session-state
+            // snapshot aligned with the existing start sequence.
+            const loadedContent = await journeyContentLoader.loadAndValidate({
+                scripts: this.scripts,
+                scriptsLanguage: this.scriptsLanguage,
+                language: state.language,
+                scriptSource: state.scriptSource,
+                customScript: state.customScript,
+                getContentSource: () => getLanguageConfig().contentSource || 'scripts.json',
+                onResolved: (scripts, language) => {
+                    this.scripts = scripts;
+                    this.scriptsLanguage = language;
+                },
+                validate: validateScriptBundle,
+                getValidationContext: () => {
+                    const focusedExperience = this.getFocusedExperience();
+                    return {
+                        value: focusedExperience,
+                        options: {
+                            allowLanguageFallback: state.scriptSource === 'custom',
+                            highEnergy: getChecked('high-energy-toggle'),
+                            corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
+                            bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
+                            perinealCare: focusedExperience === 'intimate' && state.perinealCareEnabled,
+                            assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
+                            massage: false,
+                            yoga: focusedExperience === 'yoga',
+                            hooponopono: getChecked('hooponopono-experience-toggle')
+                        }
+                    };
                 }
-                this.scriptsLanguage = state.language;
-            }
-
-            const focusedExperience = this.getFocusedExperience();
-            const scriptCheck = validateScriptBundle(this.scripts, {
-                allowLanguageFallback: state.scriptSource === 'custom',
-                highEnergy: getChecked('high-energy-toggle'),
-                corpse: focusedExperience === 'yoga' && state.corpsePoseEnabled,
-                bath: focusedExperience === 'yoga' && state.bathSessionEnabled,
-                perinealCare: focusedExperience === 'intimate' && state.perinealCareEnabled,
-                assistedBathing: focusedExperience === 'intimate' && state.assistedBathingEnabled,
-                massage: false,
-                yoga: focusedExperience === 'yoga',
-                hooponopono: getChecked('hooponopono-experience-toggle')
             });
-            if (!scriptCheck.valid) {
-                throw new Error(`Script has missing or invalid required sections: ${scriptCheck.missing.slice(0, 5).join(', ')}`);
-            }
+            const focusedExperience = loadedContent.context;
 
             await this.audio.init();
             // Start background music looping silently immediately
@@ -4811,123 +2242,42 @@ class MeditationController {
     }
 
     async runGratitude(isHighEnergy = false) {
-        const screen = document.getElementById('breathing-screen');
-        const tutorial = document.getElementById('breathing-tutorial');
-        const tutTitle = document.getElementById('tutorial-title');
-
-        showScreen(screen);
-        tutorial.classList.remove('hidden');
-        tutorial.style.opacity = "1";
-
-        const aura = document.getElementById('aura-bg');
-        aura.style.background = `radial-gradient(circle at center, #3e2723aa, transparent)`;
-        aura.style.opacity = "1";
-
-        // Keep one short, app-owned preparation for every guided path,
-        // including custom scripts and HRIM. Activity-specific guidance stays
-        // with Yoga, bathing, massage, and assisted-care stages.
-        tutTitle.textContent = journeyT('ui.preparation');
-        const prePracticeSafety = contentT('system.prePracticeSafety');
-        await this.narrate(prePracticeSafety, false);
-        if (!this.isMeditationActive) return;
-
-        await this.runArrivalInduction();
-        if (!this.isMeditationActive) return;
-
-        // Moon-phase and returning sea openings belong to the reflective
-        // journey. HRIM begins directly with its activation intention.
-        if (!isHighEnergy) {
-            const isReturningVisitor = state.returningJourney;
-            const phase = getMoonPhase();
-            const moonText = localized(this.scripts.intro.moon[phase]) ||
-                this.scripts.intro.moon[`${phase}_${state.language}`];
-            const openingText = isReturningVisitor
-                ? localized(this.scripts.intro, 'returning')
-                : moonText;
-            if (openingText && this.isMeditationActive) {
-                tutTitle.textContent = isReturningVisitor ? journeyT('ui.returning') : journeyT('ui.moon');
-                await this.narrate(openingText, false); // Keep music playing
-                await this.pauseAwareSleep(timing('transitions', 'openingPause') * 1000);
-            }
-        }
-
-        // Main gratitude + body scan. HRIM uses its own activation-oriented
-        // intention framing while the normal journey keeps the existing text.
-        if (!this.isMeditationActive) return;
-        tutTitle.textContent = isHighEnergy ? journeyT('ui.intention') : journeyT('ui.gratitude');
-        const text = isHighEnergy
-            ? localized(this.scripts.high_energy, 'intention')
-            : localized(this.scripts.intro, 'gratitude');
-        const personalIntention = state.intention && state.intention.trim();
-        if (isHighEnergy) {
-            const intentionText = text.replace('{{intention}}', personalIntention || defaultIntention(state.language));
-            await this.narrateIntentionWithFrequency(intentionText, 'hrim');
-        } else if (personalIntention) {
-            await this.narrate(text, false); // Still keep music playing for next part
-            const intentionText = contentT('system.intention').replace('{{intention}}', state.intention.trim());
-            tutTitle.textContent = journeyT('ui.intention');
-            await this.narrateIntentionWithFrequency(intentionText); // Keep music playing seamlessly into breathing
-        } else {
-            await this.narrate(text, false); // No intention? Still keep music playing.
-        }
-        if (!isHighEnergy && this.isMeditationActive) await this.runArrivalReadiness();
+        return journeyOpeningStage.run(this, isHighEnergy, {
+            document, showScreen, journeyT, contentT, state, getMoonPhase, localized, defaultIntention, timing
+        });
     }
 
     async runDharana() {
+        const dharanaPractice = await practiceModuleLoader.load('dharana');
         const anchor = document.getElementById('dharana-anchor')?.value || 'indigo-circle';
         const minutes = Number(document.getElementById('dharana-duration')?.value || 2);
         const symbol = document.getElementById('chakra-symbol');
         const focusAnchor = document.getElementById('focus-anchor');
         const focusVeil = document.getElementById('focus-veil');
         const container = document.getElementById('chakra-container');
-        const shapes = { 'indigo-circle': '●', 'gold-dot': '•', 'violet-triangle': '▲' };
-        const colors = { 'indigo-circle': '#818cf8', 'gold-dot': '#fbbf24', 'violet-triangle': '#c084fc' };
-        showScreen(meditationScreen);
-        document.body.classList.add('dharana-active');
-        this.visual.stop();
-        if (container) container.classList.remove('presence-ready');
-        if (symbol) symbol.style.visibility = 'hidden';
-        if (focusVeil) { focusVeil.hidden = false; void focusVeil.offsetWidth; focusVeil.classList.add('is-active'); }
-        if (focusAnchor) {
-            focusAnchor.textContent = shapes[anchor];
-            focusAnchor.style.color = colors[anchor];
-            focusAnchor.style.setProperty('--focus-anchor-duration', `${Math.max(1, minutes * 60)}s`);
-            focusAnchor.classList.remove('is-focusing');
-            focusAnchor.hidden = false;
-            void focusAnchor.offsetWidth;
-            focusAnchor.classList.add('is-focusing');
-        }
-        setText('mantra-display', journeyT('ui.dharanaTitle'));
-        try {
-        await this.narrate(journeyT('ui.dharanaFocusGuidance'), false);
-            const totalSeconds = Math.max(1, minutes * 60);
-            let remaining = totalSeconds;
-            while (remaining-- > 0 && this.isMeditationActive) {
-                // Static-decoration mode intentionally cancels CSS animation;
-                // update the real focus scale from the session clock instead.
-                if (focusAnchor) {
-                    const progress = (totalSeconds - remaining) / totalSeconds;
-                    focusAnchor.style.transform = `scale(${1 - progress * 0.58})`;
-                }
-                await this.pauseAwareSleep(1000);
-            }
-            if (this.isMeditationActive) {
-                focusAnchor?.classList.add('is-releasing');
-                focusVeil?.classList.add('is-releasing');
-                await Promise.all([
-                    this.narrate(journeyT('ui.dharanaClosing'), false),
-                    this.pauseAwareSleep(4000)
-                ]);
-            }
-        } finally {
-            if (focusAnchor) { focusAnchor.hidden = true; focusAnchor.classList.remove('is-focusing', 'is-releasing'); focusAnchor.style.transform = ''; }
-            if (focusVeil) { focusVeil.classList.remove('is-active', 'is-releasing'); focusVeil.hidden = true; }
-            document.body.classList.remove('dharana-active');
-            if (symbol) symbol.style.visibility = '';
-        }
+        await dharanaPractice.run({
+            anchor,
+            minutes,
+            body: document.body,
+            meditationScreen,
+            symbol,
+            focusAnchor,
+            focusVeil,
+            container,
+            guidance: journeyT('ui.dharanaFocusGuidance'),
+            title: journeyT('ui.dharanaTitle'),
+            closing: journeyT('ui.dharanaClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runBodyScan() {
+        const bodyScanPractice = await practiceModuleLoader.load('body-scan');
         const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
         const scene = document.getElementById('body-scan-scene');
         const regions = journeyT('ui.bodyScanRegions');
@@ -4950,140 +2300,87 @@ class MeditationController {
     }
 
     async runNoting() {
+        const guidedNotingPractice = await practiceModuleLoader.load('guided-noting');
         const minutes = Number(document.getElementById('noting-duration')?.value || 4);
         const scene = document.getElementById('noting-scene');
         const reminders = journeyT('ui.notingReminders');
-        const prompts = Array.isArray(reminders) ? reminders : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('noting-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.notingTitle'));
-        try {
-            await this.narrate(journeyT('ui.notingOpening'), false);
-            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, prompts.length)));
-            for (const prompt of prompts) {
-                if (!this.isMeditationActive) break;
-                await this.pauseAwareSleep(pauseSeconds * 1000);
-                if (this.isMeditationActive) await this.narrate(prompt, false);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.notingClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('noting-active');
-        }
+        await guidedNotingPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            reminders,
+            opening: journeyT('ui.notingOpening'),
+            title: journeyT('ui.notingTitle'),
+            closing: journeyT('ui.notingClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runVisualization() {
+        const visualizationPractice = await practiceModuleLoader.load('visualization');
         const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
         const blackout = document.getElementById('visualization-blackout');
-        showScreen(meditationScreen);
-        document.body.classList.add('visualization-active');
-        if (blackout) { blackout.hidden = false; void blackout.offsetWidth; blackout.classList.add('is-active'); }
-        this.audio.fadeOutBackgroundMusic(6);
-        try { await this.audio.startVisualizationAmbience(); } catch (error) { console.warn('Visualization ambience unavailable; continuing in silence.', error); }
-        await this.pauseAwareSleep(1500);
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        setText('mantra-display', journeyT('ui.visualizationTitle'));
-        await this.narrate(journeyT('ui.visualizationFocusPrompt'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 2);
-        await this.pauseAwareSleep(12000);
-        if (!this.isMeditationActive) { if (blackout) { blackout.classList.remove('is-active'); blackout.hidden = true; } document.body.classList.remove('visualization-active'); return; }
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        await this.narrate(journeyT('ui.visualizationGuidance'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 2);
-        await this.pauseAwareSleep(3000);
-        for (let remaining = Math.max(1, minutes * 60); remaining > 0 && this.isMeditationActive; remaining--) await this.pauseAwareSleep(1000);
-        if (!this.isMeditationActive) return;
-        if (state.visualizationAmbience === 'silence') {
-            await this.narrate(journeyT('ui.visualizationSilenceWakePrompt'), false, true);
-            await this.pauseAwareSleep(8000);
-        }
-        if (!this.isMeditationActive) return;
-        this.audio.setVisualizationAmbienceDucked(true, 0.8);
-        await this.narrate(journeyT('ui.visualizationReturn'), false, true);
-        this.audio.setVisualizationAmbienceDucked(false, 1.5);
-        meditationScreen.style.transition = 'opacity 10s ease-in'; meditationScreen.style.opacity = '0.45';
-        requestAnimationFrame(() => { meditationScreen.style.opacity = '1'; });
-        this.audio.stopVisualizationAmbience();
-        await this.pauseAwareSleep(6000); this.audio.fadeInBackgroundMusic(8, true); await this.pauseAwareSleep(4000);
-        meditationScreen.style.transition = ''; meditationScreen.style.opacity = '';
-        if (blackout) { blackout.classList.remove('is-active'); await this.pauseAwareSleep(5000); blackout.hidden = true; }
-        document.body.classList.remove('visualization-active');
+        await visualizationPractice.run({
+            minutes,
+            ambience: state.visualizationAmbience,
+            body: document.body,
+            meditationScreen,
+            blackout,
+            title: () => setText('mantra-display', journeyT('ui.visualizationTitle')),
+            focusPrompt: journeyT('ui.visualizationFocusPrompt'),
+            guidance: journeyT('ui.visualizationGuidance'),
+            silenceWakePrompt: journeyT('ui.visualizationSilenceWakePrompt'),
+            returnPrompt: journeyT('ui.visualizationReturn'),
+            showScreen,
+            fadeBackgroundMusicOut: seconds => this.audio.fadeOutBackgroundMusic(seconds),
+            startAmbience: () => this.audio.startVisualizationAmbience(),
+            setAmbienceDucked: (ducked, seconds) => this.audio.setVisualizationAmbienceDucked(ducked, seconds),
+            stopAmbience: () => this.audio.stopVisualizationAmbience(),
+            fadeBackgroundMusicIn: (seconds, resume) => this.audio.fadeInBackgroundMusic(seconds, resume),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive,
+            requestFrame: callback => requestAnimationFrame(callback),
+            warn: (...args) => console.warn(...args)
+        });
     }
 
     async runBoxBreathing() {
-        const screen = document.getElementById('breathing-screen');
+        const boxBreathingPractice = await practiceModuleLoader.load('box-breathing');
         const breathingStep = this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBreathing;
-        const tutorial = document.getElementById('breathing-tutorial');
-        const instruction = document.getElementById('breathing-instruction');
-        const circle = document.getElementById('breathing-circle');
-        const timer = document.getElementById('breathing-timer');
-        
-        showScreen(screen);
-        tutorial.classList.remove('hidden');
-        tutorial.style.opacity = "1";
-
-        const tutTitle = document.getElementById('tutorial-title');
-        tutTitle.textContent = journeyT('ui.preparation');
-        const text = contentT('system.centeringBreath');
-        // Fade out music before box meditation
-        this.audio.fadeOutBackgroundMusic(4);
-
-        // Narrate the preparation instruction with keepSilence = true
-        await this.narrate(text, false, true);
-
-        for (let s = timing('transitions', 'breathingPreparation'); s > 0; s--) {
-            if (!this.isMeditationActive) return;
-            await this.pauseAwareSleep(1000);
-        }
-        
-        tutorial.style.opacity = "0";
-        await this.pauseAwareSleep(timing('transitions', 'breathingTutorialFade') * 1000);
-        tutorial.classList.add('hidden');
-
-        const steps = contentT('system.breathingSteps');
-
-        for (let cycle = 0; cycle < 4; cycle++) {
-            for (const step of steps) {
-                if (!this.isMeditationActive) return;
-                
-                instruction.textContent = step.text;
-                // Sync visual timing with configurable breathing duration
-                circle.style.transition = `transform ${breathingStep}s linear`;
-                circle.style.transform = `scale(${step.scale})`;
-                
-                this.narrateSoft(step.text);
-
-                for (let s = breathingStep; s > 0; s--) {
-                    if (!this.isMeditationActive) return;
-                    timer.textContent = s.toString().padStart(2, '0');
-                    
-                    // More responsive pause: check every 100ms
-                    let elapsed = 0;
-                    while (elapsed < 1000) {
-                        if (!this.isMeditationActive) return;
-                        if (!this.isPaused) {
-                            elapsed += 100;
-                        }
-                        await new Promise(r => setTimeout(r, 100));
-                    }
-                }
-            }
-        }
-
-        // Intimate Completion
-        if (this.isMeditationActive) {
-            instruction.textContent = journeyT('ui.breathingComplete');
-            const completeText = contentT('system.breathingComplete');
-            await this.narrate(completeText, false, true);
-            
-            // Fade music back in after box meditation
-            this.audio.fadeInBackgroundMusic(4, false);
-
-            instruction.textContent = journeyT('ui.prepare');
-            await this.pauseAwareSleep(timing('transitions', 'breathingCompletion') * 1000);
-        }
+        const screen = document.getElementById('breathing-screen');
+        await boxBreathingPractice.run({
+            breathingStep,
+            breathingPreparationSeconds: timing('transitions', 'breathingPreparation'),
+            tutorialFadeSeconds: timing('transitions', 'breathingTutorialFade'),
+            completionSeconds: timing('transitions', 'breathingCompletion'),
+            screen,
+            tutorial: document.getElementById('breathing-tutorial'),
+            titleElement: document.getElementById('tutorial-title'),
+            instruction: document.getElementById('breathing-instruction'),
+            circle: document.getElementById('breathing-circle'),
+            timer: document.getElementById('breathing-timer'),
+            title: journeyT('ui.preparation'),
+            preparationNarration: contentT('system.centeringBreath'),
+            steps: contentT('system.breathingSteps'),
+            completionLabel: journeyT('ui.breathingComplete'),
+            completionNarration: contentT('system.breathingComplete'),
+            prepareLabel: journeyT('ui.prepare'),
+            showScreen,
+            narrate: (text, keepSilence) => this.narrate(text, false, keepSilence),
+            narrateSoft: text => this.narrateSoft(text),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive,
+            isPaused: () => this.isPaused,
+            fadeMusicOut: seconds => this.audio.fadeOutBackgroundMusic(seconds),
+            fadeMusicIn: (seconds, immediate) => this.audio.fadeInBackgroundMusic(seconds, immediate)
+        });
     }
 
     async runCorpsePose() {
@@ -5584,66 +2881,47 @@ class MeditationController {
     }
 
     async runHooponopono() {
+        const hooponoponoPractice = await practiceModuleLoader.load('hooponopono');
         const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(circle at center, #fff9c455, transparent)';
-            aura.style.opacity = '1';
-        }
         const symbolEl = document.getElementById('chakra-symbol');
-        if (symbolEl) symbolEl.style.opacity = '0.1';
-        
-        setText('mantra-display', '✦');
-
-        // Intro: "Repeat each phrase gently in your heart" - Keep music playing
-        await this.narrate(localized(this.scripts.hooponopono.intro), false);
-        await this.pauseAwareSleep(timing('transitions', 'hooponoponoIntroPause') * 1000);
-
-        // 3 cycles of the 4 phrases
         const phrases = localized(this.scripts.hooponopono.phrases);
-        for (let cycle = 0; cycle < 3; cycle++) {
-            if (!this.isMeditationActive) return;
-            for (let i = 0; i < phrases.length; i++) {
-                if (!this.isMeditationActive) return;
-                const phrase = phrases[i];
-                
-                // Keep music for all phrases, fade out only on the very last phrase of the last cycle
-                const isLast = (cycle === 2 && i === phrases.length - 1);
-                await this.narrate(phrase, false); // Keep music for phrases
-                await this.pauseAwareSleep(timing('transitions', 'hooponoponoPhrasePause') * 1000);
-            }
-        }
-
-        // Closing breath - Final fade out
-        await this.narrate(localized(this.scripts.hooponopono.closing), true);
-
-        // Extended rest (15 seconds) to allow the "Divine Aura" and background music 
-        // to fade out completely into a peaceful silence.
-        await this.pauseAwareSleep(timing('transitions', 'hooponoponoFinalRest') * 1000);
+        await hooponoponoPractice.run({
+            aura,
+            symbol: symbolEl,
+            intro: localized(this.scripts.hooponopono.intro),
+            phrases,
+            closing: localized(this.scripts.hooponopono.closing),
+            introPauseSeconds: timing('transitions', 'hooponoponoIntroPause'),
+            phrasePauseSeconds: timing('transitions', 'hooponoponoPhrasePause'),
+            finalRestSeconds: timing('transitions', 'hooponoponoFinalRest'),
+            setTitle: text => setText('mantra-display', text),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runUndoUnlearn() {
+        const undoUnlearnPractice = await practiceModuleLoader.load('undo-unlearn');
         const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
         const scene = document.getElementById('undo-unlearn-scene');
         const phases = journeyT('ui.undoUnlearnPhases');
-        const narrations = Array.isArray(phases) ? phases : [];
-        showScreen(meditationScreen);
-        document.body.classList.add('undo-unlearn-active');
-        this.visual.stop();
-        if (scene) { scene.hidden = false; void scene.offsetWidth; scene.classList.add('is-active'); }
-        setText('mantra-display', journeyT('ui.undoUnlearnTitle'));
-        try {
-            await this.narrate(journeyT('ui.undoUnlearnOpening'), false);
-            const pauseSeconds = Math.max(15, Math.floor((minutes * 60) / Math.max(1, narrations.length)));
-            for (const narration of narrations) {
-                if (!this.isMeditationActive) break;
-                await this.narrate(narration, false);
-                if (this.isMeditationActive) await this.pauseAwareSleep(pauseSeconds * 1000);
-            }
-            if (this.isMeditationActive) await this.narrate(journeyT('ui.undoUnlearnClosing'), false);
-        } finally {
-            if (scene) { scene.classList.remove('is-active'); await this.pauseAwareSleep(5000); scene.hidden = true; }
-            document.body.classList.remove('undo-unlearn-active');
-        }
+        await undoUnlearnPractice.run({
+            minutes,
+            body: document.body,
+            meditationScreen,
+            scene,
+            phases,
+            opening: journeyT('ui.undoUnlearnOpening'),
+            title: journeyT('ui.undoUnlearnTitle'),
+            closing: journeyT('ui.undoUnlearnClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: (...args) => this.narrate(...args),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
     }
 
     async runIntimateService() {
@@ -6081,9 +3359,36 @@ class WakeLockManager {
 
 const wakeLock = new WakeLockManager();
 const audio = new AudioEngine();
-const particleField = new AmbientParticleField();
-const visual = new VisualEngine(audio);
-const journeyVideoPrelude = new JourneyVideoPrelude(audio);
+const journeyChrome = new window.ChakraJourneyChrome();
+const particleField = new window.AmbientParticleField();
+const visual = new window.VisualEngine(audio);
+let journeyVideoPrelude = null;
+let journeyVideoPreludeLoadPromise = null;
+function loadJourneyVideoPrelude() {
+    if (journeyVideoPrelude) return Promise.resolve(journeyVideoPrelude);
+    if (journeyVideoPreludeLoadPromise) return journeyVideoPreludeLoadPromise;
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = new URL('./modules/journey-video-prelude.js?v=1.0', document.baseURI).href;
+    journeyVideoPreludeLoadPromise = new Promise((resolve, reject) => {
+        script.onload = () => {
+            const Prelude = window.ChakraJourneyVideoPrelude;
+            if (typeof Prelude !== 'function') {
+                reject(new Error('Journey video introduction module did not register.'));
+                return;
+            }
+            journeyVideoPrelude = new Prelude(audio);
+            resolve(journeyVideoPrelude);
+        };
+        script.onerror = () => reject(new Error('Journey video introduction module failed to load.'));
+        document.head.appendChild(script);
+    }).catch(error => {
+        script.remove();
+        journeyVideoPreludeLoadPromise = null;
+        throw error;
+    });
+    return journeyVideoPreludeLoadPromise;
+}
 const piperTTS = piperLifecycle.createPiperTTS(audio, {
     voiceIdFromValue: piperVoiceId,
     getVoiceDefinition: voiceId => piperVoiceRegistry.find(voice => voice.id === voiceId) || null,
@@ -6170,68 +3475,13 @@ function restorePreDemoCoreDuration() {
 }
 
 function syncPleasureAmbienceControl() {
-    const section = document.getElementById('mood-relaxation-ambience-section');
-    const toggle = document.getElementById('mood-relaxation-intention-toggle');
-    const control = document.getElementById('mood-relaxation-ambience-level-control');
-    const intensityControl = document.getElementById('pleasure-ambience-intensity-control');
-    const intensitySelect = document.getElementById('pleasure-ambience-intensity');
-    const urlControl = document.getElementById('pleasure-ambience-url-control');
-    const urlInput = document.getElementById('pleasure-ambience-url');
-    const blurControl = document.getElementById('pleasure-ambience-blur-control');
-    const blurToggle = document.getElementById('pleasure-ambience-blur-toggle');
-    const blurLevel = document.getElementById('pleasure-ambience-blur-level-control');
-    const blurLevelInput = document.getElementById('pleasure-ambience-blur-level');
-    const blurLevelOutput = document.getElementById('pleasure-ambience-blur-level-value');
-    const slider = document.getElementById('mood-relaxation-ambience-level');
-    const output = document.getElementById('mood-relaxation-ambience-level-value');
-    const status = document.getElementById('pleasure-ambience-url-status');
-    const audioUnavailable = audio.pleasureAudioAvailable === false;
-    // Optional local ambience files can be absent in a deployed build. Keep
-    // this recovery surface visible so a guide can supply a URL; hiding it
-    // would make the missing local source impossible to replace on mobile.
-    if (section) section.hidden = !state.advancedFeaturesUnlocked;
-    if (toggle) toggle.disabled = state.noFrequencyMode;
-    if (control) control.hidden = !state.moodRelaxationIntentionEnabled;
-    if (intensityControl) intensityControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (intensitySelect) {
-        intensitySelect.value = state.pleasureAmbienceIntensity;
-        intensitySelect.disabled = state.noFrequencyMode;
-    }
-    if (urlControl) urlControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (urlInput) {
-        urlInput.disabled = state.noFrequencyMode;
-        urlInput.value = state.pleasureAmbienceUrl;
-    }
-    if (blurControl) blurControl.hidden = !state.moodRelaxationIntentionEnabled;
-    if (blurToggle) {
-        blurToggle.checked = state.pleasureAmbienceBlur;
-        blurToggle.disabled = state.noFrequencyMode;
-    }
-    if (blurLevel) blurLevel.hidden = !state.moodRelaxationIntentionEnabled;
-    if (blurLevelInput) {
-        blurLevelInput.disabled = state.noFrequencyMode;
-        blurLevelInput.value = (state.pleasureAmbienceBlurAmount * 100).toFixed(0);
-        const pct = ((Number(blurLevelInput.value) - Number(blurLevelInput.min)) / (Number(blurLevelInput.max) - Number(blurLevelInput.min)) * 100).toFixed(1) + '%';
-        blurLevelInput.style.setProperty('--range-fill', pct);
-    }
-    if (blurLevelOutput) blurLevelOutput.textContent = `${Math.round(state.pleasureAmbienceBlurAmount * 100)}%`;
-    if (slider) {
-        slider.disabled = state.noFrequencyMode || audioUnavailable;
-        slider.value = (state.pleasureAmbienceGain * 100).toFixed(1);
-        const pct = ((Number(slider.value) - Number(slider.min)) / (Number(slider.max) - Number(slider.min)) * 100).toFixed(1) + '%';
-        slider.style.setProperty('--range-fill', pct);
-    }
-    if (output) output.textContent = formatPleasureAmbienceLevel(state.pleasureAmbienceGain);
-    if (status && audioUnavailable && state.moodRelaxationIntentionEnabled) {
-        status.dataset.availability = 'unavailable';
-        status.textContent = t('ui.pleasureAmbienceSourceUnavailable');
-        status.hidden = false;
-        status.style.color = '#fbbf24';
-    } else if (status?.dataset.availability === 'unavailable') {
-        delete status.dataset.availability;
-        status.hidden = true;
-        status.textContent = '';
-    }
+    moodAmbienceSettingsView.sync({
+        document,
+        state,
+        audioUnavailable: audio.pleasureAudioAvailable === false,
+        formatLevel: formatPleasureAmbienceLevel,
+        unavailableMessage: t('ui.pleasureAmbienceSourceUnavailable')
+    });
 }
 
 // ── Moon Phase Calculator ─────────────────────────────────────────────────────
@@ -6373,33 +3623,15 @@ function autoSelectVoice() {
 }
 
 function applyJourneyVoiceProfile(isHighEnergy) {
-    const shringaraVoice = !isHighEnergy && isFeminineNarrationVoice();
-    const profile = isHighEnergy
-        ? { clarity: 50, warmth: 50, pace: 1, echo: 'light' }
-        : shringaraVoice
-            ? { clarity: 28, warmth: 82, pace: 0.92, echo: 'light' }
-            : { clarity: 35, warmth: 65, pace: 0.9, echo: 'spacious' };
-
-    state.voiceClarity = profile.clarity;
-    state.voiceWarmth = profile.warmth;
-    state.voicePace = profile.pace;
-    state.voiceEcho = profile.echo;
-    localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-    localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-    localStorage.setItem('chakra_voice_pace', state.voicePace);
-    localStorage.setItem('chakra_voice_echo', state.voiceEcho);
-    syncValue('voice-clarity', state.voiceClarity);
-    syncValue('voice-warmth', state.voiceWarmth);
-    syncValue('voice-pace', state.voicePace);
-    syncValue('voice-echo', state.voiceEcho);
-    syncValue('music-echo', state.musicEcho);
-    syncValue('spatial-mode', state.spatialMode);
-    syncValue('mixer-spatial-mode', state.spatialMode);
-    document.querySelectorAll('[data-voice-preset]').forEach(button => {
-        button.classList.toggle('mixer-preset-active', button.dataset.voicePreset === (isHighEnergy ? 'balanced' : shringaraVoice ? 'shringara' : 'soft'));
+    journeyVoiceProfile.apply({
+        isHighEnergy,
+        isFeminineVoice: !isHighEnergy && isFeminineNarrationVoice(),
+        state,
+        storage: localStorage,
+        syncValue,
+        document,
+        audio
     });
-    if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
-    if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
 }
 
 async function testVoice() {
@@ -6433,68 +3665,20 @@ function loadPreferences() {
     syncValue('language-select', state.language);
     syncValue('display-language-select', state.displayLanguage);
     
-    const timeSlider = document.getElementById('time-per-chakra');
-    if (timeSlider) {
-        timeSlider.value = state.timePerChakra;
-        const pctInit = ((timeSlider.value - timeSlider.min) / (timeSlider.max - timeSlider.min) * 100).toFixed(1) + '%';
-        timeSlider.style.setProperty('--range-fill', pctInit);
-    }
-    
-    setText('time-display', `${state.timePerChakra.toFixed(1)} mins`);
-
-    const highEnergyTimeSlider = document.getElementById('time-high-energy');
-    if (highEnergyTimeSlider) {
-        highEnergyTimeSlider.value = state.timeHighEnergy;
-        const pctHigh = ((highEnergyTimeSlider.value - highEnergyTimeSlider.min) / (highEnergyTimeSlider.max - highEnergyTimeSlider.min) * 100).toFixed(1) + '%';
-        highEnergyTimeSlider.style.setProperty('--range-fill', pctHigh);
-    }
-    setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
+    timingPreferenceHydration.hydrateCore({ state, document, setText });
     syncDroneDurationModeControls();
     updateDroneDurationSummary();
     
-    // Sync Mixer Sliders
-    syncValue('vol-voice', state.volVoice);
-    syncValue('vol-drone', state.volDrone);
-    syncValue('vol-bell', state.volBell);
-    syncValue('vol-mantra', state.volMantra);
-    syncValue('vol-music', state.volMusic);
-    syncValue('settings-vol-video', state.volVideo);
-    syncValue('settings-vol-visualization', state.volVisualizationAmbience);
-    syncValue('vol-visualization', state.volVisualizationAmbience);
-    syncValue('visualization-ambience', state.visualizationAmbience);
-    syncValue('voice-clarity', state.voiceClarity);
-    syncValue('voice-warmth', state.voiceWarmth);
-    syncValue('voice-pace', state.voicePace);
-    syncValue('voice-echo', state.voiceEcho);
-    syncValue('music-echo', state.musicEcho);
-
-    // Sync Settings Sliders
-    syncValue('settings-vol-voice', state.volVoice);
-    syncValue('settings-vol-drone', state.volDrone);
-    syncValue('settings-vol-bell', state.volBell);
-    syncValue('settings-vol-mantra', state.volMantra);
-    syncValue('settings-vol-music', state.volMusic);
+    mixerPreferenceHydration.hydrate({ state, syncValue });
 
     setText('stat-journeys', state.stats.journeys);
     setText('stat-time', state.stats.time);
-    document.querySelectorAll('#chakra-selection input').forEach(cb => {
-        cb.checked = state.selectedChakras.includes(cb.value);
-    });
-    if (!state.intention.trim()) state.intention = defaultIntention();
-    syncValue('intention-input', state.intention);
-    
-    syncChecked('returning-journey-toggle', state.returningJourney);
-    syncChecked('journey-video-prelude-toggle', state.journeyVideoPreludeEnabled);
-    syncChecked('audio-filters-toggle', state.audioFilters);
+    journeySelectionHydration.hydrate({ state, document, syncValue, syncChecked, defaultIntention });
     syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
-    // The former normal-journey reverse preference is retired. Massage now
-    // derives its complete Crown-to-Root order without changing this state.
-    localStorage.removeItem('chakra_reverse_journey');
-    localStorage.removeItem('chakra_box_meditation');
-    localStorage.removeItem('chakra_hooponopono');
-    syncChecked('box-breathing-experience-toggle', false);
-    syncChecked('hooponopono-experience-toggle', false);
+    // Experience modes are session-only; retired selection keys are cleared
+    // before the persistent practice preferences are restored below.
+    sessionModeHydration.resetPreparationSelections({ storage: localStorage, syncChecked });
     syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
     syncChecked('no-mantra-mode-toggle', state.noMantraMode);
     syncChecked('mood-relaxation-intention-toggle', state.moodRelaxationIntentionEnabled);
@@ -6502,12 +3686,7 @@ function loadPreferences() {
     const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
     if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
     syncChecked('eyes-close-mode-toggle', state.eyesCloseMode);
-    localStorage.removeItem('chakra_bg_music_mode');
-    localStorage.removeItem('chakra_high_energy');
-    localStorage.removeItem('chakra_sleep_experience');
-    syncChecked('music-only-toggle', false);
-    syncChecked('high-energy-toggle', false);
-    syncChecked('sleep-mode-toggle', false);
+    sessionModeHydration.resetExclusiveModes({ storage: localStorage, syncChecked });
     syncChecked('corpse-pose-toggle', state.corpsePoseEnabled);
     if (state.eyesCloseMode) document.body.classList.add('eyes-close-mode');
 
@@ -6516,9 +3695,7 @@ function loadPreferences() {
     localStorage.removeItem('chakra_yoga_bridge');
     syncChecked('yoga-experience-toggle', false);
     syncChecked('bath-session-toggle', state.bathSessionEnabled);
-    syncChecked('perineal-care-toggle', state.perinealCareEnabled);
-    syncChecked('assisted-bathing-toggle', state.assistedBathingEnabled);
-    syncChecked('massage-toggle', state.massageEnabled);
+    carePreferenceHydration.hydrate({ state, syncChecked });
     const yogaSubOptions = document.getElementById('yoga-sub-options');
     if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
 
@@ -6528,54 +3705,19 @@ function loadPreferences() {
             r.checked = (r.value === state.deityPath);
         });
     }, 0);
-    syncValue('visual-effect-select', state.visualEffect);
-    visual.applyImageEffect();
+    appearancePreferenceHydration.hydrateEffect({ state, syncValue, applyImageEffect: () => visual.applyImageEffect() });
 
-    // Sync Journey Timings Sliders
-    syncValue('time-icebreaker', state.timeIcebreaker);
-    setText('display-icebreaker', state.timeIcebreaker + 's');
-    syncValue('time-emergence', state.timeEmergence);
-    setText('display-emergence', state.timeEmergence + 's');
+    timingPreferenceHydration.hydrateJourney({ state, syncValue, setText });
     
-    syncValue('time-breathing', state.timeBreathing);
-    setText('display-breathing', state.timeBreathing + 's');
-    
-    syncValue('time-corpse', state.timeCorpse);
-    setText('display-corpse', state.timeCorpse + 's');
-    
-    syncValue('time-interval', state.timeInterval);
-    setText('display-interval', state.timeInterval + 's');
+    appearancePreferenceHydration.hydrateBrightness({ state, syncValue, document });
 
-    syncValue('time-yoga-prep', state.timeYogaPrep);
-    setText('display-yoga-prep', state.timeYogaPrep + 's');
-
-    syncValue('time-yoga-pose', state.timeYogaPose);
-    setText('display-yoga-pose', state.timeYogaPose + 's');
-
-    syncValue('time-bath', state.timeBath);
-    setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
-    syncValue('time-perineal-care', state.timePerinealCare);
-    setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
-    syncValue('time-assisted-bathing', state.timeAssistedBathing);
-    setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
-    
-    syncValue('brightness-slider', state.brightness);
-    document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));
-
-    // Sync Script Selection
-    syncValue('script-source-select', state.scriptSource);
-    const customScriptUI = document.getElementById('custom-script-ui');
-    if (customScriptUI) {
-        customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
-    }
-    if (state.customScript) {
-        const statusEl = document.getElementById('script-status');
-        if (statusEl) {
-            statusEl.textContent = isDemoScriptSelected() ? getDemoScriptTimingMessage() : "Custom script loaded and ready.";
-            statusEl.style.display = 'block';
-            statusEl.style.color = '#4ade80';
-        }
-    }
+    scriptPreferenceHydration.hydrate({
+        state,
+        syncValue,
+        document,
+        isDemoScriptSelected,
+        getDemoScriptTimingMessage
+    });
 
     refreshRangeControlDisplays();
     
@@ -6602,20 +3744,7 @@ function checkFirstTime() {
 }
 
 function showScreen(screen) {
-    document.body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
-    document.dispatchEvent(new Event('decorationchange'));
-    [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen].forEach(s => {
-        if (s) s.classList.add('hidden');
-    });
-    if (screen) {
-        screen.classList.remove('hidden');
-        // Screen sections can be taller than a desktop viewport. Reset both
-        // possible scroll containers so returning to the Lobby never leaves
-        // the header and controls above Core Practice Duration out of view.
-        screen.scrollTop = 0;
-        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
-        if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
-    }
+    screenNavigation.showScreen(screen);
 }
 
 function attachEventListeners() {
@@ -6673,9 +3802,7 @@ function attachEventListeners() {
         syncChecked('yoga-experience-toggle', false);
         state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
-        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
-        state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(cb => cb.value);
+        yogaExperienceSettings.persist({ document, state, storage: localStorage });
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
         state.deityPath = selectedDeity ? selectedDeity.value : 'none';
         state.visualEffect = normalizeMeditationVisualEffect(document.getElementById('visual-effect-select')?.value);
@@ -6687,10 +3814,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_deity_path', state.deityPath);
         localStorage.setItem('chakra_visual_effect', state.visualEffect);
         localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
-        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
         localStorage.removeItem('chakra_yoga_bridge');
-        localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
         localStorage.setItem('chakra_script_source', state.scriptSource);
 
         if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
@@ -6705,39 +3829,11 @@ function attachEventListeners() {
 
     // Dynamic Setting Visibility
     function updateTimingRowVisibility() {
-        const corpseEnabled = getChecked('corpse-pose-toggle');
-        const bathEnabled = getChecked('bath-session-toggle');
-
-        const toggleDisplay = (id, show) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            // Let the component's CSS choose its layout when visible. This is
-            // important for enhanced range rows, which use grid rather than flex.
-            el.style.display = show ? '' : 'none';
-        };
-
-        const bathToggle = document.getElementById('bath-session-toggle');
-        if (bathToggle) {
-            bathToggle.disabled = false;
-            bathToggle.setAttribute('aria-disabled', 'false');
-        }
-        toggleDisplay('row-breathing', false);
-        toggleDisplay('row-corpse', corpseEnabled);
-        toggleDisplay('row-yoga-prep', true);
-        toggleDisplay('row-yoga-pose', true);
-        toggleDisplay('row-bath', bathEnabled);
-        
-        const yogaSubOptions = document.getElementById('yoga-sub-options');
-        if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
+        yogaExperienceSettings.syncTimingRows({ document, getChecked });
     }
 
     function persistYogaExperienceSetup() {
-        state.corpsePoseEnabled = getChecked('corpse-pose-toggle');
-        state.bathSessionEnabled = getChecked('bath-session-toggle');
-        state.selectedYogaPoses = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).map(input => input.value);
-        localStorage.setItem('chakra_corpse_enabled', state.corpsePoseEnabled);
-        localStorage.setItem('chakra_bath_enabled', state.bathSessionEnabled);
-        localStorage.setItem('chakra_yoga_selected', JSON.stringify(state.selectedYogaPoses));
+        yogaExperienceSettings.persist({ document, state, storage: localStorage });
     }
 
     function persistIntimateServiceSetup() {
@@ -7030,43 +4126,15 @@ function attachEventListeners() {
         showUnlockToast(t('ui.advancedFeaturesDisabled'));
     });
 
-    const settingsManagerButton = document.getElementById('open-settings-manager');
-    const settingsManagerStatus = document.getElementById('settings-manager-status');
-    const showSettingsManagerStatus = (message) => { if (settingsManagerStatus) settingsManagerStatus.textContent = message; };
-    settingsManagerButton?.addEventListener('click', () => {
-        showSettingsManagerStatus('');
-        showScreen(settingsManagerScreen);
-    });
-    document.getElementById('close-settings-manager')?.addEventListener('click', () => showScreen(configScreen));
-    document.getElementById('export-settings')?.addEventListener('click', () => {
-        if (!state.advancedFeaturesUnlocked) return;
-        const backup = JSON.stringify({
-            format: SETTINGS_BACKUP_FORMAT,
-            version: SETTINGS_BACKUP_VERSION,
-            exportedAt: new Date().toISOString(),
-            settings: collectManagedSettings()
-        }, null, 2);
-        const url = URL.createObjectURL(new Blob([backup], { type: 'application/json' }));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'chakra-meditation-settings.json';
-        link.click();
-        URL.revokeObjectURL(url);
-        showSettingsManagerStatus(t('ui.settingsExported'));
-    });
-    document.getElementById('import-settings')?.addEventListener('click', async () => {
-        const input = document.getElementById('import-settings-file');
-        const file = input?.files?.[0];
-        if (!file) { showSettingsManagerStatus(t('ui.settingsImportChooseFile')); return; }
-        try {
-            const settings = parseSettingsBackup(await file.text());
-            if (!window.confirm(t('ui.settingsImportConfirm'))) return;
-            replaceManagedSettings(settings);
-            showSettingsManagerStatus(t('ui.settingsImported'));
-            window.location.reload();
-        } catch (error) {
-            showSettingsManagerStatus(error.message || t('ui.settingsImportInvalid'));
-        }
+    window.ChakraSettingsManagerView.bind({
+        document,
+        window,
+        configScreen,
+        settingsManagerScreen,
+        showScreen,
+        advancedFeaturesUnlocked: () => state.advancedFeaturesUnlocked,
+        backup: window.ChakraSettingsBackup,
+        t
     });
 
     function isIntimateServiceToggle(target) {
@@ -7179,43 +4247,25 @@ function attachEventListeners() {
         });
     }
 
-    [boxBreathingExperienceToggle, hooponoponoExperienceToggle].forEach(toggle => {
-        toggle?.addEventListener('change', (event) => {
-            state.boxBreathingExperienceEnabled = boxBreathingExperienceToggle?.checked === true;
-            state.hooponoponoExperienceEnabled = hooponoponoExperienceToggle?.checked === true;
-            if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-            updateExperienceModeVisibility(); updateSessionEstimate();
-        });
-    });
-    dharanaAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('dharana-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    visualizationAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('visualization-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    bodyScanAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('body-scan-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    notingAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('noting-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    undoUnlearnAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('undo-unlearn-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
+    window.ChakraJourneyPreparationSelection.bind({
+        document,
+        state,
+        toggles: {
+            boxBreathing: boxBreathingExperienceToggle,
+            hooponopono: hooponoponoExperienceToggle,
+            dharana: dharanaAddonToggle,
+            visualization: visualizationAddonToggle,
+            bodyScan: bodyScanAddonToggle,
+            noting: notingAddonToggle,
+            undoUnlearn: undoUnlearnAddonToggle
+        },
+        clearMusicOnlyMode,
+        clearHighEnergyMode,
+        clearSleepMode,
+        clearFocusedExperiences,
+        clearIntimateService,
+        updateExperienceModeVisibility,
+        updateSessionEstimate
     });
     document.getElementById('visualization-ambience')?.addEventListener('change', event => {
         state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
@@ -7336,105 +4386,23 @@ function attachEventListeners() {
     });
     
     function updateExperienceModeVisibility() {
-        const noFrequencyMode = state.noFrequencyMode;
-        const highEnergy = getChecked('high-energy-toggle');
-        const musicOnly = getChecked('music-only-toggle');
-        const sleep = getChecked('sleep-mode-toggle');
-        const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
-        const standalonePreparation = state.selectedChakras.length === 0 && [
-            'box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle',
-            'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle', 'noting-addon-toggle'
-        ].some(id => getChecked(id));
-        const focusedExperience = getChecked('yoga-experience-toggle') || intimateService || standalonePreparation;
-        const dharanaOptions = document.getElementById('dharana-options');
-        if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
-        const visualizationOptions = document.getElementById('visualization-options');
-        if (visualizationOptions) visualizationOptions.hidden = !getChecked('visualization-addon-toggle') || getChecked('shots-toggle');
-        const bodyScanOptions = document.getElementById('body-scan-options');
-        if (bodyScanOptions) bodyScanOptions.hidden = !getChecked('body-scan-addon-toggle') || getChecked('shots-toggle');
-        const notingOptions = document.getElementById('noting-options');
-        if (notingOptions) notingOptions.hidden = !getChecked('noting-addon-toggle') || getChecked('shots-toggle');
-        const undoUnlearnOptions = document.getElementById('undo-unlearn-options');
-        if (undoUnlearnOptions) undoUnlearnOptions.hidden = !getChecked('undo-unlearn-addon-toggle') || getChecked('shots-toggle');
-        const yogaExperience = getChecked('yoga-experience-toggle');
-        const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
-        const highEnergyDuration = document.getElementById('high-energy-duration-control');
-        const droneDuration = document.getElementById('drone-duration-control');
-        const durationLabel = document.querySelector('label[for="time-per-chakra"]');
-        const timeInput = document.getElementById('time-per-chakra');
-        const meditationRoomTitle = document.getElementById('lobby-title');
-        if (shotsToggle) {
-            if (noFrequencyMode || !state.advancedFeaturesUnlocked) shotsToggle.checked = false;
-            shotsToggle.disabled = noFrequencyMode || !state.advancedFeaturesUnlocked;
-            shotsToggle.title = noFrequencyMode ? t('ui.noFrequencyShotsUnavailable') : '';
-        }
-        const shots = getChecked('shots-toggle');
-        if (meditationRoomTitle) meditationRoomTitle.hidden = shots;
-        const hideForShots = ['journey-preparation-addons', 'chakra-selection-panel', 'journey-integration-addons', 'drone-duration-control', 'intention-config-group', 'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings'];
-        hideForShots.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.hidden = shots || (id === 'intimate-service-panel' && !intimateServiceUnlocked);
+        lobbyExperienceVisibility.sync({
+            document,
+            state,
+            getChecked,
+            translate: t,
+            timingConfig,
+            isDemoScriptSelected,
+            getDemoCoreDurationMinutes,
+            setText,
+            shotsToggle,
+            yogaExperienceSetup,
+            intimateServiceUnlocked,
+            startMeditationBtn,
+            refreshRangeControlDisplays,
+            syncDroneDurationModeControls,
+            updateDroneDurationSummary
         });
-        ['intention-config-group', 'journey-preferences-group'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.hidden = shots || focusedExperience;
-        });
-        if (yogaExperienceSetup) yogaExperienceSetup.hidden = !yogaExperience || shots;
-        const intimateTiming = document.getElementById('intimate-service-timings');
-        if (intimateTiming) intimateTiming.hidden = shots || !intimateService;
-        const perinealTiming = document.getElementById('row-perineal-care');
-        if (perinealTiming) perinealTiming.style.display = getChecked('perineal-care-toggle') ? '' : 'none';
-        const assistedBathingTiming = document.getElementById('row-assisted-bathing');
-        if (assistedBathingTiming) assistedBathingTiming.style.display = getChecked('assisted-bathing-toggle') ? '' : 'none';
-        const massageNote = document.getElementById('massage-reverse-journey-note');
-        if (massageNote) massageNote.hidden = shots || !getChecked('massage-toggle');
-        const shotOptions = document.getElementById('shot-options');
-        if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
-        const customFrequency = document.getElementById('custom-shot-frequency');
-        if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || document.getElementById('shot-type-select')?.value !== 'custom';
-        const shotFrequencyNote = document.getElementById('shot-frequency-note');
-        const selectedShotType = document.getElementById('shot-type-select')?.value;
-        if (shotFrequencyNote) {
-            shotFrequencyNote.textContent = selectedShotType === 'mood_relaxation' ? t('ui.moodRelaxationShotNote') : '';
-            shotFrequencyNote.hidden = !shots || noFrequencyMode || selectedShotType !== 'mood_relaxation';
-        }
-        if (normalDuration) normalDuration.style.display = shots || focusedExperience || !highEnergy ? (focusedExperience ? 'none' : 'flex') : 'none';
-        if (highEnergyDuration) highEnergyDuration.style.display = shots || focusedExperience ? 'none' : (highEnergy ? 'flex' : 'none');
-        if (droneDuration && !shots) droneDuration.hidden = musicOnly || noFrequencyMode || focusedExperience;
-        if (durationLabel) durationLabel.textContent = t(shots ? 'ui.shotDuration' : (sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration'));
-        if (timeInput) {
-            const definition = shots ? timingConfig.journey?.shotDuration : sleep ? timingConfig.journey?.sleepStageDuration : timingConfig.journey?.timePerChakra;
-            const demoDuration = !shots && !sleep && isDemoScriptSelected() ? getDemoCoreDurationMinutes(state.customScript) : null;
-            timeInput.min = demoDuration ?? definition?.min ?? (shots ? 1 : 1);
-            timeInput.max = definition?.max ?? (shots ? 20 : sleep ? 10 : 7);
-            timeInput.step = definition?.step ?? (shots ? 1 : 0.5);
-            const activeValue = shots ? state.timeShot : sleep ? state.timeSleepStage : state.timePerChakra;
-            timeInput.value = activeValue;
-            const pct = ((activeValue - Number(timeInput.min)) / (Number(timeInput.max) - Number(timeInput.min)) * 100).toFixed(1) + '%';
-            timeInput.style.setProperty('--range-fill', pct);
-            setText('time-display', shots ? `${Number(activeValue).toFixed(0)} secs` : `${Number(activeValue).toFixed(1)} mins`);
-            const rangeControl = timeInput.closest('.range-control');
-            if (rangeControl) {
-                const maximum = rangeControl.querySelector('.range-max');
-                if (maximum) maximum.textContent = timeInput.max;
-                const increment = rangeControl.querySelector('.range-increment');
-                const decrement = rangeControl.querySelector('.range-decrement');
-                if (increment) increment.disabled = Number(timeInput.value) >= Number(timeInput.max);
-                if (decrement) decrement.disabled = Number(timeInput.value) <= Number(timeInput.min);
-            }
-        }
-        const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
-        const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
-            : intimateService ? 'ui.beginIntimateService'
-                : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
-                    : state.selectedChakras.length === 0 && getChecked('hooponopono-experience-toggle') ? 'ui.beginHooponopono'
-                        : 'ui.beginJourney';
-        if (startMeditationBtn) startMeditationBtn.textContent = t(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
-        document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
-        refreshRangeControlDisplays();
-        syncDroneDurationModeControls();
-        updateDroneDurationSummary();
     }
 
     // Initial call
@@ -7451,144 +4419,23 @@ function attachEventListeners() {
     }
 
     function updateSessionEstimate() {
-        if (getChecked('shots-toggle')) {
-            setText('session-estimate', `~ ${state.timeShot} sec frequency shot`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('music-only-toggle')) {
-            setText('session-estimate', 'Music only — stop anytime');
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('box-breathing-experience-toggle')) {
-            const seconds = state.timeBreathing * 16;
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.boxBreathingExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('hooponopono-experience-toggle')) {
-            setText('session-estimate', `~ 4 min ${t('ui.hooponoponoExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('undo-unlearn-addon-toggle')) {
-            const minutes = Number(document.getElementById('undo-unlearn-duration')?.value || 8);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.undoUnlearnAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('visualization-addon-toggle')) {
-            const minutes = Number(document.getElementById('visualization-duration')?.value || 2);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.visualizationAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('body-scan-addon-toggle')) {
-            const minutes = Number(document.getElementById('body-scan-duration')?.value || 5);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.bodyScanAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('noting-addon-toggle')) {
-            const minutes = Number(document.getElementById('noting-duration')?.value || 4);
-            setText('session-estimate', `~ ${minutes} min ${t('ui.notingAddon').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle')) {
-            let seconds = 0;
-            if (getChecked('perineal-care-toggle')) seconds += state.timePerinealCare;
-            if (getChecked('massage-toggle')) {
-                seconds += (7 * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
-                    + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
-            }
-            if (getChecked('assisted-bathing-toggle')) seconds += state.timeAssistedBathing;
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.intimateService').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('yoga-experience-toggle')) {
-            const poseCount = Array.from(document.querySelectorAll('#yoga-pose-selection input:checked')).length;
-            const bathEnabled = getChecked('bath-session-toggle');
-            let seconds = state.timeYogaPrep + poseCount * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
-            if (getChecked('corpse-pose-toggle')) seconds += state.timeCorpse;
-            if (bathEnabled) {
-                seconds += state.timeBath;
-                seconds += timing('transitions', 'bathToYogaRest');
-            }
-            setText('session-estimate', `~ ${Math.max(1, Math.ceil(seconds / 60))} min ${t('ui.yogaExperience').toLowerCase()}`);
-            updateJourneyRoadmap();
-            return;
-        }
-        if (getChecked('sleep-mode-toggle')) {
-            setText('session-estimate', `~ ${Math.round(state.timeSleepStage * SLEEP_STAGE_COUNT)} min sleep journey`);
-            updateJourneyRoadmap();
-            return;
-        }
-        const isHigh = getChecked('high-energy-toggle');
-        let overhead = timing('estimate', 'baseOverhead');
-
-        const hypnosisWrapperMinutes = !isHigh && !isDemoScriptSelected()
-            ? (state.timeEmergence / 60) + (timing('estimate', 'hypnosisTransitionToneSeconds') / 60) + (timing('estimate', 'hypnosisNarrationSeconds') / 60)
-            : 0;
-        const addonMinutes = isHigh ? 0
-            : (getChecked('box-breathing-experience-toggle') ? (state.timeBreathing * 16) / 60 : 0)
-                + (getChecked('visualization-addon-toggle') ? Number(document.getElementById('visualization-duration')?.value || 2) : 0)
-                + (getChecked('dharana-addon-toggle') ? Number(document.getElementById('dharana-duration')?.value || 2) : 0)
-                + (getChecked('body-scan-addon-toggle') ? Number(document.getElementById('body-scan-duration')?.value || 5) : 0)
-                + (getChecked('noting-addon-toggle') ? Number(document.getElementById('noting-duration')?.value || 4) : 0)
-                + (getChecked('hooponopono-experience-toggle') ? 4 : 0)
-                + (getChecked('undo-unlearn-addon-toggle') ? Number(document.getElementById('undo-unlearn-duration')?.value || 8) : 0);
-        const estimate = isHigh
-            ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead')) + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes + addonMinutes);
-        setText('session-estimate', `~ ${estimate} min session`);
+        const estimate = sessionEstimate.resolve({
+            isChecked: getChecked,
+            state,
+            readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
+            countYogaPoses: () => document.querySelectorAll('#yoga-pose-selection input:checked').length,
+            timing,
+            translate: t,
+            isDemoScriptSelected,
+            sleepStageCount: SLEEP_STAGE_COUNT
+        });
+        setText('session-estimate', estimate);
         updateJourneyRoadmap();
     }
 
-    // Timing Sliders Listeners
-    document.getElementById('time-icebreaker').addEventListener('input', (e) => {
-        state.timeIcebreaker = parseInt(e.target.value);
-        setText('display-icebreaker', state.timeIcebreaker + 's');
-        localStorage.setItem('chakra_time_icebreaker', state.timeIcebreaker);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-emergence').addEventListener('input', (e) => {
-        state.timeEmergence = parseInt(e.target.value);
-        setText('display-emergence', state.timeEmergence + 's');
-        localStorage.setItem('chakra_time_emergence', state.timeEmergence);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-breathing').addEventListener('input', (e) => {
-        state.timeBreathing = parseInt(e.target.value);
-        setText('display-breathing', state.timeBreathing + 's');
-        localStorage.setItem('chakra_time_breathing', state.timeBreathing);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-corpse').addEventListener('input', (e) => {
-        state.timeCorpse = parseInt(e.target.value);
-        setText('display-corpse', state.timeCorpse + 's');
-        localStorage.setItem('chakra_time_corpse', state.timeCorpse);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-interval').addEventListener('input', (e) => {
-        state.timeInterval = parseInt(e.target.value);
-        setText('display-interval', state.timeInterval + 's');
-        localStorage.setItem('chakra_time_interval', state.timeInterval);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-yoga-prep').addEventListener('input', (e) => {
-        state.timeYogaPrep = parseInt(e.target.value);
-        setText('display-yoga-prep', state.timeYogaPrep + 's');
-        localStorage.setItem('chakra_time_yoga_prep', state.timeYogaPrep);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-yoga-pose').addEventListener('input', (e) => {
-        state.timeYogaPose = parseInt(e.target.value);
-        setText('display-yoga-pose', state.timeYogaPose + 's');
-        localStorage.setItem('chakra_time_yoga_pose', state.timeYogaPose);
-        updateSessionEstimate();
+    // Keep transition-duration binding before custom-script controls, as before.
+    window.ChakraTimingSettingsView.bindTransitionDurationControls({
+        document, state, storage: localStorage, setText, updateSessionEstimate
     });
 
     // Script Selection Event Listeners
@@ -7705,25 +4552,9 @@ function attachEventListeners() {
         });
     }
 
-    document.getElementById('time-bath').addEventListener('input', (e) => {
-        state.timeBath = parseInt(e.target.value);
-        setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
-        localStorage.setItem('chakra_time_bath', state.timeBath);
-        updateSessionEstimate();
-    });
-
-    document.getElementById('time-perineal-care').addEventListener('input', (e) => {
-        state.timePerinealCare = parseInt(e.target.value);
-        setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
-        localStorage.setItem('chakra_time_perineal_care', state.timePerinealCare);
-        updateSessionEstimate();
-    });
-
-    document.getElementById('time-assisted-bathing').addEventListener('input', (e) => {
-        state.timeAssistedBathing = parseInt(e.target.value);
-        setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
-        localStorage.setItem('chakra_time_assisted_bathing', state.timeAssistedBathing);
-        updateSessionEstimate();
+    // Preserve care-duration listener order after custom-script handling.
+    window.ChakraTimingSettingsView.bindCareDurationControls({
+        document, state, storage: localStorage, setText, updateSessionEstimate
     });
 
     timeSlider.addEventListener('input', (e) => {
@@ -7999,12 +4830,46 @@ function attachEventListeners() {
         return true;
     }
 
+    function selectedPracticeModuleIds() {
+        return [
+            ['body-scan-addon-toggle', 'body-scan'],
+            ['noting-addon-toggle', 'guided-noting'],
+            ['dharana-addon-toggle', 'dharana'],
+            ['box-breathing-experience-toggle', 'box-breathing'],
+            ['visualization-addon-toggle', 'visualization'],
+            ['hooponopono-experience-toggle', 'hooponopono'],
+            ['undo-unlearn-addon-toggle', 'undo-unlearn']
+        ].filter(([toggleId]) => getChecked(toggleId)).map(([, moduleId]) => moduleId);
+    }
+
     startMeditationBtn.addEventListener('click', async () => {
         if (!validateLobbyStartBeforePrelude()) return;
+        if (startMeditationBtn.dataset.practiceLoading === 'true') return;
+        const selectedModules = selectedPracticeModuleIds();
+        if (selectedModules.length) {
+            startMeditationBtn.dataset.practiceLoading = 'true';
+            startMeditationBtn.disabled = true;
+            try {
+                await practiceModuleLoader.loadMany(selectedModules);
+            } catch (error) {
+                console.error('Selected guided practice could not load:', error);
+                alert(journeyT('ui.practiceLoadFailed'));
+                return;
+            } finally {
+                delete startMeditationBtn.dataset.practiceLoading;
+                startMeditationBtn.disabled = false;
+            }
+        }
         if (state.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce) {
             startMeditationBtn.disabled = true;
             startMeditationBtn.style.opacity = '0.5';
-            const preludeResult = await journeyVideoPrelude.play();
+            let preludeResult = 'unavailable';
+            try {
+                const prelude = await loadJourneyVideoPrelude();
+                preludeResult = await prelude.play();
+            } catch (error) {
+                console.warn('Journey video introduction unavailable:', error);
+            }
             if (preludeResult === 'ended') meditation.acknowledgeDndReminder();
             startMeditationBtn.disabled = false;
             startMeditationBtn.style.opacity = '1';
@@ -8199,126 +5064,13 @@ function attachEventListeners() {
     });
     document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('mixer-no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
-    // Unified Volume Handlers
-    const syncVolume = (key, value, elements) => {
-        state[key] = parseFloat(value);
-        localStorage.setItem(`chakra_${key.replace('vol', 'vol_').toLowerCase()}`, state[key]);
-        elements.forEach(el => { if (el) el.value = value; });
-    };
-
-    const voiceClarity = document.getElementById('voice-clarity');
-    const voiceWarmth = document.getElementById('voice-warmth');
-    const voicePace = document.getElementById('voice-pace');
-    const applyVoiceTuning = () => {
-        if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
-    };
-    voiceClarity?.addEventListener('input', (event) => {
-        state.voiceClarity = Number(event.target.value);
-        localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-        applyVoiceTuning();
-        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
+    window.ChakraAudioEffectsSettingsView.bind({ document, state, storage: localStorage, audio, normalizeSpatialMode, syncValue });
+    window.ChakraAudioVolumeSettingsView.bind({ document, state, storage: localStorage, audio });
+    document.getElementById('preview-video-audio')?.addEventListener('click', () => {
+        void loadJourneyVideoPrelude()
+            .then(prelude => prelude.previewAudio())
+            .catch(error => console.warn('Video audio preview unavailable:', error));
     });
-    voiceWarmth?.addEventListener('input', (event) => {
-        state.voiceWarmth = Number(event.target.value);
-        localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-        applyVoiceTuning();
-        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
-    });
-    voicePace?.addEventListener('input', (event) => {
-        state.voicePace = Number(event.target.value);
-        localStorage.setItem('chakra_voice_pace', state.voicePace);
-    });
-    document.getElementById('voice-echo')?.addEventListener('change', (event) => {
-        state.voiceEcho = event.target.value;
-        localStorage.setItem('chakra_voice_echo', state.voiceEcho);
-        if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
-    });
-    document.getElementById('music-echo')?.addEventListener('change', (event) => {
-        state.musicEcho = event.target.value;
-        localStorage.setItem('chakra_music_echo', state.musicEcho);
-        if (audio.setMusicEcho) audio.setMusicEcho(state.musicEcho);
-    });
-    const setSpatialMode = (mode) => {
-        state.spatialMode = normalizeSpatialMode(mode);
-        localStorage.setItem('chakra_spatial_mode', state.spatialMode);
-        syncValue('spatial-mode', state.spatialMode);
-        syncValue('mixer-spatial-mode', state.spatialMode);
-        if (audio.setSpatialMode) audio.setSpatialMode(state.spatialMode);
-    };
-    document.getElementById('spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
-    document.getElementById('mixer-spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
-    const voicePresets = {
-        soft: { clarity: 35, warmth: 65, pace: 0.9 },
-        shringara: { clarity: 28, warmth: 82, pace: 0.92 },
-        balanced: { clarity: 50, warmth: 50, pace: 1 },
-        clear: { clarity: 70, warmth: 40, pace: 1.05 }
-    };
-    document.querySelectorAll('[data-voice-preset]').forEach(button => {
-        button.addEventListener('click', () => {
-            const preset = voicePresets[button.dataset.voicePreset];
-            if (!preset) return;
-            state.voiceClarity = preset.clarity;
-            state.voiceWarmth = preset.warmth;
-            state.voicePace = preset.pace;
-            localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-            localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-            localStorage.setItem('chakra_voice_pace', state.voicePace);
-            syncValue('voice-clarity', state.voiceClarity);
-            syncValue('voice-warmth', state.voiceWarmth);
-            syncValue('voice-pace', state.voicePace);
-            applyVoiceTuning();
-            document.querySelectorAll('[data-voice-preset]').forEach(item => item.classList.toggle('mixer-preset-active', item === button));
-        });
-    });
-
-    // Voice
-    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')].filter(Boolean);
-    volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVoice', e.target.value, volVoiceEls);
-        if (audio.voiceGain && audio.ctx) audio.voiceGain.gain.setValueAtTime(state.volVoice, audio.ctx.currentTime);
-    }));
-
-    // Drone
-    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')].filter(Boolean);
-    volDroneEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volDrone', e.target.value, volDroneEls);
-        if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
-    }));
-
-    // Bell
-    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')].filter(Boolean);
-    volBellEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volBell', e.target.value, volBellEls);
-        if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
-    }));
-
-    // Mantra
-    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')].filter(Boolean);
-    volMantraEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volMantra', e.target.value, volMantraEls);
-        if (audio.mantraGain && audio.mantraLoop) {
-            audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
-        }
-    }));
-
-    // Music
-    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')].filter(Boolean);
-    volMusicEls.forEach(el => el.addEventListener('input', (e) => {
-        const previousVolume = state.volMusic;
-        syncVolume('volMusic', e.target.value, volMusicEls);
-        audio.setBackgroundMusicVolume(state.volMusic, previousVolume);
-    }));
-    const volVideoEls = [document.getElementById('settings-vol-video')].filter(Boolean);
-    volVideoEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVideo', e.target.value, volVideoEls);
-        audio.setJourneyVideoPreludeVolume(state.volVideo);
-    }));
-    const volVisualizationEls = [document.getElementById('settings-vol-visualization'), document.getElementById('vol-visualization')].filter(Boolean);
-    volVisualizationEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVisualizationAmbience', e.target.value, volVisualizationEls);
-        audio.setVisualizationAmbienceVolume(state.volVisualizationAmbience);
-    }));
-    document.getElementById('preview-video-audio')?.addEventListener('click', () => { void journeyVideoPrelude.previewAudio(); });
     document.getElementById('preview-visualization-ambience')?.addEventListener('click', () => { void audio.previewVisualizationAmbience(); });
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({

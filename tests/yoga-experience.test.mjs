@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
+const yogaSettings = fs.readFileSync(new URL('../modules/yoga-experience-settings.js', import.meta.url), 'utf8');
+const journeyRoadmap = fs.readFileSync(new URL('../modules/journey-roadmap.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const timings = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 const english = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -44,11 +47,12 @@ assert.doesNotMatch(html, /id="time-massage"/, 'Massage must not expose a standa
 assert.match(app, /\['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'\]/, 'Massage should force all chakras in Crown-to-Root order');
 assert.match(app, /if \(focusedExperience\) \{[\s\S]*?if \(piperWarmup\) await piperWarmup;/, 'focused care should wait for Piper before narration begins');
 assert.match(app, /focusedExperience === 'yoga' && state\.selectedYogaPoses\.length === 0/, 'Yoga Experience should require at least one configured pose when launched');
-assert.match(app, /roadmapYoga/, 'Yoga Experience should have a focused Lobby roadmap');
-assert.match(app, /roadmapRestBeforeYoga/, 'Yoga roadmap should show the required rest stage after Bath Session');
+assert.match(journeyRoadmap, /ui\.roadmapYoga/, 'Yoga Experience should have a focused Lobby roadmap');
+assert.match(journeyRoadmap, /ui\.roadmapRestBeforeYoga/, 'Yoga roadmap should show the required rest stage after Bath Session');
 assert.match(app, /yogaExperiencePanelHost\.append\(yogaExperienceSetup\)/, 'Yoga setup should move into the Lobby at runtime');
-assert.match(app, /yogaExperienceSetup\.hidden = !yogaExperience \|\| shots/, 'Yoga setup should appear only for Yoga Experience');
-assert.match(app, /function persistYogaExperienceSetup\(\)[\s\S]*?chakra_yoga_selected/, 'Yoga setup choices should save immediately from the Lobby');
+assert.match(lobbyVisibility, /yogaExperienceSetup\.hidden = !yogaExperience \|\| shots/, 'Yoga setup should appear only for Yoga Experience');
+assert.match(app, /function persistYogaExperienceSetup\(\)\s*\{\s*yogaExperienceSettings\.persist\(/, 'Yoga setup choices should save immediately from the Lobby through the extracted settings owner');
+assert.match(yogaSettings, /chakra_yoga_selected/, 'the Yoga settings owner should persist selected poses');
 assert.match(html, /id="guide-controlled-continue"[^>]*hidden/, 'the shared guide-controlled action should start hidden');
 assert.match(app, /async runGuideControlledTransition\(\{ durationSeconds, title, subtitle, readyText, continueLabel, showTimer = true \}\)/, 'guide-controlled transitions should remain reusable through generic content and timing inputs');
 assert.match(app, /showTimer: false,[\s\S]*?proceedToNextSession/, 'completed care stages should use an untimed guide approval instead of auto-advancing');

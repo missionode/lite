@@ -2,6 +2,12 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const source = fs.readFileSync('app.js','utf8');
+const controllerSource = fs.readFileSync('modules/journey-chrome.js','utf8');
+const html = fs.readFileSync('index.html','utf8');
+const serviceWorker = fs.readFileSync('sw.js','utf8');
+assert.match(html,/modules\/journey-chrome\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/,'Shared journey chrome must load before the app constructs its controller.');
+assert.match(serviceWorker,/chakra-v5.309[\s\S]*?modules\/journey-chrome\.js\?v=1\.0/,'The shared chrome module must remain available offline.');
+assert.match(source,/const journeyChrome = new window\.ChakraJourneyChrome\(\);/,'The shared chrome controller should have an app-level lifetime, independent of the video prelude.');
 const timers = new Map(); let next = 0;
 function node(hidden = false) {
     const classes = new Set(hidden ? ['hidden'] : []);
@@ -13,11 +19,12 @@ const body=node(), controls=node(true), mixer=node(true), zone=node();
 const elements={controls,'volume-mixer':mixer,'fullscreen-controls-reveal-zone':zone,app:{}};
 const listeners={};
 const document={body,hidden:false,fullscreenElement:null,getElementById:id=>elements[id]||null,addEventListener(type,fn){listeners[type]=fn;}};
-const Prelude=vm.runInNewContext(source.slice(source.indexOf('class JourneyVideoPrelude {'),source.indexOf('class MeditationController {'))+';JourneyVideoPrelude',{
-    document,MutationObserver:class{constructor(fn){this.fn=fn;}observe(){}},
+const window={};
+vm.runInNewContext(controllerSource,{
+    window,document,MutationObserver:class{constructor(fn){this.fn=fn;}observe(){}},
     setTimeout(fn,delay){timers.set(++next,{fn,delay});return next;},clearTimeout(id){timers.delete(id);}
 });
-const view=new Prelude({});
+const view=new window.ChakraJourneyChrome();
 const fire = id => {const item=timers.get(id);assert.ok(item);timers.delete(id);item.fn();};
 controls.classList.remove('hidden');view.syncFullscreenJourneyChrome();
 assert.ok(body.classList.contains('journey-controls-active'));

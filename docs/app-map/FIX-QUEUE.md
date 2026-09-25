@@ -1,5 +1,133 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-066 Timing duration settings view ownership
+
+Seven transition-duration and three care-duration input handlers now live in `modules/timing-settings-view.js`. Preserve integer parsing, shared state updates, localized display helper calls, saved `chakra_time_*` keys, update order, listener attachment positions and the existing estimate/roadmap refresh. Mode-sensitive chakra/Sleep/Shot and High Energy duration controls remain app-owned. Eager delivery is an ownership/testability extraction, not a performance gain.
+
+## Completed — CP-MOD-061 Journey content loading and validation ownership
+
+Start-time script source selection, cache reuse, fetch and required-bundle validation now live in `modules/journey-content-loader.js`. The app retains script/session state; the resolved bundle is committed before validation, validation context is captured at the same point relative to asynchronous loading, and fetch URLs and failure messaging are unchanged. No behavior or performance change is claimed.
+
+## Completed — CP-MOD-060 Guided opening and Gratitude stage ownership
+
+The shared opening/Gratitude stage now lives in `modules/journey-opening-stage.js`. Preparation-safety guidance, optional Arrival induction, Moon/Returning branch, Gratitude, personal intention, HRIM opening, and optional Arrival readiness retain their original order and guards. No behavior or performance change is claimed.
+
+## Completed — CP-MOD-059 Arrival and Emergence wrapper ownership
+
+The optional Arrival/Arrival-readiness cues and Emergence sequence now live in `modules/journey-hypnosis-wrapper.js`. App adapters retain journey behavior, stage order, frequency/no-frequency branches, configured timing, fade windows and cancellation guards. This changes ownership only.
+
+## Completed — CP-MOD-058 Music echo preset ownership
+
+The existing music echo profiles and parameter ramps now live in `modules/audio-music-echo.js`; the AudioEngine method and settings persistence stay stable. Preset values, invalid-mode fallback, 250 ms ramps and convolver-tail timing are unchanged. No performance claim is made.
+
+## Completed — CP-MOD-057 Background-music gain and fade controls
+
+Background-music fades, volume-role preservation, stage ducking, mantra mute/restore, tail-gate automation and restore-timer cancellation now live in `modules/audio-background-music-controls.js`. Stable AudioEngine methods, journey callers and cache delivery remain intact. No performance claim is made.
+
+## Completed — CP-MOD-054 Binaural and drone cleanup lifecycle
+
+`stopBinaural()` and `stopDrone()` resource retirement now live in `modules/audio-drone-stop.js`; the AudioEngine API remains stable. Pre-context state clearing, AudioParam filtering, 5-second gain fades, delayed stops and cleanup ordering are unchanged. The module is eagerly available and cached for offline sessions. No performance claim is made.
+
+## Completed — CP-MOD-053 Chakra and sleep drone startup
+
+Drone startup generation now lives in `modules/audio-drone-start.js`; public AudioEngine adapters, `stopDrone()` lifecycle, No Frequency checks, chakra and sleep frequency policies, binaural support, and journey call paths remain unchanged. The module loads eagerly and is precached for offline playback. No audio or performance improvement is claimed.
+
+## Completed — CP-MOD-052 Generated tone playback lifecycle
+
+Frequency-only Shot and guided transition-tone generation, validation, fades and disposal now live in `modules/audio-tone-playback.js`. AudioEngine method names remain compatibility adapters; UI call paths, No Frequency behavior, volume caps and routing are unchanged. The module is eagerly available and precached for offline journeys. This is ownership/testability only.
+
+## Completed — CP-MOD-051 Elemental audio-layer lifecycle
+
+Elemental noise-bed generation, per-chakra filter selection and source/LFO cleanup now live in `modules/audio-elemental-layer.js`. AudioEngine retains the public adapter and noise-buffer cache; chakra-index routing, settings and journey call order are unchanged. The module is loaded eagerly and precached offline. No audio quality or performance improvement is claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-050 Audio spatial geometry
+
+Generic Web Audio panner construction and position interpolation now live in `modules/audio-spatial-geometry.js`. The AudioEngine's public methods remain adapters; spatial mode profiles and behavior remain unchanged. The helper loads eagerly and remains in the offline cache. No spatial-audio or performance benefit is claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-049 Audio signal design helpers
+
+Soft-clipping curve, seeded diffuse reverb, stochastic impulse response and white-noise buffer generation are implemented in `modules/audio-signal-design.js`. AudioEngine retains its public adapters and cached-noise state; existing call order and algorithm inputs are preserved. The module is eager and offline-cached. No sound-quality or performance improvement is claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-048 AudioEngine initialization graph ownership
+
+The one-time Web Audio graph construction now lives in `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the public adapter and passes existing state/constants explicitly. Node topology, parameter values, output-selection fallback and call order are preserved and directly mock-tested. The new module remains eager and offline-cached; this is ownership/testability work only, with no audio-quality or performance gain claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-043 chakra visual-effect controller ownership
+
+The existing `VisualEngine` now lives in `modules/visual-engine.js` and is eagerly loaded/cached before the app. The same single instance still receives the existing `AudioEngine`; effect modes, Eyes Close handling, chakra glow, slow image breathing and stop cleanup are unchanged. CSS and persisted settings remain in their existing owners. This improves code ownership only; startup JS is effectively unchanged and no device/thermal gain is claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-044 standard journey duration-estimate ownership
+
+The exact standard chakra-journey duration calculation now belongs to `modules/session-estimate.js`; `MeditationController` delegates with the same app-owned state, script, localization, timing, narration and DOM services. Session dispatch, mode priority and legacy fallbacks remain in the controller. This is ownership/testability work only; no performance or thermal gain is claimed. See the modularization review and active handoff.
+
+## Completed — CP-MOD-045 exact session countdown-duration ownership
+
+`modules/session-estimate.js` now owns the exact per-mode milliseconds calculation for Music Only, focused practices, combined preparations, Yoga, Intimate Service, Sleep, measured standard narration and HRIM/demo fallbacks. `MeditationController` supplies app state and DOM-derived values, and still owns timer lifecycle and route entry points. Duration formulas and precedence are covered directly; eager loading remains unchanged and no performance or thermal gain is claimed.
+
+## Completed — CP-MOD-046 session countdown lifecycle ownership
+
+The exact countdown ticker state and 250 ms lifecycle now live in `modules/session-countdown.js`; the controller injects active/paused state, browser timers, clock and existing show/hide display callbacks. Controller call sites, route behavior, and estimate formulas are unchanged. Direct fake-clock tests cover elapsed-time accounting, paused/inactive time, restart, invalid durations, zero clamping and cleanup. Eager delivery adds no performance or thermal claim.
+
+## Completed — CP-MOD-047 newcomer marker layout lifecycle ownership
+
+The seven normalized chakra anchors, responsive SVG connector geometry, frame coalescing, image-load and resize triggers, and explicit cleanup now live in `modules/newcomer-marker-layout.js`. The newcomer screen, labels, narration, placement formulas and journey order remain unchanged. Direct deterministic geometry/lifecycle contracts and the existing newcomer journey checks cover parity. Eager delivery adds no visual, startup, CPU, memory or thermal claim.
+
+## Completed — CP-MOD-042 observational sky renderer ownership
+
+The existing `AmbientParticleField` renderer is now owned by `modules/ambient-particle-field.js` and loaded eagerly after its astronomy dependencies. The app still creates one instance and uses the same callbacks; canvas drawing, observer location/time, Earth/Moon/Sun/planet/star visibility, atmosphere, protective illustration, reduced-motion/static journey behavior and cleanup are unchanged. The module is included in the exact offline shell cache. This extraction improves ownership only; it does not claim startup, CPU or thermal gains. See the modularization review and active handoff.
+
+## Completed — CP-MOD-041 lazy video-introduction controller
+
+The `JourneyVideoPrelude` controller is no longer parsed or constructed at startup. It loads on the explicit Lobby video-introduction path or Settings audio preview; simultaneous requests share one load, and a failed module load falls through to the ordinary journey. Its code remains in the offline shell cache, while the large video remains uncached. Browser checks confirm no initial module/video requests, on-demand loading for both entry points, and offline shell availability. No device/thermal benefit is claimed from the local sample. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/HANDOFF.md`.
+
+## Completed — CP-MOD-040 shared journey chrome ownership
+
+Fullscreen tracking, hidden controls, pointer/focus/touch reveal, idle cursor, mixer visibility and timer cleanup now belong to the shared eager `JourneyChromeController`, not the optional-video controller. Its interaction timings and session behavior are preserved. This is an ownership extraction, not a performance claim. See the modularization review and active handoff.
+
+## Completed — CP-MOD-039 optional video startup request
+
+The optional 7.3 MB video introduction and its Settings preview no longer trigger media loading when the app starts. The URL is attached only when a user starts the explicitly opted-in introduction or requests preview; the clip remains outside service-worker precache, so offline requests use the existing safe unavailable-video path. Regression coverage observes actual browser requests before and after opt-in. This avoids unneeded media transfer/decoder work on ordinary sessions; CPU/thermal improvement is not measured. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/HANDOFF.md`.
+
+## Completed — CP-MOD-038 selected guided-practice loading
+
+Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn scripts are cached offline but excluded from eager page scripts. Begin loads only selected modules, before video/audio; a failed load blocks session start, displays a localized retry message and permits another attempt. Existing route/lifecycle contracts remain active. Local Chromium confirms zero practice scripts initially and only Box Breathing loads from cache after selecting it and starting offline. The observed initial-JavaScript body reduction is ~13.1 KiB in this harness; device/thermal gains are unproven. See the modularization review/handoff.
+
+## Completed — CP-MOD-037 offline shell cache parity
+
+The local browser baseline found that versioned `app.js`/`style.css` requests did not match unversioned service-worker precache entries, breaking offline reload. Cache entries now match the exact `index.html` URLs, and the opt-in Chromium test covers cold, warm and offline startup without starting audio. The next approved investigation is selected-only practice-module loading, gated on route parity, offline cache behavior and failure/retry coverage. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/plan.md`.
+
+## CP-MOD-036 — Personal-care preference hydration
+
+Perineal-care, assisted-bathing and massage controls display their already-loaded preference values. Session authorization and execution are unchanged.
+
+## CP-MOD-035 — Script preference hydration
+
+The current saved script source selects the default/custom UI, and loaded custom scripts keep their existing status copy. Loading, validation and demo-timing decisions remain app-owned.
+
+## CP-MOD-034 — Appearance preference hydration
+
+Visual-effect and brightness control presentation follows the existing saved state and app-owned image renderer. Script selection, status messaging and voice selection remain in `loadPreferences`.
+
+## CP-MOD-033 — Timing control presentation hydration
+
+Core and auxiliary duration values are copied into current controls with their existing range-fill and unit labels. Stored timing defaults/clamping, duration calculations and drone-duration selection remain in their current owners.
+
+## CP-MOD-032 — Journey-selection hydration
+
+Selected chakras, the existing intention fallback and returning/video/audio-filter control state are applied by a tested owner. The app still owns stored state, validation, mode gates and journey dispatch; no route or saved preference semantics change.
+
+## CP-MOD-031 — Mixer preference hydration
+
+The ordered 19-item mapping from app-owned mixer settings into Lobby/Settings controls has a dedicated tested owner. Preserve duplicate mirror controls and its current loadPreferences position; it does not own persistent state or audio-engine tuning.
+
+## CP-MOD-030 — Session-only mode reset ownership
+
+App-load cleanup of retired Box Breathing, Ho’oponopono, Music Only, High Energy and Sleep mode keys and checkbox defaults now has a dedicated owner. Yoga mode/setup restoration remains app-owned; persisted care/pose preferences are not cleared. This is eager ownership-only work, with no performance claim.
+
+## CP-MOD-029 — Automatic journey voice profile ownership
+
+The existing High Energy, feminine-voice Shringara and default soft profile branch has moved to a direct-testable module. Preserve profile values, storage keys, saved settings, control/preset synchronization and optional audio tuning behavior. This remains an eager ownership extraction, not a performance optimization. Device listening/quality validation is not claimed.
+
 ## Production release E2E gate corrections — local validation complete
 
 Standalone preparation choices now launch without chakra selection, execute in the shown order, receive a matching standalone roadmap and include their durations in the session countdown. During an active journey, once mouse movement reveals the controls, the bottom reveal area yields pointer interaction to the controls. E2E checks were corrected for current selectors, script JSON fields, voice minimum and session-only HRIM mode. Full browser suite: 26/26 passed; atlas: 32 maps verified. Production publication remains a separate approved action; device playback/thermal validation is not claimed.
@@ -61,7 +189,7 @@ App 3.44: Earth's five atmospheric gradients are stronger outside its opaque lim
 
 Earth adaptation: centered observer marker below the horizon; shrink/omit guards protect foreground text/controls, including their reveal position. Five softly merged atmospheric layers and a feathered Sun shield ring remain visual-only. Layout events cause a coalesced redraw, not idle polling.
 
-Current broad test baseline: 34/37 non-browser tests pass. Content-safety/drone-duration need owner-managed `docs/dot.json`; chakra-selection has a stale array-order source assertion, reproduced on `6337889`. Track that test cleanup separately rather than altering unrelated Shots behavior in the sky change.
+Historical test baseline: 34/37 non-browser tests passed at the original sky-checkpoint audit. The old `chakra-selection` source assertion was later updated to follow the extracted Lobby-visibility owner and passes on the current modularize branch. The two fixture-dependent `content-safety` and `drone-duration` contracts still require owner-managed `docs/dot.json`; without that fixture they remain excluded, not passing.
 
 ## Newcomer chakra orientation — implemented locally, device check pending
 
@@ -173,9 +301,11 @@ A later product-design pass can distinguish a simple participant entry from adva
 
 ### Modularization track — active on `modularize`
 
-CP-MOD-012 is implemented in the active checkpoint branch: `modules/body-scan-practice.js` owns Body Scan narration order, duration-based intervals, active-session guards and black-scene cleanup. Focused direct contracts and shell-delivery checks cover the seam. It adds one eager script and about 1.4 KiB net local uncompressed body bytes in a single comparison; observed timing changes are within noise, so this is an ownership/testability improvement, not a measured performance gain. Device playback/thermal evidence remains open. Lazy loading remains gated by parity and repeated cold/warm/offline measurements.
+CP-MOD-012 through CP-MOD-027 are integrated on `modularize`: all journey practices have directly tested lifecycle owners, shared screen switching preserves the Lobby/Settings dynamic-sky exception, Lobby session estimates are isolated, Mood & Relaxation and drone-duration Settings have view owners, central Lobby experience visibility has a directly tested controller, Yoga setup persistence/timing-row presentation has a directly tested owner, shared range controls have an isolated tested renderer, localized display-only journey roadmap ownership is extracted, and display-language UI painting is isolated. CP-MOD-028 is in progress for timing configuration/profile ownership. Modules remain eager and precached; no performance gain is claimed. Browser/device evidence limitations remain in checkpoint review. Lazy loading stays gated by extraction parity and repeated cold/warm/offline measurements.
 
-The atlas-led migration is now active. Delivered seams move settings backup operations into `modules/settings-backup.js`, initial state into `modules/app-state.js`, content path lookup/language fallback/script validation into `modules/content-localization.js`, deterministic media primitives into `modules/media-lifecycle.js`, Piper worker/synthesis/playback ownership into `modules/piper-lifecycle.js`, effect-route connect/tail-retirement ownership into `modules/audio-route-lifecycle.js`, and deterministic journey start routing plus the ordered preparation-stage plan into `modules/journey-routing.js`. All expose frozen APIs and preserve classic-script startup order. Web Audio bus construction is explicitly deferred until the next weekly reset; bounded journey stage contracts can continue before UI controllers. Each boundary must retain behavior, update its atlas ownership/source references, remove source-slicing tests where touched, and pass a focused parity gate before the next extraction. Native ES-module conversion and optional-feature lazy loading remain later decisions, not completed behavior.
+The atlas-led migration is now active. Delivered seams move settings backup operations into `modules/settings-backup.js`, initial state into `modules/app-state.js`, content path lookup/language fallback/script validation into `modules/content-localization.js`, deterministic media primitives into `modules/media-lifecycle.js`, Piper worker/synthesis/playback ownership into `modules/piper-lifecycle.js`, effect-route connect/tail-retirement ownership into `modules/audio-route-lifecycle.js`, and deterministic journey start routing plus the ordered preparation-stage plan into `modules/journey-routing.js`. All expose frozen APIs and preserve classic-script startup order. Web Audio bus construction was explicitly deferred until the next weekly reset; CP-MOD-048 is now resuming that boundary after the reset and is active in its own checkpoint. Each boundary must retain behavior, update its atlas ownership/source references, remove source-slicing tests where touched, and pass a focused parity gate before the next extraction. Native ES-module conversion and optional-feature lazy loading remain later decisions, not completed behavior.
+
+CP-MOD-054/055 are integrated on `modularize`: binaural/drone stop cleanup and recorded mantra start/stop are separately tested audio owners. CP-MOD-056 is in progress on its isolated checkpoint branch, extracting background-music loop start/stop while gain/restore policy remains app-owned. Keep all audio modules eager and precached until parity is complete; the final lazy-loading phase still requires repeatable cold/warm/offline browser evidence and explicit opt-in browser verification.
 
 ### Planned post-parity performance phase
 
@@ -198,3 +328,15 @@ CP-THEME-PLAN-001 adopts the Cosmic Observatory desktop/mobile concept saved und
 Assessment tournament software is integrated and source/automated/browser-verified; its delivered flow is documented in the `assessment-tournament` map. Remaining follow-up is trained-operator acceptance of neutral wording and real-session usability. Keep it separate from journey routing, diagnosis, consent inference, sales prompts and automatic service recommendations.
 
 For each fix: reproduce or prove the branch → implement the smallest correction → verify that branch and its neighboring exits → update the corresponding atlas map and source references. Keep a separate change record for each fix. Do not claim deployment from local checks.
+## CP-MOD-062 — Settings manager view ownership (implemented locally)
+
+Moved Manage Settings navigation, export/import event handling, status messages and the Advanced Features export gate to `modules/settings-manager-view.js`. Backup schema validation and managed-storage replacement remain in `modules/settings-backup.js`; the app continues to provide screen navigation, localization and the current session unlock state. Import remains available while locked, export remains unavailable while locked, and cancellation/invalid-input paths preserve existing settings. Direct module interaction tests and atlas rebuild are required. No browser or device evidence is claimed; remote publication and integration remain approval-gated.
+## CP-MOD-063 — Audio volume settings view ownership (implemented locally)
+
+Moved the seven paired or single mixer volume-slider bindings into `modules/audio-volume-settings-view.js`. It retains the existing `chakra_` preference key construction, mirror synchronization, active voice/drone/bell/mantra gain changes, music transition previous-volume input, video gain and Visualization ambience gain. Audio graph ownership, voice effects, spatial modes, playback and the preview controls remain in their existing owners. Verify with direct slider contracts and the `sound-options` atlas map; no runtime performance gain is presumed from an eager module extraction.
+## CP-MOD-064 — Audio effects settings view ownership (implemented locally)
+
+Moved voice clarity/warmth/pace, voice and music echo selectors, spatial-mode selectors and voice-preset interactions to `modules/audio-effects-settings-view.js`. Existing storage keys, preset values, spatial normalization, mirrored control updates and audio APIs are unchanged. DSP graph implementation and hydration remain with their existing owners. Validate direct user-input paths and `sound-options` references; do not claim audio-quality or performance changes from the extraction.
+## CP-MOD-065 — Journey preparation selection ownership (implemented locally)
+
+Moved Box Breathing, Ho’oponopono, Dharana, Visualization, Body Scan, Guided Noting and Undo & Unlearn Lobby selection listeners to `modules/journey-preparation-selection.js`. The module owns inline option-row visibility for the five options panels, session selection flags for Box/Ho’oponopono, mutual-exclusion clearing and the established visibility/estimate refresh calls. Standalone eligibility, chakra validation and dispatch remain with journey routing. Keep the existing standalone and guided paths distinct in the atlas.
