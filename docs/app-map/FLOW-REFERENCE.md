@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 9a77086 baseline + uncommitted CP-MOD-040 · 2026-09-25.
+Source snapshot: b7b2365 baseline + uncommitted CP-MOD-041 · 2026-09-25.
 
-Source-reviewed behavior at modularize integration baseline 9a77086. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin. CP-MOD-039 defers the optional 7.3 MB video URL until explicit preview or video-introduction selection; the clip is not precached. CP-MOD-040 moves shared fullscreen/idle-cursor controls into an eager owner module without behavior change. These do not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at modularize integration baseline b7b2365. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin. CP-MOD-039 defers the optional 7.3 MB video URL until explicit preview or video-introduction selection; the clip is not precached. CP-MOD-040 moves shared fullscreen/idle-cursor controls into an eager owner module without behavior change. CP-MOD-041 defers optional controller code until video opt-in or preview; its code stays precached but is not parsed at startup. These do not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:6098](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6098), [app.js:7467](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7467), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:5867](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5867), [app.js:7243](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7243), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -154,7 +154,7 @@ flowchart TD
 
 Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/mood-ambience-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mood-ambience-settings-view.js:1), [modules/drone-duration-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/drone-duration-settings-view.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/yoga-experience-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/yoga-experience-settings.js:1), [modules/range-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/range-controls.js:1), [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [tests/journey-chrome.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-chrome.test.mjs:1), [tests/practice-module-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/practice-module-loader.test.mjs:1), [tests/e2e/practice-modules-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/practice-modules-lazy-load.spec.js:1), [tests/e2e/modularization-baseline.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/modularization-baseline.spec.js:1), [tests/e2e/optional-video-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/optional-video-lazy-load.spec.js:1), [tests/journey-video-prelude.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-video-prelude.test.mjs:1), [app.js:3293](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3293), [index.html:769](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:769), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [tests/session-estimate.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-estimate.test.mjs:1), [tests/mood-ambience-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mood-ambience-settings-view.test.mjs:1), [tests/drone-duration-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/drone-duration-settings-view.test.mjs:1), [tests/lobby-experience-visibility.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/lobby-experience-visibility.test.mjs:1), [tests/yoga-experience-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/yoga-experience-settings.test.mjs:1), [tests/range-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/range-controls.test.mjs:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/audio-route-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-route-lifecycle.js:1), [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/mood-ambience-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mood-ambience-settings-view.js:1), [modules/drone-duration-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/drone-duration-settings-view.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/yoga-experience-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/yoga-experience-settings.js:1), [modules/range-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/range-controls.js:1), [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [tests/journey-chrome.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-chrome.test.mjs:1), [tests/practice-module-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/practice-module-loader.test.mjs:1), [tests/e2e/practice-modules-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/practice-modules-lazy-load.spec.js:1), [tests/e2e/modularization-baseline.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/modularization-baseline.spec.js:1), [tests/e2e/optional-video-lazy-load.spec.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/e2e/optional-video-lazy-load.spec.js:1), [tests/journey-video-prelude.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-video-prelude.test.mjs:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:5374](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5374), [index.html:769](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:769), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [tests/journey-routing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-routing.test.mjs:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [tests/session-estimate.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-estimate.test.mjs:1), [tests/mood-ambience-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mood-ambience-settings-view.test.mjs:1), [tests/drone-duration-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/drone-duration-settings-view.test.mjs:1), [tests/lobby-experience-visibility.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/lobby-experience-visibility.test.mjs:1), [tests/yoga-experience-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/yoga-experience-settings.test.mjs:1), [tests/range-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/range-controls.test.mjs:1), [tests/journey-roadmap.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-roadmap.test.mjs:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
@@ -220,7 +220,7 @@ flowchart TD
 
 Loading order and optional browser capabilities.
 
-Sources: [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [app.js:6095](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6095), [app.js:6420](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6420), [app.js:6438](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6438), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
+Sources: [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [app.js:5864](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5864), [app.js:6189](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6189), [app.js:6207](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6207), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
 
 ```mermaid
 flowchart TD
@@ -321,7 +321,7 @@ flowchart TD
 
 Mutual exclusion, validation, selected practice loading, and dispatch priority.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:5546](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5546), [app.js:7166](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7166), [app.js:7487](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7487).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:5288](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5288), [app.js:6935](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6935), [app.js:7263](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7263).
 
 ```mermaid
 flowchart TD
@@ -383,7 +383,7 @@ flowchart TD
 
 Selected chakras in Root → Crown order; returning, newcomer and demo branches included.
 
-Sources: [app.js:4342](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4342), [app.js:4653](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4653), [app.js:4682](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4682), [app.js:5498](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5498), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448).
+Sources: [app.js:4084](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4084), [app.js:4395](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4395), [app.js:4424](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4424), [app.js:5240](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5240), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448).
 
 ```mermaid
 flowchart TD
@@ -446,7 +446,7 @@ flowchart TD
 
 Narration, audio handoff, bounded exposure, and loop transitions.
 
-Sources: [app.js:5463](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5463), [app.js:2712](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2712), [app.js:4155](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4155), [app.js:20](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:20).
+Sources: [app.js:5205](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5205), [app.js:2712](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2712), [app.js:3897](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3897), [app.js:20](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:20).
 
 ```mermaid
 flowchart TD
@@ -494,7 +494,7 @@ flowchart TD
 
 A dedicated high-energy journey using one stage.
 
-Sources: [app.js:4533](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4533), [app.js:4701](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4701), [app.js:5444](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5444).
+Sources: [app.js:4275](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4275), [app.js:4443](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4443), [app.js:5186](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5186).
 
 ```mermaid
 flowchart TD
@@ -531,7 +531,7 @@ flowchart TD
 
 Two independent narration-free experiences.
 
-Sources: [app.js:4257](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4257), [app.js:4970](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4970), [app.js:2496](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2496), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1).
+Sources: [app.js:3999](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3999), [app.js:4712](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4712), [app.js:2496](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2496), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1).
 
 ```mermaid
 flowchart TD
@@ -576,7 +576,7 @@ flowchart TD
 
 Standalone practices launched through shared guided startup.
 
-Sources: [app.js:4539](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4539), [app.js:4757](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4757), [app.js:5372](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5372).
+Sources: [app.js:4281](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4281), [app.js:4499](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4499), [app.js:5114](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5114).
 
 ```mermaid
 flowchart TD
@@ -619,7 +619,7 @@ flowchart TD
 
 Advanced Features-gated rest, bathing and selected poses.
 
-Sources: [app.js:6394](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6394), [app.js:6535](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6535), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
+Sources: [app.js:6163](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6163), [app.js:6304](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6304), [index.html:448](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:448), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1).
 
 ```mermaid
 flowchart TD
@@ -669,7 +669,7 @@ flowchart TD
 
 All seven nonempty combinations follow this ordered composition.
 
-Sources: [app.js:6786](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6786), [app.js:5528](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5528).
+Sources: [app.js:6555](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6555), [app.js:5270](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5270).
 
 ```mermaid
 flowchart TD
@@ -717,7 +717,7 @@ flowchart TD
 
 Six types, confirmation, frequency validation, and distinct finish behavior.
 
-Sources: [app.js:4474](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4474), [app.js:6786](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6786), [app.js:7031](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7031), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
+Sources: [app.js:4216](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4216), [app.js:6555](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6555), [app.js:6800](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6800), [index.html:257](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:257).
 
 ```mermaid
 flowchart TD
@@ -763,7 +763,7 @@ flowchart TD
 
 Isolated activities and return behavior.
 
-Sources: [app.js:4629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4629), [app.js:7395](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7395), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
+Sources: [app.js:4371](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4371), [app.js:7164](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7164), [index.html:210](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:210).
 
 ```mermaid
 flowchart TD
@@ -806,7 +806,7 @@ flowchart TD
 
 Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [app.js:4886](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4886), [app.js:4914](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4914), [app.js:5400](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5400), [app.js:5442](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5442), [app.js:5462](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5462), [app.js:7276](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7276), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [app.js:4628](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4628), [app.js:4656](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4656), [app.js:5142](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5142), [app.js:5184](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5184), [app.js:5204](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5204), [app.js:7045](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7045), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
 
 ```mermaid
 flowchart TD
@@ -900,7 +900,7 @@ flowchart TD
 
 Shared interaction and cancellation behavior.
 
-Sources: [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [app.js:3293](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3293), [app.js:3691](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3691), [app.js:3744](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3744), [app.js:3763](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3763).
+Sources: [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:3433](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3433), [app.js:3486](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3486), [app.js:3505](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3505).
 
 ```mermaid
 flowchart TD
@@ -948,7 +948,7 @@ flowchart TD
 
 An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
 
-Sources: [app.js:3691](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3691), [app.js:3744](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3744), [app.js:62](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:62).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:5376](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5376), [app.js:6973](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6973), [app.js:7296](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7296), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -991,7 +991,7 @@ flowchart TD
 
 Different end states are intentionally visible here.
 
-Sources: [app.js:5754](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5754), [app.js:550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:550), [index.html:659](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:659).
+Sources: [app.js:5496](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5496), [app.js:550](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:550), [index.html:659](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:659).
 
 ```mermaid
 flowchart TD
@@ -1028,7 +1028,7 @@ flowchart TD
 
 Content selection, validation, fallback and demo behavior.
 
-Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:7090](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7090), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
+Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:1160](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1160), [app.js:6859](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6859), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
 
 ```mermaid
 flowchart TD
@@ -1073,7 +1073,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [app.js:5314](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5314), [app.js:6006](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6006), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [app.js:5056](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5056), [app.js:5775](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5775), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322).
 
 ```mermaid
 flowchart TD
@@ -1165,7 +1165,7 @@ flowchart TD
 
 What changes when sound settings are toggled.
 
-Sources: [app.js:7272](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7272), [app.js:2891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2891), [app.js:3008](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3008), [app.js:2253](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2253).
+Sources: [app.js:7041](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7041), [app.js:2891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2891), [app.js:3008](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3008), [app.js:2253](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2253).
 
 ```mermaid
 flowchart TD
@@ -1208,7 +1208,7 @@ flowchart TD
 
 Natural sky, chakra imagery, immersion and optional capabilities.
 
-Sources: [app.js:3307](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3307), [sky-astronomy.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sky-astronomy.js:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [sky-astronomy.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sky-astronomy.js:1), [night-sky.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/night-sky.js:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [celestial-presence.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/celestial-presence.js:1).
 
 ```mermaid
 flowchart TD
@@ -1259,7 +1259,7 @@ flowchart TD
 
 A permanent centered observer anchor below the horizon.
 
-Sources: [app.js:3548](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3548), [app.js:3667](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3667), [app.js:3700](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3700), [app.js:3735](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3735).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:3409](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3409), [app.js:3442](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3442), [app.js:3477](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3477).
 
 ```mermaid
 flowchart TD
@@ -1291,7 +1291,7 @@ flowchart TD
 
 A visual-only warm containment layer surrounding the daytime Sun.
 
-Sources: [app.js:3575](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3575), [app.js:3758](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3758).
+Sources: [app.js:3317](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3317), [app.js:3500](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3500).
 
 ```mermaid
 flowchart TD
@@ -1316,7 +1316,7 @@ flowchart TD
 
 Local state and the actual service-worker request routing.
 
-Sources: [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:6662](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6662), [app.js:6987](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6987), [app.js:7100](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7100), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
+Sources: [modules/app-state.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/app-state.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:5376](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5376), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1).
 
 ```mermaid
 flowchart TD
@@ -1361,7 +1361,7 @@ flowchart TD
 
 Implemented fallback destinations and open verification areas.
 
-Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [app.js:3376](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3376), [app.js:3390](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3390), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -1536,7 +1536,7 @@ flowchart TD
 
 Chooses and applies the established voice profile at journey start.
 
-Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:5848](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5848), [app.js:7300](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7300).
+Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:5590](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5590), [app.js:7069](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7069).
 
 ```mermaid
 flowchart TD
@@ -1567,7 +1567,7 @@ flowchart TD
 
 App-load behavior for session-only mode controls and retired selection keys.
 
-Sources: [modules/session-mode-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-mode-hydration.js:1), [tests/session-mode-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-mode-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/session-mode-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-mode-hydration.js:1), [tests/session-mode-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-mode-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1598,7 +1598,7 @@ flowchart TD
 
 Copies already-loaded preference state into audio and ambience controls in established order.
 
-Sources: [modules/mixer-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-preference-hydration.js:1), [tests/mixer-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-preference-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/mixer-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-preference-hydration.js:1), [tests/mixer-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-preference-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1626,7 +1626,7 @@ flowchart TD
 
 Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.
 
-Sources: [modules/journey-selection-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-selection-hydration.js:1), [tests/journey-selection-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-selection-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/journey-selection-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-selection-hydration.js:1), [tests/journey-selection-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-selection-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1657,7 +1657,7 @@ flowchart TD
 
 Restores timing slider values and their associated display labels without owning timing configuration.
 
-Sources: [modules/timing-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-preference-hydration.js:1), [tests/timing-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-preference-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/timing-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-preference-hydration.js:1), [tests/timing-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-preference-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1685,7 +1685,7 @@ flowchart TD
 
 Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.
 
-Sources: [modules/appearance-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/appearance-preference-hydration.js:1), [tests/appearance-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/appearance-preference-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/appearance-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/appearance-preference-hydration.js:1), [tests/appearance-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/appearance-preference-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1713,7 +1713,7 @@ flowchart TD
 
 Restores the selected script source and updates the custom-script presentation without owning script loading.
 
-Sources: [modules/script-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/script-preference-hydration.js:1), [tests/script-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/script-preference-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/script-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/script-preference-hydration.js:1), [tests/script-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/script-preference-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1744,7 +1744,7 @@ flowchart TD
 
 Restores saved personal-care toggle values without changing session authorization or care execution.
 
-Sources: [modules/care-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/care-preference-hydration.js:1), [tests/care-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/care-preference-hydration.test.mjs:1), [app.js:5887](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5887).
+Sources: [modules/care-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/care-preference-hydration.js:1), [tests/care-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/care-preference-hydration.test.mjs:1), [app.js:5629](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5629).
 
 ```mermaid
 flowchart TD
@@ -1772,7 +1772,7 @@ flowchart TD
 
 Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; exporting is operator-protected.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [app.js:6401](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6401), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [app.js:6170](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6170), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
 ```mermaid
 flowchart TD
@@ -1860,7 +1860,7 @@ flowchart TD
 
 Searchable reference → prepared custom Shot → explicit activation.
 
-Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:7031](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:7031).
+Sources: [docs/repertory.html:153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:153), [app.js:6800](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6800).
 
 ```mermaid
 flowchart TD

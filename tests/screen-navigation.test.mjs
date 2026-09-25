@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const screenNavigationModule = window\.ChakraScreenNavigation/);
 assert.match(app, /function showScreen\(screen\)\s*\{\s*screenNavigation\.showScreen\(screen\);\s*\}/);
-assert.match(html, /modules\/screen-navigation\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.90/);
-assert.match(serviceWorker, /chakra-v5\.286[\s\S]*?modules\/screen-navigation\.js\?v=1\.0/);
+assert.match(html, /modules\/screen-navigation\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.91/);
+assert.match(serviceWorker, /chakra-v5\.287[\s\S]*?modules\/screen-navigation\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
