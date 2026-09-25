@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-058: Music echo profile ownership
+### NOW — CP-MOD-059: Arrival and Emergence journey wrapper ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-058/lite`, based on local CP-MOD-057 commit `782c562` (not yet published). Music echo profile selection and parameter application moved into `modules/audio-music-echo.js`; AudioEngine keeps its stable adapter, graph ownership, voice echo and persistence.
-- App/cache versions are `4.09` / `chakra-v5.305`. Direct tests cover all profiles, fallback, no-graph guard, 250 ms ramps and tail deadline. The full Node suite is 83/85; only the two fixture-dependent tests are blocked by absent `docs/dot.json`. Loop router: 11 pass. Atlas builds at 43/353/405 with source-reference checks; browser verifier unavailable because Playwright is not installed. No audio-quality/performance gain or device listening is claimed.
-- CP-MOD-056 is merged via PR #75 at `eef41bc`; CP-MOD-057 is committed locally on its isolated branch but awaits explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-059/lite`, based on local CP-MOD-058 commit `12465f0` (CP-057/058 not yet published). Optional Arrival/Arrival-readiness and Emergence orchestration moved into `modules/journey-hypnosis-wrapper.js`; app callbacks preserve the journey controller interface.
+- App/cache versions are `4.10` / `chakra-v5.306`. Direct tests cover cue order/timing, No Frequency pacing, stage fade and cancellation. Full Node suite is 84/86; two tests stop before assertions because `docs/dot.json` is absent. Loop router 11 pass; atlas builds at 43/353/405 with valid source references; browser verifier unavailable because Playwright is not installed. No audio-quality/performance gain or device playback is claimed.
+- CP-056 is merged via PR #75 at `eef41bc`; CP-057/058 remain committed locally in isolated branches but await explicit remote-push approval. Production remains unchanged. Current root checkout’s unrelated files remain preserved.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

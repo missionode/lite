@@ -79,6 +79,8 @@ const audioBackgroundMusicControls = window.ChakraAudioBackgroundMusicControls;
 if (!audioBackgroundMusicControls) throw new Error('Audio background-music controls module is unavailable.');
 const audioMusicEcho = window.ChakraAudioMusicEcho;
 if (!audioMusicEcho) throw new Error('Audio music-echo module is unavailable.');
+const journeyHypnosisWrapper = window.ChakraJourneyHypnosisWrapper;
+if (!journeyHypnosisWrapper) throw new Error('Journey hypnosis-wrapper module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1705,7 +1707,7 @@ class MeditationController {
     }
 
     shouldRunHypnosisWrapper() {
-        return this.isHypnosisJourney && this.isMeditationActive;
+        return journeyHypnosisWrapper.shouldRun(this);
     }
 
     getJourneySystemNarration(key) {
@@ -1720,68 +1722,19 @@ class MeditationController {
     }
 
     async runGuidedTransitionTone(frequency, durationMs, { beforeGap = 0, afterGap = 0 } = {}) {
-        if (!this.isMeditationActive) return;
-        if (beforeGap > 0) await this.pauseAwareSleep(beforeGap * 1000);
-        if (!this.isMeditationActive) return;
-        if (state.noFrequencyMode) {
-            // Preserve the same quiet breathing space when generated sound is
-            // intentionally disabled; only the tone itself is omitted.
-            if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
-            return;
-        }
-        // Make a small, explicit space for the tone, then return the music to
-        // its normal narration duck before the next spoken section.
-        this.audio.fadeInBackgroundMusic(1.2, 0.08);
-        const started = this.audio.startGuidedTransitionTone(frequency, durationMs);
-        if (!started) return;
-        await this.pauseAwareSleep(durationMs);
-        this.audio.stopGuidedTransitionTone(1.1);
-        await this.pauseAwareSleep(1100);
-        if (!this.isMeditationActive) return;
-        this.audio.fadeInBackgroundMusic(2.4, true);
-        if (afterGap > 0) await this.pauseAwareSleep(afterGap * 1000);
+        return journeyHypnosisWrapper.runGuidedTransitionTone(this, frequency, durationMs, { beforeGap, afterGap }, { state });
     }
 
     async runArrivalInduction() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        const text = this.getJourneySystemNarration('arrivalInduction');
-        if (text) await this.narrate(text, false);
-        if (!this.isMeditationActive) return;
-        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
-        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
-        await this.runGuidedTransitionTone(432, halfDuration, {
-            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
-            afterGap: timing('transitions', 'arrivalToneExitGap')
-        });
+        return journeyHypnosisWrapper.runArrivalInduction(this, { state, getDroneDurationMs, timing });
     }
 
     async runArrivalReadiness() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        const text = this.getJourneySystemNarration('arrivalReadiness');
-        if (text) await this.narrate(text, false);
-        if (!this.isMeditationActive) return;
-        const totalDuration = getDroneDurationMs(state.timePerChakra, state.droneDurationMode);
-        const halfDuration = Math.max(1000, Math.round(totalDuration / 2));
-        await this.runGuidedTransitionTone(528, halfDuration, {
-            beforeGap: timing('transitions', 'arrivalToneLeadGap'),
-            afterGap: timing('transitions', 'arrivalReadinessGap')
-        });
+        return journeyHypnosisWrapper.runArrivalReadiness(this, { state, getDroneDurationMs, timing });
     }
 
     async runEmergence() {
-        if (!this.shouldRunHypnosisWrapper()) return;
-        setText('mantra-display', '✦');
-        // No Frequency Mode removes sound generators, while preserving the
-        // guide's gentle reorientation narration below.
-        if (!state.noFrequencyMode) this.audio.playSingingBowl();
-        await this.pauseAwareSleep(timing('transitions', 'emergenceBellSettle') * 1000);
-        if (!this.isMeditationActive) return;
-        const text = this.getJourneySystemNarration('emergence');
-        if (text) await withAudioStageFade(this.audio, state.timeEmergence, () => this.narrate(text, false));
-        if (!this.isMeditationActive) return;
-        await this.pauseAwareSleep(state.timeEmergence * 1000);
-        if (!this.isMeditationActive) return;
-        await this.pauseAwareSleep(timing('transitions', 'emergenceFinalQuiet') * 1000);
+        return journeyHypnosisWrapper.runEmergence(this, { state, timing, withAudioStageFade, setMantraDisplay: value => setText('mantra-display', value) });
     }
 
     async runSleepJourney() {

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-059 Arrival and Emergence wrapper ownership
+
+The optional Arrival/Arrival-readiness cues and Emergence sequence now live in `modules/journey-hypnosis-wrapper.js`. App adapters retain journey behavior, stage order, frequency/no-frequency branches, configured timing, fade windows and cancellation guards. This changes ownership only.
+
 ## Completed — CP-MOD-058 Music echo preset ownership
 
 The existing music echo profiles and parameter ramps now live in `modules/audio-music-echo.js`; the AudioEngine method and settings persistence stay stable. Preset values, invalid-mode fallback, 250 ms ramps and convolver-tail timing are unchanged. No performance claim is made.

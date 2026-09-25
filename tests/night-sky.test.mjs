@@ -50,8 +50,8 @@ const particleFieldModule=readFileSync('modules/ambient-particle-field.js','utf8
 const html=readFileSync('index.html','utf8');
 const serviceWorker=readFileSync('sw.js','utf8');
 assert.ok(html.indexOf('night-sky.js?v=1.1') < html.indexOf('modules/ambient-particle-field.js?v=1.0'));
-assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.0') < html.indexOf('app.js?v=4.09'));
-assert.match(serviceWorker,/chakra-v5\.305[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.0/,
+assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.0') < html.indexOf('app.js?v=4.10'));
+assert.match(serviceWorker,/chakra-v5\.306[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.0/,
     'The sky module must remain available from the exact offline shell cache.');
 for (const localeName of ['en', 'ml', 'hi', 'ru']) {
     const locale = JSON.parse(readFileSync(`locales/${localeName}.json`, 'utf8'));

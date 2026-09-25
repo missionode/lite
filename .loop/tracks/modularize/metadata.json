@@ -2,8 +2,8 @@
   "id": "modularize",
   "type": "migration",
   "state": "ACTIVE",
-  "branch": "codex/modularize-cp-058",
-  "baseline": "782c56225a3b4d6df627cfa694a366c91b0d3132",
+  "branch": "codex/modularize-cp-059",
+  "baseline": "12465f07c8e98047bdf19515a58977088ec205b3",
   "startedAt": "2026-09-18",
-  "currentCheckpoint": "CP-MOD-058"
+  "currentCheckpoint": "CP-MOD-059"
 }

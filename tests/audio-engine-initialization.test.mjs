@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 assert.match(app, /async init\(\)\s*\{\s*return window\.ChakraAudioEngineInitialization\.initialize\(this,/);
-assert.match(html, /modules\/audio-engine-initialization\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.09/);
-assert.match(serviceWorker, /chakra-v5\.305[\s\S]*?modules\/audio-engine-initialization\.js\?v=1\.0/);
+assert.match(html, /modules\/audio-engine-initialization\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.10/);
+assert.match(serviceWorker, /chakra-v5\.306[\s\S]*?modules\/audio-engine-initialization\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:audio-engine-initialization'], 'node tests/audio-engine-initialization.test.mjs');
 
 class FakeParam {

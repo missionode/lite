@@ -612,3 +612,12 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static ev
 - Preserved off/light/spacious values, fallback to light, 250 ms delay/send/wet/filter ramps, convolver tail deadline (`MUSIC_REVERB_TAIL_SECONDS + 0.3`) and no-op behavior before graph readiness.
 - Direct profile, background-music/mantra, audio-effects, zero-volume, loop lifecycle and graph initialization tests pass. Full Node suite: 83/85 pass; `content-safety` and `drone-duration` cannot begin because `docs/dot.json` is absent from the isolated worktree. Loop router suite: 11 pass. Syntax and `git diff --check` pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verifier cannot run because Playwright is not installed.
 - App/cache versions are `4.09` / `chakra-v5.305`; module remains eager and offline precached. No browser playback, audio quality, CPU, memory or thermal improvement is claimed.
+
+## CP-MOD-059 — Arrival/Emergence wrapper ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- Optional Arrival induction/readiness, transition-tone handoffs and Emergence are now implemented in `modules/journey-hypnosis-wrapper.js`; the app keeps its stable controller methods and custom/localized narration lookup.
+- Preserved ordinary non-demo wrapper guard, 432/528 Hz tones at half the selected drone-duration exposure (minimum 1 second), configured leading/trailing gaps, music handoff fades, No Frequency quiet gaps, Emergence bowl/narration/timing fade, and session-stop exits.
+- Direct wrapper, hypnosis journey, routing, session-estimate, audio-transition and focused practice contracts pass. Full Node suite: 84/86; `content-safety` and `drone-duration` cannot begin because owner-managed `docs/dot.json` is absent. Loop router: 11 pass. Syntax and diff checks pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verification is unavailable because Playwright is not installed.
+- App/cache versions are `4.10` / `chakra-v5.306`; module is eager/offline precached. No performance, audio-quality, browser playback or device claim.
