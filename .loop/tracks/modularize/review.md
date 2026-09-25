@@ -1,5 +1,15 @@
 # Review
 
+## CP-MOD-046 — Session countdown lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for deterministic timer lifecycle, controller integration, offline caching, full applicable Node suite and atlas/browser checks.
+
+- The countdown ticker and elapsed-time state now live in `modules/session-countdown.js`. The controller constructs one owner with the same `Date.now`, browser interval APIs, live active/paused state and existing countdown show/hide callbacks; its `startSessionCountdown`, render and stop methods remain stable for all journeys.
+- Fake-clock tests preserve the 250 ms cadence, synchronous initial render, elapsed-time subtraction, paused/inactive tick rebasing, zero clamp, restart, invalid-duration cleanup and timer/display cleanup. Existing spatial-audio and narration contracts were updated to test the new boundary.
+- App/cache advance to `3.96` / `chakra-v5.292`; the eager module is in the exact offline shell. Local Chromium cold/warm/offline startup passes, including the new cache-presence assertion.
+- All 71 applicable direct Node tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is missing. All 11 Loop router tests pass. Atlas is browser-verified at 43 maps / 353 nodes / 405 edges, with no page errors and mobile overflow false.
+- No timer behavior, route semantics, startup, CPU or thermal improvement is claimed. No manual device/audio or production evidence is claimed.
+
 ## CP-MOD-045 — Exact session countdown-duration ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct duration contracts, focused journey regressions, complete applicable Node suite, offline-shell Chromium startup, and atlas checks.

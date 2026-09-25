@@ -8,8 +8,8 @@ const html = fs.readFileSync('index.html', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /scriptPreferenceHydration\.hydrate\(/);
-assert.match(html, /modules\/script-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.95/);
-assert.match(sw, /chakra-v5\.291[\s\S]*?modules\/script-preference-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/script-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.96/);
+assert.match(sw, /chakra-v5\.292[\s\S]*?modules\/script-preference-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:script-preference-hydration'], 'node tests/script-preference-hydration.test.mjs');
 
 const context = vm.createContext({});

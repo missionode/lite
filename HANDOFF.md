@@ -1,9 +1,9 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-045: Exact session countdown-duration ownership
+### NOW — CP-MOD-046: Session countdown lifecycle ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-045/lite`, based on CP-MOD-044 integration commit `ae0762a`. Move only the exact session countdown-duration formulas to `modules/session-estimate.js`; timer lifecycle and selected-route dispatch remain in the controller.
-- CP-MOD-044 is integrated locally and remotely to `modularize` at `ae0762a` (PR #63); production is unchanged. CP-MOD-045 app/cache versions are `3.95` / `chakra-v5.291`.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-046/lite`, based on CP-MOD-045 integration commit `2f55f94`. Move the countdown ticker and elapsed-time accounting to `modules/session-countdown.js`; preserve controller entry points and the exact tick/paused behavior.
+- CP-MOD-045 is integrated locally and remotely to `modularize` at `2f55f94` (PR #64); production is unchanged. CP-MOD-046 app/cache versions are `3.96` / `chakra-v5.292`.
 - Record fresh validation and any missing fixtures in `.loop/tracks/modularize/review.md`; keep the flow atlas synchronized. User working files in the main checkout must remain untouched.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership

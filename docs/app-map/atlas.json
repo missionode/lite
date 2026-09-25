@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "ae0762a base + CP-MOD-045 checkpoint",
-    "scope": "Source-reviewed behavior at the modularize integration baseline, including CP-MOD-038–045. Selected guided practices and opt-in video/controller paths load on demand; the observational sky renderer, visual engine and session-estimate/duration owner are isolated eager cached modules. These ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "2f55f94 base + CP-MOD-046 checkpoint",
+    "scope": "Source-reviewed behavior at the modularize integration baseline, including CP-MOD-038–046. Selected guided practices and opt-in video/controller paths load on demand; the observational sky renderer, visual engine, session estimate/duration owner and countdown ticker are isolated cached modules. These ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:5196; app.js:6521; index.html:248",
+      "source": "app.js:5196; app.js:6499; index.html:248",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Remaining modularization work",
-            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves standard narrated-journey duration into the estimate module; CP-MOD-045 centralizes exact per-mode countdown durations there while the controller retains timer lifecycle and route entry. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate."
+            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves standard narrated-journey duration into the estimate module; CP-MOD-045 centralizes exact per-mode countdown durations there. CP-MOD-046 extracts the 250 ms ticker and pause-aware elapsed-time lifecycle while controller entry points and timer start/stop routes stay stable. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate."
           ]
         ],
         [
@@ -2412,7 +2412,7 @@
       "group": "Live session",
       "title": "Pause, stop and live controls",
       "subtitle": "Shared interaction and cancellation behavior.",
-      "source": "modules/journey-chrome.js:1; modules/journey-video-prelude.js:1; app.js:2762; app.js:2815; app.js:2834",
+      "source": "modules/journey-chrome.js:1; modules/session-countdown.js:1; tests/session-countdown.test.mjs:1; modules/journey-video-prelude.js:1; app.js:2762; app.js:2815; app.js:2834",
       "rows": [
         [
           [

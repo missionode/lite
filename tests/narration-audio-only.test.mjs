@@ -9,5 +9,5 @@ assert.match(app,/async narrateBrowser/);
 assert.match(app,/piperTTS\.playBuffer\(buffer/);
 assert.match(app,/speechSynthesis\.speak\(utterance\)/);
 assert.match(app,/estimateNarrationDurationSeconds,\s*timing,/, 'The app continues to supply the existing narration-duration estimator to session estimates.');
-assert.match(app,/sessionCountdownTicker/,'Session countdown remains');
+assert.match(app,/this\.sessionCountdown = new window\.ChakraSessionCountdown/,'Session countdown lifecycle remains attached to the journey controller');
 console.log('Scrolling narration removed; audio paths and session estimates retained.');
