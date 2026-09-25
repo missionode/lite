@@ -606,8 +606,7 @@
         <!-- Restart-only cinematic prelude. Fullscreen is user-controlled. -->
         <section id="journey-video-prelude" class="journey-video-prelude hidden" aria-label="Journey introduction" aria-live="polite">
             <img class="journey-video-prelude-meditator" src="video/meditator.png" alt="Meditator preparing for the journey" aria-hidden="true">
-            <video id="journey-video-prelude-media" preload="auto" playsinline>
-                <source src="video/generate.mp4" type="video/mp4">
+            <video id="journey-video-prelude-media" preload="none" playsinline data-video-src="video/generate.mp4">
             </video>
             <div class="journey-video-prelude-shade" aria-hidden="true"></div>
             <div id="journey-video-prelude-ready" class="journey-video-prelude-ready">
@@ -767,6 +766,6 @@
     <script src="modules/appearance-preference-hydration.js?v=1.0"></script>
     <script src="modules/script-preference-hydration.js?v=1.0"></script>
     <script src="modules/care-preference-hydration.js?v=1.0"></script>
-    <script src="app.js?v=3.88"></script>
+    <script src="app.js?v=3.89"></script>
 </body>
 </html>

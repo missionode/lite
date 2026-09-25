@@ -1,12 +1,16 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-038: Selected guided-practice loading
+### NOW — CP-MOD-039: Optional video media request
 
-- Active isolated branch `codex/modularize-cp-038`, based on integration commit `31d614e` (CP-MOD-037 merged via PR #56). Only checked Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn scripts load on Begin; those exact assets stay precached offline. The eager app retains its modular runtime owners. This is not a production change.
-- Versioned app script is `app.js?v=3.88`, shell cache `chakra-v5.284`. Failed selected loads are localized in four bundled languages, stop before video/audio, and clear for retry. Individual run methods also load their module on demand.
-- Baseline comparison: CP-MOD-037 cold ~903,351 encoded JS bytes / 38 scripts; CP-MOD-038 ~890,285 bytes / 32 scripts (about 13.1 KiB fewer, after adding the loader while deferring seven modules). CP-MOD-038 cold/warm/offline DCL/load was 456/1,010, 417/647 and 219/256 ms. Local navigation times vary; no CPU, heat, compressed transfer, production or device benefit is claimed.
-- Validation: all seven lifecycle contracts, focused routes, loader mapping/dedup/retry, full 70-file runnable Node suite and 11 Loop router tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent. Local Chromium proves zero practice scripts before Begin and only Box Breathing loads from the precache after selection in offline mode; no page errors. Atlas builder/verifier pass at 43 maps/353 nodes/405 edges. Preserve the 10% reserve and unrelated dirty files.
-- Next: open PR into `modularize`, merge only there after checks, fast-forward the root integration branch without overwriting user dirt, then measure the next optional boundary. The app shell (~376 KiB) and observational sky/astronomy scripts (~410 KiB combined) are the next evidence-led audit targets; retain all existing dynamic-sky behavior. AudioEngine bus remains deferred. No production publication.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-039/lite`, based on `f0a5b2e` (CP-MOD-038 merged via PR #57). Scope is the optional `video/generate.mp4` only; preserve journey-chrome listeners, current sky and all intro audio/timing behavior.
+- The 7.3 MB video has `preload="none"`, a `data-video-src`, no child `<source>`, and no constructor `.load()`. Explicit preview or opted-in Lobby video introduction attaches the URL. App/cache versions advance to `3.89` / `chakra-v5.285`; the clip remains outside precache.
+- Browser confirms zero video requests on initial load and one after opt-in; the deliberately aborted test request follows the existing safe failure path. 70 applicable Node tests, 11 router tests and all 3 Chromium modularization checks pass; 2 fixture tests are excluded because `docs/dot.json` is absent. Atlas: 43 maps / 353 nodes / 405 edges, all checks pass, no page errors. Cold/warm/offline DCL/load sample: 352/352, 428/428, 189/190 ms; noisy, not a performance claim. 7.3 MB ordinary-session media request is avoided; CPU/heat/device impact is unmeasured.
+- Preserve project reserve (10%) and root-owned `.DS_Store`, `.codex/` and `audio/BACKUP/background_music.mp3`. Integration target is `modularize`, not production.
+- Next: final diff/spec review, open a focused PR into `modularize`, merge there after validation and synchronize local integration; then reconcile approved remaining work against the plan before marking modularization complete.
+
+### COMPLETE — CP-MOD-038: Selected guided-practice loading
+
+- Integrated via PR #57 at `f0a5b2e`. Only selected guided-practice scripts load on Begin; exact assets remain precached for offline use. Local sample reduced encoded initial JavaScript by ~13.1 KiB (~1.4%); timings noisy, no CPU/thermal/device claim. Full CP38 validation and its missing-fixture exclusions are retained in `.loop/tracks/modularize/review.md`.
 
 ### COMPLETE — CP-MOD-036: Personal-care preference control hydration
 

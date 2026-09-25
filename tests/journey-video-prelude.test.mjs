@@ -14,7 +14,8 @@ assert.ok(fs.statSync(new URL('../video/meditator.png', import.meta.url)).size >
 assert.match(html, /id="journey-video-prelude"[\s\S]*?class="journey-video-prelude-meditator"[^>]*src="video\/meditator\.png"/, 'the meditator image should lead the prelude');
 assert.match(html, /id="journey-video-prelude-toggle"[\s\S]*?data-i18n="ui\.includeVideoIntroduction"/, 'Lobby should offer an explicit opt-in for the video introduction');
 assert.match(html, /id="journey-video-prelude-toggle"[\s\S]*?data-i18n="ui\.videoIntroductionSubtitle"/, 'The Lobby video option should identify the Cosmic Consciousness introduction');
-assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="auto"[^>]*playsinline[\s\S]*?src="video\/generate\.mp4"[^>]*type="video\/mp4"/, 'generate.mp4 should be the sole prelude video source');
+assert.match(html, /id="journey-video-prelude"[\s\S]*?id="journey-video-prelude-media"[^>]*preload="none"[^>]*playsinline[^>]*data-video-src="video\/generate\.mp4"/, 'the optional video source should be deferred until the introduction or preview is selected');
+assert.doesNotMatch(html, /<source[^>]+src="video\/generate\.mp4"/, 'the browser must not discover the optional video through a child source at page parse time');
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?data-i18n="ui\.journeyVideoPreludeLoading"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder, loading status, and explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?position:\s*fixed[\s\S]*?inset:\s*0[\s\S]*?z-index:\s*100100/, 'the video prelude should fill the application viewport');
@@ -43,7 +44,9 @@ assert.match(app, /this\.playButton\.hidden = true[\s\S]*?bufferVideoToSafePoint
 assert.match(app, /bufferCountdownTimer[\s\S]*?getVideoBufferTargetSeconds\(\)[\s\S]*?getBufferedAheadSeconds\(\)/, 'the prelude should show a live buffer countdown while loading');
 assert.match(css, /\.journey-video-prelude\.is-playing,[\s\S]*?cursor: none/, 'the pointer should be hidden during cinematic playback');
 assert.match(app, /is-meditator[\s\S]*?setTimeout\(\(\) => \{[\s\S]*?is-video/, 'the meditator image should dissolve into the video after a short hold');
-assert.match(app, /this\.media\?\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering');
+assert.match(app, /this\.media\.load\(\)/, 'the supplied video should be explicitly prepared for native buffering after a user request');
+assert.doesNotMatch(app.slice(app.indexOf('class JourneyVideoPrelude'), app.indexOf('ensureVideoSource()')), /this\.media\?\.load\(\)/, 'constructing the prelude must not start loading the optional video');
+assert.match(app, /ensureVideoSource\(\)[\s\S]*?this\.media\.src = source[\s\S]*?async bufferVideoToSafePoint\(\)\s*\{\s*if \(!this\.ensureVideoSource\(\)\)/, 'selected playback attaches the deferred media URL before buffering');
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?--journey-video-visual-opacity:\s*1/, 'the prelude should render its image and video fully opaque.');
 assert.match(css, /\.journey-video-prelude\.is-meditator \.journey-video-prelude-meditator[\s\S]*?opacity: var\(--journey-video-visual-opacity\)[\s\S]*?\.journey-video-prelude\.is-video \.journey-video-prelude-meditator[\s\S]*?opacity: 0/, 'the image-to-video transition should crossfade cleanly at full opacity.');
 assert.match(css, /\.journey-video-prelude-ready\s*\{[\s\S]*?background:\s*rgba\(0, 0, 0, 0\.88\)/, 'the loading and Begin content should use a highly legible backing.');

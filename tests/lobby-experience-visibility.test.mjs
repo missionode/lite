@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperienceVisibility/);
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
-assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.88/);
-assert.match(serviceWorker, /chakra-v5\.284[\s\S]*?modules\/lobby-experience-visibility\.js\?v=1\.0/);
+assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.89/);
+assert.match(serviceWorker, /chakra-v5\.285[\s\S]*?modules\/lobby-experience-visibility\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
