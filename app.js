@@ -75,6 +75,8 @@ const audioMantraPlayback = window.ChakraAudioMantraPlayback;
 if (!audioMantraPlayback) throw new Error('Audio mantra-playback module is unavailable.');
 const audioBackgroundMusicLifecycle = window.ChakraAudioBackgroundMusicLifecycle;
 if (!audioBackgroundMusicLifecycle) throw new Error('Audio background-music lifecycle module is unavailable.');
+const audioBackgroundMusicControls = window.ChakraAudioBackgroundMusicControls;
+if (!audioBackgroundMusicControls) throw new Error('Audio background-music controls module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1374,70 +1376,11 @@ class AudioEngine {
     }
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
-        if (!this.bgMusicLoop || !this.ctx) return;
-        if (this.stageFadeWindow) duration = Math.min(duration, this.stageFadeWindow.limit);
-        
-        // Support for boolean (legacy) and numeric (fine-tuned) volume levels
-        // Whisper Quality: Keep narration clearly in front of a very quiet
-        // atmospheric bed without muting the room completely.
-        let factor = 1.0;
-        if (isDucked === true) factor = 0.15;
-        else if (typeof isDucked === 'number') factor = isDucked;
-
-        const targetVol = state.volMusic * factor;
-        const targetEQ = factor < 1.0 ? -3 : 0; // Gentle, effective midrange cut under guidance
-        this.bgMusicTargetVolume = targetVol;
-        this.bgMusicTargetEQ = targetEQ;
-        
-        const now = this.ctx.currentTime;
-        
-        const liveGain = this.bgMusicGain.gain.value;
-        if (this.bgMusicGain.gain.cancelAndHoldAtTime) this.bgMusicGain.gain.cancelAndHoldAtTime(now);
-        else {
-            this.bgMusicGain.gain.cancelScheduledValues(now);
-            this.bgMusicGain.gain.setValueAtTime(liveGain, now);
-        }
-        if (targetVol <= 0) {
-            // Zero is a supported user setting. Linear ramps may end at zero,
-            // keeping playback muted without aborting the journey.
-            this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
-        } else {
-            // Linear entry avoids spending most of a long fade near silence.
-            this.bgMusicGain.gain.linearRampToValueAtTime(targetVol, now + duration);
-        }
-        
-        this.bgMusicEQ.gain.cancelScheduledValues(now);
-        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(targetEQ, now + duration);
-        
-        // Loop level is independent of the immutable overlap envelopes.
-        if (now >= this.bgMusicEntryEndsAt) this.bgMusicLoop.setGain(1.0);
-
-        // A narration request during the mantra fade may update the desired
-        // level, but must not reopen the music bus until the mantra is done.
-        if (this.bgMusicSuppressedByMantra) return;
-        if (this.bgMusicBusGain) {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-            this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + duration);
-        }
+        return audioBackgroundMusicControls.fadeIn(this, duration, isDucked, state);
     }
 
     fadeOutBackgroundMusic(duration = 4) {
-        if (!this.bgMusicLoop) return;
-        // A manual volume adjustment must not revive a deliberately silent
-        // practice such as Box Breathing. Mark this bus as intentionally
-        // muted before the envelope reaches zero.
-        this.bgMusicTargetVolume = 0;
-        this.bgMusicTargetEQ = 0;
-        const now = this.ctx.currentTime;
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicEQ.gain.cancelScheduledValues(now);
-
-        this.bgMusicGain.gain.setValueAtTime(this.bgMusicGain.gain.value, now);
-        this.bgMusicGain.gain.linearRampToValueAtTime(0, now + duration);
-        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(0, now + duration);
+        return audioBackgroundMusicControls.fadeOut(this, duration);
     }
 
     async startVisualizationAmbience(fadeSeconds = VISUALIZATION_AMBIENCE_ENTRY_FADE_SECONDS, force = false) {
@@ -1486,83 +1429,19 @@ class AudioEngine {
     }
 
     setBackgroundMusicVolume(level, previousLevel = level) {
-        if (!this.ctx || !this.bgMusicGain || !this.bgMusicLoop) return;
-        const nextLevel = Number(level);
-        const previous = Number(previousLevel);
-        const currentTarget = Number(this.bgMusicTargetVolume);
-        if (!Number.isFinite(nextLevel) || !Number.isFinite(previous) || previous <= 0 || !Number.isFinite(currentTarget)) return;
-
-        // Preserve the current role of music (full bed, narration duck, or
-        // intentional silence) instead of replacing the envelope with the
-        // slider's full value. A zero target deliberately remains silent.
-        const roleFactor = Math.max(0, Math.min(1, currentTarget / previous));
-        const nextTarget = nextLevel * roleFactor;
-        this.bgMusicTargetVolume = nextTarget;
-        if (roleFactor === 0) return;
-
-        const now = this.ctx.currentTime;
-        const currentGain = this.bgMusicGain.gain.value;
-        this.bgMusicGain.gain.cancelScheduledValues(now);
-        this.bgMusicGain.gain.setValueAtTime(currentGain, now);
-        // Do not wake a bus that is still intentionally at silence during a
-        // fade; the next explicit fade-in remains responsible for that start.
-        if (currentGain <= 0.0001) return;
-        this.bgMusicGain.gain.linearRampToValueAtTime(nextTarget, now + 0.25);
+        return audioBackgroundMusicControls.setVolume(this, level, previousLevel);
     }
 
     cancelBackgroundMusicRestore() {
-        if (this.bgMusicRestoreTimer) {
-            clearTimeout(this.bgMusicRestoreTimer);
-            this.bgMusicRestoreTimer = null;
-        }
+        return audioBackgroundMusicControls.cancelRestore(this);
     }
 
     muteBackgroundMusicForMantra(duration = MANTRA_MUSIC_FADE_SECONDS) {
-        if (!this.ctx || !this.bgMusicBusGain) return;
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = true;
-        const now = this.ctx.currentTime;
-        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
-            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
-        } else {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-        }
-        const fadeDuration = Math.max(0, duration);
-        this.bgMusicBusGain.gain.linearRampToValueAtTime(0, now + fadeDuration);
-        if (this.musicEchoTailGate) {
-            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
-                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
-            } else {
-                this.musicEchoTailGate.gain.cancelScheduledValues(now);
-                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
-            }
-            this.musicEchoTailGate.gain.linearRampToValueAtTime(0, now + fadeDuration);
-        }
-        return { startedAt: now, duration: fadeDuration };
+        return audioBackgroundMusicControls.muteForMantra(this, duration);
     }
 
     restoreBackgroundMusicAfterMantra(duration = BACKGROUND_MUSIC_RESTORE_FADE_SECONDS) {
-        if (!this.ctx || !this.bgMusicBusGain) return;
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        const now = this.ctx.currentTime;
-        if (typeof this.bgMusicBusGain.gain.cancelAndHoldAtTime === 'function') {
-            this.bgMusicBusGain.gain.cancelAndHoldAtTime(now);
-        } else {
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(this.bgMusicBusGain.gain.value, now);
-        }
-        this.bgMusicBusGain.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
-        if (this.musicEchoTailGate) {
-            if (typeof this.musicEchoTailGate.gain.cancelAndHoldAtTime === 'function') {
-                this.musicEchoTailGate.gain.cancelAndHoldAtTime(now);
-            } else {
-                this.musicEchoTailGate.gain.cancelScheduledValues(now);
-                this.musicEchoTailGate.gain.setValueAtTime(this.musicEchoTailGate.gain.value, now);
-            }
-            this.musicEchoTailGate.gain.linearRampToValueAtTime(1, now + Math.max(0, duration));
-        }
+        return audioBackgroundMusicControls.restoreAfterMantra(this, duration);
     }
 
     stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {

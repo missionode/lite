@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const yogaExperienceSettings = window\.ChakraYogaExperienceSettings/);
 assert.match(app, /yogaExperienceSettings\.persist\(\{ document, state, storage: localStorage \}\)/);
 assert.match(app, /yogaExperienceSettings\.syncTimingRows\(\{ document, getChecked \}\)/);
-assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.07/);
-assert.match(serviceWorker, /chakra-v5\.303[\s\S]*?modules\/yoga-experience-settings\.js\?v=1\.0/);
+assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.08/);
+assert.match(serviceWorker, /chakra-v5\.304[\s\S]*?modules\/yoga-experience-settings\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

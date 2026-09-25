@@ -71,7 +71,7 @@ assert.match(app, /stopBinaural\(\)\s*\{\s*return audioDroneStop\.stopBinaural\(
 assert.match(app, /stopDrone\(\)\s*\{\s*return audioDroneStop\.stopDrone\(this\);/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-drone-stop.js?v=1.0') < html.indexOf('app.js?v=4.07'));
+assert.ok(html.indexOf('modules/audio-drone-stop.js?v=1.0') < html.indexOf('app.js?v=4.08'));
 assert.match(sw, /\.\/modules\/audio-drone-stop\.js\?v=1\.0/);
 
 console.log('Audio drone-stop contract passed: uninitialized reset, AudioParam discrimination, 5-second fades and source cleanup.');

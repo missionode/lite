@@ -8,8 +8,8 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /new window\.ChakraNewcomerMarkerLayout\([\s\S]*?stage: newcomerMarkerStage[\s\S]*?svg:/);
 assert.match(app, /newcomerMarkerLayout\.schedule\(\)/);
-assert.match(html, /modules\/newcomer-marker-layout\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.07/);
-assert.match(sw, /chakra-v5\.303[\s\S]*?modules\/newcomer-marker-layout\.js\?v=1\.0/);
+assert.match(html, /modules\/newcomer-marker-layout\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.08/);
+assert.match(sw, /chakra-v5\.304[\s\S]*?modules\/newcomer-marker-layout\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

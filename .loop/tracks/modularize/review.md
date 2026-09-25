@@ -594,3 +594,12 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused unit/static e
 - Preserved versioned reload fetch, decoded-buffer reuse, active-loop continuity, waiting for a previous fade retirement before restart, stale gain reset, echo application order, entry-fade deadline, controlled stop fade, reverb retirement, and retirement-promise cleanup.
 - Direct lifecycle and background-music/mantra contracts pass; syntax checks pass. Full Node suite: 81/83 pass; `content-safety` and `drone-duration` cannot begin assertions because this isolated worktree lacks owner-managed `docs/dot.json`. Loop router suite: 11 pass. Atlas regenerated at 43 maps / 353 nodes / 405 edges; `git diff --check` passes.
 - App/cache versions are `4.07` / `chakra-v5.303`; module is eager and offline precached. Atlas browser verifier could not run because Playwright is unavailable in this worktree; browser checks remain opt-in. No startup, sound, CPU, memory or thermal improvement is claimed; browser/device playback evidence is not claimed.
+
+## CP-MOD-057 — background-music controls ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- Background-music fade-in/out, slider gain-role preservation, stage ducking, mantra bus mute/restore, echo tail-gate fades and restore-timer cancellation now live in `modules/audio-background-music-controls.js`; AudioEngine retains stable adapters, bus construction and echo preset selection.
+- Preserved zero-safe linear fades, protected entry-fade window, intentional silence during slider updates, no reopening during mantra suppression, `cancelAndHoldAtTime` fallback behavior and matched music/tail-gate envelopes.
+- Focused controls, zero-volume, audio-effects, mantra/echo, lifecycle, stage-fade, No Frequency and relevant journey tests pass. Full Node suite: 82/84 pass; `content-safety` and `drone-duration` cannot start because `docs/dot.json` is absent from this worktree (the same owner-managed fixture limitation as prior checkpoints). Loop router suite: 11 pass. Atlas build: 43 maps / 353 nodes / 405 edges; source references validate. Atlas browser verification cannot run because Playwright is not installed in this isolated worktree; browser checks remain opt-in.
+- App/cache versions: `4.08` / `chakra-v5.304`; eager and offline precached. Browser verification remains opt-in and Playwright is unavailable. No browser/device playback, sound-quality, startup, CPU, heap or thermal improvement is claimed.

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-057 Background-music gain and fade controls
+
+Background-music fades, volume-role preservation, stage ducking, mantra mute/restore, tail-gate automation and restore-timer cancellation now live in `modules/audio-background-music-controls.js`. Stable AudioEngine methods, journey callers and cache delivery remain intact. No performance claim is made.
+
 ## Completed — CP-MOD-054 Binaural and drone cleanup lifecycle
 
 `stopBinaural()` and `stopDrone()` resource retirement now live in `modules/audio-drone-stop.js`; the AudioEngine API remains stable. Pre-context state clearing, AudioParam filtering, 5-second gain fades, delayed stops and cleanup ordering are unchanged. The module is eagerly available and cached for offline sessions. No performance claim is made.

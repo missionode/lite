@@ -5,6 +5,7 @@ import vm from 'node:vm';
 const app = fs.readFileSync('app.js', 'utf8');
 const audioInitialization = fs.readFileSync('modules/audio-engine-initialization.js', 'utf8');
 const appStateModule = fs.readFileSync('modules/app-state.js', 'utf8');
+const backgroundMusicControls = fs.readFileSync('modules/audio-background-music-controls.js', 'utf8');
 
 assert.match(
   audioInitialization,
@@ -31,8 +32,8 @@ assert.doesNotMatch(
   'signed EQ gain must never use an exponential ramp',
 );
 assert.match(
-  app,
-  /if \(targetVol <= 0\)[\s\S]*?linearRampToValueAtTime\(0, now \+ duration\)/,
+  backgroundMusicControls,
+  /function fadeIn\(owner,[\s\S]*?const targetVol = state\.volMusic \* factor[\s\S]*?if \(targetVol <= 0\)[\s\S]*?linearRampToValueAtTime\(0, now \+ duration\)[\s\S]*?else[\s\S]*?linearRampToValueAtTime\(targetVol, now \+ duration\)/,
   'zero music volume must use a zero-safe linear fade',
 );
 assert.match(
