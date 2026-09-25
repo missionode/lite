@@ -3,6 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
+const audioSpatialGeometry = fs.readFileSync(new URL('../modules/audio-spatial-geometry.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -44,7 +45,7 @@ assert.match(app, /this\.setSpatialPosition\(this\.spatialPleasurePanner, config
 assert.match(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.lowCutFilter\)/, 'Narration should remain on its centered path');
 assert.doesNotMatch(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.spatial[A-Za-z]+Panner\)/, 'Narration must not be spatialized');
 
-assert.match(app, /createSpatialPanner\(\)[\s\S]*?if \(this\.ctx\?\.createPanner\)[\s\S]*?return this\.ctx\.createStereoPanner\(\)/, 'Spatial routing needs a stereo fallback');
+assert.match(audioSpatialGeometry, /function createPanner\(audioContext\)[\s\S]*?createStereoPanner\(\)/, 'Spatial routing needs a stereo fallback');
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'HRTF'/, 'Headphone mode should use HRTF positioning');
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'equalpower'/, 'Speaker-safe modes should use equal-power positioning');
 assert.match(audioInitialization, /this\.setSpatialMode\(state\.spatialMode\)/, 'Saved spatial mode should apply when the audio graph initializes');

@@ -1,5 +1,14 @@
 # Review
 
+## CP-MOD-050 — Audio spatial geometry ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for unchanged panner defaults/movement, direct module and app integration contracts, runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.
+
+- `createSpatialPanner()` and `setSpatialPosition()` now delegate to `modules/audio-spatial-geometry.js`; all spatial-mode selections, profiles and apply order remain in AudioEngine.
+- Direct module tests cover 3D modern and legacy positioning, stereo fallback, panner defaults, smooth ramps, legacy parameter scheduling, pan clamping and null-node safety. Spatial audio and effects matrix contracts pass.
+- App/cache advance to `4.00` / `chakra-v5.296`; module is loaded before app and precached. Full runnable suite and atlas build status follow below; no listening, sound-quality or performance/thermal result is claimed.
+- 75/77 direct Node files pass; `content-safety` and `drone-duration` require owner-managed `docs/dot.json`, unavailable in the isolated worktree. All 11 Loop router tests pass. Atlas builds and validates 43 maps / 353 nodes / 405 edges. Browser/device listening was not performed.
+
 ## CP-MOD-049 — Audio signal design helper ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for algorithm parity, direct helper tests, all runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.
