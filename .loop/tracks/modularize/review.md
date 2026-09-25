@@ -1,5 +1,16 @@
 # Review
 
+## CP-MOD-039 — Optional video media request
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source, request-level Chromium, offline route and atlas evidence.
+
+- The 7.3 MB `video/generate.mp4` no longer has a parser-discoverable `<source>` or an eager controller `.load()`. Its URL is retained in `data-video-src`; explicit Settings preview or an opted-in Lobby video introduction attaches the source and performs native preparation. Eager fullscreen/journey chrome remains because it supports every journey.
+- App/cache identifiers advance to `3.89` / `chakra-v5.285`; the video remains intentionally absent from precache and versioned shell cache includes the new app URL.
+- Chromium proves zero video requests and an unset media `src` on initial page load, then exactly one request after the user opts in and presses Begin. The request is deliberately aborted by the test after observation; the application emits no page errors and the existing failure path hands control to the journey. Captured console `ERR_FAILED` messages correspond to the deliberate video abort and blocked external font requests; there were no unexpected console errors.
+- Full applicable Node suite: 70 passed; two tests are excluded because owner-managed `docs/dot.json` is absent. All 11 Loop router tests pass. Three Chromium modularization checks pass (cold/warm/offline, selected practice offline, optional video request). Local static-server cold/warm/offline DCL/load: 352/352, 428/428 and 189/190 ms; 32 scripts, 890,605 encoded JS bytes. Timing is noisy. This checkpoint avoids an unneeded 7.3 MB video request for ordinary sessions; no CPU, thermal or device gain is claimed.
+- Atlas rebuilt and browser verified: 43 maps, 353 nodes, 405 edges, no page errors; source-reference selection, labels/bounds, keyboard, 43-map print, SVG download and template fallback pass. Mobile overflow check passes. `git diff --check` and JS syntax checks pass.
+- Test evidence is source/unit and local Chromium/browser; no manual device, audio playback, thermal, production or compressed-network claims. `.DS_Store`, `.codex/` and backup audio remain outside the checkpoint.
+
 ## CP-MOD-037 — Repeatable startup baseline and offline shell parity
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the measured baseline and exact-URL cache correction.

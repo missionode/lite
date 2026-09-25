@@ -14,8 +14,8 @@ assert.ok(loadPreferences.indexOf('timingPreferenceHydration.hydrateCore(') < lo
 assert.ok(loadPreferences.indexOf('syncDroneDurationModeControls();') < loadPreferences.indexOf('updateDroneDurationSummary();'));
 assert.ok(loadPreferences.indexOf("yoga-experience-toggle'") < loadPreferences.indexOf('timingPreferenceHydration.hydrateJourney('));
 assert.ok(loadPreferences.indexOf('timingPreferenceHydration.hydrateJourney(') < loadPreferences.indexOf('appearancePreferenceHydration.hydrateBrightness('));
-assert.match(html, /modules\/timing-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.88/);
-assert.match(serviceWorker, /chakra-v5\.284[\s\S]*?modules\/timing-preference-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/timing-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.89/);
+assert.match(serviceWorker, /chakra-v5\.285[\s\S]*?modules\/timing-preference-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:timing-preference-hydration'], 'node tests/timing-preference-hydration.test.mjs');
 
 const context = vm.createContext({});

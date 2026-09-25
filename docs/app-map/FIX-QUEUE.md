@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-039 optional video startup request
+
+The optional 7.3 MB video introduction and its Settings preview no longer trigger media loading when the app starts. The URL is attached only when a user starts the explicitly opted-in introduction or requests preview; the clip remains outside service-worker precache, so offline requests use the existing safe unavailable-video path. Regression coverage observes actual browser requests before and after opt-in. This avoids unneeded media transfer/decoder work on ordinary sessions; CPU/thermal improvement is not measured. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/HANDOFF.md`.
+
 ## Completed — CP-MOD-038 selected guided-practice loading
 
 Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn scripts are cached offline but excluded from eager page scripts. Begin loads only selected modules, before video/audio; a failed load blocks session start, displays a localized retry message and permits another attempt. Existing route/lifecycle contracts remain active. Local Chromium confirms zero practice scripts initially and only Box Breathing loads from cache after selecting it and starting offline. The observed initial-JavaScript body reduction is ~13.1 KiB in this harness; device/thermal gains are unproven. See the modularization review/handoff.

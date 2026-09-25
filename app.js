@@ -3308,7 +3308,6 @@ class JourneyVideoPrelude {
         this.mixer = document.getElementById('volume-mixer');
         this.previewTimer = null;
         this.activePlayback = null;
-        try { this.media?.load(); } catch (error) {}
         this.syncFullscreenJourneyChrome = this.syncFullscreenJourneyChrome.bind(this);
         document.addEventListener('fullscreenchange', this.syncFullscreenJourneyChrome);
         this.chromeObserver = new MutationObserver(this.syncFullscreenJourneyChrome);
@@ -3403,6 +3402,15 @@ class JourneyVideoPrelude {
         return JOURNEY_VIDEO_PRELUDE_BUFFER_MIN_SECONDS;
     }
 
+    ensureVideoSource() {
+        if (!this.media) return false;
+        if (this.media.getAttribute('src')) return true;
+        const source = this.media.dataset.videoSrc;
+        if (!source) return false;
+        this.media.src = source;
+        return true;
+    }
+
     getBufferedAheadSeconds() {
         if (!this.media) return 0;
         for (let index = 0; index < this.media.buffered.length; index += 1) {
@@ -3416,7 +3424,7 @@ class JourneyVideoPrelude {
     }
 
     async bufferVideoToSafePoint() {
-        if (!this.media) return false;
+        if (!this.ensureVideoSource()) return false;
         const requiredSeconds = Math.min(
             this.getVideoBufferTargetSeconds(),
             Number.isFinite(this.media.duration) ? Math.max(2, this.media.duration) : JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS
@@ -3462,7 +3470,8 @@ class JourneyVideoPrelude {
     }
 
     async previewAudio() {
-        if (!this.media) return;
+        if (!this.ensureVideoSource()) return;
+        try { this.media.load(); } catch (error) { return; }
         if (!this.audio.isInitialized) await this.audio.init();
         if (!this.audio.prepareJourneyVideoPrelude(this.media)) return;
         if (this.previewTimer) clearTimeout(this.previewTimer);
@@ -3483,7 +3492,7 @@ class JourneyVideoPrelude {
 
     async play() {
         if (this.activePlayback) return this.activePlayback;
-        if (!this.overlay || !this.media) return 'unavailable';
+        if (!this.overlay || !this.ensureVideoSource()) return 'unavailable';
 
         // Restart happens from an active journey, so the context is normally
         // ready within the click gesture. Keep the fallback for recovery.
