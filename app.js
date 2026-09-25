@@ -69,6 +69,8 @@ const audioTonePlayback = window.ChakraAudioTonePlayback;
 if (!audioTonePlayback) throw new Error('Audio tone-playback module is unavailable.');
 const audioDroneStart = window.ChakraAudioDroneStart;
 if (!audioDroneStart) throw new Error('Audio drone-start module is unavailable.');
+const audioDroneStop = window.ChakraAudioDroneStop;
+if (!audioDroneStop) throw new Error('Audio drone-stop module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1108,70 +1110,11 @@ class AudioEngine {
     }
 
     stopBinaural() {
-        if (!this.ctx) {
-            this.binauralNodes = [];
-            return;
-        }
-        const now = this.ctx.currentTime;
-        this.binauralNodes.forEach(node => {
-            if (typeof AudioParam !== 'undefined' && node instanceof AudioParam) return;
-            try { 
-                if (node.gain) {
-                    node.gain.cancelScheduledValues(now);
-                    node.gain.setValueAtTime(node.gain.value, now);
-                    node.gain.linearRampToValueAtTime(0, now + 5);
-                } else {
-                    node.stop(now + 5); 
-                }
-            } catch(e) {}
-        });
-        this.binauralNodes = [];
+        return audioDroneStop.stopBinaural(this);
     }
 
     stopDrone() {
-        if (!this.ctx) {
-            this.binauralNodes = [];
-            this.droneOscillators = [];
-            this.groundingAnchor = null;
-            this.elementalNodes = [];
-            this.vibrationLFO = null;
-            return;
-        }
-        this.stopBinaural();
-        const now = this.ctx.currentTime;
-        
-        if (this.vibrationLFO) {
-            try { this.vibrationLFO.stop(now + 5); } catch(e) {}
-            this.vibrationLFO = null;
-        }
-        this.droneOscillators.forEach(({ osc, gain }) => {
-            const currentVal = gain.gain.value;
-            if (gain.gain.cancelAndHoldAtTime) gain.gain.cancelAndHoldAtTime(now);
-            else { gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(currentVal, now); }
-            gain.gain.linearRampToValueAtTime(0, now + 5);
-            try { osc.stop(now + 5.1); } catch(e) {}
-        });
-        this.droneOscillators = [];
-
-        if (this.groundingAnchor) {
-            const currentVal = this.groundingAnchor.gain.gain.value;
-            this.groundingAnchor.gain.gain.cancelScheduledValues(now);
-            this.groundingAnchor.gain.gain.setValueAtTime(currentVal, now);
-            this.groundingAnchor.gain.gain.linearRampToValueAtTime(0, now + 5);
-            const anchorOsc = this.groundingAnchor.osc;
-            try { anchorOsc.stop(now + 5.1); } catch(e) {}
-            this.groundingAnchor = null;
-        }
-
-        this.elementalNodes.forEach(({ src, gain, lfo }) => {
-            const currentVal = gain.gain.value;
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(currentVal, now);
-            gain.gain.linearRampToValueAtTime(0, now + 5);
-            try { src.stop(now + 5.1); } catch(e) {}
-            try { lfo.stop(now + 5.1); } catch(e) {}
-        });
-        this.elementalNodes = [];
+        return audioDroneStop.stopDrone(this);
     }
 
     async playMantraTrack(key) {

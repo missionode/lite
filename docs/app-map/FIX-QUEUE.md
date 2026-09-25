@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-054 Binaural and drone cleanup lifecycle
+
+`stopBinaural()` and `stopDrone()` resource retirement now live in `modules/audio-drone-stop.js`; the AudioEngine API remains stable. Pre-context state clearing, AudioParam filtering, 5-second gain fades, delayed stops and cleanup ordering are unchanged. The module is eagerly available and cached for offline sessions. No performance claim is made.
+
 ## Completed — CP-MOD-053 Chakra and sleep drone startup
 
 Drone startup generation now lives in `modules/audio-drone-start.js`; public AudioEngine adapters, `stopDrone()` lifecycle, No Frequency checks, chakra and sleep frequency policies, binaural support, and journey call paths remain unchanged. The module loads eagerly and is precached for offline playback. No audio or performance improvement is claimed.

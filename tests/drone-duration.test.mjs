@@ -162,9 +162,7 @@ assert.match(en.ui.shotConfirm, /Lite cannot disconnect it for you/i, 'the Engli
 assert.match(ml.ui.shotConfirm, /ബ്ലൂടൂത്ത് അല്ലെങ്കിൽ മറ്റേതെങ്കിലും പുറം സ്പീക്കർ വിച്ഛേദിക്കൂ/, 'the Malayalam Shot confirmation should instruct the guide to disconnect external audio');
 assert.match(ml.ui.shotConfirm, /Lite-ന് അത് നിങ്ങൾക്കു പകരം വിച്ഛേദിക്കാനാകില്ല/, 'the Malayalam Shot confirmation should not imply the PWA can control Bluetooth');
 
-const startDroneStart = app.indexOf('    startDrone(baseFreq, index = 0)');
-const startDroneEnd = app.indexOf('    stopBinaural()', startDroneStart);
-const startDrone = app.slice(startDroneStart, startDroneEnd);
+const startDrone = fs.readFileSync(new URL('../modules/audio-drone-start.js', import.meta.url), 'utf8');
 assert.match(startDrone, /mainOscillator\.frequency\.setValueAtTime\(droneFreq,/, 'the generated drone should retain its actual main tone');
 assert.match(startDrone, /const droneFreq = safeBaseFrequency;/, 'the main drone should use the validated JSON frequency directly');
 assert.doesNotMatch(startDrone, /safeBaseFrequency\s*\/\s*[24]/, 'higher chakra frequencies must not be octave-lowered');

@@ -567,3 +567,12 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence 
 - Script order and service-worker precache cover both extracted modules.
 - The initial state object remains in `app.js`; this checkpoint deliberately does not move audio, journey or UI state.
 - Browser/device evidence was not requested and is not claimed.
+## CP-MOD-054 — drone shutdown ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- `stopBinaural()` and `stopDrone()` now delegate to `modules/audio-drone-stop.js`; public AudioEngine APIs and existing call order remain stable.
+- Preserved pre-context reset, AudioParam detection, `cancelAndHoldAtTime` fallback, 5-second fades, 5.1-second source retirement, oscillator/resource cleanup, grounding anchor reset and elemental-layer retirement.
+- The focused stop/start, Audio transitions and No Frequency contracts pass. Full Node suite: 79/81 pass; `content-safety` and `drone-duration` cannot begin assertions because owner-managed `docs/dot.json` is absent from this isolated worktree.
+- Loop routing unit suite: 11 pass. Atlas build: 43 maps / 353 nodes / 405 edges. Browser atlas verification did not run because Playwright is unavailable in this worktree; browser checks remain opt-in. No device listening or audible, CPU, memory, thermal or performance improvement is claimed.
+- Cache/app versions are `chakra-v5.301` / `4.05`. The shutdown lifecycle remains eager and offline cached. This is ownership/testability work only.

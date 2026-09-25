@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync('app.js', 'utf8');
+const droneStopSource = fs.readFileSync('modules/audio-drone-stop.js', 'utf8');
 const timers = [];
 const mediaSource = fs.readFileSync('modules/media-lifecycle.js', 'utf8');
 const mediaContext = vm.createContext({
@@ -99,12 +100,14 @@ short.start();
 const events = short.activeSources[0].gain.gain.events;
 assert.ok(events.every((event, index) => index === 0 || event[2] >= events[index - 1][2]));
 assert.equal(mediaContext.ChakraMediaLifecycle.constants.PIPER_CLIP_FADE_SECONDS, 0.05, 'speech endings retain their short final-word-safe envelope');
-const stopDrone = vm.runInNewContext('({'+app.slice(app.indexOf('    stopDrone() {'),app.indexOf('    async playMantraTrack'))+'})').stopDrone;
+const droneStopContext = vm.createContext({ Object, window: {} });
+vm.runInContext(droneStopSource, droneStopContext);
+const stopDrone = droneStopContext.window.ChakraAudioDroneStop.stopDrone;
 let lfoStops=0;
-const engine={ctx:{currentTime:0},stopBinaural(){},droneOscillators:[],elementalNodes:[{
+const engine={ctx:{currentTime:0},stopBinaural(){},droneOscillators:[],binauralNodes:[],elementalNodes:[{
     src:{stop(){}},lfo:{stop(t){assert.equal(t,5.1);lfoStops++;}},
     gain:{gain:{value:1,cancelScheduledValues(){},setValueAtTime(){},linearRampToValueAtTime(){}}}
 }]};
-stopDrone.call(engine);
+stopDrone(engine);
 assert.equal(lfoStops,1,'Stage exit stops elemental modulation');
 console.log('Audio transitions passed: native repeat PCM, timer independence, bounded sources and oscillator cleanup (not device listening).');
