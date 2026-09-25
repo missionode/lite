@@ -13,6 +13,7 @@
     "test:demo-script": "node tests/demo-script.test.mjs",
     "test:hypnosis-journey": "node tests/hypnosis-journey.test.mjs",
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
+    "test:audio-volume-settings-view": "node tests/audio-volume-settings-view.test.mjs",
     "test:settings-manager-view": "node tests/settings-manager-view.test.mjs",
     "test:app-state": "node tests/app-state.test.mjs",
     "test:content-localization": "node tests/content-localization.test.mjs",

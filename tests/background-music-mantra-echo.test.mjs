@@ -11,6 +11,7 @@ const rangeControls = fs.readFileSync(new URL('../modules/range-controls.js', im
 const localeUiRenderer = fs.readFileSync(new URL('../modules/locale-ui-renderer.js', import.meta.url), 'utf8');
 const moodAmbienceView = fs.readFileSync(new URL('../modules/mood-ambience-settings-view.js', import.meta.url), 'utf8');
 const mixerPreferenceHydration = fs.readFileSync(new URL('../modules/mixer-preference-hydration.js', import.meta.url), 'utf8');
+const audioVolumeSettingsView = fs.readFileSync(new URL('../modules/audio-volume-settings-view.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -210,7 +211,7 @@ assert.match(backgroundFade, /const fadeDuration = Math\.max\(0, duration\)[\s\S
 assert.match(backgroundFade, /function restoreAfterMantra\(owner, duration\)[\s\S]*?setBusGain\(owner, 1, fadeDuration\)/, 'music restore should use a smooth bus fade-in');
 assert.match(backgroundFade, /function fadeOut\(owner, duration = 4\)[\s\S]*?owner\.bgMusicTargetVolume = 0/, 'an intentional music fade-out should remain muted through later slider changes');
 assert.match(backgroundFade, /function setVolume\(owner, level, previousLevel = level\)[\s\S]*?const roleFactor = Math\.max\(0, Math\.min\(1, currentTarget \/ previous\)\)/, 'music volume updates should preserve the active full, ducked, or silent role');
-assert.match(app, /const previousVolume = state\.volMusic;[\s\S]*?audio\.setBackgroundMusicVolume\(state\.volMusic, previousVolume\)/, 'the music slider should use the role-preserving update rather than forcing full gain');
+assert.match(audioVolumeSettingsView, /bindVolume\('volMusic',[\s\S]*?audio\.setBackgroundMusicVolume\(state\.volMusic, previousValue\)/, 'the music slider should use the role-preserving update rather than forcing full gain');
 assert.doesNotMatch(backgroundBlock, /owner\.bgMusicLoop\.stop\(0\)/, 'background music must never be restarted with an immediate cut');
 assert.match(backgroundBlock, /function stop\(owner, fadeTime, reverbTailSeconds\)[\s\S]*?const retirementSeconds = Math\.max\(0, fadeTime\);[\s\S]*?owner\.bgMusicLoop\.stop\(retirementSeconds\);[\s\S]*?owner\.bgMusicRetirePromise = retirement;/, 'background music stops should use a controlled fade and retain its retirement until a later start can safely proceed');
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?bgMusicTargetVolume = 0;[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion uses one music exit envelope without restoring music');

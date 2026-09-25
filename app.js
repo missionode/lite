@@ -5137,13 +5137,6 @@ function attachEventListeners() {
     });
     document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('mixer-no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
-    // Unified Volume Handlers
-    const syncVolume = (key, value, elements) => {
-        state[key] = parseFloat(value);
-        localStorage.setItem(`chakra_${key.replace('vol', 'vol_').toLowerCase()}`, state[key]);
-        elements.forEach(el => { if (el) el.value = value; });
-    };
-
     const voiceClarity = document.getElementById('voice-clarity');
     const voiceWarmth = document.getElementById('voice-warmth');
     const voicePace = document.getElementById('voice-pace');
@@ -5209,53 +5202,7 @@ function attachEventListeners() {
         });
     });
 
-    // Voice
-    const volVoiceEls = [document.getElementById('vol-voice'), document.getElementById('settings-vol-voice')].filter(Boolean);
-    volVoiceEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVoice', e.target.value, volVoiceEls);
-        if (audio.voiceGain && audio.ctx) audio.voiceGain.gain.setValueAtTime(state.volVoice, audio.ctx.currentTime);
-    }));
-
-    // Drone
-    const volDroneEls = [document.getElementById('vol-drone'), document.getElementById('settings-vol-drone')].filter(Boolean);
-    volDroneEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volDrone', e.target.value, volDroneEls);
-        if (audio.masterGain) audio.masterGain.gain.setValueAtTime(state.volDrone, audio.ctx.currentTime);
-    }));
-
-    // Bell
-    const volBellEls = [document.getElementById('vol-bell'), document.getElementById('settings-vol-bell')].filter(Boolean);
-    volBellEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volBell', e.target.value, volBellEls);
-        if (audio.bellGain) audio.bellGain.gain.setValueAtTime(state.volBell, audio.ctx.currentTime);
-    }));
-
-    // Mantra
-    const volMantraEls = [document.getElementById('vol-mantra'), document.getElementById('settings-vol-mantra')].filter(Boolean);
-    volMantraEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volMantra', e.target.value, volMantraEls);
-        if (audio.mantraGain && audio.mantraLoop) {
-            audio.mantraGain.gain.setValueAtTime(state.volMantra, audio.ctx.currentTime);
-        }
-    }));
-
-    // Music
-    const volMusicEls = [document.getElementById('vol-music'), document.getElementById('settings-vol-music')].filter(Boolean);
-    volMusicEls.forEach(el => el.addEventListener('input', (e) => {
-        const previousVolume = state.volMusic;
-        syncVolume('volMusic', e.target.value, volMusicEls);
-        audio.setBackgroundMusicVolume(state.volMusic, previousVolume);
-    }));
-    const volVideoEls = [document.getElementById('settings-vol-video')].filter(Boolean);
-    volVideoEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVideo', e.target.value, volVideoEls);
-        audio.setJourneyVideoPreludeVolume(state.volVideo);
-    }));
-    const volVisualizationEls = [document.getElementById('settings-vol-visualization'), document.getElementById('vol-visualization')].filter(Boolean);
-    volVisualizationEls.forEach(el => el.addEventListener('input', (e) => {
-        syncVolume('volVisualizationAmbience', e.target.value, volVisualizationEls);
-        audio.setVisualizationAmbienceVolume(state.volVisualizationAmbience);
-    }));
+    window.ChakraAudioVolumeSettingsView.bind({ document, state, storage: localStorage, audio });
     document.getElementById('preview-video-audio')?.addEventListener('click', () => {
         void loadJourneyVideoPrelude()
             .then(prelude => prelude.previewAudio())

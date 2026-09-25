@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5294](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5294), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5241](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5241), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -1193,7 +1193,7 @@ flowchart TD
 
 What changes when sound settings are toggled.
 
-Sources: [app.js:5169](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5169), [modules/ambient-particle-field.js:315](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:315), [modules/ambient-particle-field.js:432](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:432), [app.js:2086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2086).
+Sources: [modules/audio-volume-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-volume-settings-view.js:1), [tests/audio-volume-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-volume-settings-view.test.mjs:1), [app.js:4719](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4719), [modules/ambient-particle-field.js:315](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:315), [modules/ambient-particle-field.js:432](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:432), [app.js:2086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2086).
 
 ```mermaid
 flowchart TD
@@ -1218,7 +1218,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Settings / Journey Tuning | Shared suppression settings, volume controls and comfort controls. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
+| Settings / Journey Tuning | Shared suppression settings, live paired volume sliders, and comfort controls. `audio-volume-settings-view.js` synchronizes persisted levels and updates existing audio gains. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
 | No Frequency ON | Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
@@ -1800,7 +1800,7 @@ flowchart TD
 
 Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.
 
-Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/settings-manager-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-manager-view.js:1), [app.js:4132](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4132), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
+Sources: [modules/settings-backup.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-backup.js:1), [modules/settings-manager-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-manager-view.js:1), [app.js:4129](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4129), [index.html:215](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:215).
 
 ```mermaid
 flowchart TD
