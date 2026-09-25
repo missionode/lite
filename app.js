@@ -59,6 +59,8 @@ const piperLifecycle = window.ChakraPiperLifecycle;
 if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
+const audioSignalDesign = window.ChakraAudioSignalDesign;
+if (!audioSignalDesign) throw new Error('Audio signal design module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1082,60 +1084,21 @@ class AudioEngine {
     }
 
     makeDistortionCurve(amount) {
-        const n_samples = 44100;
-        const curve = new Float32Array(n_samples);
-        for (let i = 0; i < n_samples; ++i) {
-            const x = (i * 2) / n_samples - 1;
-            // Standard Sigmoid Soft Clipping
-            curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
-        }
-        return curve;
+        return audioSignalDesign.makeDistortionCurve(amount);
     }
 
     createImpulseResponse(duration, decay) {
-        const sampleRate = this.ctx.sampleRate;
-        const length = sampleRate * duration;
-        const buffer = this.ctx.createBuffer(2, length, sampleRate);
-        for (let channel = 0; channel < 2; channel++) {
-            const data = buffer.getChannelData(channel);
-            for (let i = 0; i < length; i++) {
-                const envelope = Math.pow(1 - i / length, decay);
-                data[i] = (Math.random() * 2 - 1) * envelope;
-            }
-        }
-        return buffer;
+        return audioSignalDesign.createImpulseResponse(this.ctx, duration, decay);
     }
 
     createDiffuseReverbImpulse(duration, decay, seed) {
-        const sampleRate = this.ctx.sampleRate;
-        const length = Math.max(1, Math.floor(sampleRate * duration));
-        const buffer = this.ctx.createBuffer(2, length, sampleRate);
-        for (let channel = 0; channel < 2; channel++) {
-            const data = buffer.getChannelData(channel);
-            let randomState = (seed + (channel * 104729)) >>> 0;
-            for (let i = 0; i < length; i++) {
-                // Deterministic decorrelated noise produces a diffuse tail,
-                // with no periodic feedback repeats and no session-to-session
-                // character change.
-                randomState = (1664525 * randomState + 1013904223) >>> 0;
-                const noise = (randomState / 4294967296) * 2 - 1;
-                const envelope = Math.pow(1 - (i / length), decay);
-                data[i] = noise * envelope;
-            }
-        }
-        return buffer;
+        return audioSignalDesign.createDiffuseReverbImpulse(this.ctx, duration, decay, seed);
     }
 
     createNoiseBuffer() {
         if (this._cachedNoise) return this._cachedNoise;
-        const bufferSize = this.ctx.sampleRate * 2;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        this._cachedNoise = buffer;
-        return buffer;
+        this._cachedNoise = audioSignalDesign.createNoiseBuffer(this.ctx);
+        return this._cachedNoise;
     }
 
     startElementalLayer(index) {
