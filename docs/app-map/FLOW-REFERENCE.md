@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5241](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5241), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5177](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5177), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -335,7 +335,7 @@ flowchart TD
 
 Mutual exclusion, validation, selected practice loading, and dispatch priority.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:4450](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4450), [app.js:5189](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5189), [app.js:5223](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5223), [modules/journey-content-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-content-loader.js:1), [tests/journey-content-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-content-loader.test.mjs:1).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:4450](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4450), [app.js:4918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4918), [app.js:4941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4941), [modules/journey-content-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-content-loader.js:1), [tests/journey-content-loader.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-content-loader.test.mjs:1).
 
 ```mermaid
 flowchart TD
@@ -965,7 +965,7 @@ flowchart TD
 
 An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
 
-Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:3425](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3425), [app.js:5027](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5027), [app.js:5209](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5209), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:3425](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3425), [app.js:4918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4918), [app.js:4941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4941), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD
@@ -1045,7 +1045,7 @@ flowchart TD
 
 Content selection, validation, fallback and demo behavior.
 
-Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:5152](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5152), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
+Sources: [modules/content-localization.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/content-localization.js:1), [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/locale-ui-renderer.js:1), [tests/locale-ui-renderer.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/locale-ui-renderer.test.mjs:1), [app.js:641](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:641), [app.js:944](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:944), [app.js:4507](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4507), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [language-manifest.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/language-manifest.json:1).
 
 ```mermaid
 flowchart TD
@@ -1193,7 +1193,7 @@ flowchart TD
 
 What changes when sound settings are toggled.
 
-Sources: [modules/audio-volume-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-volume-settings-view.js:1), [tests/audio-volume-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-volume-settings-view.test.mjs:1), [app.js:4719](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4719), [modules/ambient-particle-field.js:315](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:315), [modules/ambient-particle-field.js:432](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:432), [app.js:2086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2086).
+Sources: [modules/audio-volume-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-volume-settings-view.js:1), [tests/audio-volume-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-volume-settings-view.test.mjs:1), [modules/audio-effects-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/audio-effects-settings-view.js:1), [tests/audio-effects-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/audio-effects-settings-view.test.mjs:1), [app.js:4719](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4719), [modules/ambient-particle-field.js:315](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:315), [modules/ambient-particle-field.js:432](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:432), [app.js:2086](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2086).
 
 ```mermaid
 flowchart TD
@@ -1218,7 +1218,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Settings / Journey Tuning | Shared suppression settings, live paired volume sliders, and comfort controls. `audio-volume-settings-view.js` synchronizes persisted levels and updates existing audio gains. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
+| Settings / Journey Tuning | Shared suppression settings, voice tuning/pace, echo, spatial mode, voice presets, live paired volume sliders, and comfort controls. `audio-effects-settings-view.js` owns setting interactions; `audio-volume-settings-view.js` synchronizes persisted levels and updates existing audio gains. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
 | No Frequency ON | Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
@@ -1564,7 +1564,7 @@ flowchart TD
 
 Chooses and applies the established voice profile at journey start.
 
-Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:5143](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5143).
+Sources: [modules/journey-voice-profile.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-voice-profile.js:1), [tests/journey-voice-profile.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/journey-voice-profile.test.mjs:1), [app.js:3747](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3747), [app.js:4993](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4993).
 
 ```mermaid
 flowchart TD

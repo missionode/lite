@@ -330,3 +330,6 @@ Moved Manage Settings navigation, export/import event handling, status messages 
 ## CP-MOD-063 — Audio volume settings view ownership (implemented locally)
 
 Moved the seven paired or single mixer volume-slider bindings into `modules/audio-volume-settings-view.js`. It retains the existing `chakra_` preference key construction, mirror synchronization, active voice/drone/bell/mantra gain changes, music transition previous-volume input, video gain and Visualization ambience gain. Audio graph ownership, voice effects, spatial modes, playback and the preview controls remain in their existing owners. Verify with direct slider contracts and the `sound-options` atlas map; no runtime performance gain is presumed from an eager module extraction.
+## CP-MOD-064 — Audio effects settings view ownership (implemented locally)
+
+Moved voice clarity/warmth/pace, voice and music echo selectors, spatial-mode selectors and voice-preset interactions to `modules/audio-effects-settings-view.js`. Existing storage keys, preset values, spatial normalization, mirrored control updates and audio APIs are unchanged. DSP graph implementation and hydration remain with their existing owners. Validate direct user-input paths and `sound-options` references; do not claim audio-quality or performance changes from the extraction.

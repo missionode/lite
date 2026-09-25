@@ -12,6 +12,7 @@ const localeUiRenderer = fs.readFileSync(new URL('../modules/locale-ui-renderer.
 const moodAmbienceView = fs.readFileSync(new URL('../modules/mood-ambience-settings-view.js', import.meta.url), 'utf8');
 const mixerPreferenceHydration = fs.readFileSync(new URL('../modules/mixer-preference-hydration.js', import.meta.url), 'utf8');
 const audioVolumeSettingsView = fs.readFileSync(new URL('../modules/audio-volume-settings-view.js', import.meta.url), 'utf8');
+const audioEffectsSettingsView = fs.readFileSync(new URL('../modules/audio-effects-settings-view.js', import.meta.url), 'utf8');
 const mediaLifecycle = fs.readFileSync(new URL('../modules/media-lifecycle.js', import.meta.url), 'utf8');
 const piperLifecycle = fs.readFileSync(new URL('../modules/piper-lifecycle.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -216,7 +217,7 @@ assert.doesNotMatch(backgroundBlock, /owner\.bgMusicLoop\.stop\(0\)/, 'backgroun
 assert.match(backgroundBlock, /function stop\(owner, fadeTime, reverbTailSeconds\)[\s\S]*?const retirementSeconds = Math\.max\(0, fadeTime\);[\s\S]*?owner\.bgMusicLoop\.stop\(retirementSeconds\);[\s\S]*?owner\.bgMusicRetirePromise = retirement;/, 'background music stops should use a controlled fade and retain its retirement until a later start can safely proceed');
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?bgMusicTargetVolume = 0;[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion uses one music exit envelope without restoring music');
 assert.match(mixerPreferenceHydration, /\['music-echo', 'musicEcho'\]/, 'the music echo selector should restore its saved value');
-assert.match(app, /document\.getElementById\('music-echo'\)\?\.addEventListener\('change'/, 'music echo changes should be persisted independently');
+assert.match(audioEffectsSettingsView, /getElementById\('music-echo'\)\?\.addEventListener\('change'/, 'music echo changes should be persisted independently');
 assert.match(mantraBlock, /if \(state\.noMantraMode\) return;/, 'No Mantra Mode should be independent from No Frequency Mode');
 assert.match(app, /if \(state\.noFrequencyMode \|\| state\.noMantraMode\) return;/, 'a chakra drone should not start without its mantra');
 

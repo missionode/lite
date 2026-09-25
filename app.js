@@ -5137,71 +5137,7 @@ function attachEventListeners() {
     });
     document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
     document.getElementById('mixer-no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
-    const voiceClarity = document.getElementById('voice-clarity');
-    const voiceWarmth = document.getElementById('voice-warmth');
-    const voicePace = document.getElementById('voice-pace');
-    const applyVoiceTuning = () => {
-        if (audio.setVoiceTuning) audio.setVoiceTuning(state.voiceWarmth, state.voiceClarity);
-    };
-    voiceClarity?.addEventListener('input', (event) => {
-        state.voiceClarity = Number(event.target.value);
-        localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-        applyVoiceTuning();
-        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
-    });
-    voiceWarmth?.addEventListener('input', (event) => {
-        state.voiceWarmth = Number(event.target.value);
-        localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-        applyVoiceTuning();
-        document.querySelectorAll('[data-voice-preset]').forEach(button => button.classList.remove('mixer-preset-active'));
-    });
-    voicePace?.addEventListener('input', (event) => {
-        state.voicePace = Number(event.target.value);
-        localStorage.setItem('chakra_voice_pace', state.voicePace);
-    });
-    document.getElementById('voice-echo')?.addEventListener('change', (event) => {
-        state.voiceEcho = event.target.value;
-        localStorage.setItem('chakra_voice_echo', state.voiceEcho);
-        if (audio.setVoiceEcho) audio.setVoiceEcho(state.voiceEcho);
-    });
-    document.getElementById('music-echo')?.addEventListener('change', (event) => {
-        state.musicEcho = event.target.value;
-        localStorage.setItem('chakra_music_echo', state.musicEcho);
-        if (audio.setMusicEcho) audio.setMusicEcho(state.musicEcho);
-    });
-    const setSpatialMode = (mode) => {
-        state.spatialMode = normalizeSpatialMode(mode);
-        localStorage.setItem('chakra_spatial_mode', state.spatialMode);
-        syncValue('spatial-mode', state.spatialMode);
-        syncValue('mixer-spatial-mode', state.spatialMode);
-        if (audio.setSpatialMode) audio.setSpatialMode(state.spatialMode);
-    };
-    document.getElementById('spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
-    document.getElementById('mixer-spatial-mode')?.addEventListener('change', (event) => setSpatialMode(event.target.value));
-    const voicePresets = {
-        soft: { clarity: 35, warmth: 65, pace: 0.9 },
-        shringara: { clarity: 28, warmth: 82, pace: 0.92 },
-        balanced: { clarity: 50, warmth: 50, pace: 1 },
-        clear: { clarity: 70, warmth: 40, pace: 1.05 }
-    };
-    document.querySelectorAll('[data-voice-preset]').forEach(button => {
-        button.addEventListener('click', () => {
-            const preset = voicePresets[button.dataset.voicePreset];
-            if (!preset) return;
-            state.voiceClarity = preset.clarity;
-            state.voiceWarmth = preset.warmth;
-            state.voicePace = preset.pace;
-            localStorage.setItem('chakra_voice_clarity', state.voiceClarity);
-            localStorage.setItem('chakra_voice_warmth', state.voiceWarmth);
-            localStorage.setItem('chakra_voice_pace', state.voicePace);
-            syncValue('voice-clarity', state.voiceClarity);
-            syncValue('voice-warmth', state.voiceWarmth);
-            syncValue('voice-pace', state.voicePace);
-            applyVoiceTuning();
-            document.querySelectorAll('[data-voice-preset]').forEach(item => item.classList.toggle('mixer-preset-active', item === button));
-        });
-    });
-
+    window.ChakraAudioEffectsSettingsView.bind({ document, state, storage: localStorage, audio, normalizeSpatialMode, syncValue });
     window.ChakraAudioVolumeSettingsView.bind({ document, state, storage: localStorage, audio });
     document.getElementById('preview-video-audio')?.addEventListener('click', () => {
         void loadJourneyVideoPrelude()

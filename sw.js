@@ -26,6 +26,7 @@ const ASSETS = [
   './modules/settings-backup.js?v=1.0',
   './modules/settings-manager-view.js?v=1.0',
   './modules/audio-volume-settings-view.js?v=1.0',
+  './modules/audio-effects-settings-view.js?v=1.0',
   './modules/app-state.js?v=1.1',
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.0',
