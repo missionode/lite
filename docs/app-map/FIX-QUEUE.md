@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-051 Elemental audio-layer lifecycle
+
+Elemental noise-bed generation, per-chakra filter selection and source/LFO cleanup now live in `modules/audio-elemental-layer.js`. AudioEngine retains the public adapter and noise-buffer cache; chakra-index routing, settings and journey call order are unchanged. The module is loaded eagerly and precached offline. No audio quality or performance improvement is claimed. See the modularization review and active handoff.
+
 ## Completed — CP-MOD-050 Audio spatial geometry
 
 Generic Web Audio panner construction and position interpolation now live in `modules/audio-spatial-geometry.js`. The AudioEngine's public methods remain adapters; spatial mode profiles and behavior remain unchanged. The helper loads eagerly and remains in the offline cache. No spatial-audio or performance benefit is claimed. See the modularization review and active handoff.

@@ -63,6 +63,8 @@ const audioSignalDesign = window.ChakraAudioSignalDesign;
 if (!audioSignalDesign) throw new Error('Audio signal design module is unavailable.');
 const audioSpatialGeometry = window.ChakraAudioSpatialGeometry;
 if (!audioSpatialGeometry) throw new Error('Audio spatial geometry module is unavailable.');
+const audioElementalLayer = window.ChakraAudioElementalLayer;
+if (!audioElementalLayer) throw new Error('Audio elemental-layer module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1074,62 +1076,7 @@ class AudioEngine {
     }
 
     startElementalLayer(index) {
-        this.elementalNodes.forEach(n => {
-            try { n.lfo.stop(); } catch(e) {}
-            try { n.src.stop(); } catch(e) {}
-        });
-        this.elementalNodes = [];
-
-        const noiseSrc = this.ctx.createBufferSource();
-        noiseSrc.buffer = this.createNoiseBuffer();
-        noiseSrc.loop = true;
-
-        const filter = this.ctx.createBiquadFilter();
-        const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.012, this.ctx.currentTime + 5); // Reduced noise floor
-
-        const breezeLfo = this.ctx.createOscillator();
-        breezeLfo.type = 'sine';
-        breezeLfo.frequency.setValueAtTime(0.02 + (Math.random() * 0.02), this.ctx.currentTime); 
-
-        const breezeGainMod = this.ctx.createGain();
-        breezeGainMod.gain.setValueAtTime(0.004, this.ctx.currentTime); 
-        
-        const breezeFreqMod = this.ctx.createGain();
-        breezeFreqMod.gain.setValueAtTime(index > 3 ? 1200 : 400, this.ctx.currentTime); 
-
-        breezeLfo.connect(breezeGainMod);
-        breezeGainMod.connect(gain.gain);
-        
-        breezeLfo.connect(breezeFreqMod);
-        breezeFreqMod.connect(filter.frequency);
-        breezeLfo.start();
-
-        if (index === 0 || index === 1) {
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(index === 0 ? 100 : 250, this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.2, this.ctx.currentTime);
-        } else if (index === 2 || index === 3) {
-            filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(index === 2 ? 700 : 1200, this.ctx.currentTime);
-            filter.Q.setValueAtTime(1.5, this.ctx.currentTime); 
-        } else {
-            filter.type = 'highpass';
-            filter.frequency.setValueAtTime(3500 + (index * 300), this.ctx.currentTime);
-            filter.Q.setValueAtTime(0.4, this.ctx.currentTime);
-        }
-
-        noiseSrc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.masterGain);
-        noiseSrc.start();
-        
-        noiseSrc.onended = () => {
-            try { breezeLfo.stop(); } catch (error) {}
-            for (const node of [noiseSrc, filter, gain, breezeLfo, breezeGainMod, breezeFreqMod]) node.disconnect();
-        };
-        this.elementalNodes.push({ src: noiseSrc, gain: gain, lfo: breezeLfo });
+        return audioElementalLayer.start(this, index);
     }
 
     startDrone(baseFreq, index = 0) {
