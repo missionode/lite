@@ -1,5 +1,14 @@
 # Review
 
+## CP-MOD-048 — AudioEngine initialization graph ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for initializer parity, direct mock-node coverage, all runnable Node tests, Loop router checks, syntax/diff checks, and atlas build/source-reference validation. PR review and integration sync are pending.
+
+- The original `AudioEngine.init()` body is relocated into `modules/audio-engine-initialization.js`; normalized source comparison against the integration baseline confirms it is identical apart from the injected `audioWindow` alias for selecting `AudioContext`. App retains `init()` as its public adapter and explicitly supplies current state and the existing constants/helper.
+- Direct Web Audio mock tests pass for the graph’s key routes, level/filter/reverb defaults, spatial buses, closed-eyes grounding, No Frequency suppression, rejected optional output-device selection recovery and suspended-context re-entry without rebuilding nodes. Spatial audio, audio-route, audio-effects and existing sky/settings integration contracts pass.
+- App/cache advance to `3.98` / `chakra-v5.294`; module is before app and precached. 73/75 direct Node files pass; the two remaining failures require owner-managed `docs/dot.json`, absent from this isolated worktree. All 11 Loop router tests pass. Atlas builds and validates 43 maps / 353 nodes / 405 edges. Browser/device listening is not claimed.
+- This is an ownership/testability boundary only; it makes no audible, startup, CPU, memory or thermal claim.
+
 ## CP-MOD-047 — Newcomer marker layout lifecycle ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for unchanged geometry/lifecycle contracts, newcomer integration, the applicable direct test suite, Loop router checks, and generated atlas source validation. Interactive browser verification remains opt-in and was not run.

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -24,31 +25,30 @@ for (const locale of [en, ml]) {
     }
 }
 
-assert.match(app, /this\.spatialDronePanner = this\.createSpatialPanner\(\)/);
-assert.match(app, /this\.spatialMusicPanner = this\.createSpatialPanner\(\)/);
-assert.match(app, /this\.spatialMantraPanner = this\.createSpatialPanner\(\)/);
-assert.match(app, /this\.spatialPleasurePanner = this\.createSpatialPanner\(\)/);
+for (const panner of ['spatialDronePanner', 'spatialMusicPanner', 'spatialMantraPanner', 'spatialPleasurePanner']) {
+    assert.match(audioInitialization, new RegExp(`this\\.${panner} = this\\.createSpatialPanner\\(\\)`));
+}
 assert.match(app, /const PLEASURE_SPATIAL_APPROACH_SECONDS = 45/);
-assert.match(app, /this\.spatialPleasurePanner\.rolloffFactor = 0\.55/);
+assert.match(audioInitialization, /this\.spatialPleasurePanner\.rolloffFactor = 0\.55/);
 assert.match(app, /schedulePleasureSpatialApproach\(fromCurrent = false\)[\s\S]*?positionZ\.linearRampToValueAtTime/);
 assert.match(app, /pleasure: \{ x: 0, y: 0\.2, z: -7, nearZ: -2\.8 \}/, 'headphone pleasure ambience should approach a closer position');
-assert.match(app, /this\.pannerNode\.connect\(this\.spatialDronePanner\)[\s\S]*?this\.spatialDronePanner\.connect\(this\.lowCutFilter\)/);
-assert.match(app, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/);
-assert.match(app, /this\.mantraFilter\.connect\(this\.spatialMantraPanner\)[\s\S]*?this\.spatialMantraPanner\.connect\(this\.lowCutFilter\)/);
+assert.match(audioInitialization, /this\.pannerNode\.connect\(this\.spatialDronePanner\)[\s\S]*?this\.spatialDronePanner\.connect\(this\.lowCutFilter\)/);
+assert.match(audioInitialization, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/);
+assert.match(audioInitialization, /this\.mantraFilter\.connect\(this\.spatialMantraPanner\)[\s\S]*?this\.spatialMantraPanner\.connect\(this\.lowCutFilter\)/);
 assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 5/, 'narration receives the requested longer diffuse tail');
 assert.match(app, /const MUSIC_REVERB_TAIL_SECONDS = 5/, 'background music receives a longer diffuse tail');
 assert.match(app, /const MANTRA_REVERB_TAIL_SECONDS = 7/, 'mantra receives a dedicated extended tail');
-assert.match(app, /this\.mantraFilter\.connect\(this\.mantraTailConvolver\)[\s\S]*?this\.mantraTailWetGain\.connect\(this\.spatialMantraPanner\)/, 'mantra tail should share the mantra spatial path without touching narration or music');
-assert.match(app, /this\.pleasureGain\.connect\(this\.pleasureBlurDryGain\)[\s\S]*?this\.pleasureSpatialDepthGain\.connect\(this\.spatialPleasurePanner\)[\s\S]*?this\.spatialPleasurePanner\.connect\(this\.lowCutFilter\)/);
+assert.match(audioInitialization, /this\.mantraFilter\.connect\(this\.mantraTailConvolver\)[\s\S]*?this\.mantraTailWetGain\.connect\(this\.spatialMantraPanner\)/, 'mantra tail should share the mantra spatial path without touching narration or music');
+assert.match(audioInitialization, /this\.pleasureGain\.connect\(this\.pleasureBlurDryGain\)[\s\S]*?this\.pleasureSpatialDepthGain\.connect\(this\.spatialPleasurePanner\)[\s\S]*?this\.spatialPleasurePanner\.connect\(this\.lowCutFilter\)/);
 assert.match(app, /this\.setSpatialPosition\(this\.spatialPleasurePanner, configurations\.pleasure, now\)/);
-assert.match(app, /this\.voiceClarityFilter\.connect\(this\.lowCutFilter\)/, 'Narration should remain on its centered path');
-assert.doesNotMatch(app, /this\.voiceClarityFilter\.connect\(this\.spatial[A-Za-z]+Panner\)/, 'Narration must not be spatialized');
+assert.match(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.lowCutFilter\)/, 'Narration should remain on its centered path');
+assert.doesNotMatch(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.spatial[A-Za-z]+Panner\)/, 'Narration must not be spatialized');
 
 assert.match(app, /createSpatialPanner\(\)[\s\S]*?if \(this\.ctx\?\.createPanner\)[\s\S]*?return this\.ctx\.createStereoPanner\(\)/, 'Spatial routing needs a stereo fallback');
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'HRTF'/, 'Headphone mode should use HRTF positioning');
 assert.match(app, /setSpatialMode\(mode = DEFAULT_SPATIAL_MODE\)[\s\S]*?model: 'equalpower'/, 'Speaker-safe modes should use equal-power positioning');
-assert.match(app, /setSpatialMode\(state\.spatialMode\)/, 'Saved spatial mode should apply when the audio graph initializes');
-assert.match(app, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spatial mode should apply the narration ambience without changing the saved voice preference');
+assert.match(audioInitialization, /this\.setSpatialMode\(state\.spatialMode\)/, 'Saved spatial mode should apply when the audio graph initializes');
+assert.match(audioInitialization, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spatial mode should apply the narration ambience without changing the saved voice preference');
 assert.match(app, /localStorage\.setItem\('chakra_spatial_mode', state\.spatialMode\)/, 'Spatial mode changes should persist');
 assert.match(app, /getElementById\('spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(app, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);

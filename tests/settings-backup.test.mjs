@@ -56,52 +56,52 @@ assert.deepEqual(storage.entries().sort(), [
 const html = fs.readFileSync('index.html', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert.ok(
-    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/settings-backup.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The settings backup module must load before the application consumes its API.'
 );
 assert.ok(
-    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/app-state.js?v=1.1') < html.indexOf('app.js?v=3.98'),
     'The state preference module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/settings-backup\.js\?v=1\.0/, 'The extracted runtime module must remain available offline.');
 assert.match(serviceWorker, /\.\/modules\/app-state\.js\?v=1\.1/, 'The state preference module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/content-localization.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The content/localization module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/content-localization\.js\?v=1\.0/, 'The content/localization module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/media-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/media-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The media lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/media-lifecycle\.js\?v=1\.0/, 'The media lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/piper-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/piper-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The Piper lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/piper-lifecycle\.js\?v=1\.0/, 'The Piper lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/audio-route-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/audio-route-lifecycle.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The audio route lifecycle module must load before the application consumes its API.'
 );
 assert.match(serviceWorker, /\.\/modules\/audio-route-lifecycle\.js\?v=1\.0/, 'The audio route lifecycle module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/journey-routing.js?v=1.2') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/journey-routing.js?v=1.2') < html.indexOf('app.js?v=3.98'),
     'The journey routing module must load before the app.',
 );
 assert.match(serviceWorker, /\.\/modules\/journey-routing\.js\?v=1\.2/, 'The journey routing module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/practice-module-loader.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/practice-module-loader.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The practice loader must load before the app requests selected practice modules.'
 );
 assert.match(serviceWorker, /\.\/modules\/body-scan-practice\.js\?v=1\.0/, 'The Body Scan practice module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/yoga-experience-settings.js?v=1.0') < html.indexOf('app.js?v=3.97'),
+    html.indexOf('modules/yoga-experience-settings.js?v=1.0') < html.indexOf('app.js?v=3.98'),
     'The Yoga experience settings module must load before the app consumes it.'
 );
 assert.match(serviceWorker, /\.\/modules\/yoga-experience-settings\.js\?v=1\.0/, 'Yoga experience settings must remain available offline.');
-assert.ok(html.indexOf('modules/locale-ui-renderer.js?v=1.0') < html.indexOf('app.js?v=3.97'), 'Locale UI rendering must load before the app uses it.');
-assert.match(serviceWorker, /chakra-v5\.293[\s\S]*?\.\/modules\/locale-ui-renderer\.js\?v=1\.0/, 'Locale UI rendering must remain available offline.');
+assert.ok(html.indexOf('modules/locale-ui-renderer.js?v=1.0') < html.indexOf('app.js?v=3.98'), 'Locale UI rendering must load before the app uses it.');
+assert.match(serviceWorker, /chakra-v5\.294[\s\S]*?\.\/modules\/locale-ui-renderer\.js\?v=1\.0/, 'Locale UI rendering must remain available offline.');
 assert.doesNotMatch(html, /id="open-settings-manager"[^>]* hidden/, 'The Manage Settings CTA must be available without Advanced Features.');
 assert.match(html, /id="open-settings-manager"[^>]*class="secondary-btn"/, 'The public Manage Settings CTA must remain clearly visible against the sky.');
 assert.match(html, /id="export-settings"/, 'The manager needs export.');

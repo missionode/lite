@@ -8,9 +8,9 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const boxBreathingPractice = await practiceModuleLoader\.load\('box-breathing'\)/);
 assert.match(app, /async runBoxBreathing\(\) \{[\s\S]*?boxBreathingPractice\.run\(/, 'the controller should delegate Box Breathing to its lifecycle owner');
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.97/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.98/);
 assert.doesNotMatch(html, /modules\/box-breathing-practice\.js/, 'Box Breathing is loaded only after selection');
-assert.match(serviceWorker, /chakra-v5\.293[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
+assert.match(serviceWorker, /chakra-v5\.294[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
