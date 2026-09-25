@@ -5,8 +5,8 @@ const source = fs.readFileSync('app.js','utf8');
 const controllerSource = fs.readFileSync('modules/journey-chrome.js','utf8');
 const html = fs.readFileSync('index.html','utf8');
 const serviceWorker = fs.readFileSync('sw.js','utf8');
-assert.match(html,/modules\/journey-chrome\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.05/,'Shared journey chrome must load before the app constructs its controller.');
-assert.match(serviceWorker,/chakra-v5\.301[\s\S]*?modules\/journey-chrome\.js\?v=1\.0/,'The shared chrome module must remain available offline.');
+assert.match(html,/modules\/journey-chrome\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.06/,'Shared journey chrome must load before the app constructs its controller.');
+assert.match(serviceWorker,/chakra-v5\.302[\s\S]*?modules\/journey-chrome\.js\?v=1\.0/,'The shared chrome module must remain available offline.');
 assert.match(source,/const journeyChrome = new window\.ChakraJourneyChrome\(\);/,'The shared chrome controller should have an app-level lifetime, independent of the video prelude.');
 const timers = new Map(); let next = 0;
 function node(hidden = false) {

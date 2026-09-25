@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-054: Binaural and drone shutdown ownership
+### NOW — CP-MOD-055: Recorded mantra playback ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-054/lite`, based on merged `modularize` commit `3291474` (CP-MOD-053 / PR #72). `stopBinaural()` and `stopDrone()` delegate to `modules/audio-drone-stop.js`, preserving fade/stop timing, AudioParam fallback, oscillator/resource cleanup and public AudioEngine API.
-- App/cache versions are `4.05` / `chakra-v5.301`. Focused drone-start/stop, transitions and No Frequency tests pass. 79/81 Node files pass; two require owner-managed `docs/dot.json`, absent from this isolated worktree. The atlas builds 43 maps / 353 nodes / 405 edges. Browser atlas verification could not start because Playwright is not installed in this worktree; no device playback/performance gains are claimed.
-- CP-MOD-054 is prepared for PR/integration against `modularize` only; production remains unchanged. Keep unrelated main-checkout files untouched. Remaining work includes music/mantra playback ownership, final architecture/lazy-loading measurement review, and the assessment/theme checkpoints.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-055/lite`, based on merged `modularize` commit `52a2c38` (CP-MOD-054 / PR #73). Recorded mantra play/stop lifecycle moved into `modules/audio-mantra-playback.js`; stable AudioEngine adapters and background-music bus policy remain.
+- App/cache versions are `4.06` / `chakra-v5.302`. Focused mantra, audio-transition, stage-fade, No Frequency, background-music/mantra and hypnosis tests pass; full suite, atlas and PR validation remain pending. No audio-quality/performance gain or device listening is claimed.
+- CP-MOD-054 merged into `modularize` via PR #73; local integration checkout synchronized at `52a2c38`; unrelated local files remain untouched. CP-MOD-055 proceeds through isolated PR/integration to `modularize` only; production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

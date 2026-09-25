@@ -71,6 +71,8 @@ const audioDroneStart = window.ChakraAudioDroneStart;
 if (!audioDroneStart) throw new Error('Audio drone-start module is unavailable.');
 const audioDroneStop = window.ChakraAudioDroneStop;
 if (!audioDroneStop) throw new Error('Audio drone-stop module is unavailable.');
+const audioMantraPlayback = window.ChakraAudioMantraPlayback;
+if (!audioMantraPlayback) throw new Error('Audio mantra-playback module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1118,129 +1120,21 @@ class AudioEngine {
     }
 
     async playMantraTrack(key) {
-        if (state.noMantraMode) return;
-        const filePath = MANTRA_AUDIO_MAP[key];
-        if (!filePath) return;
-
-        const requestId = ++this.mantraRequestId;
-        this.stopMantraTrack({ restoreMusic: false, invalidate: false });
-
-        try {
-            if (!this.mantraBuffer[key]) {
-                const response = await fetch(filePath);
-                if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${filePath}`);
-                const arrayBuffer = await response.arrayBuffer();
-                this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);
-            }
-
-            // Keep the already-ducked music bed alive while a first-use
-            // mantra file is loading. Starting this mute before decoding could
-            // create an avoidable silent gap on slower devices. The dedicated
-            // gates silence dry music and stop new tail input while allowing
-            // the already-created diffuse tail to settle naturally.
-            if (requestId !== this.mantraRequestId || state.noMantraMode) return;
-            this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);
-
-            // Standardized to 3.0s crossfade
-            this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, true);
-            this.mantraTailWetGain.gain.cancelScheduledValues(this.ctx.currentTime);
-            this.mantraTailWetGain.gain.setValueAtTime(MANTRA_REVERB_TAIL_WET, this.ctx.currentTime);
-            this.mantraLoop = new SeamlessLoop(this.ctx, this.mantraBuffer[key], this.mantraGain, 1, 3.0);
-            this.mantraLoop.start(MANTRA_MUSIC_FADE_SECONDS);
-
-            // New: Organic Mantra Motion (LFO Presence) - Reduced for cleaner audio
-            const lfo = this.ctx.createOscillator();
-            lfo.type = 'sine';
-            lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime); // Slower, deeper motion
-            const lfoGain = this.ctx.createGain();
-            lfoGain.gain.setValueAtTime(250, this.ctx.currentTime); // Softer modulation
-            lfo.connect(lfoGain);
-            lfoGain.connect(this.mantraFilter.frequency);
-            lfo.start();
-            this.mantraPresenceLFO = lfo;
-            this.mantraPresenceLFOGain = lfoGain;
-            lfo.onended = () => { lfo.disconnect(); lfoGain.disconnect(); };
-
-            const now = this.ctx.currentTime;
-            this.mantraGain.gain.cancelScheduledValues(now);
-            // Entry belongs to the new loop, never zero the shared bus: an
-            // outgoing mantra may still be fading through it.
-            this.mantraGain.gain.setValueAtTime(state.volMantra, now);
-
-            if (this.masterGain) {
-                this.masterGain.gain.cancelScheduledValues(now);
-                this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-                // Deeper ducking (to 15%) to create a "cradle" for the voice
-                this.masterGain.gain.linearRampToValueAtTime(state.volDrone * 0.15, now + 8);
-            }
-
-            // Explicitly fade out any elemental noise during mantra
-            this.elementalNodes.forEach(({ gain }) => {
-                gain.gain.cancelScheduledValues(now);
-                gain.gain.setValueAtTime(gain.gain.value, now);
-                gain.gain.linearRampToValueAtTime(0, now + 5);
-            });
-        } catch (e) {
-            // SOFT FAIL: Log error but don't crash the journey. 
-            // This prevents the "Stable Connection" alert if a specific file fails.
-            console.error(`Audio Load Error (${key}):`, e);
-            if (requestId === this.mantraRequestId) this.restoreBackgroundMusicAfterMantra();
-        }
+        return audioMantraPlayback.play(this, key, {
+            state,
+            mantraAudioMap: MANTRA_AUDIO_MAP,
+            SeamlessLoop,
+            musicFadeSeconds: MANTRA_MUSIC_FADE_SECONDS,
+            tailWet: MANTRA_REVERB_TAIL_WET
+        });
     }
 
     stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {}) {
-        const fadeSeconds = stageWindow === null ? MANTRA_FADE_SECONDS : Math.min(MANTRA_FADE_SECONDS, Math.max(0, Number(stageWindow) || 0) / 2);
-        const tailSeconds = stageWindow === null ? MANTRA_REVERB_TAIL_SECONDS : Math.min(MANTRA_REVERB_TAIL_SECONDS, fadeSeconds);
-        this.setConvolverActive('mantra', this.mantraFilter, this.mantraTailConvolver, this.mantraTailFilter, false, fadeSeconds + tailSeconds + 0.1);
-        if (invalidate) this.mantraRequestId += 1;
-        if (!this.mantraLoop) {
-            if (restoreMusic) this.restoreBackgroundMusicAfterMantra();
-            return;
-        }
-        const now = this.ctx.currentTime;
-
-        if (stageWindow !== null && this.mantraTailWetGain) {
-            const wet = this.mantraTailWetGain.gain;
-            if (wet.cancelAndHoldAtTime) wet.cancelAndHoldAtTime(now);
-            else { wet.cancelScheduledValues(now); wet.setValueAtTime(wet.value, now); }
-            wet.setValueAtTime(wet.value, now + fadeSeconds);
-            wet.linearRampToValueAtTime(0, now + fadeSeconds + tailSeconds);
-        }
-
-        if (this.mantraPresenceLFO) {
-            const modulation = this.mantraPresenceLFOGain?.gain;
-            if (modulation) {
-                if (modulation.cancelAndHoldAtTime) modulation.cancelAndHoldAtTime(now);
-                else { modulation.cancelScheduledValues(now); modulation.setValueAtTime(modulation.value, now); }
-                modulation.linearRampToValueAtTime(0, now + fadeSeconds);
-            }
-            try { this.mantraPresenceLFO.stop(now + fadeSeconds + 0.02); } catch(e) {}
-            this.mantraPresenceLFO = null;
-            this.mantraPresenceLFOGain = null;
-        }
-
-        // The retiring loop owns the exit envelope (no second bus fade).
-
-        if (this.masterGain) {
-            this.masterGain.gain.cancelScheduledValues(now);
-            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-            this.masterGain.gain.linearRampToValueAtTime(state.volDrone, now + 6);
-        }
-
-        // Restore elemental layer subtly after mantra
-        this.elementalNodes.forEach(({ gain }) => {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(gain.gain.value, now);
-            gain.gain.linearRampToValueAtTime(0.015, now + 4);
+        return audioMantraPlayback.stop(this, { restoreMusic, invalidate, stageWindow }, {
+            state,
+            fadeSeconds: MANTRA_FADE_SECONDS,
+            tailSeconds: MANTRA_REVERB_TAIL_SECONDS
         });
-
-        this.mantraLoop.stop(fadeSeconds);
-        this.mantraLoop = null;
-
-        // Bring the bed back during the outgoing mantra, not after silence.
-        if (restoreMusic) {
-            this.restoreBackgroundMusicAfterMantra(fadeSeconds);
-        }
     }
 
     async startBackgroundMusic() {

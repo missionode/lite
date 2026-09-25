@@ -6,6 +6,7 @@ const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-ini
 const audioTonePlayback = fs.readFileSync(new URL('../modules/audio-tone-playback.js', import.meta.url), 'utf8');
 const audioDroneStart = fs.readFileSync(new URL('../modules/audio-drone-start.js', import.meta.url), 'utf8');
 const audioDroneStop = fs.readFileSync(new URL('../modules/audio-drone-stop.js', import.meta.url), 'utf8');
+const audioMantraPlayback = fs.readFileSync(new URL('../modules/audio-mantra-playback.js', import.meta.url), 'utf8');
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -30,7 +31,7 @@ const sleepDrone = method('startSleepDrone(beatFrequency)', 'startFrequencyShot(
 const shot = method('startFrequencyShot(frequency)', 'stopFrequencyShot()');
 const stopBinaural = method('stopBinaural()', 'stopDrone()');
 const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
-const mantra = method('async playMantraTrack(key)', 'stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {})');
+const mantra = audioMantraPlayback;
 const bowlStart = app.indexOf('    playSingingBowl()');
 const bowlEnd = app.indexOf('\n}\n\n// Meditation Controller', bowlStart);
 assert.ok(bowlStart >= 0 && bowlEnd > bowlStart, 'playSingingBowl() must remain readable');

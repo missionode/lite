@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const mantraPlayback = fs.readFileSync(new URL('../modules/audio-mantra-playback.js', import.meta.url), 'utf8');
 const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
 const rangeControls = fs.readFileSync(new URL('../modules/range-controls.js', import.meta.url), 'utf8');
 const localeUiRenderer = fs.readFileSync(new URL('../modules/locale-ui-renderer.js', import.meta.url), 'utf8');
@@ -159,27 +160,21 @@ assert.match(setMusicEcho, /spacious: \{ delay: 0\.035, wet: 0\.18, filter: 3400
 assert.match(setMusicEcho, /musicEchoSend\.gain\.linearRampToValueAtTime/);
 assert.match(setMusicEcho, /musicEchoWetGain\.gain\.linearRampToValueAtTime/);
 
-const mantraStart = app.indexOf('    async playMantraTrack(key)');
-const mantraEnd = app.indexOf('    async startBackgroundMusic()', mantraStart);
-assert.ok(mantraStart >= 0 && mantraEnd > mantraStart, 'mantra audio methods must remain readable');
-const mantraBlock = app.slice(mantraStart, mantraEnd);
-assert.match(mantraBlock, /this\.stopMantraTrack\(\{ restoreMusic: false, invalidate: false \}\)/);
-assert.match(mantraBlock, /this\.muteBackgroundMusicForMantra\(MANTRA_MUSIC_FADE_SECONDS\)/);
+const mantraBlock = mantraPlayback;
+assert.match(app, /playMantraTrack\(key\) \{\s*return audioMantraPlayback\.play\(this, key/);
+assert.match(mantraBlock, /owner\.stopMantraTrack\(\{ restoreMusic: false, invalidate: false \}\)/);
+assert.match(mantraBlock, /owner\.muteBackgroundMusicForMantra\(musicFadeSeconds\)/);
 assert.ok(
-    mantraBlock.indexOf('this.mantraBuffer[key] = await this.ctx.decodeAudioData(arrayBuffer);') <
-    mantraBlock.indexOf('this.muteBackgroundMusicForMantra(MANTRA_MUSIC_FADE_SECONDS);'),
+    mantraBlock.indexOf('owner.mantraBuffer[key] = await owner.ctx.decodeAudioData(await response.arrayBuffer());') <
+    mantraBlock.indexOf('owner.muteBackgroundMusicForMantra(musicFadeSeconds);'),
     'music mute should begin after first-use mantra decoding to avoid a loading silence',
 );
 assert.doesNotMatch(mantraBlock, /bgMusicEQ\.gain\.linearRampToValueAtTime\(-12/, 'mantra muting must not rely on partial EQ ducking');
-assert.match(mantraBlock, /this\.restoreBackgroundMusicAfterMantra\(\)/, 'failed mantra loading must release the music mute');
-assert.match(mantraBlock, /this\.masterGain\.gain\.linearRampToValueAtTime\(state\.volDrone \* 0\.15/, 'drone ducking should remain separate from music muting');
-
-const stopMantraStart = app.indexOf('    stopMantraTrack(');
-const stopMantraEnd = app.indexOf('    async startBackgroundMusic()', stopMantraStart);
-const stopMantraBlock = app.slice(stopMantraStart, stopMantraEnd);
-assert.match(stopMantraBlock, /this\.mantraLoop\.stop\(fadeSeconds\)/, 'loop owns one duration-aware exit fade');
-assert.match(stopMantraBlock, /this\.restoreBackgroundMusicAfterMantra\(fadeSeconds\)/, 'music returns during the mantra exit fade');
-assert.doesNotMatch(stopMantraBlock, /setTimeout/, 'restoration must not wait for a silent valley');
+assert.match(mantraBlock, /owner\.restoreBackgroundMusicAfterMantra\(\)/, 'failed mantra loading must release the music mute');
+assert.match(mantraBlock, /owner\.masterGain\.gain\.linearRampToValueAtTime\(state\.volDrone \* 0\.15/, 'drone ducking should remain separate from music muting');
+assert.match(mantraBlock, /owner\.mantraLoop\.stop\(fadeSeconds\)/, 'loop owns one duration-aware exit fade');
+assert.match(mantraBlock, /owner\.restoreBackgroundMusicAfterMantra\(fadeSeconds\)/, 'music returns during the mantra exit fade');
+assert.doesNotMatch(mantraBlock, /setTimeout/, 'restoration must not wait for a silent valley');
 assert.match(app, /const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 8/);
 assert.match(app, /const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10/);
 const backgroundStart = app.indexOf('    async startBackgroundMusic()');
@@ -208,8 +203,8 @@ assert.match(app, /piperTTS\.cancel\('experiment stopped', \{ fadeSeconds: 2 \}\
 assert.match(app, /piperTTS\.cancel\('journey finished', \{ fadeSeconds: 2 \}\)/, 'completion fades stale narration');
 assert.match(app, /piperTTS\.cancel\('journey stopped', \{ fadeSeconds: 2 \}\)/, 'manual stop fades active narration');
 assert.doesNotMatch(mantraBlock, /remainingMs|mantraLoop\.setGain\(state\.volMantra\)/, 'handoff overlaps without applying mantra volume twice');
-assert.match(app, /if \(invalidate\) this\.mantraRequestId \+= 1/, 'stopping should invalidate pending mantra startup');
-assert.match(app, /if \(requestId !== this\.mantraRequestId \|\| state\.noMantraMode\) return;/, 'a cancelled handoff must not start the mantra');
+assert.match(mantraBlock, /if \(invalidate\) owner\.mantraRequestId \+= 1/, 'stopping should invalidate pending mantra startup');
+assert.match(mantraBlock, /if \(requestId !== owner\.mantraRequestId \|\| state\.noMantraMode\) return;/, 'a cancelled handoff must not start the mantra');
 assert.match(app, /cancelAndHoldAtTime\(now\)/, 'the music fade should preserve the live gain value without a jump');
 assert.match(app, /const fadeDuration = Math\.max\(0, duration\)[\s\S]*?this\.bgMusicBusGain\.gain\.linearRampToValueAtTime\(0, now \+ fadeDuration\)/, 'music mute should fade the complete music bus to silence');
 assert.match(app, /restoreBackgroundMusicAfterMantra\(duration = BACKGROUND_MUSIC_RESTORE_FADE_SECONDS\)[\s\S]*?this\.bgMusicBusGain\.gain\.linearRampToValueAtTime\(1, now \+ Math\.max\(0, duration\)\)/, 'music restore should use a smooth bus fade-in');
@@ -221,7 +216,7 @@ assert.match(app, /stopBackgroundMusic\(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SE
 assert.match(app, /stopMantraTrack\(\{ restoreMusic: false \}\)[\s\S]*?bgMusicTargetVolume = 0;[\s\S]*?stopBackgroundMusic\(BACKGROUND_MUSIC_STOP_FADE_SECONDS\)/, 'completion uses one music exit envelope without restoring music');
 assert.match(mixerPreferenceHydration, /\['music-echo', 'musicEcho'\]/, 'the music echo selector should restore its saved value');
 assert.match(app, /document\.getElementById\('music-echo'\)\?\.addEventListener\('change'/, 'music echo changes should be persisted independently');
-assert.match(app, /if \(state\.noMantraMode\) return;/, 'No Mantra Mode should be independent from No Frequency Mode');
+assert.match(mantraBlock, /if \(state\.noMantraMode\) return;/, 'No Mantra Mode should be independent from No Frequency Mode');
 assert.match(app, /if \(state\.noFrequencyMode \|\| state\.noMantraMode\) return;/, 'a chakra drone should not start without its mantra');
 
 console.log('Background music mantra mute and echo contract passed.');
