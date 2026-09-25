@@ -55,10 +55,10 @@ test('records cold, warm and offline startup baseline without starting playback'
   await page.evaluate(() => navigator.serviceWorker.register('./sw.js'));
   await page.evaluate(() => navigator.serviceWorker.ready);
   const shellCache = await page.evaluate(async () => {
-    const cache = await caches.open('chakra-v5.289');
+    const cache = await caches.open('chakra-v5.290');
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
-      appEntryPresent: urls.includes('/app.js?v=3.93'),
+      appEntryPresent: urls.includes('/app.js?v=3.94'),
       journeyChromeModulePresent: urls.includes('/modules/journey-chrome.js?v=1.0'),
       videoPreludeModulePresent: urls.includes('/modules/journey-video-prelude.js?v=1.0'),
       ambientParticleFieldModulePresent: urls.includes('/modules/ambient-particle-field.js?v=1.0'),

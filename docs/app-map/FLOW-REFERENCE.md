@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 078b983 baseline + uncommitted CP-MOD-043 · 2026-09-25.
+Source snapshot: 854d8df baseline + uncommitted CP-MOD-044 · 2026-09-25.
 
-Source-reviewed behavior at modularize integration baseline 078b983. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin. CP-MOD-039 defers the optional 7.3 MB video URL until explicit preview or video-introduction selection; the clip is not precached. CP-MOD-040 moves shared fullscreen/idle-cursor controls into an eager owner module without behavior change. CP-MOD-041 defers optional controller code until video opt-in or preview; its code stays precached but is not parsed at startup. CP-MOD-042 moves the unchanged observational sky renderer into its own eager, cached owner module; no sky behavior or visual changes. CP-MOD-043 moves the unchanged chakra image-effect controller into its own eager owner module. These do not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the modularize integration baseline, including CP-MOD-038–044. Selected guided practices and opt-in video/controller paths load on demand; the observational sky renderer, visual engine and standard journey duration estimator are isolated eager cached owners. These ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:5196](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5196), [app.js:6572](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6572), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:5196](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5196), [app.js:6569](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6569), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -203,7 +203,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Remaining modularization work | CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate. |
+| Remaining modularization work | CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves the detailed standard-journey countdown calculation into the existing session-estimate owner while the controller keeps route/fallback selection. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate. |
 | Baseline measured · CP-MOD-037 | Cold/warm/offline script count, encoded resource bytes, transfer sizes, cache control and page errors; CPU/heap snapshots are indicative only. |
 | Bounded optional bundle | Seven selected guided-practice scripts are the first bundle; measured initial-JS reduction is modest (~13.1 KiB locally). |
 | Offline bytes, not execution | Service worker precaches the seven practice script URLs, while the eager shell includes only the small loader. |
@@ -321,7 +321,7 @@ flowchart TD
 
 Mutual exclusion, validation, selected practice loading, and dispatch priority.
 
-Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:4617](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4617), [app.js:6264](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6264), [app.js:6592](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6592).
+Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [app.js:4617](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4617), [app.js:6211](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6211), [app.js:6264](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6264).
 
 ```mermaid
 flowchart TD
@@ -948,7 +948,7 @@ flowchart TD
 
 An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
 
-Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:4705](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4705), [app.js:6302](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6302), [app.js:6580](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6580), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [app.js:4705](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4705), [app.js:6211](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6211), [app.js:6302](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6302), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1).
 
 ```mermaid
 flowchart TD

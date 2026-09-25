@@ -8,13 +8,63 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
-assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.93/);
-assert.match(serviceWorker, /chakra-v5\.289[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.94/);
+assert.match(serviceWorker, /chakra-v5\.290[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const estimate = context.ChakraSessionEstimate;
 assert.ok(Object.isFrozen(estimate));
+
+function makeStandardJourney({ checks = [], selected = ['root', 'heart'], overrides = {} } = {}) {
+    const selectedChecks = new Set(checks);
+    const scripts = {
+        intro: { moon: { full: 'opening' }, gratitude: 'gratitude' },
+        closing: { meditation: 'closing', affirmation: 'closing affirmation' },
+        root: { meditation: 'root mantra', affirmation: 'root affirmation' },
+        heart: { meditation: 'heart mantra', affirmation: 'heart affirmation' }
+    };
+    const state = {
+        timeIcebreaker: 10, timePerChakra: 2, timeInterval: 20, timeEmergence: 15,
+        timeBreathing: 3, droneDurationMode: 'shared', noFrequencyMode: true,
+        returningJourney: false, language: 'en', intention: '', ...overrides
+    };
+    return estimate.estimateStandardJourneySeconds({
+        scripts, isHighEnergy: false, isDemoScriptSelected: () => false,
+        estimateNarrationDurationSeconds: text => text.length,
+        timing: (section, key) => ({
+            'transitions.initialSettle': 2, 'transitions.arrivalToneLeadGap': 1,
+            'transitions.arrivalToneExitGap': 2, 'transitions.openingPause': 3,
+            'transitions.arrivalReadinessGap': 2, 'transitions.postBreathing': 4,
+            'transitions.chakraLeadOut': 5, 'transitions.chakraPostMantra': 1,
+            'transitions.intervalPreparation': 2, 'transitions.finalSilence': 3,
+            'transitions.closingFirstPause': 1, 'transitions.closingSecondPause': 1,
+            'transitions.emergenceBellSettle': 2, 'transitions.emergenceFinalQuiet': 2,
+            'narration.exitGap': 1
+        }[`${section}.${key}`] ?? 0),
+        getDroneDurationMs: () => 1000, state,
+        chakraOrder: selected,
+        localized: (item, key) => typeof item === 'string' ? item : item?.[key] || item?.moon?.full,
+        contentT: key => ({
+            'system.intention': 'Intention: {{intention}}', 'system.prePracticeSafety': 'safety',
+            'system.breatheInterval': 'interval'
+        }[key]),
+        getMoonPhase: () => 'full', defaultIntention: () => 'calm',
+        isChecked: id => selectedChecks.has(id), readNumber: (id, fallback) => Number(overrides[id] ?? fallback),
+        getJourneySystemNarration: key => ({ arrivalInduction: 'arrival', arrivalReadiness: 'readiness', emergence: 'emergence' }[key])
+    });
+}
+
+assert.equal(estimate.estimateStandardJourneySeconds({ scripts: null }), null, 'Missing scripts retain the no-estimate path.');
+assert.equal(makeStandardJourney({ selected: [] }), null, 'No selected chakra retains the no-estimate path.');
+const standardSeconds = makeStandardJourney();
+assert.ok(Number.isInteger(standardSeconds) && standardSeconds > 0, 'A standard journey returns a rounded positive duration.');
+assert.equal(makeStandardJourney({ checks: ['box-breathing-experience-toggle'] }) - standardSeconds, 48,
+    'Box Breathing adds its configured four-cycle duration.');
+assert.equal(makeStandardJourney({ checks: ['visualization-addon-toggle'], overrides: { 'visualization-duration': 3 } }) - standardSeconds, 180,
+    'Visualization adds its selected duration.');
+assert.equal(makeStandardJourney({ selected: ['root'] }) < standardSeconds, true, 'Only selected chakras are included.');
+assert.throws(() => estimate.estimateStandardJourneySeconds({ scripts: {}, isHighEnergy: false, isDemoScriptSelected: () => false }), /requires script, timing/);
 
 function make({ checks = [], numbers = {}, state = {}, poseCount = 0, demo = false } = {}) {
     const checked = new Set(checks);
