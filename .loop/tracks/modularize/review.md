@@ -1,5 +1,17 @@
 # Review
 
+## CP-MOD-041 — Lazy video-introduction controller
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source/unit, offline cache and Chromium entry-point evidence.
+
+- The controller class has been relocated without changing its implementation. The app loader is deduplicated, retries after load failure, and is entered only for the selected Lobby video introduction or explicit Settings audio preview.
+- The controller script is precached for offline use but is not loaded/parsed at initial page load; the large media file remains non-precached. Journey/media failure continues through the existing journey fallback.
+- The app holds one pending load promise, registers the constructor once, resets on failure for retry, and catches failures on both entry points. Lobby input validation still runs before optional controller loading; Restart continues to bypass the prelude.
+- All 70 applicable Node test files pass; `content-safety` and `drone-duration` are excluded because owner-managed `docs/dot.json` is absent. All 11 Loop router tests pass. Four Chromium checks pass across cold/warm/offline baseline, selected preparation loading, Lobby opt-in, and explicit Settings preview; both opt-in surfaces request one controller script only after intent, with zero initial controller/video requests on normal load. The shell cache contains the controller.
+- One local cold Chromium sample records 879,754 encoded initial JavaScript bytes versus 891,328 at CP-MOD-040 (about 11.3 KiB fewer in this harness); app.js is 359,918 versus 371,492 bytes. This is a single local sample, not compressed-network, CPU, heap, device or thermal evidence, and timing/heap measures vary.
+- Atlas rebuilt and browser verified at 43 maps / 353 nodes / 405 edges; source references, map labels/bounds, keyboard navigation, mobile overflow, print, SVG export and template fallback pass without page errors. The only console `ERR_FAILED` messages in the opt-in test are the deliberate blocked video and external-font requests. JS syntax and `git diff --check` pass.
+- Dynamic sky and every journey/audio/narration/video timing behavior are unchanged. No manual device playback or production verification is claimed. Pending PR review/merge.
+
 ## CP-MOD-040 — Shared journey chrome ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct interaction contract, app wiring, offline delivery, adjacent journey browser routes and atlas evidence.

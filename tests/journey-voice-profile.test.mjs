@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /journeyVoiceProfile\.apply\(\{/);
 assert.match(app, /isFeminineVoice: !isHighEnergy && isFeminineNarrationVoice\(\)/);
-assert.match(html, /modules\/journey-voice-profile\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.90/);
-assert.match(serviceWorker, /chakra-v5\.286[\s\S]*?modules\/journey-voice-profile\.js\?v=1\.0/);
+assert.match(html, /modules\/journey-voice-profile\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.91/);
+assert.match(serviceWorker, /chakra-v5\.287[\s\S]*?modules\/journey-voice-profile\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:journey-voice-profile'], 'node tests/journey-voice-profile.test.mjs');
 
 const context = vm.createContext({});

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-041 lazy video-introduction controller
+
+The `JourneyVideoPrelude` controller is no longer parsed or constructed at startup. It loads on the explicit Lobby video-introduction path or Settings audio preview; simultaneous requests share one load, and a failed module load falls through to the ordinary journey. Its code remains in the offline shell cache, while the large video remains uncached. Browser checks confirm no initial module/video requests, on-demand loading for both entry points, and offline shell availability. No device/thermal benefit is claimed from the local sample. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/HANDOFF.md`.
+
 ## Completed — CP-MOD-040 shared journey chrome ownership
 
 Fullscreen tracking, hidden controls, pointer/focus/touch reveal, idle cursor, mixer visibility and timer cleanup now belong to the shared eager `JourneyChromeController`, not the optional-video controller. Its interaction timings and session behavior are preserved. This is an ownership extraction, not a performance claim. See the modularization review and active handoff.

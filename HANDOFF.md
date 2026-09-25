@@ -1,12 +1,19 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-040: Shared journey chrome ownership
+### NOW — CP-MOD-041: Lazy video-introduction controller
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-040/lite`, based on merged integration commit `9a77086` (CP-MOD-039 merged via PR #58). Scope: extract fullscreen/idle-cursor journey controls only; preserve all interaction timings and keep the current dynamic sky unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-041/lite`, based on merged integration commit `b7b2365` (CP-MOD-040 merged via PR #59). Scope: defer the video-introduction controller until opt-in or explicit Settings preview; preserve all current video/audio flow behavior and the dynamic sky.
+- The class has moved to `modules/journey-video-prelude.js`. App loader deduplicates concurrent requests, constructs on first demand, and clears its promise after failure. App URL is `3.91`; shell cache is `chakra-v5.287`; the controller remains precached, but the 7.3 MB media remains uncached.
+- Validation is in progress. The root integration branch is `modularize`; do not push to production. Preserve the root's unrelated `.DS_Store`, `.codex/` and backup audio changes.
+- After tests and atlas pass, open a focused PR to `modularize`, merge and sync the root workspace, then continue the remaining modularization review. AudioEngine bus internals remain owner-deferred until the next weekly reset.
+
+### COMPLETE — CP-MOD-040: Shared journey chrome ownership
+
+- CP-MOD-040 merged via PR #59 at `b7b2365`, based on CP-MOD-039 at `9a77086`. Scope: extract fullscreen/idle-cursor journey controls only; preserve all interaction timings and keep the current dynamic sky unchanged.
 - `modules/journey-chrome.js` owns the prior `JourneyVideoPrelude` control listeners and methods. The app constructs one independent app-lifetime controller. It remains eager for every journey and is precached for offline use. App/cache IDs advance to `3.90` / `chakra-v5.286`.
 - The direct interaction contracts and 70-test applicable suite pass (2 owner-fixture tests excluded: absent `docs/dot.json`); 11 router tests pass. Three Chromium modularization checks pass, including cache/offline routes and no initial intro-video request. Browser baseline: 33 scripts / 891,328 encoded JS bytes; extracted module moves ~5.2 KiB out of app.js but adds ~723 bytes net and one request, so no performance gain is claimed. Atlas verification: 43 maps / 353 nodes / 405 edges, no page errors. Only expected test-abort/external-font `ERR_FAILED` console entries; no other console/page errors.
 - Root integration still contains only the owner’s unrelated `.DS_Store`, `.codex/` and backup audio changes; merge target is `modularize`, never production.
-- Next: final diff review, focused PR to `modularize`, merge and sync locally, then reconcile the approved remaining modularization candidates and gates against the plan.
+- Merged via PR #59 at `b7b2365`; browser, test-suite and atlas evidence retained below in checkpoint history.
 
 ### COMPLETE — CP-MOD-039: Optional video media request
 
