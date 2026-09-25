@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:5196; app.js:5789; index.html:248",
+      "source": "app.js:5196; app.js:5517; index.html:248",
       "rows": [
         [
           [
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/newcomer-marker-layout.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:4703; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/newcomer-marker-layout.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/newcomer-marker-layout.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:4703; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/newcomer-marker-layout.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1; modules/audio-drone-stop.js:1; tests/audio-drone-stop.test.mjs:1",
       "rows": [
         [
           [
@@ -329,7 +329,7 @@
           [
             "next",
             "Remaining modularization work",
-            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves standard narrated-journey duration into the estimate module; CP-MOD-045 centralizes exact per-mode countdown durations there. CP-MOD-046 extracts the 250 ms ticker and pause-aware elapsed-time lifecycle; CP-MOD-047 extracts newcomer marker geometry and its observer/frame lifecycle. Continue only with safe, explicit ownership seams and CP-MOD-050 extracts generic spatial geometry; continue with scoped runtime AudioEngine ownership and measured lazy-loading boundaries."
+            "CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves standard narrated-journey duration into the estimate module; CP-MOD-045 centralizes exact per-mode countdown durations there. CP-MOD-046 extracts the 250 ms ticker and pause-aware elapsed-time lifecycle; CP-MOD-047 extracts newcomer marker geometry and its observer/frame lifecycle. Continue only with safe, explicit ownership seams and CP-MOD-054 extracts drone shutdown. Continue remaining music/mantra runtime ownership, then measured lazy-loading only after browser baselines and opt-in validation."
           ]
         ],
         [
@@ -480,7 +480,8 @@
         "CP-MOD-050 extracts only generic spatial-panner construction and movement; spatial mode configuration and orchestration remain app-owned. The eager module is precached. This changes ownership only.",
         "CP-MOD-051 extracts elemental noise-layer lifecycle, preserving the seven index profiles, audio values and cleanup. `AudioEngine` retains its compatibility method and all higher-level drone lifecycle decisions. This changes ownership only.",
         "CP-MOD-052 extracts frequency-only Shot and guided cue audio lifecycles with app state injected explicitly. Public AudioEngine method names and live-session routing remain stable. No audible or performance benefit is implied.",
-        "CP-MOD-053 extracts chakra/HRIM and sleep drone startup, preserving all exact frequency and support-oscillator behavior. AudioEngine retains its stable methods and all drone shutdown state. This is ownership/testing work only."
+        "CP-MOD-053 extracts chakra/HRIM and sleep drone startup, preserving all exact frequency and support-oscillator behavior. AudioEngine retains its stable methods and all drone shutdown state. This is ownership/testing work only.",
+        "CP-MOD-054 extracts drone stop/fade cleanup while preserving the AudioEngine compatibility API and its original source retirement order. This is lifecycle ownership work only."
       ]
     },
     {
@@ -773,7 +774,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, selected practice loading, and dispatch priority.",
-      "source": "modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; app.js:4617; app.js:5729; app.js:5763",
+      "source": "modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; app.js:4617; app.js:5356; app.js:5390",
       "rows": [
         [
           [
@@ -2550,7 +2551,7 @@
       "group": "Live session",
       "title": "Optional Lobby video introduction",
       "subtitle": "An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.",
-      "source": "modules/journey-video-prelude.js:1; app.js:4705; app.js:5729; app.js:5759; sw.js:1",
+      "source": "modules/journey-video-prelude.js:1; app.js:4705; app.js:5537; app.js:5574; sw.js:1",
       "rows": [
         [
           [
@@ -3021,7 +3022,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-drone-start.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1086; app.js:1090",
+      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-drone-start.js:1; modules/audio-drone-stop.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1086; app.js:1112",
       "rows": [
         [
           [
@@ -3121,7 +3122,8 @@
         "CP-MOD-050 moves only panner creation and generic position interpolation into `modules/audio-spatial-geometry.js`; AudioEngine retains adapters and mode-specific spatial profiles. No spatial behavior or performance change is claimed.",
         "CP-MOD-051 moves elemental noise-bed node creation and cleanup into `modules/audio-elemental-layer.js`; `startElementalLayer()` remains the AudioEngine adapter and cached-noise ownership stays unchanged. No audio/performance change is claimed.",
         "CP-MOD-052 moves generated Shot and guided transition-tone oscillator lifecycles into `modules/audio-tone-playback.js`; the AudioEngine compatibility methods, frequency guards and fade envelopes remain. No audio/performance change is claimed.",
-        "CP-MOD-053 moves chakra/HRIM and sleep drone generation into `modules/audio-drone-start.js`; the public AudioEngine methods and shutdown owner remain stable. Preserve No Frequency guards and existing binaural/drone envelopes; no audio or performance change is claimed."
+        "CP-MOD-053 moves chakra/HRIM and sleep drone generation into `modules/audio-drone-start.js`; the public AudioEngine methods and shutdown owner remain stable. Preserve No Frequency guards and existing binaural/drone envelopes; no audio or performance change is claimed.",
+        "CP-MOD-054 moves binaural and drone stop/fade cleanup into `modules/audio-drone-stop.js`; public AudioEngine methods remain adapters, including pre-context reset and AudioParam discrimination. No audio/performance improvement is claimed."
       ]
     },
     {
