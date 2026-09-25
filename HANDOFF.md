@@ -1,5 +1,12 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-MOD-065: Journey preparation selection ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-065/lite`, based on CP-MOD-064 `1e65281`; branch `codex/modularize-cp-065`. Extracted the seven journey-preparation selection listeners and nested option-row visibility to `modules/journey-preparation-selection.js`. Journey routing still owns standalone/no-chakra validation and start dispatch.
+- Updated the `modes` map source references and FIX-QUEUE. Direct selection tests cover all seven add-ons, option-row expand/collapse, exclusivity clearing order, Box/Ho’oponopono flags and both update calls; standalone selection remains independent of chakra prerequisites. Journey routing and roadmap tests pass. Full Node sweep: 90 pass; `content-safety` and `drone-duration` fail before assertions due to absent `docs/dot.json`. Syntax/diff checks and atlas build pass (43 maps / 353 nodes / 405 edges). No browser evidence or performance claim.
+- No remote publication, PR, merge or production update. Root integration checkout and unrelated local changes remain untouched.
+- Next: inspect the final diff and commit CP-065 locally, then continue the ownership audit and measured-loading investigation.
+
 ### NOW — CP-MOD-064: Audio effects settings view ownership
 
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-064/lite`, based on CP-MOD-063 `3f0c12e`; branch `codex/modularize-cp-064`. Extracted voice tuning, echo, spatial-mode and voice-preset input handlers to `modules/audio-effects-settings-view.js`. The mixer still delegates volume changes to CP-063’s `audio-volume-settings-view.js`.

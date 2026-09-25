@@ -333,3 +333,6 @@ Moved the seven paired or single mixer volume-slider bindings into `modules/audi
 ## CP-MOD-064 — Audio effects settings view ownership (implemented locally)
 
 Moved voice clarity/warmth/pace, voice and music echo selectors, spatial-mode selectors and voice-preset interactions to `modules/audio-effects-settings-view.js`. Existing storage keys, preset values, spatial normalization, mirrored control updates and audio APIs are unchanged. DSP graph implementation and hydration remain with their existing owners. Validate direct user-input paths and `sound-options` references; do not claim audio-quality or performance changes from the extraction.
+## CP-MOD-065 — Journey preparation selection ownership (implemented locally)
+
+Moved Box Breathing, Ho’oponopono, Dharana, Visualization, Body Scan, Guided Noting and Undo & Unlearn Lobby selection listeners to `modules/journey-preparation-selection.js`. The module owns inline option-row visibility for the five options panels, session selection flags for Box/Ho’oponopono, mutual-exclusion clearing and the established visibility/estimate refresh calls. Standalone eligibility, chakra validation and dispatch remain with journey routing. Keep the existing standalone and guided paths distinct in the atlas.

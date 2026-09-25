@@ -4247,43 +4247,25 @@ function attachEventListeners() {
         });
     }
 
-    [boxBreathingExperienceToggle, hooponoponoExperienceToggle].forEach(toggle => {
-        toggle?.addEventListener('change', (event) => {
-            state.boxBreathingExperienceEnabled = boxBreathingExperienceToggle?.checked === true;
-            state.hooponoponoExperienceEnabled = hooponoponoExperienceToggle?.checked === true;
-            if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-            updateExperienceModeVisibility(); updateSessionEstimate();
-        });
-    });
-    dharanaAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('dharana-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    visualizationAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('visualization-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    bodyScanAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('body-scan-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    notingAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('noting-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
-    });
-    undoUnlearnAddonToggle?.addEventListener('change', event => {
-        const options = document.getElementById('undo-unlearn-options');
-        if (options) options.hidden = !event.target.checked;
-        if (event.target.checked) { clearMusicOnlyMode(); clearHighEnergyMode(); clearSleepMode(); clearFocusedExperiences(); clearIntimateService(); }
-        updateExperienceModeVisibility(); updateSessionEstimate();
+    window.ChakraJourneyPreparationSelection.bind({
+        document,
+        state,
+        toggles: {
+            boxBreathing: boxBreathingExperienceToggle,
+            hooponopono: hooponoponoExperienceToggle,
+            dharana: dharanaAddonToggle,
+            visualization: visualizationAddonToggle,
+            bodyScan: bodyScanAddonToggle,
+            noting: notingAddonToggle,
+            undoUnlearn: undoUnlearnAddonToggle
+        },
+        clearMusicOnlyMode,
+        clearHighEnergyMode,
+        clearSleepMode,
+        clearFocusedExperiences,
+        clearIntimateService,
+        updateExperienceModeVisibility,
+        updateSessionEstimate
     });
     document.getElementById('visualization-ambience')?.addEventListener('change', event => {
         state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';

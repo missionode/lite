@@ -15,6 +15,7 @@
     "test:audio-safety": "node tests/audio-zero-volume.test.mjs",
     "test:audio-volume-settings-view": "node tests/audio-volume-settings-view.test.mjs",
     "test:audio-effects-settings-view": "node tests/audio-effects-settings-view.test.mjs",
+    "test:journey-preparation-selection": "node tests/journey-preparation-selection.test.mjs",
     "test:settings-manager-view": "node tests/settings-manager-view.test.mjs",
     "test:app-state": "node tests/app-state.test.mjs",
     "test:content-localization": "node tests/content-localization.test.mjs",
