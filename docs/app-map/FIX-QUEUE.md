@@ -1,5 +1,29 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-066 Timing duration settings view ownership
+
+Seven transition-duration and three care-duration input handlers now live in `modules/timing-settings-view.js`. Preserve integer parsing, shared state updates, localized display helper calls, saved `chakra_time_*` keys, update order, listener attachment positions and the existing estimate/roadmap refresh. Mode-sensitive chakra/Sleep/Shot and High Energy duration controls remain app-owned. Eager delivery is an ownership/testability extraction, not a performance gain.
+
+## Completed — CP-MOD-061 Journey content loading and validation ownership
+
+Start-time script source selection, cache reuse, fetch and required-bundle validation now live in `modules/journey-content-loader.js`. The app retains script/session state; the resolved bundle is committed before validation, validation context is captured at the same point relative to asynchronous loading, and fetch URLs and failure messaging are unchanged. No behavior or performance change is claimed.
+
+## Completed — CP-MOD-060 Guided opening and Gratitude stage ownership
+
+The shared opening/Gratitude stage now lives in `modules/journey-opening-stage.js`. Preparation-safety guidance, optional Arrival induction, Moon/Returning branch, Gratitude, personal intention, HRIM opening, and optional Arrival readiness retain their original order and guards. No behavior or performance change is claimed.
+
+## Completed — CP-MOD-059 Arrival and Emergence wrapper ownership
+
+The optional Arrival/Arrival-readiness cues and Emergence sequence now live in `modules/journey-hypnosis-wrapper.js`. App adapters retain journey behavior, stage order, frequency/no-frequency branches, configured timing, fade windows and cancellation guards. This changes ownership only.
+
+## Completed — CP-MOD-058 Music echo preset ownership
+
+The existing music echo profiles and parameter ramps now live in `modules/audio-music-echo.js`; the AudioEngine method and settings persistence stay stable. Preset values, invalid-mode fallback, 250 ms ramps and convolver-tail timing are unchanged. No performance claim is made.
+
+## Completed — CP-MOD-057 Background-music gain and fade controls
+
+Background-music fades, volume-role preservation, stage ducking, mantra mute/restore, tail-gate automation and restore-timer cancellation now live in `modules/audio-background-music-controls.js`. Stable AudioEngine methods, journey callers and cache delivery remain intact. No performance claim is made.
+
 ## Completed — CP-MOD-054 Binaural and drone cleanup lifecycle
 
 `stopBinaural()` and `stopDrone()` resource retirement now live in `modules/audio-drone-stop.js`; the AudioEngine API remains stable. Pre-context state clearing, AudioParam filtering, 5-second gain fades, delayed stops and cleanup ordering are unchanged. The module is eagerly available and cached for offline sessions. No performance claim is made.
@@ -304,3 +328,15 @@ CP-THEME-PLAN-001 adopts the Cosmic Observatory desktop/mobile concept saved und
 Assessment tournament software is integrated and source/automated/browser-verified; its delivered flow is documented in the `assessment-tournament` map. Remaining follow-up is trained-operator acceptance of neutral wording and real-session usability. Keep it separate from journey routing, diagnosis, consent inference, sales prompts and automatic service recommendations.
 
 For each fix: reproduce or prove the branch → implement the smallest correction → verify that branch and its neighboring exits → update the corresponding atlas map and source references. Keep a separate change record for each fix. Do not claim deployment from local checks.
+## CP-MOD-062 — Settings manager view ownership (implemented locally)
+
+Moved Manage Settings navigation, export/import event handling, status messages and the Advanced Features export gate to `modules/settings-manager-view.js`. Backup schema validation and managed-storage replacement remain in `modules/settings-backup.js`; the app continues to provide screen navigation, localization and the current session unlock state. Import remains available while locked, export remains unavailable while locked, and cancellation/invalid-input paths preserve existing settings. Direct module interaction tests and atlas rebuild are required. No browser or device evidence is claimed; remote publication and integration remain approval-gated.
+## CP-MOD-063 — Audio volume settings view ownership (implemented locally)
+
+Moved the seven paired or single mixer volume-slider bindings into `modules/audio-volume-settings-view.js`. It retains the existing `chakra_` preference key construction, mirror synchronization, active voice/drone/bell/mantra gain changes, music transition previous-volume input, video gain and Visualization ambience gain. Audio graph ownership, voice effects, spatial modes, playback and the preview controls remain in their existing owners. Verify with direct slider contracts and the `sound-options` atlas map; no runtime performance gain is presumed from an eager module extraction.
+## CP-MOD-064 — Audio effects settings view ownership (implemented locally)
+
+Moved voice clarity/warmth/pace, voice and music echo selectors, spatial-mode selectors and voice-preset interactions to `modules/audio-effects-settings-view.js`. Existing storage keys, preset values, spatial normalization, mirrored control updates and audio APIs are unchanged. DSP graph implementation and hydration remain with their existing owners. Validate direct user-input paths and `sound-options` references; do not claim audio-quality or performance changes from the extraction.
+## CP-MOD-065 — Journey preparation selection ownership (implemented locally)
+
+Moved Box Breathing, Ho’oponopono, Dharana, Visualization, Body Scan, Guided Noting and Undo & Unlearn Lobby selection listeners to `modules/journey-preparation-selection.js`. The module owns inline option-row visibility for the five options panels, session selection flags for Box/Ho’oponopono, mutual-exclusion clearing and the established visibility/estimate refresh calls. Standalone eligibility, chakra validation and dispatch remain with journey routing. Keep the existing standalone and guided paths distinct in the atlas.

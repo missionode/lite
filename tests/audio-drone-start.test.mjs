@@ -78,7 +78,7 @@ assert.match(app, /startDrone\(baseFreq, index = 0\)\s*\{\s*return audioDroneSta
 assert.match(app, /startSleepDrone\(beatFrequency\)\s*\{\s*return audioDroneStart\.startSleepDrone\(this, beatFrequency, state\);/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-drone-start.js?v=1.0') < html.indexOf('app.js?v=4.07'));
+assert.ok(html.indexOf('modules/audio-drone-start.js?v=1.0') < html.indexOf('app.js?v=4.12'));
 assert.match(sw, /\.\/modules\/audio-drone-start\.js\?v=1\.0/);
 
 console.log('Audio drone-start contract passed: chakra and sleep tones, guards, bounds, ramps, binaural support and disposal.');

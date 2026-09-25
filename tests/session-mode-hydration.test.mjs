@@ -11,8 +11,8 @@ assert.match(app, /sessionModeHydration\.resetPreparationSelections\(\{ storage:
 assert.match(app, /sessionModeHydration\.resetExclusiveModes\(\{ storage: localStorage, syncChecked \}\)/);
 assert.ok(app.indexOf('resetPreparationSelections({ storage: localStorage') < app.indexOf("syncChecked('no-frequency-mode-toggle'"));
 assert.ok(app.indexOf("syncChecked('eyes-close-mode-toggle'") < app.indexOf('resetExclusiveModes({ storage: localStorage'));
-assert.match(html, /modules\/session-mode-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.07/);
-assert.match(serviceWorker, /chakra-v5\.303[\s\S]*?modules\/session-mode-hydration\.js\?v=1\.0/);
+assert.match(html, /modules\/session-mode-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
+assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/session-mode-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:session-mode-hydration'], 'node tests/session-mode-hydration.test.mjs');
 
 const context = vm.createContext({});

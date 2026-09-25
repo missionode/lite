@@ -569,7 +569,7 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence 
 - Browser/device evidence was not requested and is not claimed.
 ## CP-MOD-054 — drone shutdown ownership
 
-Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence; browser evidence not run.
 
 - `stopBinaural()` and `stopDrone()` now delegate to `modules/audio-drone-stop.js`; public AudioEngine APIs and existing call order remain stable.
 - Preserved pre-context reset, AudioParam detection, `cancelAndHoldAtTime` fallback, 5-second fades, 5.1-second source retirement, oscillator/resource cleanup, grounding anchor reset and elemental-layer retirement.
@@ -594,3 +594,48 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused unit/static e
 - Preserved versioned reload fetch, decoded-buffer reuse, active-loop continuity, waiting for a previous fade retirement before restart, stale gain reset, echo application order, entry-fade deadline, controlled stop fade, reverb retirement, and retirement-promise cleanup.
 - Direct lifecycle and background-music/mantra contracts pass; syntax checks pass. Full Node suite: 81/83 pass; `content-safety` and `drone-duration` cannot begin assertions because this isolated worktree lacks owner-managed `docs/dot.json`. Loop router suite: 11 pass. Atlas regenerated at 43 maps / 353 nodes / 405 edges; `git diff --check` passes.
 - App/cache versions are `4.07` / `chakra-v5.303`; module is eager and offline precached. Atlas browser verifier could not run because Playwright is unavailable in this worktree; browser checks remain opt-in. No startup, sound, CPU, memory or thermal improvement is claimed; browser/device playback evidence is not claimed.
+
+## CP-MOD-057 — background-music controls ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- Background-music fade-in/out, slider gain-role preservation, stage ducking, mantra bus mute/restore, echo tail-gate fades and restore-timer cancellation now live in `modules/audio-background-music-controls.js`; AudioEngine retains stable adapters, bus construction and echo preset selection.
+- Preserved zero-safe linear fades, protected entry-fade window, intentional silence during slider updates, no reopening during mantra suppression, `cancelAndHoldAtTime` fallback behavior and matched music/tail-gate envelopes.
+- Focused controls, zero-volume, audio-effects, mantra/echo, lifecycle, stage-fade, No Frequency and relevant journey tests pass. Full Node suite: 82/84 pass; `content-safety` and `drone-duration` cannot start because `docs/dot.json` is absent from this worktree (the same owner-managed fixture limitation as prior checkpoints). Loop router suite: 11 pass. Atlas build: 43 maps / 353 nodes / 405 edges; source references validate. Atlas browser verification cannot run because Playwright is not installed in this isolated worktree; browser checks remain opt-in.
+- App/cache versions: `4.08` / `chakra-v5.304`; eager and offline precached. Browser verification remains opt-in and Playwright is unavailable. No browser/device playback, sound-quality, startup, CPU, heap or thermal improvement is claimed.
+
+## CP-MOD-058 — music echo profile ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- The existing music echo profile lookup, invalid-mode fallback and AudioParam ramps now live in `modules/audio-music-echo.js`; AudioEngine keeps its public `setMusicEcho()` adapter, graph ownership, voice echo, and settings persistence.
+- Preserved off/light/spacious values, fallback to light, 250 ms delay/send/wet/filter ramps, convolver tail deadline (`MUSIC_REVERB_TAIL_SECONDS + 0.3`) and no-op behavior before graph readiness.
+- Direct profile, background-music/mantra, audio-effects, zero-volume, loop lifecycle and graph initialization tests pass. Full Node suite: 83/85 pass; `content-safety` and `drone-duration` cannot begin because `docs/dot.json` is absent from the isolated worktree. Loop router suite: 11 pass. Syntax and `git diff --check` pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verifier cannot run because Playwright is not installed.
+- App/cache versions are `4.09` / `chakra-v5.305`; module remains eager and offline precached. No browser playback, audio quality, CPU, memory or thermal improvement is claimed.
+
+## CP-MOD-059 — Arrival/Emergence wrapper ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- Optional Arrival induction/readiness, transition-tone handoffs and Emergence are now implemented in `modules/journey-hypnosis-wrapper.js`; the app keeps its stable controller methods and custom/localized narration lookup.
+- Preserved ordinary non-demo wrapper guard, 432/528 Hz tones at half the selected drone-duration exposure (minimum 1 second), configured leading/trailing gaps, music handoff fades, No Frequency quiet gaps, Emergence bowl/narration/timing fade, and session-stop exits.
+- Direct wrapper, hypnosis journey, routing, session-estimate, audio-transition and focused practice contracts pass. Full Node suite: 84/86; `content-safety` and `drone-duration` cannot begin because owner-managed `docs/dot.json` is absent. Loop router: 11 pass. Syntax and diff checks pass. Atlas build validates 43 maps / 353 nodes / 405 edges and source references; browser verification is unavailable because Playwright is not installed.
+- App/cache versions are `4.10` / `chakra-v5.306`; module is eager/offline precached. No performance, audio-quality, browser playback or device claim.
+
+## CP-MOD-060 — guided opening/Gratitude stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct unit/static evidence.
+
+- The shared preparation-safety, Arrival induction, Moon/Returning opening, Gratitude/intention and Arrival-readiness sequence now lives in `modules/journey-opening-stage.js`; `MeditationController.runGratitude()` remains the stable adapter.
+- Preserved initial screen/tutorial/aura setup, Moon vs Returning copy, no opening branch for HRIM, selected-language narration, optional personal intention, HRIM-specific intention/frequency and all active-session guards.
+- Direct opening-stage, focused-practices, hypnosis-journey, session-estimate and video-prelude contracts pass. Full Node suite is 85/87; `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent. Loop router tests pass 11/11. Atlas rebuild succeeds at 43 maps / 353 nodes / 405 edges and source references are reconciled; the atlas browser verifier is unavailable because Playwright is not installed. `node --check` and `git diff --check` pass. App/cache versions are `4.11` / `chakra-v5.308`; module is eager and offline cached. No performance, narration-quality, browser, device playback or thermal claim.
+
+## CP-MOD-061 — journey content loading and validation ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence; browser evidence not run.
+
+- Language/custom source selection, same-language script-cache reuse, timestamped fetch, and required-bundle validation now live in `modules/journey-content-loader.js`. The app still owns active script/session state, validation dependencies and all surrounding start/navigation behavior.
+- Direct tests cover default fetch, custom-script selection, same-language reuse, validation-context timing, HTTP failure and invalid bundle messages. Loader is ordered before `app.js`, exactly precached for offline use, and cache/app versions are `chakra-v5.309` / `4.12`.
+- Static eager-shell comparison against CP-060 is 50 → 51 local script tags and 890,408 → 892,805 source-file bytes (+2,397 bytes). This is an ownership-only eager addition, not a startup/performance benefit.
+- Focused integration tests pass. Full Node suite is 86/88; `content-safety` and `drone-duration` stop before assertions because `docs/dot.json` is absent from the isolated worktree. Loop router tests pass 11/11. Atlas rebuild and generated source-reference refresh pass: 43 maps / 353 nodes / 405 edges. `node --check` and `git diff --check` pass.
+- Error-surface audit: the only test errors are the two known missing-owner-fixture failures. Node also reports an existing `MODULE_TYPELESS_PACKAGE_JSON` warning for `piper/runtime/bounded-phonemizer.js`; it is non-fatal and outside this checkpoint. Browser console/device evidence not run (browser use is opt-in). No functional-startup, performance, audio or thermal improvement is claimed.
