@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-040 shared journey chrome ownership
+
+Fullscreen tracking, hidden controls, pointer/focus/touch reveal, idle cursor, mixer visibility and timer cleanup now belong to the shared eager `JourneyChromeController`, not the optional-video controller. Its interaction timings and session behavior are preserved. This is an ownership extraction, not a performance claim. See the modularization review and active handoff.
+
 ## Completed — CP-MOD-039 optional video startup request
 
 The optional 7.3 MB video introduction and its Settings preview no longer trigger media loading when the app starts. The URL is attached only when a user starts the explicitly opted-in introduction or requests preview; the clip remains outside service-worker precache, so offline requests use the existing safe unavailable-video path. Regression coverage observes actual browser requests before and after opt-in. This avoids unneeded media transfer/decoder work on ordinary sessions; CPU/thermal improvement is not measured. See `.loop/tracks/modularize/review.md` and `.loop/tracks/modularize/HANDOFF.md`.

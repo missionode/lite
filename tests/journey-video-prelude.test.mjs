@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const journeyChrome = fs.readFileSync(new URL('../modules/journey-chrome.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
@@ -73,8 +74,9 @@ assert.match(app, /const DND_REMINDER_FALLBACK = "Before we begin:[\s\S]*?showDn
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?max-width:\s*none[\s\S]*?min-height:\s*100dvh/, 'the persistent fullscreen app should not retain the normal narrow Lobby width');
 assert.match(html, /id="fullscreen-controls-reveal-zone"/, 'fullscreen should provide a dedicated bottom-edge reveal zone');
-assert.match(app, /document\.addEventListener\('fullscreenchange', this\.syncFullscreenJourneyChrome\)[\s\S]*?syncFullscreenJourneyChrome\(\) \{[\s\S]*?document\.body\.classList\.toggle\('journey-fullscreen-active', isJourneyFullscreen\)/, 'the app should explicitly track whether its persistent container is fullscreen');
-assert.match(app, /this\.revealZone\?\.addEventListener\('pointerenter',[\s\S]*?setFullscreenChromeVisible\(true\)/, 'bottom edge hover reveals journey controls');
+assert.match(app, /const journeyChrome = new window\.ChakraJourneyChrome\(\);/, 'the app should create an independent shared journey-chrome owner');
+assert.match(journeyChrome, /document\.addEventListener\('fullscreenchange', this\.syncFullscreenJourneyChrome\)[\s\S]*?syncFullscreenJourneyChrome\(\) \{[\s\S]*?document\.body\.classList\.toggle\('journey-fullscreen-active', isJourneyFullscreen\)/, 'the shared module should explicitly track whether the persistent app container is fullscreen');
+assert.match(journeyChrome, /this\.revealZone\?\.addEventListener\('pointerenter',[\s\S]*?setFullscreenChromeVisible\(true\)/, 'bottom edge hover reveals journey controls');
 assert.match(css, /body\.journey-controls-active #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?body\.journey-controls-active\.fullscreen-controls-visible #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active\.fullscreen-controls-visible #session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should remain hidden unless the explicit reveal state is active');
 
 for (const locale of locales) {
