@@ -1,13 +1,20 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-042: Observational sky renderer ownership
+### NOW — CP-MOD-043: Chakra visual-effect controller ownership
+
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-043/lite`, based on merged CP-MOD-042 commit `078b983` (PR #61). Move only the existing `VisualEngine` owner to `modules/visual-engine.js`; preserve all effect settings, styling, audio attachment and timing.
+- The class matches the `078b983` implementation verbatim (apart from its export wrapper); the app constructs the same single instance. App/cache versions are `3.93` / `chakra-v5.289`. All 70 applicable Node tests pass (two owner-fixture skips), 11 router tests pass, four modularization Chromium scenarios pass, and atlas verification passes at 43 / 353 / 405.
+- One local browser sample has 35 scripts / 879,838 encoded JS bytes versus CP42's 34 / 879,812. App.js is about 2.3 KiB smaller, but total startup JS is effectively unchanged; this is ownership work only, not a performance/thermal claim. PR target is `modularize`, never production.
+- The dedicated sky browser assertion failed identically on the unmodified CP42 parent and is not part of this visual-effect extraction. No production push.
+
+### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-042/lite`, based on merged integration commit `dd9f033` (CP-MOD-041 merged via PR #60). Scope: move the unchanged `AmbientParticleField` owner into an eager module; preserve the current astronomy/render behavior and dynamic sky exactly.
 - Its ~670-line class is now in `modules/ambient-particle-field.js`; `app.js` creates the same shared instance via `window.AmbientParticleField`. Script order is after astronomy/night-sky dependencies and before app. Module URL is cached offline; app URL/cache generation advance to `3.92` / `chakra-v5.288`.
 - The class is verified verbatim against baseline `dd9f033`. All 70 applicable Node tests, 11 Loop router tests, four modularization Chromium scenarios and atlas verification pass (43 maps / 353 nodes / 405 edges). Two fixture-dependent tests remain skipped because `docs/dot.json` is absent.
 - `tests/night-sky-browser.mjs` fails at the Earth/mantra clearance assertion identically on the unmodified `dd9f033` baseline; this checkpoint does not alter the class or layout. Logged in `.loop/tracks/modularize/review.md`; manual device sky review remains open.
-- One local sample has 34 scripts / 879,812 encoded JS bytes (CP41 sample: 33 / 879,754). This is an ownership/maintainability extraction, not a performance, CPU, heat or memory gain. PR/merge is pending; target is `modularize`, not production.
-- Merge target is `modularize`, not production. Preserve the unrelated root `.DS_Store`, `.codex/` and backup audio files.
+- One local sample has 34 scripts / 879,812 encoded JS bytes (CP41 sample: 33 / 879,754). This is an ownership/maintainability extraction, not a performance, CPU, heat or memory gain.
+- CP42 merged via PR #61; the local `modularize` root is synchronized at `078b983`. Preserve the unrelated root `.DS_Store`, `.codex/` and backup audio files.
 
 ### COMPLETE — CP-MOD-041: Lazy video-introduction controller
 

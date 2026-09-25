@@ -1,8 +1,18 @@
 # Review
 
+## CP-MOD-043 — Chakra VisualEngine ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for verbatim ownership move, app construction, direct visual/preference contracts, offline delivery and atlas/browser checks.
+
+- The existing class matches the `078b983` app implementation verbatim (excluding its export wrapper), and app wiring constructs the same one instance with the same `AudioEngine`.
+- Preserved behavior includes visual-mode normalization, Eyes Close suppression, effect classes, chakra color glow, randomized image-breath timing, and Sacred Depth audio attachment.
+- All 70 applicable Node tests pass; two fixture-dependent tests are skipped because `docs/dot.json` is absent. All 11 Loop router tests pass. Four Chromium cold/warm/offline and optional-feature scenarios pass without page errors; the cache includes the new module and the script is loaded before `app.js`.
+- Atlas verification passes at 43 maps / 353 nodes / 405 edges, including mobile overflow, labels, keyboard navigation, print, SVG and no page errors. JS syntax and `git diff --check` pass.
+- The local sample is 35 scripts / 879,838 encoded JS bytes versus CP42's 34 / 879,812: one extra request and 26 additional bytes. `app.js` falls by about 2.3 KiB; aggregate startup JS is effectively unchanged. This is an organization/testability extraction, not a performance, CPU or thermal improvement.
+
 ## CP-MOD-042 — Observational sky renderer ownership
 
-Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for behavior-preserving ownership, direct sky contracts, cache/offline delivery and atlas/browser structure. Pending PR review and merge.
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for behavior-preserving ownership, direct sky contracts, cache/offline delivery and atlas/browser structure. Merged via PR #61 into `modularize` at `078b983`.
 
 - The original `AmbientParticleField` implementation is mechanically moved into an eager module, retaining one app-level instance and all current call sites. Its class uses the same global lexical dependencies, including `state`, `t` and `CELESTIAL_LABEL_KEYS`.
 - Existing direct contracts now load the standalone module; the service worker precaches it, and the index loads it after astronomy/night-sky dependencies and before `app.js`.

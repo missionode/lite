@@ -12,7 +12,7 @@ async function capture(page, cdp, phase) {
       .filter(entry => /\.m?js(?:\?|$)/.test(new URL(entry.name).pathname))
       .map(entry => ({ name: new URL(entry.name).pathname, encodedBodySize: entry.encodedBodySize, transferSize: entry.transferSize }));
     const practice = scripts.filter(entry => /\/(?:box-breathing|dharana|visualization|hooponopono|undo-unlearn|body-scan|guided-noting)-practice\.js$/.test(entry.name));
-    const sky = scripts.filter(entry => /\/(?:astronomy\.browser\.min|sky-stars|sky-astronomy|night-sky|celestial-presence|ambient-particle-field)\.js$/.test(entry.name));
+    const sky = scripts.filter(entry => /\/(?:astronomy\.browser\.min|sky-stars|sky-astronomy|night-sky|celestial-presence|ambient-particle-field|visual-engine)\.js$/.test(entry.name));
     const app = scripts.find(entry => entry.name === '/app.js');
     return {
       navigation: {
@@ -55,13 +55,14 @@ test('records cold, warm and offline startup baseline without starting playback'
   await page.evaluate(() => navigator.serviceWorker.register('./sw.js'));
   await page.evaluate(() => navigator.serviceWorker.ready);
   const shellCache = await page.evaluate(async () => {
-    const cache = await caches.open('chakra-v5.288');
+    const cache = await caches.open('chakra-v5.289');
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
-      appEntryPresent: urls.includes('/app.js?v=3.92'),
+      appEntryPresent: urls.includes('/app.js?v=3.93'),
       journeyChromeModulePresent: urls.includes('/modules/journey-chrome.js?v=1.0'),
       videoPreludeModulePresent: urls.includes('/modules/journey-video-prelude.js?v=1.0'),
       ambientParticleFieldModulePresent: urls.includes('/modules/ambient-particle-field.js?v=1.0'),
+      visualEngineModulePresent: urls.includes('/modules/visual-engine.js?v=1.0'),
       stylesheetEntryPresent: urls.includes('/style.css?v=2.03')
     };
   });
@@ -69,6 +70,7 @@ test('records cold, warm and offline startup baseline without starting playback'
   expect(shellCache.journeyChromeModulePresent).toBe(true);
   expect(shellCache.videoPreludeModulePresent).toBe(true);
   expect(shellCache.ambientParticleFieldModulePresent).toBe(true);
+  expect(shellCache.visualEngineModulePresent).toBe(true);
   expect(shellCache.stylesheetEntryPresent).toBe(true);
 
   await page.reload({ waitUntil: 'load' });
