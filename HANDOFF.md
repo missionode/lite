@@ -6,7 +6,8 @@
 - Acceptance: import remains available without Advanced Features; export is rechecked at click time; cancellation, invalid-input, local-only backup scope, download behavior and reload-after-import remain unchanged. Atlas `settings-backup` map and FIX-QUEUE updated.
 - CP-062 evidence: 87/89 Node tests pass; `content-safety` and `drone-duration` fail before assertions because owner-managed `docs/dot.json` is absent. Settings view and backup tests pass, including locked-export rejection, public import, cancel, invalid-file and accepted replacement paths. `node --check` for app/module and `git diff --check` pass. Atlas build passes (43 maps / 353 nodes / 405 edges); `verify-atlas.mjs` cannot start because this worktree lacks the Playwright package. No browser/manual/device evidence.
 - CP-061’s loading measurement remains static only (51 local scripts / 892,805 encoded source bytes after CP-061), not a performance claim. Remote branch publication, PR, integration merge and production update remain unapproved; the root checkout’s unrelated local files remain untouched.
-- Next: finish review and commit CP-062 locally. Continue auditing app-owned UI/journey seams; final cold/warm/offline and selected/offline/retry browser evidence and measured-loading conclusion remain required before declaring modularization complete.
+- CP-062 is committed locally at `af0a3bf` on `codex/modularize-cp-062`. Remote publication, PR, integration merge and production update are not part of this checkpoint.
+- Next: continue the remaining justified app-owned journey/UI seam audit, then perform the cold/warm/offline and selected/offline/retry loading gate when a permitted browser runner is available. Do not call modularization complete before that evidence and integration reconciliation.
 
 ### NOW — CP-MOD-061: Journey content loading and validation ownership
 
