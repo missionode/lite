@@ -1,16 +1,16 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-ASSESS-ADV-UNDO-RAPPORT-001: integrate assessment feature in active checkout
+### RELEASED — CP-ASSESS-ADV-UNDO-RAPPORT-001: single Lobby entry, undo and rapport cue
 
-- User reported seeing only the previous archetype/result controls and that the in-app browser showed `file:///.../assessment-advanced-rapport-undo/lite/index.html`. The advanced-gated assessment enhancements had remained in that isolated worktree; `localhost:8000` serves `/Users/lekshmisyam/Desktop/Ikigai/lite` on branch `modularize`.
-- Ported the result cue/icebreaker, confidence-limited chakra-only signal, one-response undo with legacy history reconstruction, and short-lived same-tab direct-page gate into the checkout used by localhost. User identified duplicate entries; keep only the gated Lobby “Begin Session Consultation” CTA and remove the Settings assessment link.
-- Updated the flow atlas and cache versions. Focused assessment and Advanced Features tests pass; browser atlas verification could not launch Chromium in this environment, and the user previously opted to handle browser review. The same-tab gate is client-side, not server authentication.
+- Merged PR [#78](https://github.com/missionode/lite/pull/78) to `production` on 2026-09-26; production merge commit `d0a8051`. Local `HEAD` was fast-forwarded to the same commit.
+- The Lobby “Begin Session Consultation” CTA is the only assessment entry point; the duplicate Settings link is removed. It remains Advanced Features-gated. The report includes one-step undo and a confidence-limited, chakra-evidence conversation cue/icebreaker; it does not predict character or behavior. The same-tab grant is client-side gating, not server authentication.
+- `npm run test:assessment`, `npm run test:advanced-unlock`, atlas generation and `git diff --check` pass. GitHub reported no CI checks. Browser atlas verification could not launch Chromium; visual review remains with the owner. Trained-operator wording/usability acceptance remains CP-ASSESS-IMPL-003.
 
-### NOW — Consultation CTA lock visibility correction
+### RELEASED — Consultation CTA lock visibility correction
 
 - Fixed in the existing `modularize` checkout. The Lobby CTA starts hidden/disabled before app initialization, follows the shared Advanced Features lock/unlock lifecycle, and has a click-time guard. Rotated the service-worker shell cache to `chakra-v5.310` so the local PWA reload can install the changed markup and logic.
 - Updated the overview flow map and added regression assertions in `tests/advanced-unlock.test.mjs`.
-- Validation: `advanced-unlock` and `git diff --check` pass; atlas is rebuilt and its edges resolve. Browser review was not run. The standalone assessment URL itself remains directly addressable; this change gates the Lobby CTA, not server authentication or the page URL.
+- This correction is included in production PR #78. Validation: assessment and Advanced Features tests pass; atlas generated successfully. Browser review was not run. The standalone assessment URL itself remains directly addressable; the app applies a same-tab client-side handoff, not server authentication.
 
 ### NOW — CP-MOD-066: Timing duration settings view ownership
 

@@ -1,5 +1,14 @@
 # Review
 
+## CP-ASSESS-ADV-UNDO-RAPPORT-001 — single Lobby CTA, undo and conversation cue
+
+Status: merged to `production` via [PR #78](https://github.com/missionode/lite/pull/78), merge commit `d0a8051` (2026-09-26).
+
+- Verified the Lobby CTA is the only in-app assessment entry point; the Settings duplicate was removed. Shared Advanced Features gating, short same-tab grant, and relock revocation are covered by the focused test.
+- Added one-step undo with legacy response-history reconstruction and confidence-gated chakra-only conversation cue/icebreaker. Values and the private dot are excluded; no behavior/personality prediction is made.
+- `npm run test:assessment`, `npm run test:advanced-unlock`, atlas generation and `git diff --check` passed. GitHub reported no status checks or review submissions.
+- Browser atlas verification could not launch Chromium in this environment; no browser visual evidence is claimed. Trained-operator wording/usability acceptance remains CP-ASSESS-IMPL-003.
+
 ## CP-ASSESS-IMPL-002 — tournament UI, persistence and offline delivery
 
 Status: implemented and locally browser-verified; trained-operator acceptance is the CP-ASSESS-IMPL-003 follow-up.

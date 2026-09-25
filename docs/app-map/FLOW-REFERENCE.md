@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 46d9c9e CP-MOD-066 baseline + uncommitted consultation CTA/cache correction · 2026-09-26.
+Source snapshot: d0a8051 production merge (PR #78) · 2026-09-26.
 
-Source-reviewed behavior through CP-MOD-066 on the local modularize checkpoint chain, plus an uncommitted consultation CTA visibility and service-worker cache correction. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed production behavior through CP-MOD-066 and CP-ASSESS-ADV-UNDO-RAPPORT-001. The Lobby has the sole assessment CTA; Settings has no assessment link. Assessment adds the shared Advanced Features gate, short same-tab handoff, undo and a confidence-limited chakra-only conversation cue. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners include timing-duration input wiring. Ownership moves do not establish device/thermal gains. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
