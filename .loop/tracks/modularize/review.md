@@ -1,5 +1,13 @@
 # Review
 
+## CP-MOD-053 — Chakra and sleep drone startup ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for current startup guards, frequency bounds/fallbacks, oscillator and binaural parameters/routes, direct fake-node coverage, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source-reference validation. PR review and integration sync are pending.
+
+- `startDrone()` and `startSleepDrone()` now delegate to `modules/audio-drone-start.js`. The public AudioEngine methods, stop-before-start and app state inputs remain unchanged; `stopDrone()` continues owning shutdown.
+- Direct coverage passes for No Frequency, exact/capped/fallback chakra pitch, Eyes Close drift, seven-index elemental handoff, sleep beat clamps/fallback, gain/filter envelopes, binaural node lifecycle and cleanup. Existing drone-quality, transition and mode tests pass.
+- App/cache advance to `4.04` / `chakra-v5.300`; module is loaded eagerly and precached. 78/80 Node files pass; `content-safety` and `drone-duration` need owner-managed `docs/dot.json`, absent from the isolated worktree. 11 Loop router tests pass; atlas validates 43 maps / 353 nodes / 405 edges. No sound/performance benefit or device listening is claimed.
+
 ## CP-MOD-052 — Generated tone playback lifecycle ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for input validation, exact gain/time envelopes, generated-tone suppression, direct lifecycle tests, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source validation. PR review and integration sync are pending.

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-053 Chakra and sleep drone startup
+
+Drone startup generation now lives in `modules/audio-drone-start.js`; public AudioEngine adapters, `stopDrone()` lifecycle, No Frequency checks, chakra and sleep frequency policies, binaural support, and journey call paths remain unchanged. The module loads eagerly and is precached for offline playback. No audio or performance improvement is claimed.
+
 ## Completed — CP-MOD-052 Generated tone playback lifecycle
 
 Frequency-only Shot and guided transition-tone generation, validation, fades and disposal now live in `modules/audio-tone-playback.js`. AudioEngine method names remain compatibility adapters; UI call paths, No Frequency behavior, volume caps and routing are unchanged. The module is eagerly available and precached for offline journeys. This is ownership/testability only.

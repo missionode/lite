@@ -57,7 +57,7 @@ assert.match(app, /audioSpatialGeometry\.createPanner\(this\.ctx\)/);
 assert.match(app, /audioSpatialGeometry\.setPosition\(node, position, now\)/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-spatial-geometry.js?v=1.0') < html.indexOf('app.js?v=4.02'));
+assert.ok(html.indexOf('modules/audio-spatial-geometry.js?v=1.0') < html.indexOf('app.js?v=4.04'));
 assert.match(sw, /\.\/modules\/audio-spatial-geometry\.js\?v=1\.0/);
 
 console.log('Audio spatial geometry contract passed: Web Audio panner defaults, legacy API fallback, timed 3D and stereo movement.');

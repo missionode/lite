@@ -67,6 +67,8 @@ const audioElementalLayer = window.ChakraAudioElementalLayer;
 if (!audioElementalLayer) throw new Error('Audio elemental-layer module is unavailable.');
 const audioTonePlayback = window.ChakraAudioTonePlayback;
 if (!audioTonePlayback) throw new Error('Audio tone-playback module is unavailable.');
+const audioDroneStart = window.ChakraAudioDroneStart;
+if (!audioDroneStart) throw new Error('Audio drone-start module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1082,141 +1084,11 @@ class AudioEngine {
     }
 
     startDrone(baseFreq, index = 0) {
-        this.stopDrone();
-        if (state.noFrequencyMode) return;
-        if (!this.ctx) return;
-        
-        this.startElementalLayer(index);
-
-        // Reject malformed custom-script values at the audio boundary as a
-        // final safeguard.
-        const requestedFrequency = Number(baseFreq);
-        const safeBaseFrequency = Number.isFinite(requestedFrequency) && requestedFrequency >= 1
-            ? Math.min(requestedFrequency, 20000)
-            : 110;
-        // Preserve the configured chakra/HRIM frequency exactly. Higher
-        // frequencies must not be octave-shifted for comfort; the JSON value
-        // is the authoritative main-drone pitch.
-        const droneFreq = safeBaseFrequency;
-        
-        // Keep one restrained main tone. The previous half-frequency lower
-        // oscillator was intentionally removed so the drone stays clean.
-        const mainOscillator = this.ctx.createOscillator();
-        const mainDroneGain = this.ctx.createGain();
-        mainOscillator.type = 'sine';
-        mainOscillator.frequency.setValueAtTime(droneFreq, this.ctx.currentTime);
-        const mainDroneFilter = this.ctx.createBiquadFilter();
-        mainDroneFilter.type = 'lowpass';
-        mainDroneFilter.frequency.setValueAtTime(Math.min(droneFreq * 4, this.ctx.sampleRate * 0.45), this.ctx.currentTime);
-        mainDroneFilter.Q.setValueAtTime(0.5, this.ctx.currentTime);
-        mainDroneGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        mainDroneGain.gain.linearRampToValueAtTime(0.06, this.ctx.currentTime + 6);
-        mainOscillator.connect(mainDroneFilter);
-        mainDroneFilter.connect(mainDroneGain);
-        mainDroneGain.connect(this.masterGain);
-        mainOscillator.start();
-        mainOscillator.onended = () => {
-            mainOscillator.disconnect(); mainDroneFilter.disconnect(); mainDroneGain.disconnect();
-        };
-        this.droneOscillators.push({ osc: mainOscillator, gain: mainDroneGain });
-
-        // Fixed: Lowered carrier to 80Hz for deep comfort
-        const binauralCarrier = Math.min(droneFreq, 80); 
-
-        const leftOsc = this.ctx.createOscillator();
-        const rightOsc = this.ctx.createOscillator();
-        const leftPanner = this.ctx.createStereoPanner();
-        const rightPanner = this.ctx.createStereoPanner();
-        const binauralGain = this.ctx.createGain();
-
-        leftPanner.pan.setValueAtTime(-1, this.ctx.currentTime);
-        rightPanner.pan.setValueAtTime(1, this.ctx.currentTime);
-        
-        leftOsc.frequency.setValueAtTime(binauralCarrier, this.ctx.currentTime);
-        // Grounding: Add 2Hz Delta pulse in Closed mode to relax forehead
-        const drift = state.eyesCloseMode ? 2.0 : 0;
-        rightOsc.frequency.setValueAtTime(binauralCarrier + drift, this.ctx.currentTime);
-        
-        binauralGain.gain.setValueAtTime(0, this.ctx.currentTime);
-        // Drastically reduced volume (0.002) for a "feeble" background effect
-        binauralGain.gain.linearRampToValueAtTime(0.002, this.ctx.currentTime + 10); 
-
-        leftOsc.connect(leftPanner);
-        rightOsc.connect(rightPanner);
-        leftPanner.connect(binauralGain);
-        rightPanner.connect(binauralGain);
-        binauralGain.connect(this.masterGain);
-
-        leftOsc.start();
-        rightOsc.start();
-        let remaining = 2;
-        const finishSupport = osc => () => {
-            osc.disconnect();
-            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
-        };
-        leftOsc.onended = finishSupport(leftOsc);
-        rightOsc.onended = finishSupport(rightOsc);
-        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+        return audioDroneStart.startDrone(this, baseFreq, index, state);
     }
 
     startSleepDrone(beatFrequency) {
-        this.stopDrone();
-        if (state.noFrequencyMode) return;
-        if (!this.ctx) return;
-
-        const requestedBeat = Number(beatFrequency);
-        const beat = Number.isFinite(requestedBeat) ? Math.min(20000, Math.max(0.1, requestedBeat)) : 6;
-        const now = this.ctx.currentTime;
-        const carrier = 80;
-
-        // Sleep targets are script-defined and are played directly as the
-        // main oscillator, including very low values such as 2 Hz. A gentle
-        // stereo 80 Hz support pair remains available for the beat texture.
-        const mainOscillator = this.ctx.createOscillator();
-        const mainGain = this.ctx.createGain();
-        const mainFilter = this.ctx.createBiquadFilter();
-        mainOscillator.type = 'sine';
-        mainOscillator.frequency.setValueAtTime(beat, now);
-        mainFilter.type = 'lowpass';
-        mainFilter.frequency.setValueAtTime(220, now);
-        mainFilter.Q.setValueAtTime(0.5, now);
-        mainGain.gain.setValueAtTime(0, now);
-        mainGain.gain.linearRampToValueAtTime(0.06, now + 6);
-        mainOscillator.connect(mainFilter);
-        mainFilter.connect(mainGain);
-        mainGain.connect(this.masterGain);
-        mainOscillator.start(now);
-        mainOscillator.onended = () => {
-            mainOscillator.disconnect(); mainFilter.disconnect(); mainGain.disconnect();
-        };
-        this.droneOscillators.push({ osc: mainOscillator, gain: mainGain });
-
-        const leftOsc = this.ctx.createOscillator();
-        const rightOsc = this.ctx.createOscillator();
-        const leftPanner = this.ctx.createStereoPanner();
-        const rightPanner = this.ctx.createStereoPanner();
-        const binauralGain = this.ctx.createGain();
-        leftPanner.pan.setValueAtTime(-1, now);
-        rightPanner.pan.setValueAtTime(1, now);
-        leftOsc.frequency.setValueAtTime(carrier, now);
-        rightOsc.frequency.setValueAtTime(carrier + beat, now);
-        binauralGain.gain.setValueAtTime(0, now);
-        binauralGain.gain.linearRampToValueAtTime(0.002, now + 10);
-        leftOsc.connect(leftPanner);
-        rightOsc.connect(rightPanner);
-        leftPanner.connect(binauralGain);
-        rightPanner.connect(binauralGain);
-        binauralGain.connect(this.masterGain);
-        leftOsc.start(now);
-        rightOsc.start(now);
-        let remaining = 2;
-        const finishSupport = osc => () => {
-            osc.disconnect();
-            if (--remaining === 0) { leftPanner.disconnect(); rightPanner.disconnect(); binauralGain.disconnect(); }
-        };
-        leftOsc.onended = finishSupport(leftOsc);
-        rightOsc.onended = finishSupport(rightOsc);
-        this.binauralNodes = [leftOsc, rightOsc, binauralGain];
+        return audioDroneStart.startSleepDrone(this, beatFrequency, state);
     }
 
     startFrequencyShot(frequency) {
