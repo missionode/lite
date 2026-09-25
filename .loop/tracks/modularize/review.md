@@ -12,6 +12,19 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for the measured baselin
 
 Next: a bounded selected-practice lazy-loading experiment is justified by the measured ~1.9% initial-JavaScript share. Require standalone and combined preparation route parity, selected-only loading, offline cache loading, retry/error recovery, and startup resource comparison. Defer AudioEngine bus work until its owner-approved weekly reset.
 
+## CP-MOD-038 — Selected guided-practice script loading
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source contracts, practice lifecycle regression and local Chromium selected/offline route evidence.
+
+- The seven Box Breathing, Guided Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn API scripts are removed from eager HTML. A small classic-script loader is eager; exact practice URL assets remain in service-worker precache. Begin resolves checked practices and loads those only, before optional video/audio startup. Every individual runner also calls the loader to protect focused/direct routes.
+- Concurrent loads deduplicate; loadMany deduplicates repeated IDs. Failed modules clear pending state for retry, and the app presents `ui.practiceLoadFailed` in English, Malayalam, Hindi and Russian before any session starts. Versioned app URL is bumped to 3.88 and shell cache to `chakra-v5.284`.
+- Direct loader tests cover all seven manifest IDs, no-eager/precached delivery, API registration, shared concurrent promises, repeated IDs, and failed-load retry. All seven lifecycle contracts plus focused-practice routing and Settings/offline delivery pass.
+- Chromium cold/warm/offline baseline and selected Box Breathing offline-start route pass. The page starts with zero practice modules; pressing Begin offline with Box Breathing selected loads only `/modules/box-breathing-practice.js`, with no uncaught page errors. Local pre/post cold sample body bytes decrease from 903,351 to 890,285 (~13.1 KiB); initial script count goes from 38 to 32. CP-MOD-038 sample cold/warm/offline DCL/load is 456/1,010 ms, 417/647 ms, and 219/256 ms respectively; timings are noisy. No CPU, device heat, production wire or audio-session benefit is claimed.
+- Atlas builder and browser verifier pass at 43 maps, 353 nodes and 405 edges with no page errors. All 70 runnable Node test files and 11 Loop router Python tests pass; `content-safety` and `drone-duration` remain excluded because owner-managed `docs/dot.json` is absent. One early browser attempt timed out waiting for automatic service-worker readiness; the test now explicitly registers the worker and passes, while app auto-registration behavior is separately covered by the cold/warm baseline.
+- This is local Chromium evidence, not device playback validation.
+
+Next: integrate CP-MOD-038 into `modularize`. Then inspect other large initial assets/modules by the same byte-and-route evidence before choosing the next lazy boundary. The largest single categories in this local baseline are app.js (~376 KiB) and the observational sky/astronomy scripts (~410 KiB combined); preserve current sky behavior while determining if any deferred page boundary offers real benefit. AudioEngine bus construction remains owner-deferred until its approved weekly reset. Production stays unchanged.
+
 ## CP-MOD-029 — Journey voice-profile application
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct-contract, integrated regression, offline-delivery, atlas-build and syntax evidence.

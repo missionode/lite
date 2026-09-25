@@ -6,10 +6,11 @@ const source = fs.readFileSync(new URL('../modules/undo-unlearn-practice.js', im
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.match(app, /const undoUnlearnPractice = window\.ChakraUndoUnlearnPractice/);
+assert.match(app, /const undoUnlearnPractice = await practiceModuleLoader\.load\('undo-unlearn'\)/);
 assert.match(app, /async runUndoUnlearn\(\) \{[\s\S]*?undoUnlearnPractice\.run\(/);
-assert.match(html, /modules\/undo-unlearn-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/);
-assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/undo-unlearn-practice\.js\?v=1\.0/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.88/);
+assert.doesNotMatch(html, /modules\/undo-unlearn-practice\.js/);
+assert.match(serviceWorker, /chakra-v5\.284[\s\S]*?modules\/undo-unlearn-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

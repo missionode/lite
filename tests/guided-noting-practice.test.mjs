@@ -6,11 +6,11 @@ const source = fs.readFileSync(new URL('../modules/guided-noting-practice.js', i
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.match(app, /const guidedNotingPractice = window\.ChakraGuidedNotingPractice/);
-assert.match(app, /if \(!guidedNotingPractice\) throw new Error\('Guided Noting practice module is unavailable\.'\)/);
+assert.match(app, /const guidedNotingPractice = await practiceModuleLoader\.load\('guided-noting'\)/);
 assert.match(app, /async runNoting\(\) \{[\s\S]*?guidedNotingPractice\.run\(/, 'the existing controller should delegate Guided Noting to its lifecycle owner');
-assert.match(html, /modules\/guided-noting-practice\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.87/, 'the module should load before app.js with a refreshed app version');
-assert.match(serviceWorker, /chakra-v5\.283[\s\S]*?modules\/guided-noting-practice\.js\?v=1\.0/, 'the offline shell should precache the same module version');
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.88/);
+assert.doesNotMatch(html, /modules\/guided-noting-practice\.js/);
+assert.match(serviceWorker, /chakra-v5\.284[\s\S]*?modules\/guided-noting-practice\.js\?v=1\.0/);
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const practice = context.ChakraGuidedNotingPractice;

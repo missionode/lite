@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "8fe9497 baseline + uncommitted CP-MOD-037",
-    "scope": "Source-reviewed behavior at modularize integration baseline 8fe9497. CP-MOD-037 aligns the service-worker cache with exact versioned app/CSS URLs and adds local cold/warm/offline baseline verification. Optional practice code remains eager pending selected-only, offline-capable lazy-loading parity checks. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "31d614e baseline + uncommitted CP-MOD-038",
+    "scope": "Source-reviewed behavior at modularize integration baseline 31d614e. CP-MOD-038 keeps seven optional guided-practice modules out of startup execution and loads only selected scripts on Begin; those exact script URLs remain precached for offline use, with deduplication and localized retry after failure. The observed local initial-JavaScript reduction is modest and does not establish device/thermal gains. Assessment is separate. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -278,7 +278,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; tests/e2e/modularization-baseline.spec.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; tests/practice-module-loader.test.mjs:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/modularization-baseline.spec.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -328,43 +328,43 @@
         [
           [
             "next",
-            "Queued extraction work",
-            "All practice lifecycles, shared screen navigation, Lobby session estimates, Mood & Relaxation and drone-duration Settings views, Lobby experience visibility, Yoga Experience settings, shared range-control UI and localized Lobby roadmap are integrated; remaining cohesive Settings/UI owners and deferred AudioEngine buses continue before measured delivery changes."
+            "Remaining modularization work",
+            "Practice lifecycles and current shared UI/preference owners through CP-MOD-036 are integrated. CP-MOD-037 established local cold/warm/offline evidence; CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate."
           ]
         ],
         [
           [
             "measure",
-            "PLANNED · Measure baseline",
-            "Cold/warm/offline startup, executed script and heap, journey-start latency, active workers, audio graphs and animation owners."
+            "Baseline measured · CP-MOD-037",
+            "Cold/warm/offline script count, encoded resource bytes, transfer sizes, cache control and page errors; CPU/heap snapshots are indicative only."
           ],
           [
             "partition",
-            "PLANNED · Approve feature bundles",
-            "Keep a small eager shell; split only cohesive optional features whose measured cost justifies added complexity."
+            "Bounded optional bundle",
+            "Seven selected guided-practice scripts are the first bundle; measured initial-JS reduction is modest (~13.1 KiB locally)."
           ]
         ],
         [
           [
             "cache",
-            "PLANNED · Cache without execution",
-            "Service worker keeps approved optional bundles offline-ready while startup does not parse or execute them."
+            "Offline bytes, not execution",
+            "Service worker precaches the seven practice script URLs, while the eager shell includes only the small loader."
           ],
           [
             "preload",
-            "PLANNED · Preload on intent",
-            "Selection or clear intent starts one deduplicated import; Begin awaits only unfinished preparation."
+            "Begin after selection",
+            "The selected Lobby toggles map to exact module IDs and one deduplicated loadMany call before video/audio startup."
           ]
         ],
         [
           [
             "activate",
-            "PLANNED · Activate selected feature",
-            "Load failure is safe and localized; unselected features remain inactive."
+            "Selected module only",
+            "Each practice runner ensures its own module is loaded; failed loads clear pending state and the localized alert lets the user retry."
           ],
           [
             "release",
-            "PLANNED · Release resources",
+            "Lifecycle cleanup remains gated",
             "Stop workers, buffers, AudioNodes, media, animation/WebGL, observers, timers and listeners where safe."
           ]
         ],
@@ -474,7 +474,7 @@
         ]
       ],
       "notes": [
-        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff; visualization-practice owns blackout, audio/narration timing and gradual return; hooponopono-practice owns its phrase cycles and closing handoff; undo-unlearn-practice owns phase sequencing and guaranteed black-scene cleanup; screen-navigation owns shared screen visibility, static-sky decoration guards, decorationchange notification and scroll resets. App controllers inject localization and existing screen/audio/session services. These frozen APIs currently load before app.js and are precached. The post-parity loading path is explicitly PLANNED: caching is not execution, and no lazy boundary or performance benefit is claimed until measured and implemented. Earlier CP-MOD-012 measurements showed about 1.4 KiB net local uncompressed body growth for its one eager practice module, with timing differences within single-run noise. No performance gain is claimed. The local server is uncompressed and the harness blocks Google Fonts; results are not production wire/device evidence. AudioEngine bus construction remains owner-deferred until the next weekly reset."
+        "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff; visualization-practice owns blackout, audio/narration timing and gradual return; hooponopono-practice owns its phrase cycles and closing handoff; undo-unlearn-practice owns phase sequencing and guaranteed black-scene cleanup; screen-navigation owns shared screen visibility, static-sky decoration guards, decorationchange notification and scroll resets. The eager shell loads `practice-module-loader.js`, not these seven APIs. The loader injects only selected classic scripts on Begin, deduplicates concurrent loads, and clears failures so a localized failure can be retried; their exact URLs remain precached for offline use. The first local comparison reduces startup JavaScript bodies by ~13.1 KiB with navigation timing variability, so only this byte reduction is claimed; CPU, heap, thermal, compressed production and device effects remain unproven. AudioEngine bus construction remains owner-deferred until the next weekly reset."
       ]
     },
     {
@@ -607,7 +607,7 @@
         ]
       ],
       "notes": [
-        "Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. This does not establish complete offline readiness."
+        "Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. The small practice loader is eager, but its seven guided-practice scripts are not parsed until selected on Begin; see Mode Selection and the modularization map. This does not establish complete offline readiness."
       ]
     },
     {
@@ -766,8 +766,8 @@
       "id": "modes",
       "group": "Journeys",
       "title": "Mode selection and start routing",
-      "subtitle": "Mutual exclusion, validation, and dispatch priority.",
-      "source": "modules/journey-routing.js:1; modules/lobby-experience-visibility.js:1; app.js:5633; app.js:7550; app.js:7573",
+      "subtitle": "Mutual exclusion, validation, selected practice loading, and dispatch priority.",
+      "source": "modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; app.js:5633; app.js:7252; app.js:7573",
       "rows": [
         [
           [
@@ -803,6 +803,13 @@
             "begin",
             "Press Begin",
             "Actual dispatcher tests Shots first; then derives Sleep and focused experience."
+          ]
+        ],
+        [
+          [
+            "preload",
+            "Preload selected practices",
+            "After start validation, only checked preparation/integration practices are loaded before video or audio startup. No selected practice means no practice script request. A load error is localized, leaves the session unstarted, and allows retry."
           ]
         ],
         [
@@ -885,6 +892,11 @@
         ],
         [
           "begin",
+          "preload",
+          "Valid + practices selected"
+        ],
+        [
+          "begin",
           "shot",
           "1 · Shots"
         ],
@@ -909,6 +921,21 @@
           "5 · Guided / add-ons"
         ],
         [
+          "preload",
+          "focused",
+          "Scripts ready"
+        ],
+        [
+          "preload",
+          "guided",
+          "Scripts ready"
+        ],
+        [
+          "preload",
+          "lobby",
+          "Load failed · retry"
+        ],
+        [
           "focused",
           "start",
           "Valid"
@@ -920,7 +947,7 @@
         ]
       ],
       "notes": [
-        "Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose."
+        "Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose. Selected guided-practice scripts load only after Begin validation and before an optional video/audio start; failed loading returns to the Lobby before a session starts."
       ]
     },
     {
@@ -3459,7 +3486,7 @@
       "group": "Systems",
       "title": "Persistence, caching and network",
       "subtitle": "Local state and the actual service-worker request routing.",
-      "source": "modules/app-state.js:1; sw.js:1; app.js:6748; app.js:7073; app.js:7186; piper-models.json:1",
+      "source": "modules/app-state.js:1; modules/practice-module-loader.js:1; sw.js:1; app.js:6748; app.js:7073; app.js:7186; piper-models.json:1",
       "rows": [
         [
           [
@@ -3515,7 +3542,7 @@
           [
             "offline",
             "Offline outcome",
-            "Only matching cached requests can work offline. The app shell script and stylesheet are precached under the exact versioned URLs requested by index.html. Other requests need matching cache entries."
+            "Only matching cached requests can work offline. App/CSS shell URLs and all seven selected-practice script URLs match their exact precache requests. A selected practice can therefore load offline after selection. If a required script is not cached, the app stays on the Lobby and gives a localized retry message."
           ]
         ]
       ],
@@ -3572,7 +3599,7 @@
         ]
       ],
       "notes": [
-        "Video is not precached. The CP-MOD-037 local Chromium baseline permits and verifies service-worker control across cold, warm and offline reloads; it does not start playback or prove target-device journey operation."
+        "Video is not precached. CP-MOD-037 verifies service-worker-controlled cold/warm/offline reloads; CP-MOD-038 additionally verifies one selected preparation module loads from the precache while offline. No full audio-session/device operation is claimed."
       ]
     },
     {

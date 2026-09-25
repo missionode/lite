@@ -54,10 +54,10 @@ test('records cold, warm and offline startup baseline without starting playback'
   const cold = await capture(page, cdp, 'cold');
   await page.evaluate(() => navigator.serviceWorker.ready);
   const shellCache = await page.evaluate(async () => {
-    const cache = await caches.open('chakra-v5.283');
+    const cache = await caches.open('chakra-v5.284');
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
-      appEntryPresent: urls.includes('/app.js?v=3.87'),
+      appEntryPresent: urls.includes('/app.js?v=3.88'),
       stylesheetEntryPresent: urls.includes('/style.css?v=2.03')
     };
   });
@@ -68,6 +68,7 @@ test('records cold, warm and offline startup baseline without starting playback'
   await waitForReady(page);
   const warm = await capture(page, cdp, 'warm');
   expect(warm.serviceWorkerControlled).toBe(true);
+  expect(cold.practiceModuleCount).toBe(0);
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'load' });
@@ -76,6 +77,7 @@ test('records cold, warm and offline startup baseline without starting playback'
   expect(offline.serviceWorkerControlled).toBe(true);
   expect(errors).toEqual([]);
   expect(offline.scriptCount).toBeGreaterThan(0);
+  expect(offline.practiceModuleCount).toBe(0);
 
   console.log(`MODULARIZATION_BASELINE ${JSON.stringify({ cold, warm, offline, errors })}`);
   await context.close();
