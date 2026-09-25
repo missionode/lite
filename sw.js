@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.298';
+const CACHE_NAME = 'chakra-v5.300';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
@@ -13,7 +13,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './style.css?v=2.03',
-  './app.js?v=4.02',
+  './app.js?v=4.04',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.0',
@@ -34,6 +34,7 @@ const ASSETS = [
   './modules/audio-spatial-geometry.js?v=1.0',
   './modules/audio-elemental-layer.js?v=1.0',
   './modules/audio-tone-playback.js?v=1.0',
+  './modules/audio-drone-start.js?v=1.0',
   './modules/journey-routing.js?v=1.2',
   './modules/practice-module-loader.js?v=1.0',
   './modules/body-scan-practice.js?v=1.0',
