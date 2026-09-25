@@ -4433,48 +4433,9 @@ function attachEventListeners() {
         updateJourneyRoadmap();
     }
 
-    // Timing Sliders Listeners
-    document.getElementById('time-icebreaker').addEventListener('input', (e) => {
-        state.timeIcebreaker = parseInt(e.target.value);
-        setText('display-icebreaker', state.timeIcebreaker + 's');
-        localStorage.setItem('chakra_time_icebreaker', state.timeIcebreaker);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-emergence').addEventListener('input', (e) => {
-        state.timeEmergence = parseInt(e.target.value);
-        setText('display-emergence', state.timeEmergence + 's');
-        localStorage.setItem('chakra_time_emergence', state.timeEmergence);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-breathing').addEventListener('input', (e) => {
-        state.timeBreathing = parseInt(e.target.value);
-        setText('display-breathing', state.timeBreathing + 's');
-        localStorage.setItem('chakra_time_breathing', state.timeBreathing);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-corpse').addEventListener('input', (e) => {
-        state.timeCorpse = parseInt(e.target.value);
-        setText('display-corpse', state.timeCorpse + 's');
-        localStorage.setItem('chakra_time_corpse', state.timeCorpse);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-interval').addEventListener('input', (e) => {
-        state.timeInterval = parseInt(e.target.value);
-        setText('display-interval', state.timeInterval + 's');
-        localStorage.setItem('chakra_time_interval', state.timeInterval);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-yoga-prep').addEventListener('input', (e) => {
-        state.timeYogaPrep = parseInt(e.target.value);
-        setText('display-yoga-prep', state.timeYogaPrep + 's');
-        localStorage.setItem('chakra_time_yoga_prep', state.timeYogaPrep);
-        updateSessionEstimate();
-    });
-    document.getElementById('time-yoga-pose').addEventListener('input', (e) => {
-        state.timeYogaPose = parseInt(e.target.value);
-        setText('display-yoga-pose', state.timeYogaPose + 's');
-        localStorage.setItem('chakra_time_yoga_pose', state.timeYogaPose);
-        updateSessionEstimate();
+    // Keep transition-duration binding before custom-script controls, as before.
+    window.ChakraTimingSettingsView.bindTransitionDurationControls({
+        document, state, storage: localStorage, setText, updateSessionEstimate
     });
 
     // Script Selection Event Listeners
@@ -4591,25 +4552,9 @@ function attachEventListeners() {
         });
     }
 
-    document.getElementById('time-bath').addEventListener('input', (e) => {
-        state.timeBath = parseInt(e.target.value);
-        setText('display-bath', Math.floor(state.timeBath / 60) + 'm');
-        localStorage.setItem('chakra_time_bath', state.timeBath);
-        updateSessionEstimate();
-    });
-
-    document.getElementById('time-perineal-care').addEventListener('input', (e) => {
-        state.timePerinealCare = parseInt(e.target.value);
-        setText('display-perineal-care', Math.floor(state.timePerinealCare / 60) + 'm');
-        localStorage.setItem('chakra_time_perineal_care', state.timePerinealCare);
-        updateSessionEstimate();
-    });
-
-    document.getElementById('time-assisted-bathing').addEventListener('input', (e) => {
-        state.timeAssistedBathing = parseInt(e.target.value);
-        setText('display-assisted-bathing', Math.floor(state.timeAssistedBathing / 60) + 'm');
-        localStorage.setItem('chakra_time_assisted_bathing', state.timeAssistedBathing);
-        updateSessionEstimate();
+    // Preserve care-duration listener order after custom-script handling.
+    window.ChakraTimingSettingsView.bindCareDurationControls({
+        document, state, storage: localStorage, setText, updateSessionEstimate
     });
 
     timeSlider.addEventListener('input', (e) => {

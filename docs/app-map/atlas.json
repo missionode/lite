@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-25",
-    "commit": "fb8e1d4 CP-MOD-060 + CP-MOD-061 source review",
-    "scope": "Source-reviewed behavior through CP-MOD-061 on modularize. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "083294a CP-MOD-065 base + CP-MOD-066 uncommitted review",
+    "scope": "Source-reviewed behavior through CP-MOD-066 on modularize. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:3514; app.js:5029; app.js:5159; index.html:248",
+      "source": "app.js:3514; app.js:5029; app.js:5104; index.html:248",
       "rows": [
         [
           [
@@ -4039,8 +4039,8 @@
       "id": "timing-configuration",
       "group": "Systems",
       "title": "Timing configuration and saved values",
-      "subtitle": "The ordered setup path for timing-config.json, named profiles, slider bounds and persisted practice durations.",
-      "source": "modules/timing-settings.js:1; tests/timing-settings.test.mjs:1; timing-config.json:1; app.js:514",
+      "subtitle": "The ordered setup path for timing-config.json, named profiles, slider bounds, persisted durations and duration-control event handling.",
+      "source": "modules/timing-settings.js:1; modules/timing-settings-view.js:1; tests/timing-settings.test.mjs:1; tests/timing-settings-view.test.mjs:1; timing-config.json:1; app.js:514; app.js:4437; app.js:4556",
       "rows": [
         [
           [
@@ -4106,7 +4106,8 @@
         ]
       ],
       "notes": [
-        "The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization."
+        "The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization.",
+        "CP-MOD-066 moves the seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; integer parsing, state/display/storage/estimate order and attachment positions are preserved. Mode-sensitive chakra/Sleep/Shot duration and High Energy controls remain app-owned."
       ]
     },
     {
@@ -4378,7 +4379,7 @@
       "group": "Systems",
       "title": "Timing preference control hydration",
       "subtitle": "Restores timing slider values and their associated display labels without owning timing configuration.",
-      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:4791",
+      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:3664",
       "rows": [
         [
           [

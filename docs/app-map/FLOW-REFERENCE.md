@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: fb8e1d4 CP-MOD-060 + CP-MOD-061 source review · 2026-09-25.
+Source snapshot: 083294a CP-MOD-065 base + CP-MOD-066 uncommitted review · 2026-09-25.
 
-Source-reviewed behavior through CP-MOD-061 on modularize. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior through CP-MOD-066 on modularize. Existing lazy guided practices and opt-in video/controller paths remain; audio owners include initialization, signal design, spatial geometry, elemental bed, transition tones, drone start/stop, mantra playback, background-music loop and controls, and music-echo preset application. Journey owners include shared preparation practices, optional Arrival/Emergence, opening/Gratitude and content loading/validation. Settings owners now include timing-duration input wiring. Ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5159](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5159), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:5029](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5029), [app.js:5104](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5104), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -1530,9 +1530,9 @@ flowchart TD
 
 ## Timing configuration and saved values
 
-The ordered setup path for timing-config.json, named profiles, slider bounds and persisted practice durations.
+The ordered setup path for timing-config.json, named profiles, slider bounds, persisted durations and duration-control event handling.
 
-Sources: [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1), [app.js:514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:514).
+Sources: [modules/timing-settings.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings.js:1), [modules/timing-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-settings-view.js:1), [tests/timing-settings.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings.test.mjs:1), [tests/timing-settings-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-settings-view.test.mjs:1), [timing-config.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/timing-config.json:1), [app.js:514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:514), [app.js:4437](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4437), [app.js:4556](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4556).
 
 ```mermaid
 flowchart TD
@@ -1557,6 +1557,7 @@ flowchart TD
 | Apply demo preset | Only after timingConfig has been assigned and preferences are normalized, run the existing demo core-duration preset callback. |
 
 - The app retains timing compatibility accessors and the demo-specific preset implementation. Existing storage keys, shallow profile merge, fallback values and units are retained. This eager owner is not a startup optimization.
+- CP-MOD-066 moves the seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; integer parsing, state/display/storage/estimate order and attachment positions are preserved. Mode-sensitive chakra/Sleep/Shot duration and High Energy controls remain app-owned.
 
 <a id="journey-voice-profile"></a>
 
@@ -1685,7 +1686,7 @@ flowchart TD
 
 Restores timing slider values and their associated display labels without owning timing configuration.
 
-Sources: [modules/timing-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-preference-hydration.js:1), [tests/timing-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-preference-hydration.test.mjs:1), [app.js:4791](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4791).
+Sources: [modules/timing-preference-hydration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/timing-preference-hydration.js:1), [tests/timing-preference-hydration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/timing-preference-hydration.test.mjs:1), [app.js:3664](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3664).
 
 ```mermaid
 flowchart TD

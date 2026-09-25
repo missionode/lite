@@ -66,6 +66,7 @@
     "test:journey-roadmap": "node tests/journey-roadmap.test.mjs",
     "test:locale-ui-renderer": "node tests/locale-ui-renderer.test.mjs",
     "test:timing-settings": "node tests/timing-settings.test.mjs",
+    "test:timing-settings-view": "node tests/timing-settings-view.test.mjs",
     "test:journey-voice-profile": "node tests/journey-voice-profile.test.mjs",
     "test:session-mode-hydration": "node tests/session-mode-hydration.test.mjs",
     "test:mixer-preference-hydration": "node tests/mixer-preference-hydration.test.mjs",

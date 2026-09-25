@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-066 Timing duration settings view ownership
+
+Seven transition-duration and three care-duration input handlers now live in `modules/timing-settings-view.js`. Preserve integer parsing, shared state updates, localized display helper calls, saved `chakra_time_*` keys, update order, listener attachment positions and the existing estimate/roadmap refresh. Mode-sensitive chakra/Sleep/Shot and High Energy duration controls remain app-owned. Eager delivery is an ownership/testability extraction, not a performance gain.
+
 ## Completed — CP-MOD-061 Journey content loading and validation ownership
 
 Start-time script source selection, cache reuse, fetch and required-bundle validation now live in `modules/journey-content-loader.js`. The app retains script/session state; the resolved bundle is committed before validation, validation context is captured at the same point relative to asynchronous loading, and fetch URLs and failure messaging are unchanged. No behavior or performance change is claimed.

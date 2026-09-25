@@ -68,6 +68,7 @@ const ASSETS = [
   './modules/journey-roadmap.js?v=1.0',
   './modules/locale-ui-renderer.js?v=1.0',
   './modules/timing-settings.js?v=1.0',
+  './modules/timing-settings-view.js?v=1.0',
   './modules/journey-voice-profile.js?v=1.0',
   './modules/session-mode-hydration.js?v=1.0',
   './modules/mixer-preference-hydration.js?v=1.0',
