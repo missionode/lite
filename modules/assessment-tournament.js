@@ -30,6 +30,7 @@
         bank.chakras.forEach(item => {
             invariant(typeof item.name === 'string' && item.name.trim(), `${item.id}.name is required`);
             invariant(typeof item.archetype === 'string' && item.archetype.trim(), `${item.id}.archetype is required`);
+            invariant(typeof item.conversationTopic === 'string' && item.conversationTopic.trim(), `${item.id}.conversationTopic is required`);
         });
 
         invariant(Array.isArray(bank.questions) && bank.questions.length >= 21, 'at least 21 chakra questions are required');
@@ -76,7 +77,8 @@
             contentVersion: bank.contentVersion,
             answers: {},
             answeredIds: [],
-            valueHistory: []
+            valueHistory: [],
+            history: []
         };
     }
 
@@ -111,7 +113,9 @@
             valueHistory.push({ pairId, leftId: entry.leftId, rightId: entry.rightId, response: entry.response });
             seenPairs.add(pairId);
         });
-        return { schemaVersion: 1, contentVersion: bank.contentVersion, answers, answeredIds, valueHistory };
+        const restored = { schemaVersion: 1, contentVersion: bank.contentVersion, answers, answeredIds, valueHistory, history: [] };
+        restored.history = reconstructResponseHistory(bank, restored);
+        return restored;
     }
 
     function canonicalPairId(firstId, secondId) {
@@ -240,9 +244,7 @@
         };
     }
 
-    function selectNext(bank, stateCandidate) {
-        validateBank(bank);
-        const state = restoreState(bank, stateCandidate);
+    function selectNextFromState(bank, state) {
         const coverageQuestion = nextCoverageQuestion(bank, state);
         if (coverageQuestion) return questionItem(coverageQuestion);
         const valuePair = nextValuePair(bank, state);
@@ -251,9 +253,12 @@
         return tieBreaker ? questionItem(tieBreaker) : { kind: 'complete', id: 'complete' };
     }
 
-    function answerItem(bank, stateCandidate, item, response) {
+    function selectNext(bank, stateCandidate) {
         validateBank(bank);
-        const state = restoreState(bank, stateCandidate);
+        return selectNextFromState(bank, restoreState(bank, stateCandidate));
+    }
+
+    function applyAnswer(bank, state, item, response) {
         if (item.kind === 'question') {
             invariant(!state.answeredIds.includes(item.id), `question ${item.id} was already consumed`);
             const question = bank.questions.find(candidate => candidate.id === item.id);
@@ -263,7 +268,8 @@
             return {
                 ...state,
                 answers: { ...state.answers, [item.id]: response },
-                answeredIds: [...state.answeredIds, item.id]
+                answeredIds: [...state.answeredIds, item.id],
+                history: [...state.history, { kind: 'question', id: item.id }]
             };
         }
         if (item.kind === 'value') {
@@ -280,10 +286,60 @@
                     leftId: item.left.id,
                     rightId: item.right.id,
                     response
-                }]
+                }],
+                history: [...state.history, { kind: 'value', id: item.pairId }]
             };
         }
         throw new Error(`Assessment item cannot be answered: ${item.kind}`);
+    }
+
+    function reconstructResponseHistory(bank, target) {
+        const questionIds = new Set(target.answeredIds);
+        const valuesByPair = new Map(target.valueHistory.map(entry => [entry.pairId, entry]));
+        let replay = createState(bank);
+        const history = [];
+        const maxSteps = bank.questions.length + bank.settings.valueRounds;
+        for (let step = 0; step < maxSteps; step += 1) {
+            const item = selectNextFromState(bank, replay);
+            if (item.kind === 'complete') break;
+            let response;
+            if (item.kind === 'question') {
+                if (!questionIds.has(item.id)) break;
+                response = target.answers[item.id];
+            } else {
+                const value = valuesByPair.get(item.pairId);
+                if (!value) break;
+                response = value.response;
+            }
+            replay = applyAnswer(bank, replay, item, response);
+            history.push(replay.history[replay.history.length - 1]);
+        }
+        return history;
+    }
+
+    function answerItem(bank, stateCandidate, item, response) {
+        validateBank(bank);
+        return applyAnswer(bank, restoreState(bank, stateCandidate), item, response);
+    }
+
+    function undoLast(bank, stateCandidate) {
+        validateBank(bank);
+        const state = restoreState(bank, stateCandidate);
+        const last = state.history[state.history.length - 1];
+        if (!last) return state;
+        if (last.kind === 'question') {
+            const answers = { ...state.answers };
+            delete answers[last.id];
+            return restoreState(bank, {
+                ...state,
+                answers,
+                answeredIds: state.answeredIds.filter(id => id !== last.id)
+            });
+        }
+        return restoreState(bank, {
+            ...state,
+            valueHistory: state.valueHistory.filter(entry => entry.pairId !== last.id)
+        });
     }
 
     function dotResult(bank, state) {
@@ -329,10 +385,17 @@
             .slice(0, 2)
             .map(item => item.archetype);
         const leadingChakras = [...chakras].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, 2).map(item => item.archetype);
+        const bestSupportedChakra = chakras
+            .filter(item => item.confidence >= 1)
+            .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))[0];
+        const rapportChakra = bestSupportedChakra && chakraById[bestSupportedChakra.id];
         return {
             complete: selectNext(bank, state).kind === 'complete',
             chakras,
             archetypes: [...new Set([...leadingChakras, ...leadingValues])].slice(0, 3),
+            rapportCue: rapportChakra?.conversationTopic
+                ? { chakraId: rapportChakra.id, topic: rapportChakra.conversationTopic }
+                : null,
             dot: dotResult(bank, state),
             progress: {
                 questionsConsumed: state.answeredIds.length,
@@ -350,6 +413,7 @@
         restoreState,
         selectNext,
         answerItem,
+        undoLast,
         buildResult,
         canonicalPairId
     });

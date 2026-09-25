@@ -1,5 +1,17 @@
 # Chakra Meditation — Active Handoff
 
+### NOW — CP-ASSESS-ADV-UNDO-RAPPORT-001: integrate assessment feature in active checkout
+
+- User reported seeing only the previous archetype/result controls and that the in-app browser showed `file:///.../assessment-advanced-rapport-undo/lite/index.html`. The advanced-gated assessment enhancements had remained in that isolated worktree; `localhost:8000` serves `/Users/lekshmisyam/Desktop/Ikigai/lite` on branch `modularize`.
+- Ported the result cue/icebreaker, confidence-limited chakra-only signal, one-response undo with legacy history reconstruction, and short-lived same-tab direct-page gate into the checkout used by localhost. User identified duplicate entries; keep only the gated Lobby “Begin Session Consultation” CTA and remove the Settings assessment link.
+- Updated the flow atlas and cache versions. Focused assessment and Advanced Features tests pass; browser atlas verification could not launch Chromium in this environment, and the user previously opted to handle browser review. The same-tab gate is client-side, not server authentication.
+
+### NOW — Consultation CTA lock visibility correction
+
+- Fixed in the existing `modularize` checkout. The Lobby CTA starts hidden/disabled before app initialization, follows the shared Advanced Features lock/unlock lifecycle, and has a click-time guard. Rotated the service-worker shell cache to `chakra-v5.310` so the local PWA reload can install the changed markup and logic.
+- Updated the overview flow map and added regression assertions in `tests/advanced-unlock.test.mjs`.
+- Validation: `advanced-unlock` and `git diff --check` pass; atlas is rebuilt and its edges resolve. Browser review was not run. The standalone assessment URL itself remains directly addressable; this change gates the Lobby CTA, not server authentication or the page URL.
+
 ### NOW — CP-MOD-066: Timing duration settings view ownership
 
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-066/lite`, branch `codex/modularize-cp-066`, based on CP-MOD-065 `083294a`. Extracted seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; mode-sensitive chakra/Sleep/Shot and High Energy durations remain app-owned.

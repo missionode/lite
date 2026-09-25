@@ -12,6 +12,13 @@
 - Obtain trained-operator review of neutral wording, dot interpretation and real-session usability.
 - Treat this as a usability/content follow-up; do not add diagnosis, direct intimate-service questions, consent inference, automatic recommendation or journey handoff.
 
+## Local feature integration — CP-ASSESS-ADV-UNDO-RAPPORT-001
+
+- Integrate the Advanced Features gate, one-step undo and evidence-limited conversation cue/icebreaker into the active `modularize` checkout served at `localhost:8000`; do not leave the user-facing feature only in the isolated worktree.
+- Maintain a 15-minute same-tab grant from the single Lobby consultation CTA, revoke it on relock, and block direct page loading before the question-bank fetch when no valid grant exists. Do not add an assessment link to Settings.
+- Keep the cue derived exclusively from chakra answers at full evidence confidence. Avoid fixed personality/behavior conclusions; the icebreaker asks what would be useful to the client. Never infer rapport from intimacy-value answers or the private dot.
+- Update English source strings and prime them through the existing Google Translate cache, support undo for question/value responses including persisted legacy state, rotate the assessment data/module and shell caches, regenerate the atlas, and test gates, undo and results contract.
+
 ## Original acceptance criteria
 
 1. Preserve one question at a time, two neutral choices, Equal, Skip and no repeat after any response.

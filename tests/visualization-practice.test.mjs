@@ -10,7 +10,7 @@ assert.match(app, /const visualizationPractice = await practiceModuleLoader\.loa
 assert.match(app, /async runVisualization\(\) \{[\s\S]*?visualizationPractice\.run\(/, 'the controller should delegate Visualization lifecycle');
 assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 assert.doesNotMatch(html, /modules\/visualization-practice\.js/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/visualization-practice\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/visualization-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

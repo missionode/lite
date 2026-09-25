@@ -40,7 +40,7 @@ assert.match(html, /night-sky\.js\?v=[^\"]+[\s\S]*?modules\/ambient-particle-fie
     'The cached sky dependencies and extracted renderer must load before the app controller.');
 assert.match(html, /modules\/ambient-particle-field\.js\?v=1\.0[\s\S]*?modules\/visual-engine\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/,
     'The shared visual-effect owner must load after sky dependencies and before the app.');
-assert.match(readFileSync('sw.js', 'utf8'), /chakra-v5.309[\s\S]*?modules\/visual-engine\.js\?v=1\.0/,
+assert.match(readFileSync('sw.js', 'utf8'), /chakra-v5.310[\s\S]*?modules\/visual-engine\.js\?v=1\.0/,
     'The visual-effect module must be precached for offline sessions.');
 assert.match(app, /new window\.AmbientParticleField\(\)/,
     'The app should construct the same one shared particle-field owner from its extracted module.');

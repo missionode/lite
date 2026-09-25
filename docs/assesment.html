@@ -77,6 +77,9 @@
     .result-card h3{font-size:1.02em;margin-bottom:6px}.status{color:var(--gold);font-weight:800}.confidence{color:var(--muted);font-size:.82em;margin-top:5px}
     .archetypes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px 0}
     .archetype{padding:8px 12px;border-radius:99px;background:rgba(169,139,255,.12);border:1px solid rgba(169,139,255,.24)}
+    .rapport-card{margin:24px 0;padding:20px;border:1px solid rgba(237,199,122,.28);border-radius:18px;background:rgba(237,199,122,.055)}
+    .rapport-card h3,.rapport-card h4{color:var(--gold);margin-bottom:8px}.rapport-card p{color:var(--muted);margin-bottom:12px}
+    .rapport-card blockquote{margin:0;padding-left:14px;border-left:2px solid var(--gold);font-size:1.05em}
     .result-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
     .primary{border-color:rgba(237,199,122,.55);background:linear-gradient(135deg,#6f4cae,#8b67cd);font-weight:850;padding-inline:22px}
     .operator-dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 4px rgba(255,255,255,.05),0 0 18px currentColor}
@@ -116,6 +119,11 @@
 
     <section class="panel" aria-live="polite">
       <div id="loadingView" class="loading">Preparing the assessment…</div>
+      <div id="accessRequiredView" class="loading" hidden>
+        <strong>Advanced Features required</strong>
+        <p>Unlock Advanced Features in Settings to open the operator assessment.</p>
+        <a class="quiet" href="../index.html">Return to Settings</a>
+      </div>
       <div id="errorView" class="error" hidden>
         <strong>Assessment could not be prepared.</strong>
         <span id="errorMessage">Please refresh and try again.</span>
@@ -132,6 +140,7 @@
         <div class="secondary-actions">
           <button class="quiet" id="equalChoice" type="button">Both equally</button>
           <button class="quiet" id="skipChoice" type="button">Skip</button>
+          <button class="quiet" id="undoAnswer" type="button" hidden>Undo last response</button>
         </div>
         <div class="save-status" id="saveStatus" role="status"></div>
       </div>
@@ -143,8 +152,15 @@
         </div>
         <div class="chakra-results" id="chakraResults"></div>
         <div class="archetypes" id="archetypeResults"></div>
+        <section class="rapport-card" aria-live="polite" aria-labelledby="rapportHeading">
+          <h3 id="rapportHeading">Conversation cue — not a prediction</h3>
+          <p id="rapportInsight"></p>
+          <h4>Gentle icebreaker</h4>
+          <blockquote id="rapportIcebreaker"></blockquote>
+        </section>
         <div class="result-actions">
           <span class="operator-dot" id="operatorDot" aria-hidden="true"></span>
+          <button class="quiet" id="undoResult" type="button">Undo last response</button>
           <button class="primary" id="newAssessment" type="button">Clear for New Client</button>
           <a class="quiet" href="../index.html">Return to Meditation Room</a>
         </div>
@@ -153,15 +169,15 @@
     <p class="privacy">Responses stay on this device. The assessment is separate from the meditation journey and does not start or configure a session.</p>
   </main>
 
-  <script src="../modules/assessment-tournament.js?v=1.1"></script>
+  <script src="../modules/assessment-tournament.js?v=1.2"></script>
   <script src="../modules/assessment-persistence.js?v=1.0"></script>
   <script>
     (() => {
       'use strict';
       const elements = Object.fromEntries([
-        'loadingView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
-        'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','saveStatus',
-        'chakraResults','archetypeResults','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
+        'loadingView','accessRequiredView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
+        'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','undoAnswer','undoResult','saveStatus',
+        'chakraResults','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
         'fontDown','fontReset','fontUp'
         ,'translationCache'
       ].map(id => [id, document.getElementById(id)]));
@@ -176,8 +192,17 @@
       try { deviceStorage = window.localStorage; } catch (error) { /* continue in memory */ }
 
       function show(view) {
-        [elements.loadingView, elements.errorView, elements.interviewView, elements.resultView]
+        [elements.loadingView, elements.accessRequiredView, elements.errorView, elements.interviewView, elements.resultView]
           .forEach(node => { node.hidden = node !== view; });
+      }
+
+      function hasAdvancedAccess() {
+        try {
+          const expiresAt = Number(window.sessionStorage.getItem('chakra_assessment_access_until'));
+          if (Number.isSafeInteger(expiresAt) && expiresAt > Date.now()) return true;
+          window.sessionStorage.removeItem('chakra_assessment_access_until');
+        } catch (error) { /* blocked session storage remains locked */ }
+        return false;
       }
 
       function progressCount() {
@@ -207,11 +232,17 @@
           registerTranslation(`chakra:archetype:${chakra.id}`, chakra.archetype);
         });
         bank.values.forEach(value => registerTranslation(`value:archetype:${value.id}`, value.archetype));
+        bank.chakras.forEach(chakra => registerTranslation(`chakra:topic:${chakra.id}`, chakra.conversationTopic));
         ['Currently supported','Developing','May benefit from support','More conversation needed'].forEach((label,index) =>
           registerTranslation(`status:${index}`, label));
         ['completed','Chakra reflection','Values reflection','Saved on this device','Continuing without device storage',
           'Previous assessment resumed on this device','New assessment started; device storage could not be cleared.',
-          'reflection confidence'].forEach((label,index) => registerTranslation(`ui:${index}`, label));
+          'reflection confidence','Undo last response','Last response undone. You can review that choice again.',
+          'This assessment’s clearest response signal was around','This reflects answers from today only; it is not a conclusion about character or behavior. Ask before assuming.',
+          'Would you like to explore this area today, or is something else more useful for you?',
+          'There is not enough answered evidence for a specific topic. Begin with an open, client-led question.',
+          'What would make this session feel useful and comfortable for you today?']
+          .forEach((label,index) => registerTranslation(`ui:${index}`, label));
       }
 
       function setChoice(button, choice, text) {
@@ -227,6 +258,7 @@
         }
         show(elements.interviewView);
         const completed = progressCount();
+        elements.undoAnswer.hidden = completed === 0;
         elements.progressLabel.textContent = `${completed} ${translation('ui:0','completed')}`;
         elements.stageLabel.textContent = item.kind === 'value' ? translation('ui:2','Values reflection') : translation('ui:1','Chakra reflection');
         const maximumSteps = bank.questions.length + bank.settings.valueRounds;
@@ -269,6 +301,21 @@
         }
       }
 
+      function undoLastResponse() {
+        if (answering || !state || progressCount() === 0) return;
+        try {
+          state = window.ChakraAssessmentTournament.undoLast(bank, state);
+          const saved = persistence.save(bank, state);
+          state = saved.state;
+          storageNotice = saved.persisted
+            ? translation('ui:9','Last response undone. You can review that choice again.')
+            : translation('ui:4','Continuing without device storage');
+          renderNext({ focus: true });
+        } catch (error) {
+          showError(error);
+        }
+      }
+
       function appendTextElement(parent, tag, className, value) {
         const node = document.createElement(tag);
         if (className) node.className = className;
@@ -294,6 +341,14 @@
           const key = chakra ? `chakra:archetype:${chakra.id}` : value ? `value:archetype:${value.id}` : '';
           appendTextElement(elements.archetypeResults, 'span', 'archetype', key ? translation(key, archetype) : archetype);
         });
+        if (result.rapportCue) {
+          const topic = translation(`chakra:topic:${result.rapportCue.chakraId}`, result.rapportCue.topic);
+          elements.rapportInsight.textContent = `${translation('ui:10','This assessment’s clearest response signal was around')} ${topic}. ${translation('ui:11','This reflects answers from today only; it is not a conclusion about character or behavior. Ask before assuming.')}`;
+          elements.rapportIcebreaker.textContent = translation('ui:12','Would you like to explore this area today, or is something else more useful for you?');
+        } else {
+          elements.rapportInsight.textContent = translation('ui:13','There is not enough answered evidence for a specific topic. Begin with an open, client-led question.');
+          elements.rapportIcebreaker.textContent = translation('ui:14','What would make this session feel useful and comfortable for you today?');
+        }
         elements.operatorDot.className = `operator-dot ${result.dot}`;
         show(elements.resultView);
         elements.resultTitle.focus();
@@ -305,9 +360,13 @@
       }
 
       async function start() {
+        if (!hasAdvancedAccess()) {
+          show(elements.accessRequiredView);
+          return;
+        }
         show(elements.loadingView);
         try {
-          const response = await fetch('../data/assessment-questions.json?v=1.0');
+          const response = await fetch('../data/assessment-questions.json?v=1.1');
           if (!response.ok) throw new Error('The assessment question set is unavailable.');
           bank = await response.json();
           window.ChakraAssessmentTournament.validateBank(bank);
@@ -328,6 +387,8 @@
       elements.choiceRight.addEventListener('click', event => answer(event.currentTarget.dataset.response));
       elements.equalChoice.addEventListener('click', () => answer(window.ChakraAssessmentTournament.RESPONSE_EQUAL));
       elements.skipChoice.addEventListener('click', () => answer(window.ChakraAssessmentTournament.RESPONSE_SKIP));
+      elements.undoAnswer.addEventListener('click', undoLastResponse);
+      elements.undoResult.addEventListener('click', undoLastResponse);
       elements.retryButton.addEventListener('click', start);
       elements.newAssessment.addEventListener('click', () => {
         if (!window.confirm('Clear this assessment before beginning with a new client?')) return;

@@ -101,6 +101,6 @@ assert.equal(accepted.elements.get('settings-manager-status').textContent, 'ui.s
 assert.equal(accepted.reloads, 1);
 
 assert.ok(html.indexOf('modules/settings-manager-view.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(sw, /chakra-v5\.309[\s\S]*?modules\/settings-manager-view\.js\?v=1\.0/);
+assert.match(sw, /chakra-v5\.310[\s\S]*?modules\/settings-manager-view\.js\?v=1\.0/);
 assert.doesNotMatch(fs.readFileSync('app.js', 'utf8'), /settingsManagerButton\?\.addEventListener|id="export-settings"'\)\?\.addEventListener/);
 console.log('Settings manager view passed: public navigation/import, Advanced Features-only export, cancellation, validation and replacement.');

@@ -1,13 +1,13 @@
-const CACHE_NAME = 'chakra-v5.309';
+const CACHE_NAME = 'chakra-v5.310';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
 const ASSETS = [
   './',
   './index.html',
   './docs/assesment.html',
-  './modules/assessment-tournament.js?v=1.1',
+  './modules/assessment-tournament.js?v=1.2',
   './modules/assessment-persistence.js?v=1.0',
-  './data/assessment-questions.json?v=1.0',
+  './data/assessment-questions.json?v=1.1',
   './docs/repertory.html',
   './data/frequency-repertory.json',
   './timing-config.json',

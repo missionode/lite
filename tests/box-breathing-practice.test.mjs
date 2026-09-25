@@ -10,7 +10,7 @@ assert.match(app, /const boxBreathingPractice = await practiceModuleLoader\.load
 assert.match(app, /async runBoxBreathing\(\) \{[\s\S]*?boxBreathingPractice\.run\(/, 'the controller should delegate Box Breathing to its lifecycle owner');
 assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 assert.doesNotMatch(html, /modules\/box-breathing-practice\.js/, 'Box Breathing is loaded only after selection');
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/box-breathing-practice\.js\?v=1\.0/, 'the offline shell should precache the module');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
