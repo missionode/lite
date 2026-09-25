@@ -586,3 +586,11 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused unit/static e
 - App/cache versions are `4.06` / `chakra-v5.302`; the module is eager and service-worker precached. No sound quality or performance improvement is claimed; device listening remains open.
 - Full Node suite: 80/82 pass; `content-safety` and `drone-duration` stop before assertions because the isolated worktree lacks owner-managed `docs/dot.json`. Loop router tests: 11 pass. Atlas regenerated at 43 maps / 353 nodes / 405 edges; browser atlas verification could not start because Playwright is unavailable in this worktree. `git diff --check` and syntax checks pass.
 - No browser/device listening, audio-quality, CPU, memory or thermal evidence is claimed. Module stays eager and offline cached; assessment/theme remain future checkpoints.
+## CP-MOD-056 — background-music loop lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused unit/static evidence.
+
+- Background-music loop startup and retirement now live in `modules/audio-background-music-lifecycle.js`; stable AudioEngine methods and music gain/duck/restore/echo policy remain app-owned.
+- Preserved versioned reload fetch, decoded-buffer reuse, active-loop continuity, waiting for a previous fade retirement before restart, stale gain reset, echo application order, entry-fade deadline, controlled stop fade, reverb retirement, and retirement-promise cleanup.
+- Direct lifecycle and background-music/mantra contracts pass; syntax checks pass. Full Node suite: 81/83 pass; `content-safety` and `drone-duration` cannot begin assertions because this isolated worktree lacks owner-managed `docs/dot.json`. Loop router suite: 11 pass. Atlas regenerated at 43 maps / 353 nodes / 405 edges; `git diff --check` passes.
+- App/cache versions are `4.07` / `chakra-v5.303`; module is eager and offline precached. Atlas browser verifier could not run because Playwright is unavailable in this worktree; browser checks remain opt-in. No startup, sound, CPU, memory or thermal improvement is claimed; browser/device playback evidence is not claimed.

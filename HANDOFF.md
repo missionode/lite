@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-055: Recorded mantra playback ownership
+### NOW — CP-MOD-056: Background music loop lifecycle ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-055/lite`, based on merged `modularize` commit `52a2c38` (CP-MOD-054 / PR #73). Recorded mantra play/stop lifecycle moved into `modules/audio-mantra-playback.js`; stable AudioEngine adapters and background-music bus policy remain.
-- App/cache versions are `4.06` / `chakra-v5.302`. Focused mantra, audio-transition, stage-fade, No Frequency, background-music/mantra and hypnosis tests pass; full suite, atlas and PR validation remain pending. No audio-quality/performance gain or device listening is claimed.
-- CP-MOD-054 merged into `modularize` via PR #73; local integration checkout synchronized at `52a2c38`; unrelated local files remain untouched. CP-MOD-055 proceeds through isolated PR/integration to `modularize` only; production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-056/lite`, based on merged `modularize` commit `73979de` (CP-MOD-055 / PR #74). Background-music loop start/stop moved into `modules/audio-background-music-lifecycle.js`; gain/duck/restore policy remains app-owned.
+- App/cache versions are `4.07` / `chakra-v5.303`. New lifecycle test covers decoded-buffer startup, active loop reuse, gain reset, echo ordering, fade retirement and cleanup. Full suite, atlas and PR validation remain pending. No audio-quality/performance gain or device listening is claimed.
+- CP-MOD-055 merged into `modularize` via PR #74; local integration checkout synchronized at `73979de`; unrelated local files remain untouched. CP-MOD-056 proceeds through isolated PR/integration to `modularize` only; production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 

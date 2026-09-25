@@ -73,6 +73,8 @@ const audioDroneStop = window.ChakraAudioDroneStop;
 if (!audioDroneStop) throw new Error('Audio drone-stop module is unavailable.');
 const audioMantraPlayback = window.ChakraAudioMantraPlayback;
 if (!audioMantraPlayback) throw new Error('Audio mantra-playback module is unavailable.');
+const audioBackgroundMusicLifecycle = window.ChakraAudioBackgroundMusicLifecycle;
+if (!audioBackgroundMusicLifecycle) throw new Error('Audio background-music lifecycle module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
@@ -1138,63 +1140,13 @@ class AudioEngine {
     }
 
     async startBackgroundMusic() {
-        this.setMusicEcho(state.musicEcho);
-        if (!this.bgMusicBuffer) {
-            const response = await fetch(BACKGROUND_MUSIC_URL, { cache: 'reload' });
-            const arrayBuffer = await response.arrayBuffer();
-            this.bgMusicBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-        }
-
-        // Reusing the active loop preserves its timeline and avoids an
-        // audible restart when an experience enters another stage.
-        if (this.bgMusicLoop?.isRunning) {
-            return;
-        }
-
-        // Do not overlap a freshly started journey with the previous
-        // journey's retiring loop. The prior stop is allowed to finish its
-        // own fade before a new slow entry begins.
-        if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
-
-        // A stopped loop that is still referenced has not entered the normal
-        // retirement path yet. Retire it before creating a replacement.
-        if (this.bgMusicLoop) {
-            this.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
-            if (this.bgMusicRetirePromise) await this.bgMusicRetirePromise;
-        }
-
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        // A stopped loop leaves the shared outer gain at its previous target.
-        // Reset it before creating the replacement so a restart cannot bypass
-        // the deliberate entry fade through stale gain state.
-        if (this.bgMusicGain) {
-            const now = this.ctx.currentTime;
-            this.bgMusicGain.gain.cancelScheduledValues(now);
-            this.bgMusicGain.gain.setValueAtTime(0, now);
-        }
-        if (this.bgMusicBusGain) {
-            const now = this.ctx.currentTime;
-            this.bgMusicBusGain.gain.cancelScheduledValues(now);
-            this.bgMusicBusGain.gain.setValueAtTime(1, now);
-        }
-        if (this.musicEchoTailGate) {
-            const now = this.ctx.currentTime;
-            this.musicEchoTailGate.gain.cancelScheduledValues(now);
-            this.musicEchoTailGate.gain.setValueAtTime(1, now);
-        }
-
-        // The bus owns entry fading; the loop duration controls repeats only.
-        this.setMusicEcho(state.musicEcho);
-        this.bgMusicLoop = new SeamlessLoop(
-            this.ctx,
-            this.bgMusicBuffer,
-            this.bgMusicGain,
-            1.0,
-            BACKGROUND_MUSIC_ENTRY_FADE_SECONDS
-        );
-        this.bgMusicLoop.start();
-        this.bgMusicEntryEndsAt = this.ctx.currentTime + BACKGROUND_MUSIC_ENTRY_FADE_SECONDS;
+        return audioBackgroundMusicLifecycle.start(this, {
+            state,
+            SeamlessLoop,
+            url: BACKGROUND_MUSIC_URL,
+            entryFadeSeconds: BACKGROUND_MUSIC_ENTRY_FADE_SECONDS,
+            stopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS
+        });
     }
 
     async loadPleasureAmbienceBuffers() {
@@ -1614,20 +1566,7 @@ class AudioEngine {
     }
 
     stopBackgroundMusic(fadeTime = BACKGROUND_MUSIC_STOP_FADE_SECONDS) {
-        this.setConvolverActive('music', this.musicEchoDelay, this.musicEchoConvolver, this.musicEchoFilter, false, Math.max(0, fadeTime) + MUSIC_REVERB_TAIL_SECONDS + 0.1);
-        this.cancelBackgroundMusicRestore();
-        this.bgMusicSuppressedByMantra = false;
-        if (this.bgMusicLoop) {
-            const retirementSeconds = Math.max(0, fadeTime);
-            this.bgMusicLoop.stop(retirementSeconds);
-            this.bgMusicLoop = null;
-            this.bgMusicEntryEndsAt = 0;
-            const retirement = new Promise(resolve => setTimeout(resolve, (retirementSeconds + 0.1) * 1000));
-            this.bgMusicRetirePromise = retirement;
-            void retirement.then(() => {
-                if (this.bgMusicRetirePromise === retirement) this.bgMusicRetirePromise = null;
-            });
-        }
+        return audioBackgroundMusicLifecycle.stop(this, fadeTime, MUSIC_REVERB_TAIL_SECONDS);
     }
 
     prepareJourneyVideoPrelude(media) {
