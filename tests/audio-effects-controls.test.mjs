@@ -3,9 +3,13 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const app = fs.readFileSync('app.js','utf8');
 const audioInitialization = fs.readFileSync('modules/audio-engine-initialization.js','utf8');
+const spatialGeometrySource = fs.readFileSync('modules/audio-spatial-geometry.js','utf8');
+const spatialGeometryContext = vm.createContext({ Math, Object, window: {} });
+vm.runInContext(spatialGeometrySource, spatialGeometryContext);
+const audioSpatialGeometry = spatialGeometryContext.window.ChakraAudioSpatialGeometry;
 const modes = ['off','stereo','headphones','room'];
 const method = (name,next) => vm.runInNewContext(`({${app.slice(app.indexOf(`    ${name}(`),app.indexOf(`    ${next}(`))}})`, {
-    VOICE_REVERB_TAIL_SECONDS:3.2, DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off'
+    VOICE_REVERB_TAIL_SECONDS:3.2, DEFAULT_SPATIAL_MODE:'off', normalizeSpatialMode:value=>modes.includes(value)?value:'off', audioSpatialGeometry
 })[name];
 const parameter = () => ({value:0, cancelScheduledValues(){}, setValueAtTime(v){this.value=v;}, linearRampToValueAtTime(v){this.value=v;}});
 const node = () => ({gain:parameter(),delayTime:parameter(),frequency:parameter(),panningModel:'equalpower'});

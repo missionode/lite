@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — CP-MOD-050 Audio spatial geometry
+
+Generic Web Audio panner construction and position interpolation now live in `modules/audio-spatial-geometry.js`. The AudioEngine's public methods remain adapters; spatial mode profiles and behavior remain unchanged. The helper loads eagerly and remains in the offline cache. No spatial-audio or performance benefit is claimed. See the modularization review and active handoff.
+
 ## Completed — CP-MOD-049 Audio signal design helpers
 
 Soft-clipping curve, seeded diffuse reverb, stochastic impulse response and white-noise buffer generation are implemented in `modules/audio-signal-design.js`. AudioEngine retains its public adapters and cached-noise state; existing call order and algorithm inputs are preserved. The module is eager and offline-cached. No sound-quality or performance improvement is claimed. See the modularization review and active handoff.

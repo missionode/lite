@@ -20,6 +20,7 @@
     "test:audio-route-lifecycle": "node tests/audio-route-lifecycle.test.mjs",
     "test:audio-engine-initialization": "node tests/audio-engine-initialization.test.mjs",
     "test:audio-signal-design": "node tests/audio-signal-design.test.mjs",
+    "test:audio-spatial-geometry": "node tests/audio-spatial-geometry.test.mjs",
     "test:journey-routing": "node tests/journey-routing.test.mjs",
     "test:audio-transitions": "node tests/audio-transitions.test.mjs",
     "test:long-narration": "node tests/long-narration.test.mjs",

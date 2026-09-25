@@ -52,7 +52,7 @@ assert.match(app, /audioSignalDesign\.createNoiseBuffer\(this\.ctx\)/);
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-signal-design.js?v=1.0') < html.indexOf('app.js?v=3.99'));
+assert.ok(html.indexOf('modules/audio-signal-design.js?v=1.0') < html.indexOf('app.js?v=4.00'));
 assert.match(serviceWorker, /\.\/modules\/audio-signal-design\.js\?v=1\.0/);
 
 console.log('Audio signal-design contract passed: distortion, randomized and deterministic impulse responses, noise buffer and app adapters.');

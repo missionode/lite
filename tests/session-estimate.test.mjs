@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
-assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=3\.99/);
-assert.match(serviceWorker, /chakra-v5\.295[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.00/);
+assert.match(serviceWorker, /chakra-v5\.296[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
 assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/);
 
 const context = vm.createContext({});

@@ -1,10 +1,10 @@
 # Chakra Meditation — Active Handoff
 
-### NOW — CP-MOD-049: Audio signal design helper ownership
+### NOW — CP-MOD-050: Audio spatial geometry ownership
 
-- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-049/lite`, based on merged `modularize` commit `51ac5d8` (CP-MOD-048 / PR #67). Extract pure signal-buffer construction to `modules/audio-signal-design.js`, keeping AudioEngine adapters and cached noise state.
-- App/cache versions are `3.99` / `chakra-v5.295`. The module's direct deterministic contracts pass. 74/76 Node files pass; two require owner-managed `docs/dot.json`, unavailable in the isolated worktree. All 11 router tests pass; atlas build validates 43 maps / 353 nodes / 405 edges. Audio listening and device/thermal evidence are not claimed.
-- CP-MOD-048 merged into `modularize` via PR #67; local integration branch synchronized at `51ac5d8`. Existing unrelated main-checkout `.DS_Store`, `.codex/` and backup audio remain untouched. CP-MOD-049 is ready for PR/integration into `modularize` only; production remains unchanged.
+- Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-050/lite`, based on merged `modularize` commit `439f992` (CP-MOD-049 / PR #68). Extract generic spatial panner creation and position interpolation to `modules/audio-spatial-geometry.js`; spatial modes/profiles remain app-owned.
+- App/cache versions are `4.00` / `chakra-v5.296`. Direct geometry, spatial-routing and audio-effects contracts pass. 75/77 Node files pass; two need owner-managed `docs/dot.json`, absent from the isolated checkout. All 11 router tests pass; the atlas validates 43 maps / 353 nodes / 405 edges. No audio listening or device/thermal evidence is claimed.
+- CP-MOD-049 merged into `modularize` via PR #68; local integration checkout is synchronized to `439f992`; unrelated checkout files remain untouched. CP-MOD-050 is ready for PR/integration against `modularize` only; production remains unchanged.
 
 ### COMPLETE — CP-MOD-042: Observational sky renderer ownership
 
