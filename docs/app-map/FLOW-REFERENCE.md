@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 854d8df baseline + uncommitted CP-MOD-044 · 2026-09-25.
+Source snapshot: ae0762a base + CP-MOD-045 checkpoint · 2026-09-25.
 
-Source-reviewed behavior at the modularize integration baseline, including CP-MOD-038–044. Selected guided practices and opt-in video/controller paths load on demand; the observational sky renderer, visual engine and standard journey duration estimator are isolated eager cached owners. These ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
+Source-reviewed behavior at the modularize integration baseline, including CP-MOD-038–045. Selected guided practices and opt-in video/controller paths load on demand; the observational sky renderer, visual engine and session-estimate/duration owner are isolated eager cached modules. These ownership moves do not establish device/thermal gains. Assessment remains a separate operator tool. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -100,7 +100,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:5196](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5196), [app.js:6569](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6569), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
+Sources: [app.js:5196](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:5196), [app.js:6521](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6521), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248).
 
 ```mermaid
 flowchart TD
@@ -203,7 +203,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Remaining modularization work | CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves the detailed standard-journey countdown calculation into the existing session-estimate owner while the controller keeps route/fallback selection. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate. |
+| Remaining modularization work | CP-MOD-038 makes seven selectable practice scripts lazy and offline-capable. CP-MOD-039 defers the optional video media request until preview or opted-in introduction. CP-MOD-040 separates shared fullscreen journey chrome from optional video ownership. CP-MOD-041 defers the optional prelude controller until opt-in/preview. CP-MOD-042 relocates the unchanged sky renderer to its own eager cached owner. CP-MOD-043 relocates the unchanged chakra image-effect controller to its own eager owner. CP-MOD-044 moves standard narrated-journey duration into the estimate module; CP-MOD-045 centralizes exact per-mode countdown durations there while the controller retains timer lifecycle and route entry. Continue focused ownership/lifecycle and larger-bundle reviews without changing the deferred AudioEngine-bus gate. |
 | Baseline measured · CP-MOD-037 | Cold/warm/offline script count, encoded resource bytes, transfer sizes, cache control and page errors; CPU/heap snapshots are indicative only. |
 | Bounded optional bundle | Seven selected guided-practice scripts are the first bundle; measured initial-JS reduction is modest (~13.1 KiB locally). |
 | Offline bytes, not execution | Service worker precaches the seven practice script URLs, while the eager shell includes only the small loader. |
@@ -804,7 +804,7 @@ flowchart TD
 
 ## Ordered Chakra Journey add-ons
 
-Box → Visualization → Dharana → Body Scan → Guided Noting → chakras.
+Box → Visualization → Dharana → Body Scan → Guided Noting → chakras; the same selected route drives its displayed estimate and countdown.
 
 Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/box-breathing-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/box-breathing-practice.js:1), [modules/visualization-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/visualization-practice.js:1), [modules/dharana-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/dharana-practice.js:1), [modules/body-scan-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/body-scan-practice.js:1), [modules/guided-noting-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/guided-noting-practice.js:1), [modules/hooponopono-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/hooponopono-practice.js:1), [modules/undo-unlearn-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/undo-unlearn-practice.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [app.js:3957](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3957), [app.js:3985](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3985), [app.js:4471](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4471), [app.js:4513](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4513), [app.js:4533](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4533), [app.js:6374](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:6374), [index.html:322](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:322).
 

@@ -1,5 +1,15 @@
 # Review
 
+## CP-MOD-045 — Exact session countdown-duration ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct duration contracts, focused journey regressions, complete applicable Node suite, offline-shell Chromium startup, and atlas checks.
+
+- Exact `getSessionDurationMs()` formulas moved into `modules/session-estimate.js` as `resolveDurationMs()`. The controller injects app-owned state, selected mode, duration inputs, Yoga pose count, Sleep script interval and the standard-narration estimator; session countdown start/pause/stop/render remains in the controller.
+- Direct duration tests cover Music Only, focused Box and Ho’oponopono, combined preparation choices, empty preparation floor, Yoga pose/Corpse Pose/Bath, Intimate Service stages and massage, Sleep’s configured intervals, standard measured timing, HRIM fallback, demo fallback, and invalid dependencies. Existing focused-practice, Yoga, thermal and hypnosis contracts pass.
+- App/cache URLs advance to `3.95` / `chakra-v5.291`; eager/offline module order remains unchanged. The first Chromium startup attempt caught a stale expected cache URL in its test; after correcting it, the cold/warm/offline test passes.
+- All 70 runnable direct Node tests pass; `content-safety` and `drone-duration` require the absent owner-managed `docs/dot.json`. All 11 Loop router tests pass. The atlas rebuild and interactive verifier pass at 43 maps / 353 nodes / 405 edges, with no page errors and mobile overflow false.
+- The module remains eager and this extraction makes no startup, memory, CPU or thermal gain claim. No device timing/audio or production verification is claimed.
+
 ## CP-MOD-044 — Standard journey duration-estimate ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for source parity, direct estimator contracts, applicable regression suite, shell-cache startup and atlas verification.

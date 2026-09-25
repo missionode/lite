@@ -8,6 +8,10 @@ The existing `VisualEngine` now lives in `modules/visual-engine.js` and is eager
 
 The exact standard chakra-journey duration calculation now belongs to `modules/session-estimate.js`; `MeditationController` delegates with the same app-owned state, script, localization, timing, narration and DOM services. Session dispatch, mode priority and legacy fallbacks remain in the controller. This is ownership/testability work only; no performance or thermal gain is claimed. See the modularization review and active handoff.
 
+## Completed — CP-MOD-045 exact session countdown-duration ownership
+
+`modules/session-estimate.js` now owns the exact per-mode milliseconds calculation for Music Only, focused practices, combined preparations, Yoga, Intimate Service, Sleep, measured standard narration and HRIM/demo fallbacks. `MeditationController` supplies app state and DOM-derived values, and still owns timer lifecycle and route entry points. Duration formulas and precedence are covered directly; eager loading remains unchanged and no performance or thermal gain is claimed.
+
 ## Completed — CP-MOD-042 observational sky renderer ownership
 
 The existing `AmbientParticleField` renderer is now owned by `modules/ambient-particle-field.js` and loaded eagerly after its astronomy dependencies. The app still creates one instance and uses the same callbacks; canvas drawing, observer location/time, Earth/Moon/Sun/planet/star visibility, atmosphere, protective illustration, reduced-motion/static journey behavior and cleanup are unchanged. The module is included in the exact offline shell cache. This extraction improves ownership only; it does not claim startup, CPU or thermal gains. See the modularization review and active handoff.
