@@ -5,7 +5,8 @@
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-064/lite`, based on CP-MOD-063 `3f0c12e`; branch `codex/modularize-cp-064`. Extracted voice tuning, echo, spatial-mode and voice-preset input handlers to `modules/audio-effects-settings-view.js`. The mixer still delegates volume changes to CP-063’s `audio-volume-settings-view.js`.
 - Updated the `sound-options` map and FIX-QUEUE. Audio graph/DSP behavior, defaults, persistence keys and hydration order remain unchanged. Targeted effects-view, background-music/echo, DSP-controls and spatial-audio tests pass. Full Node sweep: 89 pass; `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent. `node --check`, `git diff --check` and atlas build pass (43 maps / 353 nodes / 405 edges). Atlas browser verification is unavailable without Playwright; no browser or device evidence and no performance claim.
 - No remote push, PR, merge or production publication. Keep the root integration checkout and unrelated files untouched.
-- Next: review and commit CP-064 locally; then check local browser/tool availability and continue the app-owner and measured-loading audit. Do not report the migration complete without integration reconciliation and the remaining load-evidence gate.
+- CP-064 is committed locally at `6ff6945` on `codex/modularize-cp-064`; no PR, push, integration merge or production update.
+- Next: check local browser/tool availability and continue the app-owner and measured-loading audit. Do not report the migration complete without integration reconciliation and the remaining load-evidence gate.
 
 ### NOW — CP-MOD-063: Audio volume settings view ownership
 
