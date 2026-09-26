@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const screenNavigationModule = window\.ChakraScreenNavigation/);
 assert.match(app, /function showScreen\(screen\)\s*\{\s*screenNavigation\.showScreen\(screen\);\s*\}/);
 assert.match(html, /modules\/screen-navigation\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/screen-navigation\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/screen-navigation\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -32,6 +32,7 @@ const config = screen();
 const lobby = screen();
 const meditation = screen();
 const experiment = screen();
+experiment.id = 'experiment-screen';
 const nullable = null;
 const screens = [config, lobby, meditation, experiment, nullable];
 const bodyClasses = new Set();
@@ -41,9 +42,10 @@ const body = { classList: {
 const document = { scrollingElement: { scrollTop: 77 } };
 let scrollCalls = [];
 let eventCount = 0;
+const browserWindow = { scrollTo(...args) { scrollCalls.push(args); }, location: { href: '' } };
 const api = navigation.create({
-    body, document, window: { scrollTo(...args) { scrollCalls.push(args); } }, screens,
-    lobbyScreen: lobby, configScreen: config,
+    body, document, window: browserWindow, screens,
+    lobbyScreen: lobby, configScreen: config, experimentScreen: experiment,
     dispatchDecorationChange() { eventCount++; }
 });
 assert.ok(Object.isFrozen(api));
@@ -66,8 +68,21 @@ api.showScreen(config);
 assert.equal(bodyClasses.has('static-decorations'), false, 'Settings retains its dynamic sky');
 assert.equal(eventCount, 3);
 
+const actions = new Map();
+const bind = id => ({ addEventListener(type, handler) { actions.set(`${id}:${type}`, handler); } });
+api.bindLobbyActions({ settingsButton: bind('settings'), experimentButton: bind('experiment'), closeExperimentButton: bind('close-experiment'), assessmentButton: bind('assessment') });
+actions.get('settings:click')();
+assert.equal(config.classes.has('hidden'), false, 'settings CTA opens Settings');
+actions.get('experiment:click')();
+assert.equal(experiment.classes.has('hidden'), false, 'experiment CTA opens the isolated activity screen');
+actions.get('close-experiment:click')();
+assert.equal(config.classes.has('hidden'), false, 'closing an experiment returns to Settings');
+assert.equal(experiment.classes.has('hidden'), true, 'closing the experiment hides its screen');
+actions.get('assessment:click')();
+assert.equal(browserWindow.location.href, './docs/assesment.html', 'the operator consultation CTA opens the standalone assessment');
+
 api.showScreen(null);
-assert.equal(eventCount, 4);
+assert.equal(eventCount, 7);
 assert.ok(screens.filter(Boolean).every(view => view.classes.has('hidden')));
 assert.equal(document.scrollingElement.scrollTop, 0, 'navigation without a destination does not scroll the document');
 

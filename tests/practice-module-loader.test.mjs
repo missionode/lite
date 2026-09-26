@@ -9,7 +9,6 @@ const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
-const selectionSource = app.slice(app.indexOf('function selectedPracticeModuleIds()'), app.indexOf('startMeditationBtn.addEventListener', app.indexOf('function selectedPracticeModuleIds()')));
 
 assert.match(index, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
@@ -17,13 +16,13 @@ for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing'
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);
 }
 assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.0/);
-assert.match(app, /selectedPracticeModuleIds\(\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
+assert.match(app, /practiceModuleLoader\.selectedModuleIds\(getChecked\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
 for (const [toggle, id] of [
     ['body-scan-addon-toggle', 'body-scan'], ['noting-addon-toggle', 'guided-noting'],
     ['dharana-addon-toggle', 'dharana'], ['box-breathing-experience-toggle', 'box-breathing'],
     ['visualization-addon-toggle', 'visualization'], ['hooponopono-experience-toggle', 'hooponopono'],
     ['undo-unlearn-addon-toggle', 'undo-unlearn']
-]) assert.match(selectionSource, new RegExp(`${toggle}['\"]?,\\s*['\"]${id}`));
+]) assert.match(source, new RegExp(`${toggle}['\"]?,\\s*['\"]${id}`));
 assert.match(app, /alert\(journeyT\('ui\.practiceLoadFailed'\)\);\s*return;/, 'a failed module load stops the start flow before continuing');
 assert.equal(packageJson.scripts['test:practice-module-loader'], 'node tests/practice-module-loader.test.mjs');
 assert.ok(locales.every(locale => locale.ui.practiceLoadFailed), 'load failure recovery is localized in every bundled language');
@@ -56,6 +55,9 @@ const context = vm.createContext({
 vm.runInContext(source, context);
 const loader = context.ChakraPracticeModuleLoader;
 assert.deepEqual(Array.from(loader.moduleIds), practiceIds);
+assert.deepEqual(Array.from(loader.selectedModuleIds(id => ['box-breathing-experience-toggle', 'noting-addon-toggle', 'body-scan-addon-toggle'].includes(id))), ['body-scan', 'guided-noting', 'box-breathing']);
+assert.deepEqual(Array.from(loader.selectedModuleIds(() => false)), [], 'no selection requests no practice modules');
+assert.throws(() => loader.selectedModuleIds(null), /requires a toggle reader/);
 assert.ok(Object.isFrozen(loader));
 const first = loader.load('box-breathing');
 const duplicate = loader.load('box-breathing');

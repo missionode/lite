@@ -57,6 +57,7 @@ const mediaLifecycle = window.ChakraMediaLifecycle;
 if (!mediaLifecycle) throw new Error('Media lifecycle module is unavailable.');
 const piperLifecycle = window.ChakraPiperLifecycle;
 if (!piperLifecycle) throw new Error('Piper lifecycle module is unavailable.');
+const piperVoiceProfile = piperLifecycle.voiceProfile;
 const audioRouteLifecycle = window.ChakraAudioRouteLifecycle;
 if (!audioRouteLifecycle) throw new Error('Audio route lifecycle module is unavailable.');
 const audioSignalDesign = window.ChakraAudioSignalDesign;
@@ -89,6 +90,7 @@ const journeyRouting = window.ChakraJourneyRouting;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
 const sessionEstimate = window.ChakraSessionEstimate;
+const sessionCountdownDisplay = window.ChakraSessionCountdownDisplay;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
 const droneDurationSettingsView = window.ChakraDroneDurationSettingsView;
 const lobbyExperienceVisibility = window.ChakraLobbyExperienceVisibility;
@@ -104,6 +106,7 @@ const journeySelectionHydration = window.ChakraJourneySelectionHydration;
 const timingPreferenceHydration = window.ChakraTimingPreferenceHydration;
 const appearancePreferenceHydration = window.ChakraAppearancePreferenceHydration;
 const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
+const scriptSourceSettings = window.ChakraScriptSourceSettings;
 const carePreferenceHydration = window.ChakraCarePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
 if (!practiceModuleLoader) throw new Error('Guided practice module loader is unavailable.');
@@ -114,9 +117,11 @@ if (!journeySelectionHydration) throw new Error('Journey selection hydration mod
 if (!timingPreferenceHydration) throw new Error('Timing preference hydration module is unavailable.');
 if (!appearancePreferenceHydration) throw new Error('Appearance preference hydration module is unavailable.');
 if (!scriptPreferenceHydration) throw new Error('Script preference hydration module is unavailable.');
+if (!scriptSourceSettings) throw new Error('Script source settings module is unavailable.');
 if (!carePreferenceHydration) throw new Error('Care preference hydration module is unavailable.');
 if (!screenNavigationModule) throw new Error('Screen navigation module is unavailable.');
 if (!sessionEstimate) throw new Error('Session estimate module is unavailable.');
+if (!sessionCountdownDisplay) throw new Error('Session countdown display module is unavailable.');
 if (!moodAmbienceSettingsView) throw new Error('Mood ambience settings view module is unavailable.');
 if (!droneDurationSettingsView) throw new Error('Drone duration settings view module is unavailable.');
 if (!lobbyExperienceVisibility) throw new Error('Lobby experience visibility module is unavailable.');
@@ -203,141 +208,93 @@ const PLEASURE_BLUR_DRY_MIX = 1 - PLEASURE_BLUR_DEFAULT_AMOUNT;
 const PLEASURE_BLUR_WET_MIX = PLEASURE_BLUR_DEFAULT_AMOUNT;
 
 function clampPleasureAmbienceGain(value) {
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return PLEASURE_AMBIENCE_GAIN;
-    return Math.min(PLEASURE_AMBIENCE_MAX_GAIN, Math.max(PLEASURE_AMBIENCE_MIN_GAIN, numericValue));
+    return moodAmbienceSettingsView.clampGain(value, {
+        fallback: PLEASURE_AMBIENCE_GAIN, minimum: PLEASURE_AMBIENCE_MIN_GAIN, maximum: PLEASURE_AMBIENCE_MAX_GAIN
+    });
 }
 
 function clampAudioLevel(value, min, max, fallback) {
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return fallback;
-    return Math.min(max, Math.max(min, numericValue));
+    return moodAmbienceSettingsView.clampLevel(value, min, max, fallback);
 }
 
 function normalizePleasureAmbienceUrl(value) {
-    const candidate = String(value ?? '').trim();
-    if (!candidate) return '';
-    try {
-        const parsed = new URL(candidate, window.location.href);
-        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
-    } catch (error) {
-        return '';
-    }
+    return moodAmbienceSettingsView.normalizeUrl(value, window.location.href);
 }
 
 function clampPleasureAmbienceBlurAmount(value) {
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return PLEASURE_BLUR_DEFAULT_AMOUNT;
-    return Math.min(PLEASURE_BLUR_MAX_AMOUNT, Math.max(PLEASURE_BLUR_MIN_AMOUNT, numericValue));
+    return moodAmbienceSettingsView.clampBlurAmount(value, {
+        fallback: PLEASURE_BLUR_DEFAULT_AMOUNT, minimum: PLEASURE_BLUR_MIN_AMOUNT, maximum: PLEASURE_BLUR_MAX_AMOUNT
+    });
 }
 
 function normalizePleasureAmbienceIntensity(value) {
-    return Object.hasOwn(PLEASURE_AMBIENCE_INTENSITIES, value) ? value : 'gentle';
+    return moodAmbienceSettingsView.normalizeIntensity(value, PLEASURE_AMBIENCE_INTENSITIES);
 }
 
 function getPleasureAmbienceIntensityProfile() {
-    return PLEASURE_AMBIENCE_INTENSITIES[normalizePleasureAmbienceIntensity(state?.pleasureAmbienceIntensity)];
+    return moodAmbienceSettingsView.intensityProfile(state?.pleasureAmbienceIntensity, PLEASURE_AMBIENCE_INTENSITIES);
 }
 
 function getPleasureBlurMix(enabled) {
-    const profile = getPleasureAmbienceIntensityProfile();
-    const wet = enabled
-        ? clampPleasureAmbienceBlurAmount(state.pleasureAmbienceBlurAmount) * profile.blurMultiplier
-        : 0;
-    return { dry: 1 - wet, wet };
+    return moodAmbienceSettingsView.blurMix({
+        enabled, amount: state.pleasureAmbienceBlurAmount, intensity: state.pleasureAmbienceIntensity,
+        profiles: PLEASURE_AMBIENCE_INTENSITIES, clampAmount: clampPleasureAmbienceBlurAmount
+    });
 }
 
 function formatPleasureAmbienceLevel(gain) {
-    return `${(clampPleasureAmbienceGain(gain) * 100).toFixed(1)}%`;
+    return moodAmbienceSettingsView.formatLevel(gain, {
+        fallback: PLEASURE_AMBIENCE_GAIN, minimum: PLEASURE_AMBIENCE_MIN_GAIN, maximum: PLEASURE_AMBIENCE_MAX_GAIN
+    });
 }
 
 function getShotDefaultDuration(type, definition = timingConfig.journey?.shotDuration || {}) {
-    const isMultiStage = MULTI_STAGE_SHOT_TYPES.includes(type);
-    const configured = isMultiStage ? definition.default : definition.singleFrequencyDefault;
-    const fallback = isMultiStage ? 7 : 1;
-    const duration = Number(configured ?? fallback);
-    const minimum = Number(definition.min ?? 1);
-    const maximum = Number(definition.max ?? 20);
-    return Number.isFinite(duration) ? Math.min(maximum, Math.max(minimum, duration)) : fallback;
+    return timingSettings.shotDefaultDuration(type, definition, MULTI_STAGE_SHOT_TYPES);
 }
 
 function normalizeDroneDurationMode(value) {
-    return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value) ? value : DEFAULT_DRONE_DURATION_MODE;
+    return timingSettings.normalizeDroneDurationMode(value, DRONE_DURATION_RATIOS, DEFAULT_DRONE_DURATION_MODE);
 }
 
 function normalizeHrimDroneDurationMode(value) {
-    const normalized = normalizeDroneDurationMode(value);
-    return normalized === 'beginner' ? DEFAULT_HRIM_DRONE_DURATION_MODE : normalized;
+    return timingSettings.normalizeHrimDroneDurationMode(value, DRONE_DURATION_RATIOS,
+        DEFAULT_DRONE_DURATION_MODE, DEFAULT_HRIM_DRONE_DURATION_MODE);
 }
 
 function normalizeSleepDroneDurationMode(value) {
-    return Object.prototype.hasOwnProperty.call(DRONE_DURATION_RATIOS, value)
-        ? value
-        : DEFAULT_SLEEP_DRONE_DURATION_MODE;
+    return timingSettings.normalizeSleepDroneDurationMode(value, DRONE_DURATION_RATIOS, DEFAULT_SLEEP_DRONE_DURATION_MODE);
 }
 
 function normalizeSpatialMode(value) {
-    return SPATIAL_MODES.includes(value) ? value : DEFAULT_SPATIAL_MODE;
+    return window.ChakraAudioEffectsSettingsView.normalizeSpatialMode(value, SPATIAL_MODES, DEFAULT_SPATIAL_MODE);
 }
 
 function getDroneDurationMs(_practiceMinutes, mode = DEFAULT_DRONE_DURATION_MODE) {
-    return Math.round(DRONE_REFERENCE_SECONDS * 1000 * DRONE_DURATION_RATIOS[normalizeDroneDurationMode(mode)]);
+    return timingSettings.droneDurationMs(mode, DRONE_DURATION_RATIOS, DEFAULT_DRONE_DURATION_MODE, DRONE_REFERENCE_SECONDS);
 }
 
 function formatClockDuration(durationMs) {
-    const totalSeconds = Math.max(0, Math.round(Number(durationMs) / 1000));
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    return timingSettings.formatClockDuration(durationMs);
 }
 
-const SESSION_COUNTDOWN_CIRCUMFERENCE = 276.46;
 function setSessionCountdown(remainingMs, totalMs) {
-    const countdowns = document.querySelectorAll('[data-session-countdown]');
-    const progressNodes = document.querySelectorAll('[data-session-countdown-progress]');
-    const total = Number(totalMs);
-    const remaining = Number(remainingMs);
-    if (!countdowns.length || !progressNodes.length || !Number.isFinite(total) || total <= 0) {
-        countdowns.forEach(countdown => { countdown.hidden = true; });
-        return;
-    }
-
-    const safeRemaining = Math.min(total, Math.max(0, Number.isFinite(remaining) ? remaining : total));
-    const ratio = safeRemaining / total;
-    countdowns.forEach(countdown => { countdown.hidden = false; });
-    progressNodes.forEach(progress => {
-        progress.style.strokeDashoffset = String(SESSION_COUNTDOWN_CIRCUMFERENCE * (1 - ratio));
-    });
+    sessionCountdownDisplay.renderProgress(document, remainingMs, totalMs);
 }
 
 function hideSessionCountdown() {
-    document.querySelectorAll('[data-session-countdown]').forEach(countdown => {
-        countdown.hidden = true;
-    });
+    sessionCountdownDisplay.hideDisplay(document);
 }
 
 function normalizeSleepStages(scripts) {
-    const stages = scripts?.sleep_mode?.stages;
-    if (!Array.isArray(stages) || stages.length !== SLEEP_STAGE_COUNT) {
-        throw new Error('Sleep Mode requires five script-defined frequency stages.');
-    }
-    return stages.map((stage, index) => {
-        const frequency = Number(stage?.frequency);
-        if (!stage?.key || !Number.isFinite(frequency) || frequency <= 0 || frequency > 20000) {
-            throw new Error(`Sleep Mode stage ${index + 1} has an invalid frequency.`);
-        }
-        return { ...stage, frequency };
-    });
+    return timingSettings.normalizeSleepStages(scripts, SLEEP_STAGE_COUNT);
 }
 
 // Journey completion reveals a native Earn link after a quiet closing pause.
 // Navigation remains a real user action so an installed PWA can capture it.
-const EARN_HANDOFF_DELAY_MS = 3000;
-let earnHandoffTimer = null;
 const MEDITATION_VISUAL_EFFECTS = new Set(['natural', 'aura', 'holographic', 'depth']);
 
 function normalizeMeditationVisualEffect(value) {
-    return MEDITATION_VISUAL_EFFECTS.has(value) ? value : 'natural';
+    return window.ChakraVisualEffectPolicy.normalize(value, MEDITATION_VISUAL_EFFECTS);
 }
 
 // ── DOM ELEMENTS (Declared First to prevent TDZ Errors) ──────────────────────
@@ -356,6 +313,7 @@ const screenNavigation = screenNavigationModule.create({
     screens: [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
+    experimentScreen,
     dispatchDecorationChange: () => document.dispatchEvent(new Event('decorationchange'))
 });
 const icebreakerTimer = document.getElementById('icebreaker-timer');
@@ -390,73 +348,21 @@ const syncValue = (id, val) => {
     if (el) el.value = val;
 };
 const estimateNarrationDurationSeconds = (txt, pacing = 'normal') => {
-    const text = String(txt ?? '').trim();
-    if (!text) return 0;
-
-    // Keep the estimate deliberately conservative. Browser speech and Piper
-    // have different timing, and Malayalam generally needs more reading time
-    // than Latin text. A slower ticker is preferable to outrunning the voice.
-    const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
-    const charactersPerSecond = isMalayalam ? 5.5 : 7.5;
-    const piperPaceMultiplier = isPiperVoice()
-        ? getPiperMeditationPaceMultiplier()
-        : 1;
-    const pacingFactor = pacing === 'hrim' ? 1.1 : pacing === 'soft' ? 0.82 : pacing === 'feeble' ? 0.76 : 1;
-    const sentenceCount = text.split(/[.!?।]/).filter(sentence => sentence.trim()).length;
-    const sentenceGaps = Math.max(0, sentenceCount - 1) * 1.5;
-    return 1.2 + (text.length / (charactersPerSecond * pacingFactor * piperPaceMultiplier)) + sentenceGaps;
+    return sessionEstimate.estimateNarrationDurationSeconds(txt, pacing, {
+        isPiperVoice, getPiperMeditationPaceMultiplier,
+        leadInSeconds: 1.2,
+        sentenceGapSeconds: 1.5
+    });
 };
 const setText = (id, txt) => {
     const el = document.getElementById(id);
     if (el) el.textContent = txt;
 };
 
-function cancelEarnHandoff() {
-    if (earnHandoffTimer !== null) {
-        window.clearTimeout(earnHandoffTimer);
-        earnHandoffTimer = null;
-    }
-    const earnLink = document.getElementById('continue-to-earn');
-    if (earnLink) {
-        earnLink.hidden = true;
-        earnLink.classList.add('hidden');
-    }
-}
-
-function canUseEarnHandoff() {
-    // Hindi is an intentionally non-commercial, browser-TTS-only experience.
-    return state.language !== 'hi';
-}
-
-function scheduleEarnHandoff() {
-    cancelEarnHandoff();
-    if (!canUseEarnHandoff()) return;
-    earnHandoffTimer = window.setTimeout(() => {
-        earnHandoffTimer = null;
-        const earnLink = document.getElementById('continue-to-earn');
-        if (!earnLink) return;
-        earnLink.hidden = false;
-        earnLink.classList.remove('hidden');
-        earnLink.focus({ preventScroll: true });
-    }, EARN_HANDOFF_DELAY_MS);
-}
-
-function setSymbolImage(src, symbolEl = document.getElementById('chakra-symbol')) {
-    if (!symbolEl || !src) return;
-
-    symbolEl.style.visibility = 'hidden';
-    symbolEl.dataset.pendingSrc = src;
-    symbolEl.onload = () => {
-        if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'visible';
-    };
-    symbolEl.onerror = () => {
-        if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'hidden';
-    };
-    symbolEl.src = src;
-
-    // Cached images may already be complete before the load callback is attached.
-    if (symbolEl.complete && symbolEl.naturalWidth > 0) symbolEl.style.visibility = 'visible';
-}
+const earnHandoff = window.ChakraCompletionView.createEarnHandoff({ document, window, getLanguage: () => state.language });
+function cancelEarnHandoff() { earnHandoff.cancel(); }
+function canUseEarnHandoff() { return earnHandoff.canUse(); }
+function scheduleEarnHandoff() { earnHandoff.schedule(); }
 
 function getScriptPath(source, path) {
     return window.ChakraContentLocalization.getPath(source, path);
@@ -479,25 +385,15 @@ function validateScriptBundle(scripts, options = {}) {
 
 const DEMO_SCRIPT_ID = 'stakeholder-client-demo';
 const DEMO_CORE_DURATION_SECONDS = 30;
-const DEMO_CORE_DURATION_MINUTES = DEMO_CORE_DURATION_SECONDS / 60;
 const DEMO_PREVIOUS_CORE_DURATION_STORAGE_KEY = 'chakra_demo_previous_time';
 
 function getDemoCoreDurationMinutes(script) {
-    const metadata = script?._demo;
-    return metadata?.id === DEMO_SCRIPT_ID &&
-        Number(metadata.recommendedCoreDurationSeconds) === DEMO_CORE_DURATION_SECONDS
-        ? DEMO_CORE_DURATION_MINUTES
-        : null;
+    return scriptSourceSettings.getDemoCoreDurationMinutes(script, DEMO_SCRIPT_ID, DEMO_CORE_DURATION_SECONDS);
 }
 
 function getDemoScriptTimingMessage() {
     const key = 'ui.demoScriptTimingApplied';
-    const message = t(key);
-    // A stale installed language cache must never expose an implementation
-    // key to a client during a demonstration.
-    return message === key
-        ? 'Demo journey ready — 30 seconds per selected chakra.'
-        : message;
+    return scriptSourceSettings.getDemoTimingMessage(t, key, 'Demo journey ready — 30 seconds per selected chakra.');
 }
 
 let piperVoiceRegistry = [];
@@ -572,15 +468,12 @@ function contentT(path) {
 }
 
 function updateDroneDurationSummary() {
-    const summary = document.getElementById('drone-duration-summary');
-    if (!summary) return;
     const highEnergy = getChecked('high-energy-toggle');
     const sleep = getChecked('sleep-mode-toggle');
-    const practiceMinutes = highEnergy ? state.timeHighEnergy : (sleep ? state.timeSleepStage : state.timePerChakra);
-    const mode = highEnergy ? state.hrimDroneDurationMode : (sleep ? state.sleepDroneDurationMode : state.droneDurationMode);
-    const duration = formatClockDuration(getDroneDurationMs(practiceMinutes, mode));
-    const template = t(highEnergy ? 'ui.droneDurationActiveHrim' : (sleep ? 'ui.droneDurationActiveSleep' : 'ui.droneDurationActive'));
-    summary.textContent = template.replace('{duration}', duration);
+    droneDurationSettingsView.renderSummary({
+        document, state, highEnergy, sleep, getDurationMs: getDroneDurationMs,
+        formatDuration: formatClockDuration, translate: t
+    });
 }
 
 function syncDroneDurationModeControls() {
@@ -599,17 +492,18 @@ function hrimDefaultIntention(language = state.language) {
 }
 
 function isGeneratedIntention(value, language = state.language) {
-    const current = (value || '').trim();
-    return !current || current === defaultIntention(language) || current === hrimDefaultIntention(language);
+    return window.ChakraContentLocalization.isGeneratedIntention(
+        value, defaultIntention(language), hrimDefaultIntention(language)
+    );
 }
 
 function shouldRefreshLocalizedIntention(value, previousLanguage) {
     // Current and earlier releases may have saved either language's generated
     // wording. Recognize both defaults so changing Meditation Language always
     // refreshes app-generated copy, while a guide's own intention stays intact.
-    const supportedLanguages = languageRegistry.map(language => language.id);
-    const languagesToCheck = [...new Set([previousLanguage, state.language, ...supportedLanguages])];
-    return languagesToCheck.some(language => isGeneratedIntention(value, language));
+    return window.ChakraContentLocalization.shouldRefreshLocalizedIntention(
+        value, previousLanguage, state.language, languageRegistry.map(language => language.id), isGeneratedIntention
+    );
 }
 
 function getJourneyRoadmapLabels() {
@@ -686,79 +580,46 @@ function populateLanguageSelect() {
 }
 
 function isPiperVoice(value) {
-    return typeof value === 'string' && value.startsWith('piper:');
+    return piperVoiceProfile.isPiperVoice(value);
 }
 
 function piperVoiceId(value) {
-    return isPiperVoice(value) ? value.slice('piper:'.length) : '';
+    return piperVoiceProfile.voiceId(value);
 }
 
 function getPiperVoiceDefinition(value = state.voiceName) {
-    if (!isPiperVoice(value)) return null;
-    return piperVoiceRegistry.find(voice => voice.id === piperVoiceId(value)) || null;
+    return piperVoiceProfile.definition(piperVoiceRegistry, value);
 }
 
 function getPiperMeditationPaceMultiplier(value = state.voiceName) {
-    const multiplier = Number(getPiperVoiceDefinition(value)?.meditationPaceMultiplier);
-    return Number.isFinite(multiplier) && multiplier > 0 && multiplier <= 1.15 ? multiplier : 1;
+    return piperVoiceProfile.paceMultiplier(getPiperVoiceDefinition(value));
 }
 
 function getEffectivePiperPace(value = state.voiceName) {
-    const selectedPace = Number(state.voicePace) || 1;
-    const requestedMinimum = Number(getPiperVoiceDefinition(value)?.meditationPaceMin);
-    // Standard voices retain the existing 0.70 floor. Only an explicitly
-    // registered meditation voice may opt into the lower calm-cadence floor.
-    const minimum = Number.isFinite(requestedMinimum)
-        ? Math.max(0.6, Math.min(0.7, requestedMinimum))
-        : 0.7;
-    return Math.max(minimum, Math.min(1.15, selectedPace * getPiperMeditationPaceMultiplier(value)));
+    return piperVoiceProfile.effectivePace(state.voicePace, getPiperVoiceDefinition(value));
 }
 
 function getPiperMeditationSettings(value = state.voiceName) {
-    const definition = getPiperVoiceDefinition(value) || {};
-    return {
-        lengthScale: 1 / getEffectivePiperPace(value),
-        // The normal runtime ceiling remains conservative. A model may opt in
-        // to a modestly longer meditation cadence through its registry entry.
-        lengthScaleMax: Number(definition.meditationLengthScaleMax) || 1.35
-    };
+    return piperVoiceProfile.meditationSettings(state.voicePace, getPiperVoiceDefinition(value));
 }
 
 function isFeminineNarrationVoice(value = state.voiceName) {
-    const piperVoice = getPiperVoiceDefinition(value);
-    if (piperVoice) return String(piperVoice.gender || '').toLowerCase() === 'female';
-    // Unknown Piper voices are intentionally neutral until their registry
-    // entry declares a gender. This keeps future languages data-driven.
-    if (isPiperVoice(value)) return false;
-
-    const selected = getBrowserVoiceForContent();
-    const browserGender = String(selected?.gender || selected?.voiceGender || '').toLowerCase();
-    if (browserGender) return browserGender === 'female';
-    const name = `${selected?.name || ''} ${value || ''}`.toLowerCase();
-    // Web Speech has no consistently supported gender field, so keep a
-    // language-neutral fallback for browser voices that advertise it by name.
-    return /\b(female|woman|samantha|victoria|karen|moira|zira|ava|susan|veena|lekha|meera)\b/i.test(name);
+    return piperVoiceProfile.isFeminine(value, getPiperVoiceDefinition(value), getBrowserVoiceForContent);
 }
 
 function setVoiceStatus(message, tone = 'muted') {
-    const status = document.getElementById('voice-status');
-    if (!status) return;
-    status.textContent = message || '';
-    status.style.display = message ? 'block' : 'none';
-    status.style.color = tone === 'error' ? '#f87171' : tone === 'ready' ? '#4ade80' : '#ffa500';
+    window.ChakraMediaControlsView.renderVoiceStatus(document, message, tone);
 }
 
 function voiceMatchesLanguage(voice, language = state.language) {
-    if (!voice || !voice.lang) return false;
     const prefixes = getLanguageConfig(language).browserPrefixes || [language];
-    const voiceLanguage = voice.lang.toLowerCase();
-    return prefixes.some(prefix => voiceLanguage.startsWith(String(prefix).toLowerCase()));
+    return piperVoiceProfile.voiceMatchesLanguage(voice, prefixes);
 }
 
 function getBrowserVoiceForContent() {
-    const browserName = String(state.voiceName || '').replace(/^browser:/, '');
-    const selected = state.voices.find(voice => voice.name === browserName && voiceMatchesLanguage(voice));
-    return selected || state.voices.find(voice => voiceMatchesLanguage(voice)) || null;
+    const language = state.language;
+    const prefixes = getLanguageConfig(language).browserPrefixes || [language];
+    return piperVoiceProfile.browserVoice(state.voiceName, state.voices, prefixes);
 }
 
 function splitNarrationText(text, limit = 180) {
@@ -2512,7 +2373,7 @@ class MeditationController {
         // Setup simple UI
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) {
-            setSymbolImage("symbols/background-only.png", symbolEl);
+            visual.setSymbolImage("symbols/background-only.png", symbolEl);
             symbolEl.style.opacity = "0.7";
         }
         
@@ -2658,7 +2519,7 @@ class MeditationController {
                 'adho_mukha_svanasana': 'symbols/Downward_dog.png',
                 'marjaryasana': 'symbols/Marjaryasana.png'
             };
-            setSymbolImage(imageMap[pose.id] || "symbols/root.png", symbolEl);
+            visual.setSymbolImage(imageMap[pose.id] || "symbols/root.png", symbolEl);
             symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
 
             // Explain Pose
@@ -2984,9 +2845,9 @@ class MeditationController {
         
         // Deity Image Selection
         if (key !== 'high_energy' && state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath] && this.scripts.deities[state.deityPath][key]) {
-            setSymbolImage(this.scripts.deities[state.deityPath][key], symbolEl);
+            visual.setSymbolImage(this.scripts.deities[state.deityPath][key], symbolEl);
         } else {
-            setSymbolImage(chakra.symbol, symbolEl);
+            visual.setSymbolImage(chakra.symbol, symbolEl);
         }
 
         symbolEl.style.opacity = "1";
@@ -3430,7 +3291,7 @@ const state = window.ChakraAppState.createInitialState({
 });
 
 function isDemoScriptSelected() {
-    return state.scriptSource === 'custom' && getDemoCoreDurationMinutes(state.customScript) !== null;
+    return scriptSourceSettings.isDemoScriptSelected(state, DEMO_SCRIPT_ID, DEMO_CORE_DURATION_SECONDS);
 }
 
 function syncCorePracticeDuration(value) {
@@ -3497,15 +3358,7 @@ function getMoonPhase() {
 }
 
 async function loadPiperVoiceRegistry() {
-    try {
-        const response = await fetch('piper-models.json');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const json = await response.json();
-        piperVoiceRegistry = Array.isArray(json.voices) ? json.voices : [];
-    } catch (error) {
-        console.warn('Piper voice registry unavailable; browser voices remain available.', error);
-        piperVoiceRegistry = [];
-    }
+    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console);
 }
 
 async function init() {
@@ -3538,88 +3391,24 @@ function registerServiceWorker() {
 }
 
 function setupVoices() {
-    const updateUI = (availableVoices = []) => {
-        state.voices = availableVoices;
-        const currentVal = state.voiceName || voiceSelect.value;
-        voiceSelect.innerHTML = '';
-
-        const piperVoices = piperVoiceRegistry.filter(voice => voice.language === state.language);
-        piperVoices.forEach(voice => {
-            const option = document.createElement('option');
-            option.value = `piper:${voice.id}`;
-            option.textContent = `${voice.label} · local`;
-            voiceSelect.appendChild(option);
-        });
-
-        const browserGroup = document.createElement('optgroup');
-        browserGroup.label = 'Browser fallback voices';
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = 'browser:Default';
-        defaultOpt.textContent = 'System Default Voice';
-        browserGroup.appendChild(defaultOpt);
-        availableVoices.filter(voice => voiceMatchesLanguage(voice)).forEach(voice => {
-            const option = document.createElement('option');
-            option.value = `browser:${voice.name}`;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            browserGroup.appendChild(option);
-        });
-        voiceSelect.appendChild(browserGroup);
-
-        const currentExists = Array.from(voiceSelect.options).some(option => option.value === currentVal);
-        if (currentExists) voiceSelect.value = currentVal;
-        else autoSelectVoice();
-    };
-
-    updateUI('speechSynthesis' in window ? window.speechSynthesis.getVoices() : []);
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => updateUI(window.speechSynthesis.getVoices());
-        try {
-            const dummy = new SpeechSynthesisUtterance('');
-            dummy.volume = 0;
-            window.speechSynthesis.speak(dummy);
-        } catch (error) {}
-    }
+    piperLifecycle.bindVoicePicker({
+        document, window, state, voiceSelect, piperVoices: piperVoiceRegistry,
+        voiceMatchesLanguage, autoSelectVoice, SpeechSynthesisUtteranceCtor: window.SpeechSynthesisUtterance
+    });
 }
 
 function autoSelectVoice() {
-    const currentPiper = piperVoiceRegistry.find(voice =>
-        isPiperVoice(state.voiceName) && piperVoiceId(state.voiceName) === voice.id && voice.language === state.language);
-    if (currentPiper) {
-        voiceSelect.value = state.voiceName;
-        return;
-    }
-    const preferredVoiceId = getLanguageConfig().defaultPiperVoice;
-    const defaultPiper = piperVoiceRegistry.find(voice =>
-        voice.language === state.language && voice.id === preferredVoiceId
-    ) || piperVoiceRegistry.find(voice => voice.language === state.language);
-    if (defaultPiper) {
-        state.voiceName = `piper:${defaultPiper.id}`;
-        voiceSelect.value = state.voiceName;
-        return;
-    }
-    if (!state.voices || state.voices.length === 0) {
-        state.voiceName = 'browser:Default';
-        if (voiceSelect) voiceSelect.value = state.voiceName;
-        return;
-    }
-    
-    let bestVoice = null;
-    const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
-    
-    const findBestInList = (list) => {
-        // First try premium voices
-        let premium = list.find(v => premiumKeywords.some(kw => v.name.toLowerCase().includes(kw)));
-        if (premium) return premium;
-        // Then return the first in the list
-        return list[0];
-    };
-
-    bestVoice = findBestInList(state.voices.filter(voice => voiceMatchesLanguage(voice)));
-    
-    if (bestVoice) {
-        state.voiceName = `browser:${bestVoice.name}`;
-        voiceSelect.value = state.voiceName;
-    }
+    const selected = piperVoiceProfile.selectVoice({
+        currentValue: state.voiceName || voiceSelect?.value,
+        registry: piperVoiceRegistry,
+        language: state.language,
+        defaultVoiceId: getLanguageConfig().defaultPiperVoice,
+        browserVoices: state.voices,
+        browserPrefixes: getLanguageConfig().browserPrefixes || [state.language]
+    });
+    if (selected == null) return;
+    state.voiceName = selected;
+    if (voiceSelect) voiceSelect.value = selected;
 }
 
 function applyJourneyVoiceProfile(isHighEnergy) {
@@ -3754,41 +3543,19 @@ function attachEventListeners() {
     const yogaExperiencePanelHost = document.getElementById('yoga-experience-panel-host');
     if (yogaExperienceSetup && yogaExperiencePanelHost) yogaExperiencePanelHost.append(yogaExperienceSetup);
 
-    languageSelect.addEventListener('change', (e) => {
-        const previousLanguage = state.language;
-        const shouldUpdateGeneratedIntention = shouldRefreshLocalizedIntention(state.intention, previousLanguage);
-        state.language = e.target.value;
-        if (shouldUpdateGeneratedIntention) {
-            state.intention = state.highEnergyEnabled
-                ? hrimDefaultIntention(state.language)
-                : defaultIntention(state.language);
-            syncValue('intention-input', state.intention);
-            localStorage.setItem('chakra_intention', state.intention);
-        }
-        setupVoices();
-        autoSelectVoice();
-        applyLocaleUI();
-    });
     const displayLanguageSelect = document.getElementById('display-language-select');
-    if (displayLanguageSelect) {
-        displayLanguageSelect.addEventListener('change', (e) => {
-            state.displayLanguage = e.target.value;
-            localStorage.setItem('chakra_display_language', state.displayLanguage);
-            applyLocaleUI();
-        });
-    }
-    voiceSelect.addEventListener('change', (e) => { state.voiceName = e.target.value; });
-    testVoiceBtn.addEventListener('click', testVoice);
-    document.getElementById('mixer-voice-preview')?.addEventListener('click', testVoice);
-    function persistChakraSelection() {
-        state.selectedChakras = Array.from(document.querySelectorAll('#chakra-selection input:checked')).map(cb => cb.value);
-        localStorage.setItem('chakra_selected', JSON.stringify(state.selectedChakras));
-        updateSessionEstimate();
-        updateJourneyRoadmap();
-    }
+    window.ChakraLocaleUiRenderer.bindPreferenceControls({
+        languageSelect, displayLanguageSelect, voiceSelect, state, storage: localStorage,
+        shouldRefreshLocalizedIntention, hrimDefaultIntention, defaultIntention,
+        syncValue, setupVoices, autoSelectVoice, applyLocaleUI
+    });
+    window.ChakraMediaControlsView.bindVoicePreviewButtons({ document, testVoice });
+    const chakraSelectionView = window.ChakraSelectionView.create({
+        document, state, storage: localStorage, updateSessionEstimate, updateJourneyRoadmap
+    });
 
     saveConfigBtn.addEventListener('click', () => {
-        persistChakraSelection();
+        chakraSelectionView.persist();
         localStorage.setItem('chakra_lang', state.language);
         localStorage.setItem('chakra_display_language', state.displayLanguage);
         state.voiceName = voiceSelect.value;
@@ -4209,12 +3976,9 @@ function attachEventListeners() {
     }
 
     // Event Listeners for Toggles
-    ['corpse-pose-toggle', 'bath-session-toggle'].forEach(id => {
-        document.getElementById(id)?.addEventListener('change', () => {
-            persistYogaExperienceSetup();
-            updateTimingRowVisibility();
-            updateSessionEstimate();
-        });
+    yogaExperienceSettings.bindSetupChangeControls({
+        document, state, storage: localStorage,
+        syncTimingRows: updateTimingRowVisibility, updateSessionEstimate
     });
     intimateServiceToggles.forEach(toggle => {
         toggle.addEventListener('change', (event) => {
@@ -4224,29 +3988,6 @@ function attachEventListeners() {
             updateSessionEstimate();
         });
     });
-    document.querySelectorAll('#yoga-pose-selection input').forEach(input => {
-        input.addEventListener('change', () => {
-            persistYogaExperienceSetup();
-            updateSessionEstimate();
-        });
-    });
-    if (musicOnlyToggle) {
-        musicOnlyToggle.addEventListener('change', (e) => {
-            state.bgMusicMode = e.target.checked;
-            enforceMasterToggle(e.target);
-            updateExperienceModeVisibility();
-            updateSessionEstimate();
-        });
-    }
-
-    if (highEnergyToggle) {
-        highEnergyToggle.addEventListener('change', (e) => {
-            state.highEnergyEnabled = e.target.checked;
-            enforceMasterToggle(e.target);
-            updateExperienceModeVisibility();
-        });
-    }
-
     window.ChakraJourneyPreparationSelection.bind({
         document,
         state,
@@ -4267,79 +4008,31 @@ function attachEventListeners() {
         updateExperienceModeVisibility,
         updateSessionEstimate
     });
-    document.getElementById('visualization-ambience')?.addEventListener('change', event => {
-        state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
-        localStorage.setItem('chakra_visualization_ambience', state.visualizationAmbience);
+    window.ChakraJourneyPreparationSelection.bindPrimaryModeToggles({
+        musicOnlyToggle, highEnergyToggle, state, enforceMasterToggle,
+        updateExperienceModeVisibility, updateSessionEstimate
     });
-    document.getElementById('visualization-duration')?.addEventListener('change', updateSessionEstimate);
-    document.getElementById('body-scan-duration')?.addEventListener('change', updateSessionEstimate);
-    document.getElementById('noting-duration')?.addEventListener('change', updateSessionEstimate);
-    document.getElementById('undo-unlearn-duration')?.addEventListener('change', updateSessionEstimate);
-    yogaExperienceToggle?.addEventListener('change', event => {
-        if (!state.advancedFeaturesUnlocked) {
-            yogaExperienceToggle.checked = false;
-            state.yogaExperienceEnabled = false;
-            if (yogaExperienceSetup) yogaExperienceSetup.hidden = true;
-            updateExperienceModeVisibility();
-            updateSessionEstimate();
-            return;
-        }
-        state.yogaExperienceEnabled = yogaExperienceToggle.checked;
-        enforceMasterToggle(event.target);
+    window.ChakraJourneyPreparationSelection.bindVisualizationAmbiencePreference({ document, state, storage: localStorage });
+    window.ChakraJourneyPreparationSelection.bindDurationRefresh({ document, updateSessionEstimate });
+    yogaExperienceSettings.bindAdvancedToggle({
+        toggle: yogaExperienceToggle, state, setup: yogaExperienceSetup, enforceMasterToggle,
+        updateExperienceModeVisibility, updateSessionEstimate
     });
 
-    if (sleepModeToggle) {
-        sleepModeToggle.addEventListener('change', (e) => {
-            if (!state.advancedFeaturesUnlocked) {
-                clearSleepMode();
-                updateExperienceModeVisibility();
-                updateSessionEstimate();
-                return;
-            }
-            state.sleepExperienceEnabled = e.target.checked;
-            enforceMasterToggle(e.target);
-            updateExperienceModeVisibility();
-        });
-    }
-
-    if (shotsToggle) {
-        shotsToggle.addEventListener('change', (event) => {
-            if (!state.advancedFeaturesUnlocked) {
-                event.target.checked = false;
-                updateExperienceModeVisibility();
-                updateSessionEstimate();
-                return;
-            }
-            if (event.target.checked) {
-                if (state.noFrequencyMode) {
-                    event.target.checked = false;
-                    alert(t('ui.noFrequencyShotsUnavailable'));
-                    updateExperienceModeVisibility();
-                    updateSessionEstimate();
-                    return;
-                }
-                if (!window.confirm(t('ui.shotConfirm'))) {
-                    event.target.checked = false;
-                    updateExperienceModeVisibility();
-                    updateSessionEstimate();
-                    return;
-                }
-                clearMusicOnlyMode();
-                clearHighEnergyMode();
-                clearSleepMode();
-                clearFocusedExperiences();
-                clearJourneyAddons();
-                clearIntimateService();
-                resetShotDurationForType(shotTypeSelect?.value || 'meditation');
-            }
-            updateExperienceModeVisibility();
-            updateSessionEstimate();
-        });
-    }
-    shotTypeSelect?.addEventListener('change', (event) => {
-        resetShotDurationForType(event.target.value);
-        updateExperienceModeVisibility();
-        updateSessionEstimate();
+    lobbyExperienceVisibility.bindSleepModeToggle({
+        toggle: sleepModeToggle, state, clearSleepMode, enforceMasterToggle,
+        updateVisibility: updateExperienceModeVisibility, updateSessionEstimate
+    });
+    lobbyExperienceVisibility.bindShotsToggle({
+        toggle: shotsToggle, state, translate: t,
+        clearMusicOnlyMode, clearHighEnergyMode, clearSleepMode, clearFocusedExperiences,
+        clearJourneyAddons, clearIntimateService, resetDurationForType: resetShotDurationForType,
+        getShotType: () => shotTypeSelect?.value,
+        updateVisibility: updateExperienceModeVisibility, updateSessionEstimate
+    });
+    lobbyExperienceVisibility.bindShotTypeChange({
+        document, resetDurationForType: resetShotDurationForType,
+        updateVisibility: updateExperienceModeVisibility, updateSessionEstimate
     });
 
     function prepareRepertoryShotFromUrl() {
@@ -4381,9 +4074,7 @@ function attachEventListeners() {
         });
     }
 
-    [corpsePoseToggle].forEach(toggle => {
-        if (toggle) toggle.addEventListener('change', (e) => enforceMasterToggle(e.target));
-    });
+    yogaExperienceSettings.bindCorpsePoseMasterToggle({ document, enforceMasterToggle });
     
     function updateExperienceModeVisibility() {
         lobbyExperienceVisibility.sync({
@@ -4439,371 +4130,79 @@ function attachEventListeners() {
     });
 
     // Script Selection Event Listeners
-    const scriptSourceSelect = document.getElementById('script-source-select');
-    const customScriptUI = document.getElementById('custom-script-ui');
-    const uploadInput = document.getElementById('upload-script-file');
-    const urlInput = document.getElementById('script-url-input');
-    const loadUrlBtn = document.getElementById('load-script-url');
-    const scriptStatus = document.getElementById('script-status');
+    scriptSourceSettings.bindSourceSelection({
+        document, state, storage: localStorage, meditation,
+        isDemoScriptSelected, applyDemoCoreDurationPreset, restorePreDemoCoreDuration,
+        updateSessionEstimate
+    });
 
-    if (scriptSourceSelect) {
-        scriptSourceSelect.addEventListener('change', (e) => {
-            state.scriptSource = e.target.value;
-            if (isDemoScriptSelected()) applyDemoCoreDurationPreset();
-            else restorePreDemoCoreDuration();
-            updateSessionEstimate();
-            if (customScriptUI) customScriptUI.style.display = state.scriptSource === 'custom' ? 'flex' : 'none';
-            localStorage.setItem('chakra_script_source', state.scriptSource);
-            // Clear cached scripts to force reload if switching
-            meditation.scripts = null;
-        });
-    }
+    scriptSourceSettings.bindUpload({
+        document, state, storage: localStorage, meditation, FileReaderCtor: FileReader,
+        validateScriptBundle, getChecked, applyDemoCoreDurationPreset, restorePreDemoCoreDuration,
+        updateSessionEstimate, getDemoScriptTimingMessage
+    });
 
-    if (uploadInput) {
-        uploadInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const json = JSON.parse(event.target.result);
-                    const check = validateScriptBundle(json, {
-                        allowLanguageFallback: true,
-                        highEnergy: getChecked('high-energy-toggle'),
-                        corpse: getChecked('corpse-pose-toggle'),
-                        bath: false,
-                        perinealCare: false,
-                        assistedBathing: false,
-                        massage: false,
-                        yoga: false
-                    });
-                    if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
-                    state.customScript = json;
-                    localStorage.setItem('chakra_custom_script', JSON.stringify(json));
-                    const isDemo = applyDemoCoreDurationPreset();
-                    if (!isDemo) restorePreDemoCoreDuration();
-                    updateSessionEstimate();
-                    if (scriptStatus) {
-                        scriptStatus.textContent = isDemo ? getDemoScriptTimingMessage() : "Script uploaded successfully!";
-                        scriptStatus.style.display = 'block';
-                        scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
-                        scriptStatus.style.color = '#4ade80';
-                    }
-                    meditation.scripts = null;
-                } catch (err) {
-                    if (scriptStatus) {
-                        scriptStatus.textContent = "Error: Invalid JSON file.";
-                        scriptStatus.style.display = 'block';
-                        scriptStatus.style.background = 'rgba(248, 113, 113, 0.2)';
-                        scriptStatus.style.color = '#f87171';
-                    }
-                }
-            };
-            reader.readAsText(file);
-        });
-    }
-
-    if (loadUrlBtn) {
-        loadUrlBtn.addEventListener('click', async () => {
-            const url = urlInput.value.trim();
-            if (!url) return;
-
-            if (scriptStatus) {
-                scriptStatus.textContent = "Loading script from URL...";
-                scriptStatus.style.display = 'block';
-                scriptStatus.style.background = 'rgba(255, 255, 255, 0.1)';
-                scriptStatus.style.color = 'white';
-            }
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const json = await response.json();
-                const check = validateScriptBundle(json, {
-                    allowLanguageFallback: true,
-                    highEnergy: getChecked('high-energy-toggle'),
-                    corpse: getChecked('corpse-pose-toggle'),
-                    bath: false,
-                    perinealCare: false,
-                    assistedBathing: false,
-                    massage: false,
-                    yoga: false
-                });
-                if (!check.valid) throw new Error(`Missing required sections: ${check.missing.slice(0, 3).join(', ')}`);
-                state.customScript = json;
-                localStorage.setItem('chakra_custom_script', JSON.stringify(json));
-                const isDemo = applyDemoCoreDurationPreset();
-                if (!isDemo) restorePreDemoCoreDuration();
-                updateSessionEstimate();
-                if (scriptStatus) {
-                    scriptStatus.textContent = isDemo ? getDemoScriptTimingMessage() : "Script loaded from URL successfully!";
-                    scriptStatus.style.background = 'rgba(74, 222, 128, 0.2)';
-                    scriptStatus.style.color = '#4ade80';
-                }
-                meditation.scripts = null;
-            } catch (err) {
-                if (scriptStatus) {
-                    scriptStatus.textContent = `Error: ${err.message}`;
-                    scriptStatus.style.background = 'rgba(248, 113, 113, 0.2)';
-                    scriptStatus.style.color = '#f87171';
-                }
-            }
-        });
-    }
+    scriptSourceSettings.bindUrlFetch({
+        document, state, storage: localStorage, meditation, fetchImpl: fetch,
+        validateScriptBundle, getChecked, applyDemoCoreDurationPreset, restorePreDemoCoreDuration,
+        updateSessionEstimate, getDemoScriptTimingMessage
+    });
 
     // Preserve care-duration listener order after custom-script handling.
     window.ChakraTimingSettingsView.bindCareDurationControls({
         document, state, storage: localStorage, setText, updateSessionEstimate
     });
 
-    timeSlider.addEventListener('input', (e) => {
-        const value = parseFloat(e.target.value);
-        if (getChecked('shots-toggle')) {
-            state.timeShot = value;
-            timeDisplay.textContent = `${state.timeShot.toFixed(0)} secs`;
-            localStorage.setItem('chakra_time_shot', state.timeShot);
-        } else if (getChecked('sleep-mode-toggle')) {
-            state.timeSleepStage = value;
-            timeDisplay.textContent = `${state.timeSleepStage.toFixed(1)} mins`;
-            localStorage.setItem('chakra_time_sleep_stage', state.timeSleepStage);
-        } else {
-            state.timePerChakra = value;
-            timeDisplay.textContent = `${state.timePerChakra.toFixed(1)} mins`;
-            localStorage.setItem('chakra_time', state.timePerChakra);
-        }
-        const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
-        e.target.style.setProperty('--range-fill', pct);
-        updateDroneDurationSummary();
-        updateSessionEstimate();
+    window.ChakraTimingSettingsView.bindJourneyDurationControl({
+        document, state, getChecked, storage: localStorage,
+        updateDroneSummary: updateDroneDurationSummary, updateSessionEstimate
+    });
+    window.ChakraTimingSettingsView.bindHighEnergyDurationControl({
+        document, state, storage: localStorage, setText,
+        updateDroneSummary: updateDroneDurationSummary, updateSessionEstimate
     });
 
-    const highEnergyTimeSlider = document.getElementById('time-high-energy');
-    if (highEnergyTimeSlider) {
-        highEnergyTimeSlider.addEventListener('input', (e) => {
-            state.timeHighEnergy = parseFloat(e.target.value);
-            setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
-            localStorage.setItem('chakra_time_high_energy', state.timeHighEnergy);
-            const pct = ((e.target.value - e.target.min) / (e.target.max - e.target.min) * 100).toFixed(1) + '%';
-            e.target.style.setProperty('--range-fill', pct);
-            updateDroneDurationSummary();
-            updateSessionEstimate();
-        });
-    }
-
-    document.querySelectorAll('input[name="drone-duration-mode"]').forEach(input => {
-        input.addEventListener('change', (event) => {
-            if (!event.target.checked) return;
-            if (getChecked('high-energy-toggle')) {
-                state.hrimDroneDurationMode = normalizeHrimDroneDurationMode(event.target.value);
-                localStorage.setItem('chakra_hrim_drone_duration_mode', state.hrimDroneDurationMode);
-            } else if (getChecked('sleep-mode-toggle')) {
-                state.sleepDroneDurationMode = normalizeSleepDroneDurationMode(event.target.value);
-                localStorage.setItem('chakra_sleep_drone_duration_mode', state.sleepDroneDurationMode);
-            } else {
-                state.droneDurationMode = normalizeDroneDurationMode(event.target.value);
-                localStorage.setItem('chakra_drone_duration_mode', state.droneDurationMode);
-            }
-            syncDroneDurationModeControls();
-            updateDroneDurationSummary();
-        });
+    droneDurationSettingsView.bindSelection({
+        document, state, storage: localStorage, getChecked,
+        normalizeHrim: normalizeHrimDroneDurationMode,
+        normalizeSleep: normalizeSleepDroneDurationMode,
+        normalizeStandard: normalizeDroneDurationMode,
+        syncControls: syncDroneDurationModeControls, updateSummary: updateDroneDurationSummary
     });
 
-    document.getElementById('high-energy-toggle').addEventListener('change', updateSessionEstimate);
-    function setNoFrequencyMode(enabled) {
-        state.noFrequencyMode = Boolean(enabled);
-        localStorage.setItem('chakra_no_frequency_mode', state.noFrequencyMode);
-        syncChecked('no-frequency-mode-toggle', state.noFrequencyMode);
-        syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
-        const moodRelaxationToggle = document.getElementById('mood-relaxation-intention-toggle');
-        if (moodRelaxationToggle) moodRelaxationToggle.disabled = state.noFrequencyMode;
-        if (state.noFrequencyMode) {
-            meditation.cancelDroneTimer();
-            audio.stopDrone();
-            audio.stopFrequencyShot();
-            audio.stopGuidedTransitionTone();
-            audio.stopPleasureAmbience();
-        } else if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
-            void audio.startPleasureAmbience();
-        }
-        syncPleasureAmbienceControl();
-        updateExperienceModeVisibility();
-        updateSessionEstimate();
-    }
-    function setNoMantraMode(enabled) {
-        state.noMantraMode = Boolean(enabled);
-        localStorage.setItem('chakra_no_mantra_mode', state.noMantraMode);
-        syncChecked('no-mantra-mode-toggle', state.noMantraMode);
-        syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
-        if (state.noMantraMode) {
-            meditation.cancelDroneTimer();
-            audio.stopDrone();
-            audio.stopMantraTrack();
-        }
-        updateExperienceModeVisibility();
-        updateSessionEstimate();
-    }
-    document.getElementById('no-frequency-mode-toggle').addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
-    document.getElementById('no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
-    document.getElementById('mood-relaxation-intention-toggle')?.addEventListener('change', (e) => {
-        if (!state.advancedFeaturesUnlocked || state.noFrequencyMode) {
-            e.target.checked = state.moodRelaxationIntentionEnabled;
-            return;
-        }
-        state.moodRelaxationIntentionEnabled = e.target.checked;
-        if (state.moodRelaxationIntentionEnabled) state.pleasureAmbienceBlur = true;
-        audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
-        syncPleasureAmbienceControl();
-        if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
-            void audio.startPleasureAmbience();
-        } else if (!state.moodRelaxationIntentionEnabled) {
-            audio.stopPleasureAmbience();
-        }
+    const audioModeSettingsView = window.ChakraAudioModeSettingsView.create({
+        document, state, storage: localStorage, meditation, audio, syncChecked,
+        syncPleasureAmbienceControl, updateExperienceModeVisibility, updateSessionEstimate
     });
-    document.getElementById('pleasure-ambience-intensity')?.addEventListener('change', (event) => {
-        state.pleasureAmbienceIntensity = normalizePleasureAmbienceIntensity(event.target.value);
-        audio.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
-        syncPleasureAmbienceControl();
+    audioModeSettingsView.bindPrimaryControls();
+    moodAmbienceSettingsView.bindControls({
+        document, state, storage: localStorage, audio, meditation, window,
+        translate: t, syncControl: syncPleasureAmbienceControl,
+        normalizeIntensity: normalizePleasureAmbienceIntensity,
+        clampGain: clampPleasureAmbienceGain,
+        clampBlurAmount: clampPleasureAmbienceBlurAmount,
+        threshold: PLEASURE_AMBIENCE_CONFIRM_THRESHOLD
     });
-    document.getElementById('mood-relaxation-ambience-level')?.addEventListener('input', (event) => {
-        const requestedGain = clampPleasureAmbienceGain(Number(event.target.value) / 100);
-        const previousGain = state.pleasureAmbienceGain;
-        if (requestedGain > PLEASURE_AMBIENCE_CONFIRM_THRESHOLD && previousGain <= PLEASURE_AMBIENCE_CONFIRM_THRESHOLD) {
-            const confirmed = window.confirm(t('ui.pleasureAmbienceAboveFiveConfirm'));
-            if (!confirmed) {
-                syncPleasureAmbienceControl();
-                return;
-            }
-        }
-        state.pleasureAmbienceGain = requestedGain;
-        localStorage.setItem('chakra_pleasure_ambience_gain', state.pleasureAmbienceGain);
-        syncPleasureAmbienceControl();
-        audio.setPleasureAmbienceGain(state.pleasureAmbienceGain);
-    });
-    document.getElementById('pleasure-ambience-blur-toggle')?.addEventListener('change', (event) => {
-        state.pleasureAmbienceBlur = event.target.checked;
-        audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
-    });
-    document.getElementById('pleasure-ambience-blur-level')?.addEventListener('input', (event) => {
-        state.pleasureAmbienceBlurAmount = clampPleasureAmbienceBlurAmount(Number(event.target.value) / 100);
-        localStorage.setItem('chakra_pleasure_ambience_blur_amount', state.pleasureAmbienceBlurAmount);
-        syncPleasureAmbienceControl();
-        audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
-    });
-    const pleasureAmbienceUrlInput = document.getElementById('pleasure-ambience-url');
-    const loadPleasureAmbienceUrlButton = document.getElementById('load-pleasure-ambience-url');
-    const pleasureAmbienceUrlStatus = document.getElementById('pleasure-ambience-url-status');
-    const setPleasureAmbienceUrlStatus = (message, tone = 'neutral') => {
-        if (!pleasureAmbienceUrlStatus) return;
-        delete pleasureAmbienceUrlStatus.dataset.availability;
-        pleasureAmbienceUrlStatus.textContent = message;
-        pleasureAmbienceUrlStatus.hidden = false;
-        pleasureAmbienceUrlStatus.style.color = tone === 'success'
-            ? '#4ade80'
-            : tone === 'error'
-                ? '#f87171'
-                : 'rgba(255, 255, 255, 0.72)';
-    };
-    loadPleasureAmbienceUrlButton?.addEventListener('click', async () => {
-        const url = pleasureAmbienceUrlInput?.value.trim() || '';
-        loadPleasureAmbienceUrlButton.disabled = true;
-        setPleasureAmbienceUrlStatus(t('ui.pleasureAmbienceUrlLoading'));
-        try {
-            await audio.loadPleasureAmbienceUrl(url);
-            setPleasureAmbienceUrlStatus(
-                url ? t('ui.pleasureAmbienceUrlLoaded') : t('ui.pleasureAmbienceUrlCleared'),
-                'success'
-            );
-        } catch (error) {
-            const errorMessage = error?.message || String(error);
-            setPleasureAmbienceUrlStatus(
-                t('ui.pleasureAmbienceUrlError').replace('{error}', errorMessage),
-                'error'
-            );
-            syncPleasureAmbienceControl();
-        } finally {
-            loadPleasureAmbienceUrlButton.disabled = state.noFrequencyMode;
-        }
+    moodAmbienceSettingsView.bindUrlLoader({
+        document, state, audio, translate: t, syncControl: syncPleasureAmbienceControl
     });
     document.querySelectorAll('#yoga-pose-selection input').forEach(cb => {
         cb.addEventListener('change', updateSessionEstimate);
     });
-    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => {
-        cb.addEventListener('change', persistChakraSelection);
+    chakraSelectionView.bindPersistence();
+    screenNavigation.bindLobbyActions({
+        settingsButton: openSettingsBtn,
+        experimentButton: document.getElementById('open-experiment-mode'),
+        closeExperimentButton: document.getElementById('close-experiment'),
+        assessmentButton: beginConsultationBtn
     });
-    openSettingsBtn.addEventListener('click', () => showScreen(configScreen));
-    document.getElementById('open-experiment-mode')?.addEventListener('click', () => showScreen(experimentScreen));
-    document.getElementById('close-experiment')?.addEventListener('click', () => showScreen(configScreen));
-    const experimentActivity = document.getElementById('experiment-activity');
-    const experimentDuration = document.getElementById('experiment-core-duration');
-    const experimentDurationGroup = document.getElementById('experiment-core-duration-group');
-    const syncExperimentDuration = () => {
-        const activity = experimentActivity?.value || '';
-        const config = activity.startsWith('chakra:') || activity === 'hrim'
-            ? { min: 1, max: 7, step: 0.5, value: state.timePerChakra, unit: 'min' }
-            : activity === 'box'
-                ? { min: 4, max: 16, step: 1, value: state.timeBreathing, unit: 'sec' }
-                : activity === 'corpse'
-                    ? { min: 60, max: 600, step: 30, value: state.timeCorpse, unit: 'sec' }
-                    : activity === 'perineal'
-                            ? { min: 30, max: 900, step: 30, value: state.timePerinealCare, unit: 'min' }
-                            : activity === 'assisted-bath'
-                                ? { min: 60, max: 1800, step: 60, value: state.timeAssistedBathing, unit: 'min' }
-                                : activity === 'bath'
-                                    ? { min: 60, max: 1800, step: 60, value: state.timeBath, unit: 'min' }
-                                    : null;
-        if (experimentDurationGroup) experimentDurationGroup.hidden = !config;
-        if (experimentDuration) {
-            if (config) {
-                experimentDuration.min = String(config.min);
-                experimentDuration.max = String(config.max);
-                experimentDuration.step = String(config.step);
-                experimentDuration.value = String(config.value);
-                experimentDuration.dataset.unit = config.unit;
-            }
-            const displayValue = experimentDuration.dataset.unit === 'min' && Number(experimentDuration.value) >= 60
-                ? `${Number(experimentDuration.value) / 60} min`
-                : `${experimentDuration.value} ${experimentDuration.dataset.unit || 'min'}`;
-            setText('experiment-core-duration-value', displayValue);
-        }
-    };
-    experimentActivity?.addEventListener('change', syncExperimentDuration);
-    experimentDuration?.addEventListener('input', () => {
-        const unit = experimentDuration.dataset.unit || 'min';
-        const displayValue = unit === 'min' && Number(experimentDuration.value) >= 60
-            ? `${Number(experimentDuration.value) / 60} min`
-            : `${experimentDuration.value} ${unit}`;
-        setText('experiment-core-duration-value', displayValue);
-    });
-    syncExperimentDuration();
-    document.getElementById('start-experiment')?.addEventListener('click', () => {
-        const activity = document.getElementById('experiment-activity')?.value;
-        if (activity) meditation.startExperiment(activity);
-    });
-    beginConsultationBtn?.addEventListener('click', () => {
-        window.location.href = './docs/assesment.html';
-    });
+    window.ChakraExperimentSettingsView.create({
+        document, state, setText, startExperiment: activity => meditation.startExperiment(activity)
+    }).bind();
+    window.ChakraSettingsHelpView.bind({ document });
 
-    const settingsHelpModal = document.getElementById('settings-help-modal');
-    const settingsHelpButton = document.getElementById('settings-help-button');
-    const settingsHelpClose = document.getElementById('settings-help-close');
-    if (settingsHelpModal && settingsHelpButton && settingsHelpClose) {
-        settingsHelpButton.addEventListener('click', () => {
-            settingsHelpModal.classList.remove('hidden');
-            settingsHelpClose.focus();
-        });
-        settingsHelpClose.addEventListener('click', () => settingsHelpModal.classList.add('hidden'));
-    }
-
-    // Brightness slider
-    const brightnessSlider = document.getElementById('brightness-slider');
-    if (brightnessSlider) {
-        brightnessSlider.addEventListener('input', (e) => {
-            state.brightness = parseFloat(e.target.value);
-            localStorage.setItem('chakra_brightness', state.brightness);
-            document.getElementById('app').style.setProperty('--app-brightness', String(state.brightness));
-        });
-    }
+    const visualComfortSettingsView = window.ChakraVisualComfortSettingsView.create({ document, state, storage: localStorage, audio });
+    visualComfortSettingsView.bindBrightness();
 
     let bypassLobbyVideoPreludeOnce = false;
 
@@ -4830,22 +4229,10 @@ function attachEventListeners() {
         return true;
     }
 
-    function selectedPracticeModuleIds() {
-        return [
-            ['body-scan-addon-toggle', 'body-scan'],
-            ['noting-addon-toggle', 'guided-noting'],
-            ['dharana-addon-toggle', 'dharana'],
-            ['box-breathing-experience-toggle', 'box-breathing'],
-            ['visualization-addon-toggle', 'visualization'],
-            ['hooponopono-experience-toggle', 'hooponopono'],
-            ['undo-unlearn-addon-toggle', 'undo-unlearn']
-        ].filter(([toggleId]) => getChecked(toggleId)).map(([, moduleId]) => moduleId);
-    }
-
     startMeditationBtn.addEventListener('click', async () => {
         if (!validateLobbyStartBeforePrelude()) return;
         if (startMeditationBtn.dataset.practiceLoading === 'true') return;
-        const selectedModules = selectedPracticeModuleIds();
+        const selectedModules = practiceModuleLoader.selectedModuleIds(getChecked);
         if (selectedModules.length) {
             startMeditationBtn.dataset.practiceLoading = 'true';
             startMeditationBtn.disabled = true;
@@ -4961,40 +4348,9 @@ function attachEventListeners() {
         }
     });
 
-    document.getElementById('pause-meditation').addEventListener('click', (e) => {
-        console.log("Pause/Play button clicked");
-        e.stopImmediatePropagation();
-        meditation.togglePause();
-    });
-
-    document.getElementById('stop-meditation').addEventListener('click', (e) => {
-        console.log("Stop button clicked");
-        e.stopImmediatePropagation();
-        meditation.stop();
-    });
-    const eyesCloseToggle = document.getElementById('eyes-close-mode-toggle');
-    if (eyesCloseToggle) eyesCloseToggle.addEventListener('change', (e) => {
-        state.eyesCloseMode = e.target.checked;
-        localStorage.setItem('chakra_eyes_close_mode', state.eyesCloseMode);
-        if (audio.toggleEyesCloseMode) audio.toggleEyesCloseMode(state.eyesCloseMode);
-        document.body.classList.toggle('eyes-close-mode', state.eyesCloseMode);
-    });
-    const audioFiltersToggle = document.getElementById('audio-filters-toggle');
-    if (audioFiltersToggle) audioFiltersToggle.addEventListener('change', (e) => {
-        state.audioFilters = e.target.checked;
-        localStorage.setItem('chakra_audio_filters', state.audioFilters);
-        if (audio.toggleAudioFilters) audio.toggleAudioFilters(state.audioFilters);
-    });
-    document.getElementById('close-completion').addEventListener('click', () => {
-        cancelEarnHandoff();
-        document.getElementById('completion-modal').classList.add('hidden');
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-        showScreen(lobbyScreen);
-    });
+    window.ChakraSessionTransportControls.bind({ document, meditation });
+    visualComfortSettingsView.bindJourneyComfort();
+    window.ChakraCompletionView.bind({ document, cancelEarnHandoff, showScreen, lobbyScreen });
 
     // Toggle text overlay on click of the image area for immersion
     const symbolEl = document.getElementById('chakra-symbol');
@@ -5005,51 +4361,14 @@ function attachEventListeners() {
         });
     }
 
-    // Intention input
-    document.getElementById('intention-input').addEventListener('input', (e) => {
-        state.intention = e.target.value;
-        localStorage.setItem('chakra_intention', state.intention);
-    });
+    window.ChakraIntentionSettingsView.bind({ document, state, storage: localStorage });
+    window.ChakraJourneyPreferenceSettingsView.bind({ document, state, storage: localStorage, updateJourneyRoadmap });
 
-    // Keep this user-controlled opening preference separate from the completed
-    // journey counter in state.stats.journeys.
-    const returningJourneyToggle = document.getElementById('returning-journey-toggle');
-    if (returningJourneyToggle) {
-        returningJourneyToggle.addEventListener('change', (e) => {
-            state.returningJourney = e.target.checked;
-            localStorage.setItem('chakra_returning_journey', String(state.returningJourney));
-            updateJourneyRoadmap();
-        });
-    }
-    const journeyVideoPreludeToggle = document.getElementById('journey-video-prelude-toggle');
-    if (journeyVideoPreludeToggle) {
-        journeyVideoPreludeToggle.addEventListener('change', (e) => {
-            state.journeyVideoPreludeEnabled = e.target.checked;
-            localStorage.setItem('chakra_journey_video_prelude', String(state.journeyVideoPreludeEnabled));
-            updateJourneyRoadmap();
-        });
-    }
-
-    const mixer = document.getElementById('volume-mixer');
-    const mixerCloseButtons = [document.getElementById('close-mixer'), document.getElementById('close-mixer-bottom')].filter(Boolean);
-    document.getElementById('btn-mixer').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!mixer) return;
-        mixer.classList.remove('hidden');
-        syncChecked('mixer-no-frequency-mode-toggle', state.noFrequencyMode);
-        syncChecked('mixer-no-mantra-mode-toggle', state.noMantraMode);
-        syncValue('mixer-spatial-mode', state.spatialMode);
-        const closeButton = document.getElementById('close-mixer');
-        if (closeButton) closeButton.focus();
-    });
-    mixerCloseButtons.forEach(button => button.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (mixer) mixer.classList.add('hidden');
-        document.getElementById('btn-mixer')?.focus();
-    }));
+    const mixerView = window.ChakraMixerView.create({ document, state, syncChecked, syncValue });
+    mixerView.bind();
     document.getElementById('restart-meditation')?.addEventListener('click', async () => {
         if (!window.confirm(t('ui.restartConfirm'))) return;
-        if (mixer) mixer.classList.add('hidden');
+        mixerView.hide();
         meditation.stop({ preserveScreen: true });
         // A journey may still be unwinding its async start sequence. Wait for
         // the cancellation to release the start guard before launching again.
@@ -5062,34 +4381,11 @@ function attachEventListeners() {
         bypassLobbyVideoPreludeOnce = true;
         startMeditationBtn.click();
     });
-    document.getElementById('mixer-no-frequency-mode-toggle')?.addEventListener('change', (e) => setNoFrequencyMode(e.target.checked));
-    document.getElementById('mixer-no-mantra-mode-toggle')?.addEventListener('change', (e) => setNoMantraMode(e.target.checked));
+    audioModeSettingsView.bindMixerControls();
     window.ChakraAudioEffectsSettingsView.bind({ document, state, storage: localStorage, audio, normalizeSpatialMode, syncValue });
     window.ChakraAudioVolumeSettingsView.bind({ document, state, storage: localStorage, audio });
-    document.getElementById('preview-video-audio')?.addEventListener('click', () => {
-        void loadJourneyVideoPrelude()
-            .then(prelude => prelude.previewAudio())
-            .catch(error => console.warn('Video audio preview unavailable:', error));
-    });
-    document.getElementById('preview-visualization-ambience')?.addEventListener('click', () => { void audio.previewVisualizationAmbience(); });
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: 'Chakra Meditation', artist: 'Mahakatha Vibe',
-            artwork: [
-                { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
-            ]
-        });
-        navigator.mediaSession.setActionHandler('play', () => { if (meditation.isPaused) meditation.togglePause(); });
-        navigator.mediaSession.setActionHandler('pause', () => { if (!meditation.isPaused) meditation.togglePause(); });
-        navigator.mediaSession.setActionHandler('stop', () => meditation.stop());
-    }
-    document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(cb => {
-        cb.addEventListener('change', () => {
-            cb.closest('.checkbox-label').classList.toggle('chip-active', cb.checked);
-        });
-        // Set initial state
-        if (cb.checked) cb.closest('.checkbox-label').classList.add('chip-active');
-    });
+    window.ChakraMediaControlsView.bind({ document, navigator, MediaMetadataCtor: MediaMetadata, audio, meditation, loadJourneyVideoPrelude });
+    chakraSelectionView.bindChipDisplay();
 
     // Initial estimate on load
     updateSessionEstimate();

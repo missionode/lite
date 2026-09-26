@@ -10,7 +10,7 @@ assert.match(app, /const rangeControls = window\.ChakraRangeControls/);
 assert.match(app, /function enhanceRangeControls\(\)\s*\{\s*rangeControls\.enhance\(/);
 assert.match(app, /function refreshRangeControlDisplays\(\)\s*\{\s*rangeControls\.refresh\(/);
 assert.match(html, /modules\/range-controls\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/range-controls\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/range-controls\.js\?v=1\.0/);
 
 const context = vm.createContext({ Event: class { constructor(type, options) { this.type = type; this.bubbles = options.bubbles; } } });
 vm.runInContext(source, context);

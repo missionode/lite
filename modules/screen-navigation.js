@@ -1,7 +1,7 @@
 (function installScreenNavigation(global) {
     'use strict';
 
-    function create({ body, document, window, screens, lobbyScreen, configScreen, dispatchDecorationChange }) {
+    function create({ body, document, window, screens, lobbyScreen, configScreen, experimentScreen, dispatchDecorationChange }) {
         if (!body || !document || !window || !Array.isArray(screens) ||
             typeof dispatchDecorationChange !== 'function') {
             throw new TypeError('Screen navigation requires the application views and browser services');
@@ -23,7 +23,14 @@
             }
         }
 
-        return Object.freeze({ showScreen });
+        function bindLobbyActions({ settingsButton, experimentButton, closeExperimentButton, assessmentButton } = {}) {
+            settingsButton?.addEventListener('click', () => showScreen(configScreen));
+            experimentButton?.addEventListener('click', () => showScreen(experimentScreen));
+            closeExperimentButton?.addEventListener('click', () => showScreen(configScreen));
+            assessmentButton?.addEventListener('click', () => { window.location.href = './docs/assesment.html'; });
+        }
+
+        return Object.freeze({ showScreen, bindLobbyActions });
     }
 
     global.ChakraScreenNavigation = Object.freeze({ create });

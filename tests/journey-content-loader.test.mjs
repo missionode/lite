@@ -12,7 +12,7 @@ vm.runInNewContext(source, context);
 const { loadAndValidate } = context.ChakraJourneyContentLoader;
 assert.match(app, /journeyContentLoader\.loadAndValidate\(/);
 assert.ok(html.indexOf('modules/journey-content-loader.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(sw, /chakra-v5\.309[\s\S]*?\.\/modules\/journey-content-loader\.js\?v=1\.0/);
+assert.match(sw, /chakra-v5\.310[\s\S]*?\.\/modules\/journey-content-loader\.js\?v=1\.0/);
 
 const valid = { lang: 'en' };
 const checked = [];

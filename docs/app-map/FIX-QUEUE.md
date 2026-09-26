@@ -136,6 +136,14 @@ Standalone preparation choices now launch without chakra selection, execute in t
 
 The CP-MOD-011 baseline is a single indicative local cold Chromium sample: 13 classic scripts execute before Lobby (about 849 KiB encoded JS bodies), 6.7–7.5 MB reported JS heap and 0.73–1.07 s ScriptDuration. The local server does not compress; the harness blocks Google Fonts. Re-run the same cold/warm/offline and journey-start profile after extraction. These figures do not yet justify a specific dynamic-import boundary or establish a production performance gain. Preserve the small eager shell and choose cohesive optional bundles only after parity; defer implementing lazy loading until stable ownership, offline/error paths and cleanup contracts are testable.
 
+## CP-MOD-067 — custom script settings ownership
+
+Moved the default/custom source selector, file-upload handler and URL-fetch handler into `modules/script-source-settings.js`. Demo timing, estimate/roadmap refresh, panel visibility, persistence, validation feedback and journey-script cache invalidation are covered. URL loads use latest-nonempty-request-wins; stale completions cannot replace the winner or its status. Empty URL is a no-op. HTTP, JSON and schema failures preserve the previously accepted custom script/cache. The atlas now has a dedicated custom-script settings map for success, retry, failure and stale-request paths. This is ownership work only; no performance claim.
+
+## CP-MOD-068 — Mood & Relaxation ambience URL view ownership
+
+Moved the existing Journey Tuning/Lobby custom ambience URL button handler and localized loading/result status into `modules/mood-ambience-settings-view.js`. Empty URL still clears the custom replacement; load success, failure status, control resync, and the button's No Frequency disabled state are unchanged. `AudioEngine.loadPleasureAmbienceUrl()` retains URL loading, validation and persistence. Focused tests cover success, clear, error recovery and disabled-state restoration. Ownership only; no performance claim.
+
 ## CP-MOD-011 — ordered preparation execution ownership
 
 Journey routing now executes the existing stage callbacks in canonical order and checks session activity before each stage. The stage implementations and their UI/audio/narration ownership stay in `app.js`; no user-visible flow is intended to change. Atlas map `modularization` records the boundary and `journey-addons` records the cancellation guard.
@@ -340,3 +348,70 @@ Moved voice clarity/warmth/pace, voice and music echo selectors, spatial-mode se
 ## CP-MOD-065 — Journey preparation selection ownership (implemented locally)
 
 Moved Box Breathing, Ho’oponopono, Dharana, Visualization, Body Scan, Guided Noting and Undo & Unlearn Lobby selection listeners to `modules/journey-preparation-selection.js`. The module owns inline option-row visibility for the five options panels, session selection flags for Box/Ho’oponopono, mutual-exclusion clearing and the established visibility/estimate refresh calls. Standalone eligibility, chakra validation and dispatch remain with journey routing. Keep the existing standalone and guided paths distinct in the atlas.
+## CP-MOD-069 completed locally — paired audio mode controls
+
+Extracted the paired Lobby/mixer No Frequency and No Mantra event handling and existing state/audio side effects to `modules/audio-mode-settings-view.js`. The `sound-options` map topology is unchanged; ownership references are refreshed. Direct tests cover binding, mirrored state, persistence, shutdown ordering and eligible ambience restart. No browser/device or performance claim is made.
+## CP-MOD-070–072 completed locally — three small Lobby settings-view seams
+
+- CP-MOD-070: Returning Journey and Video Introduction preference event handlers moved to `modules/journey-preference-settings-view.js`; roadmap behavior unchanged.
+- CP-MOD-071: intention input state/localStorage synchronization moved to `modules/intention-settings-view.js`; journey-script/default selection unchanged.
+- CP-MOD-072: chakra selection persistence, estimate/roadmap refresh, and active chip styling moved to `modules/chakra-selection-view.js`; selection validation/dispatch unchanged.
+- Atlas source ownership references were updated for `journey-roadmap`, `standard`, and `modes`. Flow topology did not change. Automated tests only; browser/device and performance evidence are not claimed.
+## CP-MOD-073–077 completed locally — five app-shell interaction owners
+
+- CP-MOD-073 extended the existing screen-navigation owner with Settings/Experiment CTA bindings.
+- CP-MOD-074 extracted Settings help modal open/focus/close behavior.
+- CP-MOD-075 extracted brightness, Eyes Close and audio-filter controls.
+- CP-MOD-076 extracted mixer open/close/focus behavior; Restart remains app-owned and uses the view's hide adapter.
+- CP-MOD-077 extracted audio preview buttons and platform Media Session actions, without moving their playback engines.
+- Updated startup, experiments, controls, restart, sound-options and visuals map source references. No flow topology changed; focused automated tests only. No browser/device or performance gain is claimed.
+
+## CP-MOD-078–082 — bounded app-view and module-selection ownership (implemented locally)
+
+Extract experiment duration/start UI, route the existing Lobby assessment CTA through screen navigation, extract session pause/stop controls and completion dismissal, and centralize selected-practice toggle-to-module mapping in the existing practice loader. Preserve experiment execution, assessment separation, lifecycle ownership, completion/handoff order, and selected-only lazy loading. These are organization/testability changes only. Focused automated checks passed; browser/device/performance evidence is not claimed.
+
+## CP-MOD-083–087 — existing view-owner event bindings (implemented locally)
+
+Move add-on duration estimate refresh and Visualization ambience preference binding into the preparation-selection owner; move Yoga setup persistence listeners and drone-duration radio selection into their existing settings owners; move Music Only/High Energy selection bindings into preparation selection. Keep Advanced Features gating, session-mode behavior, storage keys and callback order unchanged. Tests pass for the affected view contracts. The neighboring `test:drone-duration` is unrun past fixture loading because `docs/dot.json` is owner-managed and absent in this checkout. No browser, device, or performance claim.
+
+## CP-MOD-088–097 — remaining bounded Lobby/settings event owners (implemented locally)
+
+Move High Energy estimate refresh, primary duration sliders, Mood & Relaxation toggles/sliders, Yoga's Advanced Features event gate and Shot-type reset/refresh binding into their existing modules. Preserve mode precedence, validation/confirmation, suppression behavior, persistence keys and update ordering. Focused module and adjacent journey tests are the acceptance evidence; no browser/device or performance claims.
+
+## CP-MOD-098–107 — language and mode-control event ownership (implemented locally)
+
+- Move meditation-language, display-language and selected-voice preference changes to `locale-ui-renderer.js`; generated-intention localization and voice setup order are preserved.
+- Move both voice-preview button bindings to `media-controls-view.js`.
+- Move Corpse Pose master-toggle callback binding to `yoga-experience-settings.js`.
+- Move Sleep's locked/unlocked branches and Shots' locked, No Frequency, confirmation-cancel and confirmed activation/exclusivity branches to `lobby-experience-visibility.js`.
+- Leave master-toggle policy, Advanced Features unlock/password lifecycle and repertory URL handoff in `app.js`; no new eager modules or lazy-loading boundaries.
+- Focused locale/media/Yoga/Lobby tests pass. Browser/device/performance evidence is not claimed; atlas source ownership and handoff were refreshed.
+
+## CP-MOD-108–127 — existing-owner value and display policies (implemented locally)
+
+- Move Mood & Relaxation gain/blur clamps, URL and intensity normalization, profile/mix selection and display formatting (8) into its existing settings owner.
+- Move Shot duration defaults, drone-mode normalization, fixed drone-duration calculation, clock formatting and Sleep stage validation (7) into timing settings; move spatial-mode normalization (1) beside the audio effects settings.
+- Move countdown SVG progress/hide rendering (2) into the existing countdown owner, conservative narration-duration estimation (1) into session estimates and visual-effect fallback normalization (1) into the visual engine.
+- Preserve existing app adapters, policy values, units, validation and current eager/offline module delivery. No behavior/performance improvement is claimed.
+- Relevant direct module tests pass; browser/device testing remains skipped. Atlas map count/topology is unchanged for this batch; ownership notes and handoff were refreshed.
+
+## CP-MOD-149–151 — Piper voice setup ownership (implemented locally)
+
+- Move locale-compatible voice selection policy, Piper voice-registry loading with browser fallback, and browser/Piper voice picker option rendering, refresh and silent discovery warm-up into `modules/piper-lifecycle.js`.
+- Keep locale/default policy supplied by app adapters and preserve voice synthesis, event timing, classic-script startup and offline delivery.
+- Focused Piper, Hindi and Russian contracts pass. No browser/device/performance evidence; no lazy-loading boundary changed.
+
+## Release test harness refresh — implemented locally
+
+- Replaced stale app-source slicing assertions for localized intention, audio-mode controls and completion handoff with direct behavior checks against their current module owners; repaired Advanced Features test boundaries after handler relocation.
+- The remaining full-suite exceptions are limited to `test:content-safety` and `test:drone-duration`, which cannot load the absent owner-maintained `docs/dot.json` fixture. No unrelated project data was substituted.
+
+## CP-MOD-128 — chakra-symbol image lifecycle ownership (implemented locally)
+
+Move the selected symbol/deity/Yoga image load, stale-request guard, failed-image hiding and cached-image reveal into the existing visual owner. Keep image choices and all UI/journey sequencing unchanged. Direct visual contract tests pass; no new script/cache/lazy boundary or performance claim. Next: audit one cohesive app/controller owner seam rather than forcing a fixed-size extraction batch.
+
+## CP-MOD-129–148 — 20 existing-owner helper extractions (implemented locally)
+
+- Piper voice profile: ID/registry lookup, cadence bounds and settings, browser/Piper gender policy, locale matching and voice selection (10).
+- Completion Earn-link timer lifecycle (3), voice-status view rendering (1), demo timing policy helpers (3), localized generated-intention refresh (2), and drone-duration summary rendering (1).
+- Existing event ordering, output copy, audio/session policy, and offline/eager delivery remain unchanged. Focused direct contracts pass; this does not claim performance or device gains.

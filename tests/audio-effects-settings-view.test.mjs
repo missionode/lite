@@ -84,4 +84,6 @@ assert.match(appSource, /ChakraAudioEffectsSettingsView\.bind\(\{ document, stat
 assert.doesNotMatch(appSource, /const voicePresets = \{/);
 assert.ok(html.indexOf('modules/audio-effects-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.12'));
 assert.match(sw, /modules\/audio-effects-settings-view\.js\?v=1\.0/);
+assert.equal(context.window.ChakraAudioEffectsSettingsView.normalizeSpatialMode('room', ['off', 'room'], 'off'), 'room');
+assert.equal(context.window.ChakraAudioEffectsSettingsView.normalizeSpatialMode('invalid', ['off', 'room'], 'off'), 'off');
 console.log('Audio effects settings view passed: voice tuning, echo, spatial selection and presets.');

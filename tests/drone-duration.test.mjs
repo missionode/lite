@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const timingModule = fs.readFileSync(new URL('../modules/timing-settings.js', import.meta.url), 'utf8');
+const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const contentLocalization = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
 const sessionEstimate = fs.readFileSync(new URL('../modules/session-estimate.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -22,26 +24,20 @@ assert.deepEqual(
 
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
 const referenceMatch = app.match(/const DRONE_REFERENCE_SECONDS = (\d+);/);
-const normalizeMatch = app.match(/function normalizeDroneDurationMode\([\s\S]*?\n\}/);
-const hrimNormalizeMatch = app.match(/function normalizeHrimDroneDurationMode\([\s\S]*?\n\}/);
-const sleepNormalizeMatch = app.match(/function normalizeSleepDroneDurationMode\([\s\S]*?\n\}/);
-const durationMatch = app.match(/function getDroneDurationMs\([\s\S]*?\n\}/);
-assert.ok(ratiosMatch && referenceMatch && normalizeMatch && hrimNormalizeMatch && sleepNormalizeMatch && durationMatch, 'drone duration helpers must remain extractable');
-const shotDurationMatch = app.match(/function getShotDefaultDuration\([\s\S]*?\n\}/);
-assert.ok(shotDurationMatch, 'the per-type Shot duration helper must remain extractable');
-
-const helpers = vm.runInNewContext(`
-    const DRONE_DURATION_RATIOS = Object.freeze(${ratiosMatch[1]});
-    const DRONE_REFERENCE_SECONDS = ${referenceMatch[1]};
-    const DEFAULT_DRONE_DURATION_MODE = 'beginner';
-    const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
-    const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
-    ${normalizeMatch[0]}
-    ${hrimNormalizeMatch[0]}
-    ${sleepNormalizeMatch[0]}
-    ${durationMatch[0]}
-    ({ DRONE_DURATION_RATIOS, DRONE_REFERENCE_SECONDS, normalizeDroneDurationMode, normalizeHrimDroneDurationMode, normalizeSleepDroneDurationMode, getDroneDurationMs });
-`);
+assert.ok(ratiosMatch && referenceMatch, 'drone policy values remain explicitly defined');
+const ratios = JSON.parse(ratiosMatch[1]);
+const referenceSeconds = Number(referenceMatch[1]);
+const timingContext = vm.createContext({ window: {} });
+vm.runInContext(timingModule, timingContext);
+const timing = timingContext.window.ChakraTimingSettings;
+const helpers = {
+    DRONE_DURATION_RATIOS: ratios,
+    DRONE_REFERENCE_SECONDS: referenceSeconds,
+    normalizeDroneDurationMode: value => timing.normalizeDroneDurationMode(value, ratios, 'beginner'),
+    normalizeHrimDroneDurationMode: value => timing.normalizeHrimDroneDurationMode(value, ratios, 'beginner', 'intermediate'),
+    normalizeSleepDroneDurationMode: value => timing.normalizeSleepDroneDurationMode(value, ratios, 'intermediate'),
+    getDroneDurationMs: (_minutes, mode) => timing.droneDurationMs(mode, ratios, 'beginner', referenceSeconds)
+};
 assert.deepEqual(
     JSON.parse(JSON.stringify(helpers.DRONE_DURATION_RATIOS)),
     { beginner: 0.2, intermediate: 0.5, advanced: 0.7, expert: 1 },
@@ -61,16 +57,12 @@ assert.equal(helpers.normalizeHrimDroneDurationMode('advanced'), 'advanced', 'HR
 assert.equal(helpers.normalizeSleepDroneDurationMode('unknown'), 'intermediate', 'Sleep Mode should default to Intermediate');
 assert.equal(helpers.normalizeSleepDroneDurationMode('beginner'), 'beginner', 'Sleep Mode may use Beginner when selected');
 
-const shotHelpers = vm.runInNewContext(`
-    const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
-    const timingConfig = { journey: { shotDuration: { default: 7, singleFrequencyDefault: 1, min: 1, max: 20 } } };
-    ${shotDurationMatch[0]}
-    ({ getShotDefaultDuration });
-`);
-assert.equal(shotHelpers.getShotDefaultDuration('meditation'), 7, 'Meditation Shot should default to seven seconds');
-assert.equal(shotHelpers.getShotDefaultDuration('sleep'), 7, 'Sleep Shot should default to seven seconds');
+const shotDefinition = { default: 7, singleFrequencyDefault: 1, min: 1, max: 20 };
+const getShotDefaultDuration = type => timing.shotDefaultDuration(type, shotDefinition, ['meditation', 'sleep']);
+assert.equal(getShotDefaultDuration('meditation'), 7, 'Meditation Shot should default to seven seconds');
+assert.equal(getShotDefaultDuration('sleep'), 7, 'Sleep Shot should default to seven seconds');
 for (const type of ['high_energy', 'anesthetic', 'mood_relaxation', 'custom']) {
-    assert.equal(shotHelpers.getShotDefaultDuration(type), 1, `${type} should default to one second`);
+    assert.equal(getShotDefaultDuration(type), 1, `${type} should default to one second`);
 }
 
 assert.deepEqual(scripts.sleep_mode.stages.map(stage => ({ key: stage.key, frequency: stage.frequency })), [
@@ -108,7 +100,7 @@ assert.ok(
 );
 assert.match(app, /meditationRoomTitle\.hidden = shots/, 'Shots should hide the Meditation Room heading');
 assert.match(app, /MULTI_STAGE_SHOT_TYPES = Object\.freeze\(\['meditation', 'sleep'\]\)/, 'Meditation and Sleep should retain the multi-stage duration default');
-assert.match(app, /resetShotDurationForType\(event\.target\.value\)/, 'changing Shot type should apply that type\'s duration default');
+assert.match(lobbyVisibility, /bindShotTypeChange[\s\S]*?resetDurationForType\(event\.target\.value\)/, 'changing Shot type should apply that type\'s duration default');
 assert.match(app, /anesthetic: Number\(this\.scripts\.sound_shots\?\.anesthetic\?\.frequency\)/, 'Anesthetic Shot should load 174 Hz from the active script bundle');
 assert.match(app, /mood_relaxation: Number\(this\.scripts\.sound_shots\?\.mood_relaxation\?\.frequency\)/, 'Mood & Relaxation Shot should load 221.23 Hz from the active script bundle');
 assert.match(app, /mood_relaxation: 'ui\.activateMoodRelaxationShot'/, 'the Mood & Relaxation Shot should have a localized activation label');
@@ -135,7 +127,7 @@ assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicat
 assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
 assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
 assert.match(app, /finishShot\(\)[\s\S]*shotToggle\.disabled = true[\s\S]*window\.location\.reload\(\)/, 'Successful Shots should disable controls and reload the page');
-assert.match(app, /if \(!window\.confirm\(t\('ui\.shotConfirm'\)\)\)/, 'Shots should confirm when the toggle is enabled');
+assert.match(lobbyVisibility, /confirm\(translate\('ui\.shotConfirm'\)\)/, 'Shots should confirm when the toggle is enabled');
 assert.doesNotMatch(app.slice(app.indexOf('async runShot('), app.indexOf('finishShot()')), /window\.confirm/, 'Shot start should not prompt a second time');
 assert.match(app, /ui\.sleepStage\$\{stage\.key\[0\]\.toUpperCase\(\)\}/, 'Sleep Shot status labels should use localized sleep-stage values');
 assert.doesNotMatch(app, /t\(`ui\.\$\{stage\.key === 'thirdeye'/, 'Shot status labels must not expose raw ui paths for Sleep stages');

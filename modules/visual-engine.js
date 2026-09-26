@@ -30,6 +30,22 @@ class VisualEngine {
         if (color) this.container.style.setProperty('--chakra-visual-color', color);
         this.presence?.setActive(effect === 'depth' && active, color);
     }
+    setSymbolImage(src, symbolEl = this.symbolImg) {
+        if (!symbolEl || !src) return;
+
+        symbolEl.style.visibility = 'hidden';
+        symbolEl.dataset.pendingSrc = src;
+        symbolEl.onload = () => {
+            if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'visible';
+        };
+        symbolEl.onerror = () => {
+            if (symbolEl.dataset.pendingSrc === src) symbolEl.style.visibility = 'hidden';
+        };
+        symbolEl.src = src;
+
+        // Cached images may already be complete before the load callback is attached.
+        if (symbolEl.complete && symbolEl.naturalWidth > 0) symbolEl.style.visibility = 'visible';
+    }
     startPulsing(color) {
         this.applyImageEffect(color);
         if (state.eyesCloseMode) return; // Absolute Blackout
@@ -43,3 +59,8 @@ class VisualEngine {
 }
 
 window.VisualEngine = VisualEngine;
+window.ChakraVisualEffectPolicy = Object.freeze({
+    normalize(value, allowedEffects) {
+        return allowedEffects.has(value) ? value : 'natural';
+    }
+});

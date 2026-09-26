@@ -10,7 +10,7 @@ assert.match(app, /const dharanaPractice = await practiceModuleLoader\.load\('dh
 assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\(/, 'the controller should delegate Dharana lifecycle to its owner');
 assert.match(html, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 assert.doesNotMatch(html, /modules\/dharana-practice\.js/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/dharana-practice\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

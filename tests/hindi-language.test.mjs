@@ -6,6 +6,7 @@ const readText = (path) => fs.readFileSync(new URL(path, import.meta.url), 'utf8
 const readJson = (path) => JSON.parse(readText(path));
 
 const app = readText('../app.js');
+const piper = readText('../modules/piper-lifecycle.js');
 const html = readText('../index.html');
 const serviceWorker = readText('../sw.js');
 const manifest = readJson('../language-manifest.json');
@@ -40,12 +41,12 @@ assert.match(
     'The manifest fallback must retain Hindi without a Piper default.',
 );
 assert.match(
-    app,
-    /const piperVoices = piperVoiceRegistry\.filter\(voice => voice\.language === state\.language\)/,
+    piper,
+    /piperVoices\.filter\(voice => voice\.language === state\.language\)/,
     'Piper choices must remain filtered to the selected language.',
 );
 assert.match(
-    app,
+    piper,
     /availableVoices\.filter\(voice => voiceMatchesLanguage\(voice\)\)/,
     'Hindi browser voices must use the language-prefix filter.',
 );
@@ -184,37 +185,26 @@ assert.equal(
     'Shipped production content must pass the complete Hindi narration contract.',
 );
 
-const earnStart = app.indexOf('function cancelEarnHandoff()');
-const earnEnd = app.indexOf('function setSymbolImage(', earnStart);
-assert.ok(earnStart >= 0 && earnEnd > earnStart, 'Earn scheduler source must remain extractable.');
+const completionView = readText('../modules/completion-view.js');
 const earnLink = {
     hidden: false,
     classList: { add() {}, remove() {} },
     focus() {},
 };
 let scheduledCallbacks = 0;
-const earnContext = {
-    result: null,
-    state: { language: 'hi' },
+const completionContext = vm.createContext({});
+vm.runInContext(completionView, completionContext);
+const handoff = completionContext.ChakraCompletionView.createEarnHandoff({
     document: { getElementById: () => earnLink },
-    window: {
-        clearTimeout() {},
-        setTimeout() {
-            scheduledCallbacks += 1;
-            return 1;
-        },
-    },
-};
-vm.runInNewContext(
-    `let earnHandoffTimer = null; const EARN_HANDOFF_DELAY_MS = 3000;\n${app.slice(earnStart, earnEnd)}\nresult = scheduleEarnHandoff;`,
-    earnContext,
-);
-earnContext.result();
+    window: { clearTimeout() {}, setTimeout() { scheduledCallbacks++; return 1; } },
+    getLanguage: () => 'hi'
+});
+handoff.schedule();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
 assert.match(html, /app\.js\?v=4.12/, 'The application query version must match the modularized delivery.');
-assert.match(serviceWorker, /chakra-v5.309/, 'The shell cache must be rotated for the locale UI renderer delivery.');
+assert.match(serviceWorker, /chakra-v5.310/, 'The shell cache must be rotated for the locale UI renderer delivery.');
 assert.match(serviceWorker, /chakra-language-v53/, 'The current locale cache generation must remain declared for language delivery.');
 
 console.log('Hindi language contract passed.');

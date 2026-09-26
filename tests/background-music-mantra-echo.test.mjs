@@ -60,7 +60,7 @@ assert.match(rangeControls, /if \(!minimum\.dataset\.i18n\) minimum\.textContent
 assert.doesNotMatch(css, /#mood-relaxation-ambience-level-control \.range-meta/, 'the ambience control should use the shared five-column range layout');
 assert.match(app, /const PLEASURE_AMBIENCE_MAX_GAIN = 0\.07/, 'the ambience engine should enforce the 7.0% maximum');
 assert.match(app, /const PLEASURE_AMBIENCE_CONFIRM_THRESHOLD = 0\.05/, 'the ambience engine should require confirmation above 5.0%');
-assert.match(app, /requestedGain > PLEASURE_AMBIENCE_CONFIRM_THRESHOLD[\s\S]*?window\.confirm\(t\('ui\.pleasureAmbienceAboveFiveConfirm'\)\)[\s\S]*?syncPleasureAmbienceControl\(\)[\s\S]*?return;/, 'cancelling the high-level confirmation should restore the previous ambience value');
+assert.match(moodAmbienceView, /requestedGain > threshold[\s\S]*?browserWindow\.confirm\(translate\('ui\.pleasureAmbienceAboveFiveConfirm'\)\)[\s\S]*?syncControl\(\)[\s\S]*?return;/, 'cancelling the high-level confirmation should restore the previous ambience value');
 assert.match(app, /const PLEASURE_AMBIENCE_MIN_GAIN = 0\.002/, 'the ambience engine should skip the first non-zero step');
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience selection must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience selection must not be saved to local storage');
@@ -121,7 +121,7 @@ assert.match(app, /async loadPleasureAmbienceUrl\(url\)/, 'the audio engine shou
 assert.match(app, /localStorage\.setItem\(PLEASURE_AMBIENCE_URL_STORAGE_KEY, normalizedUrl\)/, 'a successfully loaded URL should be persisted');
 assert.match(app, /localStorage\.removeItem\(PLEASURE_AMBIENCE_URL_STORAGE_KEY\)/, 'clearing the URL should restore manifest loading');
 assert.match(app, /if \(path === customUrl\) throw new Error\(`Unable to load the pleasure ambience URL/, 'custom URL failures should be reported instead of silently falling through');
-assert.match(app, /loadPleasureAmbienceUrlButton\?\.addEventListener\('click', async \(\) =>/, 'the Journey Tuning Load action should call the audio URL loader');
+assert.match(app, /moodAmbienceSettingsView\.bindUrlLoader\(/, 'the Journey Tuning Load action should be bound by its settings view owner');
 assert.match(app, /this\.pleasureLoops = \[\]/, 'pleasure ambience should support multiple simultaneous loops');
 assert.match(app, /this\.pleasureBuffers = new Map\(\)/, 'pleasure ambience buffers should be tracked per file');
 assert.ok(app.includes('[...this.pleasureBuffers.values()].map(buffer =>'), 'all decoded pleasure layers should be overlaid');
@@ -151,9 +151,9 @@ assert.match(app, /setPleasureAmbienceGain\(gain\)/, 'the audio engine should ex
 assert.match(audioInitialization, /this\.pleasureBlurFilter = this\.ctx\.createBiquadFilter\(\)/, 'pleasure ambience should have a dedicated blur filter');
 assert.match(audioInitialization, /this\.pleasureBlurConvolver\.buffer = this\.createImpulseResponse\(0\.9, 4\.5\)/, 'pleasure blur should use gentle diffusion');
 assert.match(app, /setPleasureAmbienceBlur\(enabled = true\)/, 'pleasure blur should be independently toggleable');
-assert.match(app, /state\.pleasureAmbienceBlur = true/, 'enabling the ambience should restore blur as the default');
-assert.match(app, /pleasure-ambience-blur-level'\)\?\.addEventListener\('input'/, 'the pleasure blur intensity slider should update from user input');
-assert.match(app, /mood-relaxation-ambience-level'\)\?\.addEventListener\('input'/, 'the ambience level slider should update from user input');
+assert.match(moodAmbienceView, /if \(state\.moodRelaxationIntentionEnabled\) state\.pleasureAmbienceBlur = true/, 'enabling the ambience should restore blur as the default');
+assert.match(moodAmbienceView, /getElementById\('pleasure-ambience-blur-level'\)\?\.addEventListener\('input'/, 'the pleasure blur intensity slider should update from user input');
+assert.match(moodAmbienceView, /getElementById\('mood-relaxation-ambience-level'\)\?\.addEventListener\('input'/, 'the ambience level slider should update from user input');
 
 const setMusicEchoStart = app.indexOf('    setMusicEcho(mode = \'light\')');
 const setMusicEchoEnd = app.indexOf('\n    toggleEyesCloseMode(', setMusicEchoStart);

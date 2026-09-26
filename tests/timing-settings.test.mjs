@@ -17,6 +17,20 @@ assert.equal(service.resolve({}, 'estimate', 'unknownEstimate', 42), 42);
 assert.equal(service.resolve({ estimate: { baseOverhead: 0 } }, 'estimate', 'baseOverhead', 42), 0);
 assert.equal(service.resolveJourneyDefault(defaultConfig, 'timePerChakra', 1), 5);
 assert.equal(service.resolveJourneyDefault({}, 'timePerChakra', 1), 1);
+assert.equal(service.shotDefaultDuration('meditation', { default: 9, min: 1, max: 20 }), 9);
+assert.equal(service.shotDefaultDuration('custom', { singleFrequencyDefault: 99, min: 1, max: 20 }), 20);
+assert.equal(service.shotDefaultDuration('custom', { singleFrequencyDefault: 'bad' }), 1);
+const ratios = { beginner: 0.2, intermediate: 0.5, expert: 1 };
+assert.equal(service.normalizeDroneDurationMode('invalid', ratios, 'beginner'), 'beginner');
+assert.equal(service.normalizeHrimDroneDurationMode('beginner', ratios, 'beginner', 'intermediate'), 'intermediate');
+assert.equal(service.normalizeSleepDroneDurationMode('expert', ratios, 'intermediate'), 'expert');
+assert.equal(service.droneDurationMs('beginner', ratios, 'beginner', 20), 4000);
+assert.equal(service.formatClockDuration(-1), '00:00');
+assert.equal(service.formatClockDuration(61500), '01:02');
+const sleepStages = { sleep_mode: { stages: Array.from({ length: 5 }, (_, index) => ({ key: `stage-${index}`, frequency: String(index + 1) })) } };
+assert.equal(service.normalizeSleepStages(sleepStages).at(-1).frequency, 5);
+assert.throws(() => service.normalizeSleepStages({ sleep_mode: { stages: [] } }), /requires five/);
+assert.throws(() => service.normalizeSleepStages({ sleep_mode: { stages: Array.from({ length: 5 }, () => ({ key: 'x', frequency: 0 })) } }), /invalid frequency/);
 const merged = service.mergeProfile(defaultConfig, {
     journey: { timePerChakra: { default: 2, max: 3 } },
     transitions: { initialSettle: 0 },
@@ -128,5 +142,5 @@ assert.match(app, /const timingSettings = window\.ChakraTimingSettings/);
 assert.match(app, /function timing\(section, key, fallback = 0\)\s*\{\s*return timingSettings\.resolve\(/);
 assert.match(app, /function loadTimingConfig\(\)\s*\{\s*timingConfig = await timingSettings\.loadAndApply\(/);
 assert.match(html, /modules\/timing-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/timing-settings\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/timing-settings\.js\?v=1\.0/);
 console.log('Timing settings contract passed: fallbacks, profile overlays, configured bounds, persisted preference clamping, load failure and callback order.');

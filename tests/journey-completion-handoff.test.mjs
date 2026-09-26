@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const completion = fs.readFileSync(new URL('../modules/completion-view.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 const handoffMatch = html.match(/<a\s+id="continue-to-earn"[\s\S]*?href="([^"]+)"[\s\S]*?hidden>/);
@@ -16,12 +18,23 @@ assert.deepEqual(
     'Lite must hand off only its source identity',
 );
 
-assert.match(app, /const EARN_HANDOFF_DELAY_MS = 3000;/, 'the closing blessing should remain visible briefly');
 assert.match(app, /modal\.classList\.remove\('hidden'\);\s*scheduleEarnHandoff\(\);/, 'handoff must follow the Journey Complete screen');
-assert.match(app, /earnLink\.hidden = false;[\s\S]*?earnLink\.classList\.remove\('hidden'\);[\s\S]*?earnLink\.focus/, 'the timer must reveal and focus the Earn link');
-const scheduleSource = app.match(/function scheduleEarnHandoff\(\) \{[\s\S]*?\n\}\n\nfunction setSymbolImage/)?.[0];
-assert.ok(scheduleSource, 'the delayed handoff reveal must remain directly reviewable');
-assert.doesNotMatch(scheduleSource, /location\.|\.click\(/, 'the handoff timer must never navigate or synthesize a click');
+const completionContext = vm.createContext({});
+vm.runInContext(completion, completionContext);
+const timers = new Map();
+let timerId = 0;
+const earnLink = { hidden: true, classList: { add() {}, remove() {} }, focus() {} };
+const handoffPolicy = completionContext.ChakraCompletionView.createEarnHandoff({
+    document: { getElementById: id => id === 'continue-to-earn' ? earnLink : null },
+    window: { setTimeout: (fn, delay) => { timers.set(++timerId, { fn, delay }); return timerId; }, clearTimeout: id => timers.delete(id) },
+    getLanguage: () => 'en'
+});
+handoffPolicy.schedule();
+assert.equal(timers.get(1).delay, 3000, 'the closing blessing remains visible briefly');
+timers.get(1).fn();
+assert.equal(earnLink.hidden, false, 'the timer reveals the Earn link');
+handoffPolicy.cancel();
+assert.equal(earnLink.hidden, true);
 assert.match(html, /id="continue-to-earn"[\s\S]*?class="primary-btn completion-earn-link hidden"[\s\S]*?href="https:\/\/missionode\.github\.io\/earn-app\/receive\.html\?Source=Lite"/, 'a genuine anchor tap must own the exact Earn navigation');
 assert.doesNotMatch(app, /Meditation complete\. You can now turn off/, 'completion must not be interrupted by a blocking reminder');
 

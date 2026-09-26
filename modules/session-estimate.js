@@ -1,6 +1,23 @@
 (function installSessionEstimate(global) {
     'use strict';
 
+    function estimateNarrationDurationSeconds(textValue, pacing = 'normal', {
+        isPiperVoice = () => false,
+        getPiperMeditationPaceMultiplier = () => 1,
+        leadInSeconds = 1.2,
+        sentenceGapSeconds = 1.5
+    } = {}) {
+        const text = String(textValue ?? '').trim();
+        if (!text) return 0;
+        const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
+        const charactersPerSecond = isMalayalam ? 5.5 : 7.5;
+        const piperPaceMultiplier = isPiperVoice() ? getPiperMeditationPaceMultiplier() : 1;
+        const pacingFactor = pacing === 'hrim' ? 1.1 : pacing === 'soft' ? 0.82 : pacing === 'feeble' ? 0.76 : 1;
+        const sentenceCount = text.split(/[.!?।]/).filter(sentence => sentence.trim()).length;
+        const sentenceGaps = Math.max(0, sentenceCount - 1) * sentenceGapSeconds;
+        return leadInSeconds + (text.length / (charactersPerSecond * pacingFactor * piperPaceMultiplier)) + sentenceGaps;
+    }
+
     function estimateStandardJourneySeconds({
         scripts,
         isHighEnergy,
@@ -248,5 +265,5 @@
         return `~ ${estimate} min session`;
     }
 
-    global.ChakraSessionEstimate = Object.freeze({ resolve, estimateStandardJourneySeconds, resolveDurationMs });
+    global.ChakraSessionEstimate = Object.freeze({ resolve, estimateStandardJourneySeconds, resolveDurationMs, estimateNarrationDurationSeconds });
 })(typeof window === 'undefined' ? globalThis : window);

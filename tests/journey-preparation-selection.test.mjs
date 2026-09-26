@@ -62,8 +62,61 @@ for (const [key, id] of [
     assert.deepEqual(calls.splice(0), ['visibility', 'estimate']);
 }
 
+const durationListeners = new Map();
+const preferenceControl = checkbox();
+preferenceControl.value = 'not-a-supported-choice';
+const preferenceEvents = [];
+const bindingDocument = {
+    getElementById(id) {
+        if (id === 'visualization-ambience') return preferenceControl;
+        if (['visualization-duration', 'body-scan-duration', 'noting-duration', 'undo-unlearn-duration'].includes(id)) {
+            return { addEventListener(type, handler) { durationListeners.set(`${id}:${type}`, handler); } };
+        }
+        return null;
+    }
+};
+let estimateCalls = 0;
+context.window.ChakraJourneyPreparationSelection.bindDurationRefresh({ document: bindingDocument, updateSessionEstimate: () => estimateCalls++ });
+for (const id of ['visualization-duration', 'body-scan-duration', 'noting-duration', 'undo-unlearn-duration']) {
+    durationListeners.get(`${id}:change`)();
+}
+assert.equal(estimateCalls, 4, 'each preparation duration refreshes the estimate on change');
+const preferenceState = {};
+const storedPreferences = new Map();
+context.window.ChakraJourneyPreparationSelection.bindVisualizationAmbiencePreference({
+    document: bindingDocument, state: preferenceState,
+    storage: { setItem(key, value) { storedPreferences.set(key, value); } }
+});
+preferenceControl.listeners.change({ target: preferenceControl });
+assert.equal(preferenceState.visualizationAmbience, 'silence', 'unknown ambience values safely normalize to silence');
+assert.equal(storedPreferences.get('chakra_visualization_ambience'), 'silence');
+preferenceControl.value = 'space-race';
+preferenceControl.listeners.change({ target: preferenceControl });
+assert.equal(preferenceState.visualizationAmbience, 'space-race');
+assert.equal(storedPreferences.get('chakra_visualization_ambience'), 'space-race');
+
+const musicToggle = checkbox();
+const highEnergyModeToggle = checkbox();
+const modeState = {};
+const modeCalls = [];
+context.window.ChakraJourneyPreparationSelection.bindPrimaryModeToggles({
+    musicOnlyToggle: musicToggle, highEnergyToggle: highEnergyModeToggle, state: modeState,
+    enforceMasterToggle: target => modeCalls.push(`master:${target === musicToggle ? 'music' : 'high-energy'}`),
+    updateExperienceModeVisibility: () => modeCalls.push('visibility'),
+    updateSessionEstimate: () => modeCalls.push('estimate')
+});
+change(musicToggle, true);
+assert.equal(modeState.bgMusicMode, true);
+assert.deepEqual(modeCalls.splice(0), ['master:music', 'visibility', 'estimate']);
+change(highEnergyModeToggle, true);
+assert.equal(modeState.highEnergyEnabled, true);
+assert.deepEqual(modeCalls.splice(0), ['master:high-energy', 'visibility', 'estimate']);
+
 assert.doesNotMatch(moduleSource, /chakra-selection|selectedChakras/, 'Preparation selection does not impose a chakra-selection prerequisite.');
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?undoUnlearn: undoUnlearnAddonToggle/);
+assert.match(appSource, /ChakraJourneyPreparationSelection\.bindPrimaryModeToggles\(/);
+assert.match(appSource, /ChakraJourneyPreparationSelection\.bindDurationRefresh\(/);
+assert.match(appSource, /ChakraJourneyPreparationSelection\.bindVisualizationAmbiencePreference\(/);
 assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.0') < html.indexOf('app.js?v=4.12'));
 assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.0/);
 console.log('Journey preparation selection passed: standalone stages, nested options, mutual-exclusion clears and updates.');

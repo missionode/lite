@@ -69,6 +69,54 @@
         timeAssistedBathing: ['chakra_time_assisted_bathing', 'assistedBathing', 600]
     });
 
+    function shotDefaultDuration(type, definition = {}, multiStageTypes = ['meditation', 'sleep']) {
+        const isMultiStage = multiStageTypes.includes(type);
+        const configured = isMultiStage ? definition.default : definition.singleFrequencyDefault;
+        const fallback = isMultiStage ? 7 : 1;
+        const duration = Number(configured ?? fallback);
+        const minimum = Number(definition.min ?? 1);
+        const maximum = Number(definition.max ?? 20);
+        return Number.isFinite(duration) ? Math.min(maximum, Math.max(minimum, duration)) : fallback;
+    }
+
+    function normalizeDroneDurationMode(value, ratios, fallback) {
+        return Object.prototype.hasOwnProperty.call(ratios, value) ? value : fallback;
+    }
+
+    function normalizeHrimDroneDurationMode(value, ratios, standardFallback, hrimFallback) {
+        const normalized = normalizeDroneDurationMode(value, ratios, standardFallback);
+        return normalized === 'beginner' ? hrimFallback : normalized;
+    }
+
+    function normalizeSleepDroneDurationMode(value, ratios, fallback) {
+        return Object.prototype.hasOwnProperty.call(ratios, value) ? value : fallback;
+    }
+
+    function droneDurationMs(mode, ratios, fallback, referenceSeconds) {
+        return Math.round(referenceSeconds * 1000 * ratios[normalizeDroneDurationMode(mode, ratios, fallback)]);
+    }
+
+    function formatClockDuration(durationMs) {
+        const totalSeconds = Math.max(0, Math.round(Number(durationMs) / 1000));
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function normalizeSleepStages(scripts, expectedCount = 5) {
+        const stages = scripts?.sleep_mode?.stages;
+        if (!Array.isArray(stages) || stages.length !== expectedCount) {
+            throw new Error('Sleep Mode requires five script-defined frequency stages.');
+        }
+        return stages.map((stage, index) => {
+            const frequency = Number(stage?.frequency);
+            if (!stage?.key || !Number.isFinite(frequency) || frequency <= 0 || frequency > 20000) {
+                throw new Error(`Sleep Mode stage ${index + 1} has an invalid frequency.`);
+            }
+            return { ...stage, frequency };
+        });
+    }
+
     function resolve(config, section, key, fallback = 0) {
         const value = config?.[section]?.[key];
         return value == null ? (FALLBACKS[`${section}.${key}`] ?? fallback) : value;
@@ -153,6 +201,13 @@
 
     global.ChakraTimingSettings = Object.freeze({
         fallbacks: FALLBACKS,
+        shotDefaultDuration,
+        normalizeDroneDurationMode,
+        normalizeHrimDroneDurationMode,
+        normalizeSleepDroneDurationMode,
+        droneDurationMs,
+        formatClockDuration,
+        normalizeSleepStages,
         resolve,
         resolveJourneyDefault,
         mergeProfile,

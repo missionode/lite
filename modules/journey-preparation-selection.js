@@ -55,5 +55,43 @@
         });
     }
 
-    global.ChakraJourneyPreparationSelection = Object.freeze({ bind });
+    function bindDurationRefresh({ document = global.document, updateSessionEstimate } = {}) {
+        if (!document || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Preparation durations require document and estimate services');
+        }
+        ['visualization-duration', 'body-scan-duration', 'noting-duration', 'undo-unlearn-duration'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', updateSessionEstimate);
+        });
+    }
+
+    function bindVisualizationAmbiencePreference({ document = global.document, state, storage = global.localStorage } = {}) {
+        if (!document || !state || !storage || typeof storage.setItem !== 'function') {
+            throw new TypeError('Visualization ambience preference requires document, state and storage');
+        }
+        document.getElementById('visualization-ambience')?.addEventListener('change', event => {
+            state.visualizationAmbience = event.target.value === 'space-race' ? 'space-race' : 'silence';
+            storage.setItem('chakra_visualization_ambience', state.visualizationAmbience);
+        });
+    }
+
+    function bindPrimaryModeToggles({ musicOnlyToggle, highEnergyToggle, state, enforceMasterToggle, updateExperienceModeVisibility, updateSessionEstimate }) {
+        if (!state || typeof enforceMasterToggle !== 'function' || typeof updateExperienceModeVisibility !== 'function'
+            || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Primary mode toggles require state and mode-refresh services');
+        }
+        musicOnlyToggle?.addEventListener('change', event => {
+            state.bgMusicMode = event.target.checked;
+            enforceMasterToggle(event.target);
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
+        });
+        highEnergyToggle?.addEventListener('change', event => {
+            state.highEnergyEnabled = event.target.checked;
+            enforceMasterToggle(event.target);
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
+        });
+    }
+
+    global.ChakraJourneyPreparationSelection = Object.freeze({ bind, bindDurationRefresh, bindVisualizationAmbiencePreference, bindPrimaryModeToggles });
 })(typeof window === 'undefined' ? globalThis : window);

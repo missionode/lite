@@ -1,6 +1,31 @@
 (function installSessionCountdown(global) {
     'use strict';
 
+    const CIRCUMFERENCE = 276.46;
+
+    function renderProgress(document, remainingMs, totalMs) {
+        if (!document || typeof document.querySelectorAll !== 'function') throw new TypeError('Countdown display requires a document');
+        const countdowns = document.querySelectorAll('[data-session-countdown]');
+        const progressNodes = document.querySelectorAll('[data-session-countdown-progress]');
+        const total = Number(totalMs);
+        const remaining = Number(remainingMs);
+        if (!countdowns.length || !progressNodes.length || !Number.isFinite(total) || total <= 0) {
+            countdowns.forEach(countdown => { countdown.hidden = true; });
+            return;
+        }
+        const safeRemaining = Math.min(total, Math.max(0, Number.isFinite(remaining) ? remaining : total));
+        const ratio = safeRemaining / total;
+        countdowns.forEach(countdown => { countdown.hidden = false; });
+        progressNodes.forEach(progress => {
+            progress.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - ratio));
+        });
+    }
+
+    function hideDisplay(document) {
+        if (!document || typeof document.querySelectorAll !== 'function') throw new TypeError('Countdown display requires a document');
+        document.querySelectorAll('[data-session-countdown]').forEach(countdown => { countdown.hidden = true; });
+    }
+
     class SessionCountdown {
         constructor({ now, setIntervalFn, clearIntervalFn, isActive, isPaused, render, hide }) {
             if (typeof now !== 'function' || typeof setIntervalFn !== 'function' ||
@@ -62,4 +87,5 @@
     }
 
     global.ChakraSessionCountdown = SessionCountdown;
+    global.ChakraSessionCountdownDisplay = Object.freeze({ renderProgress, hideDisplay, circumference: CIRCUMFERENCE });
 })(typeof window === 'undefined' ? globalThis : window);

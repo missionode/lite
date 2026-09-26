@@ -9,13 +9,22 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
 assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.309[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/session-estimate\.js\?v=1\.0/);
 assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const estimate = context.ChakraSessionEstimate;
 assert.ok(Object.isFrozen(estimate));
+assert.equal(estimate.estimateNarrationDurationSeconds(''), 0);
+const englishLine = estimate.estimateNarrationDurationSeconds('Hello.', 'normal', { leadInSeconds: 0, sentenceGapSeconds: 0 });
+assert.equal(englishLine, 6 / 7.5);
+const malayalamLine = estimate.estimateNarrationDurationSeconds('ശാന്തം.', 'normal', { leadInSeconds: 0, sentenceGapSeconds: 0 });
+assert.equal(malayalamLine, 'ശാന്തം.'.length / 5.5);
+assert.ok(estimate.estimateNarrationDurationSeconds('One. Two.', 'soft', {
+    leadInSeconds: 0, sentenceGapSeconds: 2, isPiperVoice: () => true,
+    getPiperMeditationPaceMultiplier: () => 0.5
+}) > englishLine, 'soft narration and slower Piper pace produce a longer estimate');
 
 function makeDuration({ experience = null, checks = [], overrides = {}, scripts = {}, poses = 0, measured = 30, highEnergy = false, demo = false } = {}) {
     const selectedChecks = new Set(checks);
