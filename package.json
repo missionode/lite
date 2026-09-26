@@ -40,6 +40,7 @@
     "test:audio-mantra-playback": "node tests/audio-mantra-playback.test.mjs",
     "test:audio-background-music-lifecycle": "node tests/audio-background-music-lifecycle.test.mjs",
     "test:audio-background-music-controls": "node tests/audio-background-music-controls.test.mjs",
+    "test:audio-pleasure-ambience": "node tests/audio-pleasure-ambience.test.mjs",
     "test:audio-music-echo": "node tests/audio-music-echo.test.mjs",
     "test:journey-hypnosis-wrapper": "node tests/journey-hypnosis-wrapper.test.mjs",
     "test:journey-opening-stage": "node tests/journey-opening-stage.test.mjs",

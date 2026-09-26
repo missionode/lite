@@ -1,10 +1,20 @@
 # Chakra Meditation — Active Handoff
 
-### RELEASE PREPARATION — pending production publication
+### INTEGRATION BASELINE — CP-MOD-151 and PR #80
 
 - Updated outdated source-slicing tests to exercise current owners: localized-intention policy and language-change binding, No Frequency/No Mantra side effects, completion Earn-handoff timer, and Advanced Features/Shot URL handler boundaries. These were test-location/harness failures, not confirmed runtime defects.
 - Fresh non-browser suite: 99/101. The only remaining failures stop before assertions because owner-maintained `docs/dot.json` is absent (`content-safety`, `drone-duration`). That file was not found in either Lite checkout; do not substitute another project's data. Atlas build/structure, targeted affected tests, and `git diff --check` pass. Browser tests remain skipped per user's prior request; Playwright is unavailable.
-- Production/integration HEAD is newer than this checkpoint base. Merge/rebase must be validated on the current production baseline; the main `modularize` checkout has separate user edits and an unrelated untracked audio backup. Preserve those, and do not commit `.codex/loop-routing` prompt/decision artifacts.
+- PR #80 integrated CP-MOD-067–151 into `production` (merge commit `6f570eebe8c0e432bf381c99406c8abcfce86528`). This sandbox starts from the same source tree as the merged checkpoint. The main `modularize` checkout has separate user edits and an unrelated untracked audio backup; preserve those, and do not commit `.codex/loop-routing` prompt/decision artifacts.
+
+### COMPLETE LOCALLY — CP-MOD-152: Mood & Relaxation audio lifecycle ownership
+
+- Extracted one cohesive audio lifecycle seam into `modules/audio-pleasure-ambience.js`: spatial approach, manifest/local/custom URL loading, custom-source rollback, loop start/stop, and gain/blur/intensity handling. AudioEngine public methods remain adapters; app state ownership, journey calls, values, fade timing, settings behavior, offline cache availability and failure paths are preserved.
+- Added a direct lifecycle contract covering manifest filtering, optional 404 handling, decode/start, gain/blur/spatial ramps, failed custom-URL recovery and resource cleanup. Refreshed the `sound-options` and modularization atlas notes, PWA manifest and fix queue.
+- Validation: `test:audio-pleasure-ambience`, AudioEngine initialization, spatial geometry, Mood & Relaxation settings, audio-mode controls, audio-effects controls, transitions, `node --check` and `git diff --check` pass. Atlas rebuilt successfully: 44 maps / 369 nodes / 434 edges; source snapshot labels CP-MOD-152 uncommitted. Interactive atlas verification could not run because Playwright is not installed; browser/device playback, sound-quality and performance evidence remain unclaimed.
+
+### NEXT — CP-MOD-153: audit next cohesive app/controller seam
+
+- Reinspect the current ownership map and coupling before choosing another extraction. Continue only with direct parity coverage; leave the larger journey/audio controller lifecycles intact unless a complete safe boundary is evident. Measured lazy-loading remains a separate evidence gate.
 
 ### COMPLETE LOCALLY — CP-MOD-149–151: Piper voice setup ownership
 

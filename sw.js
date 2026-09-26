@@ -51,6 +51,7 @@ const ASSETS = [
   './modules/audio-mantra-playback.js?v=1.0',
   './modules/audio-background-music-lifecycle.js?v=1.0',
   './modules/audio-background-music-controls.js?v=1.0',
+  './modules/audio-pleasure-ambience.js?v=1.0',
   './modules/audio-music-echo.js?v=1.0',
   './modules/journey-hypnosis-wrapper.js?v=1.0',
   './modules/journey-opening-stage.js?v=1.0',

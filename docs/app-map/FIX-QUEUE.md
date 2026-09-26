@@ -423,3 +423,9 @@ Move the selected symbol/deity/Yoga image load, stale-request guard, failed-imag
 - Piper voice profile: ID/registry lookup, cadence bounds and settings, browser/Piper gender policy, locale matching and voice selection (10).
 - Completion Earn-link timer lifecycle (3), voice-status view rendering (1), demo timing policy helpers (3), localized generated-intention refresh (2), and drone-duration summary rendering (1).
 - Existing event ordering, output copy, audio/session policy, and offline/eager delivery remain unchanged. Focused direct contracts pass; this does not claim performance or device gains.
+
+## CP-MOD-152 — Mood & Relaxation audio lifecycle ownership (implemented locally)
+
+- Moved ambience spatial approach, manifest/local/custom URL decoding, custom-source rollback, seamless-loop start/stop, gain/blur automation and intensity application into `modules/audio-pleasure-ambience.js` behind the existing AudioEngine methods.
+- Preserved state ownership, setting values, fade and automation timing, No Frequency guards, URL persistence/recovery, warnings and stop-time buffer cleanup. Added a direct lifecycle contract and kept the module eagerly available/offline cached.
+- Update the `sound-options` ownership notes. No journey topology, sound-quality, startup or thermal change is claimed.
