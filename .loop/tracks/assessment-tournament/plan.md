@@ -12,6 +12,13 @@
 - Obtain trained-operator review of neutral wording, dot interpretation and real-session usability.
 - Treat this as a usability/content follow-up; do not add diagnosis, direct intimate-service questions, consent inference, automatic recommendation or journey handoff.
 
+## Completed production integration — CP-ASSESS-ADV-UNDO-RAPPORT-001 (PR #78)
+
+- Integrated the Advanced Features gate, one-step undo and evidence-limited conversation cue/icebreaker into the served checkout. The single entry is the Lobby consultation CTA; Settings has no assessment link.
+- Maintained a 15-minute same-tab grant, revoked it on relock, and gated assessment-page startup before question-bank fetch. This is not server authentication.
+- Kept the cue derived exclusively from chakra answers at full evidence confidence; no fixed personality/behavior conclusions and no rapport inference from intimate-value answers or the private dot.
+- Rotated assessment data/module and shell caches; regenerated atlas and references. `npm run test:assessment`, `npm run test:advanced-unlock` and `git diff --check` pass. PR #78 merged to `production` as `d0a8051` on 2026-09-26. GitHub reported no CI checks; browser review remains pending with the owner. CP-ASSESS-IMPL-003 trained-operator review remains open.
+
 ## Original acceptance criteria
 
 1. Preserve one question at a time, two neutral choices, Equal, Skip and no repeat after any response.

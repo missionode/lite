@@ -9,13 +9,13 @@
     "minimumDotDistinctValues": 3
   },
   "chakras": [
-    { "id": "root", "name": "Root Chakra", "archetype": "Steady Grounder" },
-    { "id": "sacral", "name": "Sacral Chakra", "archetype": "Creative Explorer" },
-    { "id": "solar", "name": "Solar Plexus Chakra", "archetype": "Purposeful Achiever" },
-    { "id": "heart", "name": "Heart Chakra", "archetype": "Compassionate Connector" },
-    { "id": "throat", "name": "Throat Chakra", "archetype": "Authentic Communicator" },
-    { "id": "third-eye", "name": "Third Eye Chakra", "archetype": "Insightful Observer" },
-    { "id": "crown", "name": "Crown Chakra", "archetype": "Meaning Seeker" }
+    { "id": "root", "name": "Root Chakra", "archetype": "Steady Grounder", "conversationTopic": "feeling grounded and secure" },
+    { "id": "sacral", "name": "Sacral Chakra", "archetype": "Creative Explorer", "conversationTopic": "creativity, enjoyment, and emotional ease" },
+    { "id": "solar", "name": "Solar Plexus Chakra", "archetype": "Purposeful Achiever", "conversationTopic": "personal direction, choices, and confidence" },
+    { "id": "heart", "name": "Heart Chakra", "archetype": "Compassionate Connector", "conversationTopic": "care, connection, and compassion" },
+    { "id": "throat", "name": "Throat Chakra", "archetype": "Authentic Communicator", "conversationTopic": "expression and feeling heard" },
+    { "id": "third-eye", "name": "Third Eye Chakra", "archetype": "Insightful Observer", "conversationTopic": "reflection, attention, and clarity" },
+    { "id": "crown", "name": "Crown Chakra", "archetype": "Meaning Seeker", "conversationTopic": "meaning and personal values" }
   ],
   "values": [
     { "id": "sensual-joy", "label": "Sensual Joy", "archetype": "Embodied Observer", "operatorSignal": 2 },

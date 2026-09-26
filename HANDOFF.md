@@ -130,12 +130,25 @@
 
 ### PREVIOUS — CP-MOD-066: Timing duration settings view ownership
 
+### RELEASED — CP-ASSESS-ADV-UNDO-RAPPORT-001 (production baseline)
+
+- Production already includes PR #78: the Lobby-only assessment CTA is Advanced Features-gated; it provides one-step undo and a cautious chakra-evidence rapport cue/icebreaker. The same-tab grant is client-side gating, not server authentication.
+- This release merge is being prepared on top of the current production baseline; assessment behavior and its translations are preserved while modularization ownership is integrated.
+
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-066/lite`, branch `codex/modularize-cp-066`, based on CP-MOD-065 `083294a`. Extracted seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; mode-sensitive chakra/Sleep/Shot and High Energy durations remain app-owned.
 - Preserved the exact two binding positions around custom-script controls, integer parsing, state → display → storage → session-estimate ordering, all ten existing storage keys/labels, and error propagation. App-level estimate continues to refresh the roadmap. Eager/offline-pre-cached ownership only; no performance claim.
 - Atlas `timing-configuration` source references and notes plus `FIX-QUEUE.md` are updated. Router read-only audit ran via Loop’s automatic high-reasoning route; child review recommended the same ten-control boundary and explicitly excluded the mode-sensitive controls. Route evidence is recorded under `.codex/loop-routing/lite-mod-cp066-audit.json`.
 - Validation: all ten focused tests pass (`timing-settings-view`, `timing-settings`, `timing-preference-hydration`, `range-controls`, `session-estimate`, `lobby-experience-visibility`, `drone-duration-view`, `yoga-experience-settings`, `demo-script`, `journey-roadmap`). Full non-browser Node sweep: 91/93 pass; `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent. `node --check` and `git diff --check` pass. Atlas rebuilt: 43 maps / 353 nodes / 405 edges; graph topology is unchanged, source reference `timing-preference-hydration → app.js:3664` corrected, and timing ownership references refreshed. Atlas header now identifies a local source baseline rather than implying production. Browser/E2E and screenshots are intentionally omitted for owner review; atlas visual confirmation remains open. No performance claim.
 - Routing: automatic router dispatched read-only audit to `gpt-6-astra` / high effort; its bounded dependency review recommended the same ten-control boundary and named coupling guards. Supervisor made and validated the implementation directly. No remote publication, PR, merge or production update.
 - CP-MOD-066 implementation/test checkpoint is locally committed at `46d9c9e`. A documentation follow-up regenerates the atlas against that source commit; it does not change application behavior. The router decision record remains untracked under `.codex/loop-routing/` and is intentionally excluded from source commits.
+
+### NEXT — CP-MOD-067: Custom script selection and upload flow ownership (deferred)
+
+- Parked at the safe CP-066 boundary for the next weekly usage reset. No CP-067 implementation is included in this release.
+- Planned scope: extract the existing custom-script selector, demo-timing coordination, file upload and URL-fetch handlers as one cohesive UI/controller seam. Keep `state`, localStorage, `validateScriptBundle`, session-estimate updates and cached `meditation.scripts` lifecycle authoritative in their current owners; preserve event-binding positions and success/error ordering.
+- Before implementation, define stale/concurrent URL-load behavior, duplicate `highEnergy` validation option cleanup only if covered as a separately approved behavior change, and failure atomicity: malformed uploads, HTTP/JSON/schema failures and rejected validation must preserve the previously active custom script/settings/cache. Empty URL remains a no-op.
+- Required tests: defaults/source selection; valid and malformed upload; URL success, HTTP/JSON/schema failures and empty input; demo preset exact-match/restore timing; custom source readiness; cache reuse/reload; language and feature-option fallback; concurrent URL requests. Extend the `script-preference-hydration` atlas map to show selector, upload, fetch, validation, success, failure, cache invalidation and cancellation/race behavior only after executable behavior is settled; regenerate and verify atlas.
+- This is a parked proposal, not delivered behavior. Resume only after the approved weekly token reset; do not start CP-068 or lazy-loading redesign before CP-067 validation and review.
 
 ### COMPLETE LOCALLY — CP-MOD-065: Journey preparation selection ownership
 

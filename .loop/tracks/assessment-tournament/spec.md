@@ -47,3 +47,10 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - No Advanced Features assessment settings panel.
 - No separate native Malayalam, Hindi or Russian assessment bundles in this feature; multilingual readiness uses the existing Google Translate integration.
 - The software implementation is delivered and synchronized into `modularize`; trained-operator acceptance remains a separate follow-up and does not block modularization.
+
+## Local integration — Advanced Features, undo and rapport guidance
+
+- The assessment has exactly one in-app entry point: the Lobby consultation CTA, available only while Advanced Features is unlocked. Settings has no assessment link. The Lobby entry creates a 15-minute same-tab grant; relocking revokes it, and direct page entry without it remains on an access-required view without fetching the question bank. This is a client-side feature gate, not server authentication.
+- Undo removes exactly the most recent question or value-pair response and re-presents it for correction. Older persisted assessments reconstruct chronological history from their deterministic response sequence.
+- Results include a tentative conversation topic only when a chakra has full evidence confidence, plus a client-led icebreaker. This must not claim character/behavior prediction. Topic selection is based only on chakra-question answers; intimate-value choices and the private dot are excluded. Insufficient evidence gets a generic open question.
+- The result card and undo controls must appear in the localhost-served build, not only an isolated worktree. New dynamic text follows the existing Google Translate path; service-worker asset versions and atlas branches must match the running code.

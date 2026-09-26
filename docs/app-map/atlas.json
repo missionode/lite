@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-26",
-    "commit": "af9710b baseline; CP-MOD-067–151 uncommitted locally",
-    "scope": "Source-reviewed behavior through CP-MOD-151 on the isolated local modularize checkpoint chain. Existing selected-only lazy guided practices and opt-in video/controller paths remain. Journey/settings owners include preparation and primary-mode selection, Yoga gate and persistence, Lobby Shot type refresh, Chakra/Sleep/Shot and HRIM duration controls, Mood & Relaxation ambience controls and presets, drone-duration selection and summary, optional Arrival/Emergence, opening/Gratitude, localized content and intention policies, Piper voice registry and picker setup/profile policy, completion handoff timing, content loading/validation, experiment settings, transport controls, completion dismissal and chakra-symbol image loading. Assessment remains a separate operator tool linked from Lobby. Ownership moves do not establish device/thermal gains. The approved Cosmic Observatory redesign follows modularization and relocates the dynamic sky to a Settings-linked Sky page."
+    "commit": "6fa7d97 production baseline + CP-MOD-067–151 release merge (local)",
+    "scope": "Source-reviewed merged behavior through CP-MOD-151 and CP-ASSESS-ADV-UNDO-RAPPORT-001. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script and Piper voice setup paths. Existing selected-only lazy practices and opt-in video remain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page."
   },
   "graphs": [
     {
@@ -137,12 +137,12 @@
           [
             "settings",
             "Settings",
-            "First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts."
+            "First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools."
           ],
           [
             "lobby",
             "Meditation Room",
-            "Main mode selection, chakra choices, intention, duration and assessment entry point."
+            "Main mode selection, chakra choices, intention and duration. Consultation entry is hidden and disabled until Advanced Features is unlocked."
           ]
         ],
         [
@@ -163,8 +163,8 @@
           ],
           [
             "consult",
-            "Separate operator tools",
-            "Assessment is a standalone page opened directly by the operator; repertory can prepare a custom Shot."
+            "Session consultation",
+            "Single entry point: Lobby “Begin Session Consultation” CTA, available only after Advanced Features unlock. It establishes a short same-tab assessment handoff; Settings has no assessment link."
           ]
         ],
         [
@@ -230,6 +230,16 @@
         ],
         [
           "lobby",
+          "consult",
+          "Advanced Features unlocked only"
+        ],
+        [
+          "consult",
+          "lobby",
+          "Return"
+        ],
+        [
+          "lobby",
           "journeys",
           "Begin"
         ],
@@ -262,15 +272,10 @@
           "complete",
           "lobby",
           "Return"
-        ],
-        [
-          "consult",
-          "lobby",
-          "Return / prepare Shot"
         ]
       ],
       "notes": [
-        "The Lobby operator assessment CTA navigates to the standalone assessment page; it does not configure or start a journey. Runtime behavior takes precedence over older HANDOFF entries."
+        "Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. Direct entry without a handoff shows a locked view without fetching the question bank. Client-side feature gate, not server authentication."
       ]
     },
     {
@@ -4924,14 +4929,35 @@
       "id": "assessment-tournament",
       "group": "Supporting pages",
       "title": "Operator-led chakra assessment",
-      "subtitle": "Adaptive one-question/two-choice tournament → seven chakra statuses, positive archetypes and one private operator dot.",
-      "source": "docs/assesment.html:1; modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/assessment-tournament.js:1; modules/assessment-persistence.js:1; data/assessment-questions.json:1; sw.js:1",
+      "subtitle": "Single Lobby entry point, Advanced Features-gated interview with answer undo and a cautious chakra-evidence rapport cue plus icebreaker.",
+      "source": "index.html:515; app.js:4008; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1",
       "rows": [
         [
           [
-            "lobby",
-            "Open assessment",
-            "The operator opens docs/assesment.html directly; no Lobby CTA is currently provided. The page is not connected to journey start or recommendations."
+            "entry",
+            "Lobby consultation CTA",
+            "The one entry point is Lobby → Begin Session Consultation. No duplicate assessment link appears in Settings."
+          ]
+        ],
+        [
+          [
+            "gate",
+            "Advanced Features gate",
+            "The Lobby CTA becomes available only after the shared password unlock. Relock clears any pending grant."
+          ]
+        ],
+        [
+          [
+            "locked",
+            "Access required",
+            "If opened without a valid same-tab grant, show a locked message and offer return to the Lobby."
+          ]
+        ],
+        [
+          [
+            "handoff",
+            "Short same-tab handoff",
+            "A valid entry writes a 15-minute sessionStorage grant. Direct access without a current grant stays locked and does not fetch the question bank. Client-side only; not server authentication."
           ]
         ],
         [
@@ -4945,7 +4971,12 @@
           [
             "interview",
             "One prompt at a time",
-            "Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated."
+            "Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. Chronological history supports one-step undo."
+          ],
+          [
+            "undo",
+            "Undo last response",
+            "Remove the latest answer or value-pair response and deliberately offer that item again; reconstruct response order for legacy saved state."
           ]
         ],
         [
@@ -4959,7 +4990,17 @@
           [
             "result",
             "Assessment complete",
-            "Show seven relative chakra statuses/confidence and up to three positive archetypes. This is an operator reflection aid, not diagnosis or automatic recommendation."
+            "Show seven relative chakra statuses/confidence and up to three positive archetypes. Operator reflection aid, not diagnosis or automatic recommendation."
+          ],
+          [
+            "rapport",
+            "Conversation cue",
+            "If full-confidence chakra evidence exists, show a tentative topic based only on chakra answers; explicitly not a character/behavior prediction. Never use values or the private dot."
+          ],
+          [
+            "icebreaker",
+            "Gentle icebreaker",
+            "Pair the topic with an open question inviting the client to choose what feels useful. Insufficient evidence receives a generic client-led question."
           ]
         ],
         [
@@ -4993,9 +5034,34 @@
       ],
       "edges": [
         [
-          "lobby",
+          "entry",
+          "gate",
+          "CTA click when unlocked"
+        ],
+        [
+          "entry",
+          "locked",
+          "CTA unavailable while locked"
+        ],
+        [
+          "gate",
+          "handoff",
+          "Advanced Features unlocked"
+        ],
+        [
+          "gate",
+          "locked",
+          "Relocked / grant unavailable"
+        ],
+        [
+          "locked",
+          "entry",
+          "Return to Lobby"
+        ],
+        [
+          "handoff",
           "restore",
-          "Open"
+          "Open assessment"
         ],
         [
           "restore",
@@ -5008,6 +5074,16 @@
           "Answer / equal / skip"
         ],
         [
+          "interview",
+          "undo",
+          "Undo requested"
+        ],
+        [
+          "undo",
+          "interview",
+          "Correction re-presented"
+        ],
+        [
           "coverage",
           "interview",
           "More evidence; exclude consumed IDs"
@@ -5016,6 +5092,26 @@
           "coverage",
           "result",
           "Evidence complete"
+        ],
+        [
+          "result",
+          "rapport",
+          "Full-confidence chakra result"
+        ],
+        [
+          "result",
+          "icebreaker",
+          "Insufficient chakra evidence"
+        ],
+        [
+          "rapport",
+          "clear",
+          "Review result"
+        ],
+        [
+          "icebreaker",
+          "clear",
+          "Review result"
         ],
         [
           "result",
@@ -5049,7 +5145,7 @@
         ]
       ],
       "notes": [
-        "The JSON bank owns English questions, answer-card labels, chakra/value weights and positive archetype strings; the pure engine owns scheduling, uniqueness, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Chromium verified English, Malayalam, Hindi and Russian dynamic prompt rendering, desktop/mobile layout, resume, completion and reset. Google Translate requires a network connection. Trained-operator content acceptance remains a follow-up, not a software test."
+        "The JSON bank owns English questions, answer-card labels, chakra/value weights, positive archetypes and neutral conversation topics; the pure engine owns scheduling, uniqueness, chronological undo, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. The conversation cue is confidence-gated and derived only from chakra answers, never value preferences or the private dot. It starts a conversation and does not predict traits. Google Translate requires a network connection. The handoff is same-tab UI gating, not server authentication. Exactly one entry point is the Lobby CTA; Settings contains no assessment link."
       ]
     },
     {

@@ -3775,7 +3775,13 @@ function attachEventListeners() {
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
         state.advancedFeaturesUnlocked = !isLocked;
+        if (beginConsultationBtn) {
+            beginConsultationBtn.hidden = isLocked;
+            beginConsultationBtn.disabled = isLocked;
+            beginConsultationBtn.setAttribute('aria-disabled', String(isLocked));
+        }
         if (isLocked) {
+            try { sessionStorage.removeItem('chakra_assessment_access_until'); } catch (error) { /* optional session handoff */ }
             state.moodRelaxationIntentionEnabled = false;
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);
@@ -4193,8 +4199,16 @@ function attachEventListeners() {
     screenNavigation.bindLobbyActions({
         settingsButton: openSettingsBtn,
         experimentButton: document.getElementById('open-experiment-mode'),
-        closeExperimentButton: document.getElementById('close-experiment'),
-        assessmentButton: beginConsultationBtn
+        closeExperimentButton: document.getElementById('close-experiment')
+    });
+    beginConsultationBtn?.addEventListener('click', () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            sessionStorage.setItem('chakra_assessment_access_until', String(Date.now() + 15 * 60 * 1000));
+            window.location.href = './docs/assesment.html';
+        } catch (error) {
+            showUnlockToast(t('ui.operatorAssessmentUnavailable'));
+        }
     });
     window.ChakraExperimentSettingsView.create({
         document, state, setText, startExperiment: activity => meditation.startExperiment(activity)

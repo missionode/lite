@@ -12,7 +12,7 @@ assert.ok(blockStart>=0&&blockEnd>blockStart,'Advanced Features handlers must re
 const block=source.slice(blockStart,blockEnd);
 const approvedDigest=Uint8Array.from('5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3'.match(/.{2}/g).map(value=>parseInt(value,16))).buffer;
 function setup(noFrequencyMode=false,passwordAccepted=true) {
-    let now=0,id=0; const timers=new Map(), elements=new Map();
+    let now=0,id=0; const timers=new Map(), elements=new Map(), sessionValues=new Map();
     const element=()=>({hidden:false,checked:false,disabled:false,textContent:'',listeners:{},setAttribute(){},addEventListener(name,fn){this.listeners[name]=fn;},
         remove(){this.attached=false;},appendChild(child){child.attached=true;},querySelectorAll(){return [];},dispatchEvent(event){this.lastEvent=event.type;}});
     const get=name=>{if(!elements.has(name)) elements.set(name,element());return elements.get(name);};
@@ -20,7 +20,8 @@ function setup(noFrequencyMode=false,passwordAccepted=true) {
     const document={hidden:false,getElementById:get,createElement:()=>toast,body:{appendChild(){}},addEventListener(){}};
     const state={noFrequencyMode};
     const audio={stopped:false,stopPleasureAmbience(){this.stopped=true;}};
-    vm.runInNewContext(block,{document,state,Event,TextEncoder,ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',requestAdvancedPassword:async()=> 'operator-entry',crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
+    vm.runInNewContext(block,{document,state,Event,TextEncoder,beginConsultationBtn:get('begin-consultation'),ADVANCED_FEATURES_PASSWORD_HASH:'5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3',requestAdvancedPassword:async()=> 'operator-entry',crypto:{subtle:{digest:async()=>passwordAccepted?approvedDigest:new ArrayBuffer(32)}},performance:{now:()=>now},getChecked:name=>get(name).checked,syncChecked:(name,value)=>{get(name).checked=value;},
+        sessionStorage:{setItem:(key,value)=>sessionValues.set(key,value),getItem:key=>sessionValues.get(key)??null,removeItem:key=>sessionValues.delete(key)},
         localStorage:{setItem(){}},saveConfigBtn:get('save-config'),shotsToggle:get('shots-toggle'),sleepModeToggle:get('sleep-mode-toggle'),yogaExperienceToggle:get('yoga-experience-toggle'),yogaExperienceSetup:get('yoga-experience-setup'),prepareRepertoryShotFromUrl(){},
         audio,particleField:{setDeepSkyBlackHoleEnabled(value){state.deepSkyBlackHoleEnabled=value;}},syncPleasureAmbienceControl(){},
         clearSleepMode(){get('sleep-mode-toggle').checked=false;state.sleepExperienceEnabled=false;state.sleepMode=false;},
@@ -28,7 +29,7 @@ function setup(noFrequencyMode=false,passwordAccepted=true) {
         t:key=>key==='ui.advancedUnlockRemaining'?'{{remaining}} remaining':key,
         updateExperienceModeVisibility(){},updateSessionEstimate(){},updateJourneyRoadmap(){}});
     const advance=ms=>{now+=ms;for(const [key,timer] of [...timers]) if(timer.at<=now){timers.delete(key);timer.fn();}};
-    return {get,toast,state,audio,advance,tap:()=>get('app-version-unlock').listeners.click()};
+    return {get,toast,state,audio,sessionValues,advance,tap:()=>get('app-version-unlock').listeners.click()};
 }
 const app=setup();
 assert.equal(app.get('intimate-service-panel').hidden,true);
@@ -40,6 +41,8 @@ assert.equal(app.get('sleep-mode-toggle').disabled,true);
 assert.equal(app.get('yoga-mode-control').hidden,true);
 assert.equal(app.get('yoga-experience-toggle').disabled,true);
 assert.equal(app.get('advanced-features-control').hidden,true);
+assert.equal(app.get('begin-consultation').hidden,true,'The consultation CTA must remain hidden while Advanced Features is locked.');
+assert.equal(app.get('begin-consultation').disabled,true,'The consultation CTA must remain disabled while Advanced Features is locked.');
 assert.equal(app.get('deep-sky-black-hole-toggle').checked,false);
 assert.equal(app.get('experiment-care-group').attached,false,'Locked care is absent from native activity picker');
 assert.equal(app.state.advancedFeaturesUnlocked,false);
@@ -52,6 +55,8 @@ app.tap(); assert.equal(app.toast.textContent,'2 remaining');
 app.advance(100);app.tap();assert.equal(app.toast.textContent,'1 remaining');
 app.advance(100);await app.tap();
 assert.equal(app.get('intimate-service-panel').hidden,false);
+assert.equal(app.get('begin-consultation').hidden,false,'Unlocking Advanced Features reveals the consultation CTA.');
+assert.equal(app.get('begin-consultation').disabled,false);
 assert.equal(app.get('shots-control').hidden,false);
 assert.equal(app.get('sound-healing-title').hidden,false);
 assert.equal(app.get('shots-toggle').disabled,false);
@@ -71,9 +76,13 @@ assert.equal(app.get('experiment-care-group').attached,true);
 assert.equal(app.get('experiment-care-group').disabled,false);
 app.get('experiment-activity').value='perineal';
 app.get('massage-toggle').checked=true;app.state.massageEnabled=true;
+app.sessionValues.set('chakra_assessment_access_until', String(Date.now()+900000));
 app.get('advanced-features-toggle').checked=false;
 app.get('advanced-features-toggle').listeners.change();
+assert.equal(app.sessionValues.has('chakra_assessment_access_until'),false,'Relocking should revoke the assessment handoff.');
 assert.equal(app.get('intimate-service-panel').hidden,true);
+assert.equal(app.get('begin-consultation').hidden,true,'Relocking Advanced Features hides the consultation CTA.');
+assert.equal(app.get('begin-consultation').disabled,true);
 assert.equal(app.state.deepSkyBlackHoleEnabled,false,'Re-lock clears the session-only deep-sky object.');
 assert.equal(app.state.massageEnabled,false);
 assert.equal(app.get('shots-control').hidden,true);
@@ -106,9 +115,14 @@ assert.equal(setup().get('sleep-mode-control').hidden,true,'New page locks Sleep
 assert.equal(setup().get('yoga-mode-control').hidden,true,'New page locks Yoga Experience again');
 assert.equal(app.get('intimate-service-panel').listeners.click,undefined,'Panel itself is no longer an unlock target');
 assert.match(visibilityView,/element.hidden = shots \|\| \(id === 'intimate-service-panel' && !intimateServiceUnlocked\)/,'Mode changes preserve the lock');
+assert.match(source,/beginConsultationBtn\?\.addEventListener\('click', \(\) => \{\s*if \(!state\.advancedFeaturesUnlocked\) return;/,'The consultation CTA must reject activation while Advanced Features is locked.');
+assert.match(html,/id="begin-consultation"[^>]*hidden[^>]*disabled[^>]*aria-disabled="true"/,'The consultation CTA must start hidden in the static page before application initialization.');
+assert.equal((html.match(/id="begin-consultation"/g)||[]).length,1,'There must be one assessment entry point in the Lobby.');
+assert.doesNotMatch(html,/open-operator-assessment|Operator Assessment/,'Settings must not expose a second assessment link.');
 for(const locale of ['en','ml','ru','hi']) {
     const ui=JSON.parse(fs.readFileSync(`locales/${locale}.json`,'utf8')).ui;
-    for(const key of ['aboutApp','appVersion','advancedFeatures','advancedUnlockRemaining','advancedFeaturesEnabled','advancedFeaturesDisabled','advancedPasswordPrompt','advancedPasswordIncorrect']) assert.ok(ui[key]);
+    for(const key of ['aboutApp','appVersion','advancedFeatures','advancedUnlockRemaining','advancedFeaturesEnabled','advancedFeaturesDisabled','advancedPasswordPrompt','advancedPasswordIncorrect','operatorAssessmentUnavailable']) assert.ok(ui[key]);
+    assert.equal(Object.hasOwn(ui,'operatorAssessment'),false,'No Settings assessment label should remain in locale data.');
 }
 const denied=setup(false,false);
 for(let i=0;i<6;i++){denied.tap();denied.advance(100);}
