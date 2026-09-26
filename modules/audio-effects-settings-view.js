@@ -1,6 +1,10 @@
 (function installAudioEffectsSettingsView(global) {
     'use strict';
 
+    function normalizeSpatialMode(value, allowedModes, fallback) {
+        return allowedModes.includes(value) ? value : fallback;
+    }
+
     const VOICE_PRESETS = Object.freeze({
         soft: Object.freeze({ clarity: 35, warmth: 65, pace: 0.9 }),
         shringara: Object.freeze({ clarity: 28, warmth: 82, pace: 0.92 }),
@@ -88,5 +92,5 @@
         });
     }
 
-    global.ChakraAudioEffectsSettingsView = Object.freeze({ bind });
+    global.ChakraAudioEffectsSettingsView = Object.freeze({ bind, normalizeSpatialMode });
 })(typeof window === 'undefined' ? globalThis : window);

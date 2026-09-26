@@ -99,8 +99,19 @@
         return fallback == null ? path : fallback;
     }
 
+    function isGeneratedIntention(value, standardDefault, highEnergyDefault) {
+        const current = String(value || '').trim();
+        return !current || current === standardDefault || current === highEnergyDefault;
+    }
+
+    function shouldRefreshLocalizedIntention(value, previousLanguage, currentLanguage, supportedLanguages, isGenerated) {
+        if (typeof isGenerated !== 'function') throw new TypeError('Intention localization requires a generated-copy predicate');
+        const languages = [...new Set([previousLanguage, currentLanguage, ...supportedLanguages])];
+        return languages.some(language => isGenerated(value, language));
+    }
+
     global.ChakraContentLocalization = Object.freeze({
         getPath, hasPath, hasLocalizedPath, validateScriptBundle,
-        getLanguageConfig, localized, translate
+        getLanguageConfig, localized, translate, isGeneratedIntention, shouldRefreshLocalizedIntention
     });
 })(typeof window === 'undefined' ? globalThis : window);

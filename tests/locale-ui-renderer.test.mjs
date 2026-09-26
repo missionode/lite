@@ -100,4 +100,30 @@ assert.match(app, /function applyLocaleUI\(\)\s*\{[\s\S]*?particleField\.updateS
 assert.match(html, /modules\/locale-ui-renderer\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/locale-ui-renderer\.js\?v=1\.0/);
 assert.throws(() => renderer.render({}), /requires document, translation and text services/);
+
+const preferenceEvents = new Map();
+const pref = id => ({ value: '', addEventListener(type, handler) { preferenceEvents.set(`${id}:${type}`, handler); } });
+const preferenceState = { language: 'en', displayLanguage: 'en', highEnergyEnabled: false, intention: 'localized', voiceName: '' };
+const persisted = new Map();
+const orderOfPreferenceEffects = [];
+renderer.bindPreferenceControls({
+    languageSelect: pref('language'), displayLanguageSelect: pref('display'), voiceSelect: pref('voice'),
+    state: preferenceState, storage: { setItem: (key, value) => persisted.set(key, value) },
+    shouldRefreshLocalizedIntention: (value, previous) => value === 'localized' && previous === 'en',
+    hrimDefaultIntention: language => `hrim:${language}`, defaultIntention: language => `default:${language}`,
+    syncValue: (id, value) => orderOfPreferenceEffects.push(`sync:${id}:${value}`),
+    setupVoices: () => orderOfPreferenceEffects.push('voices'), autoSelectVoice: () => orderOfPreferenceEffects.push('select'),
+    applyLocaleUI: () => orderOfPreferenceEffects.push('locale')
+});
+preferenceEvents.get('language:change')({ target: { value: 'ml' } });
+assert.equal(preferenceState.language, 'ml');
+assert.equal(preferenceState.intention, 'default:ml');
+assert.equal(persisted.get('chakra_intention'), 'default:ml');
+assert.deepEqual(orderOfPreferenceEffects, ['sync:intention-input:default:ml', 'voices', 'select', 'locale']);
+preferenceEvents.get('display:change')({ target: { value: 'ru' } });
+assert.equal(preferenceState.displayLanguage, 'ru');
+assert.equal(persisted.get('chakra_display_language'), 'ru');
+assert.equal(orderOfPreferenceEffects.at(-1), 'locale');
+preferenceEvents.get('voice:change')({ target: { value: 'voice-1' } });
+assert.equal(preferenceState.voiceName, 'voice-1');
 console.log('Locale UI renderer contract passed: display text, stale-bundle fallback, controls, aria labels and refresh ordering.');

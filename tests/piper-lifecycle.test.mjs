@@ -7,6 +7,90 @@ const context = vm.createContext({});
 vm.runInContext(source, context);
 const service = context.ChakraPiperLifecycle;
 assert.ok(Object.isFrozen(service), 'Piper lifecycle should expose a stable API');
+const profiles = service.voiceProfile;
+assert.ok(Object.isFrozen(profiles), 'Piper voice policy should expose a stable API');
+const registeredVoices = [
+    { id: 'calm', language: 'en', gender: 'female', meditationPaceMultiplier: 0.8, meditationPaceMin: 0.62, meditationLengthScaleMax: 1.5 },
+    { id: 'standard', language: 'en', gender: 'male' }
+];
+assert.equal(profiles.isPiperVoice('piper:calm'), true);
+assert.equal(profiles.isPiperVoice('browser:Voice'), false);
+assert.equal(profiles.voiceId('piper:calm'), 'calm');
+assert.equal(profiles.voiceId('browser:Voice'), '');
+assert.equal(profiles.definition(registeredVoices, 'piper:calm'), registeredVoices[0]);
+assert.equal(profiles.definition(registeredVoices, 'piper:missing'), null);
+assert.equal(profiles.paceMultiplier(registeredVoices[0]), 0.8);
+assert.equal(profiles.paceMultiplier({ meditationPaceMultiplier: 2 }), 1);
+assert.equal(profiles.effectivePace(0.5, registeredVoices[0]), 0.62);
+assert.equal(profiles.effectivePace(2, registeredVoices[0]), 1.15);
+const meditationSettings = profiles.meditationSettings(0.8, registeredVoices[0]);
+assert.ok(Math.abs(meditationSettings.lengthScale - 1.5625) < 1e-12);
+assert.equal(meditationSettings.lengthScaleMax, 1.5);
+assert.equal(profiles.isFeminine('piper:calm', registeredVoices[0], () => null), true);
+assert.equal(profiles.isFeminine('piper:unknown', null, () => ({ name: 'Samantha' })), false);
+assert.equal(profiles.isFeminine('browser:Samantha', null, () => ({ name: 'Samantha' })), true);
+assert.equal(profiles.isFeminine('browser:voice', null, () => ({ gender: 'male', name: 'Samantha' })), false);
+assert.equal(profiles.browserVoiceIsFeminine('voice', { voiceGender: 'female' }), true);
+assert.equal(profiles.browserVoiceIsFeminine('voice', { name: 'Unknown' }), false);
+assert.equal(profiles.voiceMatchesLanguage({ lang: 'ml-IN' }, ['ml']), true);
+assert.equal(profiles.voiceMatchesLanguage({ lang: 'en-US' }, ['ml']), false);
+assert.equal(profiles.voiceMatchesLanguage(null, ['en']), false);
+assert.equal(profiles.browserVoice('browser:Hindi', [
+    { name: 'English', lang: 'en-US' }, { name: 'Hindi', lang: 'hi-IN' }
+], ['ru']), null, 'browser voice matching must not cross the active locale');
+assert.equal(profiles.browserVoice('browser:Hindi', [
+    { name: 'English', lang: 'en-US' }, { name: 'Hindi', lang: 'hi-IN' }
+], ['hi-IN']).name, 'Hindi');
+assert.equal(profiles.selectVoice({
+    currentValue: 'piper:calm', registry: registeredVoices, language: 'en', defaultVoiceId: 'standard', browserVoices: [], browserPrefixes: ['en']
+}), 'piper:calm', 'a currently valid Piper selection should be retained');
+assert.equal(profiles.selectVoice({
+    currentValue: 'browser:Default', registry: registeredVoices, language: 'en', defaultVoiceId: 'standard', browserVoices: [], browserPrefixes: ['en']
+}), 'piper:standard', 'the preferred local voice should take precedence when available');
+assert.equal(profiles.selectVoice({
+    currentValue: 'browser:Default', registry: [], language: 'ru', defaultVoiceId: 'missing',
+    browserVoices: [{ name: 'Russian Natural', lang: 'ru-RU' }, { name: 'Russian Basic', lang: 'ru-RU' }], browserPrefixes: ['ru']
+}), 'browser:Russian Natural', 'premium browser voices should be preferred within the selected language');
+assert.equal(profiles.selectVoice({
+    currentValue: 'browser:Existing', registry: [], language: 'ru', defaultVoiceId: '',
+    browserVoices: [{ name: 'English', lang: 'en-US' }], browserPrefixes: ['ru']
+}), null, 'no cross-language voice should be selected when the locale has no match');
+
+const loaderWarnings = [];
+assert.equal((await service.loadVoiceRegistry(async path => ({ ok: true, json: async () => ({ voices: [{ id: path }] }) }), { warn() {} }))[0].id, 'piper-models.json');
+assert.equal((await service.loadVoiceRegistry(async () => ({ ok: true, json: async () => ({ voices: null }) }), { warn() {} })).length, 0);
+assert.equal((await service.loadVoiceRegistry(async () => { throw new Error('offline'); }, { warn: (...args) => loaderWarnings.push(args) })).length, 0);
+assert.equal(loaderWarnings.length, 1, 'a missing registry should preserve browser-voice fallback');
+
+const voiceSelectOptions = [];
+const voiceSelectForModule = {
+    value: '', set innerHTML(_) { voiceSelectOptions.length = 0; }, get options() { return voiceSelectOptions; },
+    appendChild(option) { voiceSelectOptions.push(option); }
+};
+const voiceDocument = { createElement(tag) { return { tag, appendChild(option) { (this.children ||= []).push(option); } }; } };
+const availableBrowserVoices = [{ name: 'Hindi Voice', lang: 'hi-IN' }, { name: 'English Voice', lang: 'en-US' }];
+let voiceRefresh;
+let silentUtterances = 0;
+const voiceWindow = { speechSynthesis: {
+    getVoices: () => availableBrowserVoices, speak: utterance => { if (utterance.volume === 0) silentUtterances++; }
+} };
+let autoSelections = 0;
+service.bindVoicePicker({
+    document: voiceDocument, window: voiceWindow, state: { language: 'hi', voiceName: '', voices: [] },
+    voiceSelect: voiceSelectForModule, piperVoices: [{ id: 'hi', language: 'hi', label: 'Hindi Local' }],
+    voiceMatchesLanguage: voice => voice.lang.startsWith('hi'), autoSelectVoice: () => { autoSelections++; },
+    SpeechSynthesisUtteranceCtor: function Utterance(text) { this.text = text; }
+});
+assert.equal(voiceSelectForModule.value, '');
+assert.equal(voiceSelectOptions[0].value, 'piper:hi');
+assert.equal(voiceSelectOptions[1].tag, 'optgroup');
+assert.deepEqual([...voiceSelectOptions[1].children.map(option => option.value)], ['browser:Default', 'browser:Hindi Voice']);
+assert.equal(autoSelections, 1, 'missing persisted choice should use app selection fallback');
+assert.equal(silentUtterances, 1, 'browser voice discovery should retain its silent synthesis warm-up');
+voiceRefresh = voiceWindow.speechSynthesis.onvoiceschanged;
+assert.equal(typeof voiceRefresh, 'function');
+voiceRefresh();
+assert.equal(autoSelections, 2, 'late browser voice discovery should refresh the picker');
 
 const workers = [];
 class WorkerMock {

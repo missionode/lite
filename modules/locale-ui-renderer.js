@@ -20,6 +20,38 @@
         'returning-journey-toggle': 'ui.returningJourney'
     });
 
+    function bindPreferenceControls({ languageSelect, displayLanguageSelect, voiceSelect, state, storage,
+        shouldRefreshLocalizedIntention, hrimDefaultIntention,
+        defaultIntention, syncValue, setupVoices, autoSelectVoice, applyLocaleUI }) {
+        if (!state || !storage || typeof storage.setItem !== 'function'
+            || typeof shouldRefreshLocalizedIntention !== 'function'
+            || typeof hrimDefaultIntention !== 'function' || typeof defaultIntention !== 'function'
+            || typeof syncValue !== 'function' || typeof setupVoices !== 'function'
+            || typeof autoSelectVoice !== 'function' || typeof applyLocaleUI !== 'function') {
+            throw new TypeError('Locale preference controls require state, storage and language services');
+        }
+        languageSelect?.addEventListener('change', event => {
+            const previousLanguage = state.language;
+            const refreshIntention = shouldRefreshLocalizedIntention(state.intention, previousLanguage);
+            state.language = event.target.value;
+            if (refreshIntention) {
+                state.intention = state.highEnergyEnabled
+                    ? hrimDefaultIntention(state.language) : defaultIntention(state.language);
+                syncValue('intention-input', state.intention);
+                storage.setItem('chakra_intention', state.intention);
+            }
+            setupVoices();
+            autoSelectVoice();
+            applyLocaleUI();
+        });
+        displayLanguageSelect?.addEventListener('change', event => {
+            state.displayLanguage = event.target.value;
+            storage.setItem('chakra_display_language', state.displayLanguage);
+            applyLocaleUI();
+        });
+        voiceSelect?.addEventListener('change', event => { state.voiceName = event.target.value; });
+    }
+
     function render({
         document,
         translate,
@@ -89,5 +121,5 @@
         if (typeof refreshDroneDurationSummary === 'function') refreshDroneDurationSummary();
     }
 
-    global.ChakraLocaleUiRenderer = Object.freeze({ render });
+    global.ChakraLocaleUiRenderer = Object.freeze({ render, bindPreferenceControls });
 })(typeof window === 'undefined' ? globalThis : window);

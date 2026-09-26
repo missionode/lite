@@ -23,6 +23,14 @@ const bundles = { en: { ui: { begin: 'Begin' } }, ml: { ui: { begin: 'തുട�
 assert.equal(service.translate(bundles, 'ui.begin', 'ml', 'en'), 'തുടങ്ങുക');
 assert.equal(service.translate(bundles, 'ui.begin', 'ru', 'en'), 'Begin');
 assert.equal(service.translate(bundles, 'ui.missing', 'ru', 'en'), 'ui.missing');
+assert.equal(service.isGeneratedIntention('  ', 'Peace', 'Energy'), true);
+assert.equal(service.isGeneratedIntention('Peace', 'Peace', 'Energy'), true);
+assert.equal(service.isGeneratedIntention('My private intention', 'Peace', 'Energy'), false);
+const isGenerated = (value, language) => value === `default:${language}`;
+assert.equal(service.shouldRefreshLocalizedIntention('default:ml', 'ml', 'en', ['en', 'ml', 'ru', 'hi'], isGenerated), true,
+    'generated copy from any supported language should refresh after a language change');
+assert.equal(service.shouldRefreshLocalizedIntention('Personal intention', 'ml', 'en', ['en', 'ml', 'ru', 'hi'], isGenerated), false,
+    'a user-authored intention should remain unchanged');
 const fullOptions = { languages: ['en', 'ml', 'ru', 'hi'], highEnergy: true, corpse: true, bath: true, perinealCare: true, assistedBathing: true, massage: true, yoga: true, hooponopono: true };
 assert.equal(service.validateScriptBundle(scripts, fullOptions).valid, true, 'production scripts should validate for every supported language');
 const invalidFrequency = structuredClone(scripts);

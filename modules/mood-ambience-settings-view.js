@@ -1,6 +1,49 @@
 (function installMoodAmbienceSettingsView(global) {
     'use strict';
 
+    function clampGain(value, { fallback, minimum, maximum }) {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? Math.min(maximum, Math.max(minimum, numeric)) : fallback;
+    }
+
+    function clampLevel(value, min, max, fallback) {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? Math.min(max, Math.max(min, numeric)) : fallback;
+    }
+
+    function normalizeUrl(value, baseUrl) {
+        const candidate = String(value ?? '').trim();
+        if (!candidate) return '';
+        try {
+            const parsed = new URL(candidate, baseUrl);
+            return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function clampBlurAmount(value, { fallback, minimum, maximum }) {
+        return clampLevel(value, minimum, maximum, fallback);
+    }
+
+    function normalizeIntensity(value, profiles) {
+        return Object.hasOwn(profiles, value) ? value : 'gentle';
+    }
+
+    function intensityProfile(value, profiles) {
+        return profiles[normalizeIntensity(value, profiles)];
+    }
+
+    function blurMix({ enabled, amount, intensity, profiles, clampAmount }) {
+        const profile = intensityProfile(intensity, profiles);
+        const wet = enabled ? clampAmount(amount) * profile.blurMultiplier : 0;
+        return { dry: 1 - wet, wet };
+    }
+
+    function formatLevel(gain, config) {
+        return `${(clampGain(gain, config) * 100).toFixed(1)}%`;
+    }
+
     function sync({
         document,
         state,
@@ -79,5 +122,111 @@
         }
     }
 
-    global.ChakraMoodAmbienceSettingsView = Object.freeze({ sync });
+    function bindUrlLoader({ document, state, audio, translate, syncControl }) {
+        if (!document || typeof document.getElementById !== 'function') throw new TypeError('Mood ambience URL loader requires a document');
+        if (!state) throw new TypeError('Mood ambience URL loader requires app state');
+        if (!audio || typeof audio.loadPleasureAmbienceUrl !== 'function') throw new TypeError('Mood ambience URL loader requires the audio engine');
+        if (typeof translate !== 'function' || typeof syncControl !== 'function') {
+            throw new TypeError('Mood ambience URL loader requires translation and control-sync services');
+        }
+
+        const urlInput = document.getElementById('pleasure-ambience-url');
+        const loadButton = document.getElementById('load-pleasure-ambience-url');
+        const status = document.getElementById('pleasure-ambience-url-status');
+        if (!loadButton || typeof loadButton.addEventListener !== 'function') return false;
+
+        function setStatus(message, tone = 'neutral') {
+            if (!status) return;
+            delete status.dataset.availability;
+            status.textContent = message;
+            status.hidden = false;
+            status.style.color = tone === 'success'
+                ? '#4ade80'
+                : tone === 'error'
+                    ? '#f87171'
+                    : 'rgba(255, 255, 255, 0.72)';
+        }
+
+        loadButton.addEventListener('click', async () => {
+            const url = urlInput?.value.trim() || '';
+            loadButton.disabled = true;
+            setStatus(translate('ui.pleasureAmbienceUrlLoading'));
+            try {
+                await audio.loadPleasureAmbienceUrl(url);
+                setStatus(
+                    translate(url ? 'ui.pleasureAmbienceUrlLoaded' : 'ui.pleasureAmbienceUrlCleared'),
+                    'success'
+                );
+            } catch (error) {
+                const errorMessage = error?.message || String(error);
+                setStatus(translate('ui.pleasureAmbienceUrlError').replace('{error}', errorMessage), 'error');
+                syncControl();
+            } finally {
+                loadButton.disabled = state.noFrequencyMode;
+            }
+        });
+        return true;
+    }
+
+    function bindControls({
+        document, state, storage, audio, meditation, window: browserWindow = global,
+        translate, syncControl, normalizeIntensity, clampGain, clampBlurAmount, threshold
+    }) {
+        if (!document || !state || !storage || typeof storage.setItem !== 'function' || !audio || !meditation
+            || typeof translate !== 'function' || typeof syncControl !== 'function'
+            || typeof normalizeIntensity !== 'function' || typeof clampGain !== 'function' || typeof clampBlurAmount !== 'function'
+            || typeof threshold !== 'number') {
+            throw new TypeError('Mood ambience controls require state, audio, storage and confirmation services');
+        }
+        document.getElementById('mood-relaxation-intention-toggle')?.addEventListener('change', event => {
+            if (!state.advancedFeaturesUnlocked || state.noFrequencyMode) {
+                event.target.checked = state.moodRelaxationIntentionEnabled;
+                return;
+            }
+            state.moodRelaxationIntentionEnabled = event.target.checked;
+            if (state.moodRelaxationIntentionEnabled) state.pleasureAmbienceBlur = true;
+            audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+            syncControl();
+            if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
+                void audio.startPleasureAmbience();
+            } else if (!state.moodRelaxationIntentionEnabled) {
+                audio.stopPleasureAmbience();
+            }
+        });
+        document.getElementById('pleasure-ambience-intensity')?.addEventListener('change', event => {
+            state.pleasureAmbienceIntensity = normalizeIntensity(event.target.value);
+            audio.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
+            syncControl();
+        });
+        document.getElementById('mood-relaxation-ambience-level')?.addEventListener('input', event => {
+            const requestedGain = clampGain(Number(event.target.value) / 100);
+            const previousGain = state.pleasureAmbienceGain;
+            if (requestedGain > threshold && previousGain <= threshold) {
+                const confirmed = browserWindow.confirm(translate('ui.pleasureAmbienceAboveFiveConfirm'));
+                if (!confirmed) {
+                    syncControl();
+                    return;
+                }
+            }
+            state.pleasureAmbienceGain = requestedGain;
+            storage.setItem('chakra_pleasure_ambience_gain', state.pleasureAmbienceGain);
+            syncControl();
+            audio.setPleasureAmbienceGain(state.pleasureAmbienceGain);
+        });
+        document.getElementById('pleasure-ambience-blur-toggle')?.addEventListener('change', event => {
+            state.pleasureAmbienceBlur = event.target.checked;
+            audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+        });
+        document.getElementById('pleasure-ambience-blur-level')?.addEventListener('input', event => {
+            state.pleasureAmbienceBlurAmount = clampBlurAmount(Number(event.target.value) / 100);
+            storage.setItem('chakra_pleasure_ambience_blur_amount', state.pleasureAmbienceBlurAmount);
+            syncControl();
+            audio.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
+        });
+    }
+
+    global.ChakraMoodAmbienceSettingsView = Object.freeze({
+        sync, bindUrlLoader, bindControls, clampGain, clampLevel, normalizeUrl,
+        clampBlurAmount, normalizeIntensity, intensityProfile, blurMix, formatLevel
+    });
 })(typeof window === 'undefined' ? globalThis : window);

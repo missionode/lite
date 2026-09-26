@@ -46,5 +46,54 @@
         if (yogaSubOptions) yogaSubOptions.style.display = 'flex';
     }
 
-    global.ChakraYogaExperienceSettings = Object.freeze({ read, persist, syncTimingRows });
+    function bindSetupChangeControls({ document, state, storage, syncTimingRows: refreshRows, updateSessionEstimate }) {
+        if (!document || !state || !storage || typeof storage.setItem !== 'function'
+            || typeof refreshRows !== 'function' || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Yoga setup controls require document, persistence and refresh services');
+        }
+        const persistAndRefresh = () => {
+            persist({ document, state, storage });
+            refreshRows();
+            updateSessionEstimate();
+        };
+        ['corpse-pose-toggle', 'bath-session-toggle'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', persistAndRefresh);
+        });
+        document.querySelectorAll('#yoga-pose-selection input').forEach(input => {
+            input.addEventListener('change', () => {
+                persist({ document, state, storage });
+                updateSessionEstimate();
+            });
+        });
+    }
+
+    function bindAdvancedToggle({ toggle, state, setup, enforceMasterToggle, updateExperienceModeVisibility, updateSessionEstimate }) {
+        if (!state || typeof enforceMasterToggle !== 'function'
+            || typeof updateExperienceModeVisibility !== 'function' || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Yoga mode gate requires toggle, state and refresh services');
+        }
+        if (!toggle) return false;
+        toggle.addEventListener('change', event => {
+            if (!state.advancedFeaturesUnlocked) {
+                toggle.checked = false;
+                state.yogaExperienceEnabled = false;
+                if (setup) setup.hidden = true;
+                updateExperienceModeVisibility();
+                updateSessionEstimate();
+                return;
+            }
+            state.yogaExperienceEnabled = toggle.checked;
+            enforceMasterToggle(event.target);
+        });
+        return true;
+    }
+
+    function bindCorpsePoseMasterToggle({ document = global.document, enforceMasterToggle }) {
+        if (!document || typeof enforceMasterToggle !== 'function') {
+            throw new TypeError('Corpse Pose master toggle requires document and mode policy');
+        }
+        document.getElementById('corpse-pose-toggle')?.addEventListener('change', event => enforceMasterToggle(event.target));
+    }
+
+    global.ChakraYogaExperienceSettings = Object.freeze({ read, persist, syncTimingRows, bindSetupChangeControls, bindAdvancedToggle, bindCorpsePoseMasterToggle });
 })(typeof window === 'undefined' ? globalThis : window);

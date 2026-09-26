@@ -9,8 +9,10 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /ChakraTimingSettingsView\.bindTransitionDurationControls\(/);
 assert.match(app, /ChakraTimingSettingsView\.bindCareDurationControls\(/);
-assert.ok(app.indexOf('bindTransitionDurationControls(') < app.indexOf("scriptSourceSelect.addEventListener('change'")
-    && app.indexOf("scriptSourceSelect.addEventListener('change'") < app.indexOf('bindCareDurationControls('),
+assert.match(app, /ChakraTimingSettingsView\.bindJourneyDurationControl\(/);
+assert.match(app, /ChakraTimingSettingsView\.bindHighEnergyDurationControl\(/);
+assert.ok(app.indexOf('bindTransitionDurationControls(') < app.indexOf('scriptSourceSettings.bindSourceSelection(')
+    && app.indexOf('scriptSourceSettings.bindSourceSelection(') < app.indexOf('bindCareDurationControls('),
 'transition and care listener attachment stay on their original sides of custom-script handlers');
 assert.ok(html.indexOf('modules/timing-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.12'));
 assert.match(serviceWorker, /chakra-v5\.310[\s\S]*?modules\/timing-settings-view\.js\?v=1\.0/);
@@ -107,4 +109,43 @@ expectedCurrentValue = 301;
 assert.throws(() => inputs['time-bath'].emit('input', '301'), /storage blocked/);
 assert.deepEqual(storageFailureEvents, [['display-bath', '5m']], 'a storage exception prevents estimate refresh as before');
 
-console.log('Timing settings view contract passed: seven transition and three care controls preserve state, labels, storage keys, ordering, and no bind-time effects.');
+const journeyListeners = new Map();
+const slider = {
+    addEventListener(type, callback) { journeyListeners.set(`journey:${type}`, callback); },
+    min: '1', max: '7', style: { setProperty(name, value) { this[name] = value; } }
+};
+const hrimSlider = {
+    addEventListener(type, callback) { journeyListeners.set(`hrim:${type}`, callback); },
+    min: '1', max: '30', style: { setProperty(name, value) { this[name] = value; } }
+};
+const timeOutput = { textContent: '' };
+const additionalState = {};
+const additionalStored = new Map();
+const refreshes = [];
+const additionalDocument = { getElementById(id) {
+    return { 'time-per-chakra': slider, 'time-display': timeOutput, 'time-high-energy': hrimSlider }[id] || null;
+} };
+view.bindJourneyDurationControl({
+    document: additionalDocument, state: additionalState, getChecked: id => id === 'shots-toggle',
+    storage: { setItem: (key, value) => additionalStored.set(key, String(value)) },
+    updateDroneSummary: () => refreshes.push('drone'), updateSessionEstimate: () => refreshes.push('estimate')
+});
+journeyListeners.get('journey:input')({ target: { value: '23.4', min: '1', max: '7', style: slider.style } });
+assert.equal(additionalState.timeShot, 23.4);
+assert.equal(timeOutput.textContent, '23 secs');
+assert.equal(additionalStored.get('chakra_time_shot'), '23.4');
+assert.equal(slider.style['--range-fill'], '373.3%');
+assert.deepEqual(refreshes.splice(0), ['drone', 'estimate']);
+view.bindHighEnergyDurationControl({
+    document: additionalDocument, state: additionalState,
+    storage: { setItem: (key, value) => additionalStored.set(key, String(value)) },
+    setText: (id, text) => events.push(['display', id, text]),
+    updateDroneSummary: () => refreshes.push('drone'), updateSessionEstimate: () => refreshes.push('estimate')
+});
+journeyListeners.get('hrim:input')({ target: { value: '12', min: '1', max: '30', style: hrimSlider.style } });
+assert.equal(additionalState.timeHighEnergy, 12);
+assert.equal(additionalStored.get('chakra_time_high_energy'), '12');
+assert.equal(hrimSlider.style['--range-fill'], '37.9%');
+assert.deepEqual(refreshes, ['drone', 'estimate']);
+
+console.log('Timing settings view contract passed: transition, care, Chakra/Sleep/Shot and HRIM duration controls preserve values, labels, storage keys, fills and refresh ordering.');

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 
 const html = readFileSync('index.html', 'utf8');
 const app = readFileSync('app.js', 'utf8');
@@ -62,6 +63,10 @@ assert.match(visualEngine, /classList\.add\(`visual-effect-\$\{effect\}`\)[\s\S]
     'The image container should receive the normalized visual effect class.');
 assert.match(visualEngine, /const active = effect !== 'natural' && !state\.eyesCloseMode/,
     'Eyes Close Mode should suppress decorative visual effects.');
+assert.match(visualEngine, /setSymbolImage\(src, symbolEl = this\.symbolImg\)[\s\S]*?dataset\.pendingSrc = src[\s\S]*?dataset\.pendingSrc === src[\s\S]*?symbolEl\.complete && symbolEl\.naturalWidth > 0/,
+    'The visual owner should hide artwork until the current image loads and reveal cached images safely.');
+assert.doesNotMatch(app, /function setSymbolImage\(/,
+    'Artwork load state should have one implementation in the visual owner.');
 assert.match(styles, /#chakra-container\.visual-effect-holographic::after[\s\S]*?animation:\s*holographicShimmer 12s ease-in-out infinite alternate/,
     'Holographic mode should use a slow CSS-only shimmer.');
 assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation:\s*none/,
@@ -87,6 +92,12 @@ for (const character of motionBlock) {
     assert.ok(depth >= 0, 'Reduced-motion block must not close early.');
 }
 assert.equal(depth, 0, 'Reduced-motion braces must balance.');
+const visualContext = vm.createContext({ window: {} });
+vm.runInContext(visualEngine, visualContext);
+const visualPolicy = visualContext.window.ChakraVisualEffectPolicy;
+assert.ok(Object.isFrozen(visualPolicy));
+assert.equal(visualPolicy.normalize('depth', new Set(['natural', 'depth'])), 'depth');
+assert.equal(visualPolicy.normalize('unrecognized', new Set(['natural', 'depth'])), 'natural');
 assert.match(motionBlock, /#chakra-container::after[\s\S]*animation: none !important/, 'All decorative modes honor reduced motion.');
 
 for (const bundle of [en, ml, ru, hi]) {

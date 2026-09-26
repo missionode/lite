@@ -3,8 +3,13 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const source=fs.readFileSync('app.js','utf8');
 const visibilityView=fs.readFileSync('modules/lobby-experience-visibility.js','utf8');
+const moodAmbienceView=fs.readFileSync('modules/mood-ambience-settings-view.js','utf8');
+const yogaSettingsView=fs.readFileSync('modules/yoga-experience-settings.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
-const block=source.slice(source.indexOf('    const intimateServiceToggles = ['),source.indexOf('    window.ChakraSettingsManagerView.bind('));
+const blockStart=source.indexOf('    const intimateServiceToggles = [');
+const blockEnd=source.indexOf('\n    window.ChakraSettingsManagerView.bind({',blockStart);
+assert.ok(blockStart>=0&&blockEnd>blockStart,'Advanced Features handlers must remain inside attachEventListeners');
+const block=source.slice(blockStart,blockEnd);
 const approvedDigest=Uint8Array.from('5ba583e9f1bc6e5836e2822f5982c8cafeb4390af1f9ed140926dd3326e515a3'.match(/.{2}/g).map(value=>parseInt(value,16))).buffer;
 function setup(noFrequencyMode=false,passwordAccepted=true) {
     let now=0,id=0; const timers=new Map(), elements=new Map(), sessionValues=new Map();
@@ -43,7 +48,8 @@ assert.equal(app.get('experiment-care-group').attached,false,'Locked care is abs
 assert.equal(app.state.advancedFeaturesUnlocked,false);
 assert.equal(app.audio.stopped,true,'Locked Advanced Features should stop Mood & Relaxation ambience.');
 assert.match(source, /if \(isLocked\) \{[\s\S]*?state\.moodRelaxationIntentionEnabled = false;[\s\S]*?audio\.stopPleasureAmbience\(\)/, 'Relocking Advanced Features must disable and stop Mood & Relaxation ambience.');
-assert.match(source, /mood-relaxation-intention-toggle'\)\?\.addEventListener\('change', \(e\) => \{[\s\S]*?!state\.advancedFeaturesUnlocked \|\| state\.noFrequencyMode/, 'Mood & Relaxation ambience must reject direct activation while Advanced Features is locked.');
+assert.match(source, /moodAmbienceSettingsView\.bindControls\(/, 'Mood & Relaxation interaction is wired through its settings-view owner.');
+assert.match(moodAmbienceView, /mood-relaxation-intention-toggle'\)\?\.addEventListener\('change', event => \{[\s\S]*?!state\.advancedFeaturesUnlocked \|\| state\.noFrequencyMode/, 'Mood & Relaxation ambience must reject direct activation while Advanced Features is locked.');
 for(let i=0;i<4;i++){app.tap();app.advance(100);assert.equal(app.toast.textContent,'');}
 app.tap(); assert.equal(app.toast.textContent,'2 remaining');
 app.advance(100);app.tap();assert.equal(app.toast.textContent,'1 remaining');
@@ -140,7 +146,8 @@ assert.match(html, /id="sound-healing-title"[^>]* hidden/);
 assert.match(html, /id="sleep-mode-control"[^>]* hidden/);
 assert.match(source, /getChecked\('sleep-mode-toggle'\) && !state\.advancedFeaturesUnlocked/, 'Locked direct Sleep start must be rejected');
 assert.match(html, /id="yoga-mode-control"[^>]* hidden[\s\S]*?id="yoga-experience-toggle" disabled/, 'Yoga Experience must begin hidden and disabled');
-assert.match(source, /yogaExperienceToggle\?\.addEventListener\('change',[\s\S]*?!state\.advancedFeaturesUnlocked[\s\S]*?yogaExperienceToggle\.checked = false/, 'Locked direct Yoga selection must be rejected');
+assert.match(source, /yogaExperienceSettings\.bindAdvancedToggle\(/, 'Yoga selection is wired through the settings owner.');
+assert.match(yogaSettingsView, /toggle\.addEventListener\('change',[\s\S]*?!state\.advancedFeaturesUnlocked[\s\S]*?toggle\.checked = false/, 'Locked direct Yoga selection must be rejected');
 assert.match(source, /getChecked\('yoga-experience-toggle'\) && !state\.advancedFeaturesUnlocked/, 'Locked direct Yoga start must be rejected');
 const sleepJourney=source.slice(source.indexOf('    async runSleepJourney()'),source.indexOf('    async runShot('));
 const lockedSleep=vm.runInNewContext('({'+sleepJourney+'})',{state:{advancedFeaturesUnlocked:false}});
@@ -152,7 +159,10 @@ for(let i=0;i<6;i++) noFrequency.tap();
 await noFrequency.tap();
 assert.equal(noFrequency.get('shots-control').hidden,false);
 assert.equal(noFrequency.get('shots-toggle').disabled,true,'Unlock preserves No Frequency restriction');
-const handoff=source.slice(source.indexOf('    function prepareRepertoryShotFromUrl()'),source.indexOf('    [corpsePoseToggle].forEach'));
+const handoffStart=source.indexOf('    function prepareRepertoryShotFromUrl()');
+const handoffEnd=source.indexOf('\n    yogaExperienceSettings.bindCorpsePoseMasterToggle',handoffStart);
+assert.ok(handoffStart>=0&&handoffEnd>handoffStart,'Repertory URL handoff must remain directly reviewable');
+const handoff=source.slice(handoffStart,handoffEnd);
 const handoffState={advancedFeaturesUnlocked:false};
 const pending={state:handoffState,URL,window:{location:{href:'https://example.test/?shotSource=repertory&shotFrequency=528'},history:{replaceState(){pending.consumed=true;}}},
     shotsToggle:{checked:false,dispatchEvent(){pending.confirmed=true;}},shotTypeSelect:{},document:{getElementById:()=>({})},

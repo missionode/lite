@@ -123,5 +123,84 @@
         updateDroneDurationSummary();
     }
 
-    global.ChakraLobbyExperienceVisibility = Object.freeze({ sync });
+    function bindShotTypeChange({ document = global.document, resetDurationForType, updateVisibility, updateSessionEstimate }) {
+        if (!document || typeof resetDurationForType !== 'function' || typeof updateVisibility !== 'function'
+            || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Shot type binding requires duration and Lobby refresh services');
+        }
+        document.getElementById('shot-type-select')?.addEventListener('change', event => {
+            resetDurationForType(event.target.value);
+            updateVisibility();
+            updateSessionEstimate();
+        });
+    }
+
+    function bindSleepModeToggle({ toggle, state, clearSleepMode, enforceMasterToggle, updateVisibility, updateSessionEstimate }) {
+        if (!state || typeof clearSleepMode !== 'function' || typeof enforceMasterToggle !== 'function'
+            || typeof updateVisibility !== 'function' || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Sleep mode binding requires state and Lobby mode services');
+        }
+        if (!toggle) return false;
+        toggle.addEventListener('change', event => {
+            if (!state.advancedFeaturesUnlocked) {
+                clearSleepMode();
+                updateVisibility();
+                updateSessionEstimate();
+                return;
+            }
+            state.sleepExperienceEnabled = event.target.checked;
+            enforceMasterToggle(event.target);
+            updateVisibility();
+        });
+        return true;
+    }
+
+    function bindShotsToggle({ toggle, state, translate, alert = global.alert, confirm = global.confirm,
+        clearMusicOnlyMode, clearHighEnergyMode, clearSleepMode, clearFocusedExperiences, clearJourneyAddons,
+        clearIntimateService, resetDurationForType, getShotType, updateVisibility, updateSessionEstimate }) {
+        if (!state || typeof translate !== 'function' || typeof clearMusicOnlyMode !== 'function'
+            || typeof clearHighEnergyMode !== 'function' || typeof clearSleepMode !== 'function'
+            || typeof clearFocusedExperiences !== 'function' || typeof clearJourneyAddons !== 'function'
+            || typeof clearIntimateService !== 'function' || typeof resetDurationForType !== 'function'
+            || typeof getShotType !== 'function' || typeof updateVisibility !== 'function'
+            || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Shots binding requires state and mode services');
+        }
+        if (!toggle) return false;
+        toggle.addEventListener('change', event => {
+            if (!state.advancedFeaturesUnlocked) {
+                event.target.checked = false;
+                updateVisibility();
+                updateSessionEstimate();
+                return;
+            }
+            if (event.target.checked) {
+                if (state.noFrequencyMode) {
+                    event.target.checked = false;
+                    alert(translate('ui.noFrequencyShotsUnavailable'));
+                    updateVisibility();
+                    updateSessionEstimate();
+                    return;
+                }
+                if (!confirm(translate('ui.shotConfirm'))) {
+                    event.target.checked = false;
+                    updateVisibility();
+                    updateSessionEstimate();
+                    return;
+                }
+                clearMusicOnlyMode();
+                clearHighEnergyMode();
+                clearSleepMode();
+                clearFocusedExperiences();
+                clearJourneyAddons();
+                clearIntimateService();
+                resetDurationForType(getShotType() || 'meditation');
+            }
+            updateVisibility();
+            updateSessionEstimate();
+        });
+        return true;
+    }
+
+    global.ChakraLobbyExperienceVisibility = Object.freeze({ sync, bindShotTypeChange, bindSleepModeToggle, bindShotsToggle });
 })(typeof window === 'undefined' ? globalThis : window);

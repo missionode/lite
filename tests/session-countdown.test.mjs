@@ -16,6 +16,24 @@ vm.runInContext(source, context);
 const Countdown = context.ChakraSessionCountdown;
 assert.equal(typeof Countdown, 'function');
 assert.throws(() => new Countdown({}), /requires clock, timer/);
+const displayApi = context.ChakraSessionCountdownDisplay;
+assert.ok(Object.isFrozen(displayApi));
+const countdownNodes = [{ hidden: true }];
+const progressNodes = [{ style: {} }];
+const countdownDocument = {
+    querySelectorAll(selector) {
+        return selector === '[data-session-countdown]' ? countdownNodes : progressNodes;
+    }
+};
+displayApi.renderProgress(countdownDocument, 50, 100);
+assert.equal(countdownNodes[0].hidden, false);
+assert.equal(Number(progressNodes[0].style.strokeDashoffset).toFixed(2), '138.23');
+displayApi.renderProgress(countdownDocument, Number.NaN, 0);
+assert.equal(countdownNodes[0].hidden, true, 'invalid display totals hide the countdown');
+displayApi.renderProgress(countdownDocument, -10, 100);
+assert.equal(Number(progressNodes[0].style.strokeDashoffset), 276.46, 'remaining time clamps to zero progress');
+displayApi.hideDisplay(countdownDocument);
+assert.equal(countdownNodes[0].hidden, true);
 
 let now = 1000;
 let active = true;

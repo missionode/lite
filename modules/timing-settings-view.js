@@ -42,5 +42,54 @@
         bindDurationControls(CARE_DURATION_CONTROLS, services, value => `${Math.floor(value / 60)}m`);
     }
 
-    global.ChakraTimingSettingsView = Object.freeze({ bindTransitionDurationControls, bindCareDurationControls });
+    function bindJourneyDurationControl({ document, state, getChecked, storage, updateDroneSummary, updateSessionEstimate }) {
+        if (!document || !state || typeof getChecked !== 'function' || !storage || typeof storage.setItem !== 'function'
+            || typeof updateDroneSummary !== 'function' || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('Journey duration control requires preference and refresh services');
+        }
+        document.getElementById('time-per-chakra').addEventListener('input', event => {
+            const value = parseFloat(event.target.value);
+            if (getChecked('shots-toggle')) {
+                state.timeShot = value;
+                document.getElementById('time-display').textContent = `${state.timeShot.toFixed(0)} secs`;
+                storage.setItem('chakra_time_shot', state.timeShot);
+            } else if (getChecked('sleep-mode-toggle')) {
+                state.timeSleepStage = value;
+                document.getElementById('time-display').textContent = `${state.timeSleepStage.toFixed(1)} mins`;
+                storage.setItem('chakra_time_sleep_stage', state.timeSleepStage);
+            } else {
+                state.timePerChakra = value;
+                document.getElementById('time-display').textContent = `${state.timePerChakra.toFixed(1)} mins`;
+                storage.setItem('chakra_time', state.timePerChakra);
+            }
+            const percent = ((event.target.value - event.target.min) / (event.target.max - event.target.min) * 100).toFixed(1) + '%';
+            event.target.style.setProperty('--range-fill', percent);
+            updateDroneSummary();
+            updateSessionEstimate();
+        });
+    }
+
+    function bindHighEnergyDurationControl({ document, state, storage, setText, updateDroneSummary, updateSessionEstimate }) {
+        if (!document || !state || !storage || typeof storage.setItem !== 'function' || typeof setText !== 'function'
+            || typeof updateDroneSummary !== 'function' || typeof updateSessionEstimate !== 'function') {
+            throw new TypeError('High Energy duration control requires preference and refresh services');
+        }
+        const slider = document.getElementById('time-high-energy');
+        if (!slider) return false;
+        slider.addEventListener('input', event => {
+            state.timeHighEnergy = parseFloat(event.target.value);
+            setText('high-energy-time-display', `${state.timeHighEnergy} mins`);
+            storage.setItem('chakra_time_high_energy', state.timeHighEnergy);
+            const percent = ((event.target.value - event.target.min) / (event.target.max - event.target.min) * 100).toFixed(1) + '%';
+            event.target.style.setProperty('--range-fill', percent);
+            updateDroneSummary();
+            updateSessionEstimate();
+        });
+        return true;
+    }
+
+    global.ChakraTimingSettingsView = Object.freeze({
+        bindTransitionDurationControls, bindCareDurationControls,
+        bindJourneyDurationControl, bindHighEnergyDurationControl
+    });
 })(typeof window === 'undefined' ? globalThis : window);

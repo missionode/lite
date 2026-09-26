@@ -1,6 +1,123 @@
 (function installPiperLifecycle(global) {
     'use strict';
 
+    const voiceProfile = Object.freeze({
+        isPiperVoice(value) { return typeof value === 'string' && value.startsWith('piper:'); },
+        voiceId(value) { return this.isPiperVoice(value) ? value.slice('piper:'.length) : ''; },
+        definition(registry, value) {
+            if (!this.isPiperVoice(value)) return null;
+            return registry.find(voice => voice.id === this.voiceId(value)) || null;
+        },
+        paceMultiplier(definition) {
+            const multiplier = Number(definition?.meditationPaceMultiplier);
+            return Number.isFinite(multiplier) && multiplier > 0 && multiplier <= 1.15 ? multiplier : 1;
+        },
+        effectivePace(selectedPace, definition) {
+            const selected = Number(selectedPace) || 1;
+            const requestedMinimum = Number(definition?.meditationPaceMin);
+            const minimum = Number.isFinite(requestedMinimum)
+                ? Math.max(0.6, Math.min(0.7, requestedMinimum)) : 0.7;
+            return Math.max(minimum, Math.min(1.15, selected * this.paceMultiplier(definition)));
+        },
+        meditationSettings(selectedPace, definition) {
+            return {
+                lengthScale: 1 / this.effectivePace(selectedPace, definition),
+                lengthScaleMax: Number(definition?.meditationLengthScaleMax) || 1.35
+            };
+        },
+        browserVoiceIsFeminine(value, selected) {
+            const browserGender = String(selected?.gender || selected?.voiceGender || '').toLowerCase();
+            if (browserGender) return browserGender === 'female';
+            const name = `${selected?.name || ''} ${value || ''}`.toLowerCase();
+            return /\b(female|woman|samantha|victoria|karen|moira|zira|ava|susan|veena|lekha|meera)\b/i.test(name);
+        },
+        isFeminine(value, definition, getBrowserVoice) {
+            if (definition) return String(definition.gender || '').toLowerCase() === 'female';
+            if (this.isPiperVoice(value)) return false;
+            return this.browserVoiceIsFeminine(value, getBrowserVoice());
+        },
+        voiceMatchesLanguage(voice, prefixes) {
+            if (!voice || !voice.lang) return false;
+            const voiceLanguage = voice.lang.toLowerCase();
+            return prefixes.some(prefix => voiceLanguage.startsWith(String(prefix).toLowerCase()));
+        },
+        browserVoice(value, voices, prefixes) {
+            const browserName = String(value || '').replace(/^browser:/, '');
+            const matches = voice => this.voiceMatchesLanguage(voice, prefixes);
+            return voices.find(voice => voice.name === browserName && matches(voice))
+                || voices.find(matches) || null;
+        },
+        selectVoice({ currentValue, registry, language, defaultVoiceId, browserVoices, browserPrefixes }) {
+            const currentPiper = registry.find(voice => this.isPiperVoice(currentValue)
+                && this.voiceId(currentValue) === voice.id && voice.language === language);
+            if (currentPiper) return currentValue;
+            const defaultPiper = registry.find(voice => voice.language === language && voice.id === defaultVoiceId)
+                || registry.find(voice => voice.language === language);
+            if (defaultPiper) return `piper:${defaultPiper.id}`;
+            if (!browserVoices?.length) return 'browser:Default';
+            const localized = browserVoices.filter(voice => this.voiceMatchesLanguage(voice, browserPrefixes));
+            const premiumKeywords = ['premium', 'neural', 'natural', 'enhanced'];
+            const selected = localized.find(voice => premiumKeywords.some(keyword => voice.name.toLowerCase().includes(keyword)))
+                || localized[0];
+            return selected ? `browser:${selected.name}` : null;
+        }
+    });
+
+    async function loadVoiceRegistry(fetchImpl = global.fetch, logger = global.console) {
+        try {
+            const response = await fetchImpl('piper-models.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const json = await response.json();
+            return Array.isArray(json.voices) ? json.voices : [];
+        } catch (error) {
+            logger?.warn?.('Piper voice registry unavailable; browser voices remain available.', error);
+            return [];
+        }
+    }
+
+    function bindVoicePicker({ document = global.document, window = global, state, voiceSelect,
+        piperVoices = [], voiceMatchesLanguage, autoSelectVoice, SpeechSynthesisUtteranceCtor = global.SpeechSynthesisUtterance } = {}) {
+        if (!document || !window || !state || !voiceSelect || typeof voiceMatchesLanguage !== 'function'
+            || typeof autoSelectVoice !== 'function') {
+            throw new TypeError('Piper voice picker requires document, state, selection and locale services');
+        }
+        const updateUI = (availableVoices = []) => {
+            state.voices = availableVoices;
+            const currentValue = state.voiceName || voiceSelect.value;
+            voiceSelect.innerHTML = '';
+            piperVoices.filter(voice => voice.language === state.language).forEach(voice => {
+                const option = document.createElement('option');
+                option.value = `piper:${voice.id}`;
+                option.textContent = `${voice.label} · local`;
+                voiceSelect.appendChild(option);
+            });
+            const browserGroup = document.createElement('optgroup');
+            browserGroup.label = 'Browser fallback voices';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = 'browser:Default';
+            defaultOption.textContent = 'System Default Voice';
+            browserGroup.appendChild(defaultOption);
+            availableVoices.filter(voice => voiceMatchesLanguage(voice)).forEach(voice => {
+                const option = document.createElement('option');
+                option.value = `browser:${voice.name}`;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                browserGroup.appendChild(option);
+            });
+            voiceSelect.appendChild(browserGroup);
+            if (Array.from(voiceSelect.options).some(option => option.value === currentValue)) voiceSelect.value = currentValue;
+            else autoSelectVoice();
+        };
+        updateUI('speechSynthesis' in window ? window.speechSynthesis.getVoices() : []);
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => updateUI(window.speechSynthesis.getVoices());
+            try {
+                const dummy = new SpeechSynthesisUtteranceCtor('');
+                dummy.volume = 0;
+                window.speechSynthesis.speak(dummy);
+            } catch (error) {}
+        }
+    }
+
     function createPiperTTS(audioEngine, dependencies = {}) {
         const deps = {
             voiceIdFromValue: dependencies.voiceIdFromValue || (() => ''),
@@ -296,5 +413,5 @@
         }(audioEngine);
     }
 
-    global.ChakraPiperLifecycle = Object.freeze({ createPiperTTS });
+    global.ChakraPiperLifecycle = Object.freeze({ createPiperTTS, voiceProfile, loadVoiceRegistry, bindVoicePicker });
 })(typeof window === 'undefined' ? globalThis : window);

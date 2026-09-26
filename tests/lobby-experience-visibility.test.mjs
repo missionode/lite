@@ -8,6 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperienceVisibility/);
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
+assert.match(app, /lobbyExperienceVisibility\.bindShotTypeChange\(/);
 assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
 assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/lobby-experience-visibility\.js\?v=1\.0/);
 
@@ -127,4 +128,61 @@ assert.equal(result.controls['row-perineal-care'].style.display, '');
 assert.equal(result.controls['intention-config-group'].hidden, true);
 
 assert.throws(() => visibility.sync({}), /requires document, state and selection services/);
-console.log('Lobby experience visibility passed: standalone practice, chakra defaults, Sleep, HRIM, Shots gates, Intimate Service and range synchronization.');
+
+const shotEvents = [];
+let shotChange;
+visibility.bindShotTypeChange({
+    document: { getElementById: id => id === 'shot-type-select' ? { addEventListener(type, fn) { assert.equal(type, 'change'); shotChange = fn; } } : null },
+    resetDurationForType: value => shotEvents.push(`reset:${value}`),
+    updateVisibility: () => shotEvents.push('visibility'), updateSessionEstimate: () => shotEvents.push('estimate')
+});
+shotChange({ target: { value: 'custom' } });
+assert.deepEqual(shotEvents, ['reset:custom', 'visibility', 'estimate'], 'shot-type updates retain reset → visibility → estimate order');
+
+const modeListeners = new Map();
+const modeToggle = id => ({ checked: true, addEventListener(type, handler) { modeListeners.set(`${id}:${type}`, handler); } });
+const sleepCalls = [];
+let sleepToggle = modeToggle('sleep');
+const sleepState = { advancedFeaturesUnlocked: false, sleepExperienceEnabled: true };
+visibility.bindSleepModeToggle({ toggle: sleepToggle, state: sleepState,
+    clearSleepMode: () => sleepCalls.push('clear'), enforceMasterToggle: () => sleepCalls.push('master'),
+    updateVisibility: () => sleepCalls.push('visibility'), updateSessionEstimate: () => sleepCalls.push('estimate') });
+modeListeners.get('sleep:change')({ target: sleepToggle });
+assert.deepEqual(sleepCalls.splice(0), ['clear', 'visibility', 'estimate'], 'locked Sleep is cleared before normal Lobby refresh');
+sleepState.advancedFeaturesUnlocked = true;
+modeListeners.get('sleep:change')({ target: sleepToggle });
+assert.equal(sleepState.sleepExperienceEnabled, true);
+assert.deepEqual(sleepCalls, ['master', 'visibility'], 'unlocked Sleep retains master-policy then visibility order');
+
+const shotCalls = [];
+const shotState = { advancedFeaturesUnlocked: false, noFrequencyMode: false };
+const shotToggle = modeToggle('shots');
+const bindShots = overrides => visibility.bindShotsToggle({
+    toggle: shotToggle, state: shotState, translate: key => key,
+    alert: message => shotCalls.push(`alert:${message}`), confirm: () => true,
+    clearMusicOnlyMode: () => shotCalls.push('music'), clearHighEnergyMode: () => shotCalls.push('high-energy'),
+    clearSleepMode: () => shotCalls.push('sleep'), clearFocusedExperiences: () => shotCalls.push('focused'),
+    clearJourneyAddons: () => shotCalls.push('addons'), clearIntimateService: () => shotCalls.push('care'),
+    resetDurationForType: type => shotCalls.push(`duration:${type}`), getShotType: () => 'custom',
+    updateVisibility: () => shotCalls.push('visibility'), updateSessionEstimate: () => shotCalls.push('estimate'),
+    ...overrides
+});
+bindShots();
+modeListeners.get('shots:change')({ target: shotToggle });
+assert.equal(shotToggle.checked, false);
+assert.deepEqual(shotCalls.splice(0), ['visibility', 'estimate'], 'locked Shot selection is rejected and refreshed');
+shotState.advancedFeaturesUnlocked = true;
+shotState.noFrequencyMode = true;
+shotToggle.checked = true;
+modeListeners.get('shots:change')({ target: shotToggle });
+assert.deepEqual(shotCalls.splice(0), ['alert:ui.noFrequencyShotsUnavailable', 'visibility', 'estimate'], 'No Frequency guard keeps its localized alert and refresh order');
+shotState.noFrequencyMode = false;
+bindShots({ confirm: () => false });
+shotToggle.checked = true;
+modeListeners.get('shots:change')({ target: shotToggle });
+assert.deepEqual(shotCalls.splice(0), ['visibility', 'estimate'], 'cancelled Shot confirmation does not change other modes');
+bindShots();
+shotToggle.checked = true;
+modeListeners.get('shots:change')({ target: shotToggle });
+assert.deepEqual(shotCalls, ['music', 'high-energy', 'sleep', 'focused', 'addons', 'care', 'duration:custom', 'visibility', 'estimate'], 'confirmed Shot clears conflicting modes before refresh');
+console.log('Lobby experience visibility passed: standalone practice, chakra defaults, Sleep, HRIM, Shots gates, Intimate Service, ranges and shot-type refresh order.');

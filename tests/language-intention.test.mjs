@@ -1,17 +1,36 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+import vm from 'node:vm';
 
-assert.match(
-    app,
-    /function shouldRefreshLocalizedIntention\(value, previousLanguage\)[\s\S]*?languageRegistry\.map\(language => language\.id\)[\s\S]*?isGeneratedIntention\(value, language\)/,
-    'Generated intention detection should recognize every registered content language.'
+const content = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
+const localeUi = fs.readFileSync(new URL('../modules/locale-ui-renderer.js', import.meta.url), 'utf8');
+const context = vm.createContext({});
+vm.runInContext(content, context);
+vm.runInContext(localeUi, context);
+const generated = value => context.ChakraContentLocalization.isGeneratedIntention(value, 'Calm', 'Rise');
+const shouldRefresh = (value, previous) => context.ChakraContentLocalization.shouldRefreshLocalizedIntention(
+    value, previous, state.language, ['en', 'ml', 'ru', 'hi'], generated
 );
-assert.match(
-    app,
-    /languageSelect\.addEventListener\('change', \(e\) => \{[\s\S]*?const previousLanguage = state\.language;[\s\S]*?const shouldUpdateGeneratedIntention = shouldRefreshLocalizedIntention\(state\.intention, previousLanguage\);[\s\S]*?state\.language = e\.target\.value;[\s\S]*?if \(shouldUpdateGeneratedIntention\) \{[\s\S]*?defaultIntention\(state\.language\)[\s\S]*?localStorage\.setItem\('chakra_intention', state\.intention\);/,
-    'Changing Meditation Language should refresh and persist only an app-generated intention.'
-);
+const state = { language: 'en', displayLanguage: 'en', intention: 'Calm', highEnergyEnabled: false };
+const values = [];
+const storage = { setItem: (key, value) => values.push([key, value]) };
+let localeRenders = 0;
+let voiceSetups = 0;
+const languageSelect = { addEventListener: (_type, handler) => { languageSelect.change = handler; } };
+context.ChakraLocaleUiRenderer.bindPreferenceControls({
+    languageSelect, state, storage, shouldRefreshLocalizedIntention: (value, previous) => shouldRefresh(value, previous),
+    hrimDefaultIntention: () => 'Rise', defaultIntention: () => 'ശാന്തി', syncValue: (id, value) => values.push([id, value]),
+    setupVoices: () => { voiceSetups++; }, autoSelectVoice() {}, applyLocaleUI: () => { localeRenders++; }
+});
+languageSelect.change({ target: { value: 'ml' } });
+assert.equal(state.intention, 'ശാന്തി');
+assert.deepEqual(values.slice(-2), [['intention-input', 'ശാന്തി'], ['chakra_intention', 'ശാന്തി']]);
+assert.equal(voiceSetups, 1);
+assert.equal(localeRenders, 1);
+state.intention = 'my private intention';
+languageSelect.change({ target: { value: 'hi' } });
+assert.equal(state.intention, 'my private intention', 'user-authored intentions remain unchanged across language changes');
+assert.equal(values.filter(([key]) => key === 'chakra_intention').length, 1);
 
 console.log('Language intention contract passed.');

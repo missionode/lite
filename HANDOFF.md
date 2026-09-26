@@ -1,18 +1,139 @@
 # Chakra Meditation — Active Handoff
 
-### RELEASED — CP-ASSESS-ADV-UNDO-RAPPORT-001: single Lobby entry, undo and rapport cue
+### RELEASE PREPARATION — pending production publication
 
-- Merged PR [#78](https://github.com/missionode/lite/pull/78) to `production` on 2026-09-26; production merge commit `d0a8051`. Local `HEAD` was fast-forwarded to the same commit.
-- The Lobby “Begin Session Consultation” CTA is the only assessment entry point; the duplicate Settings link is removed. It remains Advanced Features-gated. The report includes one-step undo and a confidence-limited, chakra-evidence conversation cue/icebreaker; it does not predict character or behavior. The same-tab grant is client-side gating, not server authentication.
-- `npm run test:assessment`, `npm run test:advanced-unlock`, atlas generation and `git diff --check` pass. GitHub reported no CI checks. Browser atlas verification could not launch Chromium; visual review remains with the owner. Trained-operator wording/usability acceptance remains CP-ASSESS-IMPL-003.
+- Updated outdated source-slicing tests to exercise current owners: localized-intention policy and language-change binding, No Frequency/No Mantra side effects, completion Earn-handoff timer, and Advanced Features/Shot URL handler boundaries. These were test-location/harness failures, not confirmed runtime defects.
+- Fresh non-browser suite: 99/101. The only remaining failures stop before assertions because owner-maintained `docs/dot.json` is absent (`content-safety`, `drone-duration`). That file was not found in either Lite checkout; do not substitute another project's data. Atlas build/structure, targeted affected tests, and `git diff --check` pass. Browser tests remain skipped per user's prior request; Playwright is unavailable.
+- Production/integration HEAD is newer than this checkpoint base. Merge/rebase must be validated on the current production baseline; the main `modularize` checkout has separate user edits and an unrelated untracked audio backup. Preserve those, and do not commit `.codex/loop-routing` prompt/decision artifacts.
 
-### RELEASED — Consultation CTA lock visibility correction
+### COMPLETE LOCALLY — CP-MOD-149–151: Piper voice setup ownership
 
-- Fixed in the existing `modularize` checkout. The Lobby CTA starts hidden/disabled before app initialization, follows the shared Advanced Features lock/unlock lifecycle, and has a click-time guard. Rotated the service-worker shell cache to `chakra-v5.310` so the local PWA reload can install the changed markup and logic.
-- Updated the overview flow map and added regression assertions in `tests/advanced-unlock.test.mjs`.
-- This correction is included in production PR #78. Validation: assessment and Advanced Features tests pass; atlas generated successfully. Browser review was not run. The standalone assessment URL itself remains directly addressable; the app applies a same-tab client-side handoff, not server authentication.
+- Moved language-compatible voice selection, resilient Piper registry fetch, browser voice picker construction/refresh, locale-filtered options and silent speech-discovery warm-up into the existing Piper lifecycle owner.
+- App keeps providing the selected language/default and callbacks; voice synthesis/runtime behavior, script order, cache manifest and offline delivery are unchanged. Added direct module coverage and updated the Hindi contract to assert the new owners instead of app source slices.
+- `piper-lifecycle`, Hindi and Russian language contracts pass. No browser/device/audio playback/thermal evidence and no performance improvement claimed. Local/uncommitted in the isolated modularize worktree; no PR/merge/push.
 
-### NOW — CP-MOD-066: Timing duration settings view ownership
+### NEXT — CP-MOD-152: audit one cohesive app/controller seam
+
+- This requested 20-piece batch yielded three safe Piper setup extractions; forcing 17 more would fragment unrelated lifecycles. Continue at a natural boundary, with lazy loading and larger coupled owners still review/measurement gated.
+
+### COMPLETE LOCALLY — CP-MOD-129–148: twenty existing-owner helper extractions
+
+- Piper voice-profile rules (10): Piper ID/lookup, pace multiplier/floor/settings, declared or browser voice gender, language matching and locale-compatible browser voice selection.
+- Completion view owns Earn-link timer cancel/eligibility/schedule (3); media-controls owns voice-status rendering (1); script-source settings owns demo duration/message/selection policy (3); content localization owns generated-intention recognition and language refresh (2); drone-duration view owns contextual duration-summary rendering (1).
+- App compatibility adapters and exact profile/default values remain unchanged. Focused tests, syntax, atlas build, and diff checks are the acceptance gates. No new scripts/offline entries, no audio/journey flow changes and no performance/device claim. Local/uncommitted in the isolated modularize worktree; no PR/merge/push.
+
+### NEXT — CP-MOD-149: audit one cohesive app/controller seam
+
+- This request resumed work for the bounded CP-MOD-129–148 batch. The larger modularization goal’s pause state remains unchanged in goal tracking; confirm continuation before another batch. Reassess coupling and testability; measured lazy-loading remains a separate later gate.
+
+### COMPLETE LOCALLY — CP-MOD-128: chakra symbol image lifecycle ownership
+
+- Moved selected symbol/deity/Yoga/body-only artwork loading and visibility callbacks into the existing `VisualEngine` instance. The request identity guard, failed-image hiding, and cached-image reveal behavior are unchanged.
+- Direct checks cover module ownership, stale-load guard and cached-image handling; targeted test, neighboring visual checks, syntax and `git diff --check` are the acceptance gate. No script/cache/lazy boundary or user-flow topology changed; no visual/performance/device claim.
+- This is the first safe slice of the requested next batch. The remaining AudioEngine and MeditationController code is lifecycle-coupled; do not invent tiny boundaries merely to reach 20. Continue from the next audited seam after this checkpoint. Worktree remains local/uncommitted; no PR/merge/push.
+
+### NEXT — CP-MOD-149: audit one cohesive app/controller ownership seam
+
+- Reinspect active source and atlas before choosing; preserve user edits and require direct parity tests. Broader lazy loading remains measurement-gated.
+
+### COMPLETE LOCALLY — CP-MOD-108–127: twenty value and display-policy helpers
+
+- CP-MOD-108–115 moved eight Mood & Relaxation clamp, URL, intensity-profile, blur-mix and level-format helpers into `mood-ambience-settings-view.js`.
+- CP-MOD-116–122 moved Shot duration defaults, drone mode policies, fixed exposure calculation, clock formatting and Sleep-stage validation into `timing-settings.js`.
+- CP-MOD-123 moved spatial-mode fallback normalization into `audio-effects-settings-view.js`.
+- CP-MOD-124–125 moved countdown SVG progress and hide rendering into `session-countdown.js`.
+- CP-MOD-126 moved narration-duration estimation into `session-estimate.js`; CP-MOD-127 moved visual-effect fallback normalization into `visual-engine.js`.
+- App wrappers preserve existing callers, injected values, units and behavior. No new modules/scripts/cache entries or lazy-loading boundary. Focused tests cover helper edges and neighboring behavior. Atlas rebuilt; its structure verifier remains unavailable because Playwright is not installed. Browser/device/performance evidence is not claimed. Local/uncommitted; no PR/merge/push.
+
+### NEXT — CP-MOD-149: inspect the remaining controller/app seams
+
+- Reassess the atlas and remaining `app.js` ownership before the next batch. Continue only when an extraction has a cohesive owner, direct parity test and no hidden behavior change; later measured loading checks remain outstanding.
+
+### COMPLETE LOCALLY — CP-MOD-098–107: ten language and mode-control behaviors
+
+- CP-MOD-098–100 moved narration-language, display-language and selected-voice change bindings to `locale-ui-renderer.js`, preserving generated-intention refresh, voice setup, locale repaint and explicit-save behavior.
+- CP-MOD-101–102 moved both voice-preview button bindings to `media-controls-view.js`.
+- CP-MOD-103 moved Corpse Pose's master-mode callback binding to `yoga-experience-settings.js`.
+- CP-MOD-104–105 moved Sleep's locked rejection and unlocked master-policy branches to `lobby-experience-visibility.js`.
+- CP-MOD-106–107 moved Shots' locked rejection, No Frequency guard, confirmation cancellation and confirmed exclusivity/reset branches into its Lobby view owner (four tested branches grouped in two checkpoints).
+- Master-toggle policy, Advanced Features unlock/authentication, and repertory URL handoff remain app-owned. Updated locale/mode atlas ownership. Focused module tests, syntax checks and diff validation pass. Browser/device/performance evidence is not claimed; no browser test, PR, merge or push. Changes remain local and uncommitted.
+
+### NEXT — CP-MOD-149: inspect the remaining coupled handlers
+
+- Reassess the atlas and current app after this batch. Continue only with behavior-preserving seams; keep selected-only lazy loading as the only adopted feature boundary pending measurement.
+
+### COMPLETE LOCALLY — CP-MOD-088–097: ten bounded Lobby/settings owners
+
+- CP-MOD-088 moved High Energy estimate refresh into its primary selection binding.
+- CP-MOD-089/090 moved standard Chakra/Sleep/Shot and HRIM duration-slider handlers into `timing-settings-view.js`.
+- CP-MOD-091–095 moved the Mood & Relaxation enable, intensity, gain/confirmation, blur and blur-level handlers into `mood-ambience-settings-view.js`.
+- CP-MOD-096 moved the Yoga Advanced Features toggle gate into `yoga-experience-settings.js`.
+- CP-MOD-097 moved Shot-type duration reset and visibility/estimate refresh binding into `lobby-experience-visibility.js`.
+- Updated the relevant atlas owner notes, plan and fix queue; map topology unchanged. Focused preparation, timing, Mood & Relaxation, Yoga and Lobby visibility tests pass. Browser/device/performance evidence is not claimed; browser tests remain skipped. Local changes remain uncommitted; no PR/merge/push.
+
+### NEXT — CP-MOD-149: inspect the remaining coupled handlers
+
+- Reassess the atlas and current app after this batch. Continue only with behavior-preserving seams; keep selected-only lazy loading as the only adopted feature boundary pending measurement.
+
+### COMPLETE LOCALLY — CP-MOD-073–077: five app-shell interaction owners
+
+- CP-MOD-073 extended `modules/screen-navigation.js` with the existing Settings/Experiment CTA bindings.
+- CP-MOD-074 extracted Settings help modal behavior to `modules/settings-help-view.js`.
+- CP-MOD-075 extracted brightness, Eyes Close and audio-filter controls to `modules/visual-comfort-settings-view.js`.
+- CP-MOD-076 extracted mixer open/close/focus behavior to `modules/mixer-view.js`; session restart remains app-owned.
+- CP-MOD-077 extracted audio preview and Media Session controls to `modules/media-controls-view.js`; audio playback and journey services remain unchanged.
+- Atlas source references updated; topology unchanged. Router returned `PLANNED` / browser (`gpt-5.6-terra`, medium); no model switch or child run. Validation completed: screen-navigation, settings-help, visual-comfort, mixer, media-controls, CP-MOD-070–072 and neighboring selection/estimate/roadmap/video/audio tests pass; syntax, atlas build/structure and `git diff --check` pass. Atlas: 44 maps / 360 nodes / 419 edges. Browser/device/performance evidence is not claimed.
+
+### NEXT — CP-MOD-149: continue bounded app-owner audit
+
+- Reassess coupling before selecting the next seam; leave feature-level lazy-loading unchanged until cold/warm/offline measurement justifies expansion.
+
+### COMPLETE LOCALLY — CP-MOD-070–072: three small Lobby settings-view extractions
+
+- CP-MOD-070 moved Returning Journey and Lobby Video Introduction persistence/roadmap listeners to `modules/journey-preference-settings-view.js`.
+- CP-MOD-071 moved intention text input synchronization to `modules/intention-settings-view.js`.
+- CP-MOD-072 moved chakra selection persistence, session-estimate/roadmap refresh, and active chip display to `modules/chakra-selection-view.js`. Save Settings remains explicitly persistent; selection eligibility and journey dispatch remain app-owned.
+- Added direct tests and updated journey roadmap, standard journey and mode atlas ownership references; topology unchanged. Router returned `PLANNED` / browser (`gpt-5.6-terra`, medium); no model switch/child run occurred. Validation completed: all new and neighboring tests pass; atlas and diff checks are clean. Browser/device/performance evidence is not claimed.
+
+- Follow-up validation completed: the three new view tests and all listed neighboring tests pass; syntax, atlas build/structure, and `git diff --check` pass. Atlas is 44 maps / 360 nodes / 419 edges. Browser/device/performance evidence remains unclaimed.
+
+### NEXT — CP-MOD-149: continue one bounded app-owner seam at a time
+- Reassess current app/map before selecting the next boundary. Keep selected-only practice-module loading as the established lazy boundary; do not expand lazy loading until cold/warm/offline measurements justify it.
+
+### COMPLETE LOCALLY — CP-MOD-069: paired audio mode settings ownership
+
+- Moved No Frequency / No Mantra Lobby and mixer handlers into `modules/audio-mode-settings-view.js`; retained AudioEngine, preference hydration and Mood & Relaxation loading ownership. Existing side-effect order, mirrored checkboxes, persistence, suppression behavior and eligible ambience restart remain unchanged.
+- Added direct interaction tests for both controls and active-journey ambience restoration. `sound-options` source references updated and atlas rebuilt; topology unchanged.
+- Router returned `PLANNED` / high-risk (`gpt-6-astra`, high); no dispatch or model switch occurred. Direct bounded implementation proceeded. Validation: audio mode settings-view, audio volume, audio effects, audio effects controls, background-music and script-source-settings tests pass; syntax, diff and atlas structural checks pass. Atlas rebuilt: 44 maps / 360 nodes / 419 edges. Browser/device evidence is not claimed.
+
+### NEXT — CP-MOD-149: continue remaining app-owner seam audit
+
+- Select one low-coupling boundary using the atlas and current `app.js`; define the preserve-list before extraction. Keep selected-only practice loading as the only established feature-level lazy-loading boundary until broader cold/warm/offline measurement is performed.
+
+### COMPLETE LOCALLY — CP-MOD-068: Mood & Relaxation URL-loader view ownership
+
+- Extracted the Advanced Lobby ambience URL button/status handler into `modules/mood-ambience-settings-view.js`, which already owns the view rendering and recovery display. `AudioEngine.loadPleasureAmbienceUrl()` still owns loading, validation and persistence.
+- Preserved empty-URL-as-clear semantics, localized loading/loaded/cleared/error messages, disabled-while-loading behavior, finally restoration from `state.noFrequencyMode`, failure-triggered control resync, and original event-binding position. Direct tests cover success, clear, failure and disabled-state restoration. `sound-options` atlas source references and ownership note are updated; this is not a behavior or performance change.
+- Router recommended `gpt-6-astra` / high effort with state `PLANNED`; no child run/model switch occurred. Validation: Mood & Relaxation settings-view, background-music, and CP-MOD-067 script-settings tests pass; app/module syntax and `git diff --check` pass. Atlas rebuilt: 44 maps / 360 nodes / 419 edges; structural check passes. Flow topology is unchanged, so browser verification was not run.
+
+### COMPLETE LOCALLY — CP-MOD-067: script source, upload and URL-fetch ownership
+
+- Resumed in the existing isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-067/lite`, branch `codex/modularize-cp-067`, based on CP-MOD-066 documentation baseline `af9710b`. The integration checkout and its dirty user edits were not modified.
+- Extracted source selection, file upload and URL-fetch handlers to `modules/script-source-settings.js`. Demo timing apply/restore, estimate/roadmap refresh, custom panel visibility, persistence, status and `meditation.scripts` invalidation retain the expected order. URL loads use latest-nonempty-request-wins; stale success/error completions are ignored; empty URLs are no-ops.
+- Failed HTTP, JSON parsing and schema validation preserve the previously accepted custom script and cache. Direct tests cover valid source changes, upload success/failures, URL success, demo status, HTTP/JSON/schema failures, empty URL and overlapping request races. Added the dedicated custom-script settings atlas map; shell/service-worker cache is `chakra-v5.310`. No user-visible or lazy-loading/performance claim.
+- Router classified the bounded parent request as `reasoning` / `gpt-5.6-sol` high effort with state `PLANNED`; no child run/model switch occurred. Direct implementation proceeded within the isolated checkpoint.
+- Validation: script-source-settings, script-preference-hydration, demo-script, session-estimate, timing-settings-view, journey-roadmap and journey-content-loader tests pass; all 34 unit files asserting the rotated shell cache passed after 067a, and the upload/URL tests pass after their extraction. `node --check` and `git diff --check` pass. Atlas build succeeds: 44 maps / 360 nodes / 419 edges; an independent structural check confirms unique map IDs and all edge endpoints resolve. `verify-atlas.mjs` could not start because Playwright is not installed in this worktree; browser/device evidence is not claimed.
+
+### NEXT — CP-MOD-149: continue remaining app-owner seam audit
+
+- Inspect the active atlas and `app.js` for one remaining app-owned responsibility at a time, choose a low-coupling boundary supported by the map, and record acceptance criteria before extraction. Keep the broader feature-level lazy-loading redesign deferred until stable ownership/parity is assessed and cold/warm/offline baselines are measured.
+
+### PREVIOUS — CP-MOD-066: Timing duration settings view ownership
+
+### RELEASED — CP-ASSESS-ADV-UNDO-RAPPORT-001 (production baseline)
+
+- Production already includes PR #78: the Lobby-only assessment CTA is Advanced Features-gated; it provides one-step undo and a cautious chakra-evidence rapport cue/icebreaker. The same-tab grant is client-side gating, not server authentication.
+- This release merge is being prepared on top of the current production baseline; assessment behavior and its translations are preserved while modularization ownership is integrated.
 
 - Active isolated worktree `/Users/lekshmisyam/.codex/worktrees/modularize-cp-066/lite`, branch `codex/modularize-cp-066`, based on CP-MOD-065 `083294a`. Extracted seven transition-duration and three care-duration input listeners into `modules/timing-settings-view.js`; mode-sensitive chakra/Sleep/Shot and High Energy durations remain app-owned.
 - Preserved the exact two binding positions around custom-script controls, integer parsing, state → display → storage → session-estimate ordering, all ten existing storage keys/labels, and error propagation. App-level estimate continues to refresh the roadmap. Eager/offline-pre-cached ownership only; no performance claim.
