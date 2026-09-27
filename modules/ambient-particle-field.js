@@ -18,6 +18,8 @@ class AmbientParticleField {
         this.observer = null;
         this.celestialBodies = [];
         this.deepSkyBlackHoleEnabled = false;
+        this.locationRequested = false;
+        this.staticBackdropReady = false;
         this.moonBuffer = document.createElement('canvas');
         this.moonBuffer.width = 128;
         this.moonBuffer.height = 128;
@@ -34,11 +36,11 @@ class AmbientParticleField {
         this.layoutFrame = 0;
         this.invalidateSkyLayout = () => {
             this.celestialLayerKey = null;
-            if (!this.started || document.hidden || this.layoutFrame) return;
+            if (!this.started || document.hidden || (!this.isSkyPageActive() && !this.isStaticBackdropActive()) || this.layoutFrame) return;
             // One redraw for an actual layout event, never an idle loop.
             this.layoutFrame = requestAnimationFrame(() => {
                 this.layoutFrame = 0;
-                if (!document.hidden) this.draw(performance.now(), false);
+                if (!document.hidden && (this.isSkyPageActive() || this.isStaticBackdropActive())) this.draw(performance.now(), false);
             });
         };
     }
@@ -57,12 +59,37 @@ class AmbientParticleField {
             this.layoutObserver.observe(element, { attributes: true, attributeFilter: ['class'] });
         }
         this.resize();
-        this.requestObserverLocation();
-        if (!this.motionPreference.matches && !document.hidden) {
-            this.frame = requestAnimationFrame(this.render);
-        } else {
-            this.draw(performance.now(), false);
+        if (this.isSkyPageActive() && !document.hidden) this.activateSkyPage();
+    }
+
+    isSkyPageActive() {
+        return document.body.classList.contains('sky-canvas-active');
+    }
+
+    activateSkyPage() {
+        if (!this.isSkyPageActive() || document.hidden) return;
+        this.staticBackdropReady = false;
+        if (!this.locationRequested) {
+            this.locationRequested = true;
+            this.requestObserverLocation();
         }
+        this.celestialLayerKey = null;
+        this.draw(performance.now(), false);
+        if (!this.motionPreference.matches && !this.frame && !this.renderTimer) {
+            this.lastFrameAt = 0;
+            this.frame = requestAnimationFrame(this.render);
+        }
+    }
+
+    isStaticBackdropActive() {
+        return document.body.classList.contains('static-decorations');
+    }
+
+    activateStaticBackdrop() {
+        if (!this.isStaticBackdropActive() || document.hidden || this.staticBackdropReady) return;
+        this.staticBackdropReady = true;
+        this.refreshCelestialBodies(new Date(), true);
+        this.draw(performance.now(), false);
     }
 
     setFallbackObserver() {
@@ -75,7 +102,8 @@ class AmbientParticleField {
             ({ coords }) => {
                 if (!Number.isFinite(coords.latitude) || !Number.isFinite(coords.longitude)) return;
                 this.observer = { latitude: coords.latitude, longitude: coords.longitude, height: Number.isFinite(coords.altitude) ? coords.altitude : 0, approximate: false };
-                this.refreshCelestialBodies();
+                if (!this.isSkyPageActive() && !this.isStaticBackdropActive()) return;
+                this.refreshCelestialBodies(new Date(), this.isStaticBackdropActive());
                 this.draw(performance.now(), false);
             },
             () => { /* Keep the approximate fallback sky when declined. */ },
@@ -83,9 +111,9 @@ class AmbientParticleField {
         );
     }
 
-    refreshCelestialBodies(date = new Date()) {
-        if (!this.observer) return;
-        if (this.skySnapshot && document.body.classList.contains('static-decorations')) return;
+    refreshCelestialBodies(date = new Date(), force = false) {
+        if (!this.observer || (!this.isSkyPageActive() && !this.isStaticBackdropActive())) return;
+        if (this.skySnapshot && this.isStaticBackdropActive() && !force) return;
         // Bound retries as well as successful updates; a failed engine must
         // never turn into a per-frame calculation/error loop.
         this.lastCelestialRefresh = performance.now();
@@ -127,10 +155,11 @@ class AmbientParticleField {
         this.canvas.style.width = `${window.innerWidth}px`;
         this.canvas.style.height = `${window.innerHeight}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (!this.skySnapshot) this.refreshCelestialBodies();
+        const skyVisible = this.isSkyPageActive() || this.isStaticBackdropActive();
+        if (skyVisible && !this.skySnapshot) this.refreshCelestialBodies(new Date(), this.isStaticBackdropActive());
         this.sky.resize(window.innerWidth, window.innerHeight, dpr, this.skySnapshot?.stars || [], this.skySnapshot?.sunAltitude ?? -18);
         this.particles = this.sky.stars;
-        this.draw(performance.now(), false);
+        if (skyVisible) this.draw(performance.now(), false);
     }
 
     handleMotionChange() {
@@ -141,10 +170,9 @@ class AmbientParticleField {
         this.meteors = [];
         this.nextMeteorAt = 0;
         this.lastFrameAt = 0;
-        if (!document.hidden) {
-            if (this.motionPreference.matches || document.body.classList.contains('static-decorations')) this.draw(performance.now(), false);
-            else this.frame = requestAnimationFrame(this.render);
-        }
+        if (!document.hidden && this.isSkyPageActive()) this.activateSkyPage();
+        else if (!document.hidden && this.isStaticBackdropActive()) this.activateStaticBackdrop();
+        else this.staticBackdropReady = false;
     }
 
     handleVisibility() {
@@ -157,20 +185,13 @@ class AmbientParticleField {
             this.frame = 0;
             this.meteors = [];
             this.nextMeteorAt = 0;
-        } else if (document.body.classList.contains('static-decorations')) {
-            this.draw(performance.now(), false);
-        } else if (!this.motionPreference.matches && !this.frame && !this.renderTimer) {
-            this.lastFrameAt = 0;
-            this.frame = requestAnimationFrame(this.render);
-        } else if (this.motionPreference.matches) {
-            this.refreshCelestialBodies();
-            this.draw(performance.now(), false);
-        }
+        } else if (this.isSkyPageActive()) this.activateSkyPage();
+        else if (this.isStaticBackdropActive()) this.activateStaticBackdrop();
     }
 
     render(timestamp) {
         this.frame = 0;
-        if (document.hidden || this.motionPreference.matches || document.body.classList.contains('static-decorations')) { this.frame = 0; return; }
+        if (document.hidden || !this.isSkyPageActive() || this.motionPreference.matches) { this.frame = 0; return; }
         if (!this.lastFrameAt || timestamp - this.lastFrameAt >= 33) {
             this.draw(timestamp, true);
             this.lastFrameAt = timestamp;
@@ -178,14 +199,14 @@ class AmbientParticleField {
         // Sleep between draws instead of waking on every 60/120 Hz refresh.
         this.renderTimer = setTimeout(() => {
             this.renderTimer = null;
-            if (!document.hidden && !this.motionPreference.matches) {
+            if (!document.hidden && this.isSkyPageActive() && !this.motionPreference.matches) {
                 this.frame = requestAnimationFrame(this.render);
             }
         }, 33);
     }
 
     draw(timestamp, animate) {
-        if (!this.ctx) return;
+        if (!this.ctx || (!this.isSkyPageActive() && !this.isStaticBackdropActive())) return;
         const width = window.innerWidth;
         const height = window.innerHeight;
         if (this.observer && !document.body.classList.contains('static-decorations') && timestamp - this.lastCelestialRefresh >= 10000) {
@@ -240,7 +261,10 @@ class AmbientParticleField {
         if (this.deepSkyBlackHoleEnabled && !document.body.classList.contains('static-decorations')) {
             this.drawDeepSkyBlackHole(width, height);
         }
-        const labelBounds = [];
+        const labelBounds = [...document.querySelectorAll('#sky-screen [data-sky-obstacle]')]
+            .map(element => element.getBoundingClientRect())
+            .filter(rect => rect.width && rect.height)
+            .map(rect => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height }));
         this.celestialBodies.forEach((body) => {
             if (body.altitude < 0) return;
             const { x, y } = SkyAstronomy.project(body.azimuth, body.altitude, width, height);

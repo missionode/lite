@@ -2,6 +2,7 @@
   "name": "chakra-meditation-e2e",
   "private": true,
   "scripts": {
+    "test:cosmic-observatory-lobby": "node tests/cosmic-observatory-lobby.test.mjs",
     "test:content-safety": "node tests/content-safety.test.mjs",
     "test:chakra-selection": "node tests/chakra-selection.test.mjs",
     "test:lobby-scroll": "node tests/lobby-scroll.test.mjs",

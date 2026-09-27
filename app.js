@@ -329,6 +329,7 @@ function normalizeMeditationVisualEffect(value) {
 const configScreen = document.getElementById('config-screen');
 const settingsManagerScreen = document.getElementById('settings-manager-screen');
 const experimentScreen = document.getElementById('experiment-screen');
+const skyScreen = document.getElementById('sky-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
@@ -349,10 +350,11 @@ const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
     window,
-    screens: [configScreen, settingsManagerScreen, experimentScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    screens: [configScreen, settingsManagerScreen, experimentScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
     experimentScreen,
+    skyScreen,
     dispatchDecorationChange: () => document.dispatchEvent(new Event('decorationchange'))
 });
 const icebreakerTimer = document.getElementById('icebreaker-timer');
@@ -3197,7 +3199,9 @@ function attachEventListeners() {
     screenNavigation.bindLobbyActions({
         settingsButton: openSettingsBtn,
         experimentButton: document.getElementById('open-experiment-mode'),
-        closeExperimentButton: document.getElementById('close-experiment')
+        closeExperimentButton: document.getElementById('close-experiment'),
+        openSkyButton: document.getElementById('open-sky-observatory'),
+        closeSkyButton: document.getElementById('close-sky-screen')
     });
     beginConsultationBtn?.addEventListener('click', () => {
         if (!state.advancedFeaturesUnlocked) return;

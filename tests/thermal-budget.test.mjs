@@ -53,7 +53,7 @@ assert.equal(input.connections, 0); assert.equal(convolution.connections, 0);
 setConvolverActive('test', input, convolution, output, true);
 setConvolverActive('test', input, convolution, output, true);
 assert.equal(input.connections, 1, 'Reactivation reconnects exactly once');
-assert.match(fs.readFileSync(new URL('../modules/screen-navigation.js', import.meta.url), 'utf8'), /screen !== lobbyScreen && screen !== configScreen/);
+assert.match(fs.readFileSync(new URL('../modules/screen-navigation.js', import.meta.url), 'utf8'), /screen !== lobbyScreen && screen !== configScreen && !skyActive/);
 assert.match(fs.readFileSync('modules/piper-narration.js', 'utf8'), /buffer.duration - 12/);
 assert.match(fs.readFileSync('style.css', 'utf8'), /body.static-decorations/);
 console.log('Thermal budgets passed: Unicode chunks, bounded keyed cache, cancellation and audio-clock effect retirement.');

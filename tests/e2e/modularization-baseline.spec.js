@@ -65,9 +65,9 @@ test('records cold, warm and offline startup baseline without starting playback'
       sessionCountdownModulePresent: urls.includes('/modules/session-countdown.js?v=1.0'),
       journeyChromeModulePresent: urls.includes('/modules/journey-chrome.js?v=1.0'),
       videoPreludeModulePresent: urls.includes('/modules/journey-video-prelude.js?v=1.0'),
-      ambientParticleFieldModulePresent: urls.includes('/modules/ambient-particle-field.js?v=1.0'),
+      ambientParticleFieldModulePresent: urls.includes('/modules/ambient-particle-field.js?v=1.1'),
       visualEngineModulePresent: urls.includes('/modules/visual-engine.js?v=1.0'),
-      stylesheetEntryPresent: urls.includes('/style.css?v=2.03')
+      stylesheetEntryPresent: urls.includes('/style.css?v=2.06')
     };
   });
   expect(shellCache.appEntryPresent).toBe(true);

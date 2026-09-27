@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.324';
+const CACHE_NAME = 'chakra-v5.327';
 const PIPER_CACHE_NAME = 'chakra-piper-v9';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v53';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v54';
 const ASSETS = [
   './',
   './index.html',
@@ -12,11 +12,11 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.03',
+  './style.css?v=2.06',
   './app.js?v=4.12',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
-  './modules/ambient-particle-field.js?v=1.0',
+  './modules/ambient-particle-field.js?v=1.1',
   './modules/visual-engine.js?v=1.0',
   './vendor/astronomy.browser.min.js?v=2.1.19',
   './data/sky-stars.js?v=1.0',
