@@ -21,24 +21,24 @@ assert.deepEqual(hindi && {
     localeSource: hindi.localeSource,
     contentSource: hindi.contentSource,
     browserPrefixes: hindi.browserPrefixes,
-    hasDefaultPiperVoice: Object.hasOwn(hindi, 'defaultPiperVoice'),
+    defaultPiperVoice: hindi.defaultPiperVoice,
 }, {
     locale: 'hi-IN',
     localeSource: 'locales/hi.json',
     contentSource: 'scripts.json',
     browserPrefixes: ['hi'],
-    hasDefaultPiperVoice: false,
-}, 'Hindi must be registered as a complete browser-TTS-only content and display language.');
+    defaultPiperVoice: 'hi_IN-priyamvada-medium',
+}, 'Hindi must be registered as a complete localized language with its community Piper default.');
 
 assert.equal(
-    voices.voices.some((voice) => voice.language === 'hi' || voice.locale === 'hi-IN'),
-    false,
-    'Hindi must not have a Piper voice registry entry.',
+    voices.voices.some((voice) => voice.language === 'hi' && voice.id === 'hi_IN-priyamvada-medium'),
+    true,
+    'Hindi community Piper voice must be present in the registry.',
 );
 assert.match(
     app,
-    /\{ id: 'hi', locale: 'hi-IN', label: 'हिन्दी', browserPrefixes: \['hi'\] \}/,
-    'The manifest fallback must retain Hindi without a Piper default.',
+    /\{ id: 'hi', locale: 'hi-IN', label: 'हिन्दी', browserPrefixes: \['hi'\], defaultPiperVoice: 'hi_IN-priyamvada-medium' \}/,
+    'The manifest fallback must retain Hindi with its Piper default.',
 );
 assert.match(
     piper,
@@ -203,8 +203,8 @@ handoff.schedule();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
-assert.match(html, /app\.js\?v=4.12/, 'The application query version must match the modularized delivery.');
+assert.match(html, /app\.js\?v=4.13/, 'The application query version must match the voice-registry refresh.');
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'/, 'The offline shell should use a versioned cache name.');
-assert.match(serviceWorker, /chakra-language-v55/, 'The current locale cache generation must remain declared for language delivery.');
+assert.match(serviceWorker, /chakra-language-v56/, 'The current locale cache generation must include the Tamil locale.');
 
 console.log('Hindi language contract passed.');

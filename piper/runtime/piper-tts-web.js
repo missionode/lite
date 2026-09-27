@@ -254,6 +254,7 @@ const _TtsSession = class _TtsSession {
     wasmPaths,
     modelPath,
     configPath,
+    modelBaseUrl,
     phonemizerVoice
   }) {
     __publicField(this, "ready", false);
@@ -269,6 +270,7 @@ const _TtsSession = class _TtsSession {
     __privateAdd(this, _logger);
     __privateAdd(this, _modelPath);
     __privateAdd(this, _configPath);
+    __privateAdd(this, _modelBaseUrl);
     __privateAdd(this, _phonemizerVoice);
     var _a;
     if (_TtsSession._instance) {
@@ -282,6 +284,7 @@ const _TtsSession = class _TtsSession {
     this.voiceId = voiceId;
     __privateSet(this, _modelPath, modelPath || PATH_MAP[voiceId]);
     __privateSet(this, _configPath, configPath || `${__privateGet(this, _modelPath)}.json`);
+    __privateSet(this, _modelBaseUrl, (modelBaseUrl || HF_BASE).replace(/\/$/, ''));
     __privateSet(this, _phonemizerVoice, phonemizerVoice || '');
     __privateSet(this, _progressCallback, progress);
     this.waitReady = this.init();
@@ -309,10 +312,11 @@ const _TtsSession = class _TtsSession {
     const path = __privateGet(this, _modelPath);
     if (!path) throw new Error(`No Piper model path registered for voice ${this.voiceId}`);
     const configPath = __privateGet(this, _configPath) || `${path}.json`;
-    const modelConfigBlob = await getBlob(`${HF_BASE}/${configPath}`);
+    const modelBaseUrl = __privateGet(this, _modelBaseUrl);
+    const modelConfigBlob = await getBlob(`${modelBaseUrl}/${configPath}`);
     __privateSet(this, _modelConfig, JSON.parse(await modelConfigBlob.text()));
     const modelBlob = await getBlob(
-      `${HF_BASE}/${path}`,
+      `${modelBaseUrl}/${path}`,
       __privateGet(this, _progressCallback)
     );
     __privateSet(this, _ortSession, await __privateGet(this, _ort).InferenceSession.create(
@@ -374,6 +378,7 @@ _wasmPaths = new WeakMap();
 _logger = new WeakMap();
 _modelPath = new WeakMap();
 _configPath = new WeakMap();
+_modelBaseUrl = new WeakMap();
 _phonemizerVoice = new WeakMap();
 __publicField(_TtsSession, "WASM_LOCATIONS", DEFAULT_WASM_PATHS);
 __publicField(_TtsSession, "_instance", null);

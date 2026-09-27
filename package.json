@@ -30,6 +30,7 @@
     "test:content-localization": "node tests/content-localization.test.mjs",
     "test:media-lifecycle": "node tests/media-lifecycle.test.mjs",
     "test:piper-lifecycle": "node tests/piper-lifecycle.test.mjs",
+    "test:indic-piper-voices": "node tests/indic-piper-voices.test.mjs",
     "test:audio-route-lifecycle": "node tests/audio-route-lifecycle.test.mjs",
     "test:audio-engine-initialization": "node tests/audio-engine-initialization.test.mjs",
     "test:audio-signal-design": "node tests/audio-signal-design.test.mjs",

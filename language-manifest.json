@@ -40,7 +40,18 @@
       "contentSource": "scripts.json",
       "localeSource": "locales/hi.json",
       "browserPrefixes": ["hi"],
-      "preview": "धीरे से साँस लें। इस क्षण आप सुरक्षित हैं।"
+      "defaultPiperVoice": "hi_IN-priyamvada-medium",
+      "preview": "आराम से साँस भीतर लें। धीरे-धीरे साँस बाहर छोड़ें। इस क्षण आप सुरक्षित हैं।"
+    },
+    {
+      "id": "ta",
+      "locale": "ta-IN",
+      "label": "தமிழ்",
+      "contentSource": "scripts.json",
+      "localeSource": "locales/ta.json",
+      "browserPrefixes": ["ta"],
+      "defaultPiperVoice": "ta_IN-rasa_male-medium",
+      "preview": "மெதுவாக மூச்சை உள்ளிழுங்கள். அதை மென்மையாக வெளியே விடுங்கள். இந்தக் கணத்தில் நீங்கள் பாதுகாப்பாக இருக்கிறீர்கள்."
     }
   ]
 }

@@ -1,6 +1,7 @@
-const CACHE_NAME = 'chakra-v5.328';
-const PIPER_CACHE_NAME = 'chakra-piper-v9';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v55';
+const CACHE_NAME = 'chakra-v5.329';
+const PIPER_CACHE_NAME = 'chakra-piper-v10';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v56';
+const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
   './index.html',
@@ -12,8 +13,8 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.07',
-  './app.js?v=4.12',
+  './style.css?v=2.08',
+  './app.js?v=4.13',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',
@@ -135,9 +136,10 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   self.skipWaiting(); // Force update immediately
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
+    Promise.all([
+      caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)),
+      caches.open(LANGUAGE_CACHE_NAME).then(cache => cache.addAll(LANGUAGE_ASSETS))
+    ])
   );
 });
 
@@ -164,8 +166,7 @@ function isPiperRequest(request) {
     const url = new URL(request.url);
     return url.pathname.includes('/piper/') ||
         url.pathname.endsWith('/piper-worker.js') ||
-        url.pathname.endsWith('/piper-models.json') ||
-        (url.hostname === 'huggingface.co' && url.pathname.includes('/piper-voices/'));
+        url.pathname.endsWith('/piper-models.json');
 }
 
 function isLanguageRequest(request) {

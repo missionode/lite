@@ -574,7 +574,7 @@ function applyLocaleUI() {
 
 async function loadLanguageManifest() {
     try {
-        const response = await fetch('language-manifest.json');
+        const response = await fetch('language-manifest.json?v=2');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const manifest = await response.json();
         languageRegistry = Array.isArray(manifest.languages) ? manifest.languages : [];
@@ -598,7 +598,8 @@ async function loadLanguageManifest() {
             { id: 'ml', locale: 'ml-IN', label: 'Malayalam', browserPrefixes: ['ml'], defaultPiperVoice: 'ml_IN-arjun-medium' },
             { id: 'en', locale: 'en-US', label: 'English', browserPrefixes: ['en'], defaultPiperVoice: 'en_US-lessac-medium' },
             { id: 'ru', locale: 'ru-RU', label: 'Русский', browserPrefixes: ['ru'], defaultPiperVoice: 'ru_RU-irina-medium' },
-            { id: 'hi', locale: 'hi-IN', label: 'हिन्दी', browserPrefixes: ['hi'] }
+            { id: 'hi', locale: 'hi-IN', label: 'हिन्दी', browserPrefixes: ['hi'], defaultPiperVoice: 'hi_IN-priyamvada-medium' },
+            { id: 'ta', locale: 'ta-IN', label: 'தமிழ்', browserPrefixes: ['ta'], defaultPiperVoice: 'ta_IN-rasa_male-medium' }
         ];
     }
 }
@@ -2372,7 +2373,7 @@ function getMoonPhase() {
 }
 
 async function loadPiperVoiceRegistry() {
-    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console);
+    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console, 'piper-models.json?v=3');
 }
 
 async function init() {
