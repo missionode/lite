@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — CP-MOD-154 Voice tone and echo ownership
+
+`modules/audio-voice-effects.js` owns the unchanged tuning math and Voice Space profiles/routing/ramps. AudioEngine adapters, playback-state order and user flows remain unchanged. Current complete runnable Node sweep passes except `content-safety` and `drone-duration`, which cannot start without owner-managed `docs/dot.json`; browser tests remain excluded. Shell cache has since advanced to v5.324.
+
+## Completed locally — CP-MOD-168/169 audio-owner follow-through
+
+Singing-bowl oscillator lifecycle is covered by the existing tone-playback owner; eyes-closed/audio-filter policy is in `modules/audio-comfort-effects.js`. Exact targets, ramp timing, suppression guards and cleanup are directly tested. The audio map and modularization atlas notes identify both owners. Current runnable Node sweep is 117 passing; the two non-starting tests require the absent owner-maintained `docs/dot.json`. No playback or performance claim is made.
+
 ## Merged to production — CP-ASSESS-ADV-UNDO-RAPPORT-001 (PR #78)
 
 The Lobby’s “Begin Session Consultation” CTA is the sole in-app assessment entry point; the duplicate Settings link is removed. It is available only while Advanced Features is unlocked. A 15-minute same-tab grant gates assessment-page startup before question-bank loading and is revoked on relock. Undo removes the latest response; results add a confidence-gated chakra-only conversation cue and a client-led icebreaker. It does not predict character or behavior and excludes value-priority answers and the private dot. PR #78 was merged to `production` as `d0a8051` on 2026-09-26. Focused assessment and unlock tests pass; the atlas rebuild succeeds. Browser atlas verification could not launch Chromium; visual review remains pending with the owner. GitHub reported no CI checks.
@@ -423,3 +431,9 @@ Move the selected symbol/deity/Yoga image load, stale-request guard, failed-imag
 - Piper voice profile: ID/registry lookup, cadence bounds and settings, browser/Piper gender policy, locale matching and voice selection (10).
 - Completion Earn-link timer lifecycle (3), voice-status view rendering (1), demo timing policy helpers (3), localized generated-intention refresh (2), and drone-duration summary rendering (1).
 - Existing event ordering, output copy, audio/session policy, and offline/eager delivery remain unchanged. Focused direct contracts pass; this does not claim performance or device gains.
+
+## CP-MOD-152 — Mood & Relaxation audio lifecycle ownership (implemented locally)
+
+- Moved ambience spatial approach, manifest/local/custom URL decoding, custom-source rollback, seamless-loop start/stop, gain/blur automation and intensity application into `modules/audio-pleasure-ambience.js` behind the existing AudioEngine methods.
+- Preserved state ownership, setting values, fade and automation timing, No Frequency guards, URL persistence/recovery, warnings and stop-time buffer cleanup. Added a direct lifecycle contract and kept the module eagerly available/offline cached.
+- Update the `sound-options` ownership notes. No journey topology, sound-quality, startup or thermal change is claimed.

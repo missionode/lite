@@ -12,7 +12,7 @@ assert.match(app, /moodAmbienceSettingsView\.bindUrlLoader\(/);
 assert.match(app, /moodAmbienceSettingsView\.bindControls\(/);
 assert.doesNotMatch(app, /loadPleasureAmbienceUrlButton\?\.addEventListener\('click'/);
 assert.match(html, /modules\/mood-ambience-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/mood-ambience-settings-view\.js\?v=1\.0/);
+assert.match(serviceWorker, /modules\/mood-ambience-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({ URL });
 vm.runInContext(source, context);

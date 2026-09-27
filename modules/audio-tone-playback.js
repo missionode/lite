@@ -86,5 +86,36 @@
         } catch (error) {}
     }
 
-    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, startTransitionTone, stopTransitionTone });
+    function playSingingBowl(owner, state) {
+        // A muted bell is intentional. Do not schedule an exponential ramp to zero.
+        if (!owner.ctx || state.noFrequencyMode || state.volBell <= 0) return;
+        const now = owner.ctx.currentTime;
+        const baseFrequency = 180;
+        const partials = [1, 2.8, 5.0, 8.1, 12.5];
+        partials.forEach(ratio => {
+            const oscillator = owner.ctx.createOscillator();
+            const gain = owner.ctx.createGain();
+            const filter = owner.ctx.createBiquadFilter();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(baseFrequency * ratio, now);
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(baseFrequency * ratio, now);
+            filter.Q.setValueAtTime(50, now);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(state.volBell / partials.length, now + 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 8);
+            oscillator.connect(filter);
+            filter.connect(gain);
+            gain.connect(owner.bellGain);
+            oscillator.start(now);
+            oscillator.stop(now + 8.1);
+            oscillator.onended = () => {
+                oscillator.disconnect();
+                filter.disconnect();
+                gain.disconnect();
+            };
+        });
+    }
+
+    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, startTransitionTone, stopTransitionTone, playSingingBowl });
 })(window);

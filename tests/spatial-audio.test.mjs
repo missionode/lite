@@ -4,7 +4,9 @@ import fs from 'node:fs';
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
 const audioSpatialGeometry = fs.readFileSync(new URL('../modules/audio-spatial-geometry.js', import.meta.url), 'utf8');
+const audioVoiceEffects = fs.readFileSync(new URL('../modules/audio-voice-effects.js', import.meta.url), 'utf8');
 const audioEffectsSettingsView = fs.readFileSync(new URL('../modules/audio-effects-settings-view.js', import.meta.url), 'utf8');
+const audioPleasureAmbience = fs.readFileSync(new URL('../modules/audio-pleasure-ambience.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
@@ -32,7 +34,8 @@ for (const panner of ['spatialDronePanner', 'spatialMusicPanner', 'spatialMantra
 }
 assert.match(app, /const PLEASURE_SPATIAL_APPROACH_SECONDS = 45/);
 assert.match(audioInitialization, /this\.spatialPleasurePanner\.rolloffFactor = 0\.55/);
-assert.match(app, /schedulePleasureSpatialApproach\(fromCurrent = false\)[\s\S]*?positionZ\.linearRampToValueAtTime/);
+assert.match(app, /schedulePleasureSpatialApproach\(fromCurrent = false\)\s*\{\s*return audioPleasureAmbience\.scheduleSpatialApproach\(this, fromCurrent\)/);
+assert.match(audioPleasureAmbience, /function scheduleSpatialApproach\(owner, fromCurrent = false\)/);
 assert.match(app, /pleasure: \{ x: 0, y: 0\.2, z: -7, nearZ: -2\.8 \}/, 'headphone pleasure ambience should approach a closer position');
 assert.match(audioInitialization, /this\.pannerNode\.connect\(this\.spatialDronePanner\)[\s\S]*?this\.spatialDronePanner\.connect\(this\.lowCutFilter\)/);
 assert.match(audioInitialization, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/);
@@ -54,7 +57,7 @@ assert.match(audioInitialization, /this\.setVoiceEcho\(state\.voiceEcho\)/, 'Spa
 assert.match(audioEffectsSettingsView, /storage\.setItem\('chakra_spatial_mode', state\.spatialMode\)/, 'Spatial mode changes should persist');
 assert.match(audioEffectsSettingsView, /getElementById\('spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(audioEffectsSettingsView, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);
-assert.match(app, /const settings = voiceEchoSettings\[requestedMode\]/, 'Voice Space honors its own setting');
+assert.match(audioVoiceEffects, /const settings = voiceEchoSettings\[requestedMode\]/, 'Voice Space honors its own setting');
 assert.match(app, /off: \{\s*model: 'equalpower', lfo: 0,/, 'Off disables added pan motion');
 assert.match(html, /id="session-countdown"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a circular session countdown');
 assert.match(html, /id="session-countdown-right"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a mirrored circular session countdown');

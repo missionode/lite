@@ -23,6 +23,24 @@
             }
         }
 
+        function checkFirstTime(storage) {
+            if (storage.getItem('chakra_configured')) {
+                showScreen(lobbyScreen);
+                const aura = document.getElementById('aura-bg');
+                if (aura) {
+                    aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+                    aura.style.opacity = '1';
+                }
+            } else {
+                showScreen(configScreen);
+                const aura = document.getElementById('aura-bg');
+                if (aura) {
+                    aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
+                    aura.style.opacity = '1';
+                }
+            }
+        }
+
         function bindLobbyActions({ settingsButton, experimentButton, closeExperimentButton, assessmentButton } = {}) {
             settingsButton?.addEventListener('click', () => showScreen(configScreen));
             experimentButton?.addEventListener('click', () => showScreen(experimentScreen));
@@ -30,7 +48,7 @@
             assessmentButton?.addEventListener('click', () => { window.location.href = './docs/assesment.html'; });
         }
 
-        return Object.freeze({ showScreen, bindLobbyActions });
+        return Object.freeze({ showScreen, checkFirstTime, bindLobbyActions });
     }
 
     global.ChakraScreenNavigation = Object.freeze({ create });

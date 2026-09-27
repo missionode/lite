@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const app=fs.readFileSync('app.js','utf8');
+const piperNarration=fs.readFileSync('modules/piper-narration.js','utf8');
 for(const file of ['app.js','index.html','style.css']) {
     assert.doesNotMatch(fs.readFileSync(file,'utf8'),/narration-scroll|data-narration-text|narrationTickerReadOrder|showNarrationText|refreshNarrationTicker/);
 }
 assert.match(app,/async narrateWithPiper/);
 assert.match(app,/async narrateBrowser/);
-assert.match(app,/piperTTS\.playBuffer\(buffer/);
+assert.match(app,/piperNarration\.run\(this,/);
+assert.match(piperNarration,/piperTTS\.playBuffer\(buffer/);
 assert.match(app,/speechSynthesis\.speak\(utterance\)/);
 assert.match(app,/estimateNarrationDurationSeconds,\s*timing,/, 'The app continues to supply the existing narration-duration estimator to session estimates.');
 assert.match(app,/this\.sessionCountdown = new window\.ChakraSessionCountdown/,'Session countdown lifecycle remains attached to the journey controller');

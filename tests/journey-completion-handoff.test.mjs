@@ -18,7 +18,7 @@ assert.deepEqual(
     'Lite must hand off only its source identity',
 );
 
-assert.match(app, /modal\.classList\.remove\('hidden'\);\s*scheduleEarnHandoff\(\);/, 'handoff must follow the Journey Complete screen');
+assert.match(completion, /modal\.classList\.remove\('hidden'\);\s*scheduleEarnHandoff\(\);/, 'handoff must follow the Journey Complete screen');
 const completionContext = vm.createContext({});
 vm.runInContext(completion, completionContext);
 const timers = new Map();

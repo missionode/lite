@@ -68,6 +68,8 @@ const audioElementalLayer = window.ChakraAudioElementalLayer;
 if (!audioElementalLayer) throw new Error('Audio elemental-layer module is unavailable.');
 const audioTonePlayback = window.ChakraAudioTonePlayback;
 if (!audioTonePlayback) throw new Error('Audio tone-playback module is unavailable.');
+const audioComfortEffects = window.ChakraAudioComfortEffects;
+if (!audioComfortEffects) throw new Error('Audio comfort-effects module is unavailable.');
 const audioDroneStart = window.ChakraAudioDroneStart;
 if (!audioDroneStart) throw new Error('Audio drone-start module is unavailable.');
 const audioDroneStop = window.ChakraAudioDroneStop;
@@ -79,7 +81,11 @@ if (!audioBackgroundMusicLifecycle) throw new Error('Audio background-music life
 const audioBackgroundMusicControls = window.ChakraAudioBackgroundMusicControls;
 if (!audioBackgroundMusicControls) throw new Error('Audio background-music controls module is unavailable.');
 const audioMusicEcho = window.ChakraAudioMusicEcho;
+const audioVoiceEffects = window.ChakraAudioVoiceEffects;
+const audioPleasureAmbienceModule = window.ChakraAudioPleasureAmbience;
+if (!audioPleasureAmbienceModule) throw new Error('Pleasure ambience lifecycle module is unavailable.');
 if (!audioMusicEcho) throw new Error('Audio music-echo module is unavailable.');
+if (!audioVoiceEffects) throw new Error('Audio voice-effects module is unavailable.');
 const journeyHypnosisWrapper = window.ChakraJourneyHypnosisWrapper;
 if (!journeyHypnosisWrapper) throw new Error('Journey hypnosis-wrapper module is unavailable.');
 const journeyOpeningStage = window.ChakraJourneyOpeningStage;
@@ -87,8 +93,28 @@ if (!journeyOpeningStage) throw new Error('Journey opening-stage module is unava
 const journeyContentLoader = window.ChakraJourneyContentLoader;
 if (!journeyContentLoader) throw new Error('Journey content-loader module is unavailable.');
 const journeyRouting = window.ChakraJourneyRouting;
+const standardJourneySequence = window.ChakraStandardJourneySequence;
+const journeyTransitionStages = window.ChakraJourneyTransitionStages;
 const practiceModuleLoader = window.ChakraPracticeModuleLoader;
 const screenNavigationModule = window.ChakraScreenNavigation;
+const experimentSession = window.ChakraExperimentSession?.create();
+if (!experimentSession) throw new Error('Experiment session module is unavailable.');
+const shotSession = window.ChakraShotSession?.create();
+if (!shotSession) throw new Error('Shot session module is unavailable.');
+const sleepJourney = window.ChakraSleepJourney?.create();
+if (!sleepJourney) throw new Error('Sleep journey module is unavailable.');
+const yogaSession = window.ChakraYogaSession?.create();
+if (!yogaSession) throw new Error('Yoga session module is unavailable.');
+const careSession = window.ChakraCareSession?.create();
+if (!careSession) throw new Error('Care session module is unavailable.');
+const chakraSession = window.ChakraSession?.create();
+if (!chakraSession) throw new Error('Chakra session module is unavailable.');
+const piperNarration = window.ChakraPiperNarration?.create();
+if (!piperNarration) throw new Error('Piper narration module is unavailable.');
+const guideControlledTransition = window.ChakraGuideControlledTransition?.create();
+if (!guideControlledTransition) throw new Error('Guide-controlled transition module is unavailable.');
+const sessionStop = window.ChakraSessionStop?.create();
+if (!sessionStop) throw new Error('Session stop module is unavailable.');
 const sessionEstimate = window.ChakraSessionEstimate;
 const sessionCountdownDisplay = window.ChakraSessionCountdownDisplay;
 const moodAmbienceSettingsView = window.ChakraMoodAmbienceSettingsView;
@@ -109,6 +135,8 @@ const scriptPreferenceHydration = window.ChakraScriptPreferenceHydration;
 const scriptSourceSettings = window.ChakraScriptSourceSettings;
 const carePreferenceHydration = window.ChakraCarePreferenceHydration;
 if (!journeyRouting) throw new Error('Journey routing module is unavailable.');
+if (!standardJourneySequence) throw new Error('Standard journey sequence module is unavailable.');
+if (!journeyTransitionStages) throw new Error('Journey transition stages module is unavailable.');
 if (!practiceModuleLoader) throw new Error('Guided practice module loader is unavailable.');
 if (!journeyVoiceProfile) throw new Error('Journey voice profile module is unavailable.');
 if (!sessionModeHydration) throw new Error('Session mode hydration module is unavailable.');
@@ -306,6 +334,17 @@ const meditationScreen = document.getElementById('meditation-screen');
 const breathingScreen = document.getElementById('breathing-screen');
 const icebreakerScreen = document.getElementById('icebreaker-screen');
 const newcomerTutorialScreen = document.getElementById('newcomer-tutorial-screen');
+
+function getShotSessionDependencies() {
+    return {
+        state, alert: message => window.alert(message), t, document, getLanguageConfig, fetch, normalizeSleepStages,
+        shotChakraOrder: SHOT_CHAKRA_ORDER, wakeLock, showScreen, meditationScreen, lobbyScreen, setText, journeyT,
+        logError: (...args) => console.error(...args), window
+    };
+}
+function getCareSessionDependencies() {
+    return { state, journeyT, showScreen, icebreakerScreen, document, localized };
+}
 const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
@@ -738,34 +777,7 @@ class AudioEngine {
     }
 
     schedulePleasureSpatialApproach(fromCurrent = false) {
-        if (!this.ctx || !this.spatialPleasurePanner || !this.pleasureSpatialPosition) return;
-        const now = this.ctx.currentTime;
-        const position = this.pleasureSpatialPosition;
-        const isSpatial = this.spatialMode !== 'off';
-        const profile = getPleasureAmbienceIntensityProfile();
-        const approachSeconds = profile.approachSeconds;
-
-        if (this.spatialPleasurePanner.positionZ) {
-            const nearZ = Number(position.nearZ ?? position.z) * profile.nearDistanceMultiplier;
-            const param = this.spatialPleasurePanner.positionZ;
-            if (fromCurrent && param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
-            else { param.cancelScheduledValues(now); param.setValueAtTime(fromCurrent ? param.value : Number(position.z), now); }
-            this.spatialPleasurePanner.positionZ.linearRampToValueAtTime(
-                isSpatial ? nearZ : -1,
-                now + (isSpatial ? approachSeconds : 1.2)
-            );
-        } else if (this.pleasureSpatialDepthGain) {
-            // StereoPanner fallback: approximate distance with a gentle gain
-            // approach when true 3D distance positioning is unavailable.
-            const target = isSpatial ? profile.fallbackNearGain : 1;
-            const param = this.pleasureSpatialDepthGain.gain;
-            if (fromCurrent && param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
-            else { param.cancelScheduledValues(now); param.setValueAtTime(fromCurrent ? param.value : (isSpatial ? PLEASURE_SPATIAL_FALLBACK_FAR_GAIN : 1), now); }
-            this.pleasureSpatialDepthGain.gain.linearRampToValueAtTime(
-                target,
-                now + (isSpatial ? approachSeconds : 1.2)
-            );
-        }
+        return audioPleasureAmbience.scheduleSpatialApproach(this, fromCurrent);
     }
 
     setSpatialMode(mode = DEFAULT_SPATIAL_MODE) {
@@ -813,16 +825,7 @@ class AudioEngine {
     }
 
     setVoiceTuning(warmth = 50, clarity = 50) {
-        if (!this.ctx || !this.voiceWarmthFilter || !this.voiceClarityFilter) return;
-        const now = this.ctx.currentTime;
-        const bounded = value => Number.isFinite(Number(value)) ? Math.max(0, Math.min(100, Number(value))) : 50;
-        const warmthGain = ((bounded(warmth) - 50) / 50) * 3;
-        const clarityGain = ((bounded(clarity) - 50) / 50) * 4;
-        for (const [param, target] of [[this.voiceWarmthFilter.gain, warmthGain], [this.voiceClarityFilter.gain, clarityGain]]) {
-            if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
-            else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
-            param.linearRampToValueAtTime(target, now + 0.25);
-        }
+        return audioVoiceEffects.setVoiceTuning(this, warmth, clarity);
     }
 
     setConvolverActive(key, input, convolver, output, active, tailSeconds = 0) {
@@ -836,23 +839,7 @@ class AudioEngine {
     }
 
     setVoiceEcho(mode = 'off') {
-        if (!this.ctx || !this.voiceEchoSend || !this.voiceEchoDelay || !this.voiceEchoConvolver || !this.voiceEchoWetGain) return;
-        const voiceEchoSettings = {
-            off: { wet: 0, filter: 3200 },
-            light: { wet: 0.12, filter: 3000 },
-            spacious: { wet: 0.18, filter: 3600 }
-        };
-        const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
-        const settings = voiceEchoSettings[requestedMode];
-        this.setConvolverActive('voice', this.voiceEchoDelay, this.voiceEchoConvolver, this.voiceEchoFilter, settings.wet > 0 && this.voicePlaybackActive === true, VOICE_REVERB_TAIL_SECONDS + (this.voiceExitFade || 0) + 0.3);
-        const now = this.ctx.currentTime;
-        [this.voiceEchoSend.gain, this.voiceEchoWetGain.gain, this.voiceEchoFilter.frequency].forEach(param => {
-            if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
-            else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
-        });
-        this.voiceEchoSend.gain.linearRampToValueAtTime(settings.wet > 0 ? 1 : 0, now + 0.25);
-        this.voiceEchoWetGain.gain.linearRampToValueAtTime(settings.wet, now + 0.25);
-        this.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
+        return audioVoiceEffects.setVoiceEcho(this, mode, VOICE_REVERB_TAIL_SECONDS);
     }
 
     setMusicEcho(mode = 'light') {
@@ -860,55 +847,11 @@ class AudioEngine {
     }
 
     toggleEyesCloseMode(enabled) {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-
-        // Dynamic Distortion Control: Swap curves to prevent "buzzing" from soft clipping
-        if (enabled) {
-            this.exciter.curve = new Float32Array([-1, 1]); // Clean
-        } else {
-            this.exciter.curve = this.makeDistortionCurve(0.002); // Studio Polish
-        }
-
-        // Target: Deep Smoothness. Lowered cutoff from 1200Hz to 1000Hz for "Closed" mode.
-        const targetFreq = enabled ? 1000 : 20000;
-        this.eyesCloseFilter.frequency.exponentialRampToValueAtTime(targetFreq, now + 2.0);
-
-        // Recede Instruments: Reduce BG music gain by 40% (was 30%) and tighten its dedicated LPF
-        const bgSmoothGainTarget = enabled ? 0.6 : 1.0;
-        const bgLPFTarget = enabled ? 600 : (state.audioFilters ? 1200 : 20000); // 600Hz removes all percussion "bite"
-        
-        // Anti-Buzz Notch: Widened and deepened to remove the "edge"
-        const bgNotchGain = enabled ? -24 : -12; 
-        // Biquad gain is a signed decibel parameter. Exponential ramps cannot
-        // cross zero or target a negative value, so use a linear transition.
-        this.bgMusicEQ.gain.cancelScheduledValues(now);
-        this.bgMusicEQ.gain.setValueAtTime(this.bgMusicEQ.gain.value, now);
-        this.bgMusicEQ.gain.linearRampToValueAtTime(bgNotchGain, now + 2.5);
-        this.bgMusicEQ.frequency.exponentialRampToValueAtTime(3000, now + 2.5);
-        // Widen the notch (lower Q) to catch a broader range of buzzy harmonics
-        this.bgMusicEQ.Q.exponentialRampToValueAtTime(enabled ? 0.4 : 1.5, now + 2.0);
-
-        // Anti-Hum smoothing: Target the 450Hz resonant "humming" frequency
-        const hummingGain = enabled ? -15 : 0; // -15dB dip for the hum
-        this.bgMusicHumFilter.gain.linearRampToValueAtTime(hummingGain, now + 2.5);
-
-        this.bgMusicSmoothGain.gain.exponentialRampToValueAtTime(bgSmoothGainTarget, now + 2.5);
-        this.bgMusicLPF.frequency.exponentialRampToValueAtTime(bgLPFTarget, now + 2.5);
-
-        if (this.presenceFilter) {
-            const presenceGain = enabled ? -12 : -3; // More aggressive high-shelf cut
-            this.presenceFilter.gain.linearRampToValueAtTime(presenceGain, now + 2.0);
-        }
+        return audioComfortEffects.setEyesCloseMode(this, enabled, state);
     }
 
     toggleAudioFilters(enabled) {
-        if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const presenceGain = state.eyesCloseMode ? -6 : -3;
-        if (this.presenceFilter) this.presenceFilter.gain.linearRampToValueAtTime(enabled ? presenceGain : 0, now + 1.5);
-        if (this.bgMusicLPF) this.bgMusicLPF.frequency.linearRampToValueAtTime(enabled ? 1200 : 20000, now + 1.5);
-        if (this.mantraFilter) this.mantraFilter.frequency.linearRampToValueAtTime(enabled ? 2200 : 20000, now + 1.5);
+        return audioComfortEffects.setAudioFilters(this, enabled, state);
     }
 
     makeDistortionCurve(amount) {
@@ -994,227 +937,31 @@ class AudioEngine {
     }
 
     async loadPleasureAmbienceBuffers() {
-        const customUrl = normalizePleasureAmbienceUrl(state.pleasureAmbienceUrl);
-        const manifestKey = customUrl || 'manifest-primary';
-        if (this.pleasureManifest && this.pleasureManifestKey === manifestKey) return this.pleasureBuffers;
-
-        const response = await fetch(PLEASURE_AMBIENCE_MANIFEST_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status} - Failed to fetch ${PLEASURE_AMBIENCE_MANIFEST_URL}`);
-        const manifest = await response.json();
-        const entries = Array.isArray(manifest) ? manifest : manifest?.files;
-        if (!Array.isArray(entries)) throw new Error('Pleasure ambience manifest has no files array');
-
-        // The app reads the folder manifest instead of embedding individual
-        // filenames. The manifest accepts pleasure.mp3, pleasure-1.ogg,
-        // pleasure-2.wav, and any other browser-decodable audio extension.
-        const manifestPaths = entries
-            .map(entry => typeof entry === 'string' ? entry.trim() : '')
-            .map(entry => entry.replace(/^\.\/?/, '').replace(/^audio\//i, ''))
-            .filter(entry => /^pleasure(?:-\d+)?\.[^./]+$/i.test(entry))
-            .map(entry => `audio/${entry}`);
-        const serialPaths = manifestPaths.filter(path => !/^audio\/pleasure\.[^./]+$/i.test(path));
-        const paths = customUrl ? [customUrl, ...serialPaths] : manifestPaths;
-        this.pleasureManifest = [...new Set(paths)];
-        this.pleasureManifestKey = manifestKey;
-        if (!this.pleasureManifest.length) throw new Error('Pleasure ambience manifest contains no valid audio files');
-
-        try {
-            await Promise.all(this.pleasureManifest.map(async path => {
-                if (this.pleasureBuffers.has(path)) return;
-                try {
-                    const assetResponse = await fetch(path, { cache: 'no-store' });
-                    if (!assetResponse.ok) throw new Error(`HTTP ${assetResponse.status}`);
-                    const arrayBuffer = await assetResponse.arrayBuffer();
-                    const buffer = await this.ctx.decodeAudioData(arrayBuffer);
-                    if (buffer) this.pleasureBuffers.set(path, buffer);
-                } catch (error) {
-                    if (path === customUrl) throw new Error(`Unable to load the pleasure ambience URL (${error.message})`);
-                    // Manifest layers are optional local assets. A missing
-                    // optional file is normal while a contributor is moving
-                    // or replacing the local pleasure source, so do not turn
-                    // an expected 404 into console noise. Keep other decode,
-                    // network, and format failures visible for diagnosis.
-                    if (error?.message !== 'HTTP 404') {
-                        console.warn(`[Pleasure Ambience] skipped ${path}:`, error);
-                    }
-                }
-            }));
-        } catch (error) {
-            // Do not retain a partially decoded custom source. A later retry
-            // must fetch and validate the selected URL again.
-            this.pleasureManifest = null;
-            this.pleasureManifestKey = null;
-            this.pleasureBuffers.clear();
-            throw error;
-        }
-
-        if (!this.pleasureBuffers.size) throw new Error('No pleasure ambience files could be decoded');
-        return this.pleasureBuffers;
+        return audioPleasureAmbience.loadBuffers(this);
     }
 
     async loadPleasureAmbienceUrl(url) {
-        const rawUrl = String(url ?? '').trim();
-        const normalizedUrl = normalizePleasureAmbienceUrl(rawUrl);
-        if (rawUrl && !normalizedUrl) {
-            throw new Error('Please enter a valid HTTP or HTTPS audio URL.');
-        }
-
-        const previousUrl = state.pleasureAmbienceUrl;
-        const previousAmbienceEnabled = state.moodRelaxationIntentionEnabled;
-        const shouldRestart = previousAmbienceEnabled && this.ctx && !state.noFrequencyMode;
-        this.stopPleasureAmbience();
-        this.pleasureManifest = null;
-        this.pleasureManifestKey = null;
-        this.pleasureBuffers.clear();
-        this.pleasureAudioAvailable = null;
-        state.pleasureAmbienceUrl = normalizedUrl;
-
-        try {
-            // Decode the candidate before persisting it. This keeps a bad URL
-            // from becoming the source used by the next journey.
-            if (!this.isInitialized) await this.init();
-            await this.loadPleasureAmbienceBuffers();
-            this.pleasureAudioAvailable = true;
-            if (normalizedUrl) localStorage.setItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY, normalizedUrl);
-            else localStorage.removeItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY);
-            syncPleasureAmbienceControl();
-            if (shouldRestart) {
-                const started = await this.startPleasureAmbience();
-                if (!started) throw new Error('The pleasure ambience could not start. Check the URL and its CORS permissions.');
-            }
-            return normalizedUrl;
-        } catch (error) {
-            // Restore the previous preference and, when possible, the active
-            // ambience so an unsuccessful edit does not disrupt a journey.
-            state.pleasureAmbienceUrl = previousUrl;
-            if (previousUrl) localStorage.setItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY, previousUrl);
-            else localStorage.removeItem(PLEASURE_AMBIENCE_URL_STORAGE_KEY);
-            this.stopPleasureAmbience();
-            this.pleasureManifest = null;
-            this.pleasureManifestKey = null;
-            this.pleasureBuffers.clear();
-            this.pleasureAudioAvailable = null;
-            state.moodRelaxationIntentionEnabled = previousAmbienceEnabled;
-            if (shouldRestart) {
-                try {
-                    await this.loadPleasureAmbienceBuffers();
-                    this.pleasureAudioAvailable = true;
-                    await this.startPleasureAmbience();
-                } catch (restoreError) {
-                    this.pleasureAudioAvailable = false;
-                    console.warn('[Pleasure Ambience] previous source could not be restored:', restoreError);
-                }
-            }
-            syncPleasureAmbienceControl();
-            throw error;
-        }
+        return audioPleasureAmbience.loadUrl(this, url);
     }
 
     async startPleasureAmbience() {
-        if (!state.moodRelaxationIntentionEnabled || state.noFrequencyMode || !this.ctx || !this.pleasureGain) return false;
-        if (this.pleasureAudioAvailable === false) return false;
-        // Reapply the session profile whenever a journey stage asks for the
-        // ambience. All manifest layers share this same processing bus, so
-        // blur remains consistent for the complete journey and after a
-        // stop/restart without touching narration, mantra, or frequencies.
-        if (this.pleasureLoops.some(loop => loop.isRunning)) {
-            this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
-            return true;
-        }
-
-        const generation = ++this.pleasureGeneration;
-        try {
-            await this.loadPleasureAmbienceBuffers();
-            this.pleasureAudioAvailable = true;
-            syncPleasureAmbienceControl();
-            if (generation !== this.pleasureGeneration || !state.moodRelaxationIntentionEnabled || state.noFrequencyMode) return false;
-
-            this.pleasureLoops = [...this.pleasureBuffers.values()].map(buffer => {
-                const loop = new SeamlessLoop(
-                    this.ctx,
-                    buffer,
-                    this.pleasureSourceGain,
-                    1.0,
-                    PLEASURE_AMBIENCE_FADE_SECONDS
-                );
-                loop.start();
-                return loop;
-            });
-            this.setPleasureAmbienceIntensity(state.pleasureAmbienceIntensity);
-            return this.pleasureLoops.length > 0;
-        } catch (error) {
-            if (generation === this.pleasureGeneration) {
-                this.pleasureAudioAvailable = false;
-                syncPleasureAmbienceControl();
-                console.warn('[Pleasure Ambience] audio could not start:', error);
-            }
-            return false;
-        }
+        return audioPleasureAmbience.start(this);
     }
 
     stopPleasureAmbience(fadeTime = PLEASURE_AMBIENCE_FADE_SECONDS) {
-        this.setConvolverActive('pleasure', this.pleasureBlurFilter, this.pleasureBlurConvolver, this.pleasureBlurWetGain, false, Math.max(0, fadeTime) + 1);
-        this.pleasureGeneration += 1;
-        this.pleasureLoops.forEach(loop => loop.stop(Math.max(0, fadeTime)));
-        this.pleasureLoops = [];
-        // A stopped loop may otherwise leave its decoded AudioBuffer available
-        // for the next journey, causing a moved or replaced local file to keep
-        // playing until a full page reload.
-        this.pleasureManifest = null;
-        this.pleasureManifestKey = null;
-        this.pleasureBuffers.clear();
+        return audioPleasureAmbience.stop(this, fadeTime);
     }
 
     setPleasureAmbienceGain(gain) {
-        const level = clampPleasureAmbienceGain(gain);
-        if (!this.ctx || !this.pleasureGain || !this.pleasureEnhancerGain) return level;
-        const profile = getPleasureAmbienceIntensityProfile();
-        const now = this.ctx.currentTime;
-        this.pleasureGain.gain.cancelScheduledValues(now);
-        this.pleasureGain.gain.setValueAtTime(this.pleasureGain.gain.value, now);
-        this.pleasureGain.gain.linearRampToValueAtTime(level, now + 0.5);
-        this.pleasureEnhancerGain.gain.cancelScheduledValues(now);
-        this.pleasureEnhancerGain.gain.setValueAtTime(this.pleasureEnhancerGain.gain.value, now);
-        this.pleasureEnhancerGain.gain.linearRampToValueAtTime(
-            level * profile.harmonicMix,
-            now + 0.5
-        );
-        return level;
+        return audioPleasureAmbience.setGain(this, gain);
     }
 
     setPleasureAmbienceBlur(enabled = true) {
-        const blurEnabled = Boolean(enabled);
-        if (!this.ctx || !this.pleasureBlurDryGain || !this.pleasureBlurWetGain) return blurEnabled;
-        const profile = getPleasureAmbienceIntensityProfile();
-        const blurMix = getPleasureBlurMix(blurEnabled);
-        const now = this.ctx.currentTime;
-        this.setConvolverActive('pleasure', this.pleasureBlurFilter, this.pleasureBlurConvolver, this.pleasureBlurWetGain, blurMix.wet > 0 && this.pleasureLoops.some(loop => loop.isRunning), 2.2);
-        if (this.pleasureBlurFilter) {
-            this.pleasureBlurFilter.frequency.cancelScheduledValues(now);
-            this.pleasureBlurFilter.frequency.setValueAtTime(this.pleasureBlurFilter.frequency.value, now);
-            this.pleasureBlurFilter.frequency.linearRampToValueAtTime(profile.blurCutoff, now + 1.2);
-        }
-        this.pleasureBlurDryGain.gain.cancelScheduledValues(now);
-        this.pleasureBlurDryGain.gain.setValueAtTime(this.pleasureBlurDryGain.gain.value, now);
-        this.pleasureBlurDryGain.gain.linearRampToValueAtTime(
-            blurMix.dry,
-            now + 1.2
-        );
-        this.pleasureBlurWetGain.gain.cancelScheduledValues(now);
-        this.pleasureBlurWetGain.gain.setValueAtTime(this.pleasureBlurWetGain.gain.value, now);
-        this.pleasureBlurWetGain.gain.linearRampToValueAtTime(
-            blurMix.wet,
-            now + 1.2
-        );
-        return blurEnabled;
+        return audioPleasureAmbience.setBlur(this, enabled);
     }
 
     setPleasureAmbienceIntensity(intensity = 'gentle') {
-        state.pleasureAmbienceIntensity = normalizePleasureAmbienceIntensity(intensity);
-        this.setPleasureAmbienceGain(state.pleasureAmbienceGain);
-        this.setPleasureAmbienceBlur(state.pleasureAmbienceBlur);
-        if (this.pleasureLoops.some(loop => loop.isRunning)) this.schedulePleasureSpatialApproach();
-        return state.pleasureAmbienceIntensity;
+        return audioPleasureAmbience.setIntensity(this, intensity);
     }
 
     fadeInBackgroundMusic(duration = 4, isDucked = false) {
@@ -1326,35 +1073,7 @@ class AudioEngine {
     }
 
     playSingingBowl() {
-        // A muted bell is an intentional setting, not an audio error. Avoid
-        // creating oscillators whose exponential envelope would target zero.
-        if (!this.ctx || state.noFrequencyMode || state.volBell <= 0) return;
-        const now = this.ctx.currentTime;
-        const baseFreq = 180;
-        const partials = [1, 2.8, 5.0, 8.1, 12.5];
-        partials.forEach((ratio) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            const filter = this.ctx.createBiquadFilter();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(baseFreq * ratio, now);
-            filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(baseFreq * ratio, now);
-            filter.Q.setValueAtTime(50, now);
-            gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(state.volBell / partials.length, now + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 8);
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.bellGain); // Use dedicated bell gain
-            osc.start(now);
-            osc.stop(now + 8.1);
-            osc.onended = () => {
-                osc.disconnect();
-                filter.disconnect();
-                gain.disconnect();
-            };
-        });
+        return audioTonePlayback.playSingingBowl(this, state);
     }
 }
 
@@ -1595,206 +1314,29 @@ class MeditationController {
     }
 
     async runSleepJourney() {
-        if (!state.advancedFeaturesUnlocked) return;
-        if (this.isStarting || this.isMeditationActive) return;
-        this.showDndReminderIfNeeded();
-        if (!this.scripts || this.scriptsLanguage !== state.language) {
-            if (state.scriptSource === 'custom' && state.customScript) {
-                this.scripts = state.customScript;
-            } else {
-                const contentSource = getLanguageConfig().contentSource || 'scripts.json';
-                const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
-                this.scripts = await response.json();
-            }
-            this.scriptsLanguage = state.language;
-        }
-        const sleepStages = normalizeSleepStages(this.scripts);
-        const startBtn = document.getElementById('start-meditation');
-        if (startBtn) {
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.5';
-        }
-        this.isMeditationActive = true;
-        this.isPaused = false;
-        this.isHighEnergy = false;
-        this.isHypnosisJourney = false;
-        this.sessionStartedAt = Date.now();
-        showScreen(meditationScreen);
-        this.startSessionCountdown(this.getSessionDurationMs());
-
-        const controls = document.getElementById('controls');
-        if (controls) controls.classList.remove('hidden');
-        setText('pause-meditation', 'II');
-        setText('mantra-display', journeyT('ui.sleepMode'));
-        // Sleep mode has no spoken narration; keep the narration-only ticker
-        // hidden while the visual guidance, music, and sleep tones run.
-        this.visual.startPulsing('#355c7d');
-        await this.audio.startBackgroundMusic();
-        void this.audio.startPleasureAmbience();
-        this.audio.fadeInBackgroundMusic(10, 0.32);
-
-        const stageDurationMs = state.timeSleepStage * 60 * 1000;
-        for (const [index, stage] of sleepStages.entries()) {
-            if (!this.isMeditationActive) return;
-            setText('mantra-display', journeyT(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
-            this.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
-
-            let remaining = stageDurationMs;
-            while (remaining > 0 && this.isMeditationActive) {
-                const step = Math.min(1000, remaining);
-                await this.pauseAwareSleep(step);
-                if (!this.isPaused) {
-                    remaining -= step;
-                }
-            }
-            this.stopStageDrone();
-            if (index < sleepStages.length - 1) await this.pauseAwareSleep(3000);
-        }
-
-        if (this.isMeditationActive) {
-            this.audio.fadeOutBackgroundMusic(12);
-            await this.pauseAwareSleep(12000);
-            if (this.isMeditationActive) this.finish();
-        }
+        return sleepJourney.run(this, {
+            state,
+            getLanguageConfig,
+            fetch,
+            normalizeSleepStages,
+            document,
+            showScreen,
+            meditationScreen,
+            setText,
+            journeyT
+        });
     }
 
     async runShot(type, customFrequency) {
-        if (!state.advancedFeaturesUnlocked) return;
-        if (this.isStarting || this.isMeditationActive || this.isShotActive) return;
-        if (state.noFrequencyMode) {
-            alert(t('ui.noFrequencyShotsUnavailable'));
-            return;
-        }
-        if (type === 'custom' && (!Number.isFinite(customFrequency) || customFrequency <= 0 || customFrequency > 20000)) {
-            alert(t('ui.shotInvalidFrequency'));
-            return;
-        }
-        this.isShotActive = true;
-        const shotToggle = document.getElementById('shots-toggle');
-        if (shotToggle) shotToggle.disabled = true;
-        document.getElementById('shot-type-select')?.setAttribute('disabled', 'true');
-        document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
-        const startBtn = document.getElementById('start-meditation');
-        if (startBtn) { startBtn.disabled = true; startBtn.style.opacity = '0.5'; }
-
-        try {
-            if (!this.scripts || this.scriptsLanguage !== state.language) {
-                const contentSource = getLanguageConfig().contentSource || 'scripts.json';
-                const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
-                this.scripts = await response.json();
-                this.scriptsLanguage = state.language;
-            }
-            await this.audio.init();
-            this.audio.stopBackgroundMusic();
-            this.audio.stopMantraTrack();
-            this.isMeditationActive = true;
-            this.sessionStartedAt = Date.now();
-            showScreen(meditationScreen);
-            document.getElementById('controls')?.classList.remove('hidden');
-            setText('mantra-display', journeyT('ui.shotsMode'));
-            // Shots intentionally have no narration, so they must not leave
-            // a looping narration marquee on screen.
-            this.visual.startPulsing('#7c3aed');
-
-            let stages;
-            if (type === 'meditation') {
-                stages = SHOT_CHAKRA_ORDER.map(key => ({ key, frequency: Number(this.scripts[key]?.frequency) }));
-            } else if (type === 'sleep') {
-                stages = normalizeSleepStages(this.scripts);
-            } else {
-                const singleFrequencies = {
-                    high_energy: Number(this.scripts.high_energy?.frequency),
-                    anesthetic: Number(this.scripts.sound_shots?.anesthetic?.frequency),
-                    mood_relaxation: Number(this.scripts.sound_shots?.mood_relaxation?.frequency),
-                    custom: customFrequency
-                };
-                stages = [{ key: type, frequency: singleFrequencies[type] }];
-            }
-            if (stages.some(stage => !Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000)) {
-                throw new Error('The selected shot has no valid script frequency.');
-            }
-            const activeMs = (state.timeShot * 1000) / stages.length;
-            const intervalMs = type === 'sleep' ? Number(this.scripts.sleep_mode?.intervalSeconds || 2) * 1000 : 2000;
-            this.startSessionCountdown((state.timeShot * 1000) + Math.max(0, stages.length - 1) * intervalMs);
-            for (const [index, stage] of stages.entries()) {
-                if (!this.isMeditationActive) return;
-                const stageLabelPath = type === 'sleep'
-                    ? `ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`
-                    : `ui.${stage.key === 'thirdeye' ? 'thirdEye' : stage.key}`;
-                const stageLabel = stage.key === 'high_energy'
-                    ? t('ui.highEnergyShot')
-                    : stage.key === 'anesthetic'
-                        ? t('ui.anestheticShot')
-                        : stage.key === 'mood_relaxation'
-                            ? t('ui.moodRelaxationShot')
-                            : stage.key === 'custom'
-                                ? t('ui.customShot')
-                                : t(stageLabelPath);
-                setText('mantra-display', stageLabel === stageLabelPath ? stage.key : journeyT(stageLabelPath));
-                this.audio.startFrequencyShot(stage.frequency);
-                let remaining = activeMs;
-                while (remaining > 0 && this.isMeditationActive) {
-                    const step = Math.min(100, remaining);
-                    await this.pauseAwareSleep(step);
-                    if (!this.isPaused) {
-                        remaining -= step;
-                    }
-                }
-                this.audio.stopFrequencyShot();
-                if (index < stages.length - 1) await this.pauseAwareSleep(intervalMs);
-            }
-            if (this.isMeditationActive) this.finishShot();
-        } catch (error) {
-            console.error('Shot activation failed:', error);
-            alert(`Shot activation failed: ${error.message}`);
-            this.stopShot();
-        }
+        return shotSession.run(this, type, customFrequency, getShotSessionDependencies());
     }
 
     finishShot() {
-        // A completed Shot always resets the page. Disable the controls first
-        // so the success path cannot leave an active Shot affordance behind
-        // while the browser begins the safety reset.
-        const shotToggle = document.getElementById('shots-toggle');
-        if (shotToggle) shotToggle.disabled = true;
-        document.getElementById('shot-type-select')?.setAttribute('disabled', 'true');
-        document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
-        this.audio.stopFrequencyShot();
-        this.isMeditationActive = false;
-        this.isShotActive = false;
-        this.sessionStartedAt = null;
-        this.visual.stop();
-        this.audio.stopBackgroundMusic();
-        this.audio.stopVisualizationAmbience(2);
-        this.audio.stopMantraTrack();
-        this.stopSessionCountdown();
-        wakeLock.release();
-        document.body.classList.remove('sleep-mode-active');
-        document.getElementById('controls')?.classList.add('hidden');
-        showScreen(lobbyScreen);
-        const startBtn = document.getElementById('start-meditation');
-        if (startBtn) { startBtn.disabled = false; startBtn.style.opacity = '1'; }
-        window.location.reload();
+        return shotSession.finish(this, getShotSessionDependencies());
     }
 
     stopShot() {
-        if (!this.isShotActive && !this.isMeditationActive) return;
-        this.audio.stopFrequencyShot();
-        this.isMeditationActive = false;
-        this.isShotActive = false;
-        this.sessionStartedAt = null;
-        this.visual.stop();
-        this.audio.stopBackgroundMusic();
-        this.audio.stopVisualizationAmbience(2);
-        this.audio.stopMantraTrack();
-        this.stopSessionCountdown();
-        wakeLock.release();
-        document.getElementById('controls')?.classList.add('hidden');
-        showScreen(lobbyScreen);
-        const startBtn = document.getElementById('start-meditation');
-        if (startBtn) { startBtn.disabled = false; startBtn.style.opacity = '1'; }
+        return shotSession.stop(this, getShotSessionDependencies());
     }
 
     shouldShowNewcomerTutorial() {
@@ -2008,79 +1550,17 @@ class MeditationController {
     }
 
     async startExperiment(activity) {
-        if (['perineal', 'bath', 'assisted-bath'].includes(activity) && !state.advancedFeaturesUnlocked) return;
-        if (this.isStarting || this.isMeditationActive) return;
-        this.isStarting = true;
-        try {
-            const durationInput = document.getElementById('experiment-core-duration');
-            this.experimentDuration = durationInput ? Number(durationInput.value) : null;
-            if (!this.scripts || this.scriptsLanguage !== state.language) {
-                if (state.scriptSource === 'custom' && state.customScript) this.scripts = state.customScript;
-                else {
-                    const contentSource = getLanguageConfig().contentSource || 'scripts.json';
-                    const response = await fetch(contentSource + (contentSource.includes('?') ? '&' : '?') + 'v=' + Date.now());
-                    if (!response.ok) throw new Error(`Unable to load language content (${response.status})`);
-                    this.scripts = await response.json();
-                }
-                this.scriptsLanguage = state.language;
-            }
-            await this.audio.init();
-            await this.audio.startBackgroundMusic();
-            if (!state.bgMusicMode) void this.audio.startPleasureAmbience();
-            this.isMeditationActive = true;
-            this.isExperimentActive = true;
-            this.isPaused = false;
-            this.sessionStartedAt = Date.now();
-            const durationUnit = durationInput?.dataset.unit || 'min';
-            const experimentDurationMs = durationUnit === 'seconds'
-                ? Number(this.experimentDuration) * 1000
-                : Number(this.experimentDuration) * 60 * 1000;
-            this.startSessionCountdown(experimentDurationMs);
-            try { await wakeLock.request(); } catch (error) {}
-            document.getElementById('controls')?.classList.remove('hidden');
-            setText('pause-meditation', 'II');
-            this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS);
-
-            if (activity.startsWith('chakra:')) {
-                const key = activity.slice('chakra:'.length);
-                this.chakraOrder = [key];
-                showScreen(meditationScreen);
-                await this.meditateOnChakra(this.scripts[key], key);
-            } else if (activity === 'hrim') {
-                this.chakraOrder = ['high_energy'];
-                showScreen(meditationScreen);
-                await this.meditateOnChakra(this.scripts.high_energy, 'high_energy');
-            } else if (activity === 'box') await this.runBoxBreathing();
-            else if (activity === 'hooponopono') { showScreen(meditationScreen); await this.runHooponopono(); }
-            else if (activity === 'corpse') await this.runCorpsePose();
-            else if (activity === 'perineal') await this.runPerinealCare();
-            else if (activity === 'bath') await this.runBathSession();
-            else if (activity === 'assisted-bath') await this.runAssistedBathing();
-
-            if (this.isMeditationActive) this.stopExperiment();
-        } catch (error) {
-            console.error('Experiment activity failed:', error);
-            alert(`Experiment activity failed: ${error.message}`);
-            this.stopExperiment();
-        } finally { this.isStarting = false; }
+        return experimentSession.start(this, activity, {
+            state, document, fetch, getLanguageConfig, wakeLock, setText, showScreen, meditationScreen,
+            backgroundMusicEntryFadeSeconds: BACKGROUND_MUSIC_ENTRY_FADE_SECONDS,
+            logError: (...args) => console.error(...args),
+            alert: message => window.alert(message),
+            window, piperTTS, experimentScreen
+        });
     }
 
     stopExperiment() {
-        this.isMeditationActive = false;
-        this.isExperimentActive = false;
-        this.experimentDuration = null;
-        window.speechSynthesis.cancel();
-        piperTTS.cancel('experiment stopped', { fadeSeconds: 2 });
-        this.stopIntentionFrequency();
-        this.stopStageDrone();
-        this.audio.stopMantraTrack();
-        this.audio.stopBackgroundMusic();
-        this.audio.stopPleasureAmbience();
-        this.visual.stop();
-        this.stopSessionCountdown();
-        wakeLock.release();
-        document.getElementById('controls')?.classList.add('hidden');
-        showScreen(experimentScreen);
+        return experimentSession.stop(this, { window, piperTTS, wakeLock, document, showScreen, experimentScreen });
     }
 
     async runPreparationStages({ includeBox = false, highEnergy = false } = {}) {
@@ -2309,57 +1789,19 @@ class MeditationController {
     }
 
     async runBathStage(scriptKey, durationSeconds) {
-        if (!this.isMeditationActive) return;
-
-        showScreen(icebreakerScreen);
-        const title = document.getElementById('icebreaker-title');
-        const subtitle = document.getElementById('icebreaker-subtitle');
-        const timer = document.getElementById('icebreaker-timer');
-
-        const script = this.scripts[scriptKey];
-        title.textContent = localized(script.title);
-        subtitle.textContent = journeyT('ui.purification');
-
-        await this.narrate(localized(script.intro), false);
-        await this.narrate(localized(script.instructions), false);
-
-        let remaining = durationSeconds;
-        const reminderSecond = 60;
-
-        while (remaining > 0) {
-            if (!this.isMeditationActive) return;
-            if (!this.isPaused) {
-                if (timer) timer.textContent = Math.floor(remaining / 60) + ":" + (remaining % 60).toString().padStart(2, '0');
-                
-                if (remaining === reminderSecond) {
-                    this.narrateSoft(localized(script.reminder));
-                }
-                remaining--;
-            }
-            await this.pauseAwareSleep(1000);
-        }
-
-        if (!this.isMeditationActive) return false;
-        return this.runGuideControlledTransition({
-            durationSeconds: 0,
-            showTimer: false,
-            title: journeyT('ui.guideReadyForNextSession'),
-            subtitle: journeyT('ui.guideReadyForNextSessionGuidance'),
-            readyText: journeyT('ui.guideReadyForNextSessionGuidance'),
-            continueLabel: journeyT('ui.proceedToNextSession')
-        });
+        return careSession.runBathStage(this, scriptKey, durationSeconds, getCareSessionDependencies());
     }
 
     async runBathSession() {
-        return this.runBathStage('bath_session', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeBath);
+        return careSession.runBathSession(this, getCareSessionDependencies());
     }
 
     async runPerinealCare() {
-        return this.runBathStage('perineal_care', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timePerinealCare);
+        return careSession.runPerinealCare(this, getCareSessionDependencies());
     }
 
     async runAssistedBathing() {
-        return this.runBathStage('assisted_bathing', this.isExperimentActive && this.experimentDuration != null ? this.experimentDuration : state.timeAssistedBathing);
+        return careSession.runAssistedBathing(this, getCareSessionDependencies());
     }
 
     async runBackgroundMusicOnly() {
@@ -2400,153 +1842,13 @@ class MeditationController {
     }
 
     async runGuideControlledTransition({ durationSeconds, title, subtitle, readyText, continueLabel, showTimer = true }) {
-        const restButton = document.getElementById('guide-controlled-continue');
-        const titleEl = document.getElementById('icebreaker-title');
-        const subtitleEl = document.getElementById('icebreaker-subtitle');
-        const timerEl = document.getElementById('icebreaker-timer');
-
-        if (!restButton || !titleEl || !subtitleEl || !timerEl) return false;
-
-        showScreen(icebreakerScreen);
-        // Icebreaker is also used for guide-controlled waiting. Clear the
-        // previous narration so an empty marquee never appears as stale UI.
-        restButton.hidden = true;
-        restButton.disabled = true;
-        titleEl.textContent = title;
-        subtitleEl.textContent = subtitle;
-        timerEl.hidden = !showTimer;
-
-        for (let remaining = Math.max(0, Math.round(durationSeconds)); remaining > 0; remaining--) {
-            if (!this.isMeditationActive) return false;
-            if (showTimer) timerEl.textContent = formatClockDuration(remaining * 1000);
-            await this.pauseAwareSleep(1000);
-        }
-
-        if (!this.isMeditationActive) return false;
-        if (showTimer) timerEl.textContent = formatClockDuration(0);
-        subtitleEl.textContent = readyText;
-        restButton.textContent = continueLabel;
-        restButton.disabled = false;
-        restButton.hidden = false;
-        restButton.focus();
-
-        return new Promise(resolve => {
-            const complete = (shouldContinue) => {
-                restButton.removeEventListener('click', onContinue);
-                restButton.hidden = true;
-                restButton.disabled = true;
-                if (this.guideControlledResolve === complete) this.guideControlledResolve = null;
-                resolve(shouldContinue);
-            };
-            const onContinue = () => {
-                if (this.isMeditationActive && !this.isPaused) complete(true);
-            };
-            this.guideControlledResolve = complete;
-            restButton.addEventListener('click', onContinue);
+        return guideControlledTransition.run(this, { durationSeconds, title, subtitle, readyText, continueLabel, showTimer }, {
+            document, showScreen, icebreakerScreen, formatClockDuration
         });
     }
 
     async runYogaSession() {
-        if (!this.isMeditationActive) return;
-
-        // Yoga keeps its own standard Bath Session and rest-before-yoga stage.
-        // Intimate care runs separately from the Lobby.
-        if (state.corpsePoseEnabled) await this.runCorpsePose();
-        if (state.bathSessionEnabled && this.isMeditationActive) {
-            if (!await this.runBathSession()) return;
-
-            const shouldBeginYoga = await this.runGuideControlledTransition({
-                durationSeconds: timing('transitions', 'bathToYogaRest'),
-                title: journeyT('ui.bathToYogaRestTitle'),
-                subtitle: journeyT('ui.bathToYogaRestGuidance'),
-                readyText: journeyT('ui.restReadyToContinue'),
-                continueLabel: journeyT('ui.beginYogaAfterRest')
-            });
-            if (!shouldBeginYoga) return;
-        }
-
-        // Transition Screen
-        showScreen(icebreakerScreen);
-        const title = document.getElementById('icebreaker-title');
-        const subtitle = document.getElementById('icebreaker-subtitle');
-        const timer = document.getElementById('icebreaker-timer');
-
-        title.textContent = journeyT('ui.yoga');
-        subtitle.textContent = journeyT('ui.yogaSubtitle');
-        
-        // Grounding Drone for Yoga (136.1 Hz - OM frequency)
-        // Use the shared fixed exposure window; Yoga must not leave a drone
-        // running for the length of the entire session.
-        this.startTimedDrone(136.1, 3, state.timeYogaPose, state.droneDurationMode);
-        // Keep music at 30% deep smooth level
-        this.audio.fadeInBackgroundMusic(8, 0.30);
-
-        // Intro & Preparation
-        await this.narrate(localized(this.scripts.yoga.intro), false);
-        await this.narrate(localized(this.scripts.yoga.preparation), false);
-
-        // Prep Countdown
-        for (let i = state.timeYogaPrep; i > 0; i--) {
-            if (!this.isMeditationActive) return;
-            if (timer) timer.textContent = i;
-            await this.pauseAwareSleep(1000);
-        }
-
-        // Switch to main display for poses
-        showScreen(meditationScreen);
-        const symbolEl = document.getElementById('chakra-symbol');
-        const mantraEl = document.getElementById('mantra-display');
-        
-        // Aura for Yoga
-        const aura = document.getElementById('aura-bg');
-        aura.style.background = 'radial-gradient(circle at center, #FFD70022, transparent)';
-        aura.style.opacity = '1';
-
-        const yogaPoses = this.scripts.yoga.poses.filter(p => state.selectedYogaPoses.includes(p.id));
-
-        for (const pose of yogaPoses) {
-            if (!this.isMeditationActive) break;
-
-            // Display Pose Name
-            mantraEl.textContent = localized(pose, 'name');
-            mantraEl.style.color = "#FFD700"; // Golden Yoga Color
-            
-            // Set pose-specific image
-            const imageMap = {
-                'balasana': 'symbols/Balasana.png',
-                'ananda_balasana': 'symbols/ananda_balasana.png',
-                'vrikshasana': 'symbols/Vrikshasana.png',
-                'adho_mukha_svanasana': 'symbols/Downward_dog.png',
-                'marjaryasana': 'symbols/Marjaryasana.png'
-            };
-            visual.setSymbolImage(imageMap[pose.id] || "symbols/root.png", symbolEl);
-            symbolEl.style.opacity = "0.9"; // Clearer visibility for pose instruction
-
-            // Explain Pose
-            const desc = localized(pose, 'desc');
-            await this.narrate(desc, false);
-
-            // Hold Timer
-            let remaining = state.timeYogaPose;
-            while (remaining > 0) {
-                if (!this.isMeditationActive) break;
-                if (!this.isPaused) {
-                    remaining--;
-                }
-                await this.pauseAwareSleep(1000);
-            }
-            
-            if (this.isMeditationActive) {
-                this.narrateSoft(localized(this.scripts.yoga.next_pose_prompt));
-                await this.pauseAwareSleep(timing('transitions', 'yogaPoseGap') * 1000);
-            }
-        }
-
-        // Final Settle
-        if (this.isMeditationActive) {
-            await this.narrate(localized(this.scripts.yoga.session_complete), false);
-            await this.pauseAwareSleep(timing('transitions', 'yogaFinalSettle') * 1000);
-        }
+        return yogaSession.run(this, { state, timing, journeyT, showScreen, icebreakerScreen, meditationScreen, document, localized, visual });
     }
 
     shouldUsePiper() {
@@ -2554,94 +1856,14 @@ class MeditationController {
     }
 
     async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal', transition = 'none') {
-        if (!text || !this.isMeditationActive && !fadeOut) return;
-        if (!keepSilence) this.audio.fadeInBackgroundMusic(6, true);
-        if (this.audio.voiceCarveFilter) {
-            this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.setValueAtTime(this.audio.voiceCarveFilter.gain.value, this.audio.ctx.currentTime);
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(
-                state.eyesCloseMode ? 0.75 : 1.0,
-                this.audio.ctx.currentTime + 1.2
-            );
-        }
-        const leadIn = pacing === 'hrim'
-            ? timing('narration', 'hrimLeadIn', timing('narration', 'piperLeadIn'))
-            : timing('narration', 'piperLeadIn');
-        const sentenceGap = pacing === 'hrim'
-            ? timing('narration', 'hrimSentenceGap', timing('narration', 'sentenceGap'))
-            : timing('narration', 'sentenceGap');
-        await this.pauseAwareSleep(leadIn * 1000);
-
-        const sentences = splitNarrationText(text);
-        // One current clip plus one future clip. Generate the next clip only
-        // within twelve seconds of the current clip ending, using audio duration.
-        const generation = piperTTS.generation;
-        const queueSynthesis = (sentence) => {
-            const job = piperTTS.prepare(sentence);
-            // A Stop action may cancel jobs that have not reached the active
-            // await yet. Attach a sink immediately so intentional cancellation
-            // cannot create unhandled promise errors.
-            job.catch(() => {});
-            return job;
-        };
-        let pending = sentences.length ? queueSynthesis(sentences[0]) : null;
-        let piperFailed = false;
-
-        for (let i = 0; i < sentences.length; i++) {
-            if (!this.isMeditationActive) break;
-            while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
-
-            if (piperFailed) {
-                await this.narrateBrowser(sentences[i], false, true, pacing, false);
-                continue;
-            }
-
-            try {
-                const buffer = await pending;
-                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
-                while (this.isPaused && this.isMeditationActive) await new Promise(resolve => setTimeout(resolve, 100));
-                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
-                if (i + 1 < sentences.length) {
-                    pending = (async () => {
-                        await this.pauseAwareSleep(Math.max(0, buffer.duration - 12) * 1000);
-                        if (!this.isMeditationActive || generation !== piperTTS.generation) throw new Error('Narration cancelled');
-                        return queueSynthesis(sentences[i + 1]);
-                    })();
-                    pending.catch(() => {});
-                }
-                const isFinalClip = i === sentences.length - 1;
-                await piperTTS.playBuffer(buffer, volumeScale, {
-                    // Ordinary sentence boundaries stay tight. Only a final
-                    // clip that hands off to mantra receives the longer,
-                    // audible exit fade.
-                    fadeOutSeconds: isFinalClip && (transition === 'mantra' || fadeOut)
-                        ? NARRATION_MANTRA_FADE_SECONDS
-                        : PIPER_CLIP_FADE_SECONDS
-                });
-            } catch (error) {
-                // Stopping a journey intentionally cancels Piper. Do not turn
-                // that cancellation into a new browser-speech utterance.
-                if (!this.isMeditationActive || generation !== piperTTS.generation) return;
-                piperFailed = true;
-                piperTTS.cancel('sentence failed');
-                setVoiceStatus(t('ui.piperFallback'), 'error');
-                await this.narrateBrowser(sentences[i], false, true, pacing, false);
-            }
-
-            if (i < sentences.length - 1) await this.pauseAwareSleep(sentenceGap * 1000);
-        }
-
-        if (fadeOut) {
-            await this.pauseAwareSleep(timing('narration', 'fadeOutPause') * 1000);
-            this.audio.fadeOutBackgroundMusic(4);
-        } else if (transition !== 'mantra') {
-            // Give the final spoken phrase room to settle before the caller
-            // introduces another narration block or visual instruction.
-            await this.pauseAwareSleep(timing('narration', 'exitGap') * 1000);
-        }
-        if (this.audio.voiceCarveFilter) {
-            this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(0, this.audio.ctx.currentTime + timing('narration', 'fadeOutPause'));
-        }
+        return piperNarration.run(this, text, fadeOut, keepSilence, volumeScale, pacing, transition, {
+            state, piperTTS, timing, splitNarrationText,
+            piperClipFadeSeconds: PIPER_CLIP_FADE_SECONDS,
+            mantraFadeSeconds: NARRATION_MANTRA_FADE_SECONDS,
+            setVoiceStatus,
+            fallbackMessage: t('ui.piperFallback'),
+            setTimeout
+        });
     }
 
     async narrateSoft(text) {
@@ -2700,45 +1922,11 @@ class MeditationController {
     }
 
     async runSequence({ complete = true } = {}) {
-        if (state.bgMusicMode) {
-            await this.runBackgroundMusicOnly();
-            return;
-        }
-
-        for (let i = 0; i < this.chakraOrder.length; i++) {
-            const key = this.chakraOrder[i];
-            if (!this.isMeditationActive) break;
-            
-            await this.meditateOnChakra(this.scripts[key], key);
-
-            const isLastChakra = (i === this.chakraOrder.length - 1);
-            if (!isLastChakra && this.isMeditationActive) await this.handleInterval();
-        }
-        if (!complete) return;
-        if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runHooponopono();
-        if (this.isMeditationActive && getChecked('undo-unlearn-addon-toggle')) await this.runUndoUnlearn();
-        if (this.isMeditationActive) { await this.handleSilence(); }
-        if (this.isMeditationActive) { await this.runClosing(); }
-        if (this.isMeditationActive) { await this.runEmergence(); }
-        if (this.isMeditationActive) { this.finish(); }
+        return standardJourneySequence.run(this, { state, isChecked: getChecked, complete });
     }
 
     async runClosing() {
-        setText('mantra-display', "✦");
-        const symbolEl = document.getElementById('chakra-symbol');
-        if (symbolEl) symbolEl.style.opacity = "0.4";
-        const aura = document.getElementById('aura-bg');
-        if (aura) aura.style.background = `radial-gradient(circle at center, #8B00FF22, transparent)`;
-        const closingText = localized(this.scripts.closing);
-        await this.narrate(closingText);
-        await this.pauseAwareSleep(timing('transitions', 'closingFirstPause') * 1000);
-        // Full-body health affirmation — head to toe
-        const healthAffirmation = localized(this.scripts.closing, 'affirmation');
-        if (healthAffirmation && this.isMeditationActive) {
-            setText('mantra-display', `✦ ${journeyT('system.body')} ✦`);
-            await this.narrate(healthAffirmation);
-        }
-        await this.pauseAwareSleep(timing('transitions', 'closingSecondPause') * 1000);
+        return journeyTransitionStages.runClosing(this, { localized, journeyT, timing, setText, document });
     }
 
     async runHooponopono() {
@@ -2786,18 +1974,7 @@ class MeditationController {
     }
 
     async runIntimateService() {
-        if (!this.isMeditationActive) return;
-        if (state.perinealCareEnabled && !await this.runPerinealCare()) return;
-        if (state.massageEnabled) {
-            // Massage is held by a full Crown-to-Root chakra journey. When
-            // Assisted Bathing follows, defer closing until it is complete.
-            // The chakra narration/ticker belongs to the meditation screen;
-            // focused care otherwise still has the Icebreaker stage visible.
-            showScreen(meditationScreen);
-            await this.runSequence({ complete: !state.assistedBathingEnabled });
-            if (!this.isMeditationActive) return;
-        }
-        if (state.assistedBathingEnabled && !await this.runAssistedBathing()) return;
+        return careSession.runIntimateService(this, { state, showScreen, meditationScreen });
     }
 
     getFocusedExperience() {
@@ -2810,106 +1987,14 @@ class MeditationController {
     }
 
     async handleInterval() {
-        this.stopStageDrone();
-        setText('mantra-display', contentT('system.breathe'));
-        const symbolEl = document.getElementById('chakra-symbol');
-        if (symbolEl) symbolEl.style.opacity = "0.3";
-        this.visual.stop();
-        await this.pauseAwareSleep(timing('transitions', 'intervalPreparation') * 1000);
-        const breatheText = contentT('system.breatheInterval');
-        // Keep the minimum interval short for testing, but never advance to the
-        // next chakra while the break narration is still speaking.
-        const narrationPromise = withAudioStageFade(this.audio, state.timeInterval, () => this.narrateFeeble(breatheText));
-        narrationPromise.catch(() => {}); // The timer may outlast a failed preparation; await below still reports it.
-        const intervalMs = state.timeInterval * 1000;
-        let elapsed = 0;
-        while (elapsed < intervalMs) {
-            if (!this.isMeditationActive) break;
-            if (!this.isPaused) {
-                elapsed += 100;
-            }
-            await new Promise(r => setTimeout(r, 100));
-        }
-        await narrationPromise;
+        return journeyTransitionStages.runInterval(this, {
+            state, contentT, timing, setText, document, withAudioStageFade,
+            wait: milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
+        });
     }
 
     async meditateOnChakra(chakra, key) {
-        if (!this.isMeditationActive) return;
-        const symbolEl = document.getElementById('chakra-symbol');
-        symbolEl.style.opacity = '';   // clear any inline opacity
-        symbolEl.classList.remove('cosmic-entrance');
-        // Force reflow to restart animation
-        void symbolEl.offsetWidth;
-        symbolEl.classList.add('cosmic-entrance');
-        setTimeout(() => symbolEl.classList.remove('cosmic-entrance'), 1200);
-        
-        // Deity Image Selection
-        if (key !== 'high_energy' && state.deityPath !== 'none' && this.scripts.deities && this.scripts.deities[state.deityPath] && this.scripts.deities[state.deityPath][key]) {
-            visual.setSymbolImage(this.scripts.deities[state.deityPath][key], symbolEl);
-        } else {
-            visual.setSymbolImage(chakra.symbol, symbolEl);
-        }
-
-        symbolEl.style.opacity = "1";
-        document.getElementById('mantra-display').textContent = chakra.mantra;
-        document.getElementById('mantra-display').style.color = chakra.color;
-        document.body.style.setProperty('--primary-color', chakra.color);
-        document.querySelectorAll('.dot').forEach(dot => {
-            if (dot.dataset.chakra === key) dot.classList.add('active');
-            else if (this.chakraOrder.includes(dot.dataset.chakra) && this.chakraOrder.indexOf(dot.dataset.chakra) < this.chakraOrder.indexOf(key)) {
-                dot.classList.add('completed'); dot.classList.remove('active');
-            } else dot.classList.remove('active', 'completed');
-        });
-        const aura = document.getElementById('aura-bg');
-        aura.style.background = state.eyesCloseMode ? 'transparent' : `radial-gradient(circle at center, ${chakra.color}22, transparent)`;
-        aura.style.opacity = state.eyesCloseMode ? "0" : "1";
-        
-        // Define absolute index for correct elemental layers regardless of journey order
-        const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
-        const practiceMinutes = this.isExperimentActive && this.experimentDuration != null && (key === 'high_energy' || this.chakraOrder.length === 1)
-            ? this.experimentDuration
-            : key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
-        const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
-
-        if (!state.eyesCloseMode) this.visual.startPulsing(chakra.color);
-        await this.narrate(
-            localized(chakra, 'meditation') || localized(chakra),
-            false,
-            false,
-            'normal',
-            'mantra'
-        );
-        if (!this.isMeditationActive) return;
-
-        // Start the mantra first. The matching drone must never run under the
-        // narration; it begins only after mantra playback is active.
-        await this.audio.playMantraTrack(key);
-        if (!this.isMeditationActive) return;
-        if (!state.noMantraMode && this.audio.mantraLoop) {
-            this.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
-        }
-
-        const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
-        let elapsed = 0;
-
-        while (elapsed < chantDurationMs) {
-            if (!this.isMeditationActive) break;
-            
-            // Explicit pause check
-            await this.pauseAwareSleep(0);
-
-            if (!this.isPaused) {
-                elapsed += 100;
-            }
-            await new Promise(r => setTimeout(r, 100));
-        }
-
-        // Fade out mantra, restore drone before affirmation
-        const transitionSeconds = Math.max(0, timing('transitions', 'chakraPostMantra'));
-        this.audio.stopMantraTrack({ stageWindow: transitionSeconds });
-        await this.pauseAwareSleep(transitionSeconds * 1000);
-
-        if (this.isMeditationActive) await this.narrate(localized(chakra, 'affirmation'));
+        return chakraSession.run(this, chakra, key, { state, document, visual, localized, timing, setTimeout });
     }
 
     async narrateFeeble(text) {
@@ -3097,113 +2182,20 @@ class MeditationController {
     }
 
     async handleSilence() {
-        this.visual.stop();
-        setText('mantra-display', contentT('system.silence'));
-        const symbolEl = document.getElementById('chakra-symbol');
-        if (symbolEl) symbolEl.style.opacity = "0.2";
-        this.stopStageDrone();
-        const silenceTime = timing('transitions', 'finalSilence') * 1000;
-        for (let i = Math.ceil(silenceTime / 1000); i > 0; i--) {
-            if (!this.isMeditationActive) break;
-            await this.pauseAwareSleep(1000);
-        }
+        return journeyTransitionStages.runSilence(this, { contentT, timing, setText, document });
     }
 
     finish() {
-        document.body.classList.remove('visualization-active');
-        document.body.classList.remove('body-scan-active');
-        document.body.classList.remove('noting-active');
-        document.body.classList.remove('undo-unlearn-active');
-        const sessionMinutes = Math.max(1, Math.round((Date.now() - (this.sessionStartedAt || Date.now())) / 60000));
-        this.isMeditationActive = false; 
-        this.isHypnosisJourney = false;
-        this.sessionStartedAt = null;
-        this.stopSessionCountdown();
-        this.visual.stop(); 
-        this.stopStageDrone();
-        // The completion path must not restore music after the mantra fades.
-        // Schedule one coordinated fade for both layers instead.
-        this.audio.stopMantraTrack({ restoreMusic: false });
-        this.audio.stopGuidedTransitionTone();
-        this.audio.bgMusicTargetVolume = 0;
-        this.audio.bgMusicTargetEQ = 0;
-        this.audio.stopBackgroundMusic(BACKGROUND_MUSIC_STOP_FADE_SECONDS);
-        this.audio.stopVisualizationAmbience(VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS);
-        this.audio.stopPleasureAmbience(8);
-        wakeLock.release();
-        piperTTS.cancel('journey finished', { fadeSeconds: 2 });
-        document.getElementById('aura-bg').style.opacity = "0";
-        document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
-        state.stats.journeys += 1; state.stats.time += sessionMinutes;
-        localStorage.setItem('chakra_stats_journeys', state.stats.journeys);
-        localStorage.setItem('chakra_stats_time', state.stats.time);
-        setText('stat-journeys', state.stats.journeys);
-        setText('stat-time', state.stats.time);
-        setText('stat-session-time', sessionMinutes + ' mins');
-        // Lift sleep mode dimming once session ends
-        document.body.classList.remove('sleep-mode-active');
-        const app = document.getElementById('app');
-        if (app) app.style.setProperty('--app-brightness', '1');
-        const controls = document.getElementById('controls');
-        if (controls) controls.classList.add('hidden');
-        const mixer = document.getElementById('volume-mixer');
-        if (mixer) mixer.classList.add('hidden');
-
-        const modal = document.getElementById('completion-modal');
-        const title = document.getElementById('completion-title');
-        const msg = document.getElementById('completion-message');
-        const earnLink = document.getElementById('continue-to-earn');
-        const btn = document.getElementById('close-completion');
-        if (title) title.textContent = t('ui.journeyComplete');
-        if (msg) msg.textContent = t('ui.meditationCompleted');
-        if (earnLink) earnLink.textContent = t('ui.continueToEarn');
-        if (btn) btn.textContent = t('ui.returnToRoom');
-
-        modal.classList.remove('hidden');
-        scheduleEarnHandoff();
+        return window.ChakraCompletionView.finish(this, {
+            document, window, state, storage: localStorage, setText, translate: t, wakeLock, piperTTS,
+            backgroundMusicStopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS,
+            visualizationAmbienceExitFadeSeconds: VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS,
+            scheduleEarnHandoff
+        });
     }
 
     stop({ preserveScreen = false } = {}) {
-        document.body.classList.remove('visualization-active');
-        document.body.classList.remove('body-scan-active');
-        document.body.classList.remove('noting-active');
-        document.body.classList.remove('undo-unlearn-active');
-        const returnScreen = this.isExperimentActive ? experimentScreen : lobbyScreen;
-        this.isMeditationActive = false; this.isShotActive = false; this.isHypnosisJourney = false; this.stopIntentionFrequency(); this.stopStageDrone(); this.audio.stopGuidedTransitionTone(); this.audio.stopMantraTrack({ restoreMusic: false }); this.audio.stopBackgroundMusic(); this.audio.stopVisualizationAmbience(2); this.audio.stopPleasureAmbience(8); this.visual.stop(); wakeLock.release();
-        this.stopSessionCountdown();
-        this.isExperimentActive = false;
-        if (this.guideControlledResolve) this.guideControlledResolve(false);
-        const guideRestButton = document.getElementById('guide-controlled-continue');
-        if (guideRestButton) {
-            guideRestButton.hidden = true;
-            guideRestButton.disabled = true;
-        }
-        this.sessionStartedAt = null;
-        const startBtn = document.getElementById('start-meditation');
-        if (startBtn) {
-            startBtn.disabled = false;
-            startBtn.style.opacity = "1";
-        }
-        window.speechSynthesis.cancel();
-        piperTTS.cancel('journey stopped', { fadeSeconds: 2 });
-        document.body.classList.remove('sleep-mode-active');
-        const app = document.getElementById('app');
-        if (app) app.style.setProperty('--app-brightness', '1');
-        const finishAura = document.getElementById('aura-bg');
-        if (finishAura) finishAura.style.opacity = "0";
-        document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
-        const controls = document.getElementById('controls');
-        if (controls) controls.classList.add('hidden');
-        const mixer = document.getElementById('volume-mixer');
-        if (mixer) mixer.classList.add('hidden');
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-        if (!preserveScreen) {
-            showScreen(returnScreen);
-        }
+        return sessionStop.stop(this, { preserveScreen }, { document, window, piperTTS, wakeLock, lobbyScreen, experimentScreen, showScreen });
     }
 }
 
@@ -3287,6 +2279,26 @@ const state = window.ChakraAppState.createInitialState({
         PLEASURE_AMBIENCE_GAIN,
         PLEASURE_AMBIENCE_URL_STORAGE_KEY,
         PLEASURE_BLUR_DEFAULT_AMOUNT
+    }
+});
+
+const audioPleasureAmbience = audioPleasureAmbienceModule.create({
+    state,
+    fetchAudio: (...args) => fetch(...args),
+    storage: localStorage,
+    SeamlessLoop,
+    syncControl: () => syncPleasureAmbienceControl(),
+    warn: (...args) => console.warn(...args),
+    normalizeUrl: normalizePleasureAmbienceUrl,
+    normalizeIntensity: normalizePleasureAmbienceIntensity,
+    intensityProfile: getPleasureAmbienceIntensityProfile,
+    clampGain: clampPleasureAmbienceGain,
+    blurMix: getPleasureBlurMix,
+    constants: {
+        manifestUrl: PLEASURE_AMBIENCE_MANIFEST_URL,
+        urlStorageKey: PLEASURE_AMBIENCE_URL_STORAGE_KEY,
+        fadeSeconds: PLEASURE_AMBIENCE_FADE_SECONDS,
+        spatialFallbackFarGain: PLEASURE_SPATIAL_FALLBACK_FAR_GAIN
     }
 });
 
@@ -3515,21 +2527,7 @@ function loadPreferences() {
 }
 
 function checkFirstTime() {
-    if (localStorage.getItem('chakra_configured')) {
-        showScreen(lobbyScreen);
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-    } else {
-        showScreen(configScreen);
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-    }
+    screenNavigation.checkFirstTime(localStorage);
 }
 
 function showScreen(screen) {

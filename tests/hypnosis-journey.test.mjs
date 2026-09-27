@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const audioTonePlayback = fs.readFileSync(new URL('../modules/audio-tone-playback.js', import.meta.url), 'utf8');
 const hypnosisWrapper = fs.readFileSync(new URL('../modules/journey-hypnosis-wrapper.js', import.meta.url), 'utf8');
+const standardJourneySequence = fs.readFileSync(new URL('../modules/standard-journey-sequence.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const timing = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 const locales = ['en', 'ml', 'ru', 'hi'].map((language) => JSON.parse(
@@ -35,11 +36,9 @@ assert.match(app, /startTimedDrone\(baseFrequency, elementalIndex, practiceMinut
 assert.match(audioMantraPlayback, /if \(state\.noMantraMode\) return;/, 'No Mantra Mode must still suppress recorded mantra playback.');
 assert.doesNotMatch(hypnosisWrapper, /noMantraMode/, 'No Mantra Mode should not suppress non-mantra Arrival cues.');
 
-const runSequenceStart = app.indexOf('    async runSequence({ complete = true } = {})');
-const runSequenceEnd = app.indexOf('    async runClosing()', runSequenceStart);
-const runSequence = app.slice(runSequenceStart, runSequenceEnd);
-assert.match(runSequence, /for \(let i = 0; i < this\.chakraOrder\.length; i\+\+\)[\s\S]*?await this\.meditateOnChakra\(this\.scripts\[key\], key\)/, 'The original chakra loop must remain the core journey.');
-assert.match(runSequence, /await this\.runClosing\(\);[\s\S]*?await this\.runEmergence\(\);[\s\S]*?this\.finish\(\)/, 'Emergence must wrap the existing closing rather than replace the chakra journey.');
+assert.match(app, /async runSequence\(\{ complete = true \} = \{\}\)\s*\{\s*return standardJourneySequence\.run\(this, \{ state, isChecked: getChecked, complete \}\);/, 'The controller keeps a stable adapter to the standard journey owner.');
+assert.match(standardJourneySequence, /for \(let index = 0; index < owner\.chakraOrder\.length; index \+= 1\)[\s\S]*?await owner\.meditateOnChakra\(owner\.scripts\[key\], key\)/, 'The original chakra loop remains the core journey.');
+assert.match(standardJourneySequence, /await owner\.runClosing\(\);[\s\S]*?await owner\.runEmergence\(\);[\s\S]*?owner\.finish\(\)/, 'Emergence wraps the existing closing rather than replacing the chakra journey.');
 assert.match(app, /isHypnosisJourney = !this\.isHighEnergy && !isDemoScriptSelected\(\)/, 'Only normal non-demo chakra journeys should enable the wrapper.');
 assert.match(hypnosisWrapper, /async function runEmergence\(owner,[\s\S]*?playSingingBowl\(\)[\s\S]*?getJourneySystemNarration\('emergence'\)[\s\S]*?state\.timeEmergence/, 'Emergence should progress from a feeble bell to custom-or-built-in narration and a configurable quiet return.');
 assert.doesNotMatch(app.slice(app.indexOf('    finish() {'), app.indexOf('    stop() {')), /playSingingBowl\(\)/, 'Completion must not add a second abrupt bell after Emergence.');

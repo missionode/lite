@@ -55,7 +55,10 @@ test('records cold, warm and offline startup baseline without starting playback'
   await page.evaluate(() => navigator.serviceWorker.register('./sw.js'));
   await page.evaluate(() => navigator.serviceWorker.ready);
   const shellCache = await page.evaluate(async () => {
-    const cache = await caches.open('chakra-v5.310');
+    const serviceWorkerSource = await (await fetch('./sw.js')).text();
+    const cacheName = serviceWorkerSource.match(/const CACHE_NAME = '([^']+)'/)?.[1];
+    if (!cacheName) throw new Error('Service worker shell cache name is unavailable');
+    const cache = await caches.open(cacheName);
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
       appEntryPresent: urls.includes('/app.js?v=4.12'),

@@ -43,7 +43,10 @@ const mediaSource=fs.readFileSync('modules/media-lifecycle.js','utf8');
 const mediaContext=vm.createContext({});
 vm.runInContext(mediaSource,mediaContext);
 const splitNarrationText = mediaContext.ChakraMediaLifecycle.splitNarrationText;
-const method=app.slice(app.indexOf('    async narrateWithPiper('),app.indexOf('    async narrateSoft('));
+const piperNarrationSource=fs.readFileSync('modules/piper-narration.js','utf8');
+const piperNarrationContext=vm.createContext({window:{}});
+vm.runInContext(piperNarrationSource,piperNarrationContext);
+const narrate=piperNarrationContext.window.ChakraPiperNarration.create().run;
 const decoded=[],played=[];
 let cancelDuringDecode=false;
 const piper={generation:0,synthesize:async text=>text,decode:async text=>{
@@ -56,15 +59,12 @@ const piper={generation:0,synthesize:async text=>text,decode:async text=>{
     played.push(buffer.text);
 }};
 piper.prepare = async text => { const result = await piper.decode(await piper.synthesize(text)); return result; };
-const sandbox={splitNarrationText,piperTTS:piper,state:{eyesCloseMode:false},timing:()=>0,
-    PIPER_CLIP_FADE_SECONDS:.05,NARRATION_MANTRA_FADE_SECONDS:.05,
-    setNarrationTickerAwaitingPlayback(){},setText(){},estimateNarrationDurationSeconds:()=>2,
-    updateNarrationTickerDuration(){},startNarrationTicker(){},setTimeout};
-const narrate=vm.runInNewContext('({'+method+'})',sandbox).narrateWithPiper;
+const deps={splitNarrationText,piperTTS:piper,state:{eyesCloseMode:false},timing:()=>0,
+    piperClipFadeSeconds:.05,mantraFadeSeconds:.05,setVoiceStatus(){},fallbackMessage:'fallback',setTimeout};
 const controller={isMeditationActive:true,isPaused:false,audio:{fadeInBackgroundMusic(){}},pauseAwareSleep:async()=>{}};
-await narrate.call(controller,'One. Two. Three.');
+await narrate(controller,'One. Two. Three.',false,false,1,'normal','none',deps);
 assert.deepEqual(played,['One','Two','Three']);
 played.length=0; cancelDuringDecode=true;
-await narrate.call(controller,'One. Two.');
+await narrate(controller,'One. Two.',false,false,1,'normal','none',deps);
 assert.deepEqual(played,[],'Cancellation during preparation cannot start stale speech');
 console.log('Long narration passed: 64 real multilingual phonemizations, bounded instance retirement, decode-ahead and cancellation.');

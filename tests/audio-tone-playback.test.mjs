@@ -57,9 +57,48 @@ assert.equal(playback.startTransitionTone(makeOwner(), 0, 1000, { noFrequencyMod
 assert.equal(playback.startTransitionTone(makeOwner(), 528, NaN, { noFrequencyMode: false, volDrone: 0.1 }), false);
 assert.equal(playback.startTransitionTone(makeOwner(), 528, 1000, { noFrequencyMode: false, volDrone: 0 }), false);
 
+const bowlOwner = makeOwner();
+bowlOwner.bellGain = {};
+bowlOwner.ctx.createBiquadFilter = () => {
+    const filter = { frequency: parameter(), Q: parameter(), disconnects: 0, connect(target) { this.target = target; }, disconnect() { this.disconnects++; } };
+    bowlOwner.nodes.push(filter);
+    return filter;
+};
+playback.playSingingBowl(bowlOwner, { noFrequencyMode: false, volBell: 0.5 });
+assert.equal(bowlOwner.nodes.length, 15, 'the bell uses five oscillator/filter/gain partials');
+for (let index = 0; index < bowlOwner.nodes.length; index += 3) {
+    const [oscillator, gain, filter] = bowlOwner.nodes.slice(index, index + 3);
+    assert.equal(oscillator.frequency.value, 180 * [1, 2.8, 5, 8.1, 12.5][index / 3]);
+    assert.equal(filter.frequency.value, oscillator.frequency.value);
+    assert.equal(filter.Q.value, 50);
+    assert.deepEqual(gain.gain.events, [['set', 0.0001, 20], ['exponential', 0.1, 20.1], ['exponential', 0.001, 28]]);
+    assert.equal(gain.target, bowlOwner.bellGain);
+    assert.deepEqual(oscillator.starts, [20]);
+    assert.deepEqual(oscillator.stops, [28.1]);
+    oscillator.onended();
+    assert.equal(oscillator.disconnects, 1);
+    assert.equal(filter.disconnects, 1);
+    assert.equal(gain.disconnects, 1);
+}
+for (const muted of [
+    { noFrequencyMode: true, volBell: 0.5 },
+    { noFrequencyMode: false, volBell: 0 }
+]) {
+    const silentOwner = makeOwner();
+    silentOwner.bellGain = {};
+    silentOwner.ctx.createBiquadFilter = () => { throw new Error('muted bell must not allocate'); };
+    playback.playSingingBowl(silentOwner, muted);
+    assert.equal(silentOwner.nodes.length, 0);
+}
+const uninitializedBell = makeOwner();
+uninitializedBell.ctx = null;
+playback.playSingingBowl(uninitializedBell, { noFrequencyMode: false, volBell: 0.5 });
+assert.equal(uninitializedBell.nodes.length, 0);
+
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 assert.match(app, /startFrequencyShot\(frequency\)\s*\{\s*return audioTonePlayback\.startShot\(this, frequency, state\);/);
 assert.match(app, /startGuidedTransitionTone\(frequency, durationMs\)\s*\{\s*return audioTonePlayback\.startTransitionTone\(this, frequency, durationMs, state\);/);
+assert.match(app, /playSingingBowl\(\)\s*\{\s*return audioTonePlayback\.playSingingBowl\(this, state\);/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.0') < html.indexOf('app.js?v=4.12'));

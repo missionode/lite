@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-26",
-    "commit": "6fa7d97 production baseline + CP-MOD-067–151 release merge (local)",
-    "scope": "Source-reviewed merged behavior through CP-MOD-151 and CP-ASSESS-ADV-UNDO-RAPPORT-001. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script and Piper voice setup paths. Existing selected-only lazy practices and opt-in video remain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page."
+    "date": "2026-09-27",
+    "commit": "6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167",
+    "scope": "Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged."
   },
   "graphs": [
     {
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "app.js:3514; app.js:4392; index.html:248; modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1",
+      "source": "index.html:248; modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; app.js:2502; app.js:2663",
       "rows": [
         [
           [
@@ -283,7 +283,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/newcomer-marker-layout.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:1; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/newcomer-marker-layout.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1; modules/audio-drone-stop.js:1; tests/audio-drone-stop.test.mjs:1; modules/audio-mantra-playback.js:1; tests/audio-mantra-playback.test.mjs:1; modules/audio-background-music-lifecycle.js:1; tests/audio-background-music-lifecycle.test.mjs:1; modules/audio-background-music-controls.js:1; tests/audio-background-music-controls.test.mjs:1; modules/audio-music-echo.js:1; tests/audio-music-echo.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/script-source-settings.js:1; tests/script-source-settings.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/completion-view.js:1; tests/completion-view.test.mjs:1; tests/screen-navigation.test.mjs:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/drone-duration-settings-view.js:1; tests/drone-duration-settings-view.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; tests/timing-settings.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; tests/visual-effect.test.mjs:1; tests/piper-lifecycle.test.mjs:1; tests/completion-view.test.mjs:1; tests/media-controls-view.test.mjs:1; tests/demo-script.test.mjs:1; tests/content-localization.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/newcomer-marker-layout.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:1; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/newcomer-marker-layout.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1; modules/audio-drone-stop.js:1; tests/audio-drone-stop.test.mjs:1; modules/audio-mantra-playback.js:1; tests/audio-mantra-playback.test.mjs:1; modules/audio-background-music-lifecycle.js:1; tests/audio-background-music-lifecycle.test.mjs:1; modules/audio-background-music-controls.js:1; tests/audio-background-music-controls.test.mjs:1; modules/audio-music-echo.js:1; tests/audio-music-echo.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/script-source-settings.js:1; tests/script-source-settings.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/completion-view.js:1; tests/completion-view.test.mjs:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/drone-duration-settings-view.js:1; tests/drone-duration-settings-view.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; tests/timing-settings.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; tests/visual-effect.test.mjs:1; tests/piper-lifecycle.test.mjs:1; tests/completion-view.test.mjs:1; tests/media-controls-view.test.mjs:1; tests/demo-script.test.mjs:1; tests/content-localization.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/shot-session.js:1; tests/shot-session.test.mjs:1; modules/sleep-journey.js:1; tests/sleep-journey.test.mjs:1; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1; tests/completion-session.test.mjs:1",
       "rows": [
         [
           [
@@ -334,7 +334,7 @@
           [
             "next",
             "Remaining modularization work",
-            "CP-MOD-152 resumes the remaining justified app/controller ownership seams, then the track must pass the planned cold/warm/offline and browser evidence gate before modularization is declared complete."
+            "Continue the remaining justified app/controller ownership seams, reconcile the integration baseline, then complete repeatable cold/warm/offline loading measurements and the separately approved browser evidence gate before declaring modularization complete."
           ]
         ],
         [
@@ -480,6 +480,7 @@
       ],
       "notes": [
         "Delivered seams: settings backup owns collection/validation/replacement; app-state owns initial state; content-localization owns path lookup, language fallback, localized shapes and script validation; media-lifecycle owns stage fade scoping, Unicode narration chunking, Piper envelope constants and native seamless-loop preparation/cleanup; piper-lifecycle owns worker queueing, model configuration, synthesis/decode cache, playback envelopes and cancellation; audio-route-lifecycle owns idempotent effect connection, audio-clock tail retirement, cancellation and disconnection; journey-routing owns focused-mode selection, launch priority, prelude-safe chakra validation, chakra-order selection, ordered preparation-stage planning and sequential execution with a session-active cancellation guard; body-scan-practice owns timed eight-region narration, guarded sequencing and black-scene cleanup; guided-noting-practice owns timed reminder sequencing, cancellation checks and black-scene cleanup; dharana-practice owns focus-anchor/veil setup, selected shape/color, reduced-motion-compatible active-time shrink progression, narrated release and cleanup; box-breathing-practice owns preparation/tutorial transitions, the localized four-step cycle, four repetitions, 100 ms pause-aware time accounting, completion narration and background-music handoff; visualization-practice owns blackout, audio/narration timing and gradual return; hooponopono-practice owns its phrase cycles and closing handoff; undo-unlearn-practice owns phase sequencing and guaranteed black-scene cleanup; screen-navigation owns shared screen visibility, static-sky decoration guards, decorationchange notification and scroll resets. The eager shell loads `practice-module-loader.js`, not these seven APIs. The loader injects only selected classic scripts on Begin, deduplicates concurrent loads, and clears failures so a localized failure can be retried; their exact URLs remain precached for offline use. The first local comparison reduces startup JavaScript bodies by ~13.1 KiB with navigation timing variability, so only this byte reduction is claimed; CPU, heap, thermal, compressed production and device effects remain unproven. AudioEngine bus construction remains owner-deferred until the next weekly reset.",
+        "CP-MOD-154: audio-voice-effects owns voice warmth/clarity coercion, neutral fallback, clamps and gain ramps plus Voice Space profiles, active-playback convolver gate, tail duration and send/wet/filter ramps. AudioEngine retains public adapters and playback-state assignment order. Eager script follows audio-music-echo and is offline precached; this ownership extraction makes no performance or audio-quality claim.",
         "CP-MOD-078–082 extract experiment view bindings, Lobby assessment navigation, pause/stop control bindings, completion dismissal and selected-practice ID mapping. Existing runtime behavior and selected-only practice loading remain unchanged; direct automated checks pass. No browser/device or performance gain is claimed.",
         "CP-MOD-083–087 extend the existing preparation, Yoga and drone-duration settings owners with preference and change-event binding. Existing mutual exclusion, normalization, persistence keys, callback order and session-estimate refresh behavior remain in force; selected-only loading is unchanged. Ownership/testability only; no browser/device or performance gain is claimed.",
         "CP-MOD-088–097 extract ten control-binding responsibilities into existing owners: High Energy estimate refresh, standard and HRIM duration sliders, five Mood & Relaxation controls, the Yoga Advanced Features gate and Shot-type refresh. Preserve normalization, lock/No Frequency checks, confirmation threshold, storage keys, mode order and estimate/audio update sequence. This is organization/testability only; no browser/device/performance gain is claimed.",
@@ -503,7 +504,21 @@
         "CP-MOD-098–107 move ten bounded language, voice-preview, Yoga, Sleep and Shot interaction behaviors into existing view owners. The cross-mode policy and unlock lifecycle remain in app.js; no lazy boundary or user-flow change.",
         "CP-MOD-108–127 move twenty value/display helpers into their cohesive existing owners: ambience normalization and gain/blur policy (8), Shot/drone/Sleep timing policy (7), spatial-mode normalization (1), countdown SVG rendering/hiding (2), narration-duration estimation (1), and visual-effect normalization (1). App-facing adapters preserve call sites and configurations. Existing eager/offline script delivery remains unchanged; this is testability/ownership work, not a performance claim.",
         "CP-MOD-128 moves chakra-symbol image load/error/cached-image visibility handling into the existing VisualEngine instance. App call sites retain the same selected artwork and timing; request identity guards still prevent stale image callbacks from revealing a superseded symbol. Eager/offline delivery and visual behavior are unchanged; ownership/testability only.",
-        "CP-MOD-129–148 moves twenty helper responsibilities into established owners: Piper voice ID/registry/cadence/gender/locale selection (10), completion Earn-link cancellation/eligibility/scheduling (3), voice-status rendering (1), demo-script duration/message/eligibility policies (3), generated-intention language refresh (2), and contextual drone-duration summary rendering (1). Stable app adapters preserve runtime call sites; there is no new eager module or lazy boundary. Direct tests pass; this is ownership/testability work only."
+        "CP-MOD-129–148 moves twenty helper responsibilities into established owners: Piper voice ID/registry/cadence/gender/locale selection (10), completion Earn-link cancellation/eligibility/scheduling (3), voice-status rendering (1), demo-script duration/message/eligibility policies (3), generated-intention language refresh (2), and contextual drone-duration summary rendering (1). Stable app adapters preserve runtime call sites; there is no new eager module or lazy boundary. Direct tests pass; this is ownership/testability work only.",
+        "CP-MOD-155 moves the isolated experiment start/stop lifecycle into `modules/experiment-session.js` behind MeditationController adapters. Advanced Features care guard, content source selection/cache key, audio/ambience and wake-lock setup, duration assignment, activity dispatch, error fallback and stop cleanup order are retained. The existing experiment duration-unit mismatch remains tracked in FIX-QUEUE; this extraction intentionally does not change it.",
+        "CP-MOD-156 moves the Sound Shots sequence and completion/stop cleanup into `modules/shot-session.js` behind the existing MeditationController APIs. Script selection, guards, stage frequencies/labels, active-time and interval timing, countdown, pause/cancel checks, audio setup and finish/reset behavior remain unchanged. The module stays eager and offline-cached; no performance claim.",
+        "CP-MOD-157 moves Sleep journey orchestration to `modules/sleep-journey.js` behind its existing controller adapter. Locked/start guards, script source/cache behavior, timer, visual/audio setup, five stages, pause-aware timing, 3-second gaps, and long ending fade remain unchanged. Eager/offline delivery remains; ownership only, no performance claim.",
+        "CP-MOD-158 moves the Yoga session stage sequence into `modules/yoga-session.js` behind `runYogaSession()`. Optional Corpse Pose and standard Bath/rest, grounding drone, narration, preparation, selected poses, visuals, pause-aware holds and completion remain ordered; Intimate Service stays separate. Eager/offline ownership only, no performance claim.",
+        "CP-MOD-159 moves Intimate Service care-stage timing, operator-guided transitions, experiment-duration override, massage sequence composition and assisted-bathing order into `modules/care-session.js`. Existing controller and experiment APIs remain stable; the user flow is unchanged. The module remains eager/offline-cached; ownership only, no performance claim.",
+        "CP-MOD-160 moves the shared single-chakra/HRIM stage implementation into `modules/chakra-session.js` behind the stable `meditateOnChakra()` adapter. Chakra artwork/progress, narration → mantra → conditionally bounded drone, pause-aware chant timing, post-mantra tail and affirmation remain ordered. Normal, HRIM and reverse-massage routes share the same stage; eager/offline ownership only, no performance claim.",
+        "CP-MOD-161 moves Piper sentence-queued narration orchestration into `modules/piper-narration.js` behind the existing `narrateWithPiper()` adapter. Lead-in and sentence gaps, bounded decode-ahead, cancellation-generation checks, pause waits, browser-speech fallback, clip/mantra fades, exit timing and voice-carve ramps remain unchanged. Script remains eager and offline precached; this is ownership/testability only, not a performance claim.",
+        "CP-MOD-162 moves the shared guide-controlled countdown/Continue wait into `modules/guide-controlled-transition.js` behind the stable controller method used by Yoga and care. Missing-control and inactive guards, rounded countdown, pause-blocked clicks, focus, Stop cancellation and listener cleanup remain unchanged. Eager/offline ownership only; no performance claim.",
+        "CP-MOD-163 moves Stop cleanup into `modules/session-stop.js` behind `MeditationController.stop()`. Activity flags, stage/drone/tone/mantra/music/ambience shutdown order, Piper fade cancellation, wake-lock/countdown release, guide resolution, UI/aura/brightness reset, experiment-versus-Lobby return and preserveScreen behavior remain unchanged. Eager/offline ownership only; no performance claim.",
+        "CP-MOD-164 moves natural completion cleanup, elapsed-session accounting, stats persistence, translated modal setup and Earn handoff scheduling into the existing `modules/completion-view.js` owner behind `MeditationController.finish()`. Audio shutdown order, 1-minute minimum rounding, persisted keys, cleanup and visual/result behavior are retained; no new script/cache entry or performance claim.",
+        "CP-MOD-152 moves Mood & Relaxation ambience manifest loading, custom-URL rollback, loop start/stop, gain/blur ramps and spatial approach into one existing-domain audio lifecycle module. AudioEngine method names, state owner, journey calls, parameters, failure recovery and eager/offline availability remain unchanged; no flow, audio-quality or performance change is claimed.",
+        "CP-MOD-153 moves first-visit routing into the existing screen-navigation owner. The app retains its checkFirstTime adapter and both initialization call sites; chakra_configured truthiness, destination visibility, decoration notification, scroll resets and exact aura gradients/opacity are unchanged. No module, script/cache entry or performance claim is added.",
+        "CP-MOD-165 audits the remaining `MeditationController.start()` boundary: retain it as the app-level dispatcher because it coordinates user-gesture speech unlock, content validation, audio/Piper preparation, wake lock, newcomer onboarding, route ordering and shared failure/cancellation cleanup. Its cohesive inner lifecycles have owners; extracting the full dispatcher would relocate orchestration without reducing coupling. Selected preparation scripts and the optional video controller remain the justified lazy boundaries. Six other route-specific owners total 8,278 gzip bytes statically before loader overhead; keep eager/offline-cached until fresh cold/warm/offline browser measurements demonstrate net benefit. No current runtime or performance claim.",
+        "CP-MOD-166 moves standard chakra-sequence ownership into `modules/standard-journey-sequence.js`; the app controller keeps its stable `runSequence()` adapter and owns start dispatch. Direct tests cover stage order, optional integrations, partial runs, Music Only, cancellation and finish. No user-flow or eager/offline delivery change."
       ]
     },
     {
@@ -511,7 +526,7 @@
       "group": "Start here",
       "title": "Startup and first visit",
       "subtitle": "Loading order and optional browser capabilities.",
-      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/settings-help-view.js:1; tests/settings-help-view.test.mjs:1; app.js:3514; app.js:3526; app.js:3731; app.js:4392; index.html:148",
+      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/settings-help-view.js:1; tests/settings-help-view.test.mjs:1; index.html:148; app.js:2502; app.js:2510; app.js:2663",
       "rows": [
         [
           [
@@ -636,7 +651,8 @@
         ]
       ],
       "notes": [
-        "Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. The small practice loader is eager, but its seven guided-practice scripts are not parsed until selected on Begin; see Mode Selection and the modularization map. This does not establish complete offline readiness."
+        "Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. The small practice loader is eager, but its seven guided-practice scripts are not parsed until selected on Begin; see Mode Selection and the modularization map. This does not establish complete offline readiness.",
+        "CP-MOD-153: screen-navigation now reads chakra_configured at the existing checkFirstTime call time, showing Lobby for a truthy stored value and Settings otherwise. Both destinations retain dynamic decorations and one decorationchange notification before the aura treatment. The original bottom/top violet radial gradients and opacity 1, missing-aura guard, startup order and initialization-failure fallback are preserved."
       ]
     },
     {
@@ -796,7 +812,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, selected practice loading, dispatch priority, and the tested Sleep/Shot change guards.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; app.js:3786; app.js:4293; app.js:4392; app.js:4388; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1392; app.js:1459; app.js:1601; app.js:2663",
       "rows": [
         [
           [
@@ -985,7 +1001,7 @@
       "group": "Journeys",
       "title": "Standard chakra journey",
       "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
-      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; app.js:1; app.js:1709; app.js:1724; app.js:1728; app.js:1732; app.js:1736; app.js:2245; app.js:3246; app.js:3557; app.js:3586; index.html:448; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1",
+      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; index.html:448; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1601; app.js:1634; app.js:1653; app.js:1875; app.js:1994; app.js:1998; app.js:2059; app.js:2095; app.js:2254; app.js:2258",
       "rows": [
         [
           [
@@ -1177,6 +1193,8 @@
       ],
       "notes": [
         "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps. Returning Journey is an explicit preference, not a record of prior sessions.",
+        "CP-MOD-167 moves the existing interval, silence and closing-stage lifecycles into `modules/journey-transition-stages.js` behind stable `handleInterval()`, `handleSilence()` and `runClosing()` adapters. Transition timing, pause/Stop behavior, narration completion, display opacity, affirmation and visual treatment stay unchanged; the graph topology is unchanged.",
+        "CP-MOD-166 moves the existing standard chakra-stage loop and its optional integration/closing sequence into `modules/standard-journey-sequence.js` behind `MeditationController.runSequence()`. Music Only remains exclusive; chakra order, between-chakra intervals, optional Ho’oponopono/Undo, silence, closing, Emergence, completion and Stop guards are unchanged. This changes ownership only; journey topology and eager/offline loading remain unchanged.",
         "CP-MOD-059 moves the optional 432/528 Hz Arrival cues and Emergence sequence into `modules/journey-hypnosis-wrapper.js`. This is source ownership only: the standard journey order, wrapper eligibility, narration, pause timing, No Frequency quiet gaps and stop checks remain as mapped; no journey or performance change is claimed.",
         "CP-MOD-060 moves the existing shared guided-opening/Gratitude stage into `modules/journey-opening-stage.js`; preparation safety, optional Moon/Returning opening, Gratitude, private-intention narration, HRIM routing and Arrival readiness retain their prior order and guards. This is source ownership only.",
         "CP-MOD-061 moves the existing start-time content source and validation work behind `modules/journey-content-loader.js`; custom/default selection, same-language reuse, cache-before-validation order, validation context timing and failure exits remain unchanged. Source ownership only.",
@@ -1188,7 +1206,7 @@
       "group": "Journeys",
       "title": "Inside one chakra",
       "subtitle": "Narration, audio handoff, bounded exposure, and loop transitions.",
-      "source": "app.js:4367; modules/ambient-particle-field.js:136; app.js:3059; app.js:20",
+      "source": "modules/ambient-particle-field.js:136; app.js:2160; app.js:2246; app.js:2270; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1",
       "rows": [
         [
           [
@@ -1315,7 +1333,8 @@
         ]
       ],
       "notes": [
-        "Core practice duration does not extend the fixed drone exposure window. HRIM reuses this routine with high_energy content and its own duration."
+        "Core practice duration does not extend the fixed drone exposure window. HRIM reuses this routine with high_energy content and its own duration.",
+        "CP-MOD-160: `chakra-session.js` owns the shared chakra/HRIM stage behind `meditateOnChakra()`. Both standard and reverse chakra loops still use the same adapter; narration, mantra, bounded drone, pause timing, audio tail and affirmation ordering are retained."
       ]
     },
     {
@@ -1323,7 +1342,7 @@
       "group": "Journeys",
       "title": "HRIM activation",
       "subtitle": "A dedicated high-energy journey using one stage.",
-      "source": "app.js:3437; app.js:3605; app.js:4348",
+      "source": "app.js:1420; app.js:1638; app.js:2136; app.js:2270",
       "rows": [
         [
           [
@@ -1416,7 +1435,7 @@
       "group": "Journeys",
       "title": "Sleep and Music Only",
       "subtitle": "Two independent narration-free experiences.",
-      "source": "app.js:3161; app.js:3874; app.js:2329; scripts.json:1",
+      "source": "modules/sleep-journey.js:1; scripts.json:1; tests/sleep-journey.test.mjs:1; app.js:917; app.js:1329; app.js:1459",
       "rows": [
         [
           [
@@ -1529,7 +1548,8 @@
         ]
       ],
       "notes": [
-        "Sleep does not narrate. Its actual gap is hardcoded to 3 seconds, while its estimate reads script intervalSeconds. Music Only does not start the optional ambience through its normal route."
+        "Sleep does not narrate. Its actual gap is hardcoded to 3 seconds, while its estimate reads script intervalSeconds. Music Only does not start the optional ambience through its normal route.",
+        "CP-MOD-157 moves only Sleep journey orchestration behind the existing runSleepJourney adapter. Unlock/start guards, content caching and fetch query, timer initialization, music/ambience startup, five-stage pacing, pause-aware gaps, drone ownership and the 12-second ending fade retain their order. The module remains eager and precached; no performance improvement is claimed."
       ]
     },
     {
@@ -1537,7 +1557,7 @@
       "group": "Journeys",
       "title": "Box breathing and Ho’oponopono",
       "subtitle": "Standalone practices launched through shared guided startup.",
-      "source": "app.js:3443; app.js:3661; app.js:4276",
+      "source": "app.js:1420; app.js:1644; app.js:1673; app.js:1696; app.js:1719; app.js:1748; app.js:2178",
       "rows": [
         [
           [
@@ -1651,7 +1671,7 @@
       "group": "Journeys",
       "title": "Yoga experience",
       "subtitle": "Advanced Features-gated rest, bathing, selected poses and shared master-mode behavior.",
-      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; app.js:3927; app.js:3957; index.html:448; timing-config.json:1",
+      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; index.html:448; timing-config.json:1; app.js:1536; app.js:1886; app.js:1935; app.js:1982; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -1793,7 +1813,8 @@
       ],
       "notes": [
         "Yoga shares the session-only Advanced Features gate with Sleep, Shots and Intimate Service. Corpse Pose and Bath can be independently enabled. Runtime pose order comes from the script filtered by selected pose IDs. Guide waits have unbounded duration beyond the displayed session estimate.",
-        "CP-MOD-096 moves only the Yoga Advanced Features event gate into `modules/yoga-experience-settings.js`; locked attempts still clear the checkbox/state, hide setup, refresh visibility/estimate and return without invoking the master-toggle path."
+        "CP-MOD-096 moves only the Yoga Advanced Features event gate into `modules/yoga-experience-settings.js`; locked attempts still clear the checkbox/state, hide setup, refresh visibility/estimate and return without invoking the master-toggle path.",
+        "CP-MOD-158: `yoga-session.js` owns the Yoga stage sequence behind the existing `runYogaSession()` app adapter. The standard Bath/rest handoff, pose presentation, narration, timer, and completion remain the same; Intimate Service is not included. The module is eager/offline-cached pending any separately measured lazy boundary."
       ]
     },
     {
@@ -1801,7 +1822,7 @@
       "group": "Journeys",
       "title": "Intimate Service and massage",
       "subtitle": "All seven nonempty combinations follow this ordered composition.",
-      "source": "app.js:1; app.js:1",
+      "source": "app.js:1849; app.js:1853; app.js:1857; app.js:1861; app.js:2190; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -1933,7 +1954,8 @@
         ]
       ],
       "notes": [
-        "Current behavior: when assisted bathing follows massage, shared silence/closing is skipped and is not called after the bath. A nearby comment says closing is deferred, but the executable path does not perform it. This is recorded for a later fix decision."
+        "Current behavior: when assisted bathing follows massage, shared silence/closing is skipped and is not called after the bath. A nearby comment says closing is deferred, but the executable path does not perform it. This is recorded for a later fix decision.",
+        "CP-MOD-159: `care-session.js` owns timed care stages, guide-controlled continuation, experiment duration override and Intimate Service composition. App methods remain stable adapters and Yoga continues using the standard Bath Session only."
       ]
     },
     {
@@ -1941,7 +1963,7 @@
       "group": "Journeys",
       "title": "Sound Shots",
       "subtitle": "Six types, confirmation, frequency validation, and distinct finish behavior.",
-      "source": "app.js:3378; app.js:4308; app.js:4341; index.html:257",
+      "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:257; app.js:1398; app.js:3361",
       "rows": [
         [
           [
@@ -2059,7 +2081,8 @@
         ]
       ],
       "notes": [
-        "Single-frequency default is 1 second; multi-stage default 7 seconds; selected duration range 1–20 seconds. Displayed total active seconds excludes inter-stage gaps; countdown includes them."
+        "Single-frequency default is 1 second; multi-stage default 7 seconds; selected duration range 1–20 seconds. Displayed total active seconds excludes inter-stage gaps; countdown includes them.",
+        "CP-MOD-156: `shot-session.js` owns the Shot start guards, frequency validation, script reuse/loading, staged oscillator lifecycle, countdown, localized labels, failure recovery, success reload and manual-stop cleanup. MeditationController retains runShot/finishShot/stopShot adapters; start from the Lobby and the user-visible flow remain unchanged."
       ]
     },
     {
@@ -2067,7 +2090,7 @@
       "group": "Journeys",
       "title": "Experiment activities",
       "subtitle": "Isolated activities and return behavior.",
-      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; app.js:2224; index.html:210",
+      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; index.html:210; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; app.js:1605; app.js:1615",
       "rows": [
         [
           [
@@ -2175,7 +2198,8 @@
         ]
       ],
       "notes": [
-        "Current inconsistency: UI assigns sec or min, while startExperiment tests for seconds. Countdown therefore treats sec as minutes; care UI also labels raw seconds as min. Ho’oponopono has no duration control, but startExperiment still reads the hidden value. No ordinary completion modal or stats update is used."
+        "Current inconsistency: UI assigns sec or min, while startExperiment tests for seconds. Countdown therefore treats sec as minutes; care UI also labels raw seconds as min. Ho’oponopono has no duration control, but startExperiment still reads the hidden value. No ordinary completion modal or stats update is used.",
+        "CP-MOD-155 moves activity start/stop orchestration to experiment-session.js. It retains pre-load Advanced Features care rejection, current script cache/source fallback, audio/ambience initialization, wake-lock/countdown setup, dispatch, error alert and ordered cleanup. It does not change the known `sec` versus `seconds` duration-unit issue recorded in FIX-QUEUE."
       ]
     },
     {
@@ -2183,7 +2207,7 @@
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
       "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → chakras; the same selected route drives its displayed estimate and countdown.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; tests/practice-module-loader.test.mjs:1; modules/journey-opening-stage.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/session-estimate.js:1; app.js:2231; app.js:3857; index.html:322",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; tests/practice-module-loader.test.mjs:1; modules/journey-opening-stage.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/session-estimate.js:1; index.html:322; app.js:1420; app.js:2237",
       "rows": [
         [
           [
@@ -2245,7 +2269,7 @@
       "group": "Journeys",
       "title": "Lobby journey roadmap",
       "subtitle": "Localized, display-only summary of the currently selected Lobby route.",
-      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; app.js:4293; app.js:726",
+      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; app.js:529; app.js:1420",
       "rows": [
         [
           [
@@ -2447,7 +2471,7 @@
       "group": "Live session",
       "title": "Pause, stop and live controls",
       "subtitle": "Shared interaction and cancellation behavior.",
-      "source": "modules/journey-chrome.js:1; modules/session-countdown.js:1; tests/session-countdown.test.mjs:1; modules/journey-video-prelude.js:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/mixer-view.js:1; tests/mixer-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; app.js:2595; app.js:2648; app.js:2667; app.js:4392; app.js:1",
+      "source": "modules/journey-chrome.js:1; modules/session-countdown.js:1; tests/session-countdown.test.mjs:1; modules/journey-video-prelude.js:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/mixer-view.js:1; tests/mixer-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; app.js:2070; app.js:2323; app.js:2663; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1",
       "rows": [
         [
           [
@@ -2572,7 +2596,9 @@
       ],
       "notes": [
         "The app no longer requests or exits fullscreen automatically. Browser-speech cancellation and Piper buffer suspension are different pause mechanisms. Re-enable No Mantra does not immediately restart a previously skipped mantra stage.",
-        "CP-MOD-108–127 moves the shared countdown SVG progress and hide presentation helpers into `modules/session-countdown.js`; ticker cadence and session lifecycle remain unchanged."
+        "CP-MOD-108–127 moves the shared countdown SVG progress and hide presentation helpers into `modules/session-countdown.js`; ticker cadence and session lifecycle remain unchanged.",
+        "CP-MOD-162 moves the existing shared guide-controlled countdown and Continue button wait into `guide-controlled-transition.js`. Yoga and care keep their current call sites; pause rejection, Stop cancellation, focus management, and listener cleanup are unchanged.",
+        "CP-MOD-163 moves the existing Stop cleanup into `session-stop.js` behind the same controller method. Audio and visual shutdown order, wake lock/countdown release, guide cancellation, UI reset and destination screen are unchanged; this is source ownership only."
       ]
     },
     {
@@ -2580,7 +2606,7 @@
       "group": "Live session",
       "title": "Optional Lobby video introduction",
       "subtitle": "An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.",
-      "source": "modules/journey-video-prelude.js:1; modules/journey-preference-settings-view.js:1; app.js:3425; app.js:4392; app.js:1; sw.js:1",
+      "source": "modules/journey-video-prelude.js:1; modules/journey-preference-settings-view.js:1; sw.js:1; app.js:3381; app.js:3392",
       "rows": [
         [
           [
@@ -2698,7 +2724,7 @@
       "group": "Live session",
       "title": "Completion, statistics and external handoff",
       "subtitle": "Different end states are intentionally visible here.",
-      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; app.js:3294; app.js:550; index.html:659",
+      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; index.html:659; app.js:2468; tests/completion-session.test.mjs:1; tests/journey-completion-handoff.test.mjs:1",
       "rows": [
         [
           [
@@ -2780,7 +2806,8 @@
       ],
       "notes": [
         "Earn destination is https://missionode.github.io/earn-app/receive.html?Source=Lite. No automatic navigation. Shots, manual stops, and experiments do not use this stats/completion path.",
-        "CP-MOD-129–148 moves Earn-link delay, Hindi exclusion, cancellation/hide, delayed reveal and focus into the completion owner. Completion order and user-initiated navigation are unchanged."
+        "CP-MOD-129–148 moves Earn-link delay, Hindi exclusion, cancellation/hide, delayed reveal and focus into the completion owner. Completion order and user-initiated navigation are unchanged.",
+        "CP-MOD-164: the existing completion owner now performs the controller’s natural completion cleanup, stats and modal setup. Standard, HRIM, focused and Sleep entry routes remain unchanged; this is ownership only."
       ]
     },
     {
@@ -2788,7 +2815,7 @@
       "group": "Systems",
       "title": "Scripts, language and timing",
       "subtitle": "Content selection, validation, fallback and demo behavior.",
-      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:641; app.js:944; app.js:534; scripts.json:1; language-manifest.json:1",
+      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; scripts.json:1; language-manifest.json:1; app.js:470; app.js:533; app.js:550",
       "rows": [
         [
           [
@@ -2910,7 +2937,7 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; app.js:4218; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322; app.js:1961; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1",
       "rows": [
         [
           [
@@ -3046,7 +3073,8 @@
       ],
       "notes": [
         "Browser speech is outside the Web Audio effects chain. Voice Space/Warmth/Clarity processing applies to Piper audio; browser voice capabilities differ. Soft and interval prompts use related wrappers.",
-        "CP-MOD-129–151 moves Piper model lookup, supported pace bounds, cadence settings, browser voice locale/gender and voice selection, registry loading, voice picker option rendering, browser voice-change refresh and silent discovery warm-up into the existing Piper lifecycle owner. The app still supplies locale policy and voice defaults; voice synthesis/playback remain unchanged. Voice-status presentation is owned by media-controls view."
+        "CP-MOD-129–151 moves Piper model lookup, supported pace bounds, cadence settings, browser voice locale/gender and voice selection, registry loading, voice picker option rendering, browser voice-change refresh and silent discovery warm-up into the existing Piper lifecycle owner. The app still supplies locale policy and voice defaults; voice synthesis/playback remain unchanged. Voice-status presentation is owned by media-controls view.",
+        "CP-MOD-161: `piper-narration.js` owns Piper sentence sequencing behind the stable controller adapter. One sentence is prepared ahead during playback; generation cancellation, pause handling, browser-speech fallback, sentence/exit gaps and long final fades remain intact. The script stays eagerly loaded and cached for offline use. No performance gain is claimed."
       ]
     },
     {
@@ -3054,7 +3082,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-drone-start.js:1; modules/audio-drone-stop.js:1; modules/audio-mantra-playback.js:1; modules/audio-background-music-lifecycle.js:1; modules/audio-background-music-controls.js:1; modules/audio-music-echo.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; app.js:39; app.js:896; app.js:963; app.js:1086; app.js:1124; app.js:1142; app.js:997; app.js:1408",
+      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-comfort-effects.js:1; modules/audio-drone-start.js:1; modules/audio-drone-stop.js:1; modules/audio-mantra-playback.js:1; modules/audio-background-music-lifecycle.js:1; modules/audio-background-music-controls.js:1; modules/audio-music-echo.js:1; modules/audio-voice-effects.js:1; modules/audio-pleasure-ambience.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; tests/audio-tone-playback.test.mjs:1; tests/audio-comfort-effects.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; app.js:648; app.js:732",
       "rows": [
         [
           [
@@ -3149,6 +3177,7 @@
       ],
       "notes": [
         "Narration ducks music. Music/mantra gates overlap on entry and exit; completion does not restore music and uses one music exit envelope. Native loops do not depend on JavaScript timers and keep one source per layer; prepared overlap PCM is reused by original buffer and overlap length via WeakMap. Overlap remains bounded to half the buffer. Source cleanup follows audio time through pause and explicit exit fades. Elemental exit stops both noise and its modulator; source end disconnects filters and modulation gains. Music entry is linear with no second long source fade. Intentional silence and explicit mute remain. Spatial choices: Off, Stereo, Headphones, Room. PCM/mock tests do not establish device audibility, lack of silence inside recordings, or uninterrupted playback if the OS suspends audio.",
+        "CP-MOD-154: modules/audio-voice-effects.js owns setVoiceTuning and setVoiceEcho. Warmth spans -3 to +3 dB and clarity -4 to +4 dB after the existing Number finite check, neutral-50 fallback and 0–100 clamp. Off/light/spacious retain wet/filter values 0/3200, 0.12/3000 and 0.18/3600. Route activation requires wet > 0 and voicePlaybackActive === true; tail remains VOICE_REVERB_TAIL_SECONDS + (voiceExitFade || 0) + 0.3. All ramps remain 250 ms with hold-or-cancel/set behavior; pre-delay is untouched. App keeps setVoicePlaybackActive assignments before reapplying the saved echo mode.",
         "CP-MOD-048 moves only the one-time Web Audio graph construction into `modules/audio-engine-initialization.js`; `AudioEngine.init()` remains the stable adapter and runtime source/effect lifecycles stay with the existing owners. The graph and settings are unchanged; mock-node tests are not device listening evidence.",
         "CP-MOD-049 moves the existing distortion curve and impulse/noise buffer generation helpers into `modules/audio-signal-design.js`; AudioEngine helper adapters preserve call order and cached-noise lifetime. No sound or performance change is claimed.",
         "CP-MOD-050 moves only panner creation and generic position interpolation into `modules/audio-spatial-geometry.js`; AudioEngine retains adapters and mode-specific spatial profiles. No spatial behavior or performance change is claimed.",
@@ -3159,7 +3188,9 @@
         "CP-MOD-055 moves recorded mantra startup/stop orchestration into `modules/audio-mantra-playback.js`; AudioEngine keeps compatibility methods and music bus/profile policy. Async decode cancellation, reverb tails, transitions, and restoration semantics remain explicit. No audible or performance improvement is claimed.",
         "CP-MOD-056 moves background music loop startup/retirement into `modules/audio-background-music-lifecycle.js`; gain/duck/restore and echo policy remain app-owned. Buffer caching, restart waits and fade/tail timing are preserved. No audio/performance benefit is claimed.",
         "CP-MOD-057 moves background music fade/gain/duck/mute/restore and timer cancellation into `modules/audio-background-music-controls.js`; AudioEngine keeps stable methods, echo profile selection and bus ownership. Zero-volume, stage window, slider-role, mantra suppression and tail-gate behavior are preserved. No audio/performance benefit is claimed.",
-        "CP-MOD-058 moves music-echo preset resolution and parameter ramps into `modules/audio-music-echo.js`; AudioEngine keeps the stable adapter, graph ownership, voice echo and settings persistence. Profile values, invalid-mode fallback, 250 ms ramps and reverb tail timing are preserved. No audio/performance benefit is claimed."
+        "CP-MOD-058 moves music-echo preset resolution and parameter ramps into `modules/audio-music-echo.js`; AudioEngine keeps the stable adapter, graph ownership and settings persistence. Voice echo moved to `modules/audio-voice-effects.js` in CP-MOD-154. Profile values, invalid-mode fallback, 250 ms ramps and reverb tail timing are preserved. No audio/performance benefit is claimed.",
+        "CP-MOD-154 moves voice tuning and Voice Space profile application to `modules/audio-voice-effects.js`. AudioEngine retains its public adapters and graph state; playback gating, tail duration and parameter-ramp order are preserved.",
+        "CP-MOD-168 moves the existing five-part singing-bowl oscillator lifecycle into `modules/audio-tone-playback.js`; exact partial ratios, filter Q, gain envelope, No Frequency/mute guards and onended disposal remain covered. CP-MOD-169 moves eyes-closed and audio-filter tuning policy into `modules/audio-comfort-effects.js`, retaining the AudioEngine adapters and every original target/ramp. Both modules are eager and offline-cached; ownership only, with no runtime or sound-quality claim."
       ]
     },
     {
@@ -3167,7 +3198,7 @@
       "group": "Systems",
       "title": "Sound options and live suppression",
       "subtitle": "What changes when sound settings are toggled.",
-      "source": "modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; app.js:1; app.js:1; app.js:2086; tests/audio-effects-settings-view.test.mjs:1",
+      "source": "modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:1039; app.js:1058; app.js:2663",
       "rows": [
         [
           [
@@ -3271,9 +3302,11 @@
       ],
       "notes": [
         "No Frequency also suppresses generated bowl/anchor through audio-engine guards. No Mantra affects standard chakra/yoga drone starts, but is not a blanket prohibition on every generated sound route.",
+        "CP-MOD-154: AudioEngine voice tone and Voice Space adapters delegate to audio-voice-effects; settings state, caller order, graph-readiness guards, profiles and automation are unchanged. Direct module and effects-matrix tests verify this owner; no user-flow branch changes.",
         "CP-MOD-068 moves only the Lobby Mood & Relaxation custom-URL button, localized status and busy/recovery handling into `modules/mood-ambience-settings-view.js`. `AudioEngine.loadPleasureAmbienceUrl()` remains authoritative for loading, validation and persistence; displayed flow and audio behavior are unchanged.",
         "CP-MOD-091–095 move the existing Mood & Relaxation intention, intensity, gain/confirmation, blur and blur-level input handlers into this view owner. The same Advanced Features/No Frequency guards, storage keys, confirmation threshold and audio-update order remain.",
-        "CP-MOD-108–127 moves the pure Mood & Relaxation gain/blur/URL/intensity/formatting policies into this owner and moves spatial-mode normalization beside the spatial settings bindings. The app passes the same bounds, profiles and defaults; no sound-level change is intended."
+        "CP-MOD-108–127 moves the pure Mood & Relaxation gain/blur/URL/intensity/formatting policies into this owner and moves spatial-mode normalization beside the spatial settings bindings. The app passes the same bounds, profiles and defaults; no sound-level change is intended.",
+        "CP-MOD-152 moves ambience audio lifecycle ownership to `modules/audio-pleasure-ambience.js`; URL preference recovery, optional manifest-layer handling, loop fades, blur/gain automation and spatial approach remain behavior-identical behind AudioEngine adapters. This is an eager offline-cached ownership extraction, not a runtime or sound-quality optimization."
       ]
     },
     {
@@ -3281,7 +3314,7 @@
       "group": "Systems",
       "title": "Visuals and browser lifecycle",
       "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
-      "source": "modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; modules/visual-comfort-settings-view.js:1; tests/visual-comfort-settings-view.test.mjs:1; app.js:4293; sky-astronomy.js:1; night-sky.js:1; style.css:1; celestial-presence.js:1",
+      "source": "modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; modules/visual-comfort-settings-view.js:1; tests/visual-comfort-settings-view.test.mjs:1; sky-astronomy.js:1; night-sky.js:1; style.css:1; celestial-presence.js:1; app.js:1420; app.js:2468",
       "rows": [
         [
           [
@@ -4004,7 +4037,7 @@
       "group": "Systems",
       "title": "Display-language UI renderer",
       "subtitle": "Owns localized UI painting and the language, display-language and voice preference change bindings; sky redraws and journey routing remain app-owned.",
-      "source": "modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:734; app.js:3760",
+      "source": "modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:559",
       "rows": [
         [
           [
@@ -4102,7 +4135,7 @@
       "group": "Systems",
       "title": "Timing configuration and saved values",
       "subtitle": "The ordered setup path for timing-config.json, named profiles, slider bounds, persisted durations and duration-control event handling.",
-      "source": "modules/timing-settings.js:1; modules/timing-settings-view.js:1; modules/drone-duration-settings-view.js:1; tests/timing-settings.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; timing-config.json:1; app.js:514; app.js:1; app.js:1; modules/session-estimate.js:1; tests/session-estimate.test.mjs:1",
+      "source": "modules/timing-settings.js:1; modules/timing-settings-view.js:1; modules/drone-duration-settings-view.js:1; tests/timing-settings.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; timing-config.json:1; modules/session-estimate.js:1; tests/session-estimate.test.mjs:1; app.js:426; app.js:2740; app.js:1420",
       "rows": [
         [
           [
@@ -4180,7 +4213,7 @@
       "group": "Systems",
       "title": "Automatic journey voice profile",
       "subtitle": "Chooses and applies the established voice profile at journey start.",
-      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:3628; app.js:3747",
+      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:1420; app.js:2623",
       "rows": [
         [
           [
@@ -4249,7 +4282,7 @@
       "group": "Systems",
       "title": "Session-only journey-mode hydration",
       "subtitle": "App-load behavior for session-only mode controls and retired selection keys.",
-      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:101",
+      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:103",
       "rows": [
         [
           [
@@ -4318,7 +4351,7 @@
       "group": "Systems",
       "title": "Mixer preference control hydration",
       "subtitle": "Copies already-loaded preference state into audio and ambience controls in established order.",
-      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:102",
+      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:104",
       "rows": [
         [
           [
@@ -4375,7 +4408,7 @@
       "group": "Systems",
       "title": "Journey selection preference hydration",
       "subtitle": "Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.",
-      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:103",
+      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:105",
       "rows": [
         [
           [
@@ -4444,7 +4477,7 @@
       "group": "Systems",
       "title": "Timing preference control hydration",
       "subtitle": "Restores timing slider values and their associated display labels without owning timing configuration.",
-      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:3664",
+      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:2719",
       "rows": [
         [
           [
@@ -4501,7 +4534,7 @@
       "group": "Systems",
       "title": "Appearance preference control hydration",
       "subtitle": "Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.",
-      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:104",
+      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:106",
       "rows": [
         [
           [
@@ -4558,7 +4591,7 @@
       "group": "Systems",
       "title": "Script preference control hydration",
       "subtitle": "Restores the selected script source and updates the custom-script presentation without owning journey-time script loading.",
-      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:3716",
+      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:2712",
       "rows": [
         [
           [
@@ -4760,7 +4793,7 @@
       "group": "Systems",
       "title": "Personal-care preference control hydration",
       "subtitle": "Restores saved personal-care toggle values without changing session authorization or care execution.",
-      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:105",
+      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:107",
       "rows": [
         [
           [
@@ -4817,7 +4850,7 @@
       "group": "Supporting pages",
       "title": "Settings backup and restore",
       "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.",
-      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; app.js:4129; index.html:215",
+      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; index.html:215; app.js:2829",
       "rows": [
         [
           [
@@ -4930,7 +4963,7 @@
       "group": "Supporting pages",
       "title": "Operator-led chakra assessment",
       "subtitle": "Single Lobby entry point, Advanced Features-gated interview with answer undo and a cautious chakra-evidence rapport cue plus icebreaker.",
-      "source": "index.html:515; app.js:4008; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1",
+      "source": "index.html:515; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1; app.js:3332",
       "rows": [
         [
           [
@@ -5153,7 +5186,7 @@
       "group": "Supporting pages",
       "title": "Frequency repertory handoff",
       "subtitle": "Searchable reference → prepared custom Shot → explicit activation.",
-      "source": "docs/repertory.html:153; app.js:4347",
+      "source": "docs/repertory.html:153; app.js:3256",
       "rows": [
         [
           [
