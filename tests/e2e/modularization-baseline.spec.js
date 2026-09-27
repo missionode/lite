@@ -61,13 +61,13 @@ test('records cold, warm and offline startup baseline without starting playback'
     const cache = await caches.open(cacheName);
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
-      appEntryPresent: urls.includes('/app.js?v=4.12'),
+      appEntryPresent: urls.includes('/app.js?v=4.13'),
       sessionCountdownModulePresent: urls.includes('/modules/session-countdown.js?v=1.0'),
       journeyChromeModulePresent: urls.includes('/modules/journey-chrome.js?v=1.0'),
       videoPreludeModulePresent: urls.includes('/modules/journey-video-prelude.js?v=1.0'),
       ambientParticleFieldModulePresent: urls.includes('/modules/ambient-particle-field.js?v=1.1'),
       visualEngineModulePresent: urls.includes('/modules/visual-engine.js?v=1.0'),
-      stylesheetEntryPresent: urls.includes('/style.css?v=2.07')
+      stylesheetEntryPresent: urls.includes('/style.css?v=2.08')
     };
   });
   expect(shellCache.appEntryPresent).toBe(true);

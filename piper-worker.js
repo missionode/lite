@@ -32,6 +32,7 @@ async function getSession(voiceId, requestId, voiceDefinition = {}) {
             voiceId,
             modelPath: voiceDefinition.modelPath,
             configPath: voiceDefinition.configPath,
+            modelBaseUrl: voiceDefinition.modelBaseUrl,
             phonemizerVoice: voiceDefinition.phonemizerVoice,
             progress: (progress) => reportProgress(requestId, progress)
         });

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Tamil localization and Indic Piper voice setup
+
+Added Tamil to the manifest-backed language picker with a complete UI locale, narration translations and a Tamil Rasa Piper default; registered the community Hindi Priyamvada Piper voice as well. Piper now honors each voice's model repository URL, and registry/manifest plus shell/Piper/language caches are versioned so existing local previews can discover the additions. Service Worker no longer duplicates remote Piper ONNX files already managed by the runtime cache. Focused language, voice-routing, lifecycle and settings-backup checks are listed in the release PR. Hindi model terms remain explicitly marked for confirmation before commercial redistribution.
+
 ## Completed locally — CP-MOD-154 Voice tone and echo ownership
 
 `modules/audio-voice-effects.js` owns the unchanged tuning math and Voice Space profiles/routing/ramps. AudioEngine adapters, playback-state order and user flows remain unchanged. Current complete runnable Node sweep passes except `content-safety` and `drone-duration`, which cannot start without owner-managed `docs/dot.json`; browser tests remain excluded. Shell cache has since advanced to v5.324.

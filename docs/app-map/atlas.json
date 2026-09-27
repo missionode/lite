@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-27",
-    "commit": "6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261)",
-    "scope": "Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made."
+    "commit": "81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261)",
+    "scope": "Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made."
   },
   "graphs": [
     {
@@ -566,14 +566,14 @@
           [
             "language",
             "Load language registry",
-            "Restore meditation language or Malayalam default; restore display language or English fallback. Load all four locale bundles."
+            "Restore meditation language or Malayalam default; restore display language or English fallback. Load all five locale bundles, including the fully localized Tamil bundle."
           ]
         ],
         [
           [
             "voices",
             "Load voice registry",
-            "Load Piper definitions; enumerate browser voices; restore preferences and attach UI handlers."
+            "Fetch the versioned Piper definitions; offer Tamil Rasa and Hindi Priyamvada defaults alongside the Malayalam, English and Russian voices; enumerate browser voices; restore preferences and attach UI handlers. Community weights load on first preview/use."
           ]
         ],
         [
@@ -3598,7 +3598,7 @@
           [
             "install",
             "Service worker install",
-            "cache.addAll shell/content/audio assets, including pinned Astronomy Engine and the versioned star catalogue/renderer; one rejected required asset rejects precache installation. skipWaiting requested."
+            "Precache shell/content/audio assets, including pinned Astronomy Engine, the versioned star catalogue/renderer, and manifest/Tamil locale in a dedicated locale cache; one rejected required asset rejects installation. Piper registry/model cache and shell/language caches use refreshed generations; remote model weights are not duplicated in CacheStorage. skipWaiting requested."
           ]
         ],
         [
@@ -4043,7 +4043,7 @@
           [
             "language",
             "Meditation language change",
-            "Update narration language; refresh a generated intention only when it is still localized/default; choose HRIM or standard intention from the current mode; refresh voices, auto-select and repaint locale UI."
+            "Update narration language; refresh a generated intention only when it is still localized/default; choose HRIM or standard intention from the current mode; refresh voices, auto-select and repaint locale UI. Tamil is available from the manifest-backed Tamil locale and narration bundle."
           ]
         ],
         [
@@ -4056,8 +4056,8 @@
         [
           [
             "voice",
-            "Voice selection",
-            "Update the selected voice in session state; persistence remains at the explicit Save Settings action."
+            "Voice selection and preview",
+            "Load the versioned Piper registry, offer language-matched voices plus browser fallbacks, select the language default, then preview the manifest sample. Tamil Rasa and Hindi Priyamvada use their configured community model sources; initial model weights download on first use."
           ]
         ],
         [
@@ -4127,7 +4127,7 @@
         ]
       ],
       "notes": [
-        "The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module. The same owner now binds language/display-language/voice preference changes; Save Settings still owns explicit persistence of the selected narration voice."
+        "The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module. The same owner binds language/display-language/voice preference changes; Save Settings persists the selected narration voice. The Tamil bundle, narration fields, community Piper models and preview defaults are included in the supported-language flow."
       ]
     },
     {

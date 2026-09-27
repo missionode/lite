@@ -20,7 +20,7 @@ for (const language of ['en', 'ml', 'hi', 'ru']) {
 assert.match(app, /const journeyRoadmap = window\.ChakraJourneyRoadmap/);
 assert.match(app, /function getJourneyRoadmapLabels\(\)\s*\{\s*return journeyRoadmap\.resolveLabels\(/);
 assert.match(app, /function updateJourneyRoadmap\(\)\s*\{\s*journeyRoadmap\.render\(/);
-assert.match(html, /modules\/journey-roadmap\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
+assert.match(html, /modules\/journey-roadmap\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/);
 assert.match(serviceWorker, /modules\/journey-roadmap\.js\?v=1\.0/);
 
 const context = vm.createContext({});

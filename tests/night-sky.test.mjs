@@ -50,7 +50,7 @@ const particleFieldModule=readFileSync('modules/ambient-particle-field.js','utf8
 const html=readFileSync('index.html','utf8');
 const serviceWorker=readFileSync('sw.js','utf8');
 assert.ok(html.indexOf('night-sky.js?v=1.1') < html.indexOf('modules/ambient-particle-field.js?v=1.1'));
-assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.1') < html.indexOf('app.js?v=4.12'));
+assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.1') < html.indexOf('app.js?v=4.13'));
 assert.match(serviceWorker,/modules\/ambient-particle-field\.js\?v=1\.1/,
     'The sky module must remain available from the exact offline shell cache.');
 for (const localeName of ['en', 'ml', 'hi', 'ru']) {

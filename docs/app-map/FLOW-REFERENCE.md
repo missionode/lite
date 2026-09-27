@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-27.
+Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-27.
 
-Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
+Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -297,8 +297,8 @@ flowchart TD
 | Open / reload | Objects and state are constructed; splash is visible. |
 | Start observer sky | Load local Astronomy Engine and the real star catalogue before the sky controller. Begin with an explicitly labelled Greenwich reference, then replace it with granted device coordinates. Positions use the current UTC instant; display timezone does not shift them. |
 | Load timing JSON | Built-in defaults on failure; timingProfile query can apply fast-test overrides. |
-| Load language registry | Restore meditation language or Malayalam default; restore display language or English fallback. Load all four locale bundles. |
-| Load voice registry | Load Piper definitions; enumerate browser voices; restore preferences and attach UI handlers. |
+| Load language registry | Restore meditation language or Malayalam default; restore display language or English fallback. Load all five locale bundles, including the fully localized Tamil bundle. |
+| Load voice registry | Fetch the versioned Piper definitions; offer Tamil Rasa and Hindi Priyamvada defaults alongside the Malayalam, English and Russian voices; enumerate browser voices; restore preferences and attach UI handlers. Community weights load on first preview/use. |
 | Configured flag? | chakra_configured determines initial screen. |
 | Repertory query? | Keep shotSource / shotFrequency pending while locked. Seven-tap unlock consumes the query and offers normal Shot confirmation; initial screen choice remains unchanged. |
 | Settings | Unconfigured visitor. Save sets chakra_configured and opens Lobby. |
@@ -1430,7 +1430,7 @@ flowchart TD
 | Page / experience requests | HTML/CSS/JS, JSON, audio/video and Piper assets. |
 | localStorage | Languages, voices, durations, chakra choices, intention, custom script, mixer settings and stats; consultation stores answers separately. |
 | Session-only choices | Experience modes, shared care/Shots unlock and mood ambience enablement reset on page load. No full in-progress journey restore. |
-| Service worker install | cache.addAll shell/content/audio assets, including pinned Astronomy Engine and the versioned star catalogue/renderer; one rejected required asset rejects precache installation. skipWaiting requested. |
+| Service worker install | Precache shell/content/audio assets, including pinned Astronomy Engine, the versioned star catalogue/renderer, and manifest/Tamil locale in a dedicated locale cache; one rejected required asset rejects installation. Piper registry/model cache and shell/language caches use refreshed generations; remote model weights are not duplicated in CacheStorage. skipWaiting requested. |
 | Activate cache generation | Claim clients; delete every cache except three exact current shell/Piper/language names. |
 | Optional ambience | Manifest and matching pleasure files use network no-store, despite manifest appearing in precache. |
 | Piper / language | Cache-first, fetch on miss, cache successful response. Piper recognizes local assets and Hugging Face voice URLs. |
@@ -1565,7 +1565,7 @@ Sources: [modules/locale-ui-renderer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lit
 flowchart TD
   language["Meditation language change"]
   display["Display language change"]
-  voice["Voice selection"]
+  voice["Voice selection and preview"]
   sky["Refresh sky labels"]
   paint["Paint UI"]
   fallback["Stale locale bundle"]
@@ -1581,15 +1581,15 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Meditation language change | Update narration language; refresh a generated intention only when it is still localized/default; choose HRIM or standard intention from the current mode; refresh voices, auto-select and repaint locale UI. |
+| Meditation language change | Update narration language; refresh a generated intention only when it is still localized/default; choose HRIM or standard intention from the current mode; refresh voices, auto-select and repaint locale UI. Tamil is available from the manifest-backed Tamil locale and narration bundle. |
 | Display language change | Persist the selected display language and repaint locale UI. |
-| Voice selection | Update the selected voice in session state; persistence remains at the explicit Save Settings action. |
+| Voice selection and preview | Load the versioned Piper registry, offer language-matched voices plus browser fallbacks, select the language default, then preview the manifest sample. Tamil Rasa and Hindi Priyamvada use their configured community model sources; initial model weights download on first use. |
 | Refresh sky labels | Before repainting, app refreshes sky location/celestial labels and invalidates the cached celestial label layer. |
 | Paint UI | Update title, app labels, group labels, session-stat captions, placeholders, data-i18n text, ARIA labels and text nodes attached to selectable controls. |
 | Stale locale bundle | If a key is missing and lookup returns the key itself, preserve the readable HTML fallback for ordinary data-i18n elements. |
 | Refresh previews | After label painting, call the existing roadmap refresh first, then the drone-duration summary refresh. Both remain app-owned. |
 
-- The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module. The same owner now binds language/display-language/voice preference changes; Save Settings still owns explicit persistence of the selected narration voice.
+- The renderer is eager classic-script code and offline-pre-cached. It changes ownership only; no localization coverage or startup-performance improvement is claimed. Sky calculations and celestial redraw remain outside this module. The same owner binds language/display-language/voice preference changes; Save Settings persists the selected narration voice. The Tamil bundle, narration fields, community Piper models and preview defaults are included in the supported-language flow.
 
 <a id="timing-configuration"></a>
 

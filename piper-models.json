@@ -64,6 +64,36 @@
       "quality": "medium",
       "license": "See the voice MODEL_CARD before redistribution",
       "source": "https://huggingface.co/rhasspy/piper-voices"
+    },
+    {
+      "id": "ta_IN-rasa_male-medium",
+      "language": "ta",
+      "locale": "ta-IN",
+      "label": "Piper Tamil — Rasa (Community, Medium)",
+      "gender": "male",
+      "modelPath": "ta_IN-rasa_male-medium.onnx",
+      "configPath": "ta_IN-rasa_male-medium.onnx.json",
+      "modelBaseUrl": "https://huggingface.co/tinisoft/piper-ta_IN-rasa_male-medium/resolve/main",
+      "phonemizerVoice": "ta",
+      "modelSize": 66500000,
+      "quality": "medium",
+      "license": "CC-BY-4.0; attribute the model and AI4Bharat Rasa dataset",
+      "source": "https://huggingface.co/tinisoft/piper-ta_IN-rasa_male-medium"
+    },
+    {
+      "id": "hi_IN-priyamvada-medium",
+      "language": "hi",
+      "locale": "hi-IN",
+      "label": "Piper Hindi — Priyamvada (Community, Medium)",
+      "gender": "female",
+      "modelPath": "hi/hi_IN/priyamvada/medium/hi_IN-priyamvada-medium.onnx",
+      "configPath": "hi/hi_IN/priyamvada/medium/hi_IN-priyamvada-medium.onnx.json",
+      "modelBaseUrl": "https://huggingface.co/PravalX/piper-voices/resolve/main",
+      "phonemizerVoice": "hi",
+      "modelSize": 66500000,
+      "quality": "medium",
+      "license": "Community-reported CC terms; confirm the model-specific license before redistribution",
+      "source": "https://huggingface.co/PravalX/piper-voices"
     }
   ]
 }

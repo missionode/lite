@@ -63,9 +63,9 @@
         }
     });
 
-    async function loadVoiceRegistry(fetchImpl = global.fetch, logger = global.console) {
+    async function loadVoiceRegistry(fetchImpl = global.fetch, logger = global.console, registryUrl = 'piper-models.json') {
         try {
-            const response = await fetchImpl('piper-models.json');
+            const response = await fetchImpl(registryUrl);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const json = await response.json();
             return Array.isArray(json.voices) ? json.voices : [];

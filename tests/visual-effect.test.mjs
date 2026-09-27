@@ -13,8 +13,8 @@ const ml = JSON.parse(readFileSync('locales/ml.json', 'utf8'));
 const ru = JSON.parse(readFileSync('locales/ru.json', 'utf8'));
 const hi = JSON.parse(readFileSync('locales/hi.json', 'utf8'));
 
-assert.match(html, /<canvas id="particle-canvas" aria-hidden="true"><\/canvas>/,
-    'The shared background should include the ambient particle canvas.');
+assert.match(html, /<canvas id="particle-canvas"(?: aria-hidden="true")?[^>]*><\/canvas>/,
+    'The shared background should include the ambient particle canvas, directly or inside its decorative wrapper.');
 assert.match(particleField, /class AmbientParticleField[\s\S]*?requestAnimationFrame\(this\.render\)/,
     'The particle field should use a lightweight animation loop.');
 assert.match(particleField, /navigator\.geolocation\.getCurrentPosition[\s\S]*?refreshCelestialBodies/,
@@ -37,9 +37,9 @@ assert.match(particleField, /Math\.min\(window\.devicePixelRatio \|\| 1, 1\.5\)/
     'Particle rendering should cap device-pixel density for mobile performance.');
 assert.match(particleField, /this\.ctx\.save\(\);\s*this\.ctx\.shadowBlur = 0;\s*this\.ctx\.filter = 'blur\(3px\)';[\s\S]*?fillRect\(labelLeft, labelY - 12, labelWidth, 16\);\s*this\.ctx\.restore\(\);[\s\S]*?strokeText\(label/,
     'Only the label backing is blurred; text rendering restores its sharp state.');
-assert.match(html, /night-sky\.js\?v=[^\"]+[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.0[\s\S]*?app\.js\?v=/,
+assert.match(html, /night-sky\.js\?v=[^\"]+[\s\S]*?modules\/ambient-particle-field\.js\?v=1\.1[\s\S]*?app\.js\?v=/,
     'The cached sky dependencies and extracted renderer must load before the app controller.');
-assert.match(html, /modules\/ambient-particle-field\.js\?v=1\.0[\s\S]*?modules\/visual-engine\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/,
+assert.match(html, /modules\/ambient-particle-field\.js\?v=1\.1[\s\S]*?modules\/visual-engine\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/,
     'The shared visual-effect owner must load after sky dependencies and before the app.');
 assert.match(readFileSync('sw.js', 'utf8'), /modules\/visual-engine\.js\?v=1\.0/,
     'The visual-effect module must be precached for offline sessions.');

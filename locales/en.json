@@ -117,6 +117,7 @@
     "piperFallback": "Piper unavailable — using browser voice.",
     "piperLoadFailed": "Piper could not load — using browser voice.",
     "piperPreviewFailed": "Piper preview failed — choose a browser fallback voice.",
+    "piperCommunityVoiceNote": "Community Tamil/Hindi Piper models download about 64 MB the first time you preview or use them. Hindi model redistribution terms still need confirmation.",
     "practiceLoadFailed": "A selected guided practice could not load. Please check your connection and try again."
     ,"journeys": "Journeys"
     ,"totalTime": "Total Time"
