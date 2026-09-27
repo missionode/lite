@@ -2751,6 +2751,20 @@ body.static-decorations .undo-unlearn-scene {
     accent-color: var(--lobby-gold);
 }
 
+#lobby-screen .chakra-selection-thumbnail {
+    display: block;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 5px rgba(232,194,126,0.22));
+}
+
+#lobby-screen .chakra-selection-list .checkbox-label > span[data-i18n] {
+    min-width: 0;
+}
+
 #lobby-screen .experience-mode-options {
     justify-content: flex-start;
     gap: 0.55rem;

@@ -5,6 +5,7 @@ const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const selectionView = fs.readFileSync(new URL('../modules/chakra-selection-view.js', import.meta.url), 'utf8');
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 
@@ -21,7 +22,11 @@ assert.doesNotMatch(
 );
 for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']) {
     assert.match(html, new RegExp(`id="chakra-selection"[\\s\\S]*?value="${chakra}"`), `${chakra} should remain selectable`);
+    assert.match(html, new RegExp(`value="${chakra}"[^>]*>[\\s\\S]*?src="symbols/${chakra}\\.png"[\\s\\S]*?data-i18n="ui\\.(?:root|sacral|solar|heart|throat|thirdEye|crown)"`), `${chakra} should show its own image beside the localized label`);
+    assert.ok(fs.existsSync(new URL(`../symbols/${chakra}.png`, import.meta.url)), `${chakra} thumbnail asset should exist`);
+    assert.ok(serviceWorker.includes(`'./symbols/${chakra}.png'`), `${chakra} thumbnail should remain available offline`);
 }
+assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /#lobby-screen \.chakra-selection-thumbnail[\s\S]*?object-fit:\s*contain/);
 assert.match(selectionView, /function persist\(\)[\s\S]*?storage\.setItem\('chakra_selected'/, 'Room selection should persist immediately');
 assert.match(app, /chakraSelectionView\.bindPersistence\(\)/, 'Room selection should bind persistence on change');
 assert.match(app, /chakraSelectionView\.bindChipDisplay\(\)/, 'Room selection should retain its active chip display');
