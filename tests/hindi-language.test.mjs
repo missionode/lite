@@ -205,6 +205,6 @@ assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
 assert.match(html, /app\.js\?v=4.12/, 'The application query version must match the modularized delivery.');
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'/, 'The offline shell should use a versioned cache name.');
-assert.match(serviceWorker, /chakra-language-v54/, 'The current locale cache generation must remain declared for language delivery.');
+assert.match(serviceWorker, /chakra-language-v55/, 'The current locale cache generation must remain declared for language delivery.');
 
 console.log('Hindi language contract passed.');

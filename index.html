@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.06">
+    <link rel="stylesheet" href="style.css?v=2.07">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -226,7 +226,7 @@
                 </label>
                 <button id="open-settings-manager" type="button" class="secondary-btn" data-i18n="ui.manageSettings">Manage Settings</button>
             </div>
-            <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Start Meditation</button>
+            <button id="save-config" class="primary-btn" style="margin-top: 1rem; margin-bottom: 2rem;">Go to Meditation Room</button>
             <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
         </section>
 
@@ -378,13 +378,13 @@
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
                 <div id="chakra-selection" class="chakra-selection-list">
-                    <label class="checkbox-label"><input type="checkbox" value="root"> <span data-i18n="ui.root">Root</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <span data-i18n="ui.sacral">Sacral</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="solar"> <span data-i18n="ui.solar">Solar</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="heart"> <span data-i18n="ui.heart">Heart</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="throat"> <span data-i18n="ui.throat">Throat</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="root"> <img class="chakra-selection-thumbnail" src="symbols/root.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.root">Root</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <img class="chakra-selection-thumbnail" src="symbols/sacral.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.sacral">Sacral</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar"> <img class="chakra-selection-thumbnail" src="symbols/solar.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.solar">Solar</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart"> <img class="chakra-selection-thumbnail" src="symbols/heart.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.heart">Heart</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat"> <img class="chakra-selection-thumbnail" src="symbols/throat.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.throat">Throat</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <img class="chakra-selection-thumbnail" src="symbols/thirdeye.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.thirdEye">3rd Eye</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown"> <img class="chakra-selection-thumbnail" src="symbols/crown.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
             </div>
             <div id="journey-integration-addons" class="config-group lobby-experience-mode lobby-panel">

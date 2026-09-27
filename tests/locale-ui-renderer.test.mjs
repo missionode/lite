@@ -6,6 +6,16 @@ const source = fs.readFileSync('modules/locale-ui-renderer.js', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
 const html = fs.readFileSync('index.html', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
+const roomNavigationLabels = {
+    en: 'Go to Meditation Room',
+    ml: 'ധ്യാനമുറിയിലേക്ക് പോകുക',
+    hi: 'ध्यान कक्ष पर जाएँ',
+    ru: 'Перейти в комнату медитации'
+};
+for (const [language, expected] of Object.entries(roomNavigationLabels)) {
+    const locale = JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8'));
+    assert.equal(locale.ui.startMeditation, expected, `${language} Settings CTA should describe its Lobby destination`);
+}
 const context = vm.createContext({});
 vm.runInContext(source, context);
 const renderer = context.ChakraLocaleUiRenderer;
