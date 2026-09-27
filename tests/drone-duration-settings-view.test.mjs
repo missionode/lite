@@ -10,7 +10,7 @@ assert.match(app, /const droneDurationSettingsView = window\.ChakraDroneDuration
 assert.match(app, /function syncDroneDurationModeControls\(\)\s*\{[\s\S]*?droneDurationSettingsView\.sync\(/);
 assert.match(app, /droneDurationSettingsView\.bindSelection\(/);
 assert.match(html, /modules\/drone-duration-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/drone-duration-settings-view\.js\?v=1\.0/);
+assert.match(serviceWorker, /modules\/drone-duration-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

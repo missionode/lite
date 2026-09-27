@@ -7,6 +7,8 @@ const timingModule = fs.readFileSync(new URL('../modules/timing-settings.js', im
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const contentLocalization = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
 const sessionEstimate = fs.readFileSync(new URL('../modules/session-estimate.js', import.meta.url), 'utf8');
+const sleepJourney = fs.readFileSync(new URL('../modules/sleep-journey.js', import.meta.url), 'utf8');
+const chakraSession = fs.readFileSync(new URL('../modules/chakra-session.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
@@ -123,17 +125,18 @@ assert.match(app, /getDroneDurationMs\(practiceMinutes, durationMode\)/, 'the in
 assert.match(app, /narrateIntentionWithFrequency\(intentionText/, 'the intention narration must be the activation point for the optional tone');
 assert.doesNotMatch(app, /localStorage\.getItem\('chakra_mood_relaxation_intention'\)/, 'the ambience choice must not be restored from local storage');
 assert.doesNotMatch(app, /localStorage\.setItem\('chakra_mood_relaxation_intention'/, 'the ambience choice must not be saved to local storage');
-assert.match(app, /startFrequencyShot\(frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
-assert.match(app, /stopBackgroundMusic\(\);[\s\S]{0,100}stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
-assert.match(app, /shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
-assert.match(app, /finishShot\(\)[\s\S]*shotToggle\.disabled = true[\s\S]*window\.location\.reload\(\)/, 'Successful Shots should disable controls and reload the page');
+const shotSession = fs.readFileSync('modules/shot-session.js', 'utf8');
+assert.match(shotSession, /owner\.audio\.startFrequencyShot\(stage\.frequency\)/, 'Shots should use a dedicated frequency-only oscillator');
+assert.match(shotSession, /owner\.audio\.stopBackgroundMusic\(\);[\s\S]{0,100}owner\.audio\.stopMantraTrack\(\);/, 'Shots should stop music and mantra before activation');
+assert.match(shotSession, /if \(shotToggle\) shotToggle\.disabled = true/, 'Shots should remain disabled after activation');
+assert.match(shotSession, /function finish\(owner, deps\)[\s\S]*?shotToggle\.disabled = true[\s\S]*?window\.location\.reload\(\)/, 'Successful Shots should disable controls and reload the page');
 assert.match(lobbyVisibility, /confirm\(translate\('ui\.shotConfirm'\)\)/, 'Shots should confirm when the toggle is enabled');
-assert.doesNotMatch(app.slice(app.indexOf('async runShot('), app.indexOf('finishShot()')), /window\.confirm/, 'Shot start should not prompt a second time');
-assert.match(app, /ui\.sleepStage\$\{stage\.key\[0\]\.toUpperCase\(\)\}/, 'Sleep Shot status labels should use localized sleep-stage values');
-assert.doesNotMatch(app, /t\(`ui\.\$\{stage\.key === 'thirdeye'/, 'Shot status labels must not expose raw ui paths for Sleep stages');
+assert.doesNotMatch(shotSession, /window\.confirm/, 'Shot start should not prompt a second time');
+assert.match(shotSession, /ui\.sleepStage\$\{stage\.key\[0\]\.toUpperCase\(\)\}/, 'Sleep Shot status labels should use localized sleep-stage values');
+assert.doesNotMatch(shotSession, /t\(`ui\.\$\{stage\.key === 'thirdeye'/, 'Shot status labels must not expose raw ui paths for Sleep stages');
 assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a dedicated binaural sleep drone');
-assert.match(app, /await this\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
-assert.match(app, /normalizeSleepStages\(this\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');
+assert.match(sleepJourney, /await owner\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
+assert.match(sleepJourney, /normalizeSleepStages\(owner\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');
 assert.match(app, /mainOscillator\.frequency\.setValueAtTime\(beat, now\)/, 'Sleep Mode should play low script frequencies as the main oscillator');
 assert.match(app, /this\.startTimedDrone\(136\.1, 3, state\.timeYogaPose, state\.droneDurationMode\)/, 'Yoga grounding drone should use the fixed exposure timer');
 assert.doesNotMatch(app, /this\.audio\.startDrone\(136\.1, 3\)/, 'Yoga must not start an unbounded grounding drone');
@@ -161,18 +164,17 @@ assert.doesNotMatch(startDrone, /safeBaseFrequency\s*\/\s*[24]/, 'higher chakra 
 assert.doesNotMatch(startDrone, /droneFreq\s*\*\s*0\.5|\bf\s*:\s*0\.5/, 'the half-frequency lower oscillator must not return');
 assert.match(startDrone, /Number\.isFinite\(requestedFrequency\)/, 'the audio boundary should reject malformed custom frequencies');
 
-const meditationStart = app.indexOf('    async meditateOnChakra(chakra, key)');
-const meditationEnd = app.indexOf('    async narrateFeeble(', meditationStart);
-const meditationBlock = app.slice(meditationStart, meditationEnd);
-assert.match(meditationBlock, /this\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
+assert.match(app, /meditateOnChakra\(chakra, key\)\s*\{\s*return chakraSession\.run\(this, chakra, key,/, 'the app should retain a stable chakra stage adapter');
+const meditationBlock = chakraSession;
+assert.match(meditationBlock, /owner\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
 assert.match(meditationBlock, /key === 'high_energy' \? state\.hrimDroneDurationMode : state\.droneDurationMode/, 'HRIM and normal chakra stages must use separate duration preferences');
 assert.ok(
-    meditationBlock.indexOf('await this.narrate(') < meditationBlock.indexOf('await this.audio.playMantraTrack(key)') &&
-    meditationBlock.indexOf('await this.audio.playMantraTrack(key)') < meditationBlock.indexOf('this.startTimedDrone('),
+    meditationBlock.indexOf('await owner.narrate(') < meditationBlock.indexOf('await owner.audio.playMantraTrack(key)') &&
+    meditationBlock.indexOf('await owner.audio.playMantraTrack(key)') < meditationBlock.indexOf('owner.startTimedDrone('),
     'the narration must finish and mantra playback must start before the drone',
 );
 assert.match(meditationBlock, /'normal',\s*'mantra'/, 'chakra narration should use the coordinated mantra transition profile');
-assert.match(meditationBlock, /if \(!state\.noMantraMode && this\.audio\.mantraLoop\) \{[\s\S]*?this\.startTimedDrone\(/, 'the drone must be conditional on active mantra playback');
+assert.match(meditationBlock, /if \(!state\.noMantraMode && owner\.audio\.mantraLoop\) \{[\s\S]*?owner\.startTimedDrone\(/, 'the drone must be conditional on active mantra playback');
 assert.match(meditationBlock, /key === 'high_energy' \? state\.timeHighEnergy : state\.timePerChakra/, 'normal and HRIM paths should use their active practice durations');
 assert.match(app, /if \(!this\.isPaused\) remaining -= step;/, 'pausing the journey should pause the drone timer');
 assert.match(app, /generation !== this\.droneTimerGeneration/, 'a stale timer must not stop a later chakra drone');

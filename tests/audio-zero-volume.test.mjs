@@ -6,6 +6,8 @@ const app = fs.readFileSync('app.js', 'utf8');
 const audioInitialization = fs.readFileSync('modules/audio-engine-initialization.js', 'utf8');
 const appStateModule = fs.readFileSync('modules/app-state.js', 'utf8');
 const backgroundMusicControls = fs.readFileSync('modules/audio-background-music-controls.js', 'utf8');
+const audioComfortEffects = fs.readFileSync('modules/audio-comfort-effects.js', 'utf8');
+const audioTonePlayback = fs.readFileSync('modules/audio-tone-playback.js', 'utf8');
 
 assert.match(
   audioInitialization,
@@ -27,7 +29,7 @@ legacyValues.set('current', 'false');
 assert.equal(context.ChakraAppState.storedBooleanWithLegacy(legacyStorage, 'current', 'legacy'), false, 'the current boolean key takes precedence over legacy data');
 
 assert.doesNotMatch(
-  app,
+  audioComfortEffects,
   /bgMusicEQ\.gain\.exponentialRampToValueAtTime/,
   'signed EQ gain must never use an exponential ramp',
 );
@@ -37,17 +39,17 @@ assert.match(
   'zero music volume must use a zero-safe linear fade',
 );
 assert.match(
-  app,
-  /if \(!this\.ctx \|\| state\.noFrequencyMode \|\| state\.volBell <= 0\) return;/,
+  audioTonePlayback,
+  /if \(!owner\.ctx \|\| state\.noFrequencyMode \|\| state\.volBell <= 0\) return;/,
   'a muted singing bowl must be safely skipped',
 );
 assert.match(
-  app,
+  audioTonePlayback,
   /gain\.gain\.setValueAtTime\(0\.0001, now\);[\s\S]*?gain\.gain\.exponentialRampToValueAtTime\(state\.volBell/,
   'audible singing-bowl envelopes must begin above zero',
 );
 
-const exponentialCalls = [...app.matchAll(/\.exponentialRampToValueAtTime\(([^,\n]+)/g)]
+const exponentialCalls = [...`${app}\n${audioComfortEffects}\n${audioTonePlayback}`.matchAll(/\.exponentialRampToValueAtTime\(([^,\n]+)/g)]
   .map(match => match[1].trim());
 assert.ok(exponentialCalls.length > 0, 'expected Web Audio exponential ramps to be present');
 for (const target of exponentialCalls) {

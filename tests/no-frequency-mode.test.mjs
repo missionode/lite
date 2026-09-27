@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const shotSession = fs.readFileSync(new URL('../modules/shot-session.js', import.meta.url), 'utf8');
 const audioInitialization = fs.readFileSync(new URL('../modules/audio-engine-initialization.js', import.meta.url), 'utf8');
 const audioTonePlayback = fs.readFileSync(new URL('../modules/audio-tone-playback.js', import.meta.url), 'utf8');
 const audioDroneStart = fs.readFileSync(new URL('../modules/audio-drone-start.js', import.meta.url), 'utf8');
@@ -34,10 +35,7 @@ const shot = method('startFrequencyShot(frequency)', 'stopFrequencyShot()');
 const stopBinaural = method('stopBinaural()', 'stopDrone()');
 const stopDrone = method('stopDrone()', 'async playMantraTrack(key)');
 const mantra = audioMantraPlayback;
-const bowlStart = app.indexOf('    playSingingBowl()');
-const bowlEnd = app.indexOf('\n}\n\n// Meditation Controller', bowlStart);
-assert.ok(bowlStart >= 0 && bowlEnd > bowlStart, 'playSingingBowl() must remain readable');
-const bowl = app.slice(bowlStart, bowlEnd);
+const bowl = audioTonePlayback;
 
 assert.match(audioDroneStart, /function startDrone\(owner, baseFreq, index, state\)[\s\S]*?owner\.stopDrone\(\);\s*if \(state\.noFrequencyMode\) return;/, 'chakra and HRIM drones should stop or skip in No Frequency Mode');
 assert.match(audioDroneStart, /function startSleepDrone\(owner, beatFrequency, state\)[\s\S]*?owner\.stopDrone\(\);\s*if \(state\.noFrequencyMode\) return;/, 'sleep-stage drones should stop or skip in No Frequency Mode');
@@ -75,7 +73,7 @@ listeners.get('mixer-no-mantra-mode-toggle')({ target: { checked: true } });
 assert.deepEqual(calls.slice(3, 6), ['cancel-timer', 'drone', 'mantra']);
 assert.ok(calls.includes('mantra'), 'No Mantra Mode stops recorded mantra playback');
 assert.match(lobbyVisibility, /shotsToggle\.disabled = noFrequencyMode/, 'Shots should be unavailable in the Lobby while the setting is active');
-assert.match(app, /if \(state\.noFrequencyMode\) \{\s*alert\(t\('ui\.noFrequencyShotsUnavailable'\)\);\s*return;/, 'direct Shot activation should also be rejected');
+assert.match(shotSession, /if \(state\.noFrequencyMode\) \{\s*alert\(t\('ui\.noFrequencyShotsUnavailable'\)\);\s*return;/, 'direct Shot activation should also be rejected');
 assert.match(app, /audio\.startBackgroundMusic\(/, 'background music remains part of normal journeys');
 assert.match(app, /this\.narrate\(/, 'narration remains part of normal journeys');
 

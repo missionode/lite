@@ -1,5 +1,41 @@
 # Review
 
+## CP-MOD-160 — Shared chakra/HRIM stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/unit/static evidence; browser evidence intentionally not run.
+
+- `meditateOnChakra()` remains a stable app adapter; the module receives live state, DOM/visual, localization, timing and timer services. Standard, HRIM and reverse-order callers are unchanged.
+- Direct tests cover inactive return, image/progress/aura state, narration-before-mantra-before-drone, absolute chakra index, profile timing, post-mantra fade window, affirmation and Eyes Close/No Mantra suppression.
+- Focused chakra/drone, standard journey, HRIM, focused-practice and stage-fade checks pass. Fresh Node suite: 111/113 pass; only `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent. Atlas generation succeeds at 44 maps / 369 nodes / 434 edges, topology unchanged.
+- `node --check` on changed app/module/test/service-worker/atlas sources and `git diff --check` pass. Error audit finds no new errors beyond the two missing-fixture failures. Browser test and device/audio evidence remain excluded; no performance or thermal claim.
+
+## CP-MOD-159 — Intimate Service stage lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/unit/static evidence; browser evidence intentionally not run.
+
+- Existing app methods and experiment routing remain stable adapters. `care-session.js` owns the common care-stage narration/countdown/guide handoff and optional Perineal Care → massage journey → Assisted Bathing sequence.
+- Configured duration versus experiment override, cancellation exits and Yoga’s separate standard Bath Session remain explicit. No new unlock, assessment, privacy or user-flow behavior is introduced.
+- Direct care lifecycle, experiment, Yoga flow and video-language regressions pass. Fresh suite after CP-MOD-159: 110/112 pass; only `content-safety` and `drone-duration` stop before assertions because `docs/dot.json` is absent. Atlas generation passes at 44 maps / 369 nodes / 434 edges. No browser/device, performance or thermal claim.
+
+## CP-MOD-158 — Yoga session sequence ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/unit/static evidence; browser evidence intentionally not run.
+
+- `runYogaSession()` remains the controller entry point and delegates to `modules/yoga-session.js`. The module receives the existing state, timing, localization, DOM, screen and visual services; no new persistent state or user-flow branch is introduced.
+- Behavior contract covers inactive return, optional Corpse Pose and Bath/rest precedence, Yoga-only pose filtering, narration/image updates, fixed drone call, pause-aware holds, configured gaps and completion settle. Intimate Service remains excluded.
+- Focused Yoga session, existing Yoga/selection, Sleep, Advanced Features, experiment, Shot, and video-language regressions pass. Fresh Node suite: 109/111 pass; only `content-safety` and `drone-duration` fail before assertions because `docs/dot.json` is absent.
+- `node --check` on the changed app/module/test/service-worker/atlas sources and `git diff --check` pass. Atlas generation succeeds with 44 maps / 369 nodes / 434 edges; graph topology is unchanged. Browser atlas verification remains unrun per user direction. No user/device, performance or thermal claim is made.
+
+## CP-MOD-157 — Sleep journey orchestration ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/unit/static evidence; browser evidence intentionally not run.
+
+- `runSleepJourney()` delegates to `modules/sleep-journey.js`; the controller retains its method and injects the existing state, localization, fetch, UI and script-validation dependencies.
+- The existing guards/order, versioned content URL, cache-language behavior, five-stage pause-aware timing, stage drone stop, music/ambience startup, 3-second gaps and 12-second ending fade remain in place. No journey-flow or performance change is claimed.
+- Focused lifecycle tests cover lock rejection, custom/default content, stage timing, audio fade ordering and cancellation. Advanced-unlock, Shot lifecycle and drone-duration settings regressions pass. Fresh full Node sweep: 108/110 pass; only `content-safety` and `drone-duration` fail before assertions because the owner-managed `docs/dot.json` fixture is absent.
+- `node --check` for the changed app/module/test/service-worker/atlas source and `git diff --check` pass. Atlas generation succeeds at 44 maps / 369 nodes / 434 edges; no flow topology changed. Browser atlas verification was not run per the user’s browser-test exclusion.
+- Error-surface audit: the two known missing-fixture test startup errors are the only failures; no new untriaged test or process errors. Eager/offline delivery is unchanged; no performance, audio or thermal improvement is claimed.
+
 ## CP-MOD-053 — Chakra and sleep drone startup ownership
 
 Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for current startup guards, frequency bounds/fallbacks, oscillator and binaural parameters/routes, direct fake-node coverage, all runnable Node tests, Loop router checks, syntax/diff checks and atlas build/source-reference validation. PR review and integration sync are pending.
@@ -639,3 +675,130 @@ Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at unit/static evidence;
 - Static eager-shell comparison against CP-060 is 50 → 51 local script tags and 890,408 → 892,805 source-file bytes (+2,397 bytes). This is an ownership-only eager addition, not a startup/performance benefit.
 - Focused integration tests pass. Full Node suite is 86/88; `content-safety` and `drone-duration` stop before assertions because `docs/dot.json` is absent from the isolated worktree. Loop router tests pass 11/11. Atlas rebuild and generated source-reference refresh pass: 43 maps / 353 nodes / 405 edges. `node --check` and `git diff --check` pass.
 - Error-surface audit: the only test errors are the two known missing-owner-fixture failures. Node also reports an existing `MODULE_TYPELESS_PACKAGE_JSON` warning for `piper/runtime/bounded-phonemizer.js`; it is non-fatal and outside this checkpoint. Browser console/device evidence not run (browser use is opt-in). No functional-startup, performance, audio or thermal improvement is claimed.
+
+## CP-MOD-154 — Voice tone and echo effects
+
+Status: `SPEC_COMPLIANCE PASS`; `QUALITY_AND_RISK PASS` for source parity, targeted audio regressions, 105/107 non-browser suite, atlas generation, syntax and diff checks. Two suite failures are blocked before assertions by the absent owner-managed `docs/dot.json`. Browser/performance evidence is not refreshed by user direction.
+
+- Spec review: exact extraction comparison passes after only `this` → owner and tail-constant injection. Public method defaults and playback setter are preserved; new script/precache order is covered directly. Only shell cache increments to v5.311. No profile/timing, journey, state or UI behavior changes.
+- Quality/risk review: dependency-light frozen module API follows neighboring audio owners, retains original graph guards and scheduling order, adds no timers/resources. Direct tests cover finite/coercion fallback/clamps, asymmetric gains, exact profiles/prototype-key rejection, strict active gate, tails, both AudioParam paths and adapter delegation/order. Eight targeted commands and syntax pass; no audio/device/performance claim.
+- Integration tests now assert the current owners for Voice Space, ambience lifecycle, and shell cache membership without freezing v5.310. The e2e baseline resolves the cache name from the active service worker rather than assuming a release number; browser test itself remains unrun.
+- Fresh complete Node test sweep before CP-MOD-155: 105 pass, 2 fail before test assertions because owner-maintained `docs/dot.json` is absent (`content-safety`, `drone-duration`). All targeted audio tests pass. `node --check` on changed runtime files and `git diff --check` pass.
+- Atlas build validates 44 maps / 369 nodes / 434 edges. Topology is unchanged; source references label CP-MOD-154 uncommitted. Browser verifier excluded by user instruction. No external publication or shared-checkout changes.
+
+## Lazy-loading audit — after CP-MOD-154
+
+- Existing measured boundaries remain: selected-practice scripts and optional video-prelude code are deferred. The recorded CP-MOD-037/038 local Chromium comparison reduced the cold initial JavaScript body by about 13.1 KiB (~1.4%) for practices, with cold timing too noisy for a latency claim. Those historical measurements are not new CP-MOD-154 evidence.
+- Current voice-effects module is 2,381 raw bytes / 818 gzip bytes; it is core to narration tuning and the optional voice settings. Deferring it would add loader/error/offline complexity for a sub-kilobyte compressed saving, so it stays eager.
+- The sky/astronomy group is a larger candidate but directly supports the current Lobby/Settings background and is already scheduled for coordinated relocation to a dedicated Sky page in the approved redesign. Do not split it before that boundary exists. Refresh cold/warm/offline, route and journey-start evidence then; browser tests were skipped here as requested.
+- No further eager module split is justified from this bounded audit. Continue modularization after reviewing measured changes at the redesign boundary; do not claim lazy loading or performance completion based on source sizes alone.
+
+## CP-MOD-155 — Experiment session lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct care-gate, start-guard, source selection/cache, activity dispatch, countdown, failure and cleanup tests; connected experiment-settings/advanced-unlock checks; full non-browser sweep, syntax/diff checks and atlas build.
+
+- Moved experiment start/stop orchestration into `modules/experiment-session.js`; public MeditationController entry points remain adapters.
+- Preserved locked-care rejection before I/O/audio, concurrent-start guard, custom/default script selection and language cache, audio/ambience and wake-lock setup, experiment state/countdown, activity dispatch, error alert and stop cleanup order.
+- Eager script ordering and offline precache are retained; shell cache increments to v5.312. This is ownership/testability work only.
+- The existing `sec`/`seconds` and care duration-label mismatch remains tracked in FIX-QUEUE and is intentionally not changed here. Browser/device testing was not run.
+- Full Node suite: 106 pass / 2 fixture-blocked before assertions (`content-safety`, `drone-duration`; missing owner-managed `docs/dot.json`). Loop router unit tests pass 11/11. Atlas build: 44 maps / 369 nodes / 434 edges; shifted app references refreshed and topology unchanged.
+
+## CP-MOD-156 — Sound Shots session ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for direct and adjacent Shot contracts, the full runnable Node suite, syntax/diff checks, and atlas generation.
+
+- Moved Shot start, stage sequence, successful reset and manual stop into `modules/shot-session.js`. The existing `runShot`, `finishShot`, and `stopShot` controller methods remain compatibility adapters.
+- Preserve Advanced Features, concurrent session, No Frequency and custom-frequency guards; script reuse/fetch/version behavior; Chakra/Sleep/single-frequency stages and localized labels; active-time division, inter-stage waits, pause-aware loop, countdown; audio setup/teardown; failure alert/cleanup; successful reload and manual-stop state restoration.
+- Direct tests cover all guard families, valid multi-stage meditation and Sleep sequences/countdowns, default content loading, invalid custom frequency, invalid script recovery, success/reset and idempotent stop. Adjacent Advanced Unlock and Shot contracts are updated to assert the new owner.
+- Module remains eager and offline cached; shell cache increments to v5.313. This is ownership/testability only, not lazy-loading or performance work. Existing app flow topology is unchanged.
+- Fresh complete Node test sweep: 107 pass; 2 stop before assertions because owner-managed `docs/dot.json` is absent (`content-safety`, `drone-duration`). The latter's source contract was updated but cannot execute without its fixture. Targeted Shot, No Frequency, Advanced Unlock, background-audio and audio-tone tests pass. Syntax and `git diff --check` pass.
+- Atlas builder passes at 44 maps / 369 nodes / 434 edges after refreshing shifted app references; graph topology unchanged. Browser tests and atlas browser verifier remain skipped by user direction.
+
+## CP-MOD-161 — Piper narration orchestration ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at focused direct/static evidence and complete non-browser sweep, syntax checks, atlas generation and diff validation.
+
+- Moved Piper sentence sequencing into `modules/piper-narration.js`; `MeditationController.narrateWithPiper()` remains the adapter.
+- Preserved configured lead-in and sentence gaps, one-current/one-next bounded decode-ahead, pause-aware waiting, generation cancellation, browser-speech fallback after synthesis failure, clip/mantra fade selection, final quiet gap and voice-carve ramps.
+- `tests/long-narration.test.mjs` exercises the actual bundled multilingual phonemizer, bounded instance retirement, decode-ahead and stale-generation cancellation. `tests/narration-audio-only.test.mjs`, `tests/stage-fades.test.mjs`, `tests/chakra-session.test.mjs`, and syntax checks pass. Added `test:piper-narration` alias.
+- Module remains eager and service-worker precached; shell cache is v5.319. No lazy-loading, browser, playback, CPU, memory or thermal benefit is claimed.
+- Fresh full suite: 111/113 pass. `content-safety` and `drone-duration` stop before assertions because the owner-managed `docs/dot.json` is absent; it was not recreated. The thermal-budget source contract was redirected to the extracted owner and now passes. Atlas builds at 44 maps / 369 nodes / 434 edges; graph topology is unchanged. Browser checks remain excluded by user direction.
+
+## CP-MOD-162 — Shared guide-controlled wait ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/integration, non-browser suite, syntax, atlas build and diff evidence.
+
+- Moved the shared guide-controlled countdown and Continue-button wait into `modules/guide-controlled-transition.js`; the stable controller method remains the Yoga and care entry point.
+- Preserved rounded duration, active-session checks, optional timer display, focus behavior, paused-click rejection, Stop-driven false resolution, missing-control behavior, and click-listener/resolver cleanup.
+- New tests cover countdown, accepted Continue, paused rejection, Stop cancellation, missing controls and inactive sessions. Yoga and care integration tests pass.
+- Module is eager and offline precached; shell cache v5.320. No performance or lazy-loading claim.
+- Fresh non-browser sweep: 112/114 pass. Only `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent; no fixture was recreated. Atlas topology remains unchanged and browser checks remain excluded by user direction.
+
+## CP-MOD-163 — Journey Stop teardown ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/integration, non-browser suite, syntax, atlas build and diff evidence.
+
+- Moved Stop cleanup into `modules/session-stop.js`; `MeditationController.stop({preserveScreen})` remains the adapter used by manual Stop, restart and startup-failure recovery.
+- Preserved audio shutdown ordering, narration cancellation/fades, activity/experiment flags, guide-wait resolution, countdown and wake-lock cleanup, brightness/aura/control reset, return-screen choice and preserve-screen behavior.
+- Direct contract covers side-effect ordering, screens, audio stops, guide continuation cancellation, session state, UI state, HTML script order and service-worker cache membership. Session transport, countdown and guide-transition regressions pass.
+- Eager/offline precached module; shell cache v5.321. No performance claim.
+- Fresh suite: 113/115 pass. `content-safety` and `drone-duration` stop before assertions because `docs/dot.json` is absent from the owner-managed worktree; it was not recreated. Four adjacent source contracts were updated to follow the new stop owner and now pass. Atlas builds at 44 maps / 369 nodes / 434 edges; source references validate and topology is unchanged. Browser checks remain excluded.
+
+## Lazy-loading evidence refresh — after CP-MOD-162
+
+- Measured six route-specific session owners (`experiment-session`, `shot-session`, `sleep-journey`, `yoga-session`, `care-session`, `chakra-session`) at 28,595 raw bytes / 8,278 bytes gzip combined. Today they are eagerly loaded and offline precached; this is a static transfer estimate, not a runtime result.
+- Deferring those owners could avoid at most about 8.1 KiB compressed on a cold route that does not use them, before loader overhead. It introduces selection-time fetch/evaluation and offline/retry coordination; no change is made while the user has opted out of browser tests.
+- Existing measured selected-practice lazy loading saved about 13.1 KiB (about 1.4%) in historical local Chromium comparison, with noisy cold timing. Re-measure together only after browser testing is permitted; compare first Lobby render and journey start, cold/warm/offline, selected/nonselected route requests and failure retry. Until then, retain eager/offline behavior and make no latency, memory or thermal claim.
+
+## CP-MOD-164 — Natural completion lifecycle ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct/integration, non-browser suite, syntax, atlas generation and diff evidence.
+
+- Moved natural `finish()` cleanup and completion presentation into the existing `modules/completion-view.js`; no new eager script or service-worker cache entry is required.
+- Preserved session-minute rounding/minimum, stats increments and localStorage keys, audio/mantra/Piper/wake-lock/countdown/visual cleanup ordering, Sleep/brightness/control cleanup, translated modal copy and delayed Earn handoff.
+- Added direct behavior coverage for elapsed time, stats, stop ordering, display adapters, modal copy/visibility and handoff timing; existing handoff, hypnosis, Sleep and Hindi tests pass.
+- Ownership only; no performance, device or thermal gain is claimed.
+- Fresh full suite: 114/116 pass. Only `content-safety` and `drone-duration` stop before assertions because owner-managed `docs/dot.json` is absent; it was not recreated. Four source contracts were redirected to the completion owner and now pass. The existing Node module-type warning for the bundled phonemizer remains non-fatal; browser tests are excluded by request.
+
+## CP-MOD-165 — Start-dispatch and lazy-loading audit
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` for static ownership review, existing direct tests, historical route-measurement review and current byte-size estimate. No browser execution was performed.
+
+- Audited the remaining `MeditationController.start()` orchestration. Its sequence spans user-gesture speech unlock, validated script acquisition, AudioContext/music/ambience setup, Piper warmup, wake lock, newcomer onboarding, focused-vs-standard routing, and shared active-session/error/finally behavior. The existing `journey-content-loader`, `journey-routing`, practice owners, session owners and completion/stop owners already own the independently cohesive lifecycles. Keeping `start()` at the app boundary preserves the single authoritative dispatch and failure order; extracting the whole method would move orchestration without reducing coupling. No further source extraction was justified.
+- Lazy loading is not universal: selected preparation modules and the optional video-prelude controller are deferred and have historical browser evidence (CP-MOD-038/041). Other core and optional session owners remain eager and precached. Their six route-specific candidates total 28,595 raw / 8,278 gzip bytes statically; that is only a theoretical upper bound before loader/recovery/cache overhead. Do not defer them until fresh cold/warm/offline and journey-start measurements demonstrate a net benefit. Browser tests remain skipped per user direction, so there is no current runtime result or performance claim.
+- Runnable Node sweep at that checkpoint: 114/116; two tests (`content-safety`, `drone-duration`) stop before assertions because the owner-managed `docs/dot.json` fixture is absent. Targeted CP-MOD-164 and dependent completion/handoff, Sleep, hypnosis, Hindi, Stop, and guide-transition checks pass. Atlas generation was 44 maps / 369 nodes / 434 edges; interactive atlas/browser verification remains intentionally unrun.
+
+## CP-MOD-166 — Standard chakra journey sequence ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct sequence contract, dependent journey regressions, syntax, atlas generation and diff checks.
+
+- Moved `MeditationController.runSequence()` into `modules/standard-journey-sequence.js`; the controller retains the stable adapter and app-level `start()` dispatcher.
+- Preserved Music Only exclusivity, selected chakra order, stop checks before each stage and after awaited stages, intervals only between active chakras, optional Ho’oponopono then Undo & Unlearn, silence, closing, Emergence and natural completion. `complete:false` still ends after chakra stages for the Intimate Service massage wrapper.
+- Direct tests cover stage/callback order, empty/inactive sequence, Music Only, partial completion and Stop during a chakra. Updated ownership-sensitive contracts to inspect the extracted owner rather than inline controller source. New module is eagerly ordered before `app.js` and offline cached exactly once; shell cache advances from v5.321 to v5.322. This is ownership-only.
+- Focused Box/Ho’oponopono, routing, hypnosis, Yoga, care and session-Stop regressions pass. Atlas generates at 44 maps / 369 nodes / 434 edges after refreshing the affected standard and Shot references. Browser tests remain excluded by user direction.
+
+## CP-MOD-167 — Journey interval, silence and closing-stage ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct transition-stage tests, dependent journey regressions, syntax and diff checks; atlas generation and full-suite refresh are pending.
+
+- Moved the existing `handleInterval()`, `handleSilence()` and `runClosing()` lifecycle bodies into `modules/journey-transition-stages.js`; stable controller adapters remain in place.
+- Preserved interval-preparation pause, 100 ms pause-aware interval clock, narration stage fade and awaited narration completion; silence display/drone shutdown/rounded-up wait; closing symbol/aura treatment, localized closing and affirmation, configured pause order and active-session guard.
+- Direct test covers interval cadence/order, silence release, both closing narrations and display treatments, script order, and service-worker cache membership. Updated `stage-fades` ownership assertion. New module is eager/offline-cached once; shell cache advances to v5.323. No user-flow, audio or timing changes intended.
+- Focused transition, stage-fade, standard sequence, focused practices, routing, hypnosis, Yoga, care, Stop and HRIM tests pass. Subsequent CP-MOD-169 final sweep covers this checkpoint; atlas regenerated at 44 maps / 369 nodes / 434 edges with refreshed references. Browser tests remain skipped by user direction.
+
+## CP-MOD-168 — Singing-bowl tone ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct audio-node contract, No Frequency and journey regressions, syntax and source review.
+
+- Moved the existing five-part singing-bowl oscillator/filter/gain lifecycle into `modules/audio-tone-playback.js`; existing AudioEngine adapter remains.
+- Preserved base frequency/partials, Q, gain envelope, 8.1-second stop, onended disconnection, context/mute/No Frequency guards. No script/cache URL change was needed because its owner module was already eager and precached.
+- Direct tone, No Frequency, hypnosis, effects-control, background-music/echo, music-echo and AudioEngine-initialization contracts passed. No playback, sound-quality, resource-use or performance claim.
+
+## CP-MOD-169 — Audio comfort-filter policy ownership
+
+Status: `SPEC_COMPLIANCE PASS`, `QUALITY_AND_RISK PASS` at direct mocked AudioParam contract, affected audio regressions, syntax and source review.
+
+- Moved eyes-closed EQ/filter/distortion policy and general audio-filter ramps into `modules/audio-comfort-effects.js`; AudioEngine retains both public adapters and all graph/state ownership.
+- Preserved every gain/frequency target and ramp duration, including state-dependent filter defaults; no changes to journey user flow or persisted settings.
+- Added one eager/offline-cached module and advanced shell cache to `chakra-v5.324`. Focused module, tone, No Frequency, effects controls, background music/echo, music echo and initialization tests pass; final suite and atlas evidence are recorded below. No device/browser or performance claim.
+- Final verification: 117 of 119 non-browser Node test files pass. The only two unable to start require absent owner-managed `docs/dot.json` (`content-safety`, `drone-duration`); no unrelated fixture was fabricated. Atlas regenerated successfully at 44 maps / 369 nodes / 434 edges. Syntax and `git diff --check` pass. Browser test execution remains excluded by owner request.

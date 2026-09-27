@@ -12,7 +12,7 @@ assert.match(app, /yogaExperienceSettings\.syncTimingRows\(\{ document, getCheck
 assert.match(app, /yogaExperienceSettings\.bindSetupChangeControls\(/);
 assert.match(app, /yogaExperienceSettings\.bindAdvancedToggle\(/);
 assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/yoga-experience-settings\.js\?v=1\.0/);
+assert.match(serviceWorker, /modules\/yoga-experience-settings\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

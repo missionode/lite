@@ -13,7 +13,7 @@ assert.ok(Object.isFrozen(module));
 assert.match(app, /loadPleasureAmbienceBuffers\(\)\s*\{\s*return audioPleasureAmbience\.loadBuffers\(this\)/);
 assert.match(app, /loadPleasureAmbienceUrl\(url\)\s*\{\s*return audioPleasureAmbience\.loadUrl\(this, url\)/);
 assert.ok(html.indexOf('modules/audio-pleasure-ambience.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(sw, /chakra-v5\.310[\s\S]*?modules\/audio-pleasure-ambience\.js\?v=1\.0/);
+assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/audio-pleasure-ambience\.js\?v=1\.0/);
 
 const state = {
     pleasureAmbienceUrl: '', moodRelaxationIntentionEnabled: true, noFrequencyMode: false,

@@ -4,6 +4,8 @@ import fs from 'node:fs';
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const openingStage = fs.readFileSync(new URL('../modules/journey-opening-stage.js', import.meta.url), 'utf8');
 const prelude = fs.readFileSync(new URL('../modules/journey-video-prelude.js', import.meta.url), 'utf8');
+const yogaSession = fs.readFileSync(new URL('../modules/yoga-session.js', import.meta.url), 'utf8');
+const careSession = fs.readFileSync(new URL('../modules/care-session.js', import.meta.url), 'utf8');
 const journeyChrome = fs.readFileSync(new URL('../modules/journey-chrome.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
@@ -74,7 +76,7 @@ const journeyVideoPrelude = prelude;
 assert.doesNotMatch(journeyVideoPrelude, /onSkip|skipButton|JOURNEY_VIDEO_PRELUDE_SKIP/, 'the video prelude implementation should not retain an automatic skip path');
 assert.match(prelude, /const onError = \(\) => \{ void complete\('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS\); \}/, 'video failure should safely continue to the prepared journey');
 assert.match(app, /document\.getElementById\('restart-meditation'\)\?\.addEventListener\('click', async \(\) => \{[\s\S]*?meditation\.stop\(\{ preserveScreen: true \}\);[\s\S]*?bypassLobbyVideoPreludeOnce = true;[\s\S]*?startMeditationBtn\.click\(\)/, 'Restart should immediately relaunch without replaying the Lobby-only video');
-assert.match(app, /class MeditationController[\s\S]*?stop\(\{ preserveScreen = false \} = \{\}\)[\s\S]*?if \(!preserveScreen\) \{\s*showScreen\(returnScreen\);/, 'the meditation stop path should keep the active screen in place only during a restart');
+assert.match(fs.readFileSync(new URL('../modules/session-stop.js', import.meta.url), 'utf8'), /const returnScreen = owner\.isExperimentActive \? experimentScreen : lobbyScreen;[\s\S]*?if \(!preserveScreen\) showScreen\(returnScreen\)/, 'the meditation stop path should keep the active screen in place only during a restart');
 assert.match(`${app}\n${prelude}`, /const DND_REMINDER_FALLBACK = "Before we begin:[\s\S]*?showDndReminderIfNeeded\(\) \{[\s\S]*?if \(this\.dndReminderAcknowledged\)[\s\S]*?this\.dndReminderAcknowledged = false;[\s\S]*?const reminder = t\('ui\.journeyVideoPreludeReminder'\);[\s\S]*?alert\(reminder === 'ui\.journeyVideoPreludeReminder' \? DND_REMINDER_FALLBACK : reminder\);/, 'the reminder should be consumed once after a completed video while normal starts retain a human-readable fallback');
 assert.doesNotMatch(sw, /video\/nature-upgrade\.mp4/, 'the large prelude must not be pre-cached during PWA installation');
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?max-width:\s*none[\s\S]*?min-height:\s*100dvh/, 'the persistent fullscreen app should not retain the normal narrow Lobby width');
@@ -97,6 +99,8 @@ for (const locale of locales) {
 assert.match(app, /function journeyT\(path\) \{\s*return t\(path, state\.language\);\s*\}/, 'journey labels should resolve against Meditation Language rather than Display Language');
 assert.match(openingStage, /title\.textContent = journeyT\('ui\.preparation'\);/, 'the Preparation stage should use the narrated language');
 assert.match(openingStage, /journeyT\('ui\.moon'\)[\s\S]*?journeyT\('ui\.gratitude'\)[\s\S]*?journeyT\('ui\.intention'\)/, 'all reflective journey headings should use the narrated language');
-assert.match(app, /journeyT\('ui\.corpsePose'\)[\s\S]*?journeyT\('ui\.purification'\)[\s\S]*?journeyT\('ui\.guideReadyForNextSession'\)[\s\S]*?journeyT\('ui\.yoga'\)/, 'focused in-journey titles should use the narrated language');
+assert.match(app, /journeyT\('ui\.corpsePose'\)/, 'Corpse Pose title should use the narrated language');
+assert.match(careSession, /journeyT\('ui\.purification'\)[\s\S]*?journeyT\('ui\.guideReadyForNextSession'\)/, 'care-stage and guide titles should use the narrated language');
+assert.match(yogaSession, /journeyT\('ui\.yoga'\)[\s\S]*?journeyT\('ui\.yogaSubtitle'\)/, 'Yoga headings should use the narrated language');
 
 console.log('Journey video prelude contract passed.');

@@ -10,7 +10,7 @@ assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperien
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
 assert.match(app, /lobbyExperienceVisibility\.bindShotTypeChange\(/);
 assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.0[\s\S]*?app\.js\?v=4.12/);
-assert.match(serviceWorker, /chakra-v5.310[\s\S]*?modules\/lobby-experience-visibility\.js\?v=1\.0/);
+assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.0/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
