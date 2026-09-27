@@ -3314,21 +3314,7 @@ function loadPreferences() {
 }
 
 function checkFirstTime() {
-    if (localStorage.getItem('chakra_configured')) {
-        showScreen(lobbyScreen);
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-    } else {
-        showScreen(configScreen);
-        const aura = document.getElementById('aura-bg');
-        if (aura) {
-            aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
-            aura.style.opacity = '1';
-        }
-    }
+    screenNavigation.checkFirstTime(localStorage);
 }
 
 function showScreen(screen) {

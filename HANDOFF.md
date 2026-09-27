@@ -12,9 +12,12 @@
 - Added a direct lifecycle contract covering manifest filtering, optional 404 handling, decode/start, gain/blur/spatial ramps, failed custom-URL recovery and resource cleanup. Refreshed the `sound-options` and modularization atlas notes, PWA manifest and fix queue.
 - Validation: `test:audio-pleasure-ambience`, AudioEngine initialization, spatial geometry, Mood & Relaxation settings, audio-mode controls, audio-effects controls, transitions, `node --check` and `git diff --check` pass. Atlas rebuilt successfully: 44 maps / 369 nodes / 434 edges; source snapshot labels CP-MOD-152 uncommitted. Interactive atlas verification could not run because Playwright is not installed; browser/device playback, sound-quality and performance evidence remain unclaimed.
 
-### NEXT — CP-MOD-153: audit next cohesive app/controller seam
+### COMPLETE LOCALLY — CP-MOD-153: first-visit routing ownership
 
-- Reinspect the current ownership map and coupling before choosing another extraction. Continue only with direct parity coverage; leave the larger journey/audio controller lifecycles intact unless a complete safe boundary is evident. Measured lazy-loading remains a separate evidence gate.
+- Baseline `6279936`; uncommitted in this isolated worktree. Moved `checkFirstTime` routing/aura treatment into existing `modules/screen-navigation.js`, with storage passed by the app adapter at the same call time. Stored-value truthiness, Lobby/Settings destinations, decoration event/mode, scroll resets, exact gradients/opacity, missing-aura guard and both initialization call sites are preserved. No new module or script/cache entry.
+- Direct tests cover four stored values with and without the aura (eight cases). `node tests/screen-navigation.test.mjs` passes; `node --check` passes for app, navigation owner, focused test and atlas data. Atlas build passes: 44 maps / 369 nodes / 434 edges. Supervisor source review confirms unchanged `init()` order and error fallback; atlas topology is unchanged. `git diff --check` passes. The test first failed as expected before extraction; initial atlas build exposed an out-of-range controls source reference after line removal, now refreshed.
+- Atlas ownership notes: `startup`, `modularization`; source references: `overview`, `startup`, `controls`. Snapshot is labeled baseline + uncommitted CP-MOD-153. Scope/quality review found no outstanding issue. Evidence is source/static and direct unit tests only; browser tests/interactive atlas verification were excluded by instruction, with no device/playback or performance claim.
+- Execution: automatic child route `route-20260927T062421-f0ef8b48`, selected `gpt-6-astra` / high effort; usage telemetry unavailable. No push, PR, merge or deployment. Next: complete the remaining source-backed ownership audit and measured-loading evidence gate; browser checks remain skipped per instruction.
 
 ### COMPLETE LOCALLY — CP-MOD-149–151: Piper voice setup ownership
 

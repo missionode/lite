@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: af4fde5 CP-MOD-151 baseline + uncommitted CP-MOD-152 · 2026-09-26.
+Source snapshot: 6279936 CP-MOD-152 baseline + uncommitted CP-MOD-153 · 2026-09-27.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

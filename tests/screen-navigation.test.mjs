@@ -86,5 +86,48 @@ assert.equal(eventCount, 7);
 assert.ok(screens.filter(Boolean).every(view => view.classes.has('hidden')));
 assert.equal(document.scrollingElement.scrollTop, 0, 'navigation without a destination does not scroll the document');
 
+for (const configured of [null, '', 'true', 'false']) {
+    for (const hasAura of [true, false]) {
+        const settings = screen();
+        const room = screen();
+        const journey = screen();
+        const views = [settings, room, journey];
+        const decorationClasses = new Set(['static-decorations']);
+        const aura = hasAura ? { style: { background: 'previous', opacity: '0' } } : null;
+        const reads = [];
+        let decorations = 0;
+        const entry = navigation.create({
+            body: { classList: { toggle(name, enabled) {
+                enabled ? decorationClasses.add(name) : decorationClasses.delete(name);
+            } } },
+            document: { getElementById(id) {
+                assert.equal(id, 'aura-bg');
+                return aura;
+            } },
+            window: {}, screens: views, lobbyScreen: room, configScreen: settings,
+            dispatchDecorationChange() {
+                decorations++;
+                assert.equal(decorationClasses.has('static-decorations'), false);
+                if (aura) assert.equal(aura.style.background, 'previous', 'decoration event precedes aura treatment');
+            }
+        });
+        entry.checkFirstTime({ getItem(key) { reads.push(key); return configured; } });
+        assert.deepEqual(reads, ['chakra_configured']);
+        const destination = configured ? room : settings;
+        for (const view of views) {
+            assert.equal(view.classes.has('hidden'), view !== destination, 'only the entry destination is visible');
+        }
+        assert.equal(decorationClasses.has('static-decorations'), false, 'both entry destinations use dynamic decorations');
+        assert.equal(decorations, 1, 'entry routing dispatches one decoration change');
+        assert.equal(destination.scrollTop, 0);
+        if (aura) {
+            assert.equal(aura.style.background, configured
+                ? 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)'
+                : 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)');
+            assert.equal(aura.style.opacity, '1');
+        }
+    }
+}
+
 assert.throws(() => navigation.create({}), /requires the application views/);
-console.log('Screen navigation owner passed: static-sky guards, screen visibility, event, and scroll reset.');
+console.log('Screen navigation owner passed: static-sky guards, screen visibility, event, scroll reset, and first-visit routing/aura parity.');

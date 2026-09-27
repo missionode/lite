@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: af4fde5 CP-MOD-151 baseline + uncommitted CP-MOD-152 · 2026-09-26.
+Source snapshot: 6279936 CP-MOD-152 baseline + uncommitted CP-MOD-153 · 2026-09-27.
 
-Source-reviewed behavior through CP-MOD-151, plus the uncommitted CP-MOD-152 ambience lifecycle ownership extraction and CP-ASSESS-ADV-UNDO-RAPPORT-001. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script and Piper voice setup paths. Existing selected-only lazy practices and opt-in video remain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page.
+Source-reviewed behavior through CP-MOD-152, plus the uncommitted CP-MOD-153 first-visit routing ownership extraction and CP-ASSESS-ADV-UNDO-RAPPORT-001. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script and Piper voice setup paths. Existing selected-only lazy practices and opt-in video remain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -101,7 +101,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:4211](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4211), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1).
+Sources: [app.js:3163](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3163), [app.js:4193](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4193), [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1).
 
 ```mermaid
 flowchart TD
@@ -205,7 +205,7 @@ flowchart TD
 | Targeted parity check | Test the module directly and confirm its integration references and offline asset delivery. |
 | Refresh affected maps | Update delivered ownership and source references; keep future work in the fix queue. |
 | Validated checkpoint | Review scope and errors; commit only intended files after fresh checks. |
-| Remaining modularization work | CP-MOD-152 resumes the remaining justified app/controller ownership seams, then the track must pass the planned cold/warm/offline and browser evidence gate before modularization is declared complete. |
+| Remaining modularization work | CP-MOD-153 resumes the remaining justified app/controller ownership seams, then the track must pass the planned cold/warm/offline and browser evidence gate before modularization is declared complete. |
 | Baseline measured · CP-MOD-037 | Cold/warm/offline script count, encoded resource bytes, transfer sizes, cache control and page errors; CPU/heap snapshots are indicative only. |
 | Bounded optional bundle | Seven selected guided-practice scripts are the first bundle; measured initial-JS reduction is modest (~13.1 KiB locally). |
 | Offline bytes, not execution | Service worker precaches the seven practice script URLs, while the eager shell includes only the small loader. |
@@ -240,6 +240,7 @@ flowchart TD
 - CP-MOD-128 moves chakra-symbol image load/error/cached-image visibility handling into the existing VisualEngine instance. App call sites retain the same selected artwork and timing; request identity guards still prevent stale image callbacks from revealing a superseded symbol. Eager/offline delivery and visual behavior are unchanged; ownership/testability only.
 - CP-MOD-129–148 moves twenty helper responsibilities into established owners: Piper voice ID/registry/cadence/gender/locale selection (10), completion Earn-link cancellation/eligibility/scheduling (3), voice-status rendering (1), demo-script duration/message/eligibility policies (3), generated-intention language refresh (2), and contextual drone-duration summary rendering (1). Stable app adapters preserve runtime call sites; there is no new eager module or lazy boundary. Direct tests pass; this is ownership/testability work only.
 - CP-MOD-152 moves Mood & Relaxation ambience manifest loading, custom-URL rollback, loop start/stop, gain/blur ramps and spatial approach into one existing-domain audio lifecycle module. AudioEngine method names, state owner, journey calls, parameters, failure recovery and eager/offline availability remain unchanged; no flow, audio-quality or performance change is claimed.
+- CP-MOD-153 moves first-visit routing into the existing screen-navigation owner. The app retains its checkFirstTime adapter and both initialization call sites; chakra_configured truthiness, destination visibility, decoration notification, scroll resets and exact aura gradients/opacity are unchanged. No module, script/cache entry or performance claim is added.
 
 <a id="startup"></a>
 
@@ -247,7 +248,7 @@ flowchart TD
 
 Loading order and optional browser capabilities.
 
-Sources: [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [modules/settings-help-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-help-view.js:1), [tests/settings-help-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-help-view.test.mjs:1), [app.js:3514](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3514), [app.js:3526](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3526), [app.js:3731](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3731), [app.js:4211](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4211), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
+Sources: [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [modules/settings-help-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/settings-help-view.js:1), [tests/settings-help-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/settings-help-view.test.mjs:1), [app.js:3163](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3163), [app.js:3184](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3184), [app.js:3316](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3316), [app.js:4193](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4193), [index.html:148](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:148).
 
 ```mermaid
 flowchart TD
@@ -289,6 +290,7 @@ flowchart TD
 | Hide splash | 2.5-second delay begins after async initialization reaches its end. |
 
 - Timing fetch failure uses defaults. Language loading catches failures and installs built-in options. The small practice loader is eager, but its seven guided-practice scripts are not parsed until selected on Begin; see Mode Selection and the modularization map. This does not establish complete offline readiness.
+- CP-MOD-153: screen-navigation now reads chakra_configured at the existing checkFirstTime call time, showing Lobby for a truthy stored value and Settings otherwise. Both destinations retain dynamic decorations and one decorationchange notification before the aura treatment. The original bottom/top violet radial gradients and opacity 1, missing-aura guard, startup order and initialization-failure fallback are preserved.
 
 <a id="cosmic-theme-planned"></a>
 
@@ -933,7 +935,7 @@ flowchart TD
 
 Shared interaction and cancellation behavior.
 
-Sources: [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/session-countdown.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-countdown.js:1), [tests/session-countdown.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-countdown.test.mjs:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/session-transport-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-transport-controls.js:1), [tests/session-transport-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-transport-controls.test.mjs:1), [modules/mixer-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-view.js:1), [tests/mixer-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-view.test.mjs:1), [modules/media-controls-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-controls-view.js:1), [tests/media-controls-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/media-controls-view.test.mjs:1), [app.js:2461](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2461), [app.js:2891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2891), [app.js:2945](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2945), [app.js:4211](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4211), [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1).
+Sources: [modules/journey-chrome.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-chrome.js:1), [modules/session-countdown.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-countdown.js:1), [tests/session-countdown.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-countdown.test.mjs:1), [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/session-transport-controls.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-transport-controls.js:1), [tests/session-transport-controls.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/session-transport-controls.test.mjs:1), [modules/mixer-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/mixer-view.js:1), [tests/mixer-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/mixer-view.test.mjs:1), [modules/media-controls-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-controls-view.js:1), [tests/media-controls-view.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/media-controls-view.test.mjs:1), [app.js:2461](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2461), [app.js:2891](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2891), [app.js:2945](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2945), [app.js:4197](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:4197), [app.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1).
 
 ```mermaid
 flowchart TD
