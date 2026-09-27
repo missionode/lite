@@ -9,6 +9,11 @@
     --font-family: 'Inter', 'Manjari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --glass-bg: rgba(124, 58, 237, 0.06);
     --glass-border: rgba(251, 191, 36, 0.15);
+    --cosmic-panel: rgba(8, 12, 23, 0.96);
+    --cosmic-panel-border: rgba(202, 172, 105, 0.34);
+    --cosmic-ink: #f4f0e8;
+    --cosmic-muted: #c7c9d5;
+    --cosmic-gold: #d4b875;
 }
 
 * {
@@ -178,7 +183,7 @@ body {
     pointer-events: none;
     opacity: 1;
     mix-blend-mode: screen;
-    contain: strict;
+    contain: layout paint style;
 }
 
 .screen {
@@ -216,23 +221,23 @@ body {
 .newcomer-body-map { display: grid; justify-items: center; margin: 0 auto; color: rgba(255,255,255,0.72); font-size: 0.76rem; }
 .newcomer-body-map-stage { position: relative; width: clamp(245px, 62vw, 390px); max-width: 100%; }
 .newcomer-body-map img { display: block; width: 100%; max-height: 68dvh; object-fit: contain; filter: drop-shadow(0 0 14px rgba(125, 88, 210, 0.28)); }
-.newcomer-marker-connectors { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0.38; }
+.newcomer-marker-connectors { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0.62; }
 .newcomer-marker-connectors path[data-marker] { fill: none; stroke: rgba(230, 222, 255, 0.78); stroke-width: 1.25; vector-effect: non-scaling-stroke; marker-end: url(#newcomer-marker-arrow); }
 .newcomer-marker-connectors marker path { fill: rgba(230, 222, 255, 0.9); }
-.newcomer-guided-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; color: rgba(255,255,255,0.9); font-size: clamp(0.58rem, 1.8vw, 0.74rem); pointer-events: none; opacity: 0.42; }
-.newcomer-guided-labels li { position: absolute; display: grid; top: var(--marker-y); width: 34%; line-height: 1.15; text-align: left; text-shadow: 0 1px 5px #06030e; transform: translateY(-50%); }
+.newcomer-guided-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; color: rgba(255,255,255,0.96); font-size: clamp(0.58rem, 1.8vw, 0.74rem); pointer-events: none; opacity: 1; }
+.newcomer-guided-labels li { position: absolute; display: grid; top: var(--marker-y); width: 34%; line-height: 1.2; text-align: left; text-shadow: 0 1px 5px #06030e; transform: translateY(-50%); padding: 0.35rem 0.45rem; border: 1px solid rgba(202,172,105,0.42); border-radius: 0.55rem; background: rgba(5,10,20,0.94); }
 /* Each connector is calibrated to the actual marker centre in the standing
    illustration (the figure uses a stable 2:3 aspect ratio). */
 .newcomer-guided-labels li:nth-child(odd) { right: -22%; text-align: left; }.newcomer-guided-labels li:nth-child(even) { left: -22%; text-align: right; }
 .newcomer-label-crown { --marker-y: 7%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-third-eye { --marker-y: 16%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-throat { --marker-y: 27%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-heart { --marker-y: 38%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-solar { --marker-y: 49%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-sacral { --marker-y: 60%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-root { --marker-y: 70%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }
 .newcomer-guided-labels strong { color: rgba(255,255,255,0.94); font-weight: 600; }
-.newcomer-guided-labels span { color: rgba(255,255,255,0.6); font-size: 0.63rem; }
+.newcomer-guided-labels span { color: rgba(230,235,244,0.9); font-size: 0.63rem; }
 .newcomer-body-map p { max-width: 22rem; margin: 0.35rem 0 0; }
 .newcomer-guided-status { margin: 0.85rem 0 0; color: rgba(251, 191, 36, 0.9); font-size: 0.82rem; }
-.newcomer-reassurance, .newcomer-section { border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(12, 10, 28, 0.56); border-radius: 16px; padding: 1rem; margin-top: 0.9rem; line-height: 1.55; }
+.newcomer-reassurance, .newcomer-section { border: 1px solid rgba(202, 172, 105, 0.42); background: rgba(7, 13, 24, 0.96); border-radius: 16px; padding: 1rem; margin-top: 0.9rem; line-height: 1.55; }
 .newcomer-reassurance { color: rgba(255,255,255,0.86); }
 .newcomer-section h2 { font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(251,191,36,0.9); margin: 0 0 0.55rem; }
-.newcomer-section p { margin: 0; color: rgba(255,255,255,0.74); font-size: 0.88rem; }
+.newcomer-section p { margin: 0; color: rgba(240,243,248,0.94); font-size: 0.88rem; }
 .newcomer-centres { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; margin: 1rem 0 0; padding: 0; list-style: none; text-align: left; }
 .newcomer-centres li { padding: 0.65rem; border-radius: 10px; background: rgba(255,255,255,0.045); }
 .newcomer-centres strong { display: block; color: rgba(255,255,255,0.9); font-size: 0.82rem; }
@@ -242,10 +247,10 @@ body {
 @media (max-width: 600px) {
     .newcomer-centres { grid-template-columns: 1fr; }
     .newcomer-actions { flex-direction: column; }
-    .newcomer-body-map-stage { width: min(70vw, 330px); }
+    .newcomer-body-map-stage { width: min(64vw, 300px); }
     .newcomer-guided-labels li { width: 38%; font-size: clamp(0.54rem, 2.4vw, 0.68rem); }
-    .newcomer-guided-labels li:nth-child(odd) { right: -20%; }
-    .newcomer-guided-labels li:nth-child(even) { left: -20%; }
+    .newcomer-guided-labels li:nth-child(odd) { right: -28%; }
+    .newcomer-guided-labels li:nth-child(even) { left: -28%; }
     .newcomer-guided-labels li { --arrow-width: 135% !important; }
 }
 
@@ -2221,10 +2226,89 @@ body.journey-controls-active.fullscreen-controls-visible #fullscreen-controls-re
 
 .tutorial-overlay p {
     color: #ffffff;
-    opacity: 0.6;
+    opacity: 0.94;
     letter-spacing: 1px;
     line-height: 1.6;
     font-size: 0.85rem;
+}
+
+/* Supporting surfaces share the Observatory palette without adding visual
+   filters, new motion, or changes to the existing journey controls. */
+.settings-screen-container:not(#config-screen) {
+    width: min(100%, 1040px);
+    max-width: 1040px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    box-sizing: border-box;
+}
+
+#settings-manager-screen .settings-panel,
+#experiment-screen .settings-panel {
+    width: min(100%, 850px);
+    box-sizing: border-box;
+    border: 1px solid rgba(202,172,105,0.4);
+    border-radius: 1.25rem;
+    background: rgba(7,13,24,0.96);
+    color: rgba(240,243,248,0.96);
+}
+
+#settings-manager-screen .subtitle,
+#experiment-screen .subtitle,
+#experiment-screen .experiment-note {
+    color: rgba(229,235,245,0.94);
+    opacity: 1;
+    max-width: 52rem;
+    line-height: 1.6;
+}
+
+#icebreaker-screen > * {
+    width: min(calc(100% - 2rem), 48rem);
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#icebreaker-screen #icebreaker-subtitle,
+#icebreaker-screen #icebreaker-timer {
+    color: rgba(240,243,248,0.95);
+    opacity: 1 !important;
+}
+
+#icebreaker-screen #guide-controlled-continue {
+    margin-top: 1rem;
+}
+
+.journey-video-prelude-ready {
+    border-color: rgba(202,172,105,0.72);
+    background: rgba(4,9,18,0.97);
+    backdrop-filter: none;
+}
+
+#controls {
+    border: 1px solid rgba(202,172,105,0.5);
+    background: rgba(4,9,18,0.96) !important;
+    backdrop-filter: none !important;
+}
+
+#volume-mixer {
+    backdrop-filter: none;
+    color: rgba(240,243,248,0.97);
+}
+
+.mixer-section {
+    border-color: rgba(202,172,105,0.38);
+    background: rgba(13,20,33,0.97);
+}
+
+.mixer-subtitle,
+.mixer-note {
+    color: rgba(225,232,243,0.9);
+}
+
+.mixer-row label,
+.mixer-section-body,
+.mixer-url-entry label,
+.mixer-select-control > label {
+    color: rgba(240,243,248,0.96);
 }
 
 #breathing-circle-container {
@@ -2280,19 +2364,19 @@ body.journey-controls-active.fullscreen-controls-visible #fullscreen-controls-re
     justify-content: center;
     align-items: center;
     z-index: 100;
-    backdrop-filter: blur(20px);
+    backdrop-filter: none;
     animation: fadeIn 1s ease-out;
 }
 
 .modal-content {
-    background: rgba(10, 0, 20, 0.88);
-    border: 1px solid rgba(251, 191, 36, 0.25);
+    background: rgba(8, 12, 23, 0.97);
+    border: 1px solid rgba(202, 172, 105, 0.42);
     padding: 3rem;
     border-radius: 32px;
     max-width: 400px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 0 40px rgba(124, 58, 237, 0.3), 0 0 80px rgba(251, 191, 36, 0.08);
+    box-shadow: 0 18px 56px rgba(0, 0, 0, 0.42);
     z-index: 1;
     position: relative;
 }
@@ -2547,4 +2631,465 @@ body.static-decorations .body-scan-scene,
 body.static-decorations .noting-scene,
 body.static-decorations .undo-unlearn-scene {
     transition: opacity 5s ease-in-out !important;
+}
+
+/* Cosmic Observatory — first-pass Lobby presentation components.
+   Keep these CSS-owned and static: existing view modules remain the source
+   of state, selection, routing and persistence. */
+#lobby-screen {
+    --lobby-ink: #f4f1ea;
+    --lobby-muted: #c3cedb;
+    --lobby-gold: #e8c27e;
+    --lobby-surface: rgba(8, 15, 26, 0.96);
+    --lobby-surface-raised: rgba(15, 24, 38, 0.96);
+    --lobby-border: rgba(192, 207, 225, 0.22);
+    --text-color: var(--lobby-ink);
+    --accent-color: var(--lobby-gold);
+    --accent-glow: #f5dfb1;
+    --glass-bg: var(--lobby-surface-raised);
+    --glass-border: var(--lobby-border);
+    width: 100%;
+    min-width: 0;
+    gap: 1rem;
+    align-items: stretch;
+    text-align: left;
+}
+
+#lobby-screen:not(.hidden) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+#lobby-screen > * { min-width: 0; }
+
+#lobby-screen #lobby-title {
+    margin: 0;
+    color: var(--lobby-ink);
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.2;
+    text-align: left;
+    text-transform: none;
+}
+
+#lobby-screen .lobby-panel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    padding: clamp(1rem, 2vw, 1.45rem);
+    border: 1px solid var(--lobby-border);
+    border-radius: 20px;
+    background: var(--lobby-surface);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+    color: var(--lobby-ink);
+    text-align: left;
+    backdrop-filter: none;
+}
+
+#lobby-screen .lobby-panel > label:first-child,
+#lobby-screen .drone-duration-control legend {
+    padding-inline: 0;
+    color: var(--lobby-ink);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+    opacity: 1;
+    text-align: left;
+    text-transform: none;
+}
+
+#lobby-screen .lobby-panel p,
+#lobby-screen .drone-duration-help {
+    color: var(--lobby-muted);
+    opacity: 1;
+}
+
+#lobby-screen #chakra-selection-panel { text-align: left; }
+
+#lobby-screen #chakra-selection-panel .chakra-selection-help {
+    color: var(--lobby-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: left;
+    opacity: 1;
+}
+
+#lobby-screen .chakra-selection-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+#lobby-screen .chakra-selection-list .checkbox-label {
+    min-width: 0;
+    min-height: 52px;
+    justify-content: flex-start;
+    gap: 0.65rem;
+    padding: 0.7rem 0.8rem;
+    border-color: var(--lobby-border);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--lobby-ink);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+#lobby-screen .chakra-selection-list .checkbox-label.chip-active {
+    border-color: var(--lobby-gold);
+    background: rgba(232, 194, 126, 0.14);
+    color: var(--lobby-ink);
+    box-shadow: inset 0 0 0 1px rgba(232, 194, 126, 0.12);
+}
+
+#lobby-screen .chakra-selection-list .checkbox-label input {
+    flex: 0 0 auto;
+    accent-color: var(--lobby-gold);
+}
+
+#lobby-screen .experience-mode-options {
+    justify-content: flex-start;
+    gap: 0.55rem;
+}
+
+#lobby-screen .experience-mode-toggle {
+    justify-content: flex-start;
+    min-height: 48px;
+    margin: 0;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--lobby-ink);
+    letter-spacing: 0.01em;
+    text-align: left;
+}
+
+#lobby-screen .experience-mode-toggle:focus-within,
+#lobby-screen .checkbox-label:focus-within,
+#lobby-screen select:focus-visible,
+#lobby-screen input:focus-visible,
+#lobby-screen button:focus-visible {
+    outline: 3px solid rgba(169, 217, 223, 0.75);
+    outline-offset: 3px;
+}
+
+#lobby-screen .time-selector {
+    gap: 0.9rem;
+    padding: clamp(1rem, 2vw, 1.45rem);
+}
+
+#lobby-screen .time-selector > label {
+    color: var(--lobby-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+    opacity: 1;
+    text-align: left;
+    text-transform: none;
+}
+
+#lobby-screen #time-display,
+#lobby-screen #high-energy-time-display {
+    color: var(--lobby-gold);
+    text-shadow: none;
+}
+
+#lobby-screen .drone-duration-control { padding: clamp(1rem, 2vw, 1.45rem); }
+
+#lobby-screen .drone-duration-option input:checked + .drone-duration-copy {
+    border-color: var(--lobby-gold);
+    background: rgba(232, 194, 126, 0.15);
+    color: var(--lobby-ink);
+    box-shadow: none;
+    transform: none;
+}
+
+#lobby-screen #intention-config-group > label {
+    color: var(--lobby-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    opacity: 1;
+    text-transform: none;
+}
+
+#lobby-screen #session-estimate {
+    width: fit-content;
+    max-width: 100%;
+    justify-self: center;
+    margin: 0;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid var(--lobby-border);
+    border-radius: 999px;
+    background: var(--lobby-surface);
+    color: var(--lobby-muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.025em;
+    opacity: 1;
+    text-shadow: none;
+}
+
+#lobby-screen .journey-roadmap {
+    max-width: none;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--lobby-border);
+    border-radius: 14px;
+    background: var(--lobby-surface);
+    color: var(--lobby-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    text-align: left;
+}
+
+#lobby-screen .journey-safety-summary {
+    color: var(--lobby-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
+#lobby-screen .lobby-actions { margin: 0; gap: 0.7rem; }
+
+#lobby-screen .lobby-actions .primary-btn {
+    min-height: 56px;
+    border: 1px solid rgba(255, 229, 184, 0.85);
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f0d49e, #d9ad65);
+    box-shadow: 0 8px 24px rgba(10, 8, 5, 0.22);
+    color: #17130c;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    transition: filter 160ms ease, border-color 160ms ease;
+}
+
+#lobby-screen .lobby-actions .primary-btn:hover { filter: brightness(1.06); }
+
+#lobby-screen .lobby-actions .link-btn,
+#lobby-screen .lobby-actions .consultation-btn {
+    min-height: 48px;
+    border-color: var(--lobby-border);
+    color: var(--lobby-ink);
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+
+@supports selector(#app:has(#lobby-screen)) {
+    #app:has(> #lobby-screen:not(.hidden)) {
+        width: min(100%, 1440px);
+        max-width: 1440px;
+        padding: clamp(1rem, 3vw, 2.75rem);
+        text-align: left;
+    }
+
+    @media (min-width: 920px) {
+        #lobby-screen:not(.hidden) {
+            grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.8fr);
+            column-gap: clamp(1rem, 2vw, 1.75rem);
+            row-gap: 1rem;
+        }
+
+        #lobby-screen #lobby-title,
+        #lobby-screen #shots-control,
+        #lobby-screen #chakra-selection-panel,
+        #lobby-screen #journey-preferences-group,
+        #lobby-screen #yoga-experience-panel-host,
+        #lobby-screen #intimate-service-panel,
+        #lobby-screen #session-estimate,
+        #lobby-screen #journey-roadmap,
+        #lobby-screen .journey-safety-summary,
+        #lobby-screen .lobby-actions { grid-column: 1 / -1; }
+
+        #lobby-screen #journey-preparation-addons,
+        #lobby-screen #journey-integration-addons,
+        #lobby-screen #intention-config-group { grid-column: 1; }
+
+        #lobby-screen .lobby-duration-panel,
+        #lobby-screen #high-energy-duration-control,
+        #lobby-screen #drone-duration-control,
+        #lobby-screen #experience-mode-group { grid-column: 2; }
+
+        #lobby-screen .chakra-selection-list { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    }
+}
+
+@media (min-width: 560px) and (max-width: 919px) {
+    #lobby-screen .chakra-selection-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 559px) {
+    #lobby-screen { gap: 0.8rem; padding-inline: 0.85rem; }
+    #lobby-screen .lobby-panel { padding: 1rem; border-radius: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #lobby-screen .lobby-actions .primary-btn { transition: none; }
+}
+
+/* Lobby and Settings stay clear of the astronomy artwork. Journey/support
+   screens show one still canvas frame; only the Sky page enables motion. */
+.sky-backdrop { display: none; }
+body.static-decorations .sky-backdrop,
+body.sky-canvas-active .sky-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+}
+body.sky-canvas-active #nebula-bg,
+body.sky-canvas-active #particle-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.sky-settings-entry { margin-top: 1rem; }
+.sky-settings-entry .mixer-note { margin: 0 0 0.8rem; }
+#config-screen #open-sky-observatory { width: 100%; }
+
+@supports selector(#app:has(#config-screen)) {
+    #app:has(> #config-screen:not(.hidden)) {
+        width: min(100%, 1040px);
+        max-width: 1040px;
+        padding: clamp(1rem, 3vw, 2.5rem);
+        text-align: left;
+    }
+}
+#config-screen {
+    width: min(100%, 900px);
+    margin-inline: auto;
+    gap: 1rem;
+    align-items: stretch;
+    color: var(--cosmic-ink);
+}
+#config-screen > h1,
+#config-screen > .settings-title-row { text-align: center; }
+#config-screen > .config-group {
+    padding: clamp(0.95rem, 2vw, 1.3rem);
+    border: 1px solid var(--cosmic-panel-border);
+    border-radius: 18px;
+    background: var(--cosmic-panel);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+#config-screen .settings-panel {
+    margin-top: 0.25rem;
+    padding-top: 0.85rem;
+    border-top-color: rgba(202, 172, 105, 0.2);
+}
+#config-screen .mixer-note,
+#config-screen .subtitle { color: var(--cosmic-muted); opacity: 1; }
+#config-screen .checkbox-label,
+#config-screen .radio-label { color: var(--cosmic-ink); opacity: 1; }
+#config-screen .settings-panel > label:first-child,
+#config-screen .config-group > label:first-child { color: var(--cosmic-gold); opacity: 1; }
+#config-screen select,
+#config-screen input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+#config-screen textarea {
+    border: 1px solid rgba(195, 199, 216, 0.25);
+    border-radius: 11px;
+    background: rgba(3, 7, 15, 0.94);
+    color: var(--cosmic-ink);
+}
+#config-screen select:focus-visible,
+#config-screen input:focus-visible,
+#config-screen textarea:focus-visible,
+#config-screen button:focus-visible {
+    outline: 2px solid #e2c77e;
+    outline-offset: 3px;
+}
+#config-screen .secondary-btn {
+    border-color: rgba(202, 172, 105, 0.52);
+    background: rgba(19, 22, 34, 0.96);
+    color: var(--cosmic-ink);
+    backdrop-filter: none;
+    text-transform: none;
+    letter-spacing: 0.03em;
+    font-size: 0.86rem;
+}
+#config-screen .primary-btn {
+    background: linear-gradient(135deg, #d1b36e, #9b7935);
+    color: #12131a;
+    box-shadow: 0 8px 24px rgba(183, 145, 67, 0.24);
+}
+
+#sky-screen.sky-screen {
+    position: relative;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    gap: 0;
+    padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1.25rem, env(safe-area-inset-bottom, 0px));
+    text-align: center;
+}
+.sky-observatory-panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 42rem);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 1.6rem);
+    border: 1px solid rgba(202, 172, 105, 0.48);
+    border-radius: 20px;
+    background: var(--cosmic-panel);
+    color: #f4f0e8;
+    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.32);
+}
+.sky-observatory-panel .sky-eyebrow {
+    margin: 0 0 0.35rem;
+    color: #cdb77f;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.sky-observatory-panel h1 {
+    margin: 0 0 0.55rem;
+    color: #f7f2e9;
+    font-size: clamp(1.45rem, 4vw, 2.15rem);
+    letter-spacing: 0.04em;
+}
+.sky-location-status,
+.sky-chart-note {
+    max-width: 58ch;
+    margin: 0.45rem auto;
+    color: #d7d9e5;
+    font-size: clamp(0.78rem, 2vw, 0.92rem);
+    line-height: 1.5;
+}
+.sky-observatory-panel #close-sky-screen {
+    min-height: 46px;
+    margin-top: 0.8rem;
+    border-color: rgba(202, 172, 105, 0.55);
+    color: #f4f0e8;
+}
+
+@supports selector(#app:has(#sky-screen)) {
+    #app:has(> #sky-screen:not(.hidden)) {
+        width: 100%;
+        max-width: none;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .sky-observatory-panel { border-radius: 16px; }
+    #sky-screen.sky-screen { padding-inline: 0.75rem; }
+    #config-screen { padding-inline: 0.8rem; }
+    #config-screen > .config-group { border-radius: 15px; }
 }

@@ -23,8 +23,14 @@ const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors
 await page.clock.setFixedTime(new Date('2026-09-17T18:30:00Z'));
 await page.goto('https://sky-preview.local/');
 await page.waitForFunction(()=>document.getElementById('splash-screen').classList.contains('hidden'));
-await page.waitForFunction(()=>particleField.observer?.approximate===false);
+assert.equal(await page.evaluate(()=>document.body.classList.contains('sky-canvas-active')),false,'The canvas is inactive on the Lobby');
 await page.screenshot({path:'/private/tmp/natural-sky-lobby.png'});
+await page.locator('#open-settings').click();
+assert.equal(await page.evaluate(()=>document.body.classList.contains('sky-canvas-active')),false,'The canvas is inactive in Settings');
+await page.locator('#open-sky-observatory').click();
+await page.waitForFunction(()=>document.body.classList.contains('sky-canvas-active'));
+await page.waitForFunction(()=>particleField.observer?.approximate===false);
+await page.screenshot({path:'/private/tmp/natural-sky-observatory.png'});
 const metrics=await page.evaluate(()=>{
     const start=performance.now();for(let i=0;i<120;i++)particleField.draw(i*34,true);
     const frameMs=(performance.now()-start)/120;

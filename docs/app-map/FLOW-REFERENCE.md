@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167 · 2026-09-27.
+Source snapshot: 6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-27.
 
-Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged.
+Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -12,7 +12,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 2. [The whole application](#overview)
 3. [Modularization safety loop](#modularization)
 4. [Startup and first visit](#startup)
-5. [PLANNED · Cosmic Observatory theme](#cosmic-theme-planned)
+5. [Cosmic Observatory theme · implementation checkpoint](#cosmic-theme-planned)
 6. [Mode selection and start routing](#modes)
 7. [Standard chakra journey](#standard)
 8. [Inside one chakra](#chakra)
@@ -101,7 +101,7 @@ flowchart TD
 
 Navigation, journey families, supporting systems, and exits.
 
-Sources: [index.html:248](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:248), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [app.js:2502](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2502), [app.js:2663](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2663).
+Sources: [index.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/ambient-particle-field.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:1), [tests/screen-navigation.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/screen-navigation.test.mjs:1), [app.js:2502](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2502), [app.js:2663](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2663).
 
 ```mermaid
 flowchart TD
@@ -110,6 +110,7 @@ flowchart TD
   lobby["Meditation Room"]
   manage["Manage Settings"]
   experiments["Experiments"]
+  sky["Sky Observatory"]
   journeys["Journey dispatcher"]
   consult["Session consultation"]
   runtime["Active experience"]
@@ -123,6 +124,8 @@ flowchart TD
   settings -->|"Manage Settings"| manage
   manage -->|"Back"| settings
   settings -->|"Experiment Mode"| experiments
+  settings -->|"Open Sky Observatory"| sky
+  sky -->|"Back to Settings"| settings
   lobby -->|"Advanced Features unlocked only"| consult
   consult -->|"Return"| lobby
   lobby -->|"Begin"| journeys
@@ -137,10 +140,11 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
-| Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools. |
+| Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools. Settings includes a localized CTA to the dedicated Sky Observatory. |
 | Meditation Room | Main mode selection, chakra choices, intention and duration. Consultation entry is hidden and disabled until Advanced Features is unlocked. |
 | Manage Settings | Public settings import and Advanced Features-protected export. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
+| Sky Observatory | Settings → Open Sky Observatory. Only this page animates the astronomy canvas; journey/support pages show a static frame, while Lobby/Settings remain clear. Back to Settings stops it. |
 | Journey dispatcher | Shots → Music Only → Sleep → focused or standard guided start. See mode map. |
 | Session consultation | Single entry point: Lobby “Begin Session Consultation” CTA, available only after Advanced Features unlock. It establishes a short same-tab assessment handoff; Settings has no assessment link. |
 | Active experience | Shared timer, audio, narration, visuals, mixer, pause and stop. |
@@ -148,7 +152,7 @@ flowchart TD
 | Completion | Guided and Sleep flows update local stats; return to room or eligible Earn link. |
 | Other exits | Shot completion reloads; Music Only stops manually; experiments return to their screen. |
 
-- Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. Direct entry without a handoff shows a locked view without fetching the question bank. Client-side feature gate, not server authentication.
+- Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. The Sky CTA is public. Only the Observatory runs the calculated sky animation; journey/support screens draw one static frame, and Lobby/Settings hide it. Client-side assessment feature gate, not server authentication.
 
 <a id="modularization"></a>
 
@@ -307,55 +311,51 @@ flowchart TD
 
 <a id="cosmic-theme-planned"></a>
 
-## PLANNED · Cosmic Observatory theme
+## Cosmic Observatory theme · implementation checkpoint
 
-CP-THEME-PLAN-001: owner-approved appearance; implementation follows assessment and modularization.
+Owner-approved redesign in bounded slices; behavior and performance contracts remain in force.
 
-Sources: [.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1), [docs/design/lite-cosmic-observatory/README.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/design/lite-cosmic-observatory/README.md:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
+Sources: [.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/.loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1), [docs/design/lite-cosmic-observatory/README.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/design/lite-cosmic-observatory/README.md:1), [index.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:1), [style.css:1](/Users/lekshmisyam/Desktop/Ikigai/lite/style.css:1), [modules/screen-navigation.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/screen-navigation.js:1), [modules/ambient-particle-field.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/ambient-particle-field.js:1), [docs/app-map/FIX-QUEUE.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/app-map/FIX-QUEUE.md:1).
 
 ```mermaid
 flowchart TD
   assessment["Assessment delivered"]
-  modules["Complete modularization"]
+  modules["Modularization complete"]
   reference["Approved visual reference"]
   contract["Preserve all requirements"]
   tokens["Shared visual tokens"]
-  sky["Simplify redesigned core sky"]
   skyCta["Settings · Open Sky CTA"]
   skyPage["Dedicated dynamic Sky page"]
   surfaces["Responsive live controls"]
-  verify["Parity and performance gate"]
+  verify["Automated and owner visual review"]
   review["Review implemented design"]
-  assessment -->|"Existing priority"| modules
-  modules -->|"Prerequisites complete"| reference
+  assessment -->|"Prerequisites complete"| modules
+  modules -->|"Approved appearance"| reference
   reference -->|"Appearance only"| contract
-  contract -->|"Define system"| tokens
-  contract -->|"Approved exception"| sky
-  contract -->|"Preserve access"| skyCta
-  tokens -->|"Apply"| surfaces
-  sky -->|"Apply"| surfaces
+  contract -->|"Build visual system"| tokens
+  tokens -->|"Existing tokens"| skyCta
   skyCta -->|"Open"| skyPage
-  skyPage -->|"Exercise"| verify
-  surfaces -->|"Exercise"| verify
+  skyPage -->|"Check behavior"| verify
+  tokens -->|"Continue Settings/dialogs"| surfaces
+  surfaces -->|"Check parity"| verify
   verify -->|"Correct regressions"| surfaces
-  verify -->|"Pass"| review
+  verify -->|"Owner review"| review
 ```
 
 | Step | Current behavior |
 | --- | --- |
 | Assessment delivered | The standalone operator assessment is implemented and synchronized; operator acceptance remains a tracked follow-up. |
-| Complete modularization | Resume the existing migration and measured loading review. Theme work does not reorder these checkpoints. |
+| Modularization complete | Current modularization and selected-practice/video lazy-loading scope is complete; further deferral is optional and measurement-gated. |
 | Approved visual reference | See docs/design/lite-cosmic-observatory/approved-concept-v1.png: midnight panels, ivory text, champagne actions and cosmic setting. |
 | Preserve all requirements | Keep every option, default, gate, translation, navigation, timing, audio and persistence contract. Mockup omissions and sample values are illustrative. |
-| Shared visual tokens | Define readable surfaces, typography, spacing, selection states and keyboard focus. |
-| Simplify redesigned core sky | The main redesign may use a simpler concept-aligned background while retaining static/performance constraints. |
-| Settings · Open Sky CTA | Localized, keyboard/touch accessible navigation to the dedicated responsive Sky page. |
-| Dedicated dynamic Sky page | Relocate current observer calculations, proper cardinal order, straight horizon, Earth atmosphere/26°C styling and Sun shield here. |
-| Responsive live controls | Restyle Lobby, summary, Settings and applicable surfaces using existing handlers. Keep all options available and localize adopted copy. |
-| Parity and performance gate | Check languages, keyboard, mobile/tablet/desktop, video, journeys, offline updates and CPU/memory. Resolve regressions before acceptance. |
-| Review implemented design | Present the working theme checkpoint. Production publication needs its own request. |
+| Shared visual tokens | Lobby tokens and responsive presentation are implemented locally; current control IDs, order, options and behavior remain unchanged. |
+| Settings · Open Sky CTA | Localized Settings CTA is live and navigates through the shared screen owner. |
+| Dedicated dynamic Sky page | Sky is relocated to its own responsive page. Observer calculations, cardinal order, horizon, Earth atmosphere/26°C artwork and Sun shield remain. |
+| Responsive live controls | Settings/dialog theme pass remains. Continue with existing handlers and all current options. |
+| Automated and owner visual review | Focused navigation/locale/cache tests are required; owner reviews languages, keyboard, mobile/tablet/desktop and celestial-label clearance in the browser. |
+| Review implemented design | The preview is delivered locally for owner browser review. Production publication needs a separate request. |
 
-- PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative until redesign. The current dynamic sky must be preserved until then and subsequently relocated, not silently deleted; generated celestial placements remain illustrative.
+- CP-THEME-IMPL-001 Lobby presentation is local; CP-THEME-IMPL-002 adds the Settings-linked Sky page; CP-THEME-IMPL-003 finishes supporting surfaces and restores one-shot static sky imagery on journey/support pages. Only the Observatory animates; Lobby/Settings remain clear. The illustrated atmospheres and Sun shield remain non-physical artwork; calculated positions preserve observer data. Focused automated checks are required. Browser visual verification is intentionally reserved for the owner and has not been claimed.
 
 <a id="modes"></a>
 
@@ -1323,16 +1323,16 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Natural sky startup | Load NaturalNightSky before app; cache a seeded 700–2,400-star backdrop with faint procedural galactic luminance and dark dust lanes. Neutral night gradient replaces drifting colored CSS clouds. |
-| Location permission | Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. Settings explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server. |
-| Motion preference | Only Lobby and Settings may animate. Every other app screen renders one static sky, clears meteors and cancels frame/timer work. Reduced motion also makes Lobby/Settings static. At most 110 catalogue stars scintillate; sky positions refresh only on bounded calculation updates, not random drift. |
+| Location permission | Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. The dedicated Sky page explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server. Journey entry never prompts for location; it uses a previously available observer or the labelled fallback. |
+| Motion preference | Only the dedicated Sky Observatory animates. Lobby/Settings hide the canvas; every other app screen renders one static frame and schedules no continuing sky work. Reduced motion makes the Observatory static too. At most 110 catalogue stars scintillate while motion is permitted; sky positions refresh only on bounded calculation updates, not random drift. |
 | Journey scene | Chakra color, aura, deity/symbol selection and progress dots; narration is audio-only. |
 | Sky lifecycle | Astronomy Engine 2.1.19 calculates Sun, Moon and seven other planets for the observer, with light time, aberration, precession/nutation and standard refraction. A 5,044-star J2000 catalogue supplies both named and background stars, advanced by proper motion and annual aberration. All share a north–east–south–west panorama with directions centered evenly at 12.5%, 37.5%, 62.5%, 87.5% of viewport width and a straight zero-altitude horizon. Only centers at or above the horizon draw; daylight no longer hides the Moon or replaces real planets with a decorative row. Daylight retains a restrained indigo wash and enhanced visibility to preserve the space theme. Planet sizes and brightness are enhanced; this is a chart, not a camera simulation. Lunar illumination and bright-limb orientation follow the calculated Sun; the Moon stays unlabeled and retains its exact topocentric azimuth/altitude. When above the horizon, a faint cached observer guide connects the fixed Earth reference to the Moon without moving either body. Earth is permanently rendered at one centered position below the horizon with a fixed responsive size, five soft atmospheric volumes and its localized name; scrolling never moves, resizes or hides it. Advanced Features adds the existing illustrative black hole on Lobby/Settings only. Positions and cached gradients/labels update at most once per ten seconds during animation; static journeys have no repeating work and retain their existing astronomy snapshot during layout redraws. Labels use Display Language with plain-name fallback; compact 40% text and 20% backing/outline are retained. Crowded labels may move and gain fine leader lines; object coordinates never move for layout. Meteors remain illustrative, singly scheduled after 5–9 seconds and then every 25–70 seconds with a bounded cached trail. Calculation failures clear stale positions and show an unavailable status; retries remain bounded. |
 | Image effect | Natural/Aura/Holographic retain static styling on session screens; all decorative motion is disabled outside Lobby/Settings. Sacred Depth uses a local WebGL 2.5D scene: authored smooth relief displacement, luminance-derived highlight lighting and textured atmosphere around source transparency. Original artwork alpha is preserved. On static screens Sacred Depth draws once on activation/image/size changes and releases its analyser, with no repeating GPU work. Only permitted motion uses a read-only mantra analyser and two-second smoothing; no microphone or audio gain change. Capped at 30 fps, 960 px longest drawing edge and 1.25 DPR. Pause freezes the renderer; hidden pages stop frames; reduced motion draws a static scene. Stop or Eyes Close restores the original image. WebGL/texture failure or context loss falls back to CSS; restored context can retry. Scene breathing is decorative, not synchronized to separate Box Breathing instructions. |
 | Eyes Close + brightness | User brightness, Sleep 0.4 and Eyes Close 0.85 multiply as opacity factors on ordinary screens only. Video prelude, fixed controls and overlays remain readable. No filter on body/app ancestors rebases fixed controls; Eyes Close warmth filters only sky canvas and chakra artwork. Before every start the Sleep class is synchronized to the currently selected mode, preventing leftover Sleep dimming in a normal journey. Eyes Close suppresses decorative motion/light; audio comfort filtering remains unchanged. |
 | Fullscreen lifecycle | Only responds to user/browser fullscreen; normal/fullscreen journey controls have bottom hover, touch and keyboard reveal, with idle cursor hiding. |
 | Screen wake lock | Best-effort request in supported routes; failure is swallowed; release on stop/completion. |
-| Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
-| Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
+| Visual work budget | Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). Journey/support screens retain a static canvas with no repeating decorative work; Lobby/Settings hide it. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change. |
+| Background / inactive cleanup | Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws a static-screen sky once; only the dedicated Sky page may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback. |
 
 - Sky positions use local Astronomy Engine and a real star catalogue; only textures, enhanced brightness and decorative protective effects are illustrative. NASA reference comparisons and desktop/mobile browser checks pass. Assets are bundled offline; DPR is capped at 1.5. Unit/pixel tests cover protective-layer visibility, lifecycle and caching. Device thermal profiling and actual local-sky comparison remain open.
 - CP-MOD-108–127 moves the allowed visual-effect fallback policy into `modules/visual-engine.js`; selected effects and fallback remain identical.
@@ -1367,7 +1367,7 @@ flowchart TD
 | Foreground crosses anchor | Earth remains rendered at the same cached sky coordinate like the other celestial objects. Foreground interface content may visually cover part of the background artwork, but layout logic never shrinks or suppresses Earth. |
 | Earth-to-Moon reference | The Moon retains its exact calculated azimuth/altitude above the horizon. A faint cached guide connects Earth to an above-horizon Moon for observer context; below-horizon Moon remains hidden. No climate, UV, aviation, satellite, orbital or celestial-calculation effect. |
 
-- OWNER-RETAINED in the current runtime. During the separately approved redesign, relocate this dynamic sky and its five-layer 26°C cool-aqua treatment to the dedicated Settings-linked Sky page before simplifying the core background. Moon coordinates remain truthful; the guide is illustrative and adds no animation loop. Unit and browser pixel tests protect current visibility on tiny markers.
+- IMPLEMENTED on the dedicated Settings-linked Sky Observatory page, with a one-shot static sky frame on journey/support screens. The five soft atmospheric layers, cool-aqua 26°C comfort illustration and centered Earth remain artwork, not temperature or protection claims. Moon coordinates remain truthful; the guide is illustrative. Only Sky runs the animation loop and obeys reduced motion. Browser visual review remains owner-pending.
 
 <a id="solar-containment"></a>
 
@@ -1392,7 +1392,7 @@ flowchart TD
 | Diffuse containment glow | A warm diffuse glow surrounds the calculated Sun with a softly feathered circular shield rim. This protective-ring motif is artwork, not real radiation filtering. |
 | Visual-only scope | No solar-physics, radiation, energy-transfer, climate or celestial-calculation effect. |
 
-- OWNER-RETAINED in the current runtime. During the approved redesign, relocate this treatment with the dynamic sky to the dedicated Settings-linked Sky page before simplifying the core background. Unit and browser render checks protect the current contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim.
+- IMPLEMENTED with the dedicated Sky Observatory. The soft Sun shield is illustrative only and has no radiation-filtering, climate or energy-transfer effect. The renderer is animated only while this page is open; journey/support backgrounds use a static frame. Browser visual review remains owner-pending.
 
 <a id="storage"></a>
 

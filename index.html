@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.03">
+    <link rel="stylesheet" href="style.css?v=2.06">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -22,8 +22,10 @@
     <div id="splash-screen">
         <img src="Splash-v2.png" alt="Splash Screen">
     </div>
-    <div id="nebula-bg"></div>
-    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+    <div id="sky-backdrop" class="sky-backdrop" aria-hidden="true">
+        <div id="nebula-bg"></div>
+        <canvas id="particle-canvas"></canvas>
+    </div>
     <div id="app">
         <!-- Background Aura -->
         <div id="aura-bg"></div>
@@ -144,9 +146,12 @@
                 </div>
             </div>
 
+            <div class="config-group settings-panel sky-settings-entry">
+                <p class="mixer-note" data-i18n="ui.skySettingsNote">Explore the calculated sky for your location and time in a dedicated view.</p>
+                <button id="open-sky-observatory" class="secondary-btn" type="button" data-i18n="ui.openSkyObservatory">Open Sky Observatory</button>
+            </div>
+
             <div class="config-group" style="margin-top: 1rem;">
-                <p id="sky-location-status" class="mixer-note" role="status"></p>
-                <p class="mixer-note" data-i18n="ui.skyChartNote">All-sky chart: north → east → south → west. Body sizes and brightness are enhanced; Earth below the horizon is an illustration.</p>
                 <label for="visual-effect-select" data-i18n="ui.visualEffect">Meditation Visual Effect</label>
                 <select id="visual-effect-select">
                     <option value="natural" data-i18n="ui.visualEffectNatural">Natural</option>
@@ -225,6 +230,16 @@
             <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
         </section>
 
+        <section id="sky-screen" class="screen sky-screen hidden" aria-labelledby="sky-screen-title">
+            <div class="sky-observatory-panel" data-sky-obstacle>
+                <p class="sky-eyebrow" data-i18n="ui.skyObservatoryEyebrow">A live view from Earth</p>
+                <h1 id="sky-screen-title" data-i18n="ui.skyObservatoryTitle">Sky Observatory</h1>
+                <p id="sky-location-status" class="sky-location-status" role="status" aria-live="polite"></p>
+                <p class="sky-chart-note" data-i18n="ui.skyChartNote">All-sky chart: north → east → south → west. Body sizes and brightness are enhanced; Earth below the horizon is an illustration.</p>
+                <button id="close-sky-screen" class="secondary-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
+            </div>
+        </section>
+
         <section id="settings-manager-screen" class="screen settings-screen-container hidden">
             <div class="settings-title-row"><h1 data-i18n="ui.manageSettings">Manage Settings</h1></div>
             <p class="subtitle" data-i18n="ui.manageSettingsSubtitle">Create a portable backup of this app’s saved settings, or restore one on this device.</p>
@@ -299,9 +314,9 @@
         </div>
 
         <!-- Lobby Screen -->
-        <section id="lobby-screen" class="screen hidden">
+        <section id="lobby-screen" class="screen lobby-shell hidden">
             <h1 id="sound-healing-title" data-i18n="ui.soundHealing" hidden>Sound Shot</h1>
-            <div id="shots-control" class="shots-control" hidden>
+            <div id="shots-control" class="shots-control lobby-panel" hidden>
                 <label class="shots-toggle-label">
                     <input type="checkbox" id="shots-toggle" disabled>
                     <span data-i18n="ui.shotsMode">⚡ Shots</span>
@@ -326,7 +341,7 @@
                 </div>
             </div>
             <h1 id="lobby-title">Meditation Room</h1>
-            <div id="journey-preparation-addons" class="config-group lobby-experience-mode">
+            <div id="journey-preparation-addons" class="config-group lobby-experience-mode lobby-panel">
                 <label data-i18n="ui.journeyPreparation">Journey preparation</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="box-breathing-experience-toggle"><span data-i18n="ui.boxBreathingExperience">Box Breathing</span></label>
@@ -359,7 +374,7 @@
                     </div>
                 </div>
             </div>
-            <div id="chakra-selection-panel" class="config-group lobby-chakra-selection">
+            <div id="chakra-selection-panel" class="config-group lobby-chakra-selection lobby-panel">
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
                 <div id="chakra-selection" class="chakra-selection-list">
@@ -372,7 +387,7 @@
                     <label class="checkbox-label"><input type="checkbox" value="crown"> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
             </div>
-            <div id="journey-integration-addons" class="config-group lobby-experience-mode">
+            <div id="journey-integration-addons" class="config-group lobby-experience-mode lobby-panel">
                 <label data-i18n="ui.journeyIntegration">Journey integration</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="hooponopono-experience-toggle"><span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span></label>
@@ -385,19 +400,19 @@
                     </div>
                 </div>
             </div>
-            <div class="time-selector">
+            <div class="time-selector lobby-panel lobby-duration-panel">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
                 <span id="time-display">5.0 mins</span>
             </div>
 
-            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control">
+            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control lobby-panel lobby-duration-panel">
                 <label for="time-high-energy" data-i18n="ui.hrimActivationDuration">HRIM Activation Duration (minutes)</label>
                 <input type="range" id="time-high-energy" min="1" max="30" value="5" step="1">
                 <span id="high-energy-time-display">5 mins</span>
             </div>
 
-            <fieldset id="drone-duration-control" class="drone-duration-control" aria-describedby="drone-duration-help drone-duration-summary">
+            <fieldset id="drone-duration-control" class="drone-duration-control lobby-panel" aria-describedby="drone-duration-help drone-duration-summary">
                 <legend data-i18n="ui.droneDurationMode">Drone Duration</legend>
                 <div class="drone-duration-options">
                     <label class="drone-duration-option">
@@ -424,13 +439,13 @@
             </fieldset>
 
             <!-- Intention Seed -->
-            <div id="intention-config-group" class="config-group" style="margin-top: 1rem;">
+            <div id="intention-config-group" class="config-group lobby-panel" style="margin-top: 1rem;">
                 <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
                 <input type="text" id="intention-input" value="" placeholder="e.g. peace, clarity, gentle strength..." autocomplete="off">
             </div>
 
             <!-- Session preferences -->
-            <div id="journey-preferences-group" class="config-group" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
+            <div id="journey-preferences-group" class="config-group lobby-panel" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
                     <input type="checkbox" id="returning-journey-toggle">
                     <span id="returning-journey-label">Returning Journey</span>
@@ -441,7 +456,7 @@
                 </label>
             </div>
 
-            <div id="experience-mode-group" class="config-group lobby-experience-mode">
+            <div id="experience-mode-group" class="config-group lobby-experience-mode lobby-panel">
                 <label data-i18n="ui.experienceMode">Experience Mode</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle">
@@ -464,7 +479,7 @@
             </div>
             <div id="yoga-experience-panel-host" aria-live="polite"></div>
 
-            <section id="intimate-service-panel" class="config-group lobby-intimate-service" aria-live="polite" hidden>
+            <section id="intimate-service-panel" class="config-group lobby-intimate-service lobby-panel" aria-live="polite" hidden>
                 <label data-i18n="ui.intimateService">Intimate Service</label>
                 <p class="mixer-note" data-i18n="ui.intimateServiceNote">Select the care stages needed for this guided service. Their order is always Perineal Care, Massage, then Assisted Bathing.</p>
                 <div class="experience-mode-options">
@@ -494,7 +509,7 @@
                         <span id="display-assisted-bathing" style="font-size: 0.7rem; width: 40px;">10m</span>
                     </div>
                 </div>
-                <div id="mood-relaxation-ambience-section" class="mixer-section advanced-ambience-panel">
+                <div id="mood-relaxation-ambience-section" class="mixer-section advanced-ambience-panel lobby-panel">
                     <label class="mixer-section-title" data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</label>
                     <label class="checkbox-label"><input type="checkbox" id="mood-relaxation-intention-toggle"> <span data-i18n="ui.moodRelaxationIntention">Mood &amp; Relaxation Ambience</span></label>
                     <p class="mixer-note" data-i18n="ui.moodRelaxationIntentionNote">When enabled, the supplied pleasure ambience loops throughout the guided session. Use the bounded level below to keep it subtle; No Frequency Mode overrides it.</p>
@@ -814,7 +829,7 @@
     <script src="modules/script-source-settings.js?v=1.0"></script>
     <script src="modules/care-preference-hydration.js?v=1.0"></script>
     <script src="modules/journey-chrome.js?v=1.0"></script>
-    <script src="modules/ambient-particle-field.js?v=1.0"></script>
+    <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
     <script src="app.js?v=4.12"></script>
 </body>

@@ -49,9 +49,9 @@ const app=readFileSync('app.js','utf8');
 const particleFieldModule=readFileSync('modules/ambient-particle-field.js','utf8');
 const html=readFileSync('index.html','utf8');
 const serviceWorker=readFileSync('sw.js','utf8');
-assert.ok(html.indexOf('night-sky.js?v=1.1') < html.indexOf('modules/ambient-particle-field.js?v=1.0'));
-assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.0') < html.indexOf('app.js?v=4.12'));
-assert.match(serviceWorker,/modules\/ambient-particle-field\.js\?v=1\.0/,
+assert.ok(html.indexOf('night-sky.js?v=1.1') < html.indexOf('modules/ambient-particle-field.js?v=1.1'));
+assert.ok(html.indexOf('modules/ambient-particle-field.js?v=1.1') < html.indexOf('app.js?v=4.12'));
+assert.match(serviceWorker,/modules\/ambient-particle-field\.js\?v=1\.1/,
     'The sky module must remain available from the exact offline shell cache.');
 for (const localeName of ['en', 'ml', 'hi', 'ru']) {
     const locale = JSON.parse(readFileSync(`locales/${localeName}.json`, 'utf8'));
@@ -59,8 +59,8 @@ for (const localeName of ['en', 'ml', 'hi', 'ru']) {
         assert.ok(locale.ui[`celestial${name}`], `${localeName} must localize ${name}`);
     }
 }
-assert.match(particleFieldModule, /deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
-    'The Advanced Features black-hole illustration must be visible on either Lobby/Settings sky, stay off static journey screens and invalidate the cached celestial layer when its shared lock changes.');
+assert.match(particleFieldModule, /draw\(timestamp, animate\)\s*\{\s*if \(!this\.ctx \|\| \(!this\.isSkyPageActive\(\) && !this\.isStaticBackdropActive\(\)\)\) return;[\s\S]*?deepSkyBlackHoleEnabled && !document\.body\.classList\.contains\('static-decorations'\)[\s\S]*?drawDeepSkyBlackHole[\s\S]*?setDeepSkyBlackHoleEnabled/,
+    'Journey pages show the cached static sky, while the Advanced Features black-hole illustration remains exclusive to dynamic Sky mode.');
 for (const [language, earth, sun] of [['en', 'Earth', 'Sun'], ['ml', 'ഭൂമി', 'സൂര്യൻ'], ['hi', 'पृथ्वी', 'सूर्य'], ['ru', 'Земля', 'Солнце']]) {
     const locale = JSON.parse(readFileSync(`locales/${language}.json`, 'utf8'));
     assert.equal(locale.ui.celestialEarth, earth, `${language} must localize the Earth label`);
@@ -80,7 +80,7 @@ frozen.observer={latitude:0,longitude:0};frozen.skySnapshot=positions;
 sandbox.document.body.classList.contains=()=>true;
 frozen.refreshCelestialBodies(new Date('2030-01-01'));
 assert.equal(frozen.skySnapshot,positions,'A journey redraw must not recalculate its sky snapshot');
-sandbox.document.body.classList.contains=()=>false;
+sandbox.document.body.classList.contains=name=>name==='sky-canvas-active';
 // Retained visual contract: five visible merged atmosphere volumes and a
 // distinct feathered Sun shield. These tests catch removal/fading regressions.
 const gradients=[];
@@ -132,6 +132,11 @@ for(let i=0;i<9;i++){
             box.top>=other.top+other.height||box.top+box.height<=other.top,'Crowded mobile labels must separate without changing sky coordinates');
     }
 }
+const panelBounds={left:110,top:100,width:180,height:100};
+const panelLabels=field.placeCelestialLabel(195,160,2,70,390,844,[panelBounds]);
+assert.ok(panelLabels.left+panelLabels.width<=panelBounds.left || panelLabels.left>=panelBounds.left+panelBounds.width ||
+    panelLabels.top+panelLabels.height<=panelBounds.top || panelLabels.top>=panelBounds.top+panelBounds.height,
+    'Celestial names must avoid the dedicated Sky controls panel');
 sandbox.performance={now:()=>500};
 sandbox.document.getElementById=()=>null;
 const failed=Object.create(Object.getPrototypeOf(field));
@@ -189,6 +194,7 @@ sandbox.clearTimeout=key=>scheduled.delete(key);
 sandbox.requestAnimationFrame=fn=>{frames.set(++id,fn);return id;};
 sandbox.cancelAnimationFrame=key=>frames.delete(key);
 field.motionPreference={matches:false}; field.draw=()=>{};
+field.locationRequested=true;
 field.render(100);
 assert.equal(frames.size,0,'Sky sleeps rather than polling every display refresh');
 assert.equal(scheduled.size,1);
@@ -203,14 +209,26 @@ field.handleMotionChange();
 assert.equal(frames.size,0,'Reduced motion cancels the resumed frame');
 console.log('Sky cache and scheduling passed: invalidation, idle waiting, hide/resume and reduced motion.');
 field.motionPreference.matches=false;
-sandbox.document.body.classList.contains=()=>true;
+field.locationRequested=true;
+field.staticBackdropReady=false;
+let staticDraws=0,staticRefreshes=0;
+let staticLocationRequests=0;
+field.draw=()=>{staticDraws++;};
+field.refreshCelestialBodies=()=>{staticRefreshes++;};
+field.requestObserverLocation=()=>{staticLocationRequests++;};
+sandbox.document.body.classList.contains=name=>name==='static-decorations';
 field.handleMotionChange(); field.render(250);
-assert.equal(frames.size,0); assert.equal(scheduled.size,0,'Static screens schedule no sky work');
+assert.equal(frames.size,0); assert.equal(scheduled.size,0,'Static screens never schedule an animation loop');
+assert.equal(staticDraws,1,'Entering the journey backdrop paints one static sky frame');
+assert.equal(staticRefreshes,1,'The static journey sky calculates only once on entry');
+assert.equal(staticLocationRequests,0,'Journey entry never triggers a location permission prompt');
+field.handleMotionChange();
+assert.equal(staticDraws,1,'Screen transitions within a journey do not repaint the cached static sky');
 sandbox.document.hidden=true; field.handleVisibility();
 sandbox.document.hidden=false; field.handleVisibility();
 assert.equal(frames.size,0,'Returning to a static screen does not restart motion');
-sandbox.document.body.classList.contains=()=>false;
-field.handleMotionChange(); assert.equal(frames.size,1,'Lobby/Settings restore animation');
+sandbox.document.body.classList.contains=name=>name==='sky-canvas-active';
+field.handleMotionChange(); assert.equal(frames.size,1,'Opening Sky starts exactly one animation frame');
 field.motionPreference.matches=true; field.handleMotionChange();
 
 let spriteBuilds=0,meteorDraws=0;

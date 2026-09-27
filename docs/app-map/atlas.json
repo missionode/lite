@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-27",
-    "commit": "6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167",
-    "scope": "Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged."
+    "commit": "6c69ae0 CP-MOD-153 baseline + uncommitted CP-MOD-154/155/156/157/158/159/160/161/162/163/164/165/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261)",
+    "scope": "Source-reviewed behavior through CP-MOD-153, plus uncommitted CP-MOD-154 voice tone and echo, CP-MOD-155 experiment lifecycle, CP-MOD-156 Shot lifecycle, CP-MOD-157 Sleep lifecycle, CP-MOD-158 Yoga lifecycle, CP-MOD-159 Intimate Service lifecycle, CP-MOD-160 chakra-stage, CP-MOD-161 Piper narration, CP-MOD-162 shared guide-controlled wait, CP-MOD-163 session-stop and CP-MOD-164 completion lifecycle ownership extractions; CP-MOD-165 records the final app-boundary and lazy-load audit. The Lobby has the sole Advanced Features-gated assessment CTA with a short same-tab handoff, answer undo, chakra evidence, rapport cue and icebreaker; Settings has no assessment link. Journey/settings ownership includes the modularized preparation, mode, audio, timing, locale, visual, completion, transport, experiment, custom-script, Shot, Piper voice setup, sentence-queued narration, guide-controlled Continue, Stop cleanup and natural completion paths. Selected-only preparation and opt-in video code are lazy-loaded; six smaller route-specific owners remain eager pending evidence of a meaningful cold/warm/offline gain. Ownership changes do not establish device or thermal gains. Preserve the dynamic sky until the approved Cosmic Observatory redesign relocates it to a Settings-linked Sky page. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made."
   },
   "graphs": [
     {
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "index.html:248; modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; app.js:2502; app.js:2663",
+      "source": "index.html:1; modules/screen-navigation.js:1; modules/ambient-particle-field.js:1; tests/screen-navigation.test.mjs:1; app.js:2502; app.js:2663",
       "rows": [
         [
           [
@@ -137,7 +137,7 @@
           [
             "settings",
             "Settings",
-            "First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools."
+            "First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools. Settings includes a localized CTA to the dedicated Sky Observatory."
           ],
           [
             "lobby",
@@ -155,6 +155,11 @@
             "experiments",
             "Experiments",
             "Settings → isolated activity → return to Experiment screen. See Experiments map."
+          ],
+          [
+            "sky",
+            "Sky Observatory",
+            "Settings → Open Sky Observatory. Only this page animates the astronomy canvas; journey/support pages show a static frame, while Lobby/Settings remain clear. Back to Settings stops it."
           ],
           [
             "journeys",
@@ -229,6 +234,16 @@
           "Experiment Mode"
         ],
         [
+          "settings",
+          "sky",
+          "Open Sky Observatory"
+        ],
+        [
+          "sky",
+          "settings",
+          "Back to Settings"
+        ],
+        [
           "lobby",
           "consult",
           "Advanced Features unlocked only"
@@ -275,7 +290,7 @@
         ]
       ],
       "notes": [
-        "Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. Direct entry without a handoff shows a locked view without fetching the question bank. Client-side feature gate, not server authentication."
+        "Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. The Sky CTA is public. Only the Observatory runs the calculated sky animation; journey/support screens draw one static frame, and Lobby/Settings hide it. Client-side assessment feature gate, not server authentication."
       ]
     },
     {
@@ -658,9 +673,9 @@
     {
       "id": "cosmic-theme-planned",
       "group": "Start here",
-      "title": "PLANNED · Cosmic Observatory theme",
-      "subtitle": "CP-THEME-PLAN-001: owner-approved appearance; implementation follows assessment and modularization.",
-      "source": ".loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1; docs/design/lite-cosmic-observatory/README.md:1; docs/app-map/FIX-QUEUE.md:1",
+      "title": "Cosmic Observatory theme · implementation checkpoint",
+      "subtitle": "Owner-approved redesign in bounded slices; behavior and performance contracts remain in force.",
+      "source": ".loop/tracks/cosmic-observatory-theme/spec-plan-review.md:1; docs/design/lite-cosmic-observatory/README.md:1; index.html:1; style.css:1; modules/screen-navigation.js:1; modules/ambient-particle-field.js:1; docs/app-map/FIX-QUEUE.md:1",
       "rows": [
         [
           [
@@ -672,8 +687,8 @@
         [
           [
             "modules",
-            "Complete modularization",
-            "Resume the existing migration and measured loading review. Theme work does not reorder these checkpoints."
+            "Modularization complete",
+            "Current modularization and selected-practice/video lazy-loading scope is complete; further deferral is optional and measurement-gated."
           ]
         ],
         [
@@ -694,45 +709,40 @@
           [
             "tokens",
             "Shared visual tokens",
-            "Define readable surfaces, typography, spacing, selection states and keyboard focus."
-          ],
-          [
-            "sky",
-            "Simplify redesigned core sky",
-            "The main redesign may use a simpler concept-aligned background while retaining static/performance constraints."
+            "Lobby tokens and responsive presentation are implemented locally; current control IDs, order, options and behavior remain unchanged."
           ]
         ],
         [
           [
             "skyCta",
             "Settings · Open Sky CTA",
-            "Localized, keyboard/touch accessible navigation to the dedicated responsive Sky page."
+            "Localized Settings CTA is live and navigates through the shared screen owner."
           ],
           [
             "skyPage",
             "Dedicated dynamic Sky page",
-            "Relocate current observer calculations, proper cardinal order, straight horizon, Earth atmosphere/26°C styling and Sun shield here."
+            "Sky is relocated to its own responsive page. Observer calculations, cardinal order, horizon, Earth atmosphere/26°C artwork and Sun shield remain."
           ]
         ],
         [
           [
             "surfaces",
             "Responsive live controls",
-            "Restyle Lobby, summary, Settings and applicable surfaces using existing handlers. Keep all options available and localize adopted copy."
+            "Settings/dialog theme pass remains. Continue with existing handlers and all current options."
           ]
         ],
         [
           [
             "verify",
-            "Parity and performance gate",
-            "Check languages, keyboard, mobile/tablet/desktop, video, journeys, offline updates and CPU/memory. Resolve regressions before acceptance."
+            "Automated and owner visual review",
+            "Focused navigation/locale/cache tests are required; owner reviews languages, keyboard, mobile/tablet/desktop and celestial-label clearance in the browser."
           ]
         ],
         [
           [
             "review",
             "Review implemented design",
-            "Present the working theme checkpoint. Production publication needs its own request."
+            "The preview is delivered locally for owner browser review. Production publication needs a separate request."
           ]
         ]
       ],
@@ -740,12 +750,12 @@
         [
           "assessment",
           "modules",
-          "Existing priority"
+          "Prerequisites complete"
         ],
         [
           "modules",
           "reference",
-          "Prerequisites complete"
+          "Approved appearance"
         ],
         [
           "reference",
@@ -755,27 +765,12 @@
         [
           "contract",
           "tokens",
-          "Define system"
-        ],
-        [
-          "contract",
-          "sky",
-          "Approved exception"
-        ],
-        [
-          "contract",
-          "skyCta",
-          "Preserve access"
+          "Build visual system"
         ],
         [
           "tokens",
-          "surfaces",
-          "Apply"
-        ],
-        [
-          "sky",
-          "surfaces",
-          "Apply"
+          "skyCta",
+          "Existing tokens"
         ],
         [
           "skyCta",
@@ -785,12 +780,17 @@
         [
           "skyPage",
           "verify",
-          "Exercise"
+          "Check behavior"
+        ],
+        [
+          "tokens",
+          "surfaces",
+          "Continue Settings/dialogs"
         ],
         [
           "surfaces",
           "verify",
-          "Exercise"
+          "Check parity"
         ],
         [
           "verify",
@@ -800,11 +800,11 @@
         [
           "verify",
           "review",
-          "Pass"
+          "Owner review"
         ]
       ],
       "notes": [
-        "PLANNED only. The approved PNG is a documentation reference, not a runtime background or replacement for functional HTML controls. Existing flows remain authoritative until redesign. The current dynamic sky must be preserved until then and subsequently relocated, not silently deleted; generated celestial placements remain illustrative."
+        "CP-THEME-IMPL-001 Lobby presentation is local; CP-THEME-IMPL-002 adds the Settings-linked Sky page; CP-THEME-IMPL-003 finishes supporting surfaces and restores one-shot static sky imagery on journey/support pages. Only the Observatory animates; Lobby/Settings remain clear. The illustrated atmospheres and Sun shield remain non-physical artwork; calculated positions preserve observer data. Focused automated checks are required. Browser visual verification is intentionally reserved for the owner and has not been claimed."
       ]
     },
     {
@@ -3327,12 +3327,12 @@
           [
             "geo",
             "Location permission",
-            "Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. Settings explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server."
+            "Granted coordinates and device time determine apparent topocentric positions. Denied, unavailable or timed-out location keeps a labelled Greenwich reference, never an invented local night sky. The dedicated Sky page explains the observer source and enhanced chart presentation in all four languages. No location is sent to a server. Journey entry never prompts for location; it uses a previously available observer or the labelled fallback."
           ],
           [
             "motion",
             "Motion preference",
-            "Only Lobby and Settings may animate. Every other app screen renders one static sky, clears meteors and cancels frame/timer work. Reduced motion also makes Lobby/Settings static. At most 110 catalogue stars scintillate; sky positions refresh only on bounded calculation updates, not random drift."
+            "Only the dedicated Sky Observatory animates. Lobby/Settings hide the canvas; every other app screen renders one static frame and schedules no continuing sky work. Reduced motion makes the Observatory static too. At most 110 catalogue stars scintillate while motion is permitted; sky positions refresh only on bounded calculation updates, not random drift."
           ]
         ],
         [
@@ -3375,12 +3375,12 @@
           [
             "efficiency",
             "Visual work budget",
-            "Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). All other app screens retain a static canvas with no repeating decorative work. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change."
+            "Allowed animated surfaces wait 33 ms between display-aligned frame requests (at most 30 fps). Journey/support screens retain a static canvas with no repeating decorative work; Lobby/Settings hide it. Sky caches celestial lighting and blurred labels until positions, language, font readiness or canvas size change; identical resize events skip regeneration. Sacred Depth caches layout until ResizeObserver reports a change."
           ],
           [
             "background",
             "Background / inactive cleanup",
-            "Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws static screens once; only Lobby/Settings may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback."
+            "Hidden tabs cancel visual frame requests and waiting timers and pause CSS animations. Return redraws a static-screen sky once; only the dedicated Sky page may resume sky motion. Sacred Depth releases its analyser on static screens, pause, hide, reduced motion, stop or fallback; active motion recreates it lazily. Completed Piper clips and bell partials disconnect their temporary audio nodes after playback."
           ]
         ]
       ],
@@ -3520,7 +3520,7 @@
         ]
       ],
       "notes": [
-        "OWNER-RETAINED in the current runtime. During the separately approved redesign, relocate this dynamic sky and its five-layer 26°C cool-aqua treatment to the dedicated Settings-linked Sky page before simplifying the core background. Moon coordinates remain truthful; the guide is illustrative and adds no animation loop. Unit and browser pixel tests protect current visibility on tiny markers."
+        "IMPLEMENTED on the dedicated Settings-linked Sky Observatory page, with a one-shot static sky frame on journey/support screens. The five soft atmospheric layers, cool-aqua 26°C comfort illustration and centered Earth remain artwork, not temperature or protection claims. Moon coordinates remain truthful; the guide is illustrative. Only Sky runs the animation loop and obeys reduced motion. Browser visual review remains owner-pending."
       ]
     },
     {
@@ -3565,7 +3565,7 @@
         ]
       ],
       "notes": [
-        "OWNER-RETAINED in the current runtime. During the approved redesign, relocate this treatment with the dynamic sky to the dedicated Settings-linked Sky page before simplifying the core background. Unit and browser render checks protect the current contract. Cached artwork adds no animation loop, timer or per-frame allocation; it makes no real radiation-filtering claim."
+        "IMPLEMENTED with the dedicated Sky Observatory. The soft Sun shield is illustrative only and has no radiation-filtering, climate or energy-transfer effect. The renderer is animated only while this page is open; journey/support backgrounds use a static frame. Browser visual review remains owner-pending."
       ]
     },
     {

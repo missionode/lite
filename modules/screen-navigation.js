@@ -1,15 +1,16 @@
 (function installScreenNavigation(global) {
     'use strict';
 
-    function create({ body, document, window, screens, lobbyScreen, configScreen, experimentScreen, dispatchDecorationChange }) {
+    function create({ body, document, window, screens, lobbyScreen, configScreen, experimentScreen, skyScreen, dispatchDecorationChange }) {
         if (!body || !document || !window || !Array.isArray(screens) ||
             typeof dispatchDecorationChange !== 'function') {
             throw new TypeError('Screen navigation requires the application views and browser services');
         }
 
         function showScreen(screen) {
-            body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen);
-            dispatchDecorationChange();
+            const skyActive = Boolean(skyScreen && screen === skyScreen);
+            body.classList.toggle('static-decorations', screen !== lobbyScreen && screen !== configScreen && !skyActive);
+            body.classList.toggle('sky-canvas-active', skyActive);
             screens.forEach(candidate => {
                 if (candidate) candidate.classList.add('hidden');
             });
@@ -21,6 +22,7 @@
                 if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
                 if (typeof window.scrollTo === 'function') window.scrollTo(0, 0);
             }
+            dispatchDecorationChange();
         }
 
         function checkFirstTime(storage) {
@@ -41,11 +43,13 @@
             }
         }
 
-        function bindLobbyActions({ settingsButton, experimentButton, closeExperimentButton, assessmentButton } = {}) {
+        function bindLobbyActions({ settingsButton, experimentButton, closeExperimentButton, assessmentButton, openSkyButton, closeSkyButton } = {}) {
             settingsButton?.addEventListener('click', () => showScreen(configScreen));
             experimentButton?.addEventListener('click', () => showScreen(experimentScreen));
             closeExperimentButton?.addEventListener('click', () => showScreen(configScreen));
             assessmentButton?.addEventListener('click', () => { window.location.href = './docs/assesment.html'; });
+            openSkyButton?.addEventListener('click', () => showScreen(skyScreen));
+            closeSkyButton?.addEventListener('click', () => showScreen(configScreen));
         }
 
         return Object.freeze({ showScreen, checkFirstTime, bindLobbyActions });
