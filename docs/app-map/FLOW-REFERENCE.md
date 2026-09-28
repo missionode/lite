@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
+Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted assessment-result-clarity + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
 
-Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. Piper custom-repository loading now declares its private model-base URL field, advances the Piper cache generation, and falls back to a language-matched browser voice for a failed Settings preview; the chosen fallback is not saved until explicit settings save. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
+Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. Piper custom-repository loading now declares its private model-base URL field, advances the Piper cache generation, and falls back to a language-matched browser voice for a failed Settings preview; the chosen fallback is not saved until explicit settings save. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. Assessment results now show actual per-chakra response counts and relative answer-support labels instead of percentage confidence; a lowest-support conversation prompt requires minimum evidence across all seven chakras, groups close candidates, and falls back to client-led wording when evidence is incomplete or inconclusive. Focused engine/UI/persistence tests pass. Atlas source reviewed and regenerated; Playwright atlas verification could not run because the isolated checkout has no installed Playwright dependency. Browser visual review remains with the owner. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1966,7 +1966,7 @@ flowchart TD
 
 ## Operator-led chakra assessment
 
-Single Lobby entry point, Advanced Features-gated interview with answer undo and a cautious chakra-evidence rapport cue plus icebreaker.
+Single Lobby entry point, Advanced Features-gated interview with undo, per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.
 
 Sources: [index.html:515](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:515), [docs/assesment.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:1), [modules/assessment-tournament.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-tournament.js:1), [data/assessment-questions.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/data/assessment-questions.json:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:3332](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3332).
 
@@ -1981,6 +1981,7 @@ flowchart TD
   undo["Undo last response"]
   coverage["Adaptive coverage"]
   result["Assessment complete"]
+  focus["Possible session focus"]
   rapport["Conversation cue"]
   icebreaker["Gentle icebreaker"]
   dot["Private service-fit signal"]
@@ -1999,9 +2000,11 @@ flowchart TD
   undo -->|"Correction re-presented"| interview
   coverage -->|"More evidence; exclude consumed IDs"| interview
   coverage -->|"Evidence complete"| result
-  result -->|"Full-confidence chakra result"| rapport
-  result -->|"Insufficient chakra evidence"| icebreaker
-  rapport -->|"Review result"| clear
+  result -->|"Build possible-focus guidance"| focus
+  focus -->|"Candidate / near-tie / insufficient evidence reviewed"| clear
+  result -->|"Best-supported topic when evidence threshold is met"| rapport
+  result -->|"No eligible rapport topic"| icebreaker
+  rapport -->|"Offer client-led question"| icebreaker
   icebreaker -->|"Review result"| clear
   result -->|"New client"| clear
   clear -->|"Confirmed reset"| restore
@@ -2021,15 +2024,16 @@ flowchart TD
 | One prompt at a time | Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. Chronological history supports one-step undo. |
 | Undo last response | Remove the latest answer or value-pair response and deliberately offer that item again; reconstruct response order for legacy saved state. |
 | Adaptive coverage | Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing. |
-| Assessment complete | Show seven relative chakra statuses/confidence and up to three positive archetypes. Operator reflection aid, not diagnosis or automatic recommendation. |
-| Conversation cue | If full-confidence chakra evidence exists, show a tentative topic based only on chakra answers; explicitly not a character/behavior prediction. Never use values or the private dot. |
+| Assessment complete | Show seven relative answer-support signals and actual response counts, plus up to three positive archetypes. No percentage confidence. This is an operator reflection aid, not a diagnosis or automatic recommendation. |
+| Possible session focus | After minimum evidence, show the lowest-support chakra(s) as tentative conversation candidates. Group near-ties within 0.10; if scores do not meaningfully separate, say no clear lowest area. With insufficient answers, do not name a focus. |
+| Conversation cue | Show the best-supported chakra topic only when minimum response coverage exists; it is a prompt based on this assessment, not a character/behavior prediction. Never use values or the private dot. |
 | Gentle icebreaker | Pair the topic with an open question inviting the client to choose what feels useful. Insufficient evidence receives a generic client-led question. |
 | Private service-fit signal | Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. It does not activate or promise service. |
 | Clear for New Client | Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client. |
 | Translate dynamically rendered content | Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required. |
 | Failure and exit | Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress. |
 
-- The JSON bank owns English questions, answer-card labels, chakra/value weights, positive archetypes and neutral conversation topics; the pure engine owns scheduling, uniqueness, chronological undo, scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. The conversation cue is confidence-gated and derived only from chakra answers, never value preferences or the private dot. It starts a conversation and does not predict traits. Google Translate requires a network connection. The handoff is same-tab UI gating, not server authentication. Exactly one entry point is the Lobby CTA; Settings contains no assessment link.
+- The JSON bank owns English questions, answer-card labels, chakra/value weights, positive archetypes and neutral conversation topics; the pure engine owns scheduling, uniqueness, chronological undo, relative scoring and conservative dot thresholds; persistence owns sanitized state and legacy-key clearing. Each chakra shows its answered-response count; the former “confidence” number was only minimum-evidence coverage and is removed. Possible focus uses only chakra answers, requires configured minimum evidence, groups near-ties within a 0.10 score range, and explicitly avoids a weakest-area claim when there is insufficient or non-differentiating evidence. The focus is a conversation prompt, not a validated measure, diagnosis, recommendation or automatic journey setting. The rapport cue uses the best-supported chakra topic, never value preferences or the private dot. Dynamic prompts/status/results continue through the existing Google Translate cache; network required. The handoff is same-tab UI gating, not server authentication. Exactly one entry point is the Lobby CTA; Settings contains no assessment link.
 
 <a id="repertory"></a>
 

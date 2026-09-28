@@ -360,11 +360,11 @@
         return DOT_ORANGE;
     }
 
-    function statusFor(score, confidence) {
-        if (confidence < 1) return 'More conversation needed';
-        if (score >= 0.67) return 'Currently supported';
-        if (score >= 0.45) return 'Developing';
-        return 'May benefit from support';
+    function statusFor(score, evidenceCount, minimumEvidence) {
+        if (evidenceCount < minimumEvidence) return 'Not enough answers';
+        if (score >= 0.67) return 'Higher answer-support signal';
+        if (score >= 0.45) return 'Mixed answer-support signal';
+        return 'Lower answer-support signal';
     }
 
     function buildResult(bank, stateCandidate) {
@@ -375,9 +375,31 @@
         const chakras = CHAKRA_IDS.map(id => {
             const evidence = totals[id].evidence;
             const score = evidence ? totals[id].sum / evidence : 0.5;
-            const confidence = Math.min(1, evidence / bank.settings.minimumEvidencePerChakra);
-            return { id, name: chakraById[id].name, score, confidence, status: statusFor(score, confidence), archetype: chakraById[id].archetype };
+            return {
+                id,
+                name: chakraById[id].name,
+                score,
+                evidenceCount: evidence,
+                status: statusFor(score, evidence, bank.settings.minimumEvidencePerChakra),
+                archetype: chakraById[id].archetype
+            };
         });
+        const eligibleChakras = chakras.filter(item => item.evidenceCount >= bank.settings.minimumEvidencePerChakra);
+        let focusAreas = [];
+        let focusStatus = 'insufficient-evidence';
+        // A relative weakest-area comparison needs minimum coverage for all seven chakras.
+        if (eligibleChakras.length === CHAKRA_IDS.length) {
+            const lowestScore = Math.min(...eligibleChakras.map(item => item.score));
+            // Treat near-ties as shared focus candidates; this is a prompt threshold, not a confidence interval.
+            const tolerance = 0.1;
+            focusAreas = eligibleChakras.filter(item => item.score <= lowestScore + tolerance);
+            if (focusAreas.length === eligibleChakras.length) {
+                focusAreas = [];
+                focusStatus = 'no-clear-lowest';
+            } else {
+                focusStatus = 'candidate';
+            }
+        }
         const valueWins = valueStats(bank, state);
         const leadingValues = [...bank.values]
             .sort((a, b) => valueWins[b.id].wins - valueWins[a.id].wins || a.id.localeCompare(b.id))
@@ -386,12 +408,14 @@
             .map(item => item.archetype);
         const leadingChakras = [...chakras].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, 2).map(item => item.archetype);
         const bestSupportedChakra = chakras
-            .filter(item => item.confidence >= 1)
+            .filter(item => item.evidenceCount >= bank.settings.minimumEvidencePerChakra)
             .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))[0];
         const rapportChakra = bestSupportedChakra && chakraById[bestSupportedChakra.id];
         return {
             complete: selectNext(bank, state).kind === 'complete',
             chakras,
+            focusAreas,
+            focusStatus,
             archetypes: [...new Set([...leadingChakras, ...leadingValues])].slice(0, 3),
             rapportCue: rapportChakra?.conversationTopic
                 ? { chakraId: rapportChakra.id, topic: rapportChakra.conversationTopic }

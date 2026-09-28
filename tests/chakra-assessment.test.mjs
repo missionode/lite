@@ -10,7 +10,7 @@ const inlineScripts = scriptTags.map(match => match[1]).filter(source => source.
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.2');
+const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.3');
 const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.0');
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
@@ -21,7 +21,7 @@ assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?
 for (const id of [
     'loadingView', 'accessRequiredView', 'errorView', 'interviewView', 'resultView', 'progressLabel', 'progressBar',
     'questionPrompt', 'choiceLeft', 'choiceRight', 'equalChoice', 'skipChoice', 'saveStatus',
-    'chakraResults', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
+    'chakraResults', 'resultNote', 'sessionFocus', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
     'rapportInsight', 'rapportIcebreaker'
 ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `${id} should remain in the tournament shell`);
@@ -48,6 +48,10 @@ assert.match(html, /\.goog-te-gadget\{font-size:14px!important;/,
 assert.doesNotMatch(html, /\.goog-te-gadget\{font-size:0!important/, 'Google Translate copy should not be collapsed to zero size');
 assert.match(html, /id="translationCache"/, 'translated strings should be retained for later tournament screens');
 assert.match(inlineScripts[0], /function primeTranslationCache\(\)/, 'all dynamic questions and result labels should be prepared for translation');
+assert.match(inlineScripts[0], /Today’s lowest answer-support signal is for/, 'the translated result should identify a tentative lowest-support area');
+assert.match(inlineScripts[0], /evidenceCount/, 'results should show the number of responses behind each chakra signal');
+assert.match(inlineScripts[0], /result\.focusStatus/, 'the result should handle insufficient evidence and near-ties without inventing a weakest chakra');
+assert.doesNotMatch(inlineScripts[0], /reflection confidence|confidence-gated|chakra\.confidence/, 'the result must not describe answer coverage as confidence');
 assert.match(inlineScripts[0], /translation\(`question:\$\{item\.id\}:prompt`, item\.prompt\)/,
     'later prompts should reuse Google-translated cache entries');
 assert.match(html, /id="operatorDot" aria-hidden="true"/, 'the operator indicator should remain an unlabelled visual dot');
@@ -59,7 +63,7 @@ assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a retur
 
 for (const asset of [
     './data/assessment-questions.json?v=1.1',
-    './modules/assessment-tournament.js?v=1.2',
+    './modules/assessment-tournament.js?v=1.3',
     './modules/assessment-persistence.js?v=1.0'
 ]) {
     assert.ok(sw.includes(`'${asset}'`), `${asset} should be available through the app cache`);
