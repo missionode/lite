@@ -179,6 +179,10 @@ The software checkpoint is integrated and automated/browser-tested: one prompt a
 
 Removed the misleading 100% “reflection confidence” presentation. Each chakra now shows its actual answered-response count and a relative answer-support label. The operator result can surface one lowest-support chakra or close candidates only after every chakra meets minimum evidence; insufficient coverage and non-differentiating near-ties instead receive a client-led prompt. This is exploratory conversation support, not a measured weakness, diagnosis or automatic session recommendation. The dynamic labels continue through the existing Google Translate cache. Focused engine/UI/persistence tests pass; browser visual review remains with the owner.
 
+### Assessment answer-support visual cue — CP-ASSESS-IMPL-004
+
+Added a compact three-segment indicator and legend to result cards: muted lavender for Lower, soft amber for Mixed and cool aqua for Higher answer-support. The visible text status and response count remain authoritative; insufficient-evidence cards stay neutral. A possible discussion-focus card has a separate gold outline and text tag. Scoring and focus thresholds are unchanged. Browser visual verification remains owner-pending.
+
 ## Content-free Undo & Unlearn integration — release 3.51 candidate
 
 Added an optional 5/8/12-minute pitch-black integration after Ho’oponopono. It requires no recall, answer, speech, typing, examples or contact; separates three forgiveness possibilities; preserves responsibility/boundaries; and never claims another person has forgiven the meditator. Four-language source coverage and sequence guards are required; device listening remains open.

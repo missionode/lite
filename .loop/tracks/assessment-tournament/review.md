@@ -27,6 +27,12 @@ Status: implemented and integrated.
 - The versioned question bank covers seven chakras and eight approved values. The frozen engine owns validation, adaptive coverage, no-repeat scheduling, balanced unique value pairs, counterbalancing, confidence, archetypes and conservative dot thresholds.
 - Contracts cover malformed data, complete evidence, no-repeat after answer/Equal/Skip, balanced pairings, resume sanitation and the rule that a single answer cannot produce green or red.
 
+## CP-ASSESS-IMPL-004 — result visualization
+
+- Result cards pair the existing support label and response count with a three-segment lavender/amber/aqua indicator; insufficient evidence stays neutral. Possible discussion-focus candidates use a separate gold outline and text tag. Labels remain present for accessibility and non-color interpretation.
+- Scoring model, thresholds and focus-candidate logic are unchanged. No percentage, numeric gauge or validated-strength claim is introduced.
+- Focused assessment engine/UI/persistence, syntax and atlas-build checks pass. Browser visual inspection remains owner-pending; no visual-parity claim is made.
+
 ## CP-ASSESS-IMPL-003 — operator acceptance
 
 Pending trained-operator review of wording and practical interpretation. This follow-up does not authorize diagnosis, consent inference, sales language, service activation or automatic recommendations.

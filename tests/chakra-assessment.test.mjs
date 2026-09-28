@@ -21,7 +21,7 @@ assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?
 for (const id of [
     'loadingView', 'accessRequiredView', 'errorView', 'interviewView', 'resultView', 'progressLabel', 'progressBar',
     'questionPrompt', 'choiceLeft', 'choiceRight', 'equalChoice', 'skipChoice', 'saveStatus',
-    'chakraResults', 'resultNote', 'sessionFocus', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
+    'chakraResults', 'resultNote', 'sessionFocus', 'supportLegend', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
     'rapportInsight', 'rapportIcebreaker'
 ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `${id} should remain in the tournament shell`);
@@ -52,6 +52,13 @@ assert.match(inlineScripts[0], /Today’s lowest answer-support signal is for/, 
 assert.match(inlineScripts[0], /evidenceCount/, 'results should show the number of responses behind each chakra signal');
 assert.match(inlineScripts[0], /result\.focusStatus/, 'the result should handle insufficient evidence and near-ties without inventing a weakest chakra');
 assert.doesNotMatch(inlineScripts[0], /reflection confidence|confidence-gated|chakra\.confidence/, 'the result must not describe answer coverage as confidence');
+assert.match(html, /--support-lower:#c8b7ed/, 'lower support should use the agreed muted lavender');
+assert.match(html, /--support-mixed:#efca78/, 'mixed support should use the agreed soft amber');
+assert.match(html, /--support-higher:#7bd8ce/, 'higher support should use the agreed cool aqua');
+assert.match(html, /class="support-legend"/, 'the color key should label the three support colors');
+assert.match(inlineScripts[0], /signalMeter\.setAttribute\('aria-hidden','true'\)/, 'the color strip should be decorative because its status text remains visible');
+assert.match(inlineScripts[0], /supportLevelByStatus/, 'the three-step cue should map from the textual support category');
+assert.match(inlineScripts[0], /Possible discussion focus/, 'a highlighted focus candidate should also receive a readable label');
 assert.match(inlineScripts[0], /translation\(`question:\$\{item\.id\}:prompt`, item\.prompt\)/,
     'later prompts should reuse Google-translated cache entries');
 assert.match(html, /id="operatorDot" aria-hidden="true"/, 'the operator indicator should remain an unlabelled visual dot');
