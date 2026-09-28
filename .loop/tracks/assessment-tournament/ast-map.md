@@ -9,12 +9,12 @@ Mapping method: bounded symbol/dependency inspection. This dependency-light PWA 
 - `index.html` — Lobby owns the `#begin-consultation` CTA.
 - `app.js` — the CTA handler navigates to `./docs/assesment.html`; assessment state is not shared with journey state.
 - `docs/assesment.html` — standalone one-question/two-card shell, safe dynamic rendering, progress/results, font controls, Google Translate initialization and deliberate new-client reset.
-- `sw.js` — shell cache `chakra-v5.257` precaches the assessment page and its versioned JSON, engine and persistence dependencies.
+- `sw.js` — shell cache `chakra-v5.331` precaches the assessment page and its versioned JSON, engine and persistence dependencies.
 
 ## Delivered assessment owners
 
 - Data: `data/assessment-questions.json` owns English prompts, two-choice labels, weights, value cards and positive archetype names.
-- Algorithm: `ChakraAssessmentTournament` owns validation, deterministic selection, no-repeat ledgers, scoring/confidence and conservative dot thresholds.
+- Algorithm: `ChakraAssessmentTournament` owns validation, deterministic selection, no-repeat ledgers, relative response scoring and conservative dot thresholds. The UI shows response counts rather than a confidence estimate.
 - State: `ChakraAssessmentPersistence` owns `chakraAssessmentTournamentV1`; load/save sanitize through the engine and clear also removes retired `chakraAnswers` and `chakraAssessmentNotes`.
 - UI lifecycle: `start`, `renderNext`, `answer`, `renderResult`, safe DOM helpers, font controls, Translate toggle and `googleTranslateElementInit`.
 - Reset: `#newAssessment` confirms, clears replacement and legacy assessment state, then renders a fresh first prompt without reloading.
@@ -22,10 +22,10 @@ Mapping method: bounded symbol/dependency inspection. This dependency-light PWA 
 ## Verified seams
 
 - `data/assessment-questions.json` — versioned English question/value bank and declarative weights/signals only.
-- `modules/assessment-tournament.js` — pure schema validation, deterministic unique-question ledger, balanced chakra coverage, value-pair scheduling, scoring/confidence/archetypes, conservative dot and serializable state transitions.
+- `modules/assessment-tournament.js` — pure schema validation, deterministic unique-question ledger, balanced chakra coverage, value-pair scheduling, relative scoring/archetypes, conservative dot and serializable state transitions.
 - `docs/assesment.html` — one-question/two-card shell, Equal/Skip, progress, result and text-node dynamic rendering.
 - `tests/chakra-assessment.test.mjs`, `tests/assessment-tournament.test.mjs`, `tests/assessment-persistence.test.mjs` — UI, engine, no-repeat/balance, resume/reset, failure and cache contracts.
-- `docs/app-map/atlas-data.mjs` — delivered assessment map; live translation, responsive-device and operator acceptance remain explicitly pending.
+- `docs/app-map/atlas-data.mjs` — delivered assessment/result map. Google Translate remains network-dependent; visual browser review and trained-operator acceptance remain separate evidence items.
 
 ## Invariants
 

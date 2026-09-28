@@ -8,9 +8,9 @@ Replace the standalone `/docs/assesment.html` consultation with an operator-led,
 
 - The assessment remains independent from the Lobby and every journey route.
 - The operator asks one question at a time; the meditator chooses one of two neutral cards, equal, or skip.
-- Questions load from a versioned JSON file. Selection, scoring, normalization, confidence, archetype aggregation and no-repeat behavior remain executable code.
+- Questions load from a versioned JSON file. Selection, relative scoring, archetype aggregation and no-repeat behavior remain executable code. Do not present an evidence count as a confidence estimate.
 - Every answered, equal or skipped question ID is excluded for the rest of that assessment. Additional evidence uses a genuinely different question.
-- A hybrid bracket balances minimum evidence for Root, Sacral, Solar, Heart, Throat, Third Eye and Crown, then uses new tie-breakers only where confidence is insufficient or scores are close.
+- A hybrid bracket balances minimum evidence for Root, Sacral, Solar, Heart, Throat, Third Eye and Crown, then uses genuinely new tie-breakers where response evidence is below its floor or scores are close.
 - Results show seven relative chakra scores/statuses and participant-friendly archetypes.
 - Results also show one small unlabelled green, orange or red dot. No heading, percentage, explanation, intimate-service wording or automatic action accompanies it. Orange is the default until enough independent evidence exists.
 - The dot is an operator interpretation aid only. It is not consent and has no connection to service activation, journey configuration or navigation.
@@ -47,6 +47,12 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - No Advanced Features assessment settings panel.
 - No separate native Malayalam, Hindi or Russian assessment bundles in this feature; multilingual readiness uses the existing Google Translate integration.
 - The software implementation is delivered and synchronized into `modularize`; trained-operator acceptance remains a separate follow-up and does not block modularization.
+
+## Current result presentation amendment — response support and color cue
+
+- Replace percentage “reflection confidence” with actual response counts and relative answer-support labels. A tentative lowest-support focus requires the configured minimum evidence for all seven chakras; close candidates are grouped and insufficient/inconclusive results remain client-led.
+- Each result card uses a three-segment indicator with muted lavender for Lower, soft amber for Mixed and cool aqua for Higher. The textual category remains visible; color is not the only carrier of meaning. Insufficient evidence has a neutral unlit indicator.
+- Possible discussion-focus cards receive a separate gold outline and readable tag. This cue is not a chakra-strength scale, validated measurement, diagnosis or automatic recommendation.
 
 ## Local integration — Advanced Features, undo and rapport guidance
 

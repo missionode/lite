@@ -1,6 +1,12 @@
 # Chakra Meditation — Active Handoff
 
-### CURRENT — Modularization release merged to production (PR #81)
+### CURRENT — Assessment result visual cue checkpoint
+
+- Built from the production baseline `d205e49` (assessment clarity PR #86). Result cards retain the textual Lower/Mixed/Higher answer-support label and response count, add a three-segment lavender/amber/aqua cue and legend, keep insufficient evidence visually neutral, and mark possible discussion-focus cards with a separate gold outline and readable tag. Scoring/focus thresholds are unchanged.
+- Assessment engine/UI/persistence tests, syntax, diff checks and atlas generation pass. Interactive browser verification remains pending with the owner; the local `file://` preview was blocked by browser policy. No visual-parity or performance claim is made.
+- Assessment documentation and atlas were synchronized in this checkpoint. Trained-operator acceptance CP-ASSESS-IMPL-003 remains a separate follow-up.
+
+### BASELINE — Modularization release merged to production (PR #81)
 
 - Production merge commit `4cad261a63a9606cb1f2def6d78de5f0027435d1` contains the validated modularization release through CP-MOD-169. PR #81 (`https://github.com/missionode/lite/pull/81`) was merged on 2026-09-27. The remote production ref was fetched and verified at this commit; the isolated task worktree was fast-forwarded to the same tree.
 - Latest isolated work is on `codex/ui-componentization-modal-pilot`, based on production. CP-THEME-ARCH-001 found the modal shell is already shared, so no duplicate component extraction is warranted. CP-THEME-IMPL-001 adds the Lobby foundation; CP-THEME-IMPL-002 adds localized Settings → Sky Observatory navigation; CP-THEME-IMPL-003 completes supporting surfaces and restores one-shot static sky frames on journey/support pages. Only Observatory animates; Lobby/Settings remain clear.

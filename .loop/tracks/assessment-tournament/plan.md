@@ -3,7 +3,7 @@
 ## Delivered implementation
 
 - CP-ASSESS-IMPL-001/002 implement the approved standalone operator-led assessment. A versioned English question bank, pure tournament engine, persistence owner and responsive page are integrated; scoring and results do not configure or start a meditation journey.
-- The engine validates the bank, balances chakra coverage and value pairings, prevents repeated questions/pairs, sanitizes resume data and applies conservative status/confidence/dot thresholds. `Equal` and `Skip` are valid.
+- The engine validates the bank, balances chakra coverage and value pairings, prevents repeated questions/pairs, sanitizes resume data and applies conservative status/dot thresholds. Results show actual response coverage rather than a confidence percentage. `Equal` and `Skip` are valid.
 - The page uses the existing Google Translate widget for generated content. Translation needs network access. Browser checks cover desktop/mobile, progression, resume, seven-chakra result and new-client reset.
 - The service worker precaches the page and versioned data/modules. The atlas now describes delivered runtime behavior. CP-MOD-011 remains the next modularization checkpoint after this synchronization.
 
@@ -16,7 +16,7 @@
 
 - Integrated the Advanced Features gate, one-step undo and evidence-limited conversation cue/icebreaker into the served checkout. The single entry is the Lobby consultation CTA; Settings has no assessment link.
 - Maintained a 15-minute same-tab grant, revoked it on relock, and gated assessment-page startup before question-bank fetch. This is not server authentication.
-- Kept the cue derived exclusively from chakra answers at full evidence confidence; no fixed personality/behavior conclusions and no rapport inference from intimate-value answers or the private dot.
+- Kept the rapport cue derived exclusively from chakra answers once minimum evidence is met; no fixed personality/behavior conclusions and no rapport inference from intimate-value answers or the private dot.
 - Rotated assessment data/module and shell caches; regenerated atlas and references. `npm run test:assessment`, `npm run test:advanced-unlock` and `git diff --check` pass. PR #78 merged to `production` as `d0a8051` on 2026-09-26. GitHub reported no CI checks; browser review remains pending with the owner. CP-ASSESS-IMPL-003 trained-operator review remains open.
 
 ## Original acceptance criteria
@@ -28,3 +28,9 @@
 5. Support sanitized local resume and explicit Clear for New Client; storage denial degrades to in-memory state.
 6. Keep all data local; no medical diagnosis, sales language, service activation, automatic recommendation or journey changes.
 7. Preserve Google Translate for the English question bank and dynamically rendered content; translation is online-dependent.
+
+## Delivered result presentation — CP-ASSESS-IMPL-004
+
+- Each chakra card shows its response count, textual answer-support category and a matching three-segment color cue (muted lavender / soft amber / cool aqua). Insufficient evidence remains visually neutral; color never replaces the label.
+- Possible-focus candidates receive a separate gold outline and readable tag. Scoring thresholds and possible-focus guards are unchanged.
+- Updated the assessment UI, shell cache, tests, flow atlas and generated references. Automated assessment/persistence checks pass; browser visual review remains for the owner.
