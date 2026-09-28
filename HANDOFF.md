@@ -1,5 +1,10 @@
 # Chakra Meditation — Active Handoff
 
+### IMPLEMENTED — Experiment Mode sky-safe action panel
+
+- Grouped the Experiment note, Run Activity, and Back to Settings controls into a high-contrast panel so the fixed horizon/Earth reference cannot visually cross the buttons while scrolling. Updated the stylesheet URL and rotated the shell cache.
+- Desktop browser verification at 1280×720 confirms the action panel remains readable before and after scrolling. Mobile-device layout remains unverified. `experiments` flow is unchanged, so its atlas map remains accurate.
+
 ### CURRENT — Assessment result visual cue checkpoint
 
 - Built from the production baseline `d205e49` (assessment clarity PR #86). Result cards retain the textual Lower/Mixed/Higher answer-support label and response count, add a three-segment lavender/amber/aqua cue and legend, keep insufficient evidence visually neutral, and mark possible discussion-focus cards with a separate gold outline and readable tag. Scoring/focus thresholds are unchanged.

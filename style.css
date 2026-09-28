@@ -266,6 +266,51 @@ body {
     overflow-y: visible;
 }
 
+/* Keep Experiment Mode's note and actions readable when the fixed sky's
+   horizon/Earth reference passes behind the page during scrolling. */
+.experiment-actions {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 20px;
+    background: rgba(10, 12, 26, 0.96);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(18px);
+}
+
+.experiment-note {
+    max-width: 34rem;
+    margin: 0 auto 0.35rem;
+    color: var(--text-color);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.experiment-actions #start-experiment {
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+.experiment-actions #close-experiment {
+    width: 100%;
+    border: 1px solid rgba(237, 233, 254, 0.16);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.045);
+    opacity: 0.88;
+}
+
+.experiment-actions #close-experiment:hover,
+.experiment-actions #close-experiment:focus-visible {
+    background: rgba(255, 255, 255, 0.09);
+    opacity: 1;
+}
+
 /* Desktop Lobby content is taller than one viewport. Let the document grow
    and always reopen the section from its top rather than clipping its header. */
 #lobby-screen {

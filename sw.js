@@ -13,7 +13,7 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.08',
+  './style.css?v=2.09',
   './app.js?v=4.13',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
