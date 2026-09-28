@@ -4,6 +4,7 @@
 
 - Grouped the Experiment note, Run Activity, and Back to Settings controls into a high-contrast panel so the fixed horizon/Earth reference cannot visually cross the buttons while scrolling. Updated the stylesheet URL and rotated the shell cache.
 - Desktop browser verification at 1280×720 confirms the action panel remains readable before and after scrolling. Mobile-device layout remains unverified. `experiments` flow is unchanged, so its atlas map remains accurate.
+- Follow-up: the Activity and Experiment Duration groups now have full inset padding, a soft panel surface and rounded border; updated the stylesheet/cache references for prompt refresh.
 
 ### CURRENT — Assessment result visual cue checkpoint
 

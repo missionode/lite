@@ -311,6 +311,19 @@ body {
     opacity: 1;
 }
 
+#experiment-screen > .config-group.settings-panel {
+    margin-top: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 18px;
+    background: rgba(16, 12, 36, 0.82);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+#experiment-screen > .config-group.settings-panel > label:first-child {
+    margin-bottom: 0.2rem;
+}
+
 /* Desktop Lobby content is taller than one viewport. Let the document grow
    and always reopen the section from its top rather than clipping its header. */
 #lobby-screen {
