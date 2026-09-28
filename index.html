@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.08">
+    <link rel="stylesheet" href="style.css?v=2.09">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -276,9 +276,11 @@
                     <span id="experiment-core-duration-value">5 min</span>
                 </div>
             </div>
-            <p class="experiment-note" data-i18n="ui.experimentNote">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
-            <button id="start-experiment" class="primary-btn" type="button" data-i18n="ui.runExperiment">Run Activity</button>
-            <button id="close-experiment" class="link-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
+            <div class="experiment-actions">
+                <p class="experiment-note" data-i18n="ui.experimentNote">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
+                <button id="start-experiment" class="primary-btn" type="button" data-i18n="ui.runExperiment">Run Activity</button>
+                <button id="close-experiment" class="link-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
+            </div>
         </section>
 
         <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
