@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted assessment-result-clarity + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
+Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + assessment-result-clarity (a6c3ddf) + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
