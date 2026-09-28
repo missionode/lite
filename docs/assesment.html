@@ -74,7 +74,9 @@
     .result-heading{text-align:center;margin-bottom:26px}.result-heading p{color:var(--muted)}
     .chakra-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .result-card{border:1px solid var(--line);border-radius:18px;padding:17px;background:rgba(255,255,255,.035)}
-    .result-card h3{font-size:1.02em;margin-bottom:6px}.status{color:var(--gold);font-weight:800}.confidence{color:var(--muted);font-size:.82em;margin-top:5px}
+    .result-card h3{font-size:1.02em;margin-bottom:6px}.status{color:var(--gold);font-weight:800}.evidence-count{color:var(--muted);font-size:.82em;margin-top:5px}
+    .result-card.focus-candidate{border-color:rgba(237,199,122,.7);box-shadow:0 0 0 1px rgba(237,199,122,.12)}
+    .result-note{color:var(--muted);font-size:.88em;margin:14px 2px 0}
     .archetypes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px 0}
     .archetype{padding:8px 12px;border-radius:99px;background:rgba(169,139,255,.12);border:1px solid rgba(169,139,255,.24)}
     .rapport-card{margin:24px 0;padding:20px;border:1px solid rgba(237,199,122,.28);border-radius:18px;background:rgba(237,199,122,.055)}
@@ -151,6 +153,11 @@
           <p>Use this private summary to support the operator’s conversation and personal-care session planning.</p>
         </div>
         <div class="chakra-results" id="chakraResults"></div>
+        <p class="result-note" id="resultNote"></p>
+        <section class="rapport-card" aria-labelledby="sessionFocusHeading">
+          <h3 id="sessionFocusHeading">Possible session focus</h3>
+          <p id="sessionFocus" aria-live="polite"></p>
+        </section>
         <div class="archetypes" id="archetypeResults"></div>
         <section class="rapport-card" aria-live="polite" aria-labelledby="rapportHeading">
           <h3 id="rapportHeading">Conversation cue — not a prediction</h3>
@@ -169,7 +176,7 @@
     <p class="privacy">Responses stay on this device. The assessment is separate from the meditation journey and does not start or configure a session.</p>
   </main>
 
-  <script src="../modules/assessment-tournament.js?v=1.2"></script>
+  <script src="../modules/assessment-tournament.js?v=1.3"></script>
   <script src="../modules/assessment-persistence.js?v=1.0"></script>
   <script>
     (() => {
@@ -177,7 +184,7 @@
       const elements = Object.fromEntries([
         'loadingView','accessRequiredView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
         'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','undoAnswer','undoResult','saveStatus',
-        'chakraResults','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
+        'chakraResults','resultNote','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
         'fontDown','fontReset','fontUp'
         ,'translationCache'
       ].map(id => [id, document.getElementById(id)]));
@@ -233,15 +240,20 @@
         });
         bank.values.forEach(value => registerTranslation(`value:archetype:${value.id}`, value.archetype));
         bank.chakras.forEach(chakra => registerTranslation(`chakra:topic:${chakra.id}`, chakra.conversationTopic));
-        ['Currently supported','Developing','May benefit from support','More conversation needed'].forEach((label,index) =>
+        ['Higher answer-support signal','Mixed answer-support signal','Lower answer-support signal','Not enough answers'].forEach((label,index) =>
           registerTranslation(`status:${index}`, label));
         ['completed','Chakra reflection','Values reflection','Saved on this device','Continuing without device storage',
           'Previous assessment resumed on this device','New assessment started; device storage could not be cleared.',
-          'reflection confidence','Undo last response','Last response undone. You can review that choice again.',
+          'Responses counted','Undo last response','Last response undone. You can review that choice again.',
           'This assessment’s clearest response signal was around','This reflects answers from today only; it is not a conclusion about character or behavior. Ask before assuming.',
           'Would you like to explore this area today, or is something else more useful for you?',
           'There is not enough answered evidence for a specific topic. Begin with an open, client-led question.',
-          'What would make this session feel useful and comfortable for you today?']
+          'What would make this session feel useful and comfortable for you today?',
+          'Today’s lowest answer-support signal is for','Today’s lowest answer-support signals are close across',
+          'This is only a prompt, not a confirmed weakness. Check whether it feels relevant before planning around it.',
+          'There is not enough answered evidence to suggest a focus. Ask the client what would feel most useful today.',
+          'The answers do not point to one clear lowest area. Ask the client what would feel most useful today.',
+          'Responses counted:','and','These labels summarize answers from this assessment only; they are not a validated measure or diagnosis.']
           .forEach((label,index) => registerTranslation(`ui:${index}`, label));
       }
 
@@ -325,15 +337,28 @@
 
       function renderResult() {
         const result = window.ChakraAssessmentTournament.buildResult(bank, state);
+        const focusIds = new Set(result.focusAreas.map(area => area.id));
         elements.chakraResults.replaceChildren();
         result.chakras.forEach(chakra => {
           const card = document.createElement('article');
           card.className = 'result-card';
+          if (focusIds.has(chakra.id)) card.classList.add('focus-candidate');
           appendTextElement(card, 'h3', '', translation(`chakra:name:${chakra.id}`, chakra.name));
-          appendTextElement(card, 'div', 'status', translation(`status:${['Currently supported','Developing','May benefit from support','More conversation needed'].indexOf(chakra.status)}`, chakra.status));
-          appendTextElement(card, 'div', 'confidence', `${Math.round(chakra.confidence * 100)}% ${translation('ui:7','reflection confidence')}`);
+          appendTextElement(card, 'div', 'status', translation(`status:${['Higher answer-support signal','Mixed answer-support signal','Lower answer-support signal','Not enough answers'].indexOf(chakra.status)}`, chakra.status));
+          appendTextElement(card, 'div', 'evidence-count', `${translation('ui:20','Responses counted:')} ${chakra.evidenceCount}`);
           elements.chakraResults.appendChild(card);
         });
+        elements.resultNote.textContent = translation('ui:22','These labels summarize answers from this assessment only; they are not a validated measure or diagnosis.');
+        const focusNames = result.focusAreas.map(area => translation(`chakra:name:${area.id}`, area.name));
+        if (result.focusStatus === 'candidate' && focusNames.length === 1) {
+          elements.sessionFocus.textContent = `${translation('ui:15','Today’s lowest answer-support signal is for')} ${focusNames[0]}. ${translation('ui:17','This is only a prompt, not a confirmed weakness. Check whether it feels relevant before planning around it.')}`;
+        } else if (result.focusStatus === 'candidate') {
+          elements.sessionFocus.textContent = `${translation('ui:16','Today’s lowest answer-support signals are close across')} ${focusNames.join(` ${translation('ui:21','and')} `)}. ${translation('ui:17','This is only a prompt, not a confirmed weakness. Check whether it feels relevant before planning around it.')}`;
+        } else if (result.focusStatus === 'no-clear-lowest') {
+          elements.sessionFocus.textContent = translation('ui:19','The answers do not point to one clear lowest area. Ask the client what would feel most useful today.');
+        } else {
+          elements.sessionFocus.textContent = translation('ui:18','There is not enough answered evidence to suggest a focus. Ask the client what would feel most useful today.');
+        }
         elements.archetypeResults.replaceChildren();
         result.archetypes.forEach(archetype => {
           const chakra = bank.chakras.find(entry => entry.archetype === archetype);

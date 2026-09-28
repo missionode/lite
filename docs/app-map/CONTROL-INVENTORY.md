@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
+Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + assessment-result-clarity (a6c3ddf) + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
@@ -161,21 +161,21 @@ This inventories static UI declarations in the three meditation HTML entry pages
 
 | Source | Element | Identifier / label | Choices / bounds / destination |
 | --- | --- | --- | --- |
-| [102](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:102) | button | fontDown | type=button |
-| [103](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:103) | button | fontReset | type=button |
-| [104](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:104) | button | fontUp | type=button |
-| [107](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:107) | button | translateBtn | type=button |
-| [114](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:114) | a | ← Meditation Room | href=../index.html |
-| [125](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:125) | a | Return to Settings | href=../index.html |
-| [130](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:130) | button | retryButton | type=button |
-| [137](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:137) | button | choiceLeft | type=button |
-| [138](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:138) | button | choiceRight | type=button |
-| [141](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:141) | button | equalChoice | type=button |
-| [142](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:142) | button | skipChoice | type=button |
-| [143](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:143) | button | undoAnswer | type=button |
-| [163](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:163) | button | undoResult | type=button |
-| [164](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:164) | button | newAssessment | type=button |
-| [165](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:165) | a | Return to Meditation Room | href=../index.html |
+| [104](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:104) | button | fontDown | type=button |
+| [105](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:105) | button | fontReset | type=button |
+| [106](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:106) | button | fontUp | type=button |
+| [109](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:109) | button | translateBtn | type=button |
+| [116](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:116) | a | ← Meditation Room | href=../index.html |
+| [127](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:127) | a | Return to Settings | href=../index.html |
+| [132](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:132) | button | retryButton | type=button |
+| [139](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:139) | button | choiceLeft | type=button |
+| [140](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:140) | button | choiceRight | type=button |
+| [143](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:143) | button | equalChoice | type=button |
+| [144](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:144) | button | skipChoice | type=button |
+| [145](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:145) | button | undoAnswer | type=button |
+| [170](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:170) | button | undoResult | type=button |
+| [171](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:171) | button | newAssessment | type=button |
+| [172](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:172) | a | Return to Meditation Room | href=../index.html |
 
 ## docs/repertory.html
 

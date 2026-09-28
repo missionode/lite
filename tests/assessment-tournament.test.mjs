@@ -74,6 +74,58 @@ const chakraOnlyResult = engine.buildResult(bank, { ...state, valueHistory: [] }
 assert.ok(resultWithValues.rapportCue?.topic, 'sufficient chakra evidence should produce a tentative conversation cue');
 assert.equal(resultWithValues.rapportCue.topic, chakraOnlyResult.rapportCue.topic,
     'rapport topics must come from chakra answers, never value/intimate-service signals');
+assert.equal(resultWithValues.chakras.every(item => Number.isInteger(item.evidenceCount)), true,
+    'each result should expose its actual answered-evidence count');
+assert.equal(resultWithValues.chakras.some(item => 'confidence' in item), false,
+    'evidence coverage must not be mislabeled as confidence');
+assert.ok(['candidate', 'no-clear-lowest', 'insufficient-evidence'].includes(resultWithValues.focusStatus),
+    'the result should explicitly describe whether a lowest-area prompt is supportable');
+
+const emptyResult = engine.buildResult(bank, engine.createState(bank));
+assert.equal(emptyResult.focusStatus, 'insufficient-evidence', 'no answers must not produce a weakest-area claim');
+assert.deepEqual([...emptyResult.focusAreas], [], 'no-evidence results should not name a focus area');
+
+let partialEvidenceState = engine.createState(bank);
+for (const question of bank.questions.filter(item => item.coverage.includes('root')).slice(0, bank.settings.minimumEvidencePerChakra)) {
+    const prompt = { kind: 'question', id: question.id, choices: question.choices.map(choice => ({ id: choice.id })) };
+    partialEvidenceState = engine.answerItem(bank, partialEvidenceState, prompt, question.choices[0].id);
+}
+assert.equal(engine.buildResult(bank, partialEvidenceState).focusStatus, 'insufficient-evidence',
+    'a relative lowest-area prompt requires minimum evidence across all seven chakras');
+
+let equalAnswersState = engine.createState(bank);
+while (true) {
+    const next = engine.selectNext(bank, equalAnswersState);
+    if (next.kind === 'complete') break;
+    if (next.kind === 'value') {
+        equalAnswersState = engine.answerItem(bank, equalAnswersState, next, engine.RESPONSE_SKIP);
+        continue;
+    }
+    equalAnswersState = engine.answerItem(bank, equalAnswersState, next, engine.RESPONSE_EQUAL);
+}
+const equalAnswersResult = engine.buildResult(bank, equalAnswersState);
+assert.equal(equalAnswersResult.focusStatus, 'no-clear-lowest', 'even answers should not manufacture a weakest chakra');
+assert.deepEqual([...equalAnswersResult.focusAreas], [], 'near-equal results should offer a client-led prompt, not rank noise');
+
+let lowRootState = engine.createState(bank);
+while (true) {
+    const next = engine.selectNext(bank, lowRootState);
+    if (next.kind === 'complete') break;
+    if (next.kind === 'value') {
+        lowRootState = engine.answerItem(bank, lowRootState, next, engine.RESPONSE_SKIP);
+        continue;
+    }
+    const question = bank.questions.find(entry => entry.id === next.id);
+    const lowerScore = choice => question.coverage.reduce((sum, id) => sum + (choice.weights[id] ?? 0.5), 0) / question.coverage.length;
+    const rootCovered = question.coverage.includes('root');
+    const selectedChoice = [...question.choices].sort((a, b) => rootCovered
+        ? lowerScore(a) - lowerScore(b)
+        : lowerScore(b) - lowerScore(a))[0];
+    lowRootState = engine.answerItem(bank, lowRootState, next, selectedChoice.id);
+}
+const lowRootResult = engine.buildResult(bank, lowRootState);
+assert.equal(lowRootResult.focusStatus, 'candidate', 'a sufficiently differentiated profile should provide a tentative focus');
+assert.ok(lowRootResult.focusAreas.some(item => item.id === 'root'), 'the lower-support chakra should be surfaced for operator conversation');
 
 let undoQuestionState = engine.createState(bank);
 const firstQuestion = engine.selectNext(bank, undoQuestionState);
