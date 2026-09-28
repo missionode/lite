@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Piper runtime field and browser preview fallback
+
+Declared and initialized the private `_modelBaseUrl` WeakMap used by community-voice model loading; before this fix, Piper threw a `ReferenceError` and could not load the selected model. On Settings preview failure, the app now speaks the same sample with the first browser voice matching the active language (or system default), reflects that temporary fallback in the picker and reports fallback status. It is not persisted until settings are saved. Piper service-worker assets use a new cache generation to replace stale runtime code. Native browser speech is outside the Web Audio effects chain, so Voice Space applies to Piper playback but not the fallback itself. Focused runtime, fallback and language tests pass; mobile audio was not device-verified.
+
 ## Completed locally — Tamil localization and Indic Piper voice setup
 
 Added Tamil to the manifest-backed language picker with a complete UI locale, narration translations and a Tamil Rasa Piper default; registered the community Hindi Priyamvada Piper voice as well. Piper now honors each voice's model repository URL, and registry/manifest plus shell/Piper/language caches are versioned so existing local previews can discover the additions. Service Worker no longer duplicates remote Piper ONNX files already managed by the runtime cache. Focused language, voice-routing, lifecycle and settings-backup checks are listed in the release PR. Hindi model terms remain explicitly marked for confirmation before commercial redistribution.

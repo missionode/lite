@@ -2442,14 +2442,39 @@ async function testVoice() {
     const selectedValue = voiceSelect.value || state.voiceName;
     state.voiceName = selectedValue;
     if (isPiperVoice(selectedValue)) {
+        const sample = getLanguageConfig().preview || contentT('system.centeringBreath');
         try {
             if (!audio.isInitialized) await audio.init();
             piperTTS.configure(selectedValue);
-            const sample = getLanguageConfig().preview || contentT('system.centeringBreath');
             await piperTTS.preview(sample);
         } catch (error) {
             console.error('[Piper] preview failed:', error);
-            setVoiceStatus(t('ui.piperPreviewFailed'), 'error');
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance !== 'function') {
+                setVoiceStatus(t('ui.piperPreviewFailed'), 'error');
+                return;
+            }
+
+            const browserVoice = state.voices.find(voice => voiceMatchesLanguage(voice)) || null;
+            const fallbackValue = browserVoice ? `browser:${browserVoice.name}` : 'browser:Default';
+            state.voiceName = fallbackValue;
+            voiceSelect.value = fallbackValue;
+            const utterance = new SpeechSynthesisUtterance(sample);
+            if (browserVoice) {
+                utterance.voice = browserVoice;
+                utterance.lang = browserVoice.lang;
+            } else {
+                utterance.lang = getLanguageConfig().locale;
+            }
+            utterance.rate = 0.65 * state.voicePace;
+            utterance.pitch = 0.88;
+            utterance.volume = state.volVoice;
+            try {
+                window.speechSynthesis.speak(utterance);
+                setVoiceStatus(t('ui.piperFallback'));
+            } catch (fallbackError) {
+                console.error('[Voice] browser preview fallback failed:', fallbackError);
+                setVoiceStatus(t('ui.piperPreviewFailed'), 'error');
+            }
         }
         return;
     }

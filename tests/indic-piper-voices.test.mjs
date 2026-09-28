@@ -41,10 +41,12 @@ function auditTamilNarration(value, path = 'scripts') {
 auditTamilNarration(json('scripts.json'));
 assert.match(worker, /modelBaseUrl:\s*voiceDefinition\.modelBaseUrl/);
 assert.match(runtime, /modelBaseUrl\s*\|\|\s*HF_BASE/);
+assert.match(runtime, /var [^;]*_modelBaseUrl[^;]*;/, 'The custom repository backing field must be declared.');
+assert.match(runtime, /_modelBaseUrl = new WeakMap\(\)/, 'The backing field must be initialized before a session uses it.');
 assert.match(lifecycle, /registryUrl\s*=\s*'piper-models\.json'/);
 assert.match(app, /language-manifest\.json\?v=2/);
 assert.match(app, /piper-models\.json\?v=3/);
-assert.match(serviceWorker, /chakra-piper-v10/);
+assert.match(serviceWorker, /chakra-piper-v11/);
 assert.match(serviceWorker, /chakra-language-v56/);
 assert.match(serviceWorker, /LANGUAGE_ASSETS\s*=\s*\['\.\/language-manifest\.json\?v=2',\s*'\.\/locales\/ta\.json'\]/);
 assert.match(serviceWorker, /chakra-v5\.329/);

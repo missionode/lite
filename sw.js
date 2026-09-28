@@ -1,5 +1,5 @@
 const CACHE_NAME = 'chakra-v5.329';
-const PIPER_CACHE_NAME = 'chakra-piper-v10';
+const PIPER_CACHE_NAME = 'chakra-piper-v11';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v56';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [

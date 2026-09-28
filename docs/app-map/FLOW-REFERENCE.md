@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-27.
+Source snapshot: 81d4474 production base + Tamil/Indic Piper voice release/166/167 + uncommitted CP-THEME-IMPL-001/002/003 (production baseline 4cad261) · 2026-09-28.
 
-Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
+Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. Piper custom-repository loading now declares its private model-base URL field, advances the Piper cache generation, and falls back to a language-matched browser voice for a failed Settings preview; the chosen fallback is not saved until explicit settings save. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1248,6 +1248,9 @@ Sources: [modules/audio-mode-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikig
 ```mermaid
 flowchart TD
   mixer["Settings / Journey Tuning"]
+  voicepreview["Preview narration voice"]
+  browserfallback["Browser fallback"]
+  previewerror["Preview unavailable"]
   nofreq["No Frequency ON"]
   nomantra["No Mantra ON"]
   ambient["Mood ambience ON"]
@@ -1256,6 +1259,11 @@ flowchart TD
   fail["Optional source failure"]
   off["Disable / stop"]
   comfort["Comfort + volumes"]
+  mixer -->|"Preview"| voicepreview
+  voicepreview -->|"Preview succeeds"| mixer
+  voicepreview -->|"Piper fails"| browserfallback
+  browserfallback -->|"Browser speaks sample"| mixer
+  voicepreview -->|"Browser speech unavailable"| previewerror
   mixer -->|"Toggle"| nofreq
   mixer -->|"Toggle"| nomantra
   mixer -->|"Enable from Advanced Lobby"| ambient
@@ -1269,6 +1277,9 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Settings / Journey Tuning | Shared suppression settings, voice tuning/pace, echo, spatial mode, voice presets, live paired volume sliders, and comfort controls. `audio-effects-settings-view.js` owns setting interactions; `audio-volume-settings-view.js` synchronizes persisted levels and updates existing audio gains. Mood & Relaxation ambience lives in the Advanced Features Lobby panel. |
+| Preview narration voice | Test the selected voice with the current language sample. If Piper initialization, synthesis, or playback fails, choose the first browser voice matching the selected language (otherwise system default), speak the same sample, and show browser-fallback status. The fallback is reflected in the voice picker but is not persisted until Save Settings. If browser speech is unavailable, show the localized Piper preview error. |
+| Browser fallback | Uses the available language-matched browser voice, or system default when none is listed. |
+| Preview unavailable | Shown only when Piper and browser speech are both unavailable. |
 | No Frequency ON | Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
@@ -1279,6 +1290,7 @@ flowchart TD
 | Comfort + volumes | Eyes Close dims app and changes filters; brightness, voice pace, space, music/video levels act on their buses. |
 
 - No Frequency also suppresses generated bowl/anchor through audio-engine guards. No Mantra affects standard chakra/yoga drone starts, but is not a blanket prohibition on every generated sound route.
+- Voice-preview fallback is temporary until settings are saved.
 - CP-MOD-154: AudioEngine voice tone and Voice Space adapters delegate to audio-voice-effects; settings state, caller order, graph-readiness guards, profiles and automation are unchanged. Direct module and effects-matrix tests verify this owner; no user-flow branch changes.
 - CP-MOD-068 moves only the Lobby Mood & Relaxation custom-URL button, localized status and busy/recovery handling into `modules/mood-ambience-settings-view.js`. `AudioEngine.loadPleasureAmbienceUrl()` remains authoritative for loading, validation and persistence; displayed flow and audio behavior are unchanged.
 - CP-MOD-091–095 move the existing Mood & Relaxation intention, intensity, gain/confirmation, blur and blur-level input handlers into this view owner. The same Advanced Features/No Frequency guards, storage keys, confirmation threshold and audio-update order remain.
