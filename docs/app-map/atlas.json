@@ -2578,7 +2578,7 @@
           [
             "active",
             "Active session",
-            "Active journeys hide bottom controls including the mixer toggle in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. While visible, the reveal zone yields pointer events to the control strip so its buttons remain clickable. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop."
+            "A single numeric remaining-time display lives inside the bottom-right floating control bar beside Journey Tuning, Pause/Resume, icon-only Skip and Close. The old mirrored top-corner rings are removed. Active journeys hide the whole bar in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. While visible, the reveal zone yields pointer events to the control strip so its buttons remain clickable. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop."
           ]
         ],
         [
@@ -2624,7 +2624,7 @@
           [
             "fullscreen",
             "User fullscreen",
-            "Track fullscreen on app container. Bottom controls share normal-journey hover/touch/keyboard behavior; fullscreen top timers still follow the reveal state."
+            "Track fullscreen on app container. The timer stays inside the bottom-right controls; fullscreen controls reveal/hide as one unit using the existing hover/touch/keyboard behavior."
           ]
         ]
       ],

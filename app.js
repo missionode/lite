@@ -306,7 +306,7 @@ function formatClockDuration(durationMs) {
 }
 
 function setSessionCountdown(remainingMs, totalMs) {
-    sessionCountdownDisplay.renderProgress(document, remainingMs, totalMs);
+    sessionCountdownDisplay.renderDisplay(document, remainingMs, totalMs);
 }
 
 function hideSessionCountdown() {

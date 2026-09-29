@@ -1025,7 +1025,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Active session | Active journeys hide bottom controls including the mixer toggle in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. While visible, the reveal zone yields pointer events to the control strip so its buttons remain clickable. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop. |
+| Active session | A single numeric remaining-time display lives inside the bottom-right floating control bar beside Journey Tuning, Pause/Resume, icon-only Skip and Close. The old mirrored top-corner rings are removed. Active journeys hide the whole bar in normal and fullscreen views. Hover bottom/control area to reveal; leave for 180 ms to hide. While visible, the reveal zone yields pointer events to the control strip so its buttons remain clickable. Cursor hides after 3s idle and returns on movement without revealing controls elsewhere. Touch/pen tap reveals controls for 3s; keyboard focus reveals them. Open mixer preserves visibility and cursor; session exit/page hiding clears timers and hidden cursor. Sleep and Eyes Close use opacity factors instead of ancestor filters, keeping fixed controls/reveal area viewport-positioned. One-shot timers and class observation, no animation loop. |
 | Pause | Non-Lobby/Settings screens already have static sky and decorative effects. Set isPaused; freeze stage countdowns; cancel browser speech; pause Piper; suspend AudioContext. |
 | Open Journey Tuning | Opening mixer does not pause. Volume, voice, space, ambience, brightness and suppression controls apply live. |
 | Stop | Cancel narration jobs/timers; Piper fades over two seconds, mantra/music/ambience over eight seconds with effect tails. Do not restore music during Stop. Browser speech cancellation remains immediate. Stop visuals, resolve guide wait false and hide controls/mixer. |
@@ -1033,7 +1033,7 @@ flowchart TD
 | Tap chakra image | Toggle session text overlay; session continues. |
 | Return screen | Experiment → Experiment screen; other modes → Lobby. No completion statistics. |
 | Guide waiting | Continue is accepted only when active and not paused; Stop releases the pending wait. |
-| User fullscreen | Track fullscreen on app container. Bottom controls share normal-journey hover/touch/keyboard behavior; fullscreen top timers still follow the reveal state. |
+| User fullscreen | Track fullscreen on app container. The timer stays inside the bottom-right controls; fullscreen controls reveal/hide as one unit using the existing hover/touch/keyboard behavior. |
 
 - The app no longer requests or exits fullscreen automatically. Browser-speech cancellation and Piper buffer suspension are different pause mechanisms. Re-enable No Mantra does not immediately restart a previously skipped mantra stage.
 - CP-MOD-108–127 moves the shared countdown SVG progress and hide presentation helpers into `modules/session-countdown.js`; ticker cadence and session lifecycle remain unchanged.

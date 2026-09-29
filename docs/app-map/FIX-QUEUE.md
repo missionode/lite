@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — single timer in floating journey controls
+
+Consolidated the mirrored upper-corner circular timers into one readable numeric countdown inside the bottom-right control bar. The bar now aligns its timer, Journey Tuning, Pause/Resume, icon-only Skip and Close as one compact row; Skip keeps its localized screen-reader label. Countdown lifecycle, pause behavior and timing cadence are unchanged. Refreshed the app-shell, stylesheet and countdown-module caches. Focused countdown, control, journey-chrome, fullscreen/prelude and spatial-audio contracts pass; browser layout remains for owner review.
+
 ## Completed — Piper runtime field and browser preview fallback
 
 Declared and initialized the private `_modelBaseUrl` WeakMap used by community-voice model loading; before this fix, Piper threw a `ReferenceError` and could not load the selected model. On Settings preview failure, the app now speaks the same sample with the first browser voice matching the active language (or system default), reflects that temporary fallback in the picker and reports fallback status. It is not persisted until settings are saved. Piper service-worker assets use a new cache generation to replace stale runtime code. Native browser speech is outside the Web Audio effects chain, so Voice Space applies to Piper playback but not the fallback itself. Focused runtime, fallback and language tests pass; mobile audio was not device-verified.

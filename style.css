@@ -406,9 +406,10 @@ body {
     }
 
     #controls {
-        gap: 1rem !important;
+        gap: 0.4rem !important;
+        right: max(8px, env(safe-area-inset-right, 0px)) !important;
         bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-        padding: 8px 12px !important;
+        padding: 6px !important;
     }
 
     #volume-mixer { padding-inline: 0.75rem; }
@@ -1252,35 +1253,24 @@ body.undo-unlearn-active #chakra-symbol, body.undo-unlearn-active #glow-effect, 
 }
 
 .session-countdown {
-    width: clamp(2.65rem, 5.5vw, 3.4rem);
-    aspect-ratio: 1;
-    position: fixed;
-    top: max(1rem, env(safe-area-inset-top));
-    margin: 0;
-    color: var(--accent-color);
-    opacity: 0.24;
-    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent-color) 28%, transparent));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 4.4rem;
+    height: 2.75rem;
+    padding: 0 0.45rem;
+    color: var(--accent-color, #f2c875);
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--accent-color, #f2c875) 24%, transparent);
     pointer-events: none;
-    z-index: 12;
-}
-
-#session-countdown-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    pointer-events: none;
-}
-
-.session-countdown-left {
-    left: max(1rem, env(safe-area-inset-left));
-}
-
-.session-countdown-right {
-    right: max(1rem, env(safe-area-inset-right));
 }
 
 /* The symbol/deity is the visual anchor. Keep supporting metadata quiet and
-   leave the mirrored journey timers at the screen edges. */
+   leave the timer within the floating journey controls. */
 #session-overlay #mantra-display {
     position: fixed;
     left: 50%;
@@ -1306,36 +1296,6 @@ body.undo-unlearn-active #chakra-symbol, body.undo-unlearn-active #glow-effect, 
 
 #session-overlay #progress-tracker .dot.active {
     box-shadow: none;
-}
-
-.session-countdown-ring {
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-}
-
-.session-countdown-track,
-.session-countdown-progress {
-    fill: rgba(255, 255, 255, 0.025);
-    stroke-width: 3;
-}
-
-.session-countdown-track {
-    stroke: rgba(255, 255, 255, 0.12);
-}
-
-.session-countdown-progress {
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-dasharray: 276.46;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.35s linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .session-countdown-progress { transition: none; }
 }
 
 #progress-tracker {
@@ -1365,10 +1325,43 @@ body.undo-unlearn-active #chakra-symbol, body.undo-unlearn-active #glow-effect, 
 }
 
 #controls {
+    position: fixed;
+    right: max(15px, env(safe-area-inset-right));
+    bottom: max(15px, env(safe-area-inset-bottom));
+    left: auto;
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 2.5rem;
-    margin-top: 2rem;
+    gap: 0.5rem;
+    width: max-content;
+    max-width: calc(100vw - 1rem);
+    margin: 0;
+    padding: 0.5rem;
+    border: 1px solid rgba(202, 172, 105, 0.5);
+    border-radius: 999px;
+    background: rgba(4, 9, 18, 0.96);
+    z-index: 1000;
+}
+
+#controls .icon-btn {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1rem;
+    backdrop-filter: none;
+}
+
+#skip-meditation svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 360px) {
+    #controls { gap: 0.2rem !important; padding: 0.25rem !important; }
+    .session-countdown { min-width: 3.5rem; padding-inline: 0.2rem; }
 }
 
 /* All journeys reveal controls at the bottom edge, or with keyboard focus. */
@@ -1389,7 +1382,7 @@ body.journey-controls-active #fullscreen-controls-reveal-zone {
 }
 
 body.journey-controls-active #controls:not(.hidden),
-body.journey-fullscreen-active #session-countdown-layer {
+body.journey-fullscreen-active #controls:not(.hidden) {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
@@ -1400,7 +1393,7 @@ body.journey-controls-active #controls:not(.hidden) {
 }
 
 body.journey-controls-active.fullscreen-controls-visible #controls:not(.hidden),
-body.journey-fullscreen-active.fullscreen-controls-visible #session-countdown-layer {
+body.journey-fullscreen-active.fullscreen-controls-visible #controls:not(.hidden) {
     opacity: 1;
 }
 

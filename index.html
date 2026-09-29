@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.11">
+    <link rel="stylesheet" href="style.css?v=2.12">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -603,23 +603,6 @@
             </div>
         </section>
 
-        <!-- Journey-level timer lives outside individual screens so it remains
-             visible from preparation through the final closing stage. -->
-        <div id="session-countdown-layer" aria-hidden="true">
-            <div id="session-countdown" class="session-countdown session-countdown-left" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">
-                <svg class="session-countdown-ring" viewBox="0 0 100 100" aria-hidden="true">
-                    <circle class="session-countdown-track" cx="50" cy="50" r="44"></circle>
-                    <circle id="session-countdown-progress-left" data-session-countdown-progress class="session-countdown-progress" cx="50" cy="50" r="44"></circle>
-                </svg>
-            </div>
-            <div id="session-countdown-right" class="session-countdown session-countdown-right" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">
-                <svg class="session-countdown-ring" viewBox="0 0 100 100" aria-hidden="true">
-                    <circle class="session-countdown-track" cx="50" cy="50" r="44"></circle>
-                    <circle id="session-countdown-progress-right" data-session-countdown-progress class="session-countdown-progress" cx="50" cy="50" r="44"></circle>
-                </svg>
-            </div>
-        </div>
-
         <!-- Restart-only cinematic prelude. Fullscreen is user-controlled. -->
         <section id="journey-video-prelude" class="journey-video-prelude hidden" aria-label="Journey introduction" aria-live="polite">
             <img class="journey-video-prelude-meditator" src="video/meditator.png" alt="Meditator preparing for the journey" aria-hidden="true">
@@ -723,11 +706,14 @@
         <div id="fullscreen-controls-reveal-zone" aria-hidden="true"></div>
 
         <!-- Global In-Session Controls (visible across all meditation screens) -->
-        <div id="controls" class="hidden" style="position: fixed; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 10px; backdrop-filter: blur(10px); z-index: 1000;">
-            <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
-            <button id="pause-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">II</button>
-            <button id="skip-meditation" class="icon-btn" type="button" disabled data-i18n="ui.skipCurrentItem" data-i18n-aria-label="ui.skipCurrentItem" aria-label="Skip current item">Skip</button>
-            <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
+        <div id="controls" class="hidden journey-control-panel" aria-label="Session controls">
+            <div id="session-countdown" class="session-countdown" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">00:00</div>
+            <button id="btn-mixer" class="icon-btn" type="button" aria-label="Journey tuning">🎚</button>
+            <button id="pause-meditation" class="icon-btn" type="button" aria-label="Pause or resume">II</button>
+            <button id="skip-meditation" class="icon-btn" type="button" disabled data-i18n-aria-label="ui.skipCurrentItem" aria-label="Skip current item">
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M5 5v14l10-7L5 5Zm11 0h3v14h-3V5Z" fill="currentColor"/></svg>
+            </button>
+            <button id="stop-meditation" class="icon-btn" type="button" aria-label="Close session">✕</button>
         </div>
 
         <!-- Completion Modal -->
@@ -811,7 +797,7 @@
     <script src="modules/mixer-view.js?v=1.0"></script>
     <script src="modules/media-controls-view.js?v=1.0"></script>
     <script src="modules/session-estimate.js?v=1.0"></script>
-    <script src="modules/session-countdown.js?v=1.0"></script>
+    <script src="modules/session-countdown.js?v=1.1"></script>
     <script src="modules/session-item-runner.js?v=1.0"></script>
     <script src="modules/mood-ambience-settings-view.js?v=1.0"></script>
     <script src="modules/drone-duration-settings-view.js?v=1.0"></script>

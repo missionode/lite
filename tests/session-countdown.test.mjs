@@ -8,8 +8,17 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /this\.sessionCountdown = new window\.ChakraSessionCountdown/);
 assert.match(app, /startSessionCountdown\(totalMs\)\s*\{\s*this\.sessionCountdown\.start\(totalMs\);/);
-assert.match(html, /modules\/session-countdown\.js\?v=1\.0[\s\S]*?app\.js\?v=4.14/);
-assert.match(serviceWorker, /modules\/session-countdown\.js\?v=1\.0/);
+assert.match(html, /modules\/session-countdown\.js\?v=1\.1[\s\S]*?app\.js\?v=4.14/);
+assert.match(serviceWorker, /modules\/session-countdown\.js\?v=1\.1/);
+assert.equal((html.match(/data-session-countdown/g) || []).length, 1, 'the page contains exactly one timer');
+assert.match(html, /id="controls"[^>]*>[\s\S]*?id="session-countdown"[^>]*data-session-countdown/,
+    'the single numeric timer is inside the floating session controls');
+assert.doesNotMatch(html, /session-countdown-(?:layer|right)|session-countdown-ring|data-session-countdown-progress/,
+    'duplicate corner timers and circular progress markup are removed');
+assert.match(html, /id="skip-meditation"[^>]*>[\s\S]*?<svg[\s\S]*?<\/button>/,
+    'Skip displays an icon while retaining its accessible translated name');
+assert.doesNotMatch(html.match(/id="skip-meditation"[^>]*>([\s\S]*?)<\/button>/)?.[1] || '', />\s*Skip\s*</,
+    'Skip has no visible text label');
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -18,20 +27,18 @@ assert.equal(typeof Countdown, 'function');
 assert.throws(() => new Countdown({}), /requires clock, timer/);
 const displayApi = context.ChakraSessionCountdownDisplay;
 assert.ok(Object.isFrozen(displayApi));
-const countdownNodes = [{ hidden: true }];
-const progressNodes = [{ style: {} }];
+const countdownNodes = [{ hidden: true, textContent: '' }];
 const countdownDocument = {
-    querySelectorAll(selector) {
-        return selector === '[data-session-countdown]' ? countdownNodes : progressNodes;
-    }
+    querySelectorAll: selector => selector === '[data-session-countdown]' ? countdownNodes : []
 };
-displayApi.renderProgress(countdownDocument, 50, 100);
+displayApi.renderDisplay(countdownDocument, 59_500, 100_000);
 assert.equal(countdownNodes[0].hidden, false);
-assert.equal(Number(progressNodes[0].style.strokeDashoffset).toFixed(2), '138.23');
-displayApi.renderProgress(countdownDocument, Number.NaN, 0);
+assert.equal(countdownNodes[0].textContent, '01:00', 'the timer rounds up so it never appears to skip a second');
+assert.equal(displayApi.formatRemainingTime(3_661_000), '01:01:01', 'long sessions show hours when needed');
+displayApi.renderDisplay(countdownDocument, Number.NaN, 0);
 assert.equal(countdownNodes[0].hidden, true, 'invalid display totals hide the countdown');
-displayApi.renderProgress(countdownDocument, -10, 100);
-assert.equal(Number(progressNodes[0].style.strokeDashoffset), 276.46, 'remaining time clamps to zero progress');
+displayApi.renderDisplay(countdownDocument, -10, 100);
+assert.equal(countdownNodes[0].textContent, '00:00', 'remaining time clamps to zero');
 displayApi.hideDisplay(countdownDocument);
 assert.equal(countdownNodes[0].hidden, true);
 
