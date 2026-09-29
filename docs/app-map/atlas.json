@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-28",
-    "commit": "d205e49 production baseline + uncommitted assessment-result-visual-cue/166/167 + CP-THEME-IMPL-001/002/003",
-    "scope": "Focused release map: Tamil is a manifest-backed display and narration language with translated UI, scripts, preview sample and community Rasa Piper voice; Hindi also offers the community Priyamvada Piper voice. Voice selection filters by language, uses the configured default, and fetches model weights on first preview/use. Shell, locale and Piper registry cache versions refresh so local clients can discover the update. Other journey behavior is unchanged. Model weights are fetched on demand; device playback was not verified. Piper custom-repository loading now declares its private model-base URL field, advances the Piper cache generation, and falls back to a language-matched browser voice for a failed Settings preview; the chosen fallback is not saved until explicit settings save. CP-MOD-166 moves the standard chakra sequence behind a stable controller adapter without changing its routes or order. CP-MOD-167 moves the standard journey interval, silence and closing transitions behind their existing controller adapters; user-flow topology is unchanged. Assessment results show actual per-chakra response counts and relative answer-support labels instead of percentage confidence; the lowest-support prompt requires minimum evidence across all seven chakras and groups near-ties. Cards use a labeled lavender/amber/aqua three-step indicator; possible focus candidates have a distinct gold outline and tag. Focused engine/UI/persistence tests pass. The assessment-visual-cue browser review is pending; no visual parity or performance claim is made. CP-THEME-IMPL-001/002/003 add the Lobby visual foundation, Settings-linked Sky Observatory, static one-shot sky on journey/support pages and readable supporting surfaces. Only Observatory animates; Lobby/Settings hide the canvas. No browser or measured performance claim is made."
+    "date": "2026-09-29",
+    "commit": "2b1b71f production baseline + uncommitted Skip/orientation release",
+    "scope": "Production release candidate: a one-tap Skip control cancels the current planned session item and resumes the remaining flow; first-time chakra orientation uses a gender-neutral aura scene and translated chakra labels/narration for English, Malayalam, Hindi, Russian and Tamil. UI locale cache and shell cache are refreshed. Browser visual/device checks were not run."
   },
   "graphs": [
     {
@@ -298,7 +298,7 @@
       "group": "Start here",
       "title": "Modularization safety loop",
       "subtitle": "Atlas-led, behavior-preserving extraction with one independently verifiable boundary per checkpoint.",
-      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/newcomer-marker-layout.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:1; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/newcomer-marker-layout.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1; modules/audio-drone-stop.js:1; tests/audio-drone-stop.test.mjs:1; modules/audio-mantra-playback.js:1; tests/audio-mantra-playback.test.mjs:1; modules/audio-background-music-lifecycle.js:1; tests/audio-background-music-lifecycle.test.mjs:1; modules/audio-background-music-controls.js:1; tests/audio-background-music-controls.test.mjs:1; modules/audio-music-echo.js:1; tests/audio-music-echo.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/script-source-settings.js:1; tests/script-source-settings.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/completion-view.js:1; tests/completion-view.test.mjs:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/drone-duration-settings-view.js:1; tests/drone-duration-settings-view.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; tests/timing-settings.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; tests/visual-effect.test.mjs:1; tests/piper-lifecycle.test.mjs:1; tests/completion-view.test.mjs:1; tests/media-controls-view.test.mjs:1; tests/demo-script.test.mjs:1; tests/content-localization.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/shot-session.js:1; tests/shot-session.test.mjs:1; modules/sleep-journey.js:1; tests/sleep-journey.test.mjs:1; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1; tests/completion-session.test.mjs:1",
+      "source": "modules/settings-backup.js:1; modules/app-state.js:1; modules/content-localization.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; modules/journey-routing.js:1; modules/practice-module-loader.js:1; modules/journey-chrome.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/dharana-practice.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/screen-navigation.js:1; modules/session-estimate.js:1; modules/session-countdown.js:1; modules/session-item-runner.js:1; modules/mood-ambience-settings-view.js:1; modules/drone-duration-settings-view.js:1; modules/lobby-experience-visibility.js:1; modules/yoga-experience-settings.js:1; modules/range-controls.js:1; modules/journey-roadmap.js:1; modules/locale-ui-renderer.js:1; modules/timing-settings.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; tests/journey-chrome.test.mjs:1; tests/practice-module-loader.test.mjs:1; tests/e2e/modularization-baseline.spec.js:1; tests/e2e/practice-modules-lazy-load.spec.js:1; tests/e2e/optional-video-lazy-load.spec.js:1; tests/journey-video-prelude.test.mjs:1; modules/journey-video-prelude.js:1; app.js:1; index.html:769; sw.js:1; tests/journey-routing.test.mjs:1; tests/screen-navigation.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/session-item-runner.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; tests/lobby-experience-visibility.test.mjs:1; tests/yoga-experience-settings.test.mjs:1; tests/range-controls.test.mjs:1; tests/journey-roadmap.test.mjs:1; tests/locale-ui-renderer.test.mjs:1; tests/timing-settings.test.mjs:1; docs/app-map/FIX-QUEUE.md:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; modules/audio-engine-initialization.js:1; tests/audio-engine-initialization.test.mjs:1; modules/audio-signal-design.js:1; tests/audio-signal-design.test.mjs:1; modules/audio-spatial-geometry.js:1; tests/audio-spatial-geometry.test.mjs:1; modules/audio-elemental-layer.js:1; tests/audio-elemental-layer.test.mjs:1; modules/audio-tone-playback.js:1; tests/audio-tone-playback.test.mjs:1; modules/audio-drone-start.js:1; tests/audio-drone-start.test.mjs:1; modules/audio-drone-stop.js:1; tests/audio-drone-stop.test.mjs:1; modules/audio-mantra-playback.js:1; tests/audio-mantra-playback.test.mjs:1; modules/audio-background-music-lifecycle.js:1; tests/audio-background-music-lifecycle.test.mjs:1; modules/audio-background-music-controls.js:1; tests/audio-background-music-controls.test.mjs:1; modules/audio-music-echo.js:1; tests/audio-music-echo.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/script-source-settings.js:1; tests/script-source-settings.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/completion-view.js:1; tests/completion-view.test.mjs:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/drone-duration-settings-view.js:1; tests/drone-duration-settings-view.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; tests/timing-settings.test.mjs:1; tests/session-estimate.test.mjs:1; tests/session-countdown.test.mjs:1; tests/mood-ambience-settings-view.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; tests/visual-effect.test.mjs:1; tests/piper-lifecycle.test.mjs:1; tests/completion-view.test.mjs:1; tests/media-controls-view.test.mjs:1; tests/demo-script.test.mjs:1; tests/content-localization.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/shot-session.js:1; tests/shot-session.test.mjs:1; modules/sleep-journey.js:1; tests/sleep-journey.test.mjs:1; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1; tests/completion-session.test.mjs:1",
       "rows": [
         [
           [
@@ -1001,7 +1001,7 @@
       "group": "Journeys",
       "title": "Standard chakra journey",
       "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
-      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; index.html:448; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1601; app.js:1634; app.js:1653; app.js:1875; app.js:1994; app.js:1998; app.js:2059; app.js:2095; app.js:2254; app.js:2258",
+      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/session-item-runner.js:1; tests/session-item-runner.test.mjs:1; index.html:448; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1601; app.js:1634; app.js:1653; app.js:1875; app.js:1994; app.js:1998; app.js:2059; app.js:2095; app.js:2254; app.js:2258",
       "rows": [
         [
           [
@@ -1014,7 +1014,7 @@
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. The static standing body-map illustration has fixed English chakra names and leader lines embedded in the artwork. Its separate language-specific names, locations and curved arrowheads remain responsive but are deliberately faded to supporting guidance. `modules/newcomer-marker-layout.js` owns the ResizeObserver/image-load measurements, normalized anchors, coalesced frame updates and listener/observer cleanup; the spoken orientation follows the Meditation Language before Arriving."
+            "Only for a normal standard journey when Returning Journey is unchecked. A gender-neutral aura scene highlights each chakra in sequence with its symbol and translated name/location caption. Spoken orientation uses the Meditation Language, then proceeds to Arriving. Skip cancels the current narration and continues with the next planned journey item."
           ]
         ],
         [
@@ -1107,7 +1107,7 @@
         [
           "newcomer",
           "setup",
-          "Narration complete"
+          "Narration complete or Skip"
         ],
         [
           "begin",
@@ -1192,13 +1192,114 @@
         ]
       ],
       "notes": [
-        "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps. Returning Journey is an explicit preference, not a record of prior sessions.",
+        "Demo is recognized from custom-script metadata and uses a short core duration. It omits Arrival/Emergence wrappers, not the entire standard preparation and closing flow. No Frequency suppresses tones while keeping the surrounding guidance and gaps. Returning Journey is an explicit preference, not a record of prior sessions. Current planned items can be skipped independently; the universal skip lifecycle is mapped separately.",
         "CP-MOD-167 moves the existing interval, silence and closing-stage lifecycles into `modules/journey-transition-stages.js` behind stable `handleInterval()`, `handleSilence()` and `runClosing()` adapters. Transition timing, pause/Stop behavior, narration completion, display opacity, affirmation and visual treatment stay unchanged; the graph topology is unchanged.",
         "CP-MOD-166 moves the existing standard chakra-stage loop and its optional integration/closing sequence into `modules/standard-journey-sequence.js` behind `MeditationController.runSequence()`. Music Only remains exclusive; chakra order, between-chakra intervals, optional Ho’oponopono/Undo, silence, closing, Emergence, completion and Stop guards are unchanged. This changes ownership only; journey topology and eager/offline loading remain unchanged.",
         "CP-MOD-059 moves the optional 432/528 Hz Arrival cues and Emergence sequence into `modules/journey-hypnosis-wrapper.js`. This is source ownership only: the standard journey order, wrapper eligibility, narration, pause timing, No Frequency quiet gaps and stop checks remain as mapped; no journey or performance change is claimed.",
         "CP-MOD-060 moves the existing shared guided-opening/Gratitude stage into `modules/journey-opening-stage.js`; preparation safety, optional Moon/Returning opening, Gratitude, private-intention narration, HRIM routing and Arrival readiness retain their prior order and guards. This is source ownership only.",
         "CP-MOD-061 moves the existing start-time content source and validation work behind `modules/journey-content-loader.js`; custom/default selection, same-language reuse, cache-before-validation order, validation context timing and failure exits remain unchanged. Source ownership only.",
         "CP-MOD-108–127 moves the conservative narration-duration estimate into `modules/session-estimate.js`; Malayalam character-rate, pacing factors, Piper multiplier, lead-in and sentence gaps remain injected from the existing app policies."
+      ]
+    },
+    {
+      "id": "session-skip",
+      "group": "Journeys",
+      "title": "Skip the current session item",
+      "subtitle": "The global Skip control cancels only the active planned item and carries on with the remaining sequence.",
+      "source": "modules/session-item-runner.js:1; modules/session-transport-controls.js:1; app.js:1104; index.html:729; tests/session-item-runner.test.mjs:1; tests/session-transport-controls.test.mjs:1",
+      "rows": [
+        [
+          [
+            "ready",
+            "Journey item active",
+            "Skip is disabled until an item starts. Pause remains independent."
+          ]
+        ],
+        [
+          [
+            "skip",
+            "Skip current item",
+            "Skip cancels narration, mantra, tones, ambience and visuals owned by the current item; its wrapper unwinds without stopping the journey."
+          ]
+        ],
+        [
+          [
+            "next",
+            "Continue planned flow",
+            "Resume at the next selected chakra, practice, interval, or closing stage. Skipping newcomer orientation bypasses it and proceeds directly to normal Arriving/setup; it does not bypass chakra validation."
+          ]
+        ],
+        [
+          [
+            "last",
+            "Last item skipped",
+            "The normal sequence completes through its existing finish path."
+          ]
+        ],
+        [
+          [
+            "stop",
+            "Stop journey",
+            "The separate Stop control ends the entire session and performs session cleanup."
+          ]
+        ],
+        [
+          [
+            "guard",
+            "Stale work guard",
+            "Stop, natural completion or restart invalidates pending item callbacks; they cannot revive a finished session."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "ready",
+          "skip",
+          "Tap Skip"
+        ],
+        [
+          "skip",
+          "next",
+          "Item unwinds"
+        ],
+        [
+          "next",
+          "last",
+          "No planned item remains"
+        ],
+        [
+          "next",
+          "ready",
+          "More planned items"
+        ],
+        [
+          "ready",
+          "stop",
+          "Tap Stop"
+        ],
+        [
+          "skip",
+          "stop",
+          "Stop instead"
+        ],
+        [
+          "last",
+          "stop",
+          "Completion cleanup"
+        ],
+        [
+          "stop",
+          "guard",
+          "Invalidate callbacks"
+        ],
+        [
+          "last",
+          "guard",
+          "Invalidate callbacks"
+        ]
+      ],
+      "notes": [
+        "All five visible UI locales provide a translated Skip label. This is source and deterministic-test evidence only; browser/device playback and visual behavior were not run."
       ]
     },
     {

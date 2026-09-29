@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.10">
+    <link rel="stylesheet" href="style.css?v=2.11">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -546,16 +546,15 @@
             <div class="newcomer-tutorial-content">
                 <h1 id="newcomer-tutorial-title" class="sr-only">Chakra orientation</h1>
                 <div id="newcomer-body-map" class="newcomer-body-map">
-                    <div class="newcomer-body-map-stage">
-                        <img src="symbols/newcomer-chakra-body-map.png" alt="Standing figure with seven illuminated chakra locations from the base of the spine to the crown of the head">
-                        <svg id="newcomer-marker-connectors" class="newcomer-marker-connectors" aria-hidden="true" preserveAspectRatio="none">
-                            <defs><marker id="newcomer-marker-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z"/></marker></defs>
-                            <path data-marker="crown"/><path data-marker="thirdeye"/><path data-marker="throat"/><path data-marker="heart"/><path data-marker="solar"/><path data-marker="sacral"/><path data-marker="root"/>
+                    <div class="newcomer-aura-scene" id="newcomer-aura-scene" data-active-chakra="root" aria-hidden="true">
+                        <svg viewBox="0 0 340 480" role="presentation" focusable="false">
+                            <defs><radialGradient id="newcomer-aura-core"><stop stop-color="#f4d58a" stop-opacity=".5"/><stop offset=".45" stop-color="#9278e8" stop-opacity=".2"/><stop offset="1" stop-color="#526fbc" stop-opacity="0"/></radialGradient><linearGradient id="newcomer-aura-axis" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#ff765e" stop-opacity=".48"/><stop offset=".5" stop-color="#8adfd5" stop-opacity=".62"/><stop offset="1" stop-color="#c6a5ff" stop-opacity=".62"/></linearGradient><filter id="newcomer-aura-blur"><feGaussianBlur stdDeviation="18"/></filter></defs>
+                            <ellipse cx="170" cy="245" rx="102" ry="204" fill="url(#newcomer-aura-core)" filter="url(#newcomer-aura-blur)"/><ellipse cx="170" cy="245" rx="66" ry="186" fill="none" stroke="#c2bbff" stroke-opacity=".14"/><ellipse cx="170" cy="245" rx="44" ry="167" fill="none" stroke="#96dcd9" stroke-opacity=".18"/><path d="M170 414 C143 350 193 319 170 277 C149 237 190 207 170 166 C153 126 182 92 170 65" fill="none" stroke="url(#newcomer-aura-axis)" stroke-width="2"/>
+                            <g fill="#d9d4ff" opacity=".58"><circle cx="91" cy="132" r="1.4"/><circle cx="237" cy="168" r="1.2"/><circle cx="110" cy="287" r="1.2"/><circle cx="224" cy="332" r="1.5"/><circle cx="131" cy="80" r="1"/><circle cx="208" cy="408" r="1"/></g>
+                            <g class="newcomer-aura-node" data-focus="root" transform="translate(170 405)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="sacral" transform="translate(170 345)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="solar" transform="translate(170 285)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="heart" transform="translate(170 225)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="throat" transform="translate(170 165)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="thirdeye" transform="translate(170 105)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="crown" transform="translate(170 55)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g>
                         </svg>
-                        <ol id="newcomer-guided-labels" class="newcomer-guided-labels" aria-label="The seven chakra locations">
-                            <li data-marker="crown" class="newcomer-label-crown"><strong data-i18n="ui.crown">Crown</strong><span data-i18n="ui.newcomerCrownLocation">top of head</span></li><li data-marker="thirdeye" class="newcomer-label-third-eye"><strong data-i18n="ui.thirdEye">Third Eye</strong><span data-i18n="ui.newcomerThirdEyeLocation">centre of forehead</span></li><li data-marker="throat" class="newcomer-label-throat"><strong data-i18n="ui.throat">Throat</strong><span data-i18n="ui.newcomerThroatLocation">throat area</span></li><li data-marker="heart" class="newcomer-label-heart"><strong data-i18n="ui.heart">Heart</strong><span data-i18n="ui.newcomerHeartLocation">centre of chest</span></li><li data-marker="solar" class="newcomer-label-solar"><strong data-i18n="ui.solar">Solar</strong><span data-i18n="ui.newcomerSolarLocation">upper abdomen</span></li><li data-marker="sacral" class="newcomer-label-sacral"><strong data-i18n="ui.sacral">Sacral</strong><span data-i18n="ui.newcomerSacralLocation">lower abdomen</span></li><li data-marker="root" class="newcomer-label-root"><strong data-i18n="ui.root">Root</strong><span data-i18n="ui.newcomerRootLocation">base of spine</span></li>
-                        </ol>
                     </div>
+                    <div class="newcomer-chakra-caption" aria-live="polite" aria-atomic="true"><img id="newcomer-chakra-symbol" src="symbols/root.png" alt=""><div><h2 id="newcomer-chakra-name" data-i18n="ui.root">Root</h2><p id="newcomer-chakra-location" data-i18n="ui.newcomerRootLocation">base of spine</p></div></div>
                 </div>
                 <p id="newcomer-guided-status" class="newcomer-guided-status" aria-live="polite" hidden></p>
             </div>
@@ -727,6 +726,7 @@
         <div id="controls" class="hidden" style="position: fixed; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 10px; backdrop-filter: blur(10px); z-index: 1000;">
             <button id="btn-mixer" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">🎚</button>
             <button id="pause-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">II</button>
+            <button id="skip-meditation" class="icon-btn" type="button" disabled data-i18n="ui.skipCurrentItem" data-i18n-aria-label="ui.skipCurrentItem" aria-label="Skip current item">Skip</button>
             <button id="stop-meditation" class="icon-btn" style="width: 40px; height: 40px; font-size: 0.8rem;">✕</button>
         </div>
 
@@ -812,7 +812,7 @@
     <script src="modules/media-controls-view.js?v=1.0"></script>
     <script src="modules/session-estimate.js?v=1.0"></script>
     <script src="modules/session-countdown.js?v=1.0"></script>
-    <script src="modules/newcomer-marker-layout.js?v=1.0"></script>
+    <script src="modules/session-item-runner.js?v=1.0"></script>
     <script src="modules/mood-ambience-settings-view.js?v=1.0"></script>
     <script src="modules/drone-duration-settings-view.js?v=1.0"></script>
     <script src="modules/lobby-experience-visibility.js?v=1.0"></script>
@@ -834,6 +834,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.13"></script>
+    <script src="app.js?v=4.14"></script>
 </body>
 </html>

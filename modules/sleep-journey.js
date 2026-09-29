@@ -23,6 +23,7 @@
                 startBtn.style.opacity = '0.5';
             }
             owner.isMeditationActive = true;
+            owner.sessionItemRunner?.reset();
             owner.isPaused = false;
             owner.isHighEnergy = false;
             owner.isHypnosisJourney = false;
@@ -45,21 +46,22 @@
             for (const [index, stage] of sleepStages.entries()) {
                 if (!owner.isMeditationActive) return;
                 setText('mantra-display', journeyT(`ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`));
-                owner.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
-
-                let remaining = stageDurationMs;
-                while (remaining > 0 && owner.isMeditationActive) {
-                    const step = Math.min(1000, remaining);
-                    await owner.pauseAwareSleep(step);
-                    if (!owner.isPaused) remaining -= step;
-                }
-                owner.stopStageDrone();
-                if (index < sleepStages.length - 1) await owner.pauseAwareSleep(3000);
+                await owner.runSessionItem(`Sleep stage ${stage.key}`, async () => {
+                    owner.startTimedSleepDrone(stage.frequency, state.timeSleepStage, state.sleepDroneDurationMode);
+                    let remaining = stageDurationMs;
+                    while (remaining > 0 && owner.isMeditationActive) {
+                        const step = Math.min(1000, remaining);
+                        await owner.pauseAwareSleep(step);
+                        if (!owner.isPaused) remaining -= step;
+                    }
+                    owner.stopStageDrone();
+                });
+                if (index < sleepStages.length - 1) await owner.runSessionItem('Sleep interval', () => owner.pauseAwareSleep(3000));
             }
 
             if (owner.isMeditationActive) {
                 owner.audio.fadeOutBackgroundMusic(12);
-                await owner.pauseAwareSleep(12000);
+                await owner.runSessionItem('Sleep ending fade', () => owner.pauseAwareSleep(12000));
                 if (owner.isMeditationActive) owner.finish();
             }
         }

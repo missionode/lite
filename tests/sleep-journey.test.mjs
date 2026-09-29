@@ -25,6 +25,8 @@ function harness(overrides = {}) {
         ...overrides.state
     };
     const owner = {
+        sessionItemRunner: { reset: () => events.push('runner-reset') },
+        async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
         isStarting: false,
         isMeditationActive: false,
         isPaused: false,

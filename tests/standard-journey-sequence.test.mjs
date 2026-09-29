@@ -10,6 +10,7 @@ assert.ok(sequence, 'the standard journey owner registers a public API');
 function createOwner({ chakraOrder = ['root', 'heart', 'crown'], active = true } = {}) {
     const events = [];
     const owner = {
+        async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
         chakraOrder,
         scripts: Object.fromEntries(chakraOrder.map(key => [key, `${key}-script`])),
         isMeditationActive: active,
@@ -63,7 +64,7 @@ const app = fs.readFileSync('app.js', 'utf8');
 const html = fs.readFileSync('index.html', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 assert.match(app, /async runSequence\(\{ complete = true \} = \{\}\)\s*\{\s*return standardJourneySequence\.run\(this, \{ state, isChecked: getChecked, complete \}\);/);
-assert.match(html, /modules\/standard-journey-sequence\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.12/);
+assert.match(html, /modules\/standard-journey-sequence\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.14/);
 assert.equal((sw.match(/\.\/modules\/standard-journey-sequence\.js\?v=1\.0/g) || []).length, 1,
     'the sequence owner is precached exactly once for offline use');
 console.log('Standard journey sequence passed: ordering, optional stages, partial completion, cancellation, Music Only and offline wiring.');

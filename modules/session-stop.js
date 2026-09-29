@@ -7,6 +7,7 @@
             document.body.classList.remove('noting-active');
             document.body.classList.remove('undo-unlearn-active');
             const returnScreen = owner.isExperimentActive ? experimentScreen : lobbyScreen;
+            owner.sessionItemRunner?.reset();
             owner.isMeditationActive = false;
             owner.isShotActive = false;
             owner.isHypnosisJourney = false;

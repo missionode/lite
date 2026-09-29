@@ -57,7 +57,10 @@
         async function runIntimateService(owner, deps) {
             const { state, showScreen, meditationScreen } = deps;
             if (!owner.isMeditationActive) return;
-            if (state.perinealCareEnabled && !await owner.runPerinealCare()) return;
+            if (state.perinealCareEnabled) {
+                const care = await owner.runSessionItem('Perineal Care', () => owner.runPerinealCare());
+                if (!care.skipped && care.value === false) return;
+            }
             if (state.massageEnabled) {
                 // Massage is held by a full Crown-to-Root chakra journey. When
                 // Assisted Bathing follows, defer closing until it is complete.
@@ -66,7 +69,7 @@
                 await owner.runSequence({ complete: !state.assistedBathingEnabled });
                 if (!owner.isMeditationActive) return;
             }
-            if (state.assistedBathingEnabled) await owner.runAssistedBathing();
+            if (state.assistedBathingEnabled) await owner.runSessionItem('Assisted bathing', () => owner.runAssistedBathing());
         }
 
         return Object.freeze({ runBathStage, runBathSession, runPerinealCare, runAssistedBathing, runIntimateService });
