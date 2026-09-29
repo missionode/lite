@@ -84,7 +84,8 @@ assert.match(html, /id="fullscreen-controls-reveal-zone"/, 'fullscreen should pr
 assert.match(app, /const journeyChrome = new window\.ChakraJourneyChrome\(\);/, 'the app should create an independent shared journey-chrome owner');
 assert.match(journeyChrome, /document\.addEventListener\('fullscreenchange', this\.syncFullscreenJourneyChrome\)[\s\S]*?syncFullscreenJourneyChrome\(\) \{[\s\S]*?document\.body\.classList\.toggle\('journey-fullscreen-active', isJourneyFullscreen\)/, 'the shared module should explicitly track whether the persistent app container is fullscreen');
 assert.match(journeyChrome, /this\.revealZone\?\.addEventListener\('pointerenter',[\s\S]*?setFullscreenChromeVisible\(true\)/, 'bottom edge hover reveals journey controls');
-assert.match(css, /body\.journey-controls-active #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active #session-countdown-layer[\s\S]*?opacity:\s*0[\s\S]*?body\.journey-controls-active\.fullscreen-controls-visible #controls:not\(\.hidden\),[\s\S]*?body\.journey-fullscreen-active\.fullscreen-controls-visible #session-countdown-layer[\s\S]*?opacity:\s*1/, 'fullscreen journey controls and top timers should remain hidden unless the explicit reveal state is active');
+assert.match(css, /body\.journey-controls-active #controls:not\(\.hidden\)[\s\S]*?opacity:\s*0[\s\S]*?body\.journey-controls-active\.fullscreen-controls-visible #controls:not\(\.hidden\)[\s\S]*?opacity:\s*1/, 'the timer remains within controls and follows their fullscreen reveal state');
+assert.doesNotMatch(css, /session-countdown-layer/, 'fullscreen no longer maintains a separate top-timer visibility layer');
 
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');

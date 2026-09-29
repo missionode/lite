@@ -1,23 +1,29 @@
 (function installSessionCountdown(global) {
     'use strict';
 
-    const CIRCUMFERENCE = 276.46;
+    function formatRemainingTime(remainingMs) {
+        const value = Number(remainingMs);
+        const seconds = Math.ceil(Math.max(0, Number.isFinite(value) ? value : 0) / 1000);
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainder = seconds % 60;
+        return hours > 0
+            ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`
+            : `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+    }
 
-    function renderProgress(document, remainingMs, totalMs) {
+    function renderDisplay(document, remainingMs, totalMs) {
         if (!document || typeof document.querySelectorAll !== 'function') throw new TypeError('Countdown display requires a document');
         const countdowns = document.querySelectorAll('[data-session-countdown]');
-        const progressNodes = document.querySelectorAll('[data-session-countdown-progress]');
         const total = Number(totalMs);
-        const remaining = Number(remainingMs);
-        if (!countdowns.length || !progressNodes.length || !Number.isFinite(total) || total <= 0) {
+        if (!countdowns.length || !Number.isFinite(total) || total <= 0) {
             countdowns.forEach(countdown => { countdown.hidden = true; });
             return;
         }
-        const safeRemaining = Math.min(total, Math.max(0, Number.isFinite(remaining) ? remaining : total));
-        const ratio = safeRemaining / total;
-        countdowns.forEach(countdown => { countdown.hidden = false; });
-        progressNodes.forEach(progress => {
-            progress.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - ratio));
+        const remaining = Number.isFinite(Number(remainingMs)) ? Number(remainingMs) : total;
+        countdowns.forEach(countdown => {
+            countdown.textContent = formatRemainingTime(remaining);
+            countdown.hidden = false;
         });
     }
 
@@ -87,5 +93,5 @@
     }
 
     global.ChakraSessionCountdown = SessionCountdown;
-    global.ChakraSessionCountdownDisplay = Object.freeze({ renderProgress, hideDisplay, circumference: CIRCUMFERENCE });
+    global.ChakraSessionCountdownDisplay = Object.freeze({ renderDisplay, hideDisplay, formatRemainingTime });
 })(typeof window === 'undefined' ? globalThis : window);

@@ -23,7 +23,8 @@ runner.reset();
 const html = read('index.html');
 const app = read('app.js');
 const sw = read('sw.js');
-assert.match(html, /id="skip-meditation"[^>]+data-i18n="ui\.skipCurrentItem"/);
+assert.match(html, /id="skip-meditation"[^>]+data-i18n-aria-label="ui\.skipCurrentItem"[\s\S]*?<svg[\s\S]*?<\/button>/,
+  'Skip is icon-only while preserving its translated accessible name.');
 assert.equal((sw.match(/\.\/modules\/session-item-runner\.js\?v=1\.0/g) || []).length, 1);
 for (const [file, ids] of [
   ['modules/sleep-journey.js',['Sleep stage','Sleep interval','Sleep ending fade']],

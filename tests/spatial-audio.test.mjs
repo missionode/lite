@@ -59,20 +59,19 @@ assert.match(audioEffectsSettingsView, /getElementById\('spatial-mode'\)\?\.addE
 assert.match(audioEffectsSettingsView, /getElementById\('mixer-spatial-mode'\)\?\.addEventListener\('change'/);
 assert.match(audioVoiceEffects, /const settings = voiceEchoSettings\[requestedMode\]/, 'Voice Space honors its own setting');
 assert.match(app, /off: \{\s*model: 'equalpower', lfo: 0,/, 'Off disables added pan motion');
-assert.match(html, /id="session-countdown"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a circular session countdown');
-assert.match(html, /id="session-countdown-right"[\s\S]*?data-session-countdown-progress/, 'The meditation view should expose a mirrored circular session countdown');
-assert.match(html, /id="session-countdown-layer"[\s\S]*?id="session-countdown-right"/, 'The countdown should live in a shared layer outside individual screens');
+assert.equal((html.match(/id="session-countdown"/g) || []).length, 1, 'The meditation view should expose exactly one session timer');
+assert.match(html, /id="controls"[^>]*>[\s\S]*?id="session-countdown"[^>]*role="timer"/, 'The timer should live inside the floating controls');
+assert.doesNotMatch(html, /session-countdown-layer|session-countdown-right|session-countdown-ring|data-session-countdown-progress/, 'The duplicated corner timers and circular countdown are removed');
 assert.doesNotMatch(html, /id="timer-display"/, 'The legacy text timer should be removed');
-assert.doesNotMatch(html, /data-session-countdown-value/, 'The circular countdown should not contain a numeric ticker');
+assert.match(html, /id="session-countdown"[^>]*>00:00<\/div>/, 'The countdown should be a plain numeric timer');
 assert.match(app, /startSessionCountdown\(totalMs\)/, 'The meditation controller should start one journey-level countdown');
 assert.match(app, /isActive: \(\) => this\.isMeditationActive[\s\S]*?isPaused: \(\) => this\.isPaused/,
     'The countdown owner should read live journey-active and pause state.');
 assert.match(app, /this\.startSessionCountdown\(this\.getSessionDurationMs\(focusedExperience\)\)/, 'The main journey should initialize its total duration once');
 assert.doesNotMatch(app, /setSessionCountdown\(remaining, chantDurationMs\)/, 'The circular countdown must not reset for each chakra');
 assert.doesNotMatch(app, /setSessionCountdown\(remaining, activeMs\)/, 'The circular countdown must not reset for each shot stage');
-assert.match(styles, /\.session-countdown\s*\{[\s\S]*?position:\s*fixed[\s\S]*?top:\s*max\(1rem, env\(safe-area-inset-top\)\)/, 'The countdown should stay pinned to the upper screen corners');
-assert.match(styles, /\.session-countdown\s*\{[\s\S]*?opacity:\s*0\.24/, 'The mirrored countdowns should remain visually subtle');
-assert.match(styles, /#session-countdown-layer\s*\{[\s\S]*?z-index:\s*100/, 'The shared countdown layer should remain above meditation content');
+assert.match(styles, /#controls\s*\{[\s\S]*?position:\s*fixed[\s\S]*?right:\s*max\(15px, env\(safe-area-inset-right\)\)[\s\S]*?left:\s*auto/, 'The controls should float as a right-aligned unit');
+assert.match(styles, /\.session-countdown\s*\{[\s\S]*?font-variant-numeric:\s*tabular-nums/, 'The timer should use a stable numeric display');
 assert.match(styles, /#session-overlay #mantra-display\s*\{[\s\S]*?opacity:\s*0\.48/, 'The chakra title should remain visually secondary');
 assert.match(styles, /#session-overlay #progress-tracker\s*\{[\s\S]*?opacity:\s*0\.34/, 'The progress dots should remain visually secondary');
 assert.match(styles, /#breathing-screen\s*\{[\s\S]*?position:\s*fixed[\s\S]*?height:\s*100dvh/, 'The breathing experience should fill the viewport responsively');

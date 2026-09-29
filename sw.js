@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.333';
+const CACHE_NAME = 'chakra-v5.334';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v57';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
@@ -13,7 +13,7 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.11',
+  './style.css?v=2.12',
   './app.js?v=4.14',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
@@ -84,7 +84,7 @@ const ASSETS = [
   './modules/session-transport-controls.js?v=1.0',
   './modules/completion-view.js?v=1.0',
   './modules/session-estimate.js?v=1.0',
-  './modules/session-countdown.js?v=1.0',
+  './modules/session-countdown.js?v=1.1',
   './modules/session-item-runner.js?v=1.0',
   './modules/mood-ambience-settings-view.js?v=1.0',
   './modules/drone-duration-settings-view.js?v=1.0',
