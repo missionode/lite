@@ -15,6 +15,7 @@ const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const hi = JSON.parse(fs.readFileSync(new URL('../locales/hi.json', import.meta.url), 'utf8'));
 const ru = JSON.parse(fs.readFileSync(new URL('../locales/ru.json', import.meta.url), 'utf8'));
+const ta = JSON.parse(fs.readFileSync(new URL('../locales/ta.json', import.meta.url), 'utf8'));
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
 
 for (const id of ['box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'yoga-experience-toggle']) assert.match(html, new RegExp(`id="${id}"`), `${id} should remain selectable in the Lobby`);
@@ -58,7 +59,7 @@ assert.match(app, /visualizationAmbienceGain\.gain\.setValueAtTime\(1, this\.ctx
 assert.match(mediaLifecycle, /source\.loop = true/, 'Visualization score uses the native seamless loop path for the full practice duration');
 assert.match(visualizationPractice, /ambience === 'silence'[\s\S]*?silenceWakePrompt[\s\S]*?sleep\(8000\)/, 'Silence mode should gently re-orient the meditator before the return prompt');
 assert.match(visualizationPractice, /setAmbienceDucked\(true, 0\.8\)[\s\S]*?narrate\(focusPrompt[\s\S]*?setAmbienceDucked\(false, 2\)/, 'Narration should duck and restore visualization ambience');
-assert.match(standardJourneySequence, /if \(owner\.isMeditationActive && isChecked\('hooponopono-experience-toggle'\)\) await owner\.runHooponopono\(\);[\s\S]*?await owner\.handleSilence\(\);[\s\S]*?await owner\.runClosing\(\);[\s\S]*?await owner\.runEmergence\(\)/, 'Ho’oponopono should run after chakras and before closing/emergence');
+assert.match(standardJourneySequence, /if \(owner\.isMeditationActive && isChecked\('hooponopono-experience-toggle'\)\) await owner\.runSessionItem\('Ho’oponopono', \(\) => owner\.runHooponopono\(\)\);[\s\S]*?await owner\.handleSilence\(\);[\s\S]*?await owner\.runClosing\(\);[\s\S]*?await owner\.runEmergence\(\)/, 'Ho’oponopono should run after chakras and before closing/emergence');
 assert.match(app, /clearFocusedExperiences\(target\)/, 'Standalone Experience Modes should remain mutually exclusive');
 assert.match(app, /clearFocusedExperiences\(\);/, 'Shots and other Experience Modes should clear focused practices');
 const focusedClearBody = app.slice(app.indexOf('function clearFocusedExperiences'), app.indexOf('function clearJourneyAddons'));
@@ -103,6 +104,16 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['visualizationAddon', 'visualizationAmbience', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationReturn', 'visualizationSilenceWakePrompt', 'roadmapVisualization', 'bodyScanAddon', 'bodyScanDuration', 'bodyScanTitle', 'roadmapBodyScan', 'notingAddon', 'notingSubtitle', 'notingDuration', 'notingTitle', 'roadmapNoting', 'undoUnlearnAddon', 'undoUnlearnSubtitle', 'undoUnlearnDuration', 'undoUnlearnTitle', 'roadmapUndoUnlearn']) {
         assert.ok(locale.ui[key]?.trim(), `locale ui.${key} is required`);
     }
+}
+
+for (const [language, locale, wording] of [
+    ['English', en, 'Rest comfortably. We will start with a centering breath.'],
+    ['Malayalam', ml, 'സുഖമായി വിശ്രമിക്കൂ. നമുക്ക് ഒരു ശാന്തമായ ശ്വാസത്തോടെ ആരംഭിക്കാം.'],
+    ['Hindi', hi, 'सहज होकर आराम करें। हम एक केंद्रित श्वास से शुरुआत करेंगे।'],
+    ['Russian', ru, 'Устройтесь поудобнее и отдохните. Начнём с центрирующего дыхания.'],
+    ['Tamil', ta, 'சௌகரியமாக ஓய்வெடுங்கள். மனதை ஒருமுகப்படுத்தும் மூச்சுடன் தொடங்குவோம்.']
+]) {
+    assert.equal(locale.system.centeringBreath, wording, `${language} centering narration should invite comfortable rest, not sitting`);
 }
 
 console.log('Focused Box Breathing and Ho’oponopono experience-mode contract passed.');

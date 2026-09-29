@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — No Frequency default selection
+
+Fresh profiles now default No Frequency Mode to ON, with both Settings and Journey Tuning checkboxes selected. A previously saved explicit ON or OFF remains respected; an opt-out is not overwritten on reload. The sound-options atlas now records the default and persistence rule. Updated app-state script and shell cache versions. State, No Frequency, audio mode, settings-backup, language/cache and hydration contracts pass. Interactive browser verification was not run.
+
 ## Completed locally — single timer in floating journey controls
 
 Consolidated the mirrored upper-corner circular timers into one readable numeric countdown inside the bottom-right control bar. The bar now aligns its timer, Journey Tuning, Pause/Resume, icon-only Skip and Close as one compact row; Skip keeps its localized screen-reader label. Countdown lifecycle, pause behavior and timing cadence are unchanged. Refreshed the app-shell, stylesheet and countdown-module caches. Focused countdown, control, journey-chrome, fullscreen/prelude and spatial-audio contracts pass; browser layout remains for owner review.
