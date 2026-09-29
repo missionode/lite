@@ -32,6 +32,7 @@
                 owner.audio.stopBackgroundMusic();
                 owner.audio.stopMantraTrack();
                 owner.isMeditationActive = true;
+                owner.sessionItemRunner?.reset();
                 owner.sessionStartedAt = Date.now();
                 showScreen(meditationScreen);
                 document.getElementById('controls')?.classList.remove('hidden');
@@ -75,15 +76,17 @@
                                     ? t('ui.customShot')
                                     : t(stageLabelPath);
                     setText('mantra-display', stageLabel === stageLabelPath ? stage.key : journeyT(stageLabelPath));
-                    owner.audio.startFrequencyShot(stage.frequency);
-                    let remaining = activeMs;
-                    while (remaining > 0 && owner.isMeditationActive) {
-                        const step = Math.min(100, remaining);
-                        await owner.pauseAwareSleep(step);
-                        if (!owner.isPaused) remaining -= step;
-                    }
-                    owner.audio.stopFrequencyShot();
-                    if (index < stages.length - 1) await owner.pauseAwareSleep(intervalMs);
+                    await owner.runSessionItem(`Shot ${stageLabel}`, async () => {
+                        owner.audio.startFrequencyShot(stage.frequency);
+                        let remaining = activeMs;
+                        while (remaining > 0 && owner.isMeditationActive) {
+                            const step = Math.min(100, remaining);
+                            await owner.pauseAwareSleep(step);
+                            if (!owner.isPaused) remaining -= step;
+                        }
+                        owner.audio.stopFrequencyShot();
+                    });
+                    if (index < stages.length - 1) await owner.runSessionItem('Shot interval', () => owner.pauseAwareSleep(intervalMs));
                 }
                 if (owner.isMeditationActive) finish(owner, deps);
             } catch (error) {
@@ -104,6 +107,7 @@
             document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
             owner.audio.stopFrequencyShot();
             owner.isMeditationActive = false;
+            owner.sessionItemRunner?.reset();
             owner.isShotActive = false;
             owner.sessionStartedAt = null;
             owner.visual.stop();
@@ -125,6 +129,7 @@
             const { document, wakeLock, showScreen, lobbyScreen } = deps;
             owner.audio.stopFrequencyShot();
             owner.isMeditationActive = false;
+            owner.sessionItemRunner?.reset();
             owner.isShotActive = false;
             owner.sessionStartedAt = null;
             owner.visual.stop();

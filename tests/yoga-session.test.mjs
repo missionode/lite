@@ -26,6 +26,7 @@ const state = {
 };
 const elements = Object.fromEntries(['icebreaker-title', 'icebreaker-subtitle', 'icebreaker-timer', 'chakra-symbol', 'mantra-display', 'aura-bg'].map(id => [id, { style: {}, textContent: '' }]));
 const owner = {
+    async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
     isMeditationActive: true,
     isPaused: false,
     scripts: { yoga: { intro: 'intro', preparation: 'prep', poses: [{ id: 'vrikshasana' }], next_pose_prompt: 'next', session_complete: 'done' } },

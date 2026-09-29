@@ -219,20 +219,6 @@ body {
 .newcomer-kicker { color: rgba(251, 191, 36, 0.82); font-size: 0.7rem; letter-spacing: 0.2em; margin: 0 0 0.65rem; }
 .newcomer-tutorial-content > .subtitle { max-width: 40rem; margin: 0 auto 1rem; }
 .newcomer-body-map { display: grid; justify-items: center; margin: 0 auto; color: rgba(255,255,255,0.72); font-size: 0.76rem; }
-.newcomer-body-map-stage { position: relative; width: clamp(245px, 62vw, 390px); max-width: 100%; }
-.newcomer-body-map img { display: block; width: 100%; max-height: 68dvh; object-fit: contain; filter: drop-shadow(0 0 14px rgba(125, 88, 210, 0.28)); }
-.newcomer-marker-connectors { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0.62; }
-.newcomer-marker-connectors path[data-marker] { fill: none; stroke: rgba(230, 222, 255, 0.78); stroke-width: 1.25; vector-effect: non-scaling-stroke; marker-end: url(#newcomer-marker-arrow); }
-.newcomer-marker-connectors marker path { fill: rgba(230, 222, 255, 0.9); }
-.newcomer-guided-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; color: rgba(255,255,255,0.96); font-size: clamp(0.58rem, 1.8vw, 0.74rem); pointer-events: none; opacity: 1; }
-.newcomer-guided-labels li { position: absolute; display: grid; top: var(--marker-y); width: 34%; line-height: 1.2; text-align: left; text-shadow: 0 1px 5px #06030e; transform: translateY(-50%); padding: 0.35rem 0.45rem; border: 1px solid rgba(202,172,105,0.42); border-radius: 0.55rem; background: rgba(5,10,20,0.94); }
-/* Each connector is calibrated to the actual marker centre in the standing
-   illustration (the figure uses a stable 2:3 aspect ratio). */
-.newcomer-guided-labels li:nth-child(odd) { right: -22%; text-align: left; }.newcomer-guided-labels li:nth-child(even) { left: -22%; text-align: right; }
-.newcomer-label-crown { --marker-y: 7%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-third-eye { --marker-y: 16%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-throat { --marker-y: 27%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-heart { --marker-y: 38%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-solar { --marker-y: 49%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-sacral { --marker-y: 60%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }.newcomer-label-root { --marker-y: 70%; --arrow-y: 50%; --arrow-width: 114%; --arrow-angle: 0deg; }
-.newcomer-guided-labels strong { color: rgba(255,255,255,0.94); font-weight: 600; }
-.newcomer-guided-labels span { color: rgba(230,235,244,0.9); font-size: 0.63rem; }
-.newcomer-body-map p { max-width: 22rem; margin: 0.35rem 0 0; }
 .newcomer-guided-status { margin: 0.85rem 0 0; color: rgba(251, 191, 36, 0.9); font-size: 0.82rem; }
 .newcomer-reassurance, .newcomer-section { border: 1px solid rgba(202, 172, 105, 0.42); background: rgba(7, 13, 24, 0.96); border-radius: 16px; padding: 1rem; margin-top: 0.9rem; line-height: 1.55; }
 .newcomer-reassurance { color: rgba(255,255,255,0.86); }
@@ -244,15 +230,22 @@ body {
 .newcomer-centres span { display: block; color: rgba(255,255,255,0.65); font-size: 0.76rem; margin-top: 0.15rem; }
 .newcomer-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.25rem; }
 
-@media (max-width: 600px) {
-    .newcomer-centres { grid-template-columns: 1fr; }
-    .newcomer-actions { flex-direction: column; }
-    .newcomer-body-map-stage { width: min(64vw, 300px); }
-    .newcomer-guided-labels li { width: 38%; font-size: clamp(0.54rem, 2.4vw, 0.68rem); }
-    .newcomer-guided-labels li:nth-child(odd) { right: -28%; }
-    .newcomer-guided-labels li:nth-child(even) { left: -28%; }
-    .newcomer-guided-labels li { --arrow-width: 135% !important; }
-}
+/* Gender-neutral localized chakra orientation scene. */
+.newcomer-body-map { gap:.65rem; width:min(100%,26rem); }
+.newcomer-aura-scene { width:min(100%,21rem); height:min(58dvh,29rem); min-height:18rem; filter:drop-shadow(0 0 16px rgba(125,108,228,.22)); }
+.newcomer-aura-scene svg { display:block; width:100%; height:100%; }
+.newcomer-aura-node circle:first-child { fill:rgba(197,188,255,.035); stroke:rgba(205,198,255,.2); stroke-width:1; transition:fill 700ms ease,stroke 700ms ease; }
+.newcomer-aura-node-core { fill:rgba(213,203,255,.38); transition:fill 700ms ease,r 700ms ease; }
+.newcomer-aura-scene[data-active-chakra="root"] { --chakra-glow:#ff887d; }.newcomer-aura-scene[data-active-chakra="sacral"] { --chakra-glow:#f7a87f; }.newcomer-aura-scene[data-active-chakra="solar"] { --chakra-glow:#edcc83; }.newcomer-aura-scene[data-active-chakra="heart"] { --chakra-glow:#8ed7b8; }.newcomer-aura-scene[data-active-chakra="throat"] { --chakra-glow:#84c8e8; }.newcomer-aura-scene[data-active-chakra="thirdeye"] { --chakra-glow:#a79beb; }.newcomer-aura-scene[data-active-chakra="crown"] { --chakra-glow:#d7b2ff; }
+.newcomer-aura-scene [data-focus] circle:first-child,.newcomer-aura-scene [data-focus] .newcomer-aura-node-core { transition:fill 700ms ease,stroke 700ms ease,r 700ms ease; }
+.newcomer-aura-scene[data-active-chakra="root"] [data-focus="root"] circle:first-child,.newcomer-aura-scene[data-active-chakra="sacral"] [data-focus="sacral"] circle:first-child,.newcomer-aura-scene[data-active-chakra="solar"] [data-focus="solar"] circle:first-child,.newcomer-aura-scene[data-active-chakra="heart"] [data-focus="heart"] circle:first-child,.newcomer-aura-scene[data-active-chakra="throat"] [data-focus="throat"] circle:first-child,.newcomer-aura-scene[data-active-chakra="thirdeye"] [data-focus="thirdeye"] circle:first-child,.newcomer-aura-scene[data-active-chakra="crown"] [data-focus="crown"] circle:first-child { fill:var(--chakra-glow); fill-opacity:.16; stroke:var(--chakra-glow); stroke-width:1.6; }
+.newcomer-aura-scene[data-active-chakra="root"] [data-focus="root"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="sacral"] [data-focus="sacral"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="solar"] [data-focus="solar"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="heart"] [data-focus="heart"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="throat"] [data-focus="throat"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="thirdeye"] [data-focus="thirdeye"] .newcomer-aura-node-core,.newcomer-aura-scene[data-active-chakra="crown"] [data-focus="crown"] .newcomer-aura-node-core { fill:var(--chakra-glow); r:6; }
+.newcomer-chakra-caption { display:flex; align-items:center; justify-content:center; gap:.8rem; width:min(100%,24rem); min-height:4.5rem; padding:.6rem 1rem; border:1px solid rgba(208,193,255,.16); border-radius:999px; background:rgba(7,13,24,.92); text-align:left; }
+.newcomer-chakra-caption img { flex:0 0 auto; width:2.65rem; height:2.65rem; object-fit:contain; filter:drop-shadow(0 0 10px rgba(231,199,255,.38)); }
+.newcomer-chakra-caption h2 { margin:0; color:rgba(255,255,255,.96); font-size:clamp(1rem,4vw,1.2rem); font-weight:500; letter-spacing:.06em; }
+.newcomer-chakra-caption p { margin:.18rem 0 0; color:rgba(230,235,244,.9); font-size:.82rem; }
+@media (max-width:600px) { .newcomer-aura-scene { width:min(100%,18rem); height:min(54dvh,25rem); min-height:16rem; } .newcomer-chakra-caption { border-radius:18px; } }
+@media (prefers-reduced-motion:reduce) { .newcomer-aura-scene,.newcomer-aura-node circle,.newcomer-aura-node-core { transition:none!important; } }
 
 /* Specific fix for Settings Screen on mobile to prevent top-clipping and ensure scrollability */
 .settings-screen-container {

@@ -3,7 +3,8 @@
 
     async function run(owner, { state, isChecked, complete = true }) {
         if (state.bgMusicMode) {
-            await owner.runBackgroundMusicOnly();
+            const music = await owner.runSessionItem('Music Only', () => owner.runBackgroundMusicOnly());
+            if (music.skipped && owner.isMeditationActive) owner.finish();
             return;
         }
 
@@ -17,8 +18,8 @@
             if (!isLastChakra && owner.isMeditationActive) await owner.handleInterval();
         }
         if (!complete) return;
-        if (owner.isMeditationActive && isChecked('hooponopono-experience-toggle')) await owner.runHooponopono();
-        if (owner.isMeditationActive && isChecked('undo-unlearn-addon-toggle')) await owner.runUndoUnlearn();
+        if (owner.isMeditationActive && isChecked('hooponopono-experience-toggle')) await owner.runSessionItem('Ho’oponopono', () => owner.runHooponopono());
+        if (owner.isMeditationActive && isChecked('undo-unlearn-addon-toggle')) await owner.runSessionItem('Undo & Unlearn', () => owner.runUndoUnlearn());
         if (owner.isMeditationActive) await owner.handleSilence();
         if (owner.isMeditationActive) await owner.runClosing();
         if (owner.isMeditationActive) await owner.runEmergence();

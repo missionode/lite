@@ -22,6 +22,7 @@
                 await owner.audio.startBackgroundMusic();
                 if (!state.bgMusicMode) void owner.audio.startPleasureAmbience();
                 owner.isMeditationActive = true;
+                owner.sessionItemRunner?.reset();
                 owner.isExperimentActive = true;
                 owner.isPaused = false;
                 owner.sessionStartedAt = Date.now();
@@ -44,12 +45,12 @@
                     owner.chakraOrder = ['high_energy'];
                     showScreen(meditationScreen);
                     await owner.meditateOnChakra(owner.scripts.high_energy, 'high_energy');
-                } else if (activity === 'box') await owner.runBoxBreathing();
-                else if (activity === 'hooponopono') { showScreen(meditationScreen); await owner.runHooponopono(); }
-                else if (activity === 'corpse') await owner.runCorpsePose();
-                else if (activity === 'perineal') await owner.runPerinealCare();
-                else if (activity === 'bath') await owner.runBathSession();
-                else if (activity === 'assisted-bath') await owner.runAssistedBathing();
+                } else if (activity === 'box') await owner.runSessionItem('Box Breathing', () => owner.runBoxBreathing());
+                else if (activity === 'hooponopono') { showScreen(meditationScreen); await owner.runSessionItem('Ho’oponopono', () => owner.runHooponopono()); }
+                else if (activity === 'corpse') await owner.runSessionItem('Corpse Pose', () => owner.runCorpsePose());
+                else if (activity === 'perineal') await owner.runSessionItem('Perineal Care', () => owner.runPerinealCare());
+                else if (activity === 'bath') await owner.runSessionItem('Bath session', () => owner.runBathSession());
+                else if (activity === 'assisted-bath') await owner.runSessionItem('Assisted bathing', () => owner.runAssistedBathing());
 
                 if (owner.isMeditationActive) stop(owner, deps);
             } catch (error) {
@@ -62,6 +63,7 @@
         function stop(owner, deps) {
             const { window, piperTTS, wakeLock, document, showScreen, experimentScreen } = deps;
             owner.isMeditationActive = false;
+            owner.sessionItemRunner?.reset();
             owner.isExperimentActive = false;
             owner.experimentDuration = null;
             window.speechSynthesis.cancel();

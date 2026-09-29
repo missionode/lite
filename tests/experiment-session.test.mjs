@@ -8,7 +8,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 assert.match(app, /startExperiment\(activity\)\s*\{\s*return experimentSession\.start\(this, activity,/);
 assert.match(app, /stopExperiment\(\)\s*\{\s*return experimentSession\.stop\(this,/);
-assert.match(html, /modules\/experiment-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.12/);
+assert.match(html, /modules\/experiment-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.14/);
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/experiment-session\.js\?v=1\.0/);
 assert.equal(pkg.scripts['test:experiment-session'], 'node tests/experiment-session.test.mjs');
 
@@ -23,6 +23,8 @@ function fixture(overrides = {}) {
     const document = { getElementById: id => id === 'experiment-core-duration' ? duration : id === 'controls' ? controls : null };
     const state = { advancedFeaturesUnlocked: true, language: 'en', scriptSource: 'custom', customScript: { root: 'Root script', high_energy: 'HRIM script' }, bgMusicMode: false };
     const owner = {
+        sessionItemRunner: { reset: () => events.push('runner-reset') },
+        async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
         scripts: null, scriptsLanguage: null, isStarting: false, isMeditationActive: false, isExperimentActive: false,
         audio: Object.fromEntries(['init', 'startBackgroundMusic', 'startPleasureAmbience', 'fadeInBackgroundMusic', 'stopMantraTrack', 'stopBackgroundMusic', 'stopPleasureAmbience'].map(name => [name, (...args) => events.push(`audio:${name}:${args.join(',')}`)])),
         startSessionCountdown: value => events.push(`countdown:start:${value}`), stopSessionCountdown: () => events.push('countdown:stop'),
@@ -102,7 +104,7 @@ function fixture(overrides = {}) {
     assert.equal(owner.isMeditationActive, false);
     assert.equal(owner.isExperimentActive, false);
     assert.equal(owner.experimentDuration, null);
-    assert.deepEqual(events.slice(0, 5), ['speech:cancel', 'piper:cancel:experiment stopped:2', 'intention:stop', 'drone:stop', 'audio:stopMantraTrack:']);
+    assert.deepEqual(events.slice(0, 6), ['runner-reset', 'speech:cancel', 'piper:cancel:experiment stopped:2', 'intention:stop', 'drone:stop', 'audio:stopMantraTrack:']);
     assert.ok(events.includes('screen:experiment'));
     assert.ok(events.includes('controls:add:hidden'));
 }

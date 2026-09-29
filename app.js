@@ -359,12 +359,6 @@ const screenNavigation = screenNavigationModule.create({
 });
 const icebreakerTimer = document.getElementById('icebreaker-timer');
 
-const newcomerMarkerStage = document.querySelector('.newcomer-body-map-stage');
-const newcomerMarkerLayout = new window.ChakraNewcomerMarkerLayout({
-    stage: newcomerMarkerStage,
-    svg: document.getElementById('newcomer-marker-connectors')
-});
-
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
 const testVoiceBtn = document.getElementById('test-voice');
@@ -1110,7 +1104,34 @@ class MeditationController {
         this.intentionFrequencyGeneration = 0;
         this.guideControlledResolve = null;
         this.chakraOrder = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+        this.sessionItemRunner = window.ChakraSessionItemRunner.create({
+            onStart: () => { const button = document.getElementById('skip-meditation'); if (button) button.disabled = false; },
+            onSkip: item => this.cancelCurrentItem(item),
+            onFinish: (item, runState) => {
+                const button = document.getElementById('skip-meditation');
+                if (button && (runState.wasCurrent || !this.sessionItemRunner.current)) button.disabled = true;
+                if (!runState.stale && runState.wasCurrent && item.skipped && this.sessionStartedAt !== null) this.isMeditationActive = true;
+            }
+        });
     }
+
+    runSessionItem(label, task) { return this.sessionItemRunner.run(label, task); }
+
+    cancelCurrentItem() {
+        this.isMeditationActive = false;
+        window.speechSynthesis?.cancel();
+        piperTTS.cancel('current item skipped', { fadeSeconds: 2 });
+        this.stopIntentionFrequency();
+        this.stopStageDrone();
+        this.audio.stopFrequencyShot();
+        this.audio.stopGuidedTransitionTone();
+        this.audio.stopMantraTrack({ stageWindow: 2 });
+        this.audio.stopVisualizationAmbience(2);
+        this.visual.stop();
+        if (this.guideControlledResolve) this.guideControlledResolve(true);
+    }
+
+    skipCurrentItem() { return this.sessionItemRunner.skip(); }
 
     acknowledgeDndReminder() {
         this.dndReminderAcknowledged = true;
@@ -1313,7 +1334,7 @@ class MeditationController {
     }
 
     async runEmergence() {
-        return journeyHypnosisWrapper.runEmergence(this, { state, timing, withAudioStageFade, setMantraDisplay: value => setText('mantra-display', value) });
+        return this.runSessionItem('emergence', () => journeyHypnosisWrapper.runEmergence(this, { state, timing, withAudioStageFade, setMantraDisplay: value => setText('mantra-display', value) }));
     }
 
     async runSleepJourney() {
@@ -1352,8 +1373,12 @@ class MeditationController {
 
     async runNewcomerGuidedOrientation() {
         const status = document.getElementById('newcomer-guided-status');
+        const scene = document.getElementById('newcomer-aura-scene');
+        const symbol = document.getElementById('newcomer-chakra-symbol');
+        const name = document.getElementById('newcomer-chakra-name');
+        const location = document.getElementById('newcomer-chakra-location');
+        const focus = [['root','root','newcomerRootLocation'],['sacral','sacral','newcomerSacralLocation'],['solar','solar','newcomerSolarLocation'],['heart','heart','newcomerHeartLocation'],['throat','throat','newcomerThroatLocation'],['thirdeye','thirdEye','newcomerThirdEyeLocation'],['crown','crown','newcomerCrownLocation']];
         showScreen(newcomerTutorialScreen);
-        newcomerMarkerLayout.schedule();
         newcomerTutorialScreen?.classList.add('is-guided');
         if (status) {
             status.hidden = false;
@@ -1361,7 +1386,19 @@ class MeditationController {
         }
         // This is spoken guidance, so it must follow Meditation Language rather
         // than the independent Display Language used by the on-screen labels.
-        await this.narrate(contentT('ui.newcomerGuidedNarration'), false, true, 'soft');
+        await this.narrate(contentT('ui.newcomerOrientationIntro'), false, true, 'soft');
+        for (let index = 0; index < focus.length && this.isMeditationActive; index += 1) {
+            const [chakra, displayNameKey, locationKey] = focus[index];
+            if (scene) scene.dataset.activeChakra = chakra;
+            if (symbol) symbol.src = `symbols/${chakra}.png`;
+            if (name) name.textContent = t(`ui.${displayNameKey}`);
+            if (location) location.textContent = t(`ui.${locationKey}`);
+            if (status) status.textContent = `${index + 1} / ${focus.length} · ${t('ui.newcomerGuidedStatus')}`;
+            const narrationKey = `ui.newcomer${displayNameKey[0].toUpperCase()}${displayNameKey.slice(1)}Narration`;
+            await this.narrate(contentT(narrationKey), false, true, 'soft');
+        }
+        if (this.isMeditationActive) await this.narrate(contentT('ui.newcomerOrientationClosing'), true, true, 'soft');
+        if (!this.isMeditationActive) return;
         if (status) status.hidden = true;
         newcomerTutorialScreen?.classList.remove('is-guided');
         showScreen(icebreakerScreen);
@@ -1446,6 +1483,7 @@ class MeditationController {
             try { await wakeLock.request(); } catch(e) { console.warn("Wake lock failed", e); }
             
             this.isMeditationActive = true;
+            this.sessionItemRunner.reset();
             this.isPaused = false;
             this.isHighEnergy = getChecked('high-energy-toggle');
             this.isHypnosisJourney = false;
@@ -1468,7 +1506,7 @@ class MeditationController {
             if (newcomerChoice === 'guided') {
                 if (piperWarmup) await piperWarmup;
                 if (!this.isMeditationActive) return;
-                await this.runNewcomerGuidedOrientation();
+                await this.runSessionItem('newcomer orientation', () => this.runNewcomerGuidedOrientation());
                 if (!this.isMeditationActive) return;
             }
 
@@ -1487,8 +1525,8 @@ class MeditationController {
                 else if (focusedExperience === 'intimate') await this.runIntimateService();
                 else if (focusedExperience === 'preparation') {
                     await this.runPreparationStages({ includeBox: true });
-                    if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runHooponopono();
-                    if (this.isMeditationActive && getChecked('undo-unlearn-addon-toggle')) await this.runUndoUnlearn();
+                    if (this.isMeditationActive && getChecked('hooponopono-experience-toggle')) await this.runSessionItem('Ho’oponopono', () => this.runHooponopono());
+                    if (this.isMeditationActive && getChecked('undo-unlearn-addon-toggle')) await this.runSessionItem('Undo & Unlearn', () => this.runUndoUnlearn());
                 }
                 if (this.isMeditationActive) this.finish();
                 return;
@@ -1504,25 +1542,27 @@ class MeditationController {
             setText('icebreaker-title', contentT('system.arriving'));
             setText('icebreaker-subtitle', contentT('system.breatheAndSettle'));
 
-            this.audio.fadeInBackgroundMusic(stageFadeSeconds(state.timeIcebreaker));
-            for (let i = state.timeIcebreaker; i > 0; i--) {
-                if (!this.isMeditationActive) return;
-                await this.pauseAwareSleep(1000);
-                if (icebreakerTimer) icebreakerTimer.textContent = i;
-            }
+            await this.runSessionItem('arrival settling', async () => {
+                this.audio.fadeInBackgroundMusic(stageFadeSeconds(state.timeIcebreaker));
+                for (let i = state.timeIcebreaker; i > 0; i--) {
+                    if (!this.isMeditationActive) return;
+                    await this.pauseAwareSleep(1000);
+                    if (icebreakerTimer) icebreakerTimer.textContent = i;
+                }
+            });
 
             if (piperWarmup) await piperWarmup;
 
             // Transition to Preparation
             showScreen(breathingScreen);
 
-            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000);
+            if (this.isMeditationActive) await this.runSessionItem('initial settling', () => this.pauseAwareSleep(timing('transitions', 'initialSettle') * 1000));
 
             if (this.isMeditationActive) await this.runGratitude(this.isHighEnergy);
             if (this.isMeditationActive) await this.runPreparationStages({ includeBox: true, highEnergy: this.isHighEnergy });
             // Immediate screen switch to meditation room for better user experience
-            if (this.isMeditationActive) showScreen(meditationScreen);            
-            if (this.isMeditationActive) await this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000);
+            if (this.isMeditationActive) showScreen(meditationScreen);
+            if (this.isMeditationActive) await this.runSessionItem('pre-journey pause', () => this.pauseAwareSleep(timing('transitions', 'postBreathing') * 1000));
 
             if (this.isMeditationActive) {
                 if (this.isHighEnergy) {
@@ -1576,19 +1616,19 @@ class MeditationController {
             noting: getChecked('noting-addon-toggle')
         });
         const runners = {
-            box: () => this.runBoxBreathing(),
-            visualization: () => this.runVisualization(),
-            dharana: () => this.runDharana(),
-            bodyScan: () => this.runBodyScan(),
-            noting: () => this.runNoting()
+            box: () => this.runSessionItem('Box Breathing', () => this.runBoxBreathing()),
+            visualization: () => this.runSessionItem('Guided visualisation', () => this.runVisualization()),
+            dharana: () => this.runSessionItem('Focused attention', () => this.runDharana()),
+            bodyScan: () => this.runSessionItem('Body Scan', () => this.runBodyScan()),
+            noting: () => this.runSessionItem('Guided Noting', () => this.runNoting())
         };
         await journeyRouting.executePreparationStages(stages, runners, () => this.isMeditationActive);
     }
 
     async runGratitude(isHighEnergy = false) {
-        return journeyOpeningStage.run(this, isHighEnergy, {
+        return this.runSessionItem('Gratitude and intention', () => journeyOpeningStage.run(this, isHighEnergy, {
             document, showScreen, journeyT, contentT, state, getMoonPhase, localized, defaultIntention, timing
-        });
+        }));
     }
 
     async runDharana() {
@@ -1929,7 +1969,7 @@ class MeditationController {
     }
 
     async runClosing() {
-        return journeyTransitionStages.runClosing(this, { localized, journeyT, timing, setText, document });
+        return this.runSessionItem('closing guidance', () => journeyTransitionStages.runClosing(this, { localized, journeyT, timing, setText, document }));
     }
 
     async runHooponopono() {
@@ -1990,14 +2030,14 @@ class MeditationController {
     }
 
     async handleInterval() {
-        return journeyTransitionStages.runInterval(this, {
+        return this.runSessionItem('chakra interval', () => journeyTransitionStages.runInterval(this, {
             state, contentT, timing, setText, document, withAudioStageFade,
             wait: milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
-        });
+        }));
     }
 
     async meditateOnChakra(chakra, key) {
-        return chakraSession.run(this, chakra, key, { state, document, visual, localized, timing, setTimeout });
+        return this.runSessionItem(`chakra ${key}`, () => chakraSession.run(this, chakra, key, { state, document, visual, localized, timing, setTimeout }));
     }
 
     async narrateFeeble(text) {
@@ -2185,10 +2225,11 @@ class MeditationController {
     }
 
     async handleSilence() {
-        return journeyTransitionStages.runSilence(this, { contentT, timing, setText, document });
+        return this.runSessionItem('closing silence', () => journeyTransitionStages.runSilence(this, { contentT, timing, setText, document }));
     }
 
     finish() {
+        this.sessionItemRunner.reset();
         return window.ChakraCompletionView.finish(this, {
             document, window, state, storage: localStorage, setText, translate: t, wakeLock, piperTTS,
             backgroundMusicStopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS,
@@ -2198,6 +2239,7 @@ class MeditationController {
     }
 
     stop({ preserveScreen = false } = {}) {
+        this.sessionItemRunner.reset();
         return sessionStop.stop(this, { preserveScreen }, { document, window, piperTTS, wakeLock, lobbyScreen, experimentScreen, showScreen });
     }
 }
@@ -3357,7 +3399,7 @@ function attachEventListeners() {
                 const targetOpacity = Math.min(state.brightness, 0.7);
                 if (app) app.style.setProperty('--app-brightness', String(targetOpacity));
             }
-            await meditation.runBackgroundMusicOnly();
+            await meditation.runSessionItem('Music Only', () => meditation.runBackgroundMusicOnly());
         } else if (launchRoute === 'sleep') {
             document.body.classList.add('sleep-mode-active');
             meditation.runSleepJourney().catch(err => {

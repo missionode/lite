@@ -11,7 +11,7 @@ const context = vm.createContext({ window: {} });
 vm.runInContext(source, context);
 const api = context.window.ChakraSession.create();
 
-assert.match(app, /meditateOnChakra\(chakra, key\)\s*\{\s*return chakraSession\.run\(this, chakra, key,/);
+assert.match(app, /meditateOnChakra\(chakra, key\)\s*\{\s*return this\.runSessionItem\(`chakra \$\{key\}`,[\s\S]*?chakraSession\.run\(this, chakra, key,/);
 assert.ok(html.indexOf('modules/chakra-session.js') < html.indexOf('src="app.js'), 'Chakra owner must load before app.js.');
 assert.match(sw, /chakra-v5\.\d+/);
 assert.equal((sw.match(/modules\/chakra-session\.js/g) || []).length, 1, 'Chakra owner must be precached exactly once.');

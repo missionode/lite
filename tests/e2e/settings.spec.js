@@ -58,8 +58,9 @@ test('shows the direct illustrated newcomer orientation for a normal journey wit
 
   await page.locator('#start-meditation').click();
   await expect(page.locator('#newcomer-body-map')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('#newcomer-guided-labels')).toContainText('Root');
-  await expect(page.locator('#newcomer-guided-labels')).toContainText('Crown');
+  await expect(page.locator('#newcomer-aura-scene')).toBeVisible();
+  await expect(page.locator('#newcomer-chakra-name')).toHaveText('Root');
+  await expect(page.locator('#newcomer-chakra-location')).toContainText('spine');
   await expect(page.locator('#newcomer-tutorial-screen')).not.toContainText('A gentle introduction');
 });
 

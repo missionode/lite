@@ -21,6 +21,7 @@ const events = [];
 const elements = Object.fromEntries(['icebreaker-title', 'icebreaker-subtitle', 'icebreaker-timer'].map(id => [id, { textContent: '' }]));
 const state = { timeBath: 3, timePerinealCare: 4, timeAssistedBathing: 5, perinealCareEnabled: true, massageEnabled: true, assistedBathingEnabled: true };
 const owner = {
+    async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
     isMeditationActive: true,
     isPaused: false,
     isExperimentActive: false,

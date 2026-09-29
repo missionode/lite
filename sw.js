@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.332';
+const CACHE_NAME = 'chakra-v5.333';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v56';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v57';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -13,8 +13,8 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.10',
-  './app.js?v=4.13',
+  './style.css?v=2.11',
+  './app.js?v=4.14',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',
@@ -85,7 +85,7 @@ const ASSETS = [
   './modules/completion-view.js?v=1.0',
   './modules/session-estimate.js?v=1.0',
   './modules/session-countdown.js?v=1.0',
-  './modules/newcomer-marker-layout.js?v=1.0',
+  './modules/session-item-runner.js?v=1.0',
   './modules/mood-ambience-settings-view.js?v=1.0',
   './modules/drone-duration-settings-view.js?v=1.0',
   './modules/lobby-experience-visibility.js?v=1.0',

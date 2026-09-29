@@ -9,7 +9,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
 assert.match(app, /runShot\(type, customFrequency\)\s*\{\s*return shotSession\.run\(this, type, customFrequency,/);
 assert.match(app, /finishShot\(\)\s*\{\s*return shotSession\.finish\(this,/);
 assert.match(app, /stopShot\(\)\s*\{\s*return shotSession\.stop\(this,/);
-assert.match(html, /modules\/shot-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.12/);
+assert.match(html, /modules\/shot-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.14/);
 assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.0/);
 assert.equal(pkg.scripts['test:shot-session'], 'node tests/shot-session.test.mjs');
 
@@ -27,6 +27,7 @@ function fixture(overrides = {}) {
     const document = { getElementById: id => elements.get(id) || { setAttribute: (...args) => attrs.push([id, ...args]) }, body: { classList: { remove: name => events.push(`body:remove:${name}`) } } };
     const state = { advancedFeaturesUnlocked: true, noFrequencyMode: false, language: 'en', timeShot: 0.2 };
     const owner = {
+        async runSessionItem(_label, task) { return { skipped: false, value: await task() }; },
         isStarting: false, isMeditationActive: false, isShotActive: false, isPaused: false,
         scripts: { root: { frequency: 396 }, thirdeye: { frequency: 852 }, high_energy: { frequency: 528 }, sleep_mode: { intervalSeconds: 1 } }, scriptsLanguage: 'en',
         audio: {
