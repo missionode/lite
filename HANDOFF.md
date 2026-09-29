@@ -1,13 +1,13 @@
 # Chakra Meditation — Active Handoff
 
-### CURRENT — CP-JOURNEY-SKIP / localized chakra orientation (release validation)
+### COMPLETE — CP-JOURNEY-SKIP / localized chakra orientation
 
-- Isolated release branch `codex/journey-skip-production` is based on `origin/production` at `2b1b71f`; the dirty shared checkout remains untouched.
+- PR [#90](https://github.com/missionode/lite/pull/90) merged to `production` on 2026-09-29 as `fa799c4e5360c47aa08eca5ab190794c6f63e356`, based on `2b1b71f`. The dirty shared checkout remains untouched.
 - Added one global Skip current item control. It is enabled only while a planned item is active, cancels current audio/narration/visual work, then continues through the remaining route. Stop still ends the whole session. Newcomer orientation is skippable; skipping it goes directly to the normal Arriving/setup path without a transient screen or bypassing chakra validation.
 - Replaced obsolete body-map marker styling/module with the gender-neutral aura orientation and localized narration/name/location/Skip strings across English, Malayalam, Hindi, Russian and Tamil. Refreshed app, shell and locale-cache versions.
-- Atlas generated at 45 maps / 379 nodes / 450 edges. Interactive `verify-atlas.mjs` cannot start because Playwright is unavailable. Browser testing remains skipped as requested.
-- Fresh focused contracts: orientation, session-item runner, transport controls, standard/Sleep/Shot/Yoga/care/experiment/chakra/transition sessions, Indic Piper locale parity, Malayalam, Russian, Hindi and locale UI passed. Some historical tests hard-code earlier cache identifiers; release-specific locale cache checks were refreshed. Full-suite result is not claimed.
-- Next: run final changed-source checks and `git diff --check`, then prepare the production PR. User explicitly requested production publication; merge/push only after fresh checks pass. Main checkout synchronization is unsafe because it contains unrelated dirty changes.
+- Atlas is synchronized at 45 maps / 379 nodes / 450 edges. Interactive `verify-atlas.mjs` could not start because Playwright is unavailable. Browser testing remains skipped as requested.
+- Fresh post-merge focused checks: 20 journey, session, locale and translation contracts passed. JavaScript syntax, locale JSON validation and `git diff --check` passed before merge. Device/audio playback was not verified.
+- Production merge is confirmed. The shared local checkout was deliberately not synchronized because it contains unrelated dirty changes.
 
 ### IMPLEMENTED — Experiment Mode sky-safe action panel
 

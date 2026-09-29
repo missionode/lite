@@ -454,9 +454,9 @@ Move the selected symbol/deity/Yoga image load, stale-request guard, failed-imag
 - Preserved state ownership, setting values, fade and automation timing, No Frequency guards, URL persistence/recovery, warnings and stop-time buffer cleanup. Added a direct lifecycle contract and kept the module eagerly available/offline cached.
 - Update the `sound-options` ownership notes. No journey topology, sound-quality, startup or thermal change is claimed.
 
-## Journey Skip + localized aura orientation (implemented locally; release validation in progress)
+## Journey Skip + localized aura orientation (merged to production, PR #90)
 
 - Add a global Skip current item control that is active only while a planned stage is running; Skip cancels that item’s audio/narration/visual work and resumes the remaining sequence, while Stop still ends the whole journey.
 - Ensure first-time chakra orientation is itself skippable and that skipping it proceeds directly into the normal journey setup without transiently showing Arriving before orientation finishes.
 - Use the responsive, gender-neutral aura scene with the active chakra symbol, translated name/location caption and Meditation-Language narration. English, Malayalam, Hindi, Russian and Tamil UI keys are supplied.
-- Regression coverage: item-runner lifecycle, skip control event, newcomer orientation translation and atlas. Browser/device validation remains with the owner; do not claim it passed.
+- Regression coverage: item-runner lifecycle, skip control event, newcomer orientation translation and atlas. PR #90 merged to `production` as `fa799c4` on 2026-09-29. Browser/device validation remains with the owner; it was not run or claimed.
