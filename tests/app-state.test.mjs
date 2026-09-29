@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source = fs.readFileSync('modules/app-state.js', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8');
+const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const context = vm.createContext({});
 vm.runInContext(source, context);
 
@@ -41,7 +43,12 @@ assert.equal(defaults.pleasureAmbienceIntensity, 'gentle');
 assert.equal(defaults.pleasureAmbienceBlur, true);
 assert.equal(defaults.musicEcho, 'light');
 assert.equal(defaults.spatialMode, 'off');
-assert.equal(defaults.noFrequencyMode, false);
+assert.equal(defaults.noFrequencyMode, true, 'No Frequency Mode should default on when the user has no saved preference');
+assert.match(html, /id="no-frequency-mode-toggle" checked/, 'Settings should show No Frequency Mode selected by default');
+assert.match(html, /id="mixer-no-frequency-mode-toggle" checked/, 'Journey Tuning should mirror the default selection');
+assert.match(html, /modules\/app-state\.js\?v=1\.2/);
+assert.match(serviceWorker, /modules\/app-state\.js\?v=1\.2/);
+assert.match(serviceWorker, /chakra-v5\.335/);
 assert.equal(defaults.visualEffect, 'natural');
 for (const key of ['sleepMode', 'boxBreathingExperienceEnabled', 'hooponoponoExperienceEnabled', 'yogaExperienceEnabled', 'moodRelaxationIntentionEnabled', 'advancedFeaturesUnlocked', 'bgMusicMode', 'highEnergyEnabled', 'sleepExperienceEnabled']) {
     assert.equal(defaults[key], false, `${key} must begin as session-only false`);
@@ -63,6 +70,8 @@ const restored = create([
     ['chakra_stats_journeys', '2'],
     ['chakra_perineal_care', 'true']
 ]);
+const restoredOptOut = create([['chakra_no_frequency_mode', 'false']]);
+assert.equal(restoredOptOut.noFrequencyMode, false, 'an explicit saved opt-out should remain respected');
 assert.equal(restored.language, 'ru');
 assert.equal(restored.displayLanguage, 'hi');
 assert.deepEqual([...restored.selectedChakras], ['root', 'heart']);

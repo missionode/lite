@@ -149,8 +149,8 @@ test('opens the full-screen mixer and safely restarts the active journey', async
        await expect(page.locator('#audio-filters-toggle')).toBeVisible();
        await expect(page.locator('#eyes-close-mode-toggle')).toBeVisible();
        await expect(page.locator('#mixer-no-frequency-mode-toggle')).toBeVisible();
-       await expect(page.locator('#mixer-no-frequency-mode-toggle')).not.toBeChecked();
-       await expect(page.locator('#no-frequency-mode-toggle')).not.toBeChecked();
+       await expect(page.locator('#mixer-no-frequency-mode-toggle')).toBeChecked();
+       await expect(page.locator('#no-frequency-mode-toggle')).toBeChecked();
        const voiceTuning = page.locator('#voice-tuning-panel');
        await expect(voiceTuning).not.toHaveAttribute('open', '');
        await voiceTuning.locator('summary').click();

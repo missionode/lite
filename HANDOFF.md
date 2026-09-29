@@ -1,10 +1,16 @@
 # Chakra Meditation — Active Handoff
 
-### COMPLETE LOCALLY — Floating journey timer and controls
+### RELEASE CHECKPOINT — No Frequency default and centering-breath narration
 
-- Baseline `19a9b15` (`codex/journey-skip-doc-status`), isolated task worktree. The shared checkout remains untouched. The single session countdown is now a numeric `MM:SS`/`HH:MM:SS` display inside a compact bottom-right control bar. Removed both corner rings; retained timer lifecycle/cadence and the shared auto-hide/reveal behavior. Skip is icon-only with its existing translated accessible name.
+- Baseline `b967a5f` (`production`). Fresh profiles now default No Frequency Mode to selected in Settings and Journey Tuning; a stored explicit OFF or ON continues to win on reload. The shared centering-breath narration now invites comfortable rest in English, Malayalam, Hindi, Russian and Tamil. No audio pathways were otherwise changed.
+- Bumped `modules/app-state.js` to `v1.2`, shell cache to `chakra-v5.335`, and updated the offline precache. Updated app-state/default/persistence tests and sound-options atlas; flow topology is unchanged.
+- Focused app-state, No Frequency, audio-settings, settings-backup, locale/cache and hydration contracts pass. Browser visual QA remains unrun. Production publication is the active requested step.
+
+### MERGED — Floating journey timer and controls
+
+- PR #92 merged to production at `b967a5f`. The single session countdown is now a numeric `MM:SS`/`HH:MM:SS` display inside a compact bottom-right control bar. Removed both corner rings; retained timer lifecycle/cadence and the shared auto-hide/reveal behavior. Skip is icon-only with its existing translated accessible name.
 - Refreshed style/module/service-worker cache versions. Updated the Live session atlas map and FIX-QUEUE. Flow edges and session timing are unchanged.
-- Focused countdown, spatial-audio, fullscreen/prelude, journey-chrome, transport and session-item tests pass. JavaScript syntax and `git diff --check` pass. Atlas regenerated: 45 maps / 379 nodes / 450 edges; 13 control-map edges unchanged. Browser layout testing remains skipped at the user's request; no production push/merge was requested. Model router returned `PLANNED` (`simple`, recommended `gpt-5.6-luna`/low); work was performed directly and no model switch occurred.
+- Focused countdown, spatial-audio, fullscreen/prelude, journey-chrome, transport and session-item tests pass. JavaScript syntax and `git diff --check` pass. Atlas regenerated: 45 maps / 379 nodes / 450 edges; 13 control-map edges unchanged. Browser layout testing remains skipped at the user's request. Model router returned `PLANNED` (`simple`, recommended `gpt-5.6-luna`/low); work was performed directly and no model switch occurred.
 
 ### COMPLETE — CP-JOURNEY-SKIP / localized chakra orientation
 

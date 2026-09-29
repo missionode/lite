@@ -17,6 +17,7 @@
     function createInitialState({ storage = global.localStorage, helpers, constants }) {
         const get = (key) => storage.getItem(key);
         const number = (key, fallback) => storedNumber(storage, key, fallback);
+        const storedNoFrequencyMode = get('chakra_no_frequency_mode');
         const {
             normalizeDroneDurationMode,
             normalizeHrimDroneDurationMode,
@@ -76,7 +77,7 @@
             boxBreathingExperienceEnabled: false,
             hooponoponoExperienceEnabled: false,
             yogaExperienceEnabled: false,
-            noFrequencyMode: get('chakra_no_frequency_mode') === 'true',
+            noFrequencyMode: storedNoFrequencyMode === null || storedNoFrequencyMode === 'true',
             noMantraMode: get('chakra_no_mantra_mode') === 'true',
             moodRelaxationIntentionEnabled: false,
             pleasureAmbienceBlur: true,

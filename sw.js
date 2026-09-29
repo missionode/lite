@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.334';
+const CACHE_NAME = 'chakra-v5.335';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v57';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v58';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -37,7 +37,7 @@ const ASSETS = [
   './modules/chakra-selection-view.js?v=1.0',
   './modules/audio-effects-settings-view.js?v=1.0',
   './modules/journey-preparation-selection.js?v=1.0',
-  './modules/app-state.js?v=1.1',
+  './modules/app-state.js?v=1.2',
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.0',
   './modules/piper-lifecycle.js?v=1.0',

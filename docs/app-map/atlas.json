@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-09-29",
-    "commit": "2b1b71f production baseline + uncommitted Skip/orientation release",
-    "scope": "Production release candidate: a one-tap Skip control cancels the current planned session item and resumes the remaining flow; first-time chakra orientation uses a gender-neutral aura scene and translated chakra labels/narration for English, Malayalam, Hindi, Russian and Tamil. UI locale cache and shell cache are refreshed. Browser visual/device checks were not run."
+    "commit": "b967a5f production + uncommitted narration and No Frequency default updates",
+    "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run."
   },
   "graphs": [
     {
@@ -3299,7 +3299,7 @@
       "group": "Systems",
       "title": "Sound options and live suppression",
       "subtitle": "What changes when sound settings are toggled.",
-      "source": "modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:1039; app.js:1058; app.js:2663",
+      "source": "modules/app-state.js:1; tests/app-state.test.mjs:1; modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:1039; app.js:1058; app.js:2663",
       "rows": [
         [
           [
@@ -3329,7 +3329,7 @@
           [
             "nofreq",
             "No Frequency ON",
-            "Cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls."
+            "Selected by default when no preference is saved; an explicit saved opt-out remains off. When enabled: cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls."
           ],
           [
             "nomantra",
@@ -3444,7 +3444,7 @@
         ]
       ],
       "notes": [
-        "No Frequency also suppresses generated bowl/anchor through audio-engine guards. No Mantra affects standard chakra/yoga drone starts, but is not a blanket prohibition on every generated sound route.",
+        "Fresh profiles default to No Frequency ON. A saved explicit OFF remains OFF across reloads. No Frequency also suppresses generated bowl/anchor through audio-engine guards. No Mantra affects standard chakra/yoga drone starts, but is not a blanket prohibition on every generated sound route.",
         "Voice-preview fallback is temporary until settings are saved.",
         "CP-MOD-154: AudioEngine voice tone and Voice Space adapters delegate to audio-voice-effects; settings state, caller order, graph-readiness guards, profiles and automation are unchanged. Direct module and effects-matrix tests verify this owner; no user-flow branch changes.",
         "CP-MOD-068 moves only the Lobby Mood & Relaxation custom-URL button, localized status and busy/recovery handling into `modules/mood-ambience-settings-view.js`. `AudioEngine.loadPleasureAmbienceUrl()` remains authoritative for loading, validation and persistence; displayed flow and audio behavior are unchanged.",
