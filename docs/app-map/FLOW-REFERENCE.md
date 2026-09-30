@@ -2,7 +2,7 @@
 
 Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-09-30.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -55,6 +55,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 45. [Settings backup and restore](#settings-backup)
 46. [Operator-led chakra assessment](#assessment-tournament)
 47. [Frequency repertory handoff](#repertory)
+48. [Secret Body Part · dev-mode party game](#secret-body-game)
 
 <a id="curriculum-branding"></a>
 
@@ -896,6 +897,7 @@ flowchart TD
 | Experiment screen | Natural end and caught failure use stopExperiment; visible Stop uses shared stop which also returns here. |
 
 - Current inconsistency: UI assigns sec or min, while startExperiment tests for seconds. Countdown therefore treats sec as minutes; care UI also labels raw seconds as min. Ho’oponopono has no duration control, but startExperiment still reads the hidden value. No ordinary completion modal or stats update is used.
+- While dev mode is unlocked, Experiment Mode also shows the Secret Body Part party game button; see the secret-body-game map.
 - CP-MOD-155 moves activity start/stop orchestration to experiment-session.js. It retains pre-load Advanced Features care rejection, current script cache/source fallback, audio/ambience initialization, wake-lock/countdown setup, dispatch, error alert and ordered cleanup. It does not change the known `sec` versus `seconds` duration-unit issue recorded in FIX-QUEUE.
 
 <a id="journey-addons"></a>
@@ -2209,6 +2211,62 @@ flowchart TD
 | User presses Begin | Only now run Shot; completion reload cannot replay consumed URL request. |
 
 - Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. Initial checkFirstTime still routes new visitors to Settings. The pending handoff is offered only after the shared unlock, then acceptance shows the Lobby.
+
+<a id="secret-body-game"></a>
+
+## Secret Body Part · dev-mode party game
+
+A 2–7 player pass-the-phone luck game opened from Experiment Mode only while Advanced Features (dev mode) is unlocked. Nothing is saved.
+
+Sources: [modules/secret-body-part-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/secret-body-part-game.js:1), [tests/secret-body-part-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/secret-body-part-game.test.mjs:1), [app.js:2921](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2921), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1).
+
+```mermaid
+flowchart TD
+  locked["Hidden and disabled"]
+  setup["Setup"]
+  bold["Bold card notice"]
+  deal["Deal secret cards"]
+  spin["Spin the chakra wheel"]
+  luck["Luck card"]
+  guess["Guess by luck"]
+  out["Out"]
+  survive["Survive"]
+  reveal["Grand Reveal and Faker Catch"]
+  exit["Play again or return"]
+  locked -->|"Dev mode unlocked"| setup
+  setup -->|"Third game in a row"| bold
+  setup -->|"Start"| deal
+  bold -->|"Include / skip"| deal
+  deal -->|"All memorised"| spin
+  spin -->|"Card drawn"| luck
+  spin -->|"No card"| guess
+  luck -->|"Swap · view new cards"| deal
+  luck -->|"Double / Reverse / Lightning"| guess
+  luck -->|"Shield"| survive
+  guess -->|"Marked right"| out
+  guess -->|"All missed"| survive
+  out -->|"Next call"| spin
+  survive -->|"Next call"| spin
+  spin -->|"Rounds done / one left"| reveal
+  reveal -->|"Finish"| exit
+  exit -->|"Play again"| setup
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Hidden and disabled | The Experiment Mode button stays hidden and disabled until the current page load unlocks dev mode. Relocking hides it and closes an open game without leaving Settings. |
+| Setup | Choose 2–7 players and 1–5 rounds. Players are chakras in order: Root, Sacral, Solar, Heart, Throat, Third Eye, Crown. The setup shows how many games were played in a row this page load. |
+| Bold card notice | Before every third consecutive game, ask the group to include the bold Secret Card or play without it. |
+| Deal secret cards | Pass the phone to each chakra player. Tapping the face-down card shows one unique everyday body part; private parts are not in the normal list. In a third consecutive game with the Secret Card accepted, one random player gets it instead. |
+| Spin the chakra wheel | Each round calls every remaining player once in random order. About one spin in four also draws a luck card. |
+| Luck card | Swap (two players swap and privately view new cards), Double Guess, Shield (safe this call), Reverse (the called player guesses a random other player) or Lightning (anyone shouts first). |
+| Guess by luck | No clues. The called player records each spoken guess on a 12-word board that always contains the answer and marks it right or wrong on their honour. |
+| Out | A right answer puts the called player out and gives the guesser a star. |
+| Survive | If every guess misses, or Shield/Lightning ends the call, the called player earns a shield. |
+| Grand Reveal and Faker Catch | After the last round or when one player remains, all cards flip, the Secret Card last. A correct guess that was marked wrong exposes a Faker, who loses all shields. Awards: Lucky Survivor, Sharp Guesser and Faker of the Night. |
+| Play again or return | Play again keeps the in-memory consecutive-game count; returning goes back to Experiment Mode. Closing the app resets everything. |
+
+- Dev-mode only; not part of any meditation journey or session statistics. The module loads lazily through the practice-module loader and is offline pre-cached. Secret Card words live in SECRET_PARTS inside the module with matching ui.sbpPart_* translations in all five locales.
 
 ## Coverage and limitations
 

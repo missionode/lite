@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.336';
+const CACHE_NAME = 'chakra-v5.337';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v59';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v60';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -13,8 +13,8 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.13',
-  './app.js?v=4.15',
+  './style.css?v=2.14',
+  './app.js?v=4.16',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',
@@ -62,7 +62,7 @@ const ASSETS = [
   './modules/journey-routing.js?v=1.3',
   './modules/standard-journey-sequence.js?v=1.0',
   './modules/journey-transition-stages.js?v=1.0',
-  './modules/practice-module-loader.js?v=1.1',
+  './modules/practice-module-loader.js?v=1.2',
   './modules/body-scan-practice.js?v=1.0',
   './modules/guided-noting-practice.js?v=1.0',
   './modules/dharana-practice.js?v=1.0',
@@ -72,6 +72,7 @@ const ASSETS = [
   './modules/undo-unlearn-practice.js?v=1.0',
   './modules/quiet-courage-practice.js?v=1.0',
   './modules/self-exploration-practices.js?v=1.0',
+  './modules/secret-body-part-game.js?v=1.0',
   './modules/screen-navigation.js?v=1.0',
   './modules/shot-session.js?v=1.0',
   './modules/sleep-journey.js?v=1.0',

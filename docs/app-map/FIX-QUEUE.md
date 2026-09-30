@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Secret Body Part dev-mode party game
+
+- Owner-designed pass-the-phone luck game for 2–7 chakra players, opened from Experiment Mode only while dev mode (Advanced Features) is unlocked. Luck cards, Faker Catch at the Grand Reveal, and a bold Secret Card offered before every third consecutive game. Nothing is saved.
+- New module `modules/secret-body-part-game.js` (lazy, offline-cached), five-language strings, `secret-body-game` atlas map, guide `docs/secret-body-part-game.md`. Also fixed two assessment test pins left stale by the previous release.
+
 ## Released — 2026-09-30 port of local dev-mode features
 
 - Quiet Courage and the Self-Exploration trio (dev mode only) run as ordered preparation stages after Guided Noting; practice modules load only while unlocked.

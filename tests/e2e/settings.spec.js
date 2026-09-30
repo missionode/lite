@@ -356,3 +356,47 @@ test('dev mode reveals Reverse Journey and Self-Exploration, and the roadmap fol
   expect(text.indexOf('Intention')).toBeLessThan(text.indexOf('Quiet Courage'));
   expect(text.indexOf('Quiet Courage')).toBeLessThan(text.indexOf('Reverse Journey'));
 });
+
+test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides it', async ({ page }) => {
+  await page.locator('#open-experiment-mode').click();
+  await expect(page.locator('#open-secret-body-game')).toBeHidden();
+  await page.locator('#close-experiment').click();
+  await unlockAdvancedFeatures(page);
+  await page.locator('#open-experiment-mode').click();
+  await expect(page.locator('#open-secret-body-game')).toBeVisible();
+  await page.locator('#open-secret-body-game').click();
+  const game = page.locator('#secret-body-game-screen');
+  await expect(game).toBeVisible();
+  await expect(game.locator('[data-sbp="players-value"]')).toHaveText('4');
+  for (let i = 0; i < 2; i++) await game.locator('[data-sbp="players-down"]').click();
+  await expect(game.locator('[data-sbp="players-value"]')).toHaveText('2');
+  for (let i = 0; i < 2; i++) await game.locator('[data-sbp="rounds-down"]').click();
+  await game.locator('[data-sbp="start"]').click();
+  for (let step = 0; step < 60; step++) {
+    if (await game.locator('[data-sbp="reveal"]').count()) break;
+    if (await game.locator('[data-sbp="card"]').count() && await game.locator('[data-sbp="memorised"]').isHidden()) {
+      await game.locator('[data-sbp="card"]').click();
+      await game.locator('[data-sbp="memorised"]').click();
+    } else if (await game.locator('[data-sbp="memorised"]').isVisible().catch(() => false)) {
+      await game.locator('[data-sbp="memorised"]').click();
+    } else if (await game.locator('[data-sbp="spin"]').count()) {
+      await game.locator('[data-sbp="spin"]').click();
+    } else if (await game.locator('[data-sbp="continue"]').count()) {
+      await game.locator('[data-sbp="continue"]').click();
+    } else if (await game.locator('[data-sbp="nobody"]').count()) {
+      await game.locator('[data-sbp="nobody"]').click();
+    } else if (await game.locator('[data-sbp="wrong"]').count()) {
+      await game.locator('[data-sbp="word"]').first().click();
+      await game.locator('[data-sbp="wrong"]').click();
+    } else if (await game.locator('[data-sbp="next"]').count()) {
+      await game.locator('[data-sbp="next"]').click();
+    }
+  }
+  await expect(game.locator('[data-sbp="reveal"]')).toHaveCount(2);
+  await game.locator('[data-sbp="back"]').click();
+  await expect(page.locator('#experiment-screen')).toBeVisible();
+  await page.locator('#close-experiment').click();
+  await page.locator('#advanced-features-toggle').uncheck();
+  await page.locator('#open-experiment-mode').click();
+  await expect(page.locator('#open-secret-body-game')).toBeHidden();
+});

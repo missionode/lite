@@ -15,7 +15,7 @@ const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
     'engine and persistence should load before the application');
-assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.1'\)/,
+assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.2'\)/,
     'the UI should fetch the versioned English question bank');
 
 for (const id of [
@@ -40,7 +40,7 @@ assert.match(inlineScripts[0], /show\(elements\.accessRequiredView\)/, 'locked d
 assert.match(html, /Conversation cue — not a prediction/, 'rapport guidance should not claim to predict character or behavior');
 assert.match(inlineScripts[0], /window\.confirm\('Clear this assessment/, 'new-client clearing should be deliberate');
 
-assert.match(html, /includedLanguages:\s*'en,ml,hi,ru'/, 'English, Malayalam, Hindi and Russian should remain available');
+assert.match(html, /includedLanguages:\s*'en,ml,hi,ru,ta'/, 'English, Malayalam, Hindi and Russian should remain available');
 assert.match(html, /translate\.google\.com\/translate_a\/element\.js\?cb=googleTranslateElementInit/,
     'the existing Google Translate path should be retained');
 assert.match(html, /\.goog-te-gadget\{font-size:14px!important;/,

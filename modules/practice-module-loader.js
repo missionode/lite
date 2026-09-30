@@ -10,7 +10,8 @@
         hooponopono: Object.freeze({ src: './modules/hooponopono-practice.js?v=1.0', globalName: 'ChakraHooponoponoPractice' }),
         'undo-unlearn': Object.freeze({ src: './modules/undo-unlearn-practice.js?v=1.0', globalName: 'ChakraUndoUnlearnPractice' }),
         'quiet-courage': Object.freeze({ src: './modules/quiet-courage-practice.js?v=1.0', globalName: 'ChakraQuietCouragePractice' }),
-        'self-exploration': Object.freeze({ src: './modules/self-exploration-practices.js?v=1.0', globalName: 'ChakraSelfExplorationPractices' })
+        'self-exploration': Object.freeze({ src: './modules/self-exploration-practices.js?v=1.0', globalName: 'ChakraSelfExplorationPractices' }),
+        'secret-body-game': Object.freeze({ src: './modules/secret-body-part-game.js?v=1.0', globalName: 'ChakraSecretBodyPartGame' })
     });
     const pending = new Map();
     const selectionOrder = Object.freeze([

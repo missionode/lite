@@ -332,6 +332,7 @@ function normalizeMeditationVisualEffect(value) {
 const configScreen = document.getElementById('config-screen');
 const settingsManagerScreen = document.getElementById('settings-manager-screen');
 const experimentScreen = document.getElementById('experiment-screen');
+const secretBodyGameScreen = document.getElementById('secret-body-game-screen');
 const skyScreen = document.getElementById('sky-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
@@ -353,7 +354,7 @@ const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
     window,
-    screens: [configScreen, settingsManagerScreen, experimentScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
     experimentScreen,
@@ -2916,6 +2917,29 @@ function attachEventListeners() {
     ].filter(Boolean);
     const intimateServicePanel = document.getElementById('intimate-service-panel');
     const experimentCareOptions = document.getElementById('experiment-care-group');
+    // Dev-mode Secret Body Part party game (lazy module, nothing saved).
+    const secretBodyGameButton = document.getElementById('open-secret-body-game');
+    let secretBodyGame = null;
+    secretBodyGameButton?.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            const api = await practiceModuleLoader.load('secret-body-game');
+            if (!secretBodyGame) {
+                secretBodyGame = api.mount({
+                    document,
+                    root: document.getElementById('secret-body-game-root'),
+                    t,
+                    showScreen,
+                    gameScreen: secretBodyGameScreen,
+                    returnScreen: experimentScreen,
+                    isUnlocked: () => state.advancedFeaturesUnlocked
+                });
+            }
+            secretBodyGame.open();
+        } catch (error) {
+            console.error('Secret Body Part could not start:', error);
+        }
+    });
     const experimentActivitySelect = document.getElementById('experiment-activity');
     let intimateServiceUnlocked = false;
     let intimateServiceTapCount = 0;
@@ -3006,6 +3030,11 @@ function attachEventListeners() {
             }
             yogaExperienceToggle.disabled = isLocked;
         }
+        if (secretBodyGameButton) {
+            secretBodyGameButton.hidden = isLocked;
+            secretBodyGameButton.disabled = isLocked;
+        }
+        if (isLocked && secretBodyGame) secretBodyGame.close();
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
             experimentCareOptions.hidden = isLocked;

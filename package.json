@@ -70,6 +70,7 @@
     "test:undo-unlearn": "node tests/undo-unlearn-practice.test.mjs",
     "test:quiet-courage": "node tests/quiet-courage-practice.test.mjs",
     "test:self-exploration": "node tests/self-exploration-practices.test.mjs",
+    "test:secret-body-game": "node tests/secret-body-part-game.test.mjs",
     "test:screen-navigation": "node tests/screen-navigation.test.mjs",
     "test:experiment-settings-view": "node tests/experiment-settings-view.test.mjs",
     "test:experiment-session": "node tests/experiment-session.test.mjs",

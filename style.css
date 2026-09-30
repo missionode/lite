@@ -3253,3 +3253,34 @@ body.sky-canvas-active #particle-canvas {
     .self-exploration-challenge { border-radius: 1.4rem; }
     .challenge-actions { flex-direction: column; }
     .challenge-actions button { width: 100%; }
+
+/* Secret Body Part (dev mode): pass-the-phone party game. */
+.sbp-panel { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; width: min(100%, 36rem); margin: 0 auto; text-align: center; }
+.sbp-note { margin: 0; color: rgba(233, 220, 255, 0.78); font-size: 0.95rem; }
+.sbp-stepper { display: flex; align-items: center; gap: 0.6rem; }
+.sbp-stepper-label { min-width: 5.5rem; text-align: right; }
+.sbp-stepper-value { min-width: 2rem; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.sbp-step { width: 2.6rem; min-height: 2.6rem; padding: 0; }
+.sbp-card { width: min(70vw, 15rem); aspect-ratio: 3 / 4; border: 2px solid; border-radius: 1.2rem; background: rgba(20, 18, 48, 0.92); color: #fff; font-size: 1.5rem; cursor: pointer; transition: transform 0.35s ease; }
+.sbp-card-back { font-size: 3rem; background: repeating-linear-gradient(45deg, rgba(124, 58, 237, 0.35) 0 12px, rgba(20, 18, 48, 0.9) 12px 24px); }
+.sbp-card-secret { box-shadow: 0 0 0 2px #fbbf24, 0 0 28px rgba(251, 191, 36, 0.45); }
+.sbp-wheel { font-size: 4rem; animation: sbp-spin 3s linear infinite; }
+@keyframes sbp-spin { to { transform: rotate(360deg); } }
+.sbp-luck { padding: 0.75rem 1rem; border: 1px solid rgba(251, 191, 36, 0.5); border-radius: 1rem; background: rgba(251, 191, 36, 0.08); }
+.sbp-luck p { margin: 0.35rem 0 0; }
+.sbp-score { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.sbp-score li { padding: 0.25rem 0.6rem; border: 1px solid; border-radius: 999px; font-size: 0.82rem; }
+.sbp-score li.is-out { opacity: 0.45; text-decoration: line-through; }
+.sbp-board, .sbp-guessers { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.45rem; }
+.sbp-word, .sbp-guesser { min-height: 2.6rem; padding: 0.4rem 0.8rem; border: 1px solid rgba(220, 205, 255, 0.3); border-radius: 0.8rem; background: rgba(36, 28, 70, 0.5); color: inherit; font: inherit; cursor: pointer; }
+.sbp-word.is-selected, .sbp-guesser.is-selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.18); }
+.sbp-actions { display: flex; gap: 0.6rem; }
+.sbp-actions button:disabled { opacity: 0.45; }
+.sbp-reveal { display: grid; gap: 0.5rem; width: 100%; margin: 0; padding: 0; list-style: none; }
+.sbp-reveal-card { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem; padding: 0.7rem 1rem; border: 1px solid; border-radius: 1rem; opacity: 0; animation: sbp-flip 0.5s ease forwards; }
+.sbp-reveal-card.is-faker em { color: #ff8a8a; font-style: normal; }
+@keyframes sbp-flip { from { opacity: 0; transform: rotateX(90deg); } to { opacity: 1; transform: none; } }
+.sbp-award { margin: 0; }
+.sbp-faker { color: #ff8a8a; }
+.sbp-bold-badge { font-size: 3rem; }
+@media (prefers-reduced-motion: reduce) { .sbp-wheel, .sbp-reveal-card { animation: none; opacity: 1; } }

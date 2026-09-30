@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /journeyVoiceProfile\.apply\(\{/);
 assert.match(app, /isFeminineVoice: !isHighEnergy && isFeminineNarrationVoice\(\)/);
-assert.match(html, /modules\/journey-voice-profile\.js\?v=1\.0[\s\S]*?app\.js\?v=4.15/);
+assert.match(html, /modules\/journey-voice-profile\.js\?v=1\.0[\s\S]*?app\.js\?v=4.16/);
 assert.match(serviceWorker, /modules\/journey-voice-profile\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:journey-voice-profile'], 'node tests/journey-voice-profile.test.mjs');
 

@@ -13,6 +13,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 - **Verification:** 124/124 unit tests; 31/31 Playwright e2e (Chromium, including a new dev-mode Reverse Journey / Self-Exploration / roadmap-order test); atlas verifier passed for 47 maps with no page errors.
 - **Limits:** device audio/thermal playback not verified.
 
+- **Follow-up (feature/secret-body-part-game):** added the dev-mode Secret Body Part party game (Experiment Mode, 2–7 chakra players, luck cards, Faker Catch, Secret Card every third consecutive game). App `v4.16`, style `v2.14`, practice loader `v1.2`, shell cache `chakra-v5.337`, language cache `v60`. Guide: `docs/secret-body-part-game.md`. The previous release (9bb0d8e) is live on production.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration
