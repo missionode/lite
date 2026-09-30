@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Pitch Mode works sitting or standing
+
+- Calm, Energy and Focus openings said "sit" only; all four mood openings now welcome sitting or standing in all five languages, and the Malayalam/Tamil Calm step no longer mentions a seat. A test checks every language.
+
 ## Completed — Secret Body Part moved to the Lobby
 
 - Owner felt the Experiment Mode entry was too hidden. The game now has its own dev-mode Lobby panel right after the Mood & Relaxation Ambience section (Play now / Back to Meditation Room). Still hidden and locked until dev mode is unlocked.

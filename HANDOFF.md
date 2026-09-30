@@ -19,6 +19,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/game-in-lobby):** Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. App `v4.18`, style `v2.16`, practice loader `v1.3`, game module `v1.1`, shell cache `chakra-v5.339`, language cache `v62`.
 
+- **Follow-up (feature/pitch-sit-or-stand):** every 2-Minute Mind Reset opening now welcomes sitting or standing in all five languages. Shell cache `chakra-v5.340`, language cache `v63`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

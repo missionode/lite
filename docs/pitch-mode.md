@@ -21,6 +21,8 @@ One tap starts the session. There is no Rest mood, so nobody is sent to sleep in
    - **Begin a full journey** → scrolls to the Meditation Room.
    - **Try another feeling** → scrolls back to the moods.
 
+**Sitting or standing:** demos are often done standing, so every mood's opening welcomes the listener to sit or stand, and no step assumes a chair.
+
 Close, Pause and the sound mixer work as usual. There is **no mantra, drone, chakra frequency or chakra visual** — voice-guided only.
 
 ## The four moods

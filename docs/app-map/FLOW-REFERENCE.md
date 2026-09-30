@@ -1137,7 +1137,7 @@ flowchart TD
 | Borrow the fixed voice | For this session only, switch to the fixed male Piper voice for the content language (English Ryan, Hindi Pratham, Russian Dmitri, Malayalam Arjun, Tamil Rasa) at a fixed pace. The Settings voice and pace are ignored and never saved over. |
 | Prepare the voice | The first use in a language downloads that voice (about 60 MB); if it cannot load, the browser voice for the language is used. |
 | Start the 2-minute clock | Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone, chakra frequency or visual journey. |
-| Guided lines | Speak the opening, four guided steps and closing in the selected content language. Quiet gaps are spread so the voice ends about 12 seconds before two minutes. |
+| Guided lines | Speak the opening, four guided steps and closing in the selected content language. Every opening invites the listener to sit or stand (demos are often standing); no step assumes a chair. Quiet gaps are spread so the voice ends about 12 seconds before two minutes. |
 | Close early | The standard Close control stops the demo at any time; pause and the mixer work as usual. |
 | End without statistics | Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. |
 | Invite | Show “That was 2 minutes. Imagine what 20 minutes could do.” with Begin a full journey (scrolls to the Meditation Room) or Try another feeling (scrolls back to the moods). |

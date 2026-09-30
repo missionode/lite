@@ -124,6 +124,13 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const locale = JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'));
     for (const key of keys) assert.ok(locale.ui[key], `${language} is missing ui.${key}`);
     for (const mood of pitch.MOODS) assert.equal(locale.ui[`pitch_${mood}_steps`]?.length, 4, `${language} ${mood} has four guided steps`);
+    // Demos are often done standing: every opening welcomes sitting or standing.
+    const posture = { en: [/sit/i, /stand/i], ml: [/ഇരി|ഇരു/, /നിൽ|നിന്/], hi: [/बैठ/, /खड़/], ru: [/[Сс]ид|[Сс]яд/, /[Сс]то|[Вв]ста/], ta: [/அமர/, /நில|நின்/] }[language];
+    for (const mood of pitch.MOODS) {
+        const opening = locale.ui[`pitch_${mood}_opening`];
+        for (const pattern of posture) assert.match(opening, pattern, `${language} ${mood} opening mentions both sitting and standing`);
+    }
+    assert.doesNotMatch(JSON.stringify(locale.ui.pitch_calm_steps), /ഇരിപ്പിട|இருக்கை/, `${language} Calm does not assume a seat`);
     const copy = JSON.stringify(keys.map(key => locale.ui[key]));
     assert.doesNotMatch(copy, /\bheal|\bcure|guarantee/i, `${language} Pitch copy makes no healing claims`);
 }
