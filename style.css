@@ -3284,3 +3284,13 @@ body.sky-canvas-active #particle-canvas {
 .sbp-faker { color: #ff8a8a; }
 .sbp-bold-badge { font-size: 3rem; }
 @media (prefers-reduced-motion: reduce) { .sbp-wheel, .sbp-reveal-card { animation: none; opacity: 1; } }
+
+/* Pitch Mode: public 2-minute "Choose Your Feeling" demo (normal mode). */
+.pitch-mode-panel { text-align: center; }
+.pitch-moods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; width: 100%; }
+.pitch-mood { min-height: 3.4rem; padding: 0.6rem 0.8rem; border: 1px solid rgba(220, 205, 255, 0.28); border-radius: 1rem; background: rgba(36, 28, 70, 0.5); color: inherit; font: inherit; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease; }
+.pitch-mood:hover, .pitch-mood:focus-visible { border-color: var(--accent-color); transform: translateY(-1px); }
+.pitch-mood:disabled { opacity: 0.5; cursor: default; transform: none; }
+.pitch-invite { text-align: center; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; }
+.pitch-invite h2 { margin: 0; }
+@media (max-width: 360px) { .pitch-moods { grid-template-columns: 1fr; } }

@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Pitch Mode (2-Minute Mind Reset)
+
+- Public normal-mode marketing demo between Sound Shot and the Meditation Room. Four moods (Calm, Courage, Energy, Focus; no Rest), voice-guided only, two-minute countdown, invite at the end, no statistics.
+- Fixed young male Piper voice per language (English Ryan, Hindi Pratham, Russian Dmitri, Malayalam Arjun, Tamil Rasa); text follows the content language; Settings voice and pace are ignored and restored. New Pitch-only voices are hidden from Settings. Guide: `docs/pitch-mode.md`.
+
 ## Completed — Secret Body Part dev-mode party game
 
 - Owner-designed pass-the-phone luck game for 2–7 chakra players, opened from Experiment Mode only while dev mode (Advanced Features) is unlocked. Luck cards, Faker Catch at the Grand Reveal, and a bold Secret Card offered before every third consecutive game. Nothing is saved.

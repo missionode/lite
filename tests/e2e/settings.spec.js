@@ -400,3 +400,25 @@ test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides 
   await page.locator('#open-experiment-mode').click();
   await expect(page.locator('#open-secret-body-game')).toBeHidden();
 });
+
+test('Pitch Mode starts a public two-minute demo and keeps Pitch-only voices out of Settings', async ({ page }) => {
+  const voiceOptions = await page.locator('#voice-select option').evaluateAll(options => options.map(option => option.value));
+  expect(voiceOptions.some(value => /ryan|pratham|dmitri/.test(value))).toBe(false);
+  await page.locator('#save-config').click();
+  const panel = page.locator('#pitch-mode-panel');
+  await expect(panel).toBeVisible();
+  await expect(panel.locator('[data-pitch-mood]')).toHaveCount(4);
+  const order = await page.evaluate(() => {
+    const index = id => Array.from(document.querySelectorAll('[id]')).findIndex(element => element.id === id);
+    return [index('shots-control'), index('pitch-mode-panel'), index('lobby-title')];
+  });
+  expect(order[0]).toBeLessThan(order[1]);
+  expect(order[1]).toBeLessThan(order[2]);
+  await panel.locator('[data-pitch-mood="focus"]').click();
+  await expect(page.locator('#meditation-screen')).toBeVisible({ timeout: 15000 });
+  // The title follows the content language (Malayalam by default).
+  await expect(page.locator('#mantra-display')).toHaveText(/^(Focus|ശ്രദ്ധ)$/);
+  await page.locator('#stop-meditation').click({ force: true });
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await expect(page.locator('#pitch-invite')).toBeHidden();
+});

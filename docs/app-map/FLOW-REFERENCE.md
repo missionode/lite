@@ -2,7 +2,7 @@
 
 Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-09-30.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -27,35 +27,36 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 17. [Ordered Chakra Journey add-ons](#journey-addons)
 18. [Lobby journey roadmap](#journey-roadmap)
 19. [Quiet Courage · private self-expression practice](#quiet-courage)
-20. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
-21. [Pause, stop and live controls](#controls)
-22. [Optional Lobby video introduction](#restart)
-23. [Completion, statistics and external handoff](#completion)
-24. [Scripts, language and timing](#content)
-25. [Narration and fallback](#narration)
-26. [Audio signal architecture](#audio)
-27. [Sound options and live suppression](#sound-options)
-28. [Visuals and browser lifecycle](#visuals)
-29. [Earth observer reference and atmosphere](#earth-atmosphere)
-30. [Thematic solar containment glow](#solar-containment)
-31. [Persistence, caching and network](#storage)
-32. [Failure and recovery map](#recovery)
-33. [Isolated checkpoint delivery](#delivery-workflow)
-34. [Display-language UI renderer](#locale-ui-renderer)
-35. [Timing configuration and saved values](#timing-configuration)
-36. [Automatic journey voice profile](#journey-voice-profile)
-37. [Session-only journey-mode hydration](#session-mode-hydration)
-38. [Mixer preference control hydration](#mixer-preference-hydration)
-39. [Journey selection preference hydration](#journey-selection-hydration)
-40. [Timing preference control hydration](#timing-preference-hydration)
-41. [Appearance preference control hydration](#appearance-preference-hydration)
-42. [Script preference control hydration](#script-preference-hydration)
-43. [Custom meditation script settings](#custom-script-settings)
-44. [Personal-care preference control hydration](#care-preference-hydration)
-45. [Settings backup and restore](#settings-backup)
-46. [Operator-led chakra assessment](#assessment-tournament)
-47. [Frequency repertory handoff](#repertory)
-48. [Secret Body Part · dev-mode party game](#secret-body-game)
+20. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
+21. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
+22. [Pause, stop and live controls](#controls)
+23. [Optional Lobby video introduction](#restart)
+24. [Completion, statistics and external handoff](#completion)
+25. [Scripts, language and timing](#content)
+26. [Narration and fallback](#narration)
+27. [Audio signal architecture](#audio)
+28. [Sound options and live suppression](#sound-options)
+29. [Visuals and browser lifecycle](#visuals)
+30. [Earth observer reference and atmosphere](#earth-atmosphere)
+31. [Thematic solar containment glow](#solar-containment)
+32. [Persistence, caching and network](#storage)
+33. [Failure and recovery map](#recovery)
+34. [Isolated checkpoint delivery](#delivery-workflow)
+35. [Display-language UI renderer](#locale-ui-renderer)
+36. [Timing configuration and saved values](#timing-configuration)
+37. [Automatic journey voice profile](#journey-voice-profile)
+38. [Session-only journey-mode hydration](#session-mode-hydration)
+39. [Mixer preference control hydration](#mixer-preference-hydration)
+40. [Journey selection preference hydration](#journey-selection-hydration)
+41. [Timing preference control hydration](#timing-preference-hydration)
+42. [Appearance preference control hydration](#appearance-preference-hydration)
+43. [Script preference control hydration](#script-preference-hydration)
+44. [Custom meditation script settings](#custom-script-settings)
+45. [Personal-care preference control hydration](#care-preference-hydration)
+46. [Settings backup and restore](#settings-backup)
+47. [Operator-led chakra assessment](#assessment-tournament)
+48. [Frequency repertory handoff](#repertory)
+49. [Secret Body Part · dev-mode party game](#secret-body-game)
 
 <a id="curriculum-branding"></a>
 
@@ -157,6 +158,7 @@ flowchart TD
 | Other exits | Shot completion reloads; Music Only stops manually; experiments return to their screen. |
 
 - Exactly one assessment CTA is in the Lobby; Settings has no assessment link. It starts hidden/disabled, appears only after the shared Advanced Features unlock, hides again on relock, and establishes a 15-minute same-tab handoff. The Sky CTA is public. Only the Observatory runs the calculated sky animation; journey/support screens draw one static frame, and Lobby/Settings hide it. Client-side assessment feature gate, not server authentication.
+- The Lobby also offers Pitch Mode (2-Minute Mind Reset) between Sound Shot and the Meditation Room; see the pitch-mode map.
 
 <a id="modularization"></a>
 
@@ -1044,6 +1046,48 @@ flowchart TD
 | Practice-module load failure | Show the existing localized retry message; leave the session unstarted. |
 
 - Narration follows the selected meditation language; visible name and roadmap follow display language. Private reflection never requires saying, typing, or reporting anything. This is a wellbeing/choice practice, not treatment or an outcome promise. The subsequent Self-Exploration games are mapped separately in the Self-Exploration challenges graph.
+
+<a id="pitch-mode"></a>
+
+## Pitch Mode · 2-Minute Mind Reset
+
+Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.
+
+Sources: [modules/pitch-mode.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:1), [tests/pitch-mode.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/pitch-mode.test.mjs:1), [app.js:1603](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1603), [app.js:2918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2918), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1), [docs/pitch-mode.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/pitch-mode.md:1).
+
+```mermaid
+flowchart TD
+  lobby["Lobby panel"]
+  voice["Borrow the fixed voice"]
+  warm["Prepare the voice"]
+  start["Start the 2-minute clock"]
+  guide["Guided lines"]
+  close["Close early"]
+  end["End without statistics"]
+  invite["Invite"]
+  lobby -->|"Tap a mood"| voice
+  voice -->|"Fixed voice set"| warm
+  warm -->|"Ready / fallback"| start
+  start -->|"Begin"| guide
+  guide -->|"Close tapped"| close
+  guide -->|"Lines finished"| end
+  close -->|"Stop"| end
+  end -->|"Natural finish"| invite
+  invite -->|"Journey / another feeling"| lobby
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Lobby panel | Always visible (no dev mode). Four one-tap moods: Calm, Courage, Energy and Focus. There is no Rest mood. |
+| Borrow the fixed voice | For this session only, switch to the fixed male Piper voice for the content language (English Ryan, Hindi Pratham, Russian Dmitri, Malayalam Arjun, Tamil Rasa) at a fixed pace. The Settings voice and pace are ignored and never saved over. |
+| Prepare the voice | The first use in a language downloads that voice (about 60 MB); if it cannot load, the browser voice for the language is used. |
+| Start the 2-minute clock | Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone, chakra frequency or visual journey. |
+| Guided lines | Speak the opening, four guided steps and closing in the selected content language. Quiet gaps are spread so the voice ends about 12 seconds before two minutes. |
+| Close early | The standard Close control stops the demo at any time; pause and the mixer work as usual. |
+| End without statistics | Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. |
+| Invite | Show “That was 2 minutes. Imagine what 20 minutes could do.” with Begin a full journey (scrolls to the Meditation Room) or Try another feeling (scrolls back to the moods). |
+
+- Normal-mode marketing demo. Pitch-only voices carry pitchOnly in piper-models.json, so the Settings picker and automatic voice choice never list them. Honest wording only: relax, pause, feel calmer or fresher; no healing claims.
 
 <a id="self-exploration-challenges"></a>
 

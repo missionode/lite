@@ -94,6 +94,51 @@
       "quality": "medium",
       "license": "Community-reported CC terms; confirm the model-specific license before redistribution",
       "source": "https://huggingface.co/PravalX/piper-voices"
+    },
+    {
+      "id": "en_US-ryan-medium",
+      "language": "en",
+      "locale": "en-US",
+      "label": "Piper English — Ryan (Medium, Pitch Mode)",
+      "gender": "male",
+      "modelPath": "en/en_US/ryan/medium/en_US-ryan-medium.onnx",
+      "configPath": "en/en_US/ryan/medium/en_US-ryan-medium.onnx.json",
+      "phonemizerVoice": "en-us",
+      "modelSize": 63201294,
+      "quality": "medium",
+      "pitchOnly": true,
+      "license": "See the voice MODEL_CARD before redistribution",
+      "source": "https://huggingface.co/rhasspy/piper-voices"
+    },
+    {
+      "id": "hi_IN-pratham-medium",
+      "language": "hi",
+      "locale": "hi-IN",
+      "label": "Piper Hindi — Pratham (Medium, Pitch Mode)",
+      "gender": "male",
+      "modelPath": "hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx",
+      "configPath": "hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx.json",
+      "phonemizerVoice": "hi",
+      "modelSize": 63516050,
+      "quality": "medium",
+      "pitchOnly": true,
+      "license": "See the voice MODEL_CARD before redistribution",
+      "source": "https://huggingface.co/rhasspy/piper-voices"
+    },
+    {
+      "id": "ru_RU-dmitri-medium",
+      "language": "ru",
+      "locale": "ru-RU",
+      "label": "Piper Russian — Dmitri (Medium, Pitch Mode)",
+      "gender": "male",
+      "modelPath": "ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx",
+      "configPath": "ru/ru_RU/dmitri/medium/ru_RU-dmitri-medium.onnx.json",
+      "phonemizerVoice": "ru",
+      "modelSize": 63201294,
+      "quality": "medium",
+      "pitchOnly": true,
+      "license": "See the voice MODEL_CARD before redistribution",
+      "source": "https://huggingface.co/rhasspy/piper-voices"
     }
   ]
 }

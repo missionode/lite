@@ -1,6 +1,7 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
 export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-29', commit: 'b967a5f production + uncommitted narration and No Frequency default updates', scope: 'Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run.' };
 meta.date = '2026-09-30';
+meta.scope += ' Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map).';
 meta.scope += ' Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map).';
 meta.scope += ' 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.';
 const graphs = [];
@@ -485,6 +486,17 @@ add('secret-body-game','Supporting pages','Secret Body Part · dev-mode party ga
 ],[['locked','setup','Dev mode unlocked'],['setup','bold','Third game in a row'],['setup','deal','Start'],['bold','deal','Include / skip'],['deal','spin','All memorised'],['spin','luck','Card drawn'],['spin','guess','No card'],['luck','deal','Swap · view new cards'],['luck','guess','Double / Reverse / Lightning'],['luck','survive','Shield'],['guess','out','Marked right'],['guess','survive','All missed'],['out','spin','Next call'],['survive','spin','Next call'],['spin','reveal','Rounds done / one left'],['reveal','exit','Finish'],['exit','setup','Play again']],['Dev-mode only; not part of any meditation journey or session statistics. The module loads lazily through the practice-module loader and is offline pre-cached. Secret Card words live in SECRET_PARTS inside the module with matching ui.sbpPart_* translations in all five locales.']);
 
 graphs.find(graph => graph.id === 'experiments').notes.push('While dev mode is unlocked, Experiment Mode also shows the Secret Body Part party game button; see the secret-body-game map.');
+
+add('pitch-mode','Journeys','Pitch Mode · 2-Minute Mind Reset','Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.','modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1603; app.js:2918; piper-models.json:1; docs/pitch-mode.md:1',[
+ [['lobby','Lobby panel','Always visible (no dev mode). Four one-tap moods: Calm, Courage, Energy and Focus. There is no Rest mood.']],
+ [['voice','Borrow the fixed voice','For this session only, switch to the fixed male Piper voice for the content language (English Ryan, Hindi Pratham, Russian Dmitri, Malayalam Arjun, Tamil Rasa) at a fixed pace. The Settings voice and pace are ignored and never saved over.'],['warm','Prepare the voice','The first use in a language downloads that voice (about 60 MB); if it cannot load, the browser voice for the language is used.']],
+ [['start','Start the 2-minute clock','Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone, chakra frequency or visual journey.']],
+ [['guide','Guided lines','Speak the opening, four guided steps and closing in the selected content language. Quiet gaps are spread so the voice ends about 12 seconds before two minutes.'],['close','Close early','The standard Close control stops the demo at any time; pause and the mixer work as usual.']],
+ [['end','End without statistics','Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace.']],
+ [['invite','Invite','Show “That was 2 minutes. Imagine what 20 minutes could do.” with Begin a full journey (scrolls to the Meditation Room) or Try another feeling (scrolls back to the moods).']]
+],[['lobby','voice','Tap a mood'],['voice','warm','Fixed voice set'],['warm','start','Ready / fallback'],['start','guide','Begin'],['guide','close','Close tapped'],['guide','end','Lines finished'],['close','end','Stop'],['end','invite','Natural finish'],['invite','lobby','Journey / another feeling']],['Normal-mode marketing demo. Pitch-only voices carry pitchOnly in piper-models.json, so the Settings picker and automatic voice choice never list them. Honest wording only: relax, pause, feel calmer or fresher; no healing claims.']);
+
+graphs.find(graph => graph.id === 'overview').notes.push('The Lobby also offers Pitch Mode (2-Minute Mind Reset) between Sound Shot and the Meditation Room; see the pitch-mode map.');
 
 // CP-MOD-048/049/050/051/052/053/054 update ownership references without changing flow nodes or edges.
 const audioMap = graphs.find(graph => graph.id === 'audio');

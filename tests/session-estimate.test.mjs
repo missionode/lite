@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
-assert.match(html, /modules\/session-estimate\.js\?v=1\.1[\s\S]*?app\.js\?v=4.16/);
+assert.match(html, /modules\/session-estimate\.js\?v=1\.1[\s\S]*?app\.js\?v=4.17/);
 assert.match(serviceWorker, /modules\/session-estimate\.js\?v=1\.1/);
 assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/);
 

@@ -103,6 +103,7 @@ const screenNavigationModule = window.ChakraScreenNavigation;
 const experimentSession = window.ChakraExperimentSession?.create();
 if (!experimentSession) throw new Error('Experiment session module is unavailable.');
 const shotSession = window.ChakraShotSession?.create();
+const pitchMode = window.ChakraPitchMode?.create();
 if (!shotSession) throw new Error('Shot session module is unavailable.');
 const sleepJourney = window.ChakraSleepJourney?.create();
 if (!sleepJourney) throw new Error('Sleep journey module is unavailable.');
@@ -436,6 +437,8 @@ function getDemoScriptTimingMessage() {
 }
 
 let piperVoiceRegistry = [];
+// Pitch-only voices stay out of Settings and automatic voice choice.
+const selectablePiperVoices = () => piperVoiceRegistry.filter(voice => !voice.pitchOnly);
 let languageRegistry = [];
 let localeBundles = {};
 let fallbackLanguageId = 'en';
@@ -1596,6 +1599,14 @@ class MeditationController {
         }
     }
 
+    // Pitch Mode: public 2-minute guided demo with a fixed voice per language.
+    async startPitch(mood) {
+        return pitchMode.start(this, mood, {
+            state, document, piperTTS, isPiperVoice, wakeLock, showScreen, meditationScreen,
+            setText, journeyT, setVoiceStatus, t, logError: (...args) => console.error(...args)
+        });
+    }
+
     async startExperiment(activity) {
         return experimentSession.start(this, activity, {
             state, document, fetch, getLanguageConfig, wakeLock, setText, showScreen, meditationScreen,
@@ -2519,7 +2530,7 @@ function getMoonPhase() {
 }
 
 async function loadPiperVoiceRegistry() {
-    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console, 'piper-models.json?v=3');
+    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console, 'piper-models.json?v=4');
 }
 
 async function init() {
@@ -2553,7 +2564,7 @@ function registerServiceWorker() {
 
 function setupVoices() {
     piperLifecycle.bindVoicePicker({
-        document, window, state, voiceSelect, piperVoices: piperVoiceRegistry,
+        document, window, state, voiceSelect, piperVoices: selectablePiperVoices(),
         voiceMatchesLanguage, autoSelectVoice, SpeechSynthesisUtteranceCtor: window.SpeechSynthesisUtterance
     });
 }
@@ -2561,7 +2572,7 @@ function setupVoices() {
 function autoSelectVoice() {
     const selected = piperVoiceProfile.selectVoice({
         currentValue: state.voiceName || voiceSelect?.value,
-        registry: piperVoiceRegistry,
+        registry: selectablePiperVoices(),
         language: state.language,
         defaultVoiceId: getLanguageConfig().defaultPiperVoice,
         browserVoices: state.voices,
@@ -2904,6 +2915,15 @@ function attachEventListeners() {
         if (event.key === 'Enter' || event.key === ' ') setAdvancedPasswordVisible(false);
     });
 
+    // Pitch Mode (normal mode): one tap per mood starts a 2-minute guided demo.
+    pitchMode?.bindInvite({
+        document,
+        onJourney: () => document.getElementById('lobby-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+        onAgain: () => document.getElementById('pitch-mode-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    });
+    document.querySelectorAll('[data-pitch-mood]').forEach(button => {
+        button.addEventListener('click', () => meditation.startPitch(button.dataset.pitchMood));
+    });
     const intimateServiceToggles = [
         document.getElementById('perineal-care-toggle'),
         document.getElementById('massage-toggle'),

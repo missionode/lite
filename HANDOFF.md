@@ -15,6 +15,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/secret-body-part-game):** added the dev-mode Secret Body Part party game (Experiment Mode, 2–7 chakra players, luck cards, Faker Catch, Secret Card every third consecutive game). App `v4.16`, style `v2.14`, practice loader `v1.2`, shell cache `chakra-v5.337`, language cache `v60`. Guide: `docs/secret-body-part-game.md`. The previous release (9bb0d8e) is live on production.
 
+- **Follow-up (feature/pitch-mode):** public Pitch Mode (2-Minute Mind Reset) with four moods and fixed male voices per language (Ryan, Pratham, Dmitri new and Pitch-only; Arjun, Rasa existing). App `v4.17`, style `v2.15`, shell cache `chakra-v5.338`, language cache `v61`, voice registry `piper-models.json?v=4`. Guide: `docs/pitch-mode.md`. Device listening check of the new voices is still needed.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

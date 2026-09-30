@@ -12,7 +12,7 @@ const echo = context.window.ChakraAudioMusicEcho;
 assert.ok(Object.isFrozen(echo));
 assert.ok(Object.isFrozen(echo.PROFILES));
 assert.match(app, /setMusicEcho\(mode = 'light'\) \{\s*return audioMusicEcho\.setMusicEcho\(this, mode, MUSIC_REVERB_TAIL_SECONDS\)/);
-assert.ok(html.indexOf('modules/audio-music-echo.js?v=1.0') < html.indexOf('app.js?v=4.16'));
+assert.ok(html.indexOf('modules/audio-music-echo.js?v=1.0') < html.indexOf('app.js?v=4.17'));
 assert.match(sw, /\.\/modules\/audio-music-echo\.js\?v=1\.0/);
 
 function param(value = 0.3) {

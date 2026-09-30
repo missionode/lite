@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.14">
+    <link rel="stylesheet" href="style.css?v=2.15">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -347,6 +347,16 @@
                     <p class="shots-help" data-i18n="ui.shotsHelp">One short frequency-only activation. No narration or background music.</p>
                     <p id="shot-frequency-note" class="shots-help" hidden></p>
                     <a class="shots-repertory-link" href="./docs/repertory.html" data-i18n="ui.frequencyRepertory">View Frequency Repertory</a>
+                </div>
+            </div>
+            <div id="pitch-mode-panel" class="config-group lobby-panel pitch-mode-panel">
+                <label data-i18n="ui.pitchTitle">2-Minute Mind Reset</label>
+                <p class="mixer-note" data-i18n="ui.pitchSubtitle">Choose your feeling. A short guided session — just a voice and soft music.</p>
+                <div class="pitch-moods">
+                    <button type="button" class="pitch-mood" data-pitch-mood="calm" data-i18n="ui.pitch_calm_label">😌 Calm</button>
+                    <button type="button" class="pitch-mood" data-pitch-mood="courage" data-i18n="ui.pitch_courage_label">💪 Courage</button>
+                    <button type="button" class="pitch-mood" data-pitch-mood="energy" data-i18n="ui.pitch_energy_label">⚡ Energy</button>
+                    <button type="button" class="pitch-mood" data-pitch-mood="focus" data-i18n="ui.pitch_focus_label">🎯 Focus</button>
                 </div>
             </div>
             <h1 id="lobby-title">Meditation Room</h1>
@@ -762,6 +772,15 @@
             </div>
         </div>
 
+        <div id="pitch-invite" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pitch-invite-title">
+            <div class="modal-content pitch-invite">
+                <h2 id="pitch-invite-title" data-i18n="ui.pitchInviteTitle">That was 2 minutes.</h2>
+                <p data-i18n="ui.pitchInviteText">Imagine what 20 minutes could do for you.</p>
+                <button id="pitch-invite-journey" type="button" class="primary-btn" data-i18n="ui.pitchInviteJourney">Begin a full journey</button>
+                <button id="pitch-invite-again" type="button" class="secondary-btn" data-i18n="ui.pitchInviteAgain">Try another feeling</button>
+            </div>
+        </div>
+
         <!-- Global In-Session Controls (visible across all meditation screens) -->
         <div id="controls" class="hidden journey-control-panel" aria-label="Session controls">
             <div id="session-countdown" class="session-countdown" data-session-countdown hidden role="timer" aria-live="off" data-i18n-aria-label="ui.sessionCountdown" aria-label="Time remaining">00:00</div>
@@ -838,6 +857,7 @@
     <script src="modules/practice-module-loader.js?v=1.2"></script>
     <script src="modules/screen-navigation.js?v=1.0"></script>
     <script src="modules/shot-session.js?v=1.0"></script>
+    <script src="modules/pitch-mode.js?v=1.0"></script>
     <script src="modules/sleep-journey.js?v=1.0"></script>
     <script src="modules/yoga-session.js?v=1.0"></script>
     <script src="modules/care-session.js?v=1.0"></script>
@@ -877,6 +897,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.16"></script>
+    <script src="app.js?v=4.17"></script>
 </body>
 </html>

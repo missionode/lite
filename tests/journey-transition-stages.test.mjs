@@ -70,6 +70,6 @@ const sw = fs.readFileSync('sw.js', 'utf8');
 assert.match(app, /async handleInterval\(\)\s*\{\s*return this\.runSessionItem\('chakra interval',[\s\S]*?journeyTransitionStages\.runInterval\(this,/);
 assert.match(app, /async handleSilence\(\)\s*\{\s*return this\.runSessionItem\('closing silence',[\s\S]*?journeyTransitionStages\.runSilence\(this,/);
 assert.match(app, /async runClosing\(\)\s*\{\s*return this\.runSessionItem\('closing guidance',[\s\S]*?journeyTransitionStages\.runClosing\(this,/);
-assert.match(html, /modules\/journey-transition-stages\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.16/);
+assert.match(html, /modules\/journey-transition-stages\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.17/);
 assert.equal((sw.match(/\.\/modules\/journey-transition-stages\.js\?v=1\.0/g) || []).length, 1);
 console.log('Journey transition stages passed: interval cadence, quiet period, closing narration/fades and offline wiring.');

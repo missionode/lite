@@ -45,11 +45,11 @@ assert.match(runtime, /var [^;]*_modelBaseUrl[^;]*;/, 'The custom repository bac
 assert.match(runtime, /_modelBaseUrl = new WeakMap\(\)/, 'The backing field must be initialized before a session uses it.');
 assert.match(lifecycle, /registryUrl\s*=\s*'piper-models\.json'/);
 assert.match(app, /language-manifest\.json\?v=2/);
-assert.match(app, /piper-models\.json\?v=3/);
+assert.match(app, /piper-models\.json\?v=4/);
 assert.match(serviceWorker, /chakra-piper-v11/);
-assert.match(serviceWorker, /chakra-language-v60/);
+assert.match(serviceWorker, /chakra-language-v61/);
 assert.match(serviceWorker, /LANGUAGE_ASSETS\s*=\s*\['\.\/language-manifest\.json\?v=2',\s*'\.\/locales\/ta\.json'\]/);
-assert.match(serviceWorker, /chakra-v5\.337/);
+assert.match(serviceWorker, /chakra-v5\.338/);
 assert.doesNotMatch(serviceWorker, /hostname\s*===\s*['"]huggingface\.co['"]/, 'ONNX downloads are not duplicated in Service Worker storage');
 assert.match(html, /data-i18n="ui\.piperCommunityVoiceNote"/);
 
