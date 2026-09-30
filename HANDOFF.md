@@ -10,6 +10,7 @@ This is the authoritative current checkpoint. Read this block first; later secti
 - **Versions:** app `v4.15`, style `v2.13`, shell cache `chakra-v5.336`, language cache `v59`, routing `v1.3`, roadmap/practice loader/session estimate/lobby visibility/preparation selection `v1.1`, assessment data `v1.2`.
 - **Tests:** stale version pins and code-moved regexes in production tests were refreshed; `docs/dot.json` is optional in tests. All unit tests pass; atlas rebuilt (47 maps).
 - **Local snapshot:** the old uncommitted Mac checkout is preserved on local branch `release/local-snapshot-2026-09-30` (excludes `.DS_Store`, `.codex/`, `audio/BACKUP/`).
+- **Verification:** 124/124 unit tests; 31/31 Playwright e2e (Chromium, including a new dev-mode Reverse Journey / Self-Exploration / roadmap-order test); atlas verifier passed for 47 maps with no page errors.
 - **Limits:** device audio/thermal playback not verified.
 
 ## Checkpoint history (production)

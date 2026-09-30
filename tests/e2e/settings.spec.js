@@ -66,7 +66,8 @@ test('shows the direct illustrated newcomer orientation for a normal journey wit
 
 test('organizes Settings controls and keeps Corpse Pose off by default', async ({ page }) => {
   await expect(page.locator('#corpse-pose-toggle')).not.toBeChecked();
-  await expect(page.locator('#reverse-journey-toggle')).toHaveCount(0);
+  await expect(page.locator('#reverse-journey-control')).toBeHidden();
+  await expect(page.locator('#reverse-journey-toggle')).toBeDisabled();
   await expect(page.locator('#box-meditation-toggle')).toHaveCount(0);
   await expect(page.locator('#hooponopono-toggle')).toHaveCount(0);
   await expect(page.locator('#volume-mixer')).toContainText('Comfort & Visuals');
@@ -335,4 +336,23 @@ test('persists timing changes through settings reload', async ({ page }) => {
 
   await page.reload();
   await expect(page.locator('#time-bath')).toHaveValue('3');
+});
+
+test('dev mode reveals Reverse Journey and Self-Exploration, and the roadmap follows runtime order', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#reverse-journey-control')).toBeHidden();
+  await expect(page.locator('#self-exploration-section')).toBeHidden();
+  await page.locator('#open-settings').click();
+  await unlockAdvancedFeatures(page);
+  await page.locator('#save-config').click();
+  await expect(page.locator('#reverse-journey-control')).toBeVisible();
+  await expect(page.locator('#self-exploration-section')).toBeVisible();
+  await page.locator('#chakra-selection input[value="root"]').check();
+  await page.locator('#reverse-journey-toggle').check();
+  await page.locator('#quiet-courage-addon-toggle').check();
+  const roadmap = page.locator('#journey-roadmap');
+  await expect(roadmap).toContainText('Reverse Journey (Crown ➔ Root)');
+  const text = await roadmap.textContent();
+  expect(text.indexOf('Intention')).toBeLessThan(text.indexOf('Quiet Courage'));
+  expect(text.indexOf('Quiet Courage')).toBeLessThan(text.indexOf('Reverse Journey'));
 });
