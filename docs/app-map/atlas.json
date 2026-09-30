@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-09-29",
+    "date": "2026-09-30",
     "commit": "b967a5f production + uncommitted narration and No Frequency default updates",
-    "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run."
+    "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
     {
@@ -592,7 +592,7 @@
           [
             "settings",
             "Settings",
-            "Unconfigured visitor. Save sets chakra_configured and opens Lobby."
+            "Unconfigured visitor. “Go to Meditation Room” saves settings, sets chakra_configured and opens the Lobby."
           ],
           [
             "lobby",
@@ -812,13 +812,13 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, selected practice loading, dispatch priority, and the tested Sleep/Shot change guards.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1392; app.js:1459; app.js:1601; app.js:2663",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1392; app.js:1459; app.js:1601; app.js:2663",
       "rows": [
         [
           [
             "lobby",
             "Choose an experience",
-            "Ordinary mode uses selected chakras; choose at least one."
+            "Ordinary mode uses selected chakras; choose at least one. Dev mode (Advanced Features) also reveals a session-only Reverse Journey toggle below the chakra list; it is hidden, disabled and cleared when locked or reloaded, and never saved."
           ]
         ],
         [
@@ -878,7 +878,7 @@
           [
             "focused",
             "Focused practice",
-            "Yoga and Intimate Care are standalone routes. With no chakra selected, Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Ho’oponopono and Undo & Unlearn run as standalone preparation sessions in the displayed order; Ho’oponopono and Undo & Unlearn follow the chakra loop when chakras are selected."
+            "Yoga and Intimate Care are standalone routes. With no chakra selected, Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Advanced Features-only Self-Exploration (Quiet Courage, Confidence Visualization, Deep Secrets, Final Challenge), Ho’oponopono and Undo & Unlearn run as standalone preparation sessions in the displayed order; Ho’oponopono and Undo & Unlearn follow the chakra loop when chakras are selected."
           ],
           [
             "guided",
@@ -993,6 +993,7 @@
       ],
       "notes": [
         "Lobby experience visibility owns Shot-type refresh, Sleep’s session-only unlock gate, and Shots rejection/confirmation/activation UI bindings. It delegates all cross-mode clearing to app-owned enforceMasterToggle and callbacks; it does not own mode policy. Shots hide incompatible Lobby controls. Add-on selectors remain independently selectable and their option rows open directly below each checked item. Checking Music Only, Sleep, Yoga, Intimate Care or Shots clears journey add-ons; those exclusive choices can also clear Corpse Pose. Selected guided-practice scripts load only after Begin validation and before an optional video/audio start; failed loading returns to the Lobby before a session starts. ChakraSelectionView owns immediate chakra preference persistence and active-chip display; Save Settings retains its explicit persistence call.",
+        "Self-Exploration is available only while Advanced Features is unlocked; relocking clears its session-only selections and locked start rejects stale selections. Selected practice modules load only after valid Begin and can run without a chakra.",
         "CP-MOD-088 moves High Energy estimate refresh into the existing High Energy selection handler, retaining visibility-before-estimate ordering. CP-MOD-097 moves Shot-type reset/visibility/estimate binding into the Lobby visibility owner; Shots/Sleep validation and confirmation paths stay app-owned."
       ]
     },
@@ -1073,7 +1074,7 @@
           [
             "loop",
             "Selected chakra loop",
-            "Each chakra: narration → mantra and bounded drone → affirmation. Between chakras: breathing interval."
+            "Each chakra: narration → mantra and bounded drone → affirmation. Between chakras: breathing interval. Default order is Root → Crown; with dev mode (Advanced Features) unlocked and the session-only Reverse Journey checked, the selected chakras run Crown → Root. HRIM and focused experiences ignore it."
           ]
         ],
         [
@@ -2307,14 +2308,21 @@
       "id": "journey-addons",
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
-      "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → chakras; the same selected route drives its displayed estimate and countdown.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; tests/practice-module-loader.test.mjs:1; modules/journey-opening-stage.js:1; modules/box-breathing-practice.js:1; modules/visualization-practice.js:1; modules/dharana-practice.js:1; modules/body-scan-practice.js:1; modules/guided-noting-practice.js:1; modules/hooponopono-practice.js:1; modules/undo-unlearn-practice.js:1; modules/session-estimate.js:1; index.html:322; app.js:1420; app.js:2237",
+      "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → Final Challenge → chakras; the same selected route drives its displayed estimate and countdown.",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/quiet-courage-practice.js:1; modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; modules/journey-roadmap.js:1; modules/session-estimate.js:1; index.html:363; tests/self-exploration-practices.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1420; app.js:2237",
       "rows": [
         [
           [
             "prepare",
             "Preparation add-ons",
-            "All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions; its new module owns the timed narration, cancellation guard and black-scene fade/cleanup while the controller supplies localized copy and app services. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. When no chakras are selected, these sessions and Ho’oponopono/Undo & Unlearn run alone; the roadmap shows only the selected standalone stages. With chakras selected, preparation precedes the chakra journey and integration practices follow it."
+            "All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions; its new module owns the timed narration, cancellation guard and black-scene fade/cleanup while the controller supplies localized copy and app services. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. Quiet Courage uses a subtle 396 Hz Root-associated symbolic tone at its opening; its fade-in/out duration exactly follows Drone Duration (4/10/14/20 seconds), and No Frequency suppresses it. This is an aesthetic grounding cue, not a proven therapeutic frequency. When no chakras are selected, these sessions and Ho’oponopono/Undo & Unlearn run alone; the roadmap shows only the selected standalone stages. With chakras selected, preparation precedes the chakra journey and integration practices follow it. The separate Self-Exploration section appears directly below Journey Preparation when Advanced Features is unlocked; its ordered options follow Quiet Courage, then Confidence Visualization, Deep Secrets and Final Challenge after Guided Noting and before chakras. These may run without chakra selection."
+          ]
+        ],
+        [
+          [
+            "quiet",
+            "Self-Exploration",
+            "A separate Advanced Features-only section directly below Journey Preparation. Quiet Courage comes first, then Confidence Visualization, Deep Secrets and Final Challenge. Selected items follow Guided Noting and precede chakras; any combination can run without chakra selection. Relocking clears all selections. See the Self-Exploration challenges map."
           ]
         ],
         [
@@ -2359,10 +2367,26 @@
           "integrate",
           "separate",
           "Other choices"
+        ],
+        [
+          "prepare",
+          "quiet",
+          "Advanced Features unlocked + selected"
+        ],
+        [
+          "quiet",
+          "chakras",
+          "Chakras selected · continue"
+        ],
+        [
+          "quiet",
+          "separate",
+          "No chakras · finish"
         ]
       ],
       "notes": [
-        "Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Box Breathing execution lives in `modules/box-breathing-practice.js`; Visualization blackout/audio/narration/return timing in `modules/visualization-practice.js`; Ho’oponopono phrase-cycle timing and visual setup in `modules/hooponopono-practice.js`; Undo & Unlearn phase/scene lifecycle in `modules/undo-unlearn-practice.js`; Dharana in `modules/dharana-practice.js`; Body Scan in `modules/body-scan-practice.js`; Guided Noting in `modules/guided-noting-practice.js`. The controller supplies localized narration, timing and existing screen/audio/session services. Box Breathing preserves its four-step/four-cycle order, 100 ms pause accounting and music fades. Visualization preserves optional ambience/error fallback, ducked narration, waits, selected duration, silence wake prompt, return-screen fades, ambience stop and music restoration. Ho’oponopono preserves the three four-phrase cycles, configured pauses and closing fade handoff; journey placement remains after the chakra sequence. Undo & Unlearn preserves the selected duration, translated content-free phases and active-session guards, and always hides the scene/releases body mode even if its fade wait rejects. The Lobby estimate owner preserves mode priority, timing/default inputs and the standard add-on formula while app.js refreshes its text and roadmap. Dharana preserves selected anchor shape/color, duration-based CSS timing plus an active-session shrink clock for reduced-motion mode, the four-second narrated release and cleanup. Guided Noting preserves its selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the four Meditation Languages."
+        "Preparation stages execute sequentially in the canonical order; the routing owner stops before the next stage if the session becomes inactive. Box Breathing execution lives in `modules/box-breathing-practice.js`; Visualization blackout/audio/narration/return timing in `modules/visualization-practice.js`; Ho’oponopono phrase-cycle timing and visual setup in `modules/hooponopono-practice.js`; Undo & Unlearn phase/scene lifecycle in `modules/undo-unlearn-practice.js`; Dharana in `modules/dharana-practice.js`; Body Scan in `modules/body-scan-practice.js`; Guided Noting in `modules/guided-noting-practice.js`. Quiet Courage starts a low-level 396 Hz symbolic cue only when No Frequency is off; the gain envelope fades in/out across the selected Drone Duration (4/10/14/20 seconds), not the entire practice. Research does not establish a unique frequency that causes courage or therapeutic benefit. The controller supplies localized narration, timing and existing screen/audio/session services. Box Breathing preserves its four-step/four-cycle order, 100 ms pause accounting and music fades. Visualization preserves optional ambience/error fallback, ducked narration, waits, selected duration, silence wake prompt, return-screen fades, ambience stop and music restoration. Ho’oponopono preserves the three four-phrase cycles, configured pauses and closing fade handoff; journey placement remains after the chakra sequence. Undo & Unlearn preserves the selected duration, translated content-free phases and active-session guards, and always hides the scene/releases body mode even if its fade wait rejects. The Lobby estimate owner preserves mode priority, timing/default inputs and the standard add-on formula while app.js refreshes its text and roadmap. Dharana preserves selected anchor shape/color, duration-based CSS timing plus an active-session shrink clock for reduced-motion mode, the four-second narrated release and cleanup. Guided Noting preserves its selected duration, four translated neutral reminders, active-session checks, black-scene five-second fade and cleanup on narration/fade failure. Body Scan, Guided Noting and Undo & Unlearn use only pitch-black fades: no figure, text labels, recurring canvas loop or decorative animation. Undo & Unlearn is content-free: no memory search, private answer or examples; its three forgiveness invitations preserve responsibility, safety, boundaries and choice. It cannot claim another person has forgiven the meditator. Replacement experiences clear every add-on. All narration is contract-checked in the five Meditation Languages.",
+        "Quiet Courage is not a clinical intervention or a demand to become outgoing. Its localized narration gives permission to keep reflection private, imagine a neutral low-stakes scene, pause or stop, and take no real-world action."
       ]
     },
     {
@@ -2370,7 +2394,7 @@
       "group": "Journeys",
       "title": "Lobby journey roadmap",
       "subtitle": "Localized, display-only summary of the currently selected Lobby route.",
-      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; app.js:529; app.js:1420",
+      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; modules/self-exploration-practices.js:1; tests/self-exploration-practices.test.mjs:1; app.js:529; app.js:1420",
       "rows": [
         [
           [
@@ -2420,7 +2444,7 @@
           [
             "guided",
             "Standard guided journey",
-            "Arrival or Returning → Intention → Chakras, with selected preparation labels inserted in their established order and optional integration stages before Closing."
+            "Arrival or Returning → Intention → selected preparation practices (Box → Visualization → Focused Attention → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → Final Challenge) → Chakras (shown as “Reverse Journey (Crown ➔ Root)” when dev-mode Reverse Journey is checked) → optional Ho’oponopono → optional Undo & Unlearn → Closing. This matches the runtime, where preparation practices run after the opening and Intention stage."
           ]
         ],
         [
@@ -2564,7 +2588,233 @@
         ]
       ],
       "notes": [
-        "The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility."
+        "The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility.",
+        "Quiet Courage is included after Guided Noting and before chakras, or among selected standalone preparation stages when no chakra is chosen. Its displayed name and roadmap follow Display Language.",
+        "Confidence Visualization, Deep Secrets, and Final Challenge follow Quiet Courage in order and are included in both chakra and standalone preparation roadmaps. Final Challenge responses are transient and not saved."
+      ]
+    },
+    {
+      "id": "quiet-courage",
+      "group": "Journeys",
+      "title": "Quiet Courage · private self-expression practice",
+      "subtitle": "Optional Advanced Features practice in the Self-Exploration section directly below Journey Preparation; may run alone or as the last preparation stage before chakras.",
+      "source": "modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/lobby-experience-visibility.js:1; modules/journey-roadmap.js:1; app.js:2348; index.html:363",
+      "rows": [
+        [
+          [
+            "locked",
+            "Hidden and disabled",
+            "Only available after the current page load unlocks Advanced Features. It is never restored from storage; relocking clears the selection."
+          ]
+        ],
+        [
+          [
+            "choose",
+            "Choose Quiet Courage",
+            "The first option in the optional Self-Exploration section, shown only while Advanced Features is unlocked. Choose 3/5/8 minutes; it may be combined with preparation or run without selecting a chakra."
+          ]
+        ],
+        [
+          [
+            "opening",
+            "Arrive safely",
+            "The meditator may keep everything private, imagine a neutral situation, rest with the breath, or stop at any time."
+          ]
+        ],
+        [
+          [
+            "explore",
+            "Explore without pressure",
+            "Notice a preference only if comfortable; imagine a safe, ordinary moment; practise pausing, choosing not now, changing one’s mind, or setting a boundary. No real event, disclosure, public action or personality change is requested."
+          ]
+        ],
+        [
+          [
+            "continue",
+            "Return or continue",
+            "After Guided Noting and before chakra selection, complete the Quiet Courage stage; with no chakras, the selected preparation session finishes independently. Cancellation stops the remaining stages."
+          ]
+        ],
+        [
+          [
+            "next",
+            "Next route",
+            "With selected chakras, continue the journey; otherwise complete the standalone preparation."
+          ],
+          [
+            "journey",
+            "Continue chakra journey",
+            "Run the selected chakra route."
+          ],
+          [
+            "finish",
+            "Finish standalone practice",
+            "Complete the preparation-only session."
+          ],
+          [
+            "failure",
+            "Practice-module load failure",
+            "Show the existing localized retry message; leave the session unstarted."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "locked",
+          "choose",
+          "Advanced Features unlocked"
+        ],
+        [
+          "choose",
+          "opening",
+          "Selected"
+        ],
+        [
+          "choose",
+          "failure",
+          "Module unavailable · retry"
+        ],
+        [
+          "opening",
+          "explore",
+          "Narration"
+        ],
+        [
+          "explore",
+          "continue",
+          "Complete"
+        ],
+        [
+          "continue",
+          "next",
+          "Practice ends"
+        ],
+        [
+          "next",
+          "journey",
+          "Chakras selected"
+        ],
+        [
+          "next",
+          "finish",
+          "No chakras selected"
+        ]
+      ],
+      "notes": [
+        "Narration follows the selected meditation language; visible name and roadmap follow display language. Private reflection never requires saying, typing, or reporting anything. This is a wellbeing/choice practice, not treatment or an outcome promise. The subsequent Self-Exploration games are mapped separately in the Self-Exploration challenges graph."
+      ]
+    },
+    {
+      "id": "self-exploration-challenges",
+      "group": "Journeys",
+      "title": "Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge",
+      "subtitle": "Advanced Features-only optional stages after Quiet Courage and before chakras; individually selectable and available as standalone preparation.",
+      "source": "modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/lobby-experience-visibility.js:1; modules/session-estimate.js:1; modules/journey-roadmap.js:1; app.js:2291; index.html:365; sw.js:62; tests/self-exploration-practices.test.mjs:1",
+      "rows": [
+        [
+          [
+            "gate",
+            "Advanced Features gate",
+            "Choices are session-only and cleared on relock. Selected practice module loads lazily at Begin and is precached for offline use."
+          ]
+        ],
+        [
+          [
+            "confidence",
+            "Confidence Visualization",
+            "A fully clothed, non-explicit self-kindness visualization with a localized step counter. No appearance ideal, body inspection, touching, disclosure, or real-world action. Choose 3/5/8 minutes."
+          ]
+        ],
+        [
+          [
+            "secrets",
+            "Deep Secrets · Speak or Stay Silent",
+            "Speaking is optional; fiction/metaphor, silence, skip or stop are welcome. Localized narration says in first person “I won’t record or save what you say here.” The PWA does not request microphone access or capture, transcribe, store or upload speech; an in-room listener may hear. Choose 3/4/6 minutes."
+          ]
+        ],
+        [
+          [
+            "final",
+            "Final Challenge",
+            "One checklist task appears after a calm 5-second countdown. No flashing, sound, penalty or deadline. Yes / No / Skip are equal and none is preselected."
+          ]
+        ],
+        [
+          [
+            "answer",
+            "Transient choice",
+            "Yes only invites the meditator to ask the guide for information after the session. No and Skip continue neutrally. No storage, analytics, assessment, operator record, booking or automatic upsell."
+          ]
+        ],
+        [
+          [
+            "exit",
+            "Skip / Stop / Continue",
+            "Each stage is skippable; cancellation closes its UI and uses the current session exit path. Load failure uses the shared localized recovery notice."
+          ]
+        ],
+        [
+          [
+            "route",
+            "Chakra journey",
+            "If chakras were selected, continue to the selected chakra stages."
+          ],
+          [
+            "finish",
+            "Standalone completion",
+            "If none were selected, complete the standalone practices."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "gate",
+          "confidence",
+          "Choose + unlocked"
+        ],
+        [
+          "gate",
+          "secrets",
+          "Choose + unlocked"
+        ],
+        [
+          "gate",
+          "final",
+          "Choose + unlocked"
+        ],
+        [
+          "confidence",
+          "secrets",
+          "Next selected stage"
+        ],
+        [
+          "secrets",
+          "final",
+          "Next selected stage"
+        ],
+        [
+          "final",
+          "answer",
+          "Countdown completes"
+        ],
+        [
+          "answer",
+          "exit",
+          "Yes / No / Skip"
+        ],
+        [
+          "exit",
+          "route",
+          "Chakras selected"
+        ],
+        [
+          "exit",
+          "finish",
+          "No chakras"
+        ]
+      ],
+      "notes": [
+        "All visible text and spoken prompts are supplied for English, Malayalam, Hindi, Russian and Tamil. No disclosure is scored or rewarded. The Yes choice does not activate service; information can only be requested from the guide after the session. Browser and device audio verification remain outstanding."
       ]
     },
     {
@@ -2929,7 +3179,7 @@
           [
             "default",
             "Default content",
-            "All four languages currently point to scripts.json. Journey fetch appends a timestamp query."
+            "English, Malayalam, Hindi, Russian and Tamil point to scripts.json. Journey fetch appends a timestamp query."
           ],
           [
             "custom",
@@ -2965,7 +3215,7 @@
           [
             "voice",
             "Resolve voice",
-            "Matching browser voice or supported configured Piper voice; Hindi has no default Piper voice."
+            "Fetch the versioned Piper registry to avoid stale service-worker responses. Choose the configured Piper voice for the meditation language by default, or a matching browser voice. Tamil Rasa and Hindi Priyamvada are community Piper models fetched on first preview/use and cached locally; browser fallback remains selectable. Tamil model is CC-BY-4.0. Hindi repository uses a generic CC tag, so confirm model redistribution terms before commercial distribution."
           ]
         ],
         [
@@ -3029,7 +3279,7 @@
         ]
       ],
       "notes": [
-        "Default add-on narration is complete in English, Malayalam, Hindi and Russian. The production Malayalam fields in scripts.json use a calm, consistent spoken register, natural sentence pacing and corrected care/yoga terminology; Ho’oponopono preserves its four canonical meanings. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono resolves from scripts.json. Automated checks establish key presence, non-empty copy and expected phrase/step counts, not audible pronunciation quality. Sleep and Shots validate stage frequencies in their own routes. Shots load default language content when a script load is needed; an already-loaded script may be reused. Experiments do not run the same guided schema validation.",
+        "Tamil is registered as ta-IN with a complete UI bundle and translated default narration, chakra content, optional practices, care/Yoga prompts and pose descriptions. Hindi and Tamil default to community Piper voices; the versioned registry URL plus shell/service-worker cache generations prevent the app from retaining an older voice list. Their ONNX weights download only on first preview/use (about 64 MB) and are cached in browser storage for later use. Tamil Rasa states CC-BY-4.0 with AI4Bharat Rasa attribution. The Hindi community repository is tagged only as generic CC, so its derivative-model redistribution terms need confirmation before commercial distribution. Browser/device fallback remains available. Box/Dharana/Visualization resolve from locale bundles; Ho’oponopono and other script-led practices resolve from scripts.json. Automated tests verify localized path completeness and voice registry wiring; they do not establish audible pronunciation quality. Sleep and Shots validate stage frequencies in their own routes.",
         "CP-MOD-129–148 moves generated-intention detection and cross-language refresh policy into content localization. User-authored intentions remain preserved; default copy continues to follow the selected meditation language."
       ]
     },
@@ -3761,7 +4011,7 @@
           [
             "special",
             "Piper / language",
-            "Cache-first, fetch on miss, cache successful response. Piper recognizes local assets and Hugging Face voice URLs."
+            "Local Piper code, worker and registry use the service-worker cache; downloaded Hugging Face model/config blobs use Piper OPFS storage only, avoiding a duplicate Service Worker copy. Locale files use their language cache."
           ],
           [
             "general",
@@ -3955,7 +4205,7 @@
       "group": "Systems",
       "title": "Isolated checkpoint delivery",
       "subtitle": "Approved project workflow for high-quality, token-aware implementation without changing runtime behavior.",
-      "source": ".loop/workflow.md:1; Loop/EFFICIENT-WORKFLOW.md:1; Loop/DELIVERY-WORKFLOW.md:1",
+      "source": "AGENTS.md:1; HANDOFF.md:1; .loop/workflow.md:1; Loop/loop.md:1; Loop/TECH-STACK.md:1; Loop/communication-architecture.md:1; Loop/EFFICIENT-WORKFLOW.md:1; Loop/DELIVERY-WORKFLOW.md:1",
       "rows": [
         [
           [
@@ -3982,7 +4232,7 @@
           [
             "context",
             "Compact task packet",
-            "Load the active handoff, affected atlas/AST neighborhood and targeted source ranges; do not copy the full conversation or repeatedly scan history."
+            "Load the active handoff, affected atlas/AST neighborhood and targeted source ranges. Loop/TECH-STACK.md and Loop/communication-architecture.md describe Lite’s static browser runtime, local state, Piper worker and cache boundaries; unrelated server examples are removed."
           ]
         ],
         [
@@ -4038,7 +4288,7 @@
           [
             "reset",
             "Durable session reset",
-            "At a clean boundary, save baseline, decisions, owned symbols, evidence, risks and exact next action; start fresh instead of forking long history."
+            "Update the single CURRENT RESUME block in HANDOFF.md. AGENTS.md directs new/resumed sessions to it: verify the checkout, load the Lite profile and pick up the next authorized action. Historical NOW/NEXT headings do not restart completed work; no background task is launched."
           ]
         ],
         [
@@ -4173,7 +4423,7 @@
         ]
       ],
       "notes": [
-        "Caveman Mode is deliberately primitive: smallest context, one direct agent, no sub-agents and the smallest deterministic check. A worktree consumes disk space, not model tokens. Effective savings come from bounded AST neighborhoods, unified diffs, fresh sessions, targeted checks, one owner and reduced rework. Assessment → modularization/loading → Cosmic Observatory remains the current feature order."
+        "Caveman Mode is deliberately primitive: smallest context, one direct agent, no sub-agents and the smallest deterministic check. A worktree consumes disk space, not model tokens. Effective savings come from bounded AST neighborhoods, unified diffs, fresh sessions, targeted checks, one owner and reduced rework. Assessment → modularization/loading → Cosmic Observatory records the approved dependency order; consult the active handoff and fix queue for completion status. The Lite Loop profile replaces generic server/technology assumptions and keeps browser checks opt-in."
       ]
     },
     {
@@ -5203,7 +5453,7 @@
           [
             "translate",
             "Translate dynamically rendered content",
-            "Existing Google Translate widget uses an off-screen translated-string cache for upcoming prompts and results; network required."
+            "Existing Google Translate widget offers English, Malayalam, Hindi, Russian and Tamil, using an off-screen translated-string cache for upcoming prompts and results; network required."
           ]
         ],
         [

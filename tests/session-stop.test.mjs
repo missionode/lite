@@ -8,7 +8,7 @@ const sessionStop = context.window.ChakraSessionStop.create();
 const appSource = fs.readFileSync('app.js', 'utf8');
 const htmlSource = fs.readFileSync('index.html', 'utf8');
 const workerSource = fs.readFileSync('sw.js', 'utf8');
-assert.match(appSource, /stop\(\{ preserveScreen = false \} = \{\}\) \{\s*return sessionStop\.stop\(this, \{ preserveScreen \}/);
+assert.match(appSource, /stop\(\{ preserveScreen = false \} = \{\}\) \{\s*(?:this\.sessionItemRunner\.reset\(\);\s*)?return sessionStop\.stop\(this, \{ preserveScreen \}/);
 assert.ok(htmlSource.indexOf('modules/session-stop.js?v=1.0') < htmlSource.indexOf('app.js?v='));
 assert.match(workerSource, /modules\/session-stop\.js\?v=1\.0/);
 const events = [];

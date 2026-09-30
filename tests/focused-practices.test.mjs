@@ -42,7 +42,7 @@ assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\([\s\S]*?
 assert.match(dharanaPractice, /focusAnchor\.textContent = shapes\[anchor\][\s\S]*?focusAnchor\.hidden = false[\s\S]*?focusAnchor\.hidden = true/, 'Focused Attention should show its selected anchor and clean it up afterwards');
 assert.match(dharanaPractice, /while \(remaining-- > 0 && isActive\(\)\)[\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)[\s\S]*?finally[\s\S]*?focusAnchor\.hidden = true/, 'Dharana should narrate its closing before the anchor and veil are removed');
 assert.match(dharanaPractice, /--focus-anchor-duration[\s\S]*?is-focusing[\s\S]*?focusAnchor\.style\.transform = `scale\(/, 'Focused Attention should slowly settle the anchor over selected active-session time');
-assert.match(html, /box-breathing-experience-toggle[\s\S]*?visualization-addon-toggle[\s\S]*?dharana-addon-toggle[\s\S]*?body-scan-addon-toggle[\s\S]*?noting-addon-toggle[\s\S]*?chakra-selection-panel/, 'Lobby preparation controls should match the approved runtime order');
+assert.match(html, /id="journey-preparation-addons"[\s\S]*?id="self-exploration-section"[\s\S]*?id="quiet-courage-addon-toggle"[\s\S]*?id="chakra-selection-panel"/, 'Self-Exploration sits below Journey Preparation; Quiet Courage precedes chakra selection');
 assert.match(html, /id="body-scan-duration"[\s\S]*?value="3"[\s\S]*?value="5" selected[\s\S]*?value="8"/, 'Body Scan should offer 3, 5 and 8 minute durations');
 assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanPractice\.run[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'The controller should pass localized Body Scan content into its practice owner');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.body-scan-scene[\s\S]*?background:\s*#000/, 'Body Scan should use a pitch-black fade');
@@ -71,7 +71,7 @@ const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app
 assert.match(dharanaPractice, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
 assert.match(app, /journeyRouting\.buildChakraOrder\([\s\S]*?focusedExperience[\s\S]*?massage-toggle[\s\S]*?selectedChakras/, 'Guided starts should delegate chakra-order selection to the journey-routing owner');
-assert.match(journeyRoadmap, /labels\.splice\(0, 0, translate\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(translate\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should place preparation before chakras and integration after them');
+assert.match(journeyRoadmap, /translate\('ui\.roadmapIntention'\)[\s\S]*?labels\.push\(translate\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(translate\(reverse \? 'ui\.reverseJourney' : 'ui\.roadmapChakras'\)\)[\s\S]*?labels\.push\(translate\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should follow the runtime: Intention, then preparation, then chakras, then integration');
 
 for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
     for (const key of ['dharanaFocusGuidance', 'dharanaClosing', 'visualizationFocusPrompt', 'visualizationGuidance', 'visualizationSilenceWakePrompt', 'visualizationReturn']) {

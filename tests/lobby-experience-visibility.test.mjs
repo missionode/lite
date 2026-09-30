@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperienceVisibility/);
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
 assert.match(app, /lobbyExperienceVisibility\.bindShotTypeChange\(/);
-assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/);
-assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.0/);
+assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.1[\s\S]*?app\.js\?v=4.15/);
+assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.1/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -19,6 +19,7 @@ assert.ok(Object.isFrozen(visibility));
 
 const ids = [
     'dharana-options', 'visualization-options', 'body-scan-options', 'noting-options', 'undo-unlearn-options',
+    'quiet-courage-control', 'quiet-courage-options', 'self-exploration-section',
     'high-energy-duration-control', 'drone-duration-control', 'time-per-chakra', 'lobby-title',
     'journey-preparation-addons', 'chakra-selection-panel', 'journey-integration-addons', 'intention-config-group',
     'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings',
@@ -86,6 +87,15 @@ assert.equal(result.controls['journey-preparation-addons'].hidden, false);
 assert.equal(result.controls['time-per-chakra'].value, 3.5);
 assert.equal(result.controls['time-per-chakra'].style.values['--range-fill'], '41.7%');
 assert.equal(result.callbackCounts.range, 1);
+
+result = makeHarness({ checks: ['quiet-courage-addon-toggle'], advancedUnlocked: false });
+assert.equal(result.controls['self-exploration-section'].hidden, true, 'Self-Exploration stays hidden while Advanced Features is locked');
+assert.equal(result.startMeditationBtn.textContent, 'ui.beginJourney', 'a locked practice cannot change the Begin label');
+result = makeHarness({ checks: ['quiet-courage-addon-toggle'], advancedUnlocked: true });
+assert.equal(result.controls['self-exploration-section'].hidden, false, 'Advanced Features unlock reveals Self-Exploration below Journey Preparation');
+assert.equal(result.controls['quiet-courage-control'].hidden, false, 'Quiet Courage appears as the first Self-Exploration option');
+assert.equal(result.controls['quiet-courage-options'].hidden, false, 'the selected standalone practice reveals its duration');
+assert.equal(result.startMeditationBtn.textContent, 'ui.beginQuietCourage', 'Quiet Courage can be started without selecting a chakra');
 
 result = makeHarness();
 assert.equal(result.startMeditationBtn.textContent, 'ui.beginJourney');

@@ -36,14 +36,25 @@ const copied = routing.buildChakraOrder({ selectedChakras: selected });
 assert.deepEqual(Array.from(copied), selected);
 assert.notEqual(copied, selected, 'normal journey order should be copied, not shared');
 assert.deepEqual(
+    Array.from(routing.buildChakraOrder({ selectedChakras: ['root', 'heart', 'crown'], reverse: true })),
+    ['crown', 'heart', 'root'],
+    'dev-mode Reverse Journey runs the selected chakras Crown to Root'
+);
+assert.deepEqual(
+    Array.from(routing.buildChakraOrder({ selectedChakras: ['root', 'heart'], reverse: false })),
+    ['root', 'heart'],
+    'normal order stays Root to Crown'
+);
+assert.deepEqual(
     Array.from(routing.buildChakraOrder({ focusedExperience: 'intimate', massageSelected: true })),
     ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root']
 );
 assert.deepEqual(
     Array.from(routing.buildPreparationStagePlan({
-        box: true, visualization: true, dharana: true, bodyScan: true, noting: true
+        box: true, visualization: true, dharana: true, bodyScan: true, noting: true, quietCourage: true,
+        confidenceVisualization: true, deepSecrets: true, finalChallenge: true
     })),
-    ['box', 'visualization', 'dharana', 'bodyScan', 'noting']
+    ['box', 'visualization', 'dharana', 'bodyScan', 'noting', 'quietCourage', 'confidenceVisualization', 'deepSecrets', 'finalChallenge']
 );
 assert.deepEqual(
     Array.from(routing.buildPreparationStagePlan({ visualization: true, bodyScan: true })),
@@ -79,6 +90,8 @@ assert.match(app, /journeyRouting\.resolveFocusedExperience/);
 assert.match(app, /journeyRouting\.resolveLaunchRoute/);
 assert.match(app, /journeyRouting\.validateLobbyStart/);
 assert.match(app, /journeyRouting\.buildChakraOrder/);
+assert.match(app, /reverse: state\.advancedFeaturesUnlocked && getChecked\('reverse-journey-toggle'\)/,
+    'Begin must only reverse when dev mode is unlocked');
 assert.match(app, /journeyRouting\.buildPreparationStagePlan/);
 
 console.log('Journey routing contract passed: focused modes, launch priority, chakra guard and order.');

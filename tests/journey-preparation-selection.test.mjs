@@ -12,9 +12,10 @@ function checkbox() {
 }
 const toggles = {
     boxBreathing: checkbox(), hooponopono: checkbox(), dharana: checkbox(), visualization: checkbox(),
-    bodyScan: checkbox(), noting: checkbox(), undoUnlearn: checkbox()
+    bodyScan: checkbox(), noting: checkbox(), undoUnlearn: checkbox(), quietCourage: checkbox(),
+    confidenceVisualization: checkbox(), deepSecrets: checkbox(), finalChallenge: checkbox()
 };
-for (const id of ['dharana-options', 'visualization-options', 'body-scan-options', 'noting-options', 'undo-unlearn-options']) {
+for (const id of ['dharana-options', 'visualization-options', 'body-scan-options', 'noting-options', 'undo-unlearn-options', 'quiet-courage-options', 'confidence-visualization-options', 'deep-secrets-options']) {
     elements.set(id, { hidden: true });
 }
 const state = {};
@@ -52,13 +53,15 @@ assert.deepEqual(calls.splice(0), [...competingClear, 'visibility', 'estimate'])
 
 for (const [key, id] of [
     ['dharana', 'dharana-options'], ['visualization', 'visualization-options'],
-    ['bodyScan', 'body-scan-options'], ['noting', 'noting-options'], ['undoUnlearn', 'undo-unlearn-options']
+    ['bodyScan', 'body-scan-options'], ['noting', 'noting-options'], ['undoUnlearn', 'undo-unlearn-options'],
+    ['quietCourage', 'quiet-courage-options'], ['confidenceVisualization', 'confidence-visualization-options'],
+    ['deepSecrets', 'deep-secrets-options'], ['finalChallenge', null]
 ]) {
     change(toggles[key], true);
-    assert.equal(elements.get(id).hidden, false, `${key} options appear when selected`);
+    if (id) assert.equal(elements.get(id).hidden, false, `${key} options appear when selected`);
     assert.deepEqual(calls.splice(0), [...competingClear, 'visibility', 'estimate']);
     change(toggles[key], false);
-    assert.equal(elements.get(id).hidden, true, `${key} options collapse when unselected`);
+    if (id) assert.equal(elements.get(id).hidden, true, `${key} options collapse when unselected`);
     assert.deepEqual(calls.splice(0), ['visibility', 'estimate']);
 }
 
@@ -117,6 +120,7 @@ assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?undoUn
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindPrimaryModeToggles\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindDurationRefresh\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindVisualizationAmbiencePreference\(/);
-assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.0') < html.indexOf('app.js?v=4.14'));
-assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.0/);
+assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.1') < html.indexOf('app.js?v=4.15'));
+assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.1/);
+assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?quietCourage: quietCourageAddonToggle/);
 console.log('Journey preparation selection passed: standalone stages, nested options, mutual-exclusion clears and updates.');

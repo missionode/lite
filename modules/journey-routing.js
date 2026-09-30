@@ -5,7 +5,8 @@
         'crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'
     ]);
     const PREPARATION_STAGE_ORDER = Object.freeze([
-        'box', 'visualization', 'dharana', 'bodyScan', 'noting'
+        'box', 'visualization', 'dharana', 'bodyScan', 'noting', 'quietCourage',
+        'confidenceVisualization', 'deepSecrets', 'finalChallenge'
     ]);
 
     function resolveFocusedExperience({
@@ -44,10 +45,13 @@
     function buildChakraOrder({
         focusedExperience = null,
         massageSelected = false,
-        selectedChakras = []
+        selectedChakras = [],
+        reverse = false
     } = {}) {
         if (focusedExperience === 'intimate' && massageSelected) return [...MASSAGE_CHAKRA_ORDER];
-        return Array.isArray(selectedChakras) ? [...selectedChakras] : [];
+        const order = Array.isArray(selectedChakras) ? [...selectedChakras] : [];
+        // Dev-mode Reverse Journey: selected chakras run Crown → Root.
+        return reverse && !focusedExperience ? order.reverse() : order;
     }
 
     function buildPreparationStagePlan({
@@ -56,10 +60,14 @@
         visualization = false,
         dharana = false,
         bodyScan = false,
-        noting = false
+        noting = false,
+        quietCourage = false,
+        confidenceVisualization = false,
+        deepSecrets = false,
+        finalChallenge = false
     } = {}) {
         if (highEnergy) return [];
-        const selected = { box, visualization, dharana, bodyScan, noting };
+        const selected = { box, visualization, dharana, bodyScan, noting, quietCourage, confidenceVisualization, deepSecrets, finalChallenge };
         return PREPARATION_STAGE_ORDER.filter(stage => selected[stage]);
     }
 

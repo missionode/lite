@@ -3180,3 +3180,76 @@ body.sky-canvas-active #particle-canvas {
     #config-screen { padding-inline: 0.8rem; }
     #config-screen > .config-group { border-radius: 15px; }
 }
+
+/* Self-Exploration (dev mode): Final Challenge dialog and step progress. */
+.self-exploration-challenge {
+    width: min(92vw, 34rem);
+    max-width: 34rem;
+    max-height: min(88vh, 44rem);
+    overflow: auto;
+    padding: clamp(1.35rem, 4vw, 2.25rem);
+    border-color: rgba(168, 145, 255, 0.34);
+    background: rgba(9, 10, 28, 0.96);
+}
+
+.challenge-kicker {
+    margin: 0 0 0.55rem;
+    color: rgba(220, 205, 255, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+}
+
+.challenge-checklist {
+    margin: 1.2rem 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.challenge-checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(168, 145, 255, 0.2);
+    border-radius: 1rem;
+    background: rgba(36, 28, 70, 0.36);
+}
+
+.challenge-checklist li > span:first-child {
+    display: grid;
+    flex: 0 0 1.6rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    place-items: center;
+    border: 1px solid rgba(220, 205, 255, 0.38);
+    border-radius: 50%;
+    color: var(--accent-color);
+}
+
+.challenge-countdown {
+    margin: 0.5rem auto 1.2rem;
+    color: rgba(233, 220, 255, 0.9);
+    font-size: clamp(2.6rem, 12vw, 4rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 300;
+}
+
+.challenge-question { margin: 1rem 0; font-size: 1.08rem; }
+.challenge-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.65rem; }
+.challenge-actions button { min-height: 2.9rem; }
+.self-exploration-progress {
+    width: fit-content;
+    margin: 0 auto 0.5rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid rgba(220, 205, 255, 0.2);
+    border-radius: 999px;
+    color: rgba(233, 220, 255, 0.76);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+}
+
+@media (max-width: 480px) {
+    .self-exploration-challenge { border-radius: 1.4rem; }
+    .challenge-actions { flex-direction: column; }
+    .challenge-actions button { width: 100%; }

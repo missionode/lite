@@ -1,5 +1,19 @@
 # Chakra Meditation — Active Handoff
 
+## CURRENT RESUME — 2026-09-30
+
+This is the authoritative current checkpoint. Read this block first; later sections are history.
+
+- **Release:** `release/port-local-features-2026-09-30`, built from `origin/production` `74e2ba4`. The owner asked to merge and push everything. A direct merge of the old local `modularize` checkout gave 78 conflicts, so the owner chose to port only features production lacked.
+- **Ported:** Advanced Features (dev mode) Quiet Courage (with its symbolic 396 Hz cue) and the Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; session-only dev-mode Reverse Journey (Crown → Root for selected chakras); Lobby roadmap now follows runtime order (Intention before preparation practices); Malayalam wording simplifications on keys production had not changed (the pre-practice guide line, gratitude and waning-moon lines keep the committed wording by owner choice); Tamil Ho'oponopono phrases; assessment question wording `2026-09-24.2`; Lite Loop/AGENTS docs and tracks.
+- **Kept from production:** its own current-item skip, floating controls, newcomer orientation and module structure. The local `journey-item-skip.js` design was not ported.
+- **Versions:** app `v4.15`, style `v2.13`, shell cache `chakra-v5.336`, language cache `v59`, routing `v1.3`, roadmap/practice loader/session estimate/lobby visibility/preparation selection `v1.1`, assessment data `v1.2`.
+- **Tests:** stale version pins and code-moved regexes in production tests were refreshed; `docs/dot.json` is optional in tests. All unit tests pass; atlas rebuilt (47 maps).
+- **Local snapshot:** the old uncommitted Mac checkout is preserved on local branch `release/local-snapshot-2026-09-30` (excludes `.DS_Store`, `.codex/`, `audio/BACKUP/`).
+- **Limits:** device audio/thermal playback not verified.
+
+## Checkpoint history (production)
+
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration
 
 - Baseline `b967a5f` (`production`). Fresh profiles now default No Frequency Mode to selected in Settings and Journey Tuning; a stored explicit OFF or ON continues to win on reload. The shared centering-breath narration now invites comfortable rest in English, Malayalam, Hindi, Russian and Tamil. No audio pathways were otherwise changed.

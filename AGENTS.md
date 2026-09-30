@@ -1,5 +1,17 @@
 # Project working agreement
 
+## Automatic project pickup on handoff
+
+At the start of a new task in this repository, after context compaction, or when resuming a handoff:
+
+1. Read the `CURRENT RESUME` block at the top of `HANDOFF.md` before selecting work. It is the active checkpoint; older `NOW`, `NEXT`, `LOCAL` and release entries below the history heading are historical context.
+2. Read `Loop/README.md` and follow `Loop/loop.md`, `Loop/EFFICIENT-WORKFLOW.md` and `.loop/workflow.md`. Load the Lite-specific technology/communication guide and affected atlas/track only when relevant. Apply this project profile even if the installed Loop plugin is older.
+3. Verify the current repository root, branch, working-tree changes and relevant source before trusting recorded status. Local remote-tracking refs are last-known information until refreshed; permission/network failures are session-specific evidence.
+4. Pick up the recorded next action within the owner's existing authorization, unless the newest request changes the task. Do not restart completed checkpoints, ask the user to repeat known requirements, restore intentionally removed files, or interpret a postponed feature as approved.
+5. Before handing off, update the same `CURRENT RESUME` block with the objective, completed work, exact next action, relevant files, latest validation and limits, approvals and local-versus-published status. Preserve historical entries below it. Do not create competing current-state documents.
+
+This is context pickup when an assistant session is opened or resumed in this repository. It does not schedule background work or launch a new task by itself.
+
 ## Preserve the dynamic sky until its approved redesign relocation
 
 Until the approved Cosmic Observatory redesign is implemented, preserve the current centered Earth reference with five softly merged atmospheric layers (troposphere through exosphere), its clearly visible cool-aqua **26°C comfort theme**, the Sun's soft protective shield ring, Earth-only labeling, text/control-clearance guards, truthful observer coordinates and static journey performance. During that redesign, the owner explicitly permits the main application background to simplify or diverge from these sky requirements to achieve the approved interface. Move the current dynamic observational sky into a dedicated Sky page and add a Settings CTA to it; preserve its astronomy behavior and illustrative atmosphere/Sun treatments there unless the owner changes them again. Keep `earth-atmosphere`, `solar-containment`, Settings navigation and dedicated-sky atlas maps/tests synchronized. The temperature and protection remain illustrative, never physical safety or climate claims.

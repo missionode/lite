@@ -43,11 +43,15 @@
             [toggles.visualization, 'visualization-options'],
             [toggles.bodyScan, 'body-scan-options'],
             [toggles.noting, 'noting-options'],
-            [toggles.undoUnlearn, 'undo-unlearn-options']
+            [toggles.undoUnlearn, 'undo-unlearn-options'],
+            [toggles.quietCourage, 'quiet-courage-options'],
+            [toggles.confidenceVisualization, 'confidence-visualization-options'],
+            [toggles.deepSecrets, 'deep-secrets-options'],
+            [toggles.finalChallenge, null]
         ];
         optionToggles.forEach(([toggle, optionsId]) => {
             toggle?.addEventListener('change', event => {
-                const options = document.getElementById(optionsId);
+                const options = optionsId ? document.getElementById(optionsId) : null;
                 if (options) options.hidden = !event.target.checked;
                 if (event.target.checked) clearCompetingModes();
                 refresh();
@@ -59,7 +63,8 @@
         if (!document || typeof updateSessionEstimate !== 'function') {
             throw new TypeError('Preparation durations require document and estimate services');
         }
-        ['visualization-duration', 'body-scan-duration', 'noting-duration', 'undo-unlearn-duration'].forEach(id => {
+        ['visualization-duration', 'body-scan-duration', 'noting-duration', 'undo-unlearn-duration',
+            'quiet-courage-duration', 'confidence-visualization-duration', 'deep-secrets-duration'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', updateSessionEstimate);
         });
     }

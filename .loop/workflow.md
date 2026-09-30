@@ -2,6 +2,8 @@
 
 Status: APPROVED project default for upcoming work.
 
+Use the project-specific [Lite Loop policy](../Loop/loop.md), [technology profile](../Loop/TECH-STACK.md) and [browser communication architecture](../Loop/communication-architecture.md). They describe the existing static PWA; generic server examples are not project requirements.
+
 ## Objective
 
 Use isolated Git worktrees and focused pull requests for substantial, risky, experimental or parallel work while preserving Lite's existing product, localization, audio, performance, sky and flow-atlas requirements. The workflow must reduce re-reading and rework; it must not create a fleet of agents or extra reviews merely to appear thorough.
@@ -58,7 +60,7 @@ Mode selection is automatic and may escalate when evidence reveals more coupling
 ## Chat history and session resets
 
 - Reset at natural boundaries: completed checkpoint, major feature transition, context saturation or a materially different task. Do not reset in the middle of an unresolved edit/test cycle.
-- Before reset, write a compact resume packet containing baseline commit, objective, decisions, invariants, owned files/symbols, completed evidence, unresolved risks and exact next command/action.
+- Before reset, update the single `CURRENT RESUME` block at the top of `HANDOFF.md` with baseline commit, objective, decisions, invariants, owned files/symbols, completed evidence, unresolved risks, existing authorization and exact next command/action. `AGENTS.md` directs the next session to that block; it must verify the checkout and pick up the recorded work rather than restart historical checkpoints.
 - Start the next bounded task as a fresh session when possible. Do not fork a long conversation merely to save tokens because a fork retains its history.
 - Durable truth remains in source, track, atlas, handoff and Git—not private chat memory. Never discard unresolved approvals, failures or recovery information during reset.
 
@@ -115,7 +117,9 @@ Use direct work on the active branch for a genuinely tiny, isolated documentatio
 - After an approved remote PR merge, update the local integration branch with a clean fast-forward synchronization, then run combined regression checks. Do not overwrite unrelated local changes.
 - Production merge and deployment are a separate reviewed checkpoint even when the feature PR is green.
 
-## Current sequence
+## Checkpoint ordering and current status
+
+The sequence below records the approved dependency order. Use the active `HANDOFF.md`, `docs/app-map/FIX-QUEUE.md` and relevant track for current completion status; this list must not restart already completed work.
 
 1. Implement and review the standalone assessment in its own sandbox.
 2. Resume modularization as bounded sandbox checkpoints, including the deferred loading/performance work.

@@ -435,7 +435,7 @@
         }
         show(elements.loadingView);
         try {
-          const response = await fetch('../data/assessment-questions.json?v=1.1');
+          const response = await fetch('../data/assessment-questions.json?v=1.2');
           if (!response.ok) throw new Error('The assessment question set is unavailable.');
           bank = await response.json();
           window.ChakraAssessmentTournament.validateBank(bank);
@@ -489,7 +489,7 @@
 
       window.googleTranslateElementInit = () => {
         new window.google.translate.TranslateElement({
-          pageLanguage: 'en', includedLanguages: 'en,ml,hi,ru', autoDisplay: false,
+          pageLanguage: 'en', includedLanguages: 'en,ml,hi,ru,ta', autoDisplay: false,
           layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
         }, 'google_translate_element');
       };

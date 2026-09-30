@@ -24,22 +24,22 @@ assert.match(app, /async runSequence\(\{ complete = true \} = \{\}\)\s*\{\s*retu
 assert.doesNotMatch(standardJourneySequence, /runYogaSession/, 'a normal chakra sequence must never insert Yoga');
 
 assert.match(app, /runYogaSession\(\)\s*\{\s*return yogaSession\.run\(this,/, 'Yoga should retain a stable app adapter.');
-assert.match(yogaSession, /if \(state\.corpsePoseEnabled\) await owner\.runCorpsePose\(\);/, 'Yoga Experience should retain its optional Corpse Pose');
+assert.match(yogaSession, /if \(state\.corpsePoseEnabled\) await owner\.runSessionItem\('Corpse Pose', \(\) => owner\.runCorpsePose\(\)\);/, 'Yoga Experience should retain its optional Corpse Pose');
 assert.match(yogaSession, /if \(state\.bathSessionEnabled/, 'Yoga Experience should retain its optional standard Bath Session');
-assert.match(yogaSession, /await owner\.runGuideControlledTransition\(\{[\s\S]*?durationSeconds: timing\('transitions', 'bathToYogaRest'\)/, 'Yoga should rest after a bath/care stage before its introduction');
-assert.match(yogaSession, /if \(!await owner\.runBathSession\(\)\) return;/, 'Yoga should retain the standard Bath Session only');
+assert.match(yogaSession, /owner\.runGuideControlledTransition\(\{[\s\S]*?durationSeconds: timing\('transitions', 'bathToYogaRest'\)/, 'Yoga should rest after a bath/care stage before its introduction');
+assert.match(yogaSession, /const bath = await owner\.runSessionItem\('Bath session', \(\) => owner\.runBathSession\(\)\);\s*if \(!bath\.skipped && bath\.value === false\) return;/, 'Yoga should retain the standard Bath Session only');
 assert.doesNotMatch(yogaSession, /runMassage|runPerinealCare|runAssistedBathing/, 'Intimate Service stages must not be coupled into Yoga');
 assert.match(app, /runIntimateService\(\)\s*\{\s*return careSession\.runIntimateService\(this,/, 'Intimate Service should retain its stable controller adapter');
-assert.match(careSession, /state\.perinealCareEnabled && !await owner\.runPerinealCare\(\)/, 'Intimate Service should start with optional Perineal Care');
+assert.match(careSession, /if \(state\.perinealCareEnabled\) \{\s*const care = await owner\.runSessionItem\('Perineal Care', \(\) => owner\.runPerinealCare\(\)\);/, 'Intimate Service should start with optional Perineal Care');
 assert.match(careSession, /showScreen\(meditationScreen\);[\s\S]*?owner\.runSequence\(/, 'Massage should enter the meditation screen before its narrated chakra sequence');
 assert.match(careSession, /owner\.runSequence\(\{ complete: !state\.assistedBathingEnabled \}\)/, 'Massage should wrap the reverse chakra sequence without a separate timer');
-assert.match(careSession, /if \(state\.assistedBathingEnabled\) await owner\.runAssistedBathing\(\)/, 'Intimate Service should finish with optional Assisted Bathing');
+assert.match(careSession, /if \(state\.assistedBathingEnabled\) await owner\.runSessionItem\('Assisted bathing', \(\) => owner\.runAssistedBathing\(\)\)/, 'Intimate Service should finish with optional Assisted Bathing');
 assert.match(html, /id="intimate-service-panel"/, 'Intimate Service should be a dedicated Lobby section');
 assert.doesNotMatch(html, /intimate-service-unlock/, 'Intimate Service should not expose a visible reveal control');
 assert.match(html, /id="intimate-service-panel"[^>]*hidden/, 'Intimate Service is hidden before initialization');
 assert.match(app, /versionUnlockButton\?\.addEventListener\('click', handleIntimateServiceUnlockTap\)/, 'App version is the reveal target');
 assert.match(app, /intimateServiceTapCount \+= 1[\s\S]*?remaining = 7 - intimateServiceTapCount[\s\S]*?setIntimateServiceLocked\(false\)/, 'Intimate Service should unlock after seven taps');
-assert.doesNotMatch(html, /id="reverse-journey-toggle"/, 'normal Settings must not offer Reverse Journey');
+assert.match(html, /<label id="reverse-journey-control"[^>]* hidden><input type="checkbox" id="reverse-journey-toggle" disabled>/, 'Reverse Journey returns only as a hidden, disabled dev-mode control');
 assert.doesNotMatch(html, /id="time-massage"/, 'Massage must not expose a standalone duration');
 assert.match(app, /\['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'\]/, 'Massage should force all chakras in Crown-to-Root order');
 assert.match(app, /if \(focusedExperience\) \{[\s\S]*?if \(piperWarmup\) await piperWarmup;/, 'focused care should wait for Piper before narration begins');

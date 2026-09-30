@@ -8,7 +8,9 @@
         'box-breathing': Object.freeze({ src: './modules/box-breathing-practice.js?v=1.0', globalName: 'ChakraBoxBreathingPractice' }),
         visualization: Object.freeze({ src: './modules/visualization-practice.js?v=1.0', globalName: 'ChakraVisualizationPractice' }),
         hooponopono: Object.freeze({ src: './modules/hooponopono-practice.js?v=1.0', globalName: 'ChakraHooponoponoPractice' }),
-        'undo-unlearn': Object.freeze({ src: './modules/undo-unlearn-practice.js?v=1.0', globalName: 'ChakraUndoUnlearnPractice' })
+        'undo-unlearn': Object.freeze({ src: './modules/undo-unlearn-practice.js?v=1.0', globalName: 'ChakraUndoUnlearnPractice' }),
+        'quiet-courage': Object.freeze({ src: './modules/quiet-courage-practice.js?v=1.0', globalName: 'ChakraQuietCouragePractice' }),
+        'self-exploration': Object.freeze({ src: './modules/self-exploration-practices.js?v=1.0', globalName: 'ChakraSelfExplorationPractices' })
     });
     const pending = new Map();
     const selectionOrder = Object.freeze([
@@ -18,12 +20,20 @@
         Object.freeze(['box-breathing-experience-toggle', 'box-breathing']),
         Object.freeze(['visualization-addon-toggle', 'visualization']),
         Object.freeze(['hooponopono-experience-toggle', 'hooponopono']),
-        Object.freeze(['undo-unlearn-addon-toggle', 'undo-unlearn'])
+        Object.freeze(['undo-unlearn-addon-toggle', 'undo-unlearn']),
+        // Dev-mode (Advanced Features) practices load only while unlocked.
+        Object.freeze(['quiet-courage-addon-toggle', 'quiet-courage', true]),
+        Object.freeze(['confidence-visualization-addon-toggle', 'self-exploration', true]),
+        Object.freeze(['deep-secrets-addon-toggle', 'self-exploration', true]),
+        Object.freeze(['final-challenge-addon-toggle', 'self-exploration', true])
     ]);
 
-    function selectedModuleIds(isChecked) {
+    function selectedModuleIds(isChecked, { advancedFeaturesUnlocked = false } = {}) {
         if (typeof isChecked !== 'function') throw new TypeError('Practice selection requires a toggle reader');
-        return selectionOrder.filter(([toggleId]) => isChecked(toggleId)).map(([, moduleId]) => moduleId);
+        const ids = selectionOrder
+            .filter(([toggleId, , advanced = false]) => (!advanced || advancedFeaturesUnlocked) && isChecked(toggleId))
+            .map(([, moduleId]) => moduleId);
+        return [...new Set(ids)];
     }
 
     function load(id) {

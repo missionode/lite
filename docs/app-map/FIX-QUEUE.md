@@ -1,5 +1,12 @@
 # Fix queue derived from the flow atlas
 
+## Released — 2026-09-30 port of local dev-mode features
+
+- Quiet Courage and the Self-Exploration trio (dev mode only) run as ordered preparation stages after Guided Noting; practice modules load only while unlocked.
+- Dev-mode Reverse Journey restored as a session-only Lobby toggle (Crown → Root for selected chakras); roadmap shows “Reverse Journey (Crown ➔ Root)”.
+- Lobby roadmap follows runtime order: Arrival/Returning → Intention → preparation practices → Chakras → integration → Closing.
+- Production's own skip/floating controls retained. Stale production test pins and moved-code regexes refreshed.
+
 ## Completed locally — No Frequency default selection
 
 Fresh profiles now default No Frequency Mode to ON, with both Settings and Journey Tuning checkboxes selected. A previously saved explicit ON or OFF remains respected; an opt-out is not overwritten on reload. The sound-options atlas now records the default and persistence rule. Updated app-state script and shell cache versions. State, No Frequency, audio mode, settings-backup, language/cache and hydration contracts pass. Interactive browser verification was not run.

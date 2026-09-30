@@ -26,6 +26,9 @@ const DRONE_DURATION_RATIOS = Object.freeze({
 // Frequency drones use a fixed exposure window. The core-practice duration
 // controls the session, but must never extend a drone's frequency exposure.
 const DRONE_REFERENCE_SECONDS = 20;
+// A brief, low-level Root-associated tone is a symbolic grounding cue for
+// Quiet Courage, not a clinically validated frequency treatment.
+const QUIET_COURAGE_SUPPORT_FREQUENCY_HZ = 396;
 const DEFAULT_DRONE_DURATION_MODE = 'beginner';
 const DEFAULT_HRIM_DRONE_DURATION_MODE = 'intermediate';
 const DEFAULT_SLEEP_DRONE_DURATION_MODE = 'intermediate';
@@ -1613,14 +1616,22 @@ class MeditationController {
             visualization: getChecked('visualization-addon-toggle'),
             dharana: getChecked('dharana-addon-toggle'),
             bodyScan: getChecked('body-scan-addon-toggle'),
-            noting: getChecked('noting-addon-toggle')
+            noting: getChecked('noting-addon-toggle'),
+            quietCourage: state.advancedFeaturesUnlocked && getChecked('quiet-courage-addon-toggle'),
+            confidenceVisualization: state.advancedFeaturesUnlocked && getChecked('confidence-visualization-addon-toggle'),
+            deepSecrets: state.advancedFeaturesUnlocked && getChecked('deep-secrets-addon-toggle'),
+            finalChallenge: state.advancedFeaturesUnlocked && getChecked('final-challenge-addon-toggle')
         });
         const runners = {
             box: () => this.runSessionItem('Box Breathing', () => this.runBoxBreathing()),
             visualization: () => this.runSessionItem('Guided visualisation', () => this.runVisualization()),
             dharana: () => this.runSessionItem('Focused attention', () => this.runDharana()),
             bodyScan: () => this.runSessionItem('Body Scan', () => this.runBodyScan()),
-            noting: () => this.runSessionItem('Guided Noting', () => this.runNoting())
+            noting: () => this.runSessionItem('Guided Noting', () => this.runNoting()),
+            quietCourage: () => this.runSessionItem('Quiet Courage', () => this.runQuietCourage()),
+            confidenceVisualization: () => this.runSessionItem('Confidence Visualization', () => this.runConfidenceVisualization()),
+            deepSecrets: () => this.runSessionItem('Deep Secrets', () => this.runDeepSecrets()),
+            finalChallenge: () => this.runSessionItem('Final Challenge', () => this.runFinalChallenge())
         };
         await journeyRouting.executePreparationStages(stages, runners, () => this.isMeditationActive);
     }
@@ -1704,6 +1715,98 @@ class MeditationController {
             sleep: milliseconds => this.pauseAwareSleep(milliseconds),
             isActive: () => this.isMeditationActive
         });
+    }
+
+    async runQuietCourage() {
+        if (!state.advancedFeaturesUnlocked || !getChecked('quiet-courage-addon-toggle')) return;
+        const practice = await practiceModuleLoader.load('quiet-courage');
+        const minutes = Number(document.getElementById('quiet-courage-duration')?.value || 5);
+        const supportToneDurationMs = getDroneDurationMs(minutes, state.droneDurationMode);
+        await practice.run({
+            minutes,
+            meditationScreen,
+            opening: journeyT('ui.quietCourageOpening'),
+            phases: journeyT('ui.quietCouragePhases'),
+            title: journeyT('ui.quietCourageTitle'),
+            closing: journeyT('ui.quietCourageClosing'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            startSupportTone: () => state.noFrequencyMode
+                ? false
+                : this.audio.startGuidedTransitionTone(QUIET_COURAGE_SUPPORT_FREQUENCY_HZ, supportToneDurationMs),
+            stopSupportTone: () => this.audio.stopGuidedTransitionTone(0.8),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
+    }
+
+    async runConfidenceVisualization() {
+        if (!state.advancedFeaturesUnlocked || !getChecked('confidence-visualization-addon-toggle')) return;
+        const practice = await practiceModuleLoader.load('self-exploration');
+        await practice.guided({
+            minutes: Number(document.getElementById('confidence-visualization-duration')?.value || 5),
+            meditationScreen,
+            opening: journeyT('ui.confidenceVisualizationOpening'),
+            steps: journeyT('ui.confidenceVisualizationSteps'),
+            title: journeyT('ui.confidenceVisualizationTitle'),
+            closing: journeyT('ui.confidenceVisualizationClosing'),
+            progress: document.getElementById('self-exploration-progress'),
+            progressTemplate: journeyT('ui.selfExplorationStep'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
+    }
+
+    async runDeepSecrets() {
+        if (!state.advancedFeaturesUnlocked || !getChecked('deep-secrets-addon-toggle')) return;
+        const practice = await practiceModuleLoader.load('self-exploration');
+        await practice.deepSecrets({
+            minutes: Number(document.getElementById('deep-secrets-duration')?.value || 4),
+            meditationScreen,
+            opening: journeyT('ui.deepSecretsOpening'),
+            invitation: journeyT('ui.deepSecretsInvitation'),
+            title: journeyT('ui.deepSecretsTitle'),
+            closing: journeyT('ui.deepSecretsClosing'),
+            progress: document.getElementById('self-exploration-progress'),
+            progressTemplate: journeyT('ui.selfExplorationStep'),
+            showScreen,
+            stopVisual: () => this.visual.stop(),
+            setTitle: text => setText('mantra-display', text),
+            narrate: text => this.narrate(text, false),
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
+    }
+
+    async runFinalChallenge() {
+        if (!state.advancedFeaturesUnlocked || !getChecked('final-challenge-addon-toggle')) return;
+        const practice = await practiceModuleLoader.load('self-exploration');
+        const result = await practice.finalChallenge({
+            elements: {
+                modal: document.getElementById('final-challenge-modal'),
+                countdown: document.getElementById('final-challenge-countdown'),
+                question: document.getElementById('final-challenge-question'),
+                yes: document.getElementById('final-challenge-yes'),
+                no: document.getElementById('final-challenge-no'),
+                skip: document.getElementById('final-challenge-skip'),
+                feedback: document.getElementById('final-challenge-feedback')
+            },
+            copy: {
+                yesFeedback: journeyT('ui.finalChallengeYesFeedback'),
+                noFeedback: journeyT('ui.finalChallengeNoFeedback'),
+                skipFeedback: journeyT('ui.finalChallengeSkipFeedback')
+            },
+            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
+            isActive: () => this.isMeditationActive
+        });
+        // The answer is intentionally ephemeral and is never saved or exposed to the operator.
+        return result;
     }
 
     async runVisualization() {
@@ -2025,7 +2128,7 @@ class MeditationController {
             yogaSelected: getChecked('yoga-experience-toggle'),
             intimateSelected: getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle'),
             selectedChakraCount: state.selectedChakras.length,
-            preparationSelected: getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('undo-unlearn-addon-toggle') || getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle')
+            preparationSelected: getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('undo-unlearn-addon-toggle') || getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle') || (state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'].some(id => getChecked(id)))
         });
     }
 
@@ -2693,6 +2796,10 @@ function attachEventListeners() {
     const bodyScanAddonToggle = document.getElementById('body-scan-addon-toggle');
     const notingAddonToggle = document.getElementById('noting-addon-toggle');
     const undoUnlearnAddonToggle = document.getElementById('undo-unlearn-addon-toggle');
+    const quietCourageAddonToggle = document.getElementById('quiet-courage-addon-toggle');
+    const confidenceVisualizationAddonToggle = document.getElementById('confidence-visualization-addon-toggle');
+    const deepSecretsAddonToggle = document.getElementById('deep-secrets-addon-toggle');
+    const finalChallengeAddonToggle = document.getElementById('final-challenge-addon-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
@@ -2738,6 +2845,7 @@ function attachEventListeners() {
         if (bodyScanAddonToggle) bodyScanAddonToggle.checked = false;
         if (notingAddonToggle) notingAddonToggle.checked = false;
         if (undoUnlearnAddonToggle) undoUnlearnAddonToggle.checked = false;
+        selfExplorationAddonToggles.forEach(toggle => { toggle.checked = false; });
         state.boxBreathingExperienceEnabled = false;
         state.hooponoponoExperienceEnabled = false;
     }
@@ -2800,6 +2908,12 @@ function attachEventListeners() {
         document.getElementById('massage-toggle'),
         document.getElementById('assisted-bathing-toggle')
     ].filter(Boolean);
+    const selfExplorationAddonToggles = [
+        document.getElementById('quiet-courage-addon-toggle'),
+        document.getElementById('confidence-visualization-addon-toggle'),
+        document.getElementById('deep-secrets-addon-toggle'),
+        document.getElementById('final-challenge-addon-toggle')
+    ].filter(Boolean);
     const intimateServicePanel = document.getElementById('intimate-service-panel');
     const experimentCareOptions = document.getElementById('experiment-care-group');
     const experimentActivitySelect = document.getElementById('experiment-activity');
@@ -2853,7 +2967,22 @@ function attachEventListeners() {
             state.moodRelaxationIntentionEnabled = false;
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);
+            selfExplorationAddonToggles.forEach(toggle => { toggle.checked = false; });
         }
+        // Dev-mode Reverse Journey is session-only: hidden, disabled and
+        // cleared whenever Advanced Features is locked.
+        const reverseJourneyControl = document.getElementById('reverse-journey-control');
+        if (reverseJourneyControl) reverseJourneyControl.hidden = isLocked;
+        const reverseJourneyToggle = document.getElementById('reverse-journey-toggle');
+        if (reverseJourneyToggle) {
+            if (isLocked) reverseJourneyToggle.checked = false;
+            reverseJourneyToggle.disabled = isLocked;
+        }
+        const quietCourageControl = document.getElementById('quiet-courage-control');
+        if (quietCourageControl) quietCourageControl.hidden = isLocked || getChecked('shots-toggle');
+        const selfExplorationSection = document.getElementById('self-exploration-section');
+        if (selfExplorationSection) selfExplorationSection.hidden = isLocked || getChecked('shots-toggle');
+        selfExplorationAddonToggles.forEach(toggle => { toggle.disabled = isLocked; });
         particleField.setDeepSkyBlackHoleEnabled(!isLocked);
         document.getElementById('shots-control').hidden = isLocked;
         document.getElementById('sound-healing-title').hidden = isLocked;
@@ -3072,7 +3201,11 @@ function attachEventListeners() {
             visualization: visualizationAddonToggle,
             bodyScan: bodyScanAddonToggle,
             noting: notingAddonToggle,
-            undoUnlearn: undoUnlearnAddonToggle
+            undoUnlearn: undoUnlearnAddonToggle,
+            quietCourage: quietCourageAddonToggle,
+            confidenceVisualization: confidenceVisualizationAddonToggle,
+            deepSecrets: deepSecretsAddonToggle,
+            finalChallenge: finalChallengeAddonToggle
         },
         clearMusicOnlyMode,
         clearHighEnergyMode,
@@ -3314,9 +3447,16 @@ function attachEventListeners() {
     }
 
     startMeditationBtn.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked && selfExplorationAddonToggles.some(toggle => toggle.checked)) {
+            selfExplorationAddonToggles.forEach(toggle => { toggle.checked = false; });
+            updateExperienceModeVisibility();
+            updateSessionEstimate();
+            updateJourneyRoadmap();
+            return;
+        }
         if (!validateLobbyStartBeforePrelude()) return;
         if (startMeditationBtn.dataset.practiceLoading === 'true') return;
-        const selectedModules = practiceModuleLoader.selectedModuleIds(getChecked);
+        const selectedModules = practiceModuleLoader.selectedModuleIds(getChecked, { advancedFeaturesUnlocked: state.advancedFeaturesUnlocked });
         if (selectedModules.length) {
             startMeditationBtn.dataset.practiceLoading = 'true';
             startMeditationBtn.disabled = true;
@@ -3411,7 +3551,8 @@ function attachEventListeners() {
             const order = journeyRouting.buildChakraOrder({
                 focusedExperience,
                 massageSelected: getChecked('massage-toggle'),
-                selectedChakras: state.selectedChakras
+                selectedChakras: state.selectedChakras,
+                reverse: state.advancedFeaturesUnlocked && getChecked('reverse-journey-toggle') && !getChecked('high-energy-toggle')
             });
             const isHighEnergy = getChecked('high-energy-toggle');
             if (!focusedExperience && !isHighEnergy && order.length === 0) {
@@ -3450,6 +3591,11 @@ function attachEventListeners() {
 
     const mixerView = window.ChakraMixerView.create({ document, state, syncChecked, syncValue });
     mixerView.bind();
+    // Dev-mode Reverse Journey is session-only; it is never saved.
+    document.getElementById('reverse-journey-toggle')?.addEventListener('change', (e) => {
+        if (!state.advancedFeaturesUnlocked) e.target.checked = false;
+        updateJourneyRoadmap();
+    });
     document.getElementById('restart-meditation')?.addEventListener('click', async () => {
         if (!window.confirm(t('ui.restartConfirm'))) return;
         mixerView.hide();

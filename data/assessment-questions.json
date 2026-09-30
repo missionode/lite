@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "2026-09-24.1",
+  "contentVersion": "2026-09-24.2",
   "valuePrompt": "Which of these two do you prioritize more?",
   "settings": {
     "minimumEvidencePerChakra": 2,
@@ -33,7 +33,7 @@
     { "id": "root-3", "tier": "core", "coverage": ["root"], "prompt": "What matters more in a changing routine?", "choices": [{ "id": "adapt", "label": "A stable base with room to adapt", "weights": { "root": 1 } }, { "id": "fixed", "label": "Keeping the routine exactly unchanged", "weights": { "root": 0 } }] },
     { "id": "root-tie", "tier": "tie-breaker", "coverage": ["root"], "prompt": "When uncertainty remains, which direction fits better?", "choices": [{ "id": "present", "label": "Return attention to what can be done now", "weights": { "root": 1 } }, { "id": "forecast", "label": "Keep searching for every possible future risk", "weights": { "root": 0 } }] },
 
-    { "id": "sacral-1", "tier": "core", "coverage": ["sacral"], "prompt": "Which relationship with enjoyment feels healthier?", "choices": [{ "id": "receive", "label": "Enjoy it while remaining free to stop", "weights": { "sacral": 1 } }, { "id": "depend", "label": "Need more stimulation to keep feeling satisfied", "weights": { "sacral": 0 } }] },
+    { "id": "sacral-1", "tier": "core", "coverage": ["sacral"], "prompt": "Which relationship with enjoyment feels healthier?", "choices": [{ "id": "receive", "label": "Free to stop once fulfilled", "weights": { "sacral": 1 } }, { "id": "depend", "label": "Need more stimulation to keep feeling satisfied", "weights": { "sacral": 0 } }] },
     { "id": "sacral-2", "tier": "core", "coverage": ["sacral"], "prompt": "When emotions become strong, which feels closer?", "choices": [{ "id": "feel", "label": "Notice and express them with some steadiness", "weights": { "sacral": 1 } }, { "id": "avoid", "label": "Disconnect from them until they disappear", "weights": { "sacral": 0 } }] },
     { "id": "sacral-3", "tier": "core", "coverage": ["sacral"], "prompt": "How would you rather approach creativity?", "choices": [{ "id": "play", "label": "Experiment without demanding a perfect result", "weights": { "sacral": 1 } }, { "id": "prove", "label": "Create only when the result can prove something", "weights": { "sacral": 0 } }] },
     { "id": "sacral-tie", "tier": "tie-breaker", "coverage": ["sacral"], "prompt": "In closeness, which balance matters more?", "choices": [{ "id": "close-free", "label": "Connection while keeping individuality", "weights": { "sacral": 1 } }, { "id": "merge", "label": "Giving up personal space to preserve closeness", "weights": { "sacral": 0 } }] },

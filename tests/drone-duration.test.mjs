@@ -2,7 +2,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+// Runtime behavior lives in app.js plus the extracted modules, so source
+// assertions search the combined runtime rather than app.js alone.
+const modulesDir = new URL('../modules/', import.meta.url);
+const app = [
+    fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8'),
+    ...fs.readdirSync(modulesDir).filter(name => name.endsWith('.js')).sort()
+        .map(name => fs.readFileSync(new URL(name, modulesDir), 'utf8')),
+].join('\n');
 const timingModule = fs.readFileSync(new URL('../modules/timing-settings.js', import.meta.url), 'utf8');
 const lobbyVisibility = fs.readFileSync(new URL('../modules/lobby-experience-visibility.js', import.meta.url), 'utf8');
 const contentLocalization = fs.readFileSync(new URL('../modules/content-localization.js', import.meta.url), 'utf8');
@@ -14,7 +21,9 @@ const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
 const testScripts = JSON.parse(fs.readFileSync(new URL('../test-script.json', import.meta.url), 'utf8'));
-const dotScripts = JSON.parse(fs.readFileSync(new URL('../docs/dot.json', import.meta.url), 'utf8'));
+// docs/dot.json is an optional, owner-managed facilitator bundle; check it only when present.
+const dotScriptsPath = new URL('../docs/dot.json', import.meta.url);
+const dotScripts = fs.existsSync(dotScriptsPath) ? JSON.parse(fs.readFileSync(dotScriptsPath, 'utf8')) : null;
 const timingConfig = JSON.parse(fs.readFileSync(new URL('../timing-config.json', import.meta.url), 'utf8'));
 const piperModels = JSON.parse(fs.readFileSync(new URL('../piper-models.json', import.meta.url), 'utf8'));
 
@@ -27,7 +36,8 @@ assert.deepEqual(
 const ratiosMatch = app.match(/const DRONE_DURATION_RATIOS = Object\.freeze\((\{[\s\S]*?\})\);/);
 const referenceMatch = app.match(/const DRONE_REFERENCE_SECONDS = (\d+);/);
 assert.ok(ratiosMatch && referenceMatch, 'drone policy values remain explicitly defined');
-const ratios = JSON.parse(ratiosMatch[1]);
+// The ratios are a JavaScript object literal (unquoted keys), not JSON.
+const ratios = JSON.parse(JSON.stringify(vm.runInNewContext(`(${ratiosMatch[1]})`)));
 const referenceSeconds = Number(referenceMatch[1]);
 const timingContext = vm.createContext({ window: {} });
 vm.runInContext(timingModule, timingContext);
@@ -78,7 +88,7 @@ assert.equal(scripts.sleep_mode.intervalSeconds, 2, 'Sleep Mode stage intervals 
 assert.equal(timingConfig.journey.shotDuration.default, 7, 'Shots should default to seven seconds');
 assert.equal(timingConfig.journey.shotDuration.singleFrequencyDefault, 1, 'Single-frequency Shots should default to one second');
 assert.equal(timingConfig.journey.shotDuration.max, 20, 'Shots should cap at twenty seconds');
-for (const bundle of [scripts, testScripts, dotScripts]) {
+for (const bundle of [scripts, testScripts, ...(dotScripts ? [dotScripts] : [])]) {
     assert.equal(bundle.sound_shots?.anesthetic?.frequency, 174, 'every script bundle should provide the Anesthetic Shot at 174 Hz');
     assert.equal(bundle.sound_shots?.mood_relaxation?.frequency, 221.23, 'every script bundle should provide the Mood & Relaxation Shot at 221.23 Hz');
 }
@@ -103,12 +113,12 @@ assert.ok(
 assert.match(app, /meditationRoomTitle\.hidden = shots/, 'Shots should hide the Meditation Room heading');
 assert.match(app, /MULTI_STAGE_SHOT_TYPES = Object\.freeze\(\['meditation', 'sleep'\]\)/, 'Meditation and Sleep should retain the multi-stage duration default');
 assert.match(lobbyVisibility, /bindShotTypeChange[\s\S]*?resetDurationForType\(event\.target\.value\)/, 'changing Shot type should apply that type\'s duration default');
-assert.match(app, /anesthetic: Number\(this\.scripts\.sound_shots\?\.anesthetic\?\.frequency\)/, 'Anesthetic Shot should load 174 Hz from the active script bundle');
-assert.match(app, /mood_relaxation: Number\(this\.scripts\.sound_shots\?\.mood_relaxation\?\.frequency\)/, 'Mood & Relaxation Shot should load 221.23 Hz from the active script bundle');
+assert.match(app, /anesthetic: Number\((?:this|owner)\.scripts\.sound_shots\?\.anesthetic\?\.frequency\)/, 'Anesthetic Shot should load 174 Hz from the active script bundle');
+assert.match(app, /mood_relaxation: Number\((?:this|owner)\.scripts\.sound_shots\?\.mood_relaxation\?\.frequency\)/, 'Mood & Relaxation Shot should load 221.23 Hz from the active script bundle');
 assert.match(app, /mood_relaxation: 'ui\.activateMoodRelaxationShot'/, 'the Mood & Relaxation Shot should have a localized activation label');
 assert.match(app, /moodRelaxationShotNote/, 'the Mood & Relaxation Shot should explain its evidence limits in the Lobby');
 assert.match(app, /function getPiperVoiceDefinition\(/, 'voice styling should resolve Piper voice metadata from the registry');
-assert.match(app, /piperVoice\.gender[\s\S]{0,80}=== 'female'/, 'voice styling should use registry gender metadata for Piper voices');
+assert.match(app, /(?:piperVoice|definition)\.gender[\s\S]{0,80}=== 'female'/, 'voice styling should use registry gender metadata for Piper voices');
 assert.doesNotMatch(app, /(?:^|[-_])meera(?:[-_]|$)/i, 'voice styling must not be hard-coded to the Meera Piper model');
 assert.match(app, /function isFeminineNarrationVoice\(/, 'voice styling should identify feminine voices without changing the audio model');
 assert.match(app, /shringaraVoice[\s\S]{0,120}clarity: 28, warmth: 82, pace: 0\.92, echo: 'light'/, 'the normal feminine journey profile should use a warm, gentle Shringara-inspired tuning');
@@ -138,7 +148,7 @@ assert.match(app, /startSleepDrone\(beatFrequency\)/, 'Sleep Mode should use a d
 assert.match(sleepJourney, /await owner\.audio\.startBackgroundMusic\(\)/, 'Sleep Mode should start continuous background music');
 assert.match(sleepJourney, /normalizeSleepStages\(owner\.scripts\)/, 'Sleep Mode should load its staged frequencies from the script bundle');
 assert.match(app, /mainOscillator\.frequency\.setValueAtTime\(beat, now\)/, 'Sleep Mode should play low script frequencies as the main oscillator');
-assert.match(app, /this\.startTimedDrone\(136\.1, 3, state\.timeYogaPose, state\.droneDurationMode\)/, 'Yoga grounding drone should use the fixed exposure timer');
+assert.match(app, /(?:this|owner)\.startTimedDrone\(136\.1, 3, state\.timeYogaPose, state\.droneDurationMode\)/, 'Yoga grounding drone should use the fixed exposure timer');
 assert.doesNotMatch(app, /this\.audio\.startDrone\(136\.1, 3\)/, 'Yoga must not start an unbounded grounding drone');
 assert.match(sessionEstimate, /state\.timeSleepStage \* sleepStageCount/, 'Sleep Mode should estimate one common duration across five stages');
 assert.equal(timingConfig.journey.sleepStageDuration.max, 10, 'Sleep Mode should cap the shared stage duration at 10 minutes');
@@ -164,7 +174,7 @@ assert.doesNotMatch(startDrone, /safeBaseFrequency\s*\/\s*[24]/, 'higher chakra 
 assert.doesNotMatch(startDrone, /droneFreq\s*\*\s*0\.5|\bf\s*:\s*0\.5/, 'the half-frequency lower oscillator must not return');
 assert.match(startDrone, /Number\.isFinite\(requestedFrequency\)/, 'the audio boundary should reject malformed custom frequencies');
 
-assert.match(app, /meditateOnChakra\(chakra, key\)\s*\{\s*return chakraSession\.run\(this, chakra, key,/, 'the app should retain a stable chakra stage adapter');
+assert.match(app, /meditateOnChakra\(chakra, key\)\s*\{\s*return (?:this\.runSessionItem\(`chakra \$\{key\}`, \(\) => )?chakraSession\.run\(this, chakra, key,/, 'the app should retain a stable chakra stage adapter');
 const meditationBlock = chakraSession;
 assert.match(meditationBlock, /owner\.startTimedDrone\(chakra\.frequency,/, 'the stage must pass its JSON frequency into the drone engine');
 assert.match(meditationBlock, /key === 'high_energy' \? state\.hrimDroneDurationMode : state\.droneDurationMode/, 'HRIM and normal chakra stages must use separate duration preferences');
@@ -180,7 +190,7 @@ assert.match(app, /if \(!this\.isPaused\) remaining -= step;/, 'pausing the jour
 assert.match(app, /generation !== this\.droneTimerGeneration/, 'a stale timer must not stop a later chakra drone');
 assert.match(app, /chakra_drone_duration_mode/, 'the selected mode should persist locally');
 assert.match(app, /chakra_hrim_drone_duration_mode/, 'the HRIM mode should persist separately');
-assert.match(app, /input\.disabled = highEnergy && input\.value === 'beginner'/, 'Beginner must be disabled in the HRIM UI');
+assert.match(app, /input\.disabled = (?:Boolean\()?highEnergy && input\.value === 'beginner'/, 'Beginner must be disabled in the HRIM UI');
 assert.match(contentLocalization, /'high_energy\.frequency'/, 'HRIM custom scripts should require a frequency');
 assert.match(contentLocalization, /frequency < 1 \|\| frequency > 20000/, 'custom frequency values should remain in the safe Web Audio range');
 

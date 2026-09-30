@@ -7,16 +7,16 @@ const index = fs.readFileSync('index.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn'];
+const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.1[\s\S]*?app\.js\?v=4.15/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);
 }
-assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.0/);
-assert.match(app, /practiceModuleLoader\.selectedModuleIds\(getChecked\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
+assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.1/);
+assert.match(app, /practiceModuleLoader\.selectedModuleIds\(getChecked, \{ advancedFeaturesUnlocked: state\.advancedFeaturesUnlocked \}\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
 for (const [toggle, id] of [
     ['body-scan-addon-toggle', 'body-scan'], ['noting-addon-toggle', 'guided-noting'],
     ['dharana-addon-toggle', 'dharana'], ['box-breathing-experience-toggle', 'box-breathing'],
@@ -58,6 +58,10 @@ assert.deepEqual(Array.from(loader.moduleIds), practiceIds);
 assert.deepEqual(Array.from(loader.selectedModuleIds(id => ['box-breathing-experience-toggle', 'noting-addon-toggle', 'body-scan-addon-toggle'].includes(id))), ['body-scan', 'guided-noting', 'box-breathing']);
 assert.deepEqual(Array.from(loader.selectedModuleIds(() => false)), [], 'no selection requests no practice modules');
 assert.throws(() => loader.selectedModuleIds(null), /requires a toggle reader/);
+const devModeToggles = id => ['quiet-courage-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'].includes(id);
+assert.deepEqual(Array.from(loader.selectedModuleIds(devModeToggles)), [], 'dev-mode practices never load while locked');
+assert.deepEqual(Array.from(loader.selectedModuleIds(devModeToggles, { advancedFeaturesUnlocked: true })), ['quiet-courage', 'self-exploration'],
+    'unlocked dev-mode practices load once each');
 assert.ok(Object.isFrozen(loader));
 const first = loader.load('box-breathing');
 const duplicate = loader.load('box-breathing');

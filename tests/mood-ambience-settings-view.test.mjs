@@ -11,7 +11,7 @@ assert.match(app, /function syncPleasureAmbienceControl\(\)\s*\{\s*moodAmbienceS
 assert.match(app, /moodAmbienceSettingsView\.bindUrlLoader\(/);
 assert.match(app, /moodAmbienceSettingsView\.bindControls\(/);
 assert.doesNotMatch(app, /loadPleasureAmbienceUrlButton\?\.addEventListener\('click'/);
-assert.match(html, /modules\/mood-ambience-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/);
+assert.match(html, /modules\/mood-ambience-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.15/);
 assert.match(serviceWorker, /modules\/mood-ambience-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({ URL });

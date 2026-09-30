@@ -4,7 +4,7 @@ This document extends [`MODEL-ROUTING.md`](./MODEL-ROUTING.md) with an optional 
 
 The host-integrated Loop capability refreshes the machine and local-model profile at activation. The profile check is read-only and advisory until a verified model adapter is configured; it does not start a model or make a routing decision on behalf of an unconfigured project.
 
-The reference pattern is a local [llamafile](https://github.com/Mozilla-Ocho/llamafile) executable paired with a compatible GGUF model. The supplied reference document, [Run Offline AI from a USB Pendrive](https://docs.google.com/document/d/1tWyQ5ZonKTR8kLBL3E06Y9t1CWQIGy5ZHN1QXPjpCYI/edit), describes the portable executable/model arrangement. Its Windows and USB commands are examples, not universal project requirements.
+This optional route is for development assistance. Lite's app narration uses Piper/Web Speech as described in [TECH-STACK.md](./TECH-STACK.md). A verified local coding model can be used when separately configured; it is not an application dependency. Do not load this guide for ordinary app changes unless local model routing is relevant.
 
 ## Local route boundary
 

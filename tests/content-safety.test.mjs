@@ -4,15 +4,26 @@ import fs from 'node:fs';
 const readJson = path => JSON.parse(fs.readFileSync(path, 'utf8'));
 const scripts = readJson('scripts.json');
 const testScripts = readJson('test-script.json');
-const facilitatorScripts = readJson('docs/dot.json');
+// docs/dot.json is an optional, owner-managed facilitator bundle. It was
+// intentionally removed from this repository, so check it only when present.
+const facilitatorScripts = fs.existsSync('docs/dot.json') ? readJson('docs/dot.json') : null;
+const scriptFixtures = [['test-script.json', testScripts]];
+if (facilitatorScripts) scriptFixtures.push(['docs/dot.json', facilitatorScripts]);
+const scriptBundles = [scripts, testScripts, ...(facilitatorScripts ? [facilitatorScripts] : [])];
 const en = readJson('locales/en.json');
 const ml = readJson('locales/ml.json');
-const app = fs.readFileSync('app.js', 'utf8');
+// Runtime behavior now lives in app.js plus the extracted ES modules, so source
+// assertions search the combined runtime rather than app.js alone.
+const app = [
+  fs.readFileSync('app.js', 'utf8'),
+  ...fs.readdirSync('modules').filter(name => name.endsWith('.js')).sort()
+    .map(name => fs.readFileSync(`modules/${name}`, 'utf8')),
+].join('\n');
 
-const languageIds = new Set(['en', 'ml', 'ru', 'hi']);
+const languageIds = new Set(['en', 'ml', 'ru', 'hi', 'ta']);
 
 function isLocalizedKey(key) {
-  return languageIds.has(key) || /_(?:en|ml|ru|hi)$/.test(key);
+  return languageIds.has(key) || /_(?:en|ml|ru|hi|ta)$/.test(key);
 }
 
 function collectSchemaPaths(value, path = '', output = new Set()) {
@@ -36,7 +47,7 @@ function collectSchemaPaths(value, path = '', output = new Set()) {
 }
 
 const productionSchema = collectSchemaPaths(scripts);
-for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.json', facilitatorScripts]]) {
+for (const [name, fixture] of scriptFixtures) {
   const fixtureSchema = collectSchemaPaths(fixture);
   const missing = [...productionSchema].filter(path => !fixtureSchema.has(path));
   assert.deepEqual(missing, [], `${name} is missing production script fields`);
@@ -59,7 +70,7 @@ function collectLocalizedStringPaths(value, path = '', output = new Set()) {
 
 const productionEnglishMalayalam = [...collectLocalizedStringPaths(scripts)]
   .filter(path => /(?:^|_)(?:en|ml)$/.test(path) || /\.(?:en|ml)$/.test(path));
-for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.json', facilitatorScripts]]) {
+for (const [name, fixture] of scriptFixtures) {
   const fixtureLocalized = collectLocalizedStringPaths(fixture);
   const missing = productionEnglishMalayalam.filter(path => !fixtureLocalized.has(path));
   assert.deepEqual(missing, [], `${name} is missing English/Malayalam script fields`);
@@ -68,10 +79,10 @@ for (const [name, fixture] of [['test-script.json', testScripts], ['docs/dot.jso
 for (const section of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown', 'high_energy']) {
   for (const language of ['en', 'ml']) {
     assert.ok(scripts[section][`meditation_${language}`], `${section} ${language} meditation is required`);
-    assert.ok(facilitatorScripts[section][`meditation_${language}`], `${section} ${language} fixture meditation is required`);
+    if (facilitatorScripts) assert.ok(facilitatorScripts[section][`meditation_${language}`], `${section} ${language} fixture meditation is required`);
     assert.ok(testScripts[section][`meditation_${language}`], `${section} ${language} test meditation is required`);
     assert.equal(scripts[section][language], undefined, `${section}.${language} duplicates the canonical meditation field`);
-    assert.equal(facilitatorScripts[section][language], undefined, `${section}.${language} fixture duplicate must stay removed`);
+    if (facilitatorScripts) assert.equal(facilitatorScripts[section][language], undefined, `${section}.${language} fixture duplicate must stay removed`);
     assert.equal(testScripts[section][language], undefined, `${section}.${language} test duplicate must stay removed`);
   }
 }
@@ -84,7 +95,7 @@ assert.match(scripts.heart.meditation_en, /Keep the learning, release the burden
 assert.doesNotMatch(scripts.heart.meditation_en, /karma/i,
   'Heart narration should not introduce karma terminology into the production journey.');
 
-for (const bundle of [scripts, facilitatorScripts, testScripts]) {
+for (const bundle of scriptBundles) {
   for (const language of ['en', 'ml']) {
     assert.ok(bundle.closing[language], `closing.${language} is the canonical closing narration`);
     assert.equal(bundle.closing[`meditation_${language}`], undefined,

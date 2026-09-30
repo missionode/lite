@@ -27,10 +27,10 @@
         const musicOnly = getChecked('music-only-toggle');
         const sleep = getChecked('sleep-mode-toggle');
         const intimateService = getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle');
-        const standalonePreparation = state.selectedChakras.length === 0 && [
+        const standalonePreparation = state.selectedChakras.length === 0 && ([
             'box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle',
             'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle', 'noting-addon-toggle'
-        ].some(id => getChecked(id));
+        ].some(id => getChecked(id)) || state.selectedChakras.length === 0 && state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'].some(id => getChecked(id)));
         const focusedExperience = getChecked('yoga-experience-toggle') || intimateService || standalonePreparation;
         const dharanaOptions = document.getElementById('dharana-options');
         if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
@@ -42,6 +42,25 @@
         if (notingOptions) notingOptions.hidden = !getChecked('noting-addon-toggle') || getChecked('shots-toggle');
         const undoUnlearnOptions = document.getElementById('undo-unlearn-options');
         if (undoUnlearnOptions) undoUnlearnOptions.hidden = !getChecked('undo-unlearn-addon-toggle') || getChecked('shots-toggle');
+        const quietCourageControl = document.getElementById('quiet-courage-control');
+        if (quietCourageControl) quietCourageControl.hidden = getChecked('shots-toggle');
+        const selfExplorationSection = document.getElementById('self-exploration-section');
+        if (selfExplorationSection) selfExplorationSection.hidden = !state.advancedFeaturesUnlocked || getChecked('shots-toggle');
+        const quietCourageToggle = document.getElementById('quiet-courage-addon-toggle');
+        if (quietCourageToggle) quietCourageToggle.disabled = !state.advancedFeaturesUnlocked;
+        const quietCourageOptions = document.getElementById('quiet-courage-options');
+        if (quietCourageOptions) quietCourageOptions.hidden = !getChecked('quiet-courage-addon-toggle') || getChecked('shots-toggle');
+        for (const id of ['confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle']) {
+            const toggle = document.getElementById(id);
+            if (toggle) toggle.disabled = !state.advancedFeaturesUnlocked;
+        }
+        for (const [toggleId, optionsId] of [
+            ['confidence-visualization-addon-toggle', 'confidence-visualization-options'],
+            ['deep-secrets-addon-toggle', 'deep-secrets-options']
+        ]) {
+            const options = document.getElementById(optionsId);
+            if (options) options.hidden = !getChecked(toggleId) || getChecked('shots-toggle');
+        }
         const yogaExperience = getChecked('yoga-experience-toggle');
         const normalDuration = document.getElementById('time-per-chakra')?.closest('.time-selector');
         const highEnergyDuration = document.getElementById('high-energy-duration-control');
@@ -114,7 +133,8 @@
         const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
             : intimateService ? 'ui.beginIntimateService'
                 : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
-                    : state.selectedChakras.length === 0 && getChecked('hooponopono-experience-toggle') ? 'ui.beginHooponopono'
+                : state.selectedChakras.length === 0 && getChecked('hooponopono-experience-toggle') ? 'ui.beginHooponopono'
+                : state.advancedFeaturesUnlocked && state.selectedChakras.length === 0 && getChecked('quiet-courage-addon-toggle') ? 'ui.beginQuietCourage'
                         : 'ui.beginJourney';
         if (startMeditationBtn) startMeditationBtn.textContent = translate(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
         document.getElementById('shots-control')?.classList.toggle('shots-active', shots);

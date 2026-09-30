@@ -69,7 +69,7 @@ assert.doesNotMatch(inlineScripts[0], /startJourney|selectedChakras|journeyConfi
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a return path to the Meditation Room');
 
 for (const asset of [
-    './data/assessment-questions.json?v=1.1',
+    './data/assessment-questions.json?v=1.2',
     './modules/assessment-tournament.js?v=1.3',
     './modules/assessment-persistence.js?v=1.0'
 ]) {

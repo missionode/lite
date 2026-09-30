@@ -8,7 +8,7 @@ const appSource = fs.readFileSync('app.js', 'utf8');
 const moduleSource = fs.readFileSync('modules/completion-view.js', 'utf8');
 assert.ok(html.indexOf('modules/completion-view.js?v=1.0') < html.indexOf('app.js?v='));
 assert.match(worker, /modules\/completion-view\.js\?v=1\.0/);
-assert.match(appSource, /finish\(\) \{\s*return window\.ChakraCompletionView\.finish\(this,/);
+assert.match(appSource, /finish\(\) \{\s*(?:this\.sessionItemRunner\.reset\(\);\s*)?return window\.ChakraCompletionView\.finish\(this,/);
 
 const context = vm.createContext({ window: {} });
 vm.runInContext(moduleSource, context);

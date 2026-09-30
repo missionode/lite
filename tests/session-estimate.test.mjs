@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const sessionEstimate = window\.ChakraSessionEstimate/);
 assert.match(app, /function updateSessionEstimate\(\)\s*\{[\s\S]*?sessionEstimate\.resolve\([\s\S]*?updateJourneyRoadmap\(\);\s*\}/);
-assert.match(html, /modules\/session-estimate\.js\?v=1\.0[\s\S]*?app\.js\?v=4.13/);
-assert.match(serviceWorker, /modules\/session-estimate\.js\?v=1\.0/);
+assert.match(html, /modules\/session-estimate\.js\?v=1\.1[\s\S]*?app\.js\?v=4.15/);
+assert.match(serviceWorker, /modules\/session-estimate\.js\?v=1\.1/);
 assert.match(app, /getSessionDurationMs\(focusedExperience = null\)\s*\{\s*return window\.ChakraSessionEstimate\.resolveDurationMs\(/);
 
 const context = vm.createContext({});
@@ -56,9 +56,9 @@ assert.equal(makeDuration({ experience: 'box' }), 540000, 'Focused Box duration 
 assert.equal(makeDuration({ experience: 'hooponopono' }), 240000, 'Focused Ho’oponopono remains four minutes.');
 assert.equal(makeDuration({ experience: 'preparation', checks: [
     'box-breathing-experience-toggle', 'visualization-addon-toggle', 'dharana-addon-toggle',
-    'body-scan-addon-toggle', 'noting-addon-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle'
-], overrides: { 'visualization-duration': 3, 'dharana-duration': 2, 'body-scan-duration': 5, 'noting-duration': 4, 'undo-unlearn-duration': 6 } }),
-1980000, 'Combined preparation includes each selected duration and existing Box, Ho’oponopono and Undo & Unlearn values.');
+    'body-scan-addon-toggle', 'noting-addon-toggle', 'quiet-courage-addon-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle'
+], overrides: { 'visualization-duration': 3, 'dharana-duration': 2, 'body-scan-duration': 5, 'noting-duration': 4, 'quiet-courage-duration': 7, 'undo-unlearn-duration': 6 } }),
+2400000, 'Combined preparation includes each selected duration, Quiet Courage, Box, Ho’oponopono and Undo & Unlearn values.');
 assert.equal(makeDuration({ experience: 'preparation' }), 1000, 'Empty preparation retains the one-second floor.');
 assert.equal(makeDuration({ experience: 'yoga', poses: 2, overrides: { corpsePoseEnabled: true, bathSessionEnabled: true } }), 250000,
     'Yoga includes selected poses, transitions, optional Corpse Pose and Bath.');

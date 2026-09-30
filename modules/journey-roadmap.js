@@ -47,23 +47,34 @@
             if (isChecked('dharana-addon-toggle')) standalone.push(translate('ui.roadmapDharana'));
             if (isChecked('body-scan-addon-toggle')) standalone.push(translate('ui.roadmapBodyScan'));
             if (isChecked('noting-addon-toggle')) standalone.push(translate('ui.roadmapNoting'));
+            if (isChecked('quiet-courage-addon-toggle')) standalone.push(translate('ui.roadmapQuietCourage'));
+            if (isChecked('confidence-visualization-addon-toggle')) standalone.push(translate('ui.roadmapConfidenceVisualization'));
+            if (isChecked('deep-secrets-addon-toggle')) standalone.push(translate('ui.roadmapDeepSecrets'));
+            if (isChecked('final-challenge-addon-toggle')) standalone.push(translate('ui.roadmapFinalChallenge'));
             if (isChecked('hooponopono-experience-toggle')) standalone.push(translate('ui.roadmapHooponopono'));
             if (isChecked('undo-unlearn-addon-toggle')) standalone.push(translate('ui.roadmapUndoUnlearn'));
             if (standalone.length) return withOptionalVideo(standalone);
         }
 
+        // Mirror the runtime order: Arrival/opening and Intention run first,
+        // then selected preparation practices (journey-routing
+        // PREPARATION_STAGE_ORDER), chakras, integration practices and closing.
         const labels = [
             translate(state.returningJourney ? 'ui.roadmapReturning' : 'ui.roadmapArrival'),
-            translate('ui.roadmapIntention'),
-            translate('ui.roadmapChakras')
+            translate('ui.roadmapIntention')
         ];
-        if (isChecked('box-breathing-experience-toggle')) labels.splice(0, 0, translate('ui.roadmapBoxBreathing'));
-        let preparationIndex = isChecked('box-breathing-experience-toggle') ? 1 : 0;
-        if (isChecked('visualization-addon-toggle')) labels.splice(preparationIndex++, 0, translate('ui.roadmapVisualization'));
-        if (isChecked('dharana-addon-toggle')) labels.splice(preparationIndex++, 0, translate('ui.roadmapDharana'));
-        if (isChecked('body-scan-addon-toggle')) labels.splice(preparationIndex, 0, translate('ui.roadmapBodyScan'));
-        if (isChecked('body-scan-addon-toggle')) preparationIndex++;
-        if (isChecked('noting-addon-toggle')) labels.splice(preparationIndex, 0, translate('ui.roadmapNoting'));
+        if (isChecked('box-breathing-experience-toggle')) labels.push(translate('ui.roadmapBoxBreathing'));
+        if (isChecked('visualization-addon-toggle')) labels.push(translate('ui.roadmapVisualization'));
+        if (isChecked('dharana-addon-toggle')) labels.push(translate('ui.roadmapDharana'));
+        if (isChecked('body-scan-addon-toggle')) labels.push(translate('ui.roadmapBodyScan'));
+        if (isChecked('noting-addon-toggle')) labels.push(translate('ui.roadmapNoting'));
+        if (isChecked('quiet-courage-addon-toggle')) labels.push(translate('ui.roadmapQuietCourage'));
+        if (isChecked('confidence-visualization-addon-toggle')) labels.push(translate('ui.roadmapConfidenceVisualization'));
+        if (isChecked('deep-secrets-addon-toggle')) labels.push(translate('ui.roadmapDeepSecrets'));
+        if (isChecked('final-challenge-addon-toggle')) labels.push(translate('ui.roadmapFinalChallenge'));
+        // Dev-mode Reverse Journey names its Crown → Root direction.
+        const reverse = state.advancedFeaturesUnlocked && isChecked('reverse-journey-toggle');
+        labels.push(translate(reverse ? 'ui.reverseJourney' : 'ui.roadmapChakras'));
         if (isChecked('hooponopono-experience-toggle')) labels.push(translate('ui.roadmapHooponopono'));
         if (isChecked('undo-unlearn-addon-toggle')) labels.push(translate('ui.roadmapUndoUnlearn'));
         labels.push(translate('ui.roadmapClosing'));
