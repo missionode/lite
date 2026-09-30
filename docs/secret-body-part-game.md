@@ -5,9 +5,9 @@ A dev-mode party game for 2–7 players on one phone. Pure luck: no clues. Nothi
 ## Where to find it
 
 1. Unlock dev mode (Advanced Features): Settings → About → tap the app version 7 times → password.
-2. Open **Experiment Mode** → tap **🎭 Secret Body Part**.
+2. Go to the **Lobby** (Meditation Room screen). Under the **Mood & Relaxation Ambience** section, find the **🎭 Secret Body Part** panel and tap **Play now**.
 
-The button is hidden while dev mode is locked. Locking dev mode also closes an open game.
+The panel is hidden while dev mode is locked. Locking dev mode also closes an open game. **Back to Meditation Room** returns to the Lobby.
 
 ## Players
 

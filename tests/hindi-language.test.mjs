@@ -203,8 +203,8 @@ handoff.schedule();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
 assert.equal(earnLink.hidden, true, 'Hindi must keep Continue to Earn hidden.');
 
-assert.match(html, /app\.js\?v=4.17/, 'The application query version must match the current shell.');
+assert.match(html, /app\.js\?v=4.18/, 'The application query version must match the current shell.');
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'/, 'The offline shell should use a versioned cache name.');
-assert.match(serviceWorker, /chakra-language-v61/, 'The current locale cache generation must include updated translations.');
+assert.match(serviceWorker, /chakra-language-v62/, 'The current locale cache generation must include updated translations.');
 
 console.log('Hindi language contract passed.');

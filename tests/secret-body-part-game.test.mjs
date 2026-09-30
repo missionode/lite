@@ -135,19 +135,24 @@ luck = withCard('swap');
 assert.equal(luck.result.swap.length, 2, 'Swap names the two players who must look at their new card');
 
 // Dev mode only: hidden and disabled entry point, gated open, lock closes the game.
-assert.match(html, /<button id="open-secret-body-game"[^>]*hidden[^>]*disabled/, 'the Experiment Mode entry is hidden and disabled by default');
+assert.match(html, /<div id="secret-body-game-panel"[^>]*hidden>[\s\S]*?<button id="open-secret-body-game"[^>]*disabled/, 'the Lobby game panel is hidden and its button disabled by default');
+const ambience = html.indexOf('id="mood-relaxation-ambience-section"');
+const gamePanel = html.indexOf('id="secret-body-game-panel"');
+assert.ok(ambience > 0 && gamePanel > ambience && gamePanel < html.indexOf('id="session-estimate"'), 'the game sits in the Lobby after the Mood & Relaxation Ambience section');
+assert.doesNotMatch(html.slice(html.indexOf('id="experiment-screen"'), html.indexOf('id="secret-body-game-screen"')), /open-secret-body-game/, 'the game is no longer inside Experiment Mode');
 assert.match(html, /<section id="secret-body-game-screen" class="screen[^"]*hidden"/);
-assert.match(app, /secretBodyGameButton\.hidden = isLocked[\s\S]*?secretBodyGameButton\.disabled = isLocked/, 'the dev-mode lock hides the game entry');
+assert.match(app, /secretBodyGamePanel\.hidden = isLocked[\s\S]*?secretBodyGameButton\.disabled = isLocked/, 'the dev-mode lock hides the game panel');
+assert.match(app, /returnScreen: lobbyScreen/, 'leaving the game returns to the Lobby');
 assert.match(app, /if \(isLocked && secretBodyGame\) secretBodyGame\.close\(\)/, 'locking dev mode closes an open game');
 assert.match(app, /isUnlocked: \(\) => state\.advancedFeaturesUnlocked/, 'the game checks dev mode itself');
-assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=1\.0', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
-assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=1\.0'/, 'the game works offline');
+assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=1\.1', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
+assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=1\.1'/, 'the game works offline');
 
 // Every locale has every label and part name.
 const keys = ['sbpTitle', 'sbpIntro', 'sbpPlayers', 'sbpRounds', 'sbpGamesInRow', 'sbpStart', 'backToExperiment', 'sbpBoldTitle', 'sbpBoldNotice',
     'sbpBoldContinue', 'sbpBoldSkip', 'sbpMemorised', 'sbpPassTo', 'sbpTapCard', 'sbpRound', 'sbpSpin', 'sbpCalled', 'sbpReverseNote',
     'sbpContinue', 'sbpLightningPrompt', 'sbpGuessPrompt', 'sbpHonour', 'sbpRight', 'sbpWrong', 'sbpNobody', 'sbpShielded', 'sbpOut',
-    'sbpSurvived', 'sbpNext', 'sbpGrandReveal', 'sbpFakerCaught', 'sbpLuckySurvivor', 'sbpSharpGuesser', 'sbpFakerOfNight', 'sbpPlayAgain',
+    'sbpSurvived', 'sbpNext', 'sbpGrandReveal', 'sbpFakerCaught', 'sbpLuckySurvivor', 'sbpSharpGuesser', 'sbpFakerOfNight', 'sbpPlayAgain', 'sbpBack', 'sbpOpen',
     'secretBodyGame', 'secretBodyGameNote',
     ...Array.from(game.LUCK_CARDS).flatMap(card => [`sbpLuck_${card}`, `sbpLuck_${card}_note`]),
     ...[...game.PARTS, ...game.SECRET_PARTS].map(part => `sbpPart_${part}`)];

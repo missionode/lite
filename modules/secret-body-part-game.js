@@ -345,7 +345,7 @@
                 stepper('ui.sbpRounds', setup.rounds, MIN_ROUNDS, MAX_ROUNDS, value => { setup.rounds = value; }, 'rounds'),
                 el('p', { className: 'sbp-note', text: fill(t('ui.sbpGamesInRow'), { count: String(engine.consecutiveGames) }) }),
                 button(t('ui.sbpStart'), () => (secretNext ? showBoldNotice() : startGame(true)), 'primary-btn', { sbp: 'start' }),
-                button(t('ui.backToExperiment'), close, 'link-btn', { sbp: 'back' })
+                button(t('ui.sbpBack'), close, 'link-btn', { sbp: 'back' })
             );
         }
 
@@ -526,7 +526,7 @@
                 el('p', { className: 'sbp-award', text: `${t('ui.sbpSharpGuesser')}: ${names(summary.sharpGuessers)}` }),
                 summary.fakers.length ? el('p', { className: 'sbp-award sbp-faker', dataset: { sbp: 'fakers' }, text: `${t('ui.sbpFakerOfNight')}: ${names(summary.fakers)}` }) : null,
                 button(t('ui.sbpPlayAgain'), () => { engine.reset(); showSetup(); }, 'primary-btn', { sbp: 'again' }),
-                button(t('ui.backToExperiment'), close, 'link-btn', { sbp: 'back' })
+                button(t('ui.sbpBack'), close, 'link-btn', { sbp: 'back' })
             );
         }
 

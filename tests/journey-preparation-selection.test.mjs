@@ -120,7 +120,7 @@ assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?undoUn
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindPrimaryModeToggles\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindDurationRefresh\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindVisualizationAmbiencePreference\(/);
-assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.1') < html.indexOf('app.js?v=4.17'));
+assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.1') < html.indexOf('app.js?v=4.18'));
 assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.1/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?quietCourage: quietCourageAddonToggle/);
 console.log('Journey preparation selection passed: standalone stages, nested options, mutual-exclusion clears and updates.');

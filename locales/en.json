@@ -594,7 +594,9 @@
     "pitch_focus_title": "Focus",
     "pitch_focus_opening": "Welcome. Let's use two minutes to clear your mind. Sit comfortably and rest your eyes on one point.",
     "pitch_focus_steps": ["Breathe in and count one, breathe out. Breathe in and count two, breathe out. Breathe in and count three, breathe out.", "If a thought comes, simply notice it, and come back to your breath.", "Now choose one thing you want to do next. Just one.", "See yourself starting it, calm and clear. One thing at a time."],
-    "pitch_focus_closing": "Take one more breath, and keep this clear mind as you begin."
+    "pitch_focus_closing": "Take one more breath, and keep this clear mind as you begin.",
+    "sbpBack": "Back to Meditation Room",
+    "sbpOpen": "Play now"
   },
   "system": {
     "prePracticeSafety": "Settle into a comfortable position. Your guide is here with you. Let your breathing remain natural, and allow yourself to arrive gently in this moment.",

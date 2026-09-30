@@ -8,7 +8,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 assert.match(app, /startExperiment\(activity\)\s*\{\s*return experimentSession\.start\(this, activity,/);
 assert.match(app, /stopExperiment\(\)\s*\{\s*return experimentSession\.stop\(this,/);
-assert.match(html, /modules\/experiment-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.17/);
+assert.match(html, /modules\/experiment-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.18/);
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/experiment-session\.js\?v=1\.0/);
 assert.equal(pkg.scripts['test:experiment-session'], 'node tests/experiment-session.test.mjs');
 

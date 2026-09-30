@@ -10,12 +10,12 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration', 'secret-body-game'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.2[\s\S]*?app\.js\?v=4.17/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.3[\s\S]*?app\.js\?v=4.18/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);
 }
-assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.2/);
+assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.3/);
 assert.match(app, /practiceModuleLoader\.selectedModuleIds\(getChecked, \{ advancedFeaturesUnlocked: state\.advancedFeaturesUnlocked \}\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
 for (const [toggle, id] of [
     ['body-scan-addon-toggle', 'body-scan'], ['noting-addon-toggle', 'guided-noting'],

@@ -2938,6 +2938,7 @@ function attachEventListeners() {
     const intimateServicePanel = document.getElementById('intimate-service-panel');
     const experimentCareOptions = document.getElementById('experiment-care-group');
     // Dev-mode Secret Body Part party game (lazy module, nothing saved).
+    const secretBodyGamePanel = document.getElementById('secret-body-game-panel');
     const secretBodyGameButton = document.getElementById('open-secret-body-game');
     let secretBodyGame = null;
     secretBodyGameButton?.addEventListener('click', async () => {
@@ -2951,7 +2952,7 @@ function attachEventListeners() {
                     t,
                     showScreen,
                     gameScreen: secretBodyGameScreen,
-                    returnScreen: experimentScreen,
+                    returnScreen: lobbyScreen,
                     isUnlocked: () => state.advancedFeaturesUnlocked
                 });
             }
@@ -3050,10 +3051,8 @@ function attachEventListeners() {
             }
             yogaExperienceToggle.disabled = isLocked;
         }
-        if (secretBodyGameButton) {
-            secretBodyGameButton.hidden = isLocked;
-            secretBodyGameButton.disabled = isLocked;
-        }
+        if (secretBodyGamePanel) secretBodyGamePanel.hidden = isLocked;
+        if (secretBodyGameButton) secretBodyGameButton.disabled = isLocked;
         if (isLocked && secretBodyGame) secretBodyGame.close();
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.15">
+    <link rel="stylesheet" href="style.css?v=2.16">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -279,7 +279,6 @@
             <div class="experiment-actions">
                 <p class="experiment-note" data-i18n="ui.experimentNote">Only the selected activity runs. Care activities retain their guide-controlled completion step.</p>
                 <button id="start-experiment" class="primary-btn" type="button" data-i18n="ui.runExperiment">Run Activity</button>
-                <button id="open-secret-body-game" class="secondary-btn" type="button" hidden disabled data-i18n="ui.secretBodyGame">🎭 Secret Body Part</button>
                 <button id="close-experiment" class="link-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
             </div>
         </section>
@@ -571,6 +570,13 @@
                 </div>
             </section>
 
+            <!-- Dev-mode (Advanced Features) Secret Body Part party game. -->
+            <div id="secret-body-game-panel" class="config-group lobby-panel secret-body-game-panel" hidden>
+                <label data-i18n="ui.secretBodyGame">🎭 Secret Body Part</label>
+                <p class="mixer-note" data-i18n="ui.secretBodyGameNote">Dev-mode party game for 2–7 players. Pure luck, nothing saved.</p>
+                <button id="open-secret-body-game" class="secondary-btn" type="button" disabled data-i18n="ui.sbpOpen">Play now</button>
+            </div>
+
             <div id="session-estimate">~ 36 mins</div>
             <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
             <p class="journey-safety-summary" data-i18n="ui.safetySummary">Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time.</p>
@@ -854,7 +860,7 @@
     <script src="modules/journey-routing.js?v=1.3"></script>
     <script src="modules/standard-journey-sequence.js?v=1.0"></script>
     <script src="modules/journey-transition-stages.js?v=1.0"></script>
-    <script src="modules/practice-module-loader.js?v=1.2"></script>
+    <script src="modules/practice-module-loader.js?v=1.3"></script>
     <script src="modules/screen-navigation.js?v=1.0"></script>
     <script src="modules/shot-session.js?v=1.0"></script>
     <script src="modules/pitch-mode.js?v=1.0"></script>
@@ -897,6 +903,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.17"></script>
+    <script src="app.js?v=4.18"></script>
 </body>
 </html>

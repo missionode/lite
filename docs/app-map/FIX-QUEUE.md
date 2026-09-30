@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Secret Body Part moved to the Lobby
+
+- Owner felt the Experiment Mode entry was too hidden. The game now has its own dev-mode Lobby panel right after the Mood & Relaxation Ambience section (Play now / Back to Meditation Room). Still hidden and locked until dev mode is unlocked.
+
 ## Completed — Pitch Mode (2-Minute Mind Reset)
 
 - Public normal-mode marketing demo between Sound Shot and the Meditation Room. Four moods (Calm, Courage, Energy, Focus; no Rest), voice-guided only, two-minute countdown, invite at the end, no statistics.

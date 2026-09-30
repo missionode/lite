@@ -3294,3 +3294,6 @@ body.sky-canvas-active #particle-canvas {
 .pitch-invite { text-align: center; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; }
 .pitch-invite h2 { margin: 0; }
 @media (max-width: 360px) { .pitch-moods { grid-template-columns: 1fr; } }
+
+.secret-body-game-panel { text-align: center; }
+.secret-body-game-panel button { width: 100%; }

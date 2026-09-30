@@ -17,6 +17,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/pitch-mode):** public Pitch Mode (2-Minute Mind Reset) with four moods and fixed male voices per language (Ryan, Pratham, Dmitri new and Pitch-only; Arjun, Rasa existing). App `v4.17`, style `v2.15`, shell cache `chakra-v5.338`, language cache `v61`, voice registry `piper-models.json?v=4`. Guide: `docs/pitch-mode.md`. Device listening check of the new voices is still needed.
 
+- **Follow-up (feature/game-in-lobby):** Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. App `v4.18`, style `v2.16`, practice loader `v1.3`, game module `v1.1`, shell cache `chakra-v5.339`, language cache `v62`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

@@ -358,12 +358,13 @@ test('dev mode reveals Reverse Journey and Self-Exploration, and the roadmap fol
 });
 
 test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides it', async ({ page }) => {
-  await page.locator('#open-experiment-mode').click();
-  await expect(page.locator('#open-secret-body-game')).toBeHidden();
-  await page.locator('#close-experiment').click();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#secret-body-game-panel')).toBeHidden();
+  await page.locator('#open-settings').click();
   await unlockAdvancedFeatures(page);
-  await page.locator('#open-experiment-mode').click();
-  await expect(page.locator('#open-secret-body-game')).toBeVisible();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#secret-body-game-panel')).toBeVisible();
+  await expect(page.locator('#open-secret-body-game')).toBeEnabled();
   await page.locator('#open-secret-body-game').click();
   const game = page.locator('#secret-body-game-screen');
   await expect(game).toBeVisible();
@@ -394,11 +395,11 @@ test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides 
   }
   await expect(game.locator('[data-sbp="reveal"]')).toHaveCount(2);
   await game.locator('[data-sbp="back"]').click();
-  await expect(page.locator('#experiment-screen')).toBeVisible();
-  await page.locator('#close-experiment').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+  await page.locator('#open-settings').click();
   await page.locator('#advanced-features-toggle').uncheck();
-  await page.locator('#open-experiment-mode').click();
-  await expect(page.locator('#open-secret-body-game')).toBeHidden();
+  await page.locator('#save-config').click();
+  await expect(page.locator('#secret-body-game-panel')).toBeHidden();
 });
 
 test('Pitch Mode starts a public two-minute demo and keeps Pitch-only voices out of Settings', async ({ page }) => {
