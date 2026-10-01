@@ -35,7 +35,7 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/mantra-fade):** chakra mantra exit is a 12 s window (6 s fade + reverb tail) inside the chant time (`transitions.chakraMantraExit`); pause fades the whole mix out over 0.8 s before suspending and back in over 1.2 s (new `pauseFader` after the limiter); skip fades the mantra over ~3 s. App `v4.21`, audio init `v1.1`, chakra session `v1.1`, shell cache `chakra-v5.348`.
 
-- **Follow-up (feature/chakra-touch):** dev-mode **Chakra Touch** couples touch game as the third Play Zone card (Warm/Close/Spicy 18+, private Yes/Maybe/No consent maps, chakra wheel, touch cards, timer, ratings, luck cards, always-visible Pause, check-in every 3 rounds, optional Swap Roles, private summary, nothing saved, five languages). Guide `docs/chakra-touch-game.md`. App `v4.22`, practice loader `v1.6`, chakra-touch module `v1.0`, style `v2.20`, shell cache `chakra-v5.349`, language cache `v70`.
+- **Follow-up (feature/chakra-touch):** dev-mode **Chakra Touch** couples touch game as the third Play Zone card (Warm/Close/Spicy 18+, private Yes/Maybe/No consent maps, chakra wheel, touch cards, timer, ratings, luck cards, always-visible Pause, check-in every 3 rounds, optional Swap Roles, private summary, nothing saved, five languages). Guide `docs/chakra-touch-game.md`. App `v4.22`, practice loader `v1.6`, chakra-touch module `v1.0`, style `v2.20`, shell cache `chakra-v5.349`, language cache `v71`.
 
 - **Push status:** production is at `3c78247` (everything up to mantra-fade is live). Push `feature/chakra-touch` to production to release Chakra Touch.
 

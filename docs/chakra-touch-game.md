@@ -1,6 +1,6 @@
 # Chakra Touch — game guide
 
-A dev-mode (Advanced Features) **couples touch game for two partners**. The wheel picks a place on the body, a card picks how to touch, and the one receiving keeps their eyes closed. It is slow, gentle and built on consent. Nothing is saved.
+A dev-mode (Advanced Features) **couples touch game for two players**. The wheel picks a place on the body, a card picks how to touch, and the one receiving keeps their eyes closed. It is slow, gentle and built on consent. Nothing is saved.
 
 ## Where to find it
 
@@ -11,21 +11,21 @@ The card is disabled while dev mode is locked. Locking dev mode also closes the 
 
 ## Setup
 
-- Names of both partners (default "Partner 1" / "Partner 2").
+- Names of both players (default "Player 1" / "Player 2").
 - **Heat level**: 🌸 Warm, 🔥 Close, 🌶️ Spicy 18+.
 - **Rounds**: 6, 10 (default) or 14.
 - **Touch time**: 30 s, 45 s (default) or 60 s.
-- **Swap Roles** (optional): each partner plays the other for the whole game.
+- **Swap Roles** (optional): each player plays the other player for the whole game.
 
-**Spicy** asks both partners to tick "I am an adult and I agree". Without both ticks the game offers **Play Close instead**.
+**Spicy** asks both players to tick "I am an adult and I agree". Without both ticks the game offers **Play Close instead**.
 
 ## Private consent map
 
-Before play, each partner gets the phone in turn (press-and-hold hand-off lock) and marks every place **Yes / Maybe / No**.
+Before play, each player gets the phone in turn (press-and-hold hand-off lock) and marks every place **Yes / Maybe / No**.
 
 - **No** is never picked.
 - **Maybe** means the game asks first ("Asha, is Neck okay this time?"). **Not this time** skips that place for the round.
-- Warm places start as Yes, closer places start as Maybe. The other partner never sees the map.
+- Warm places start as Yes, closer places start as Maybe. The other player never sees the map.
 
 ## Places (outer body only, no genitals)
 
@@ -41,7 +41,7 @@ Each place belongs to a chakra and shows its colour and image.
 
 1. **Spin the chakra wheel** — it stops on an allowed place. Givers take turns every round.
 2. **Touch card** — Feather fingertips, Warm still palm, Slow circles, Draw a letter (receiver guesses), Breath only, Receiver's choice; Close adds Gentle kiss; Spicy adds Slow trail.
-3. About one round in five draws a **luck card**: Swap (the other partner gives), Double time, Your choice (receiver picks the place), Slow motion.
+3. About one round in five draws a **luck card**: Swap (the other player gives), Double time, Your choice (receiver picks the place), Slow motion.
 4. The receiver closes their eyes. **Start** runs the timer ring. **Finish now** stops early.
 5. The receiver rates: **More of this / Just right / Less of this**. "More of this" goes into the private summary.
 
@@ -51,11 +51,11 @@ Every **3 rounds** a **check-in** asks: We are good / Go one level lower / End t
 
 ## Swap Roles
 
-If turned on, an intro says "Asha now plays Ravi, and Ravi plays Asha". Each round adds a fun prompt (touch the way your partner likes, ask the way your partner asks, say their favourite line, react like them, dress up like them). At the end: **"Role swap ends. Back to yourselves."** and a reflection question. The wording is gender-neutral.
+If turned on, an intro says "Asha now plays Ravi, and Ravi plays Asha". Each round adds a fun prompt (touch the way the other player likes, ask the way they ask, say their favourite line, react like them, dress up like them). At the end: **"Role swap ends. Back to yourselves."** and a reflection question. The wording is gender-neutral.
 
 ## End
 
-A private summary of each partner's "More of this" places. Nothing is stored. **Play again** or **Back**.
+A private summary of each player's "More of this" places. Nothing is stored. **Play again** or **Back**.
 
 ## Technical notes
 
