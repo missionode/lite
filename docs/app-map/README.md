@@ -2,7 +2,7 @@
 
 Open [index.html](./index.html) in a browser. It is self-contained and needs no server or internet connection.
 
-- 24 selectable maps covering navigation, journey branches, live controls, supporting pages and runtime services.
+- 50 selectable maps covering navigation, journey branches, live controls, supporting pages and runtime services.
 - Select any step to inspect its behavior and incoming/outgoing connections.
 - Numbered arrows correspond to the expandable connection list.
 - Save the current map as SVG, or use Print / Save all as PDF to print the entire atlas.
@@ -12,6 +12,8 @@ Open [index.html](./index.html) in a browser. It is self-contained and needs no 
 - [Structured atlas data](./atlas.json) supports later maintenance and reuse.
 
 ## Evidence
+
+Latest update (2026-10-01): branch `feature/mantra-fade` on top of production `e7ce6bd` — Play Zone games (Hush Hush v2.0, Contactless Eye Shooter), confident five-language narration with the speech-form layer, chakra orientation names, spelling proofread, clearer assessment with the reliable service-fit dot, and smooth mantra exits/pause fades. Atlas verifier passed for all 50 maps.
 
 Source baseline: production commit `6a0ee84` plus the uncommitted natural-sky update, 2026-09-08. The visuals map describes the new cached renderer, motion lifecycle, lunar texture and illustrative star field. New sky behavior has static/unit evidence; browser preview was declined. This atlas captures source-identified branches and explicitly labels uncertainty; it is not an exhaustive runtime-state proof. Independent settings combine with journey flows rather than appearing as thousands of duplicated diagrams.
 

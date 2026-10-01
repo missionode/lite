@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-10-01.
+Source snapshot: feature/mantra-fade on production e7ce6bd (narration, spelling, assessment, dot and mantra-fade follow-ups) · 2026-10-01.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

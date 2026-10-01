@@ -29,6 +29,14 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/narration-confidence):** all narration in five languages rewritten to be natural, meditative and confident (no hedging, clear benefit, gender-neutral); review fixes applied; engine keeps ? ! tone, breaks long sentences at commas, and applies voice-only respellings (`modules/narration-speech-form.js`). Guide `docs/narration-style.md`. App `v4.20`, media lifecycle `v1.1`, piper narration `v1.1`, speech form `v1.0`, shell cache `chakra-v5.344`, language cache `v67`.
 
+- **Follow-up (spelling + orientation, on feature/narration-confidence):** chakra orientation lines say the on-screen chakra name with confident wording (Hindi मणिपूर/अनाहत/विशुद्ध, Tamil Sanskrit names, Russian "чакра", "Third Eye"); dictionary + native proofread of all spoken lines in five languages (58 fixes). Language cache `v69`.
+
+- **Follow-up (feature/assessment-clarity):** all 28 assessment questions, answers, the value prompt and 8 value cards rewritten in plain, translation-friendly English (same IDs/weights); question bank `v1.4`, content version `2026-10-01.1`. Service-fit dot fixed: value rounds are always pleasure vs cautious (12 pairs, no card twice in a row, sides alternate), green/red at ≥75% of picks (red was unreachable before); healthier chakra answer shown on the right for 13 of 28 questions. Engine `v1.4`.
+
+- **Follow-up (feature/mantra-fade):** chakra mantra exit is a 12 s window (6 s fade + reverb tail) inside the chant time (`transitions.chakraMantraExit`); pause fades the whole mix out over 0.8 s before suspending and back in over 1.2 s (new `pauseFader` after the limiter); skip fades the mantra over ~3 s. App `v4.21`, audio init `v1.1`, chakra session `v1.1`, shell cache `chakra-v5.348`.
+
+- **Push status:** production is at `e7ce6bd`. Push `feature/mantra-fade` to production to release everything above (it contains all earlier follow-ups).
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

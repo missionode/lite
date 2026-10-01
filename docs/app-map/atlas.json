@@ -2,7 +2,7 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-10-01",
-    "commit": "b967a5f production + uncommitted narration and No Frequency default updates",
+    "commit": "feature/mantra-fade on production e7ce6bd (narration, spelling, assessment, dot and mantra-fade follow-ups)",
     "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
@@ -1016,7 +1016,7 @@
           [
             "newcomer",
             "Newcomer orientation",
-            "Only for a normal standard journey when Returning Journey is unchecked. A gender-neutral aura scene highlights each chakra in sequence with its symbol and translated name/location caption. Spoken orientation uses the Meditation Language, then proceeds to Arriving. Skip cancels the current narration and continues with the next planned journey item."
+            "Only for a normal standard journey when Returning Journey is unchecked. A gender-neutral aura scene highlights each chakra in sequence with its symbol and translated name/location caption. Spoken orientation uses the Meditation Language and says the same chakra name as the caption, in confident wording (\"Root sits at the base of the spine. It brings steadiness.\"), then proceeds to Arriving. Skip cancels the current narration and continues with the next planned journey item."
           ]
         ],
         [
@@ -1221,7 +1221,7 @@
           [
             "skip",
             "Skip current item",
-            "Skip cancels narration, mantra, tones, ambience and visuals owned by the current item; its wrapper unwinds without stopping the journey."
+            "Skip cancels narration, mantra, tones, ambience and visuals owned by the current item (the mantra fades over about 3 seconds); its wrapper unwinds without stopping the journey."
           ]
         ],
         [
@@ -1355,14 +1355,14 @@
           [
             "hold",
             "Practice window",
-            "Core minutes ×60 minus 15-second lead-out, bounded at zero. Pauses suspend elapsed stage time."
+            "Core minutes ×60 minus 15-second lead-out and minus the extra mantra-exit time (chakraMantraExit 12s − chakraPostMantra 4s = 8s), bounded at zero. Pauses suspend elapsed stage time."
           ]
         ],
         [
           [
             "affirm",
             "Affirmation",
-            "Fit the mantra exit into the configured post-mantra window: default 4s means 2s dry fade/music restoration plus 2s wet-tail fade, reaching zero before affirmation. Wait only the existing window; zero-duration test profiles remain zero."
+            "The mantra leaves over the chakraMantraExit window (default 12s: 6s dry fade/music restoration plus 6s wet-tail fade), which starts inside the chant time so the chakra keeps the same total length; it reaches zero before the affirmation. Zero-duration test profiles remain zero."
           ]
         ],
         [
@@ -3170,7 +3170,7 @@
           [
             "pause",
             "Pause",
-            "Non-Lobby/Settings screens already have static sky and decorative effects. Set isPaused; freeze stage countdowns; cancel browser speech; pause Piper; suspend AudioContext."
+            "Non-Lobby/Settings screens already have static sky and decorative effects. Set isPaused; freeze stage countdowns; cancel browser speech; pause Piper; fade the whole mix out over 0.8s through the pause fader, then suspend AudioContext (no hard cut)."
           ],
           [
             "mixer",
@@ -3187,7 +3187,7 @@
           [
             "resume",
             "Resume",
-            "Resume Piper/context. Ordinary browser narration replays the interrupted sentence if pause was observed."
+            "Resume Piper/context, then fade the whole mix back in over 1.2s. Ordinary browser narration replays the interrupted sentence if pause was observed."
           ],
           [
             "image",
@@ -3643,12 +3643,12 @@
           [
             "piper",
             "Piper worker",
-            "The piper-lifecycle module owns model configuration, serial worker requests, synthesis/decode caching, playback envelopes and cancellation. The media-lifecycle module splits text into at most 180 Unicode code points at word boundaries where possible. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup."
+            "The piper-lifecycle module owns model configuration, serial worker requests, synthesis/decode caching, playback envelopes and cancellation. Text first passes the narration-speech-form module (voice-only respellings: English mantras/Chakra/Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). The media-lifecycle module splits it into sentence pieces that keep their . ? ! । mark (so tone survives); a sentence over 180 Unicode code points breaks at its last comma, semicolon or colon, else a space. A comma-continued piece gets a 0.4s breath instead of the full sentence gap. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup."
           ],
           [
             "browser",
             "Browser speech",
-            "Select matching voice and locale; apply pace/pitch/volume; speak each sentence."
+            "Select matching voice and locale; apply pace/pitch/volume; speak each piece from the same spoken-form split."
           ]
         ],
         [
@@ -3779,7 +3779,7 @@
           [
             "mantra",
             "Mantra MP3",
-            "SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner. Six-second entry belongs to each loop, never zeroing the shared bus. Final Stop/completion uses an eight-second exit plus seven-second response. Stage handoffs instead split the existing post-mantra window into equal dry and wet-tail fades (default 2s + 2s), so affirmation cannot overlap the chant. New mantra entry restores the wet return. Filter modulation fades with the dry exit. Repeated loop Stop does not restart the envelope; restart cancels route retirement and reconnects."
+            "SeamlessLoop → mantra gain/filter → dry path and reverb tail → spatial panner. Six-second entry belongs to each loop, never zeroing the shared bus. Final Stop/completion uses an eight-second exit plus seven-second response. Stage handoffs split the chakraMantraExit window into equal dry and wet-tail fades (default 6s + 6s), started inside the chant time, so the mantra never drops and affirmation cannot overlap the chant. New mantra entry restores the wet return. Filter modulation fades with the dry exit. Repeated loop Stop does not restart the envelope; restart cancels route retirement and reconnects."
           ],
           [
             "generated",
@@ -3858,7 +3858,7 @@
         [
           "shared",
           "limiter",
-          "Output"
+          "Output → pause fader → speakers"
         ]
       ],
       "notes": [
@@ -5745,7 +5745,7 @@
           [
             "coverage",
             "Adaptive coverage",
-            "Balance evidence across seven chakras and eight value priorities. Use unused unique prompts for evidence gaps; no repeated unordered value pairing."
+            "Balance evidence across seven chakras with unused unique prompts. Questions and answers are plain, short, translation-friendly English; the healthier answer is shown on the right for 13 of 28 questions (stable per question). Value rounds: “Which of these two matters more to you?”, always one pleasure-leaning card vs one cautious card (12 pairs; neutral Loyalty card not asked), never the same card in two rounds in a row, each card alternating sides."
           ]
         ],
         [
