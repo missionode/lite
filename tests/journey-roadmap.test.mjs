@@ -22,7 +22,7 @@ assert.match(app, /const journeyRoadmap = window\.ChakraJourneyRoadmap/);
 assert.match(app, /function getJourneyRoadmapLabels\(\)\s*\{\s*return journeyRoadmap\.resolveLabels\(/);
 assert.match(app, /function updateJourneyRoadmap\(\)\s*\{\s*journeyRoadmap\.render\(/);
 assert.match(html, /modules\/journey-roadmap\.js\?v=1\.1[\s\S]*?app\.js\?v=4.20/);
-assert.match(serviceWorker, /chakra-v5.345[\s\S]*?modules\/journey-roadmap\.js\?v=1\.1/);
+assert.match(serviceWorker, /chakra-v5.346[\s\S]*?modules\/journey-roadmap\.js\?v=1\.1/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);

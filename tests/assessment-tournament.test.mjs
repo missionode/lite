@@ -13,9 +13,20 @@ assert.equal(engine.validateBank(bank), true, 'the approved assessment bank shou
 assert.deepEqual([...engine.CHAKRA_IDS], ['root', 'sacral', 'solar', 'heart', 'throat', 'third-eye', 'crown']);
 assert.equal(bank.values.length, 8, 'the value bracket should contain all eight approved cards');
 assert.deepEqual(
-    bank.values.map(item => item.label),
-    ['Sensual Joy', 'Luxury', 'Independence', 'Spontaneity', 'Commitment', 'Social Approval', 'Emotional Safety', 'Romantic Idealism'],
+    bank.values.map(item => item.id),
+    ['sensual-joy', 'luxury', 'independence', 'spontaneity', 'commitment', 'social-approval', 'emotional-safety', 'romantic-idealism'],
 );
+// Client-facing wording (Oct 2026): plain, short and translation-friendly,
+// with the same meaning as the approved value names.
+assert.deepEqual(
+    bank.values.map(item => item.label),
+    ['Enjoying pleasure through the senses', 'Luxury and comfort', 'Freedom to do things my way', 'Doing fun things without planning',
+        'Loyalty and keeping promises', 'Being liked and accepted by others', 'Feeling emotionally safe', 'Deep romantic love'],
+);
+for (const question of bank.questions) {
+    assert.ok(question.prompt.length <= 60 && question.prompt.endsWith('?'), `${question.id} prompt stays short and is a question`);
+    for (const choice of question.choices) assert.ok(choice.label.length <= 55, `${question.id}.${choice.id} answer stays short`);
+}
 
 const malformed = structuredClone(bank);
 malformed.questions[1].id = malformed.questions[0].id;

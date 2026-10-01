@@ -435,7 +435,7 @@
         }
         show(elements.loadingView);
         try {
-          const response = await fetch('../data/assessment-questions.json?v=1.2');
+          const response = await fetch('../data/assessment-questions.json?v=1.3');
           if (!response.ok) throw new Error('The assessment question set is unavailable.');
           bank = await response.json();
           window.ChakraAssessmentTournament.validateBank(bank);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.345';
+const CACHE_NAME = 'chakra-v5.346';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v69';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
@@ -8,7 +8,7 @@ const ASSETS = [
   './docs/assesment.html',
   './modules/assessment-tournament.js?v=1.3',
   './modules/assessment-persistence.js?v=1.0',
-  './data/assessment-questions.json?v=1.2',
+  './data/assessment-questions.json?v=1.3',
   './docs/repertory.html',
   './data/frequency-repertory.json',
   './timing-config.json',

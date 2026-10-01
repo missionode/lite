@@ -1,5 +1,14 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Clear, translation-friendly assessment questions
+
+- All 28 chakra questions, their 56 answers, the value prompt and the 8 value cards are rewritten in plain, short English with the same meaning, IDs and weights (no idioms; Google Translate friendly). Question bank `?v=1.3`.
+
+## Open — Service-fit dot accuracy (owner decision needed)
+
+- Every client sees the same 12 value pairs. With that schedule a red dot is mathematically impossible (most cautious possible answers give mean −0.42, threshold −0.5), and a client who leans to pleasure 80% of the time gets green only ~42% of the time.
+- Proposed: use the 12 pleasure-vs-caution pairs (4 positive × 3 cautious values) and colour by count: green ≥ 9 of 12 positive picks, red ≥ 9 of 12 cautious picks, else orange (random answers: 7% green, 7% red; 80% leaners: 80%).
+
 ## Completed — Spelling proofread (all languages)
 
 - Dictionary pass (hunspell en/ru/hi/ml + LibreOffice ta) plus a line-by-line native proofread of all 202 spoken lines per language. 58 fixes: Hindi nukta consistency (क़दम, बाक़ी, ख़ुशी, फ़्लोर) and a plural; Tamil sandhi doubling (மெதுவாகச், ஏற்பத்/ஏற்பச், அடுத்துச், அன்றாடச், சுற்றித்); Russian missing "ли", dashes, "сидеть", chakra capitals; Malayalam consistent വയറ്റിൽ / ബോധപൂർവ്വം; English consistent British spelling (symbolise, visualisation, towards) and pose-name hyphens. Owner-pinned spellings kept (മാർഗദർശി, മാർഗ്ഗനിർദ്ദേശകന്റെ നിർദേശങ്ങൾ).

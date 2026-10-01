@@ -15,7 +15,7 @@ const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
     'engine and persistence should load before the application');
-assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.2'\)/,
+assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.3'\)/,
     'the UI should fetch the versioned English question bank');
 
 for (const id of [
@@ -69,7 +69,7 @@ assert.doesNotMatch(inlineScripts[0], /startJourney|selectedChakras|journeyConfi
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a return path to the Meditation Room');
 
 for (const asset of [
-    './data/assessment-questions.json?v=1.2',
+    './data/assessment-questions.json?v=1.3',
     './modules/assessment-tournament.js?v=1.3',
     './modules/assessment-persistence.js?v=1.0'
 ]) {
