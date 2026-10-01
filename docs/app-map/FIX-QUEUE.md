@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Confident, natural narration in all five languages
+
+- Owner: narration felt doubtful ("like giving up"), meditators questioned the benefit. All 181 spoken lines per language rewritten as natural spoken language with calm confidence and clear benefit, no medical or magical claims, safety kept briefly. Hedging phrases cut (English 50 → 0, Hindi 90 → 5, Russian 87 → 9, Tamil 128 → ~20 mostly safety/choice). Gender-neutral throughout.
+- Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
+- Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
+
 ## Completed — Contactless Eye Shooter
 
 - Owner-designed dev-mode gaze game for people with gaze avoidance, as a second Play Zone card. Explanation only (no camera, nothing saved): look at a spot on the partner, hold 3 seconds, blink once, add points. Points 1–5 by difficulty (Eyes and Pubic mound 5). Points goal Short 15 / Medium 30 / Long 50. Five languages. Module `modules/eye-shooter-game.js`, guide `docs/eye-shooter-game.md`, atlas map `eye-shooter`.

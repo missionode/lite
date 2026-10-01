@@ -72,6 +72,7 @@
     "test:self-exploration": "node tests/self-exploration-practices.test.mjs",
     "test:secret-body-game": "node tests/secret-body-part-game.test.mjs",
     "test:eye-shooter": "node tests/eye-shooter-game.test.mjs",
+    "test:narration-speech-form": "node tests/narration-speech-form.test.mjs",
     "test:pitch-mode": "node tests/pitch-mode.test.mjs",
     "test:screen-navigation": "node tests/screen-navigation.test.mjs",
     "test:experiment-settings-view": "node tests/experiment-settings-view.test.mjs",

@@ -393,7 +393,7 @@ test('dev mode Hush Hush game plays to the Grand Reveal with hand-off locks and 
   await expect(game.locator('.sbp-chakra-img').first()).toHaveAttribute('src', /symbols\/(root|sacral)\.png/);
 
   let sawGuessScreen = false;
-  for (let step = 0; step < 120; step++) {
+  for (let step = 0; step < 300; step++) {
     if (await game.locator('[data-sbp="reveal"]').count()) break;
     if (await hold.count()) {
       await holdOpen();

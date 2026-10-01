@@ -1,7 +1,7 @@
 (function () {
     function create() {
         async function run(owner, text, fadeOut, keepSilence, volumeScale, pacing, transition, deps) {
-            const { state, piperTTS, timing, splitNarrationText, piperClipFadeSeconds, mantraFadeSeconds, setVoiceStatus, fallbackMessage, setTimeout } = deps;
+            const { state, piperTTS, timing, splitNarrationText, spokenForm = value => value, isContinuationPiece = () => false, piperClipFadeSeconds, mantraFadeSeconds, setVoiceStatus, fallbackMessage, setTimeout } = deps;
             if (!text || (!owner.isMeditationActive && !fadeOut)) return;
             if (!keepSilence) owner.audio.fadeInBackgroundMusic(6, true);
             if (owner.audio.voiceCarveFilter) {
@@ -20,7 +20,8 @@
                 : timing('narration', 'sentenceGap');
             await owner.pauseAwareSleep(leadIn * 1000);
 
-            const sentences = splitNarrationText(text);
+            // Voice-only respellings, then sentence pieces that keep their . ? ! marks.
+            const sentences = splitNarrationText(spokenForm(text));
             const generation = piperTTS.generation;
             const queueSynthesis = sentence => {
                 const job = piperTTS.prepare(sentence);
@@ -65,7 +66,11 @@
                     await owner.narrateBrowser(sentences[i], false, true, pacing, false);
                 }
 
-                if (i < sentences.length - 1) await owner.pauseAwareSleep(sentenceGap * 1000);
+                if (i < sentences.length - 1) {
+                    // A piece cut at a comma continues the thought: a short breath, not a full pause.
+                    const gap = isContinuationPiece(sentences[i]) ? Math.min(sentenceGap, 0.4) : sentenceGap;
+                    await owner.pauseAwareSleep(gap * 1000);
+                }
             }
 
             if (fadeOut) {

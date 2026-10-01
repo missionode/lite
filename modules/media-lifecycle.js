@@ -23,19 +23,34 @@
     }
 
     // Bound each inference, including scripts without sentence punctuation.
+    // Sentence marks (. ! ? ।) stay on their piece so the voice keeps the
+    // falling, questioning or exclaiming tone. A sentence longer than the
+    // limit is split at its last comma, semicolon or colon (then at a space),
+    // never in the middle of a word.
     function splitNarrationText(text, limit = 180) {
         const chunks = [];
-        for (const sentence of String(text).split(/[.!?।]/)) {
-            let rest = Array.from(sentence.trim());
+        const sentences = String(text).match(/[^.!?।]+[.!?।]*|[.!?।]+/g) || [];
+        for (const raw of sentences) {
+            let rest = Array.from(raw.replace(/([.!?।])[.!?।]+$/, '$1').trim());
+            if (!rest.length || /^[.!?।\s]*$/.test(rest.join(''))) continue;
             while (rest.length > limit) {
-                let cut = rest.slice(0, limit + 1).lastIndexOf(' ');
-                if (cut < limit / 2) cut = limit;
+                const window = rest.slice(0, limit + 1).join('');
+                let cut = Math.max(window.lastIndexOf(', '), window.lastIndexOf('; '), window.lastIndexOf(': '),
+                    window.lastIndexOf('، '), window.lastIndexOf('， ')) + 1;
+                if (cut < limit / 3) cut = window.lastIndexOf(' ');
+                if (cut < limit / 3) cut = limit;
                 chunks.push(rest.splice(0, cut).join('').trim());
                 while (rest[0] === ' ') rest.shift();
             }
-            if (rest.length) chunks.push(rest.join(''));
+            if (rest.length) chunks.push(rest.join('').trim());
         }
-        return chunks;
+        return chunks.filter(chunk => chunk.length);
+    }
+
+    // A piece that ends mid-sentence (comma, semicolon, colon or no mark)
+    // continues the same thought, so it gets a short breath, not a full pause.
+    function isContinuationPiece(chunk) {
+        return !/[.!?।]$/.test(String(chunk).trim());
     }
 
     class SeamlessLoop {
@@ -164,6 +179,7 @@
         stageFadeSeconds,
         withAudioStageFade,
         splitNarrationText,
+        isContinuationPiece,
         SeamlessLoop
     });
 })(typeof window === 'undefined' ? globalThis : window);

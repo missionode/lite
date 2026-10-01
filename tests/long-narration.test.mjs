@@ -55,7 +55,7 @@ const piper={generation:0,synthesize:async text=>text,decode:async text=>{
     return {text,duration:2};
 },getNormalizationGain(){return 1;},playBuffer:async buffer=>{
     await new Promise(resolve => setTimeout(resolve, 0));
-    if(played.length===0) assert.ok(decoded.includes('Two'),'The next sentence is decoded during first playback');
+    if(played.length===0) assert.ok(decoded.includes('Two.'),'The next sentence is decoded during first playback');
     played.push(buffer.text);
 }};
 piper.prepare = async text => { const result = await piper.decode(await piper.synthesize(text)); return result; };
@@ -63,7 +63,7 @@ const deps={splitNarrationText,piperTTS:piper,state:{eyesCloseMode:false},timing
     piperClipFadeSeconds:.05,mantraFadeSeconds:.05,setVoiceStatus(){},fallbackMessage:'fallback',setTimeout};
 const controller={isMeditationActive:true,isPaused:false,audio:{fadeInBackgroundMusic(){}},pauseAwareSleep:async()=>{}};
 await narrate(controller,'One. Two. Three.',false,false,1,'normal','none',deps);
-assert.deepEqual(played,['One','Two','Three']);
+assert.deepEqual(played,['One.','Two.','Three.'],'pieces keep their sentence mark so the voice keeps its tone');
 played.length=0; cancelDuringDecode=true;
 await narrate(controller,'One. Two.',false,false,1,'normal','none',deps);
 assert.deepEqual(played,[],'Cancellation during preparation cannot start stale speech');

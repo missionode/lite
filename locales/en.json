@@ -28,7 +28,7 @@
     "newcomerSkip": "Skip introduction",
     "newcomerNotNow": "Not now",
     "newcomerBodyMap": "A simple attention map: from the base of the spine to the crown of the head.",
-    "newcomerOrientationIntro": "Chakra means wheel in Sanskrit. In this traditional practice, the seven chakras are a symbolic map of attention along the body's centre line. We will meet them one at a time, from the base of the spine to the crown of the head.",
+    "newcomerOrientationIntro": "Chakra means wheel in Sanskrit. In this traditional practice, the seven chakras form a map of attention along the centre line of the body. We will meet them one at a time, from the base of the spine to the crown of the head.",
     "newcomerRootNarration": "Root is placed at the base of the spine. It can be a gentle reminder of steadiness and feeling grounded.",
     "newcomerSacralNarration": "Sacral is placed in the lower abdomen. It can invite awareness of feelings, creativity, and enjoyment.",
     "newcomerSolarNarration": "Solar is placed in the upper abdomen. It can represent choice, confidence, and purposeful energy.",
@@ -36,7 +36,7 @@
     "newcomerThroatNarration": "Throat is placed around the throat. It can bring attention to expression and listening.",
     "newcomerThirdEyeNarration": "Third Eye is placed at the centre of the forehead. It can invite reflection, attention, and seeing a situation with clarity.",
     "newcomerCrownNarration": "Crown is placed at the top of the head. It can represent meaning, openness, and a wider perspective.",
-    "newcomerOrientationClosing": "These are traditional symbols for reflection, not something you need to make happen. You do not need to feel anything special. Simply follow the centres you selected, at your own ease.",
+    "newcomerOrientationClosing": "These are traditional symbols for reflection and focus. Simply follow the centres you selected, at your own ease, and let the practice work gently.",
     "skipCurrentItem": "Skip current item",
     "newcomerGuidedStatus": "A short guided orientation is playing…",
     "newcomerGuidedNarration": "Chakra means wheel in Sanskrit. In this traditional practice, the seven chakras are a simple map for attention along the centre of the body, from the base of the spine to the crown of the head. On the figure, Root is at the base of the spine; Sacral is in the lower abdomen; Solar is in the upper abdomen; Heart is at the centre of the chest; Throat is in the throat area; Third Eye is at the centre of the forehead; and Crown is at the top of the head. Root can be a prompt for steadiness. Sacral for feeling and creativity. Solar for choice and confidence. Heart for care and connection. Throat for expression. Third Eye for reflection. Crown for meaning and openness. You do not need to feel anything special or make anything happen. We will move gently through the centres you selected, using breath, imagery, sound, and quiet pauses as invitations for your attention.",
@@ -159,9 +159,9 @@
     ,"operatorAssessmentUnavailable": "Assessment access could not be prepared in this browser session."
     ,"advancedPasswordPrompt": "Enter the Advanced Features password."
     ,"previewVisualizationAmbience": "Preview Visualization Ambience"
-    ,"dharanaFocusGuidance": "Let your attention rest only on this anchor. Allow everything else to soften into the background. When the mind wanders, notice gently and return to this one clear point."
-    ,"dharanaClosing": "Now let the anchor soften. Relax your gaze and allow your awareness to widen again. Notice your breath, your body, and the space around you. Carry this steadiness gently into what comes next."
-    ,"visualizationFocusPrompt": "Choose any experience, possibility, or direction you would like to explore in your mind."
+    ,"dharanaFocusGuidance": "Let your attention rest only on this anchor. Everything else softens into the background. When the mind wanders, gently return to this one clear point."
+    ,"dharanaClosing": "Now let the anchor soften. Relax your gaze and let your awareness widen again. Notice your breath, your body, and the space around you. Carry this steadiness into what comes next."
+    ,"visualizationFocusPrompt": "Choose an experience, a possibility, or a direction to explore in your mind."
     ,"dharanaAddon": "Focused Attention (Dharana)"
     ,"dharanaAnchor": "Focus anchor"
     ,"dharanaIndigoCircle": "Indigo circle"
@@ -177,34 +177,34 @@
     ,"visualizationSpaceRace": "Space Race"
     ,"visualizationAmbienceVolume": "Visualization ambience volume"
     ,"visualizationTitle": "Guided visualization"
-    ,"visualizationGuidance": "Close your eyes if that feels comfortable. Let that experience become a simple scene in your inner mind. Notice where you are, what you can see and hear, how your body feels, and how you would like to respond. There is nothing to force; simply let the scene become familiar."
+    ,"visualizationGuidance": "Let your eyes gently shut. Let that experience become a simple scene in your inner mind. Notice where you are, what you see and hear, and how your body feels. Notice how you respond. Let the scene grow clear and familiar, all on its own."
     ,"visualizationIntention": "{{intention}}"
     ,"visualizationReturn": "Now let the scene soften. Slowly open your eyes when you are ready, and bring its calm clarity with you."
-    ,"visualizationSilenceWakePrompt": "As this quiet practice comes to a close, begin to notice your breath and the space around you. There is no need to hurry."
+    ,"visualizationSilenceWakePrompt": "As this quiet practice comes to an end, begin to notice your breath and the space around you. Return slowly and calmly."
     ,"roadmapDharana": "Focused attention"
     ,"roadmapVisualization": "Visualization"
     ,"bodyScanAddon": "Body Scan Guided Session"
     ,"bodyScanDuration": "Duration"
     ,"bodyScanTitle": "Body scan"
-    ,"bodyScanOpening": "If it feels comfortable, close your eyes. Let your body be supported exactly as it is. We will move awareness slowly from the top of the head to the toes. Notice sensation, tension, or no clear sensation, without needing to change anything. You may skip any area that feels uncomfortable."
-    ,"bodyScanRegions": ["Bring awareness to the top of your head and scalp. Notice pressure, warmth, coolness, tingling, or simply quiet.", "Notice the forehead, eyes, cheeks, mouth, and jaw. Let each sensation be present without trying to correct it.", "Move awareness through the neck, shoulders, arms, hands, and fingers. Notice where the body feels light, heavy, open, or tense.", "Notice the chest and upper back, and the natural movement of breathing. There is no need to deepen or control the breath.", "Bring awareness to the abdomen, lower back, and pelvis. Observe the sensations here with patience and choice.", "Move through the thighs and knees. Notice contact, temperature, clothing, or the absence of a distinct sensation.", "Continue through the lower legs and ankles, noticing whatever is present without judgement.", "Finally, feel the feet, heels, soles, and every toe. Sense their contact with the ground or the support beneath you."]
-    ,"bodyScanClosing": "Now sense the body as one complete field, from the top of the head to the tips of the toes. Feel the support beneath you. Nothing needs to be corrected. Let this grounded awareness remain with you as the journey continues."
+    ,"bodyScanOpening": "Let your eyes gently shut. Let your body rest, fully supported. We will move awareness slowly from the top of the head down to the toes. Notice each sensation, each tension, and each quiet place, just as it is. Pass gently over any area that feels uncomfortable, and keep moving."
+    ,"bodyScanRegions": ["Bring awareness to the top of your head and scalp. Notice warmth, tingling, or a simple quiet.", "Notice your forehead and eyes, then your cheeks and jaw. Let each sensation rest as it is, and let the face soften.", "Move awareness through your neck and shoulders, down your arms to your fingertips. Notice where the body feels light, heavy, or open.", "Notice your chest and upper back, and the natural rise and fall of your breath. Let the breath move freely on its own.", "Bring awareness to your belly, lower back, and pelvis. Feel the sensations here with patience and kindness.", "Move through your thighs and knees. Notice contact, temperature, or a quiet stillness.", "Continue through your lower legs and ankles, noticing whatever is present with calm acceptance.", "Finally, feel your feet, heels, and every toe. Sense their contact with the ground or the support beneath you."]
+    ,"bodyScanClosing": "Now sense your whole body as one complete field, from the top of your head to the tips of your toes. Feel the support beneath you. Your body is at ease, just as it is. This grounded awareness stays with you as the journey continues."
     ,"roadmapBodyScan": "Body scan"
     ,"notingAddon": "Guided Noting"
     ,"notingSubtitle": "Notice, name, and release."
     ,"notingDuration": "Duration"
     ,"notingTitle": "Guided noting"
-    ,"notingOpening": "Now notice whatever experience is most apparent. Give it one quiet, simple label in your mind, such as thinking, hearing, planning, itching, warmth, or feeling. Then release the label and wait. The purpose is not to stop thoughts or change emotions. If anything feels overwhelming, return to the feeling of breathing or end the practice."
-    ,"notingReminders": ["Notice what is here now. Name it gently, then let the word go.", "A repeated thought can simply be labelled thinking again. Nothing has gone wrong.", "If an emotion is strong, use a simple label such as sadness, fear, anger, or just feeling. You do not need to investigate it.", "If no label seems right, quietly use knowing, or return to breathing. The exact word is not important."]
+    ,"notingOpening": "Now notice whatever experience is strongest. Give it one quiet, simple label in your mind, such as thinking, hearing, or warmth. Then release the label and wait. Thoughts and feelings come and go on their own, and you simply watch. If anything feels overwhelming, return to the feeling of your breath."
+    ,"notingReminders": ["Notice what is here now. Name it gently, then let the word go.", "A repeated thought can simply be labelled thinking again. This is part of the practice.", "If an emotion is strong, use a simple label such as sadness, fear, or just feeling. Name it and let it be.", "If no label seems right, quietly use the word knowing, or return to your breath. Any simple word works."]
     ,"notingClosing": "Now let all labels fall away. Notice the quiet awareness in which thoughts, sounds, emotions, and sensations appear and pass. Carry this clear, spacious attention into the next part of the journey."
     ,"roadmapNoting": "Guided noting"
     ,"undoUnlearnAddon": "Undo & Unlearn"
     ,"undoUnlearnSubtitle": "A private practice of acknowledgement, forgiveness, and release."
     ,"undoUnlearnDuration": "Duration"
     ,"undoUnlearnTitle": "Undo and unlearn"
-    ,"undoUnlearnOpening": "You do not need to remember, name, explain, speak, or think through anything. Nothing specific needs to enter your mind. If something no longer supports you, allow it to loosen only in its own time. You may return to breathing or end this practice whenever you choose."
-    ,"undoUnlearnPhases": ["Without searching for a memory or forming a story, acknowledge that every person carries learned responses and unfinished experiences. Nothing specific needs to be found.", "If any part of you is ready to receive self-forgiveness, allow that possibility gently. Self-forgiveness does not remove responsibility, and nothing needs to be explained.", "If forgiveness from another person is relevant, you may quietly pray for forgiveness without picturing, naming, or contacting anyone. Their response, safety, boundaries, and freedom of choice remain entirely their own.", "If forgiveness toward someone else is possible today, allow only as much as feels safe. Forgiveness is not approval, reconciliation, restored trust, or permission for harm.", "Let earlier parts of you receive kindness without revisiting what they experienced. You worked with the awareness and capacity available at the time. You may offer yourself care now.", "If I were beside you as a compassionate witness, I would remind you that sincere responsibility does not require endless self-punishment.", "Soften your effort. Let the jaw, shoulders, hands, and breathing become less involved in holding. Release only what is naturally ready. Nothing needs to be forced.", "Rest without checking whether anything changed. Keep what supports you, and allow what no longer serves you to become lighter in its own time."]
-    ,"undoUnlearnClosing": "You do not need to know what changed or confirm that anything was released. Keep the understanding that is useful, preserve responsibility and choice, and move forward without analysing this experience."
+    ,"undoUnlearnOpening": "Simply rest with your breath. Your mind can stay quiet and open. Whatever no longer supports you loosens in its own time. Your breath is always here as an anchor. You are free to end this practice whenever you choose."
+    ,"undoUnlearnPhases": ["Every person carries learned habits and unfinished experiences. Acknowledge this gently, with no memory to search for and no story to build.", "Let any part of you that is ready receive self-forgiveness, gently. Self-forgiveness keeps your responsibility and frees you from extra weight.", "If forgiveness from another person matters to you, quietly pray for forgiveness. No one needs to be pictured, named, or contacted. Their response, safety, and freedom of choice remain entirely their own.", "If forgiveness toward someone else is right for you today, allow as much as feels safe. Forgiveness is not approval, and it is not permission for harm.", "Let earlier parts of you receive kindness, without revisiting what they lived through. You did your best with the awareness you had at the time. Offer yourself care now.", "Picture a compassionate witness beside you. This witness reminds you that true responsibility never asks for endless self-punishment.", "Soften your effort. Let your jaw, shoulders, and hands let go of holding. Your breathing becomes easy. Release what is ready to go, gently and naturally.", "Rest in the quiet that follows. Keep what supports you. What no longer serves you grows lighter and lighter in its own time."]
+    ,"undoUnlearnClosing": "Keep the understanding that serves you. Hold on to your responsibility and your freedom of choice. Move forward lightly, and trust the quiet work of this practice."
     ,"roadmapUndoUnlearn": "Undo and unlearn"
     ,"journeyPreparation": "Journey preparation"
     ,"journeyIntegration": "Journey integration"
@@ -289,11 +289,11 @@
     ,"roadmapAssistedBathing": "Assisted Bathing"
     ,"roadmapBath": "Bath"
     ,"bathToYogaRestTitle": "Rest Before Yoga"
-    ,"bathToYogaRestGuidance": "The bath and care stage is complete. Rest quietly for fifteen minutes before Yoga. When the timer is complete, the guide will choose when to begin."
+    ,"bathToYogaRestGuidance": "The bath and care stage is complete. Rest quietly for fifteen minutes before Yoga. When the timer ends, your guide will choose when to begin."
     ,"restReadyToContinue": "The rest is complete. Begin Yoga whenever you are ready."
     ,"beginYogaAfterRest": "Begin Yoga"
-    ,"guideReadyForNextSession": "Ready for the next session?"
-    ,"guideReadyForNextSessionGuidance": "This stage is complete. Take the time you need; the session will continue only when the guide is ready."
+    ,"guideReadyForNextSession": "When you are ready, we will begin the next session."
+    ,"guideReadyForNextSessionGuidance": "This stage is complete. Take the time you need. The session continues when the guide is ready."
     ,"proceedToNextSession": "Proceed to Next Session"
     ,"experimentMode": "Experiment Mode"
     ,"experimentSubtitle": "Run one isolated guide activity. It does not change the journey plan or history."
@@ -448,9 +448,9 @@
     "quietCourageSubtitle": "A private, gentle practice for exploring authentic expression at your own pace.",
     "quietCourageDuration": "Duration",
     "quietCourageTitle": "Quiet courage",
-    "quietCourageOpening": "Settle into the support beneath you. There is no need to become bolder or more outgoing. This is a private space: you may keep everything to yourself, imagine a neutral situation, or simply rest with your breath. You may stop whenever you choose.",
-    "quietCouragePhases": ["If it feels comfortable, notice whether there is a preference, wish, boundary, or way of being that you would like to make room for. It may be small, unclear, or nothing comes to mind. There is no need to name, decide, or share it.", "You may imagine a safe, ordinary moment where you have a choice about expressing something. Keep it light, imagined, or neutral; there is no need to revisit a real event or involve another person.", "Imagine taking a small step at your own pace. You can pause, choose not now, change your mind, or set a boundary. Courage can include protecting your comfort.", "Notice what might help you feel steady and supported. No action is required after this practice, and you do not need to change who you are. Take only what feels useful."],
-    "quietCourageClosing": "Let the imagined moment soften. Notice your breath, the support beneath you, and the room around you. Keep your choices your own, and return gently at your own pace.",
+    "quietCourageOpening": "Settle into the support beneath you. This is a private space for your own quiet strength. Keep everything to yourself, imagine a simple everyday situation, or rest with your breath. Your courage grows in its own way, at your own pace.",
+    "quietCouragePhases": ["Notice a wish, a boundary, or a way of being you would like to make room for. Even a small or unclear feeling is a good beginning. Keep it private, and let it rest gently in your awareness.", "Imagine a safe, ordinary moment where you choose to express something. Keep it light and simple, an imagined scene that stays private and involves only you.", "Imagine taking one small step at your own pace. You can pause, wait, or set a boundary. Courage includes protecting your comfort.", "Notice what helps you feel steady and supported. You stay fully yourself, and this quiet strength stays with you. Take what serves you."],
+    "quietCourageClosing": "Let the imagined moment soften. Notice your breath, the support beneath you, and the room around you. Your choices are your own. Return gently, at your own pace.",
     "roadmapQuietCourage": "Quiet Courage",
     "beginQuietCourage": "Begin Quiet Courage",
     "selfExploration": "Self-Exploration",
@@ -458,16 +458,16 @@
     "confidenceVisualizationSubtitle": "A gentle, fully clothed practice in self-kindness and confidence. No appearance goal or action is required.",
     "confidenceVisualizationDuration": "Duration",
     "confidenceVisualizationTitle": "A kinder view of yourself",
-    "confidenceVisualizationOpening": "Settle comfortably. Imagine yourself in a familiar, peaceful place, fully dressed and at ease. This is not a test of appearance; there is nothing you need to change.",
-    "confidenceVisualizationSteps": ["Notice one quality, strength, or way of being that you appreciate in yourself. It may be quiet or ordinary; there is no need to judge it.", "Picture yourself moving through a small everyday moment with that quality beside you. Let confidence mean being gently on your own side, not performing for anyone.", "Allow the image to soften. You can keep, change, or let go of anything you imagined. Rest with one natural breath."],
-    "confidenceVisualizationClosing": "Let the scene fade at its own pace. Feel the support beneath you and return your attention to the room. You do not need to prove or change anything.",
+    "confidenceVisualizationOpening": "Settle comfortably. Imagine yourself in a familiar, peaceful place, fully dressed and at ease. Here you are accepted exactly as you are.",
+    "confidenceVisualizationSteps": ["Notice one quality or strength you appreciate in yourself. Even a quiet, ordinary quality has real value.", "Picture yourself in a small everyday moment with that quality beside you. Confidence means being gently on your own side, with nothing to perform.", "Let the image soften. Keep what you imagined that serves you. Rest with one natural breath."],
+    "confidenceVisualizationClosing": "Let the scene fade at its own pace. Feel the support beneath you and return to the room. You are enough, just as you are.",
     "deepSecretsAddon": "Deep Secrets · Speak or Stay Silent",
     "deepSecretsSubtitle": "Speaking or silence is your choice. I won’t record or save what you say here; someone in the room may hear you.",
     "deepSecretsDuration": "Duration",
     "deepSecretsTitle": "A space for your own words",
-    "deepSecretsOpening": "This practice is your choice. I won’t record or save what you say here. If a guide or another person is in the room, they may hear you. You may speak, use fiction or metaphor, stay silent, or stop at any time.",
-    "deepSecretsInvitation": "If it feels right, let one thought, wish, feeling, or imagined story take shape in your own words. You do not need to explain it, name anyone, or share anything specific. Silence is equally welcome.",
-    "deepSecretsClosing": "Let the words—or the silence—rest now. Take an easy breath and notice the room. You do not need to repeat or act on anything you explored.",
+    "deepSecretsOpening": "This practice is your choice. I will not record or save what you say here. If a guide or another person is in the room, they can hear you. Speak, use story or image, or stay silent. Stop whenever you wish.",
+    "deepSecretsInvitation": "Let one thought, wish, or imagined story take shape in your own words. Keep it as simple or as private as you choose. Silence is equally welcome.",
+    "deepSecretsClosing": "Let the words, or the silence, rest now. Take an easy breath and notice the room. What you explored stays yours alone.",
     "finalChallengeAddon": "Final Challenge",
     "finalChallengeSubtitle": "One optional question. No answer is saved, and you may skip it.",
     "finalChallengeKicker": "FINAL CHALLENGE",
@@ -478,8 +478,8 @@
     "finalChallengeNo": "No, thank you",
     "skipForNow": "Skip for now",
     "finalChallengeYesFeedback": "Of course. You can ask your guide for information after the session. Nothing has been booked or shared.",
-    "finalChallengeNoFeedback": "Of course. We’ll continue without discussing it.",
-    "finalChallengeSkipFeedback": "That’s fine. We’ll continue.",
+    "finalChallengeNoFeedback": "Of course. We will continue without discussing it.",
+    "finalChallengeSkipFeedback": "That is fine. We will continue.",
     "roadmapConfidenceVisualization": "Confidence Visualization",
     "roadmapDeepSecrets": "Deep Secrets",
     "roadmapFinalChallenge": "Final Challenge",
@@ -632,15 +632,15 @@
     "pitchInviteAgain": "Try another feeling",
     "pitch_calm_title": "Calm",
     "pitch_calm_opening": "Welcome. For the next two minutes, this time is just for you. Whether you are sitting or standing, get comfortable and let your shoulders drop.",
-    "pitch_calm_steps": ["Breathe in slowly through your nose, and let it out gently through your mouth.", "Once more. Breathe in, and breathe out a little longer. Feel your body soften.", "Notice your feet on the ground and the support beneath you. There is nothing to fix right now.", "Bring one calm thought to mind: I can take this moment slowly."],
+    "pitch_calm_steps": ["Breathe in slowly through your nose, and let it out gently through your mouth.", "Once more. Breathe in, and breathe out a little longer. Feel your body soften.", "Notice your feet on the ground and the support beneath you. Everything is steady right now.", "Bring one calm thought to mind: I can take this moment slowly."],
     "pitch_calm_closing": "Take one last easy breath. Carry this calm with you as you look around the room.",
     "pitch_courage_title": "Courage",
     "pitch_courage_opening": "Welcome. Let's spend two minutes building quiet strength. Sit or stand tall, with your feet steady on the ground.",
     "pitch_courage_steps": ["Lift your chest a little and relax your shoulders. Notice how steady you already are.", "Take a strong breath in, hold it for a moment, and let it go with a slow breath out.", "Think of one time you handled something hard. You got through it.", "Say it quietly in your mind: I can handle today, one step at a time."],
     "pitch_courage_closing": "Take one more strong breath. Keep this tall, steady feeling as you get back to your day.",
     "pitch_energy_title": "Energy",
-    "pitch_energy_opening": "Welcome! Two minutes to wake up your body and mind. Sit or stand tall, and let's begin.",
-    "pitch_energy_steps": ["Take three short breaths in through your nose, and one long breath out. In, in, in, and out. Go at a comfortable pace.", "Once more. In, in, in, and out. If you feel light-headed, just breathe normally.", "Roll your shoulders back twice, and stretch your arms up if you like.", "Now bring a small smile to your face. Notice how that feels."],
+    "pitch_energy_opening": "Welcome. Here are two minutes to wake up your body and mind. Sit or stand tall, and let's begin.",
+    "pitch_energy_steps": ["Take three short breaths in through your nose, and one long breath out. In, in, in, and out. Go at a comfortable pace.", "Once more. In, in, in, and out. If you feel light-headed, just breathe normally.", "Roll your shoulders back twice, and stretch your arms up high.", "Now bring a small smile to your face. Notice how that feels."],
     "pitch_energy_closing": "One last deep breath in, and out. You are awake, fresh and ready to go.",
     "pitch_focus_title": "Focus",
     "pitch_focus_opening": "Welcome. Let's use two minutes to clear your mind. Sitting or standing, get comfortable and rest your eyes on one point.",
@@ -650,18 +650,18 @@
     "sbpOpen": "Play now"
   },
   "system": {
-    "prePracticeSafety": "Settle into a comfortable position. Your guide is here with you. Let your breathing remain natural, and allow yourself to arrive gently in this moment.",
+    "prePracticeSafety": "Settle into a comfortable position. Your guide is here with you. Let your breathing stay natural, and arrive gently in this moment.",
     "arriving": "Arriving",
     "breatheAndSettle": "Breathe and settle into the space",
-    "arrivalInduction": "Feel the support beneath you. There is nothing to achieve or force. With each natural breath, you may become more settled and more relaxed, while remaining comfortably aware of the room and free to adjust at any time.",
-    "arrivalReadiness": "Let your intention rest quietly within you. Keep only what feels supportive. With each breath, allow your attention to become a little steadier and a little deeper, in the way that feels right for you.",
-    "emergence": "Take your time returning to the room. Notice the support beneath you, gently move your fingers and toes, and let your eyes open when you feel ready. Carry only what feels useful from this practice into the rest of your day.",
-    "intention": "You are calling in: {{intention}}. Hold this in your heart — let it remain quietly with you through every moment of this journey.",
-    "centeringBreath": "Rest comfortably. We will start with a centering breath.",
-    "breathingComplete": "Breathing exercise is complete. Stay still for a moment.",
+    "arrivalInduction": "Feel the support beneath you. With each natural breath, you become more settled and more relaxed. You stay calmly aware of the room, and you are free to adjust your position at any time.",
+    "arrivalReadiness": "Let your intention rest quietly within you. Keep what supports you. With each breath, your attention becomes a little steadier and a little deeper, and your body grows still.",
+    "emergence": "Take your time returning to the room. Notice the support beneath you, gently move your fingers and toes, and let your eyes open when you feel ready. Carry the calm of this practice into the rest of your day.",
+    "intention": "You are calling in: {{intention}}. Hold this in your heart, and let it stay quietly with you through every moment of this journey.",
+    "centeringBreath": "Rest comfortably. We will begin with a centring breath.",
+    "breathingComplete": "The breathing exercise is complete. Stay still for a moment.",
     "corpsePoseSubtitle": "Surrender your body completely to the earth",
     "yogaSubtitle": "Union of breath, movement, and spirit",
-    "breatheInterval": "Take a break... breathe and prepare... for the next chakra",
+    "breatheInterval": "Take a short break. Breathe, and get ready for the next chakra.",
     "breathingSteps": [
       { "text": "Inhale", "scale": 8 },
       { "text": "Hold", "scale": 8 },

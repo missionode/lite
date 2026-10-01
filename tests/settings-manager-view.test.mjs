@@ -100,7 +100,7 @@ assert.deepEqual(accepted.statuses[0], ['replace', { chakra_voice: 'settings' }]
 assert.equal(accepted.elements.get('settings-manager-status').textContent, 'ui.settingsImported');
 assert.equal(accepted.reloads, 1);
 
-assert.ok(html.indexOf('modules/settings-manager-view.js?v=1.0') < html.indexOf('app.js?v=4.19'));
+assert.ok(html.indexOf('modules/settings-manager-view.js?v=1.0') < html.indexOf('app.js?v=4.20'));
 assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/settings-manager-view\.js\?v=1\.0/);
 assert.doesNotMatch(fs.readFileSync('app.js', 'utf8'), /settingsManagerButton\?\.addEventListener|id="export-settings"'\)\?\.addEventListener/);
 console.log('Settings manager view passed: public navigation/import, Advanced Features-only export, cancellation, validation and replacement.');

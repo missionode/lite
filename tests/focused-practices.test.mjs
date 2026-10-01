@@ -107,11 +107,11 @@ for (const [language, locale] of Object.entries({ en, ml, hi, ru })) {
 }
 
 for (const [language, locale, wording] of [
-    ['English', en, 'Rest comfortably. We will start with a centering breath.'],
-    ['Malayalam', ml, 'സുഖമായി വിശ്രമിക്കൂ. നമുക്ക് ഒരു ശാന്തമായ ശ്വാസത്തോടെ ആരംഭിക്കാം.'],
-    ['Hindi', hi, 'सहज होकर आराम करें। हम एक केंद्रित श्वास से शुरुआत करेंगे।'],
-    ['Russian', ru, 'Устройтесь поудобнее и отдохните. Начнём с центрирующего дыхания.'],
-    ['Tamil', ta, 'சௌகரியமாக ஓய்வெடுங்கள். மனதை ஒருமுகப்படுத்தும் மூச்சுடன் தொடங்குவோம்.']
+    ['English', en, 'Rest comfortably. We will begin with a centring breath.'],
+    ['Malayalam', ml, 'സുഖമായി വിശ്രമിക്കൂ. മനസ്സിനെ കേന്ദ്രീകരിക്കുന്ന ഒരു ശ്വാസത്തോടെ നമുക്ക് തുടങ്ങാം.'],
+    ['Hindi', hi, 'आराम से टिक जाएँ। हम मन को केंद्र में लाने वाली एक साँस से शुरुआत करते हैं।'],
+    ['Russian', ru, 'Удобно устройтесь и отдохните. Начнём с дыхания, которое собирает внимание.'],
+    ['Tamil', ta, 'வசதியாக ஓய்வெடுங்கள். மனதை மையப்படுத்தும் ஒரு மூச்சுடன் தொடங்குவோம்.']
 ]) {
     assert.equal(locale.system.centeringBreath, wording, `${language} centering narration should invite comfortable rest, not sitting`);
 }

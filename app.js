@@ -113,6 +113,10 @@ const careSession = window.ChakraCareSession?.create();
 if (!careSession) throw new Error('Care session module is unavailable.');
 const chakraSession = window.ChakraSession?.create();
 if (!chakraSession) throw new Error('Chakra session module is unavailable.');
+const narrationSpeechForm = window.ChakraNarrationSpeechForm;
+if (!narrationSpeechForm) throw new Error('Narration speech-form module is unavailable.');
+// Voice-only respellings (mantras, Sanskrit names); screen text is unchanged.
+const spokenForm = text => narrationSpeechForm.spokenForm(text, state.language);
 const piperNarration = window.ChakraPiperNarration?.create();
 if (!piperNarration) throw new Error('Piper narration module is unavailable.');
 const guideControlledTransition = window.ChakraGuideControlledTransition?.create();
@@ -2016,7 +2020,8 @@ class MeditationController {
 
     async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal', transition = 'none') {
         return piperNarration.run(this, text, fadeOut, keepSilence, volumeScale, pacing, transition, {
-            state, piperTTS, timing, splitNarrationText,
+            state, piperTTS, timing, splitNarrationText, spokenForm,
+            isContinuationPiece: mediaLifecycle.isContinuationPiece,
             piperClipFadeSeconds: PIPER_CLIP_FADE_SECONDS,
             mantraFadeSeconds: NARRATION_MANTRA_FADE_SECONDS,
             setVoiceStatus,
@@ -2170,7 +2175,7 @@ class MeditationController {
 
     async narrateFeebleBrowser(text) {
         return new Promise(resolve => {
-            const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(spokenForm(text));
             const selectedVoice = getBrowserVoiceForContent();
             if (selectedVoice) { utterance.voice = selectedVoice; utterance.lang = selectedVoice.lang; }
             
@@ -2235,7 +2240,7 @@ class MeditationController {
             this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(targetGain, this.audio.ctx.currentTime + 1.5);
         }
 
-        const sentences = text.split(/[.!?।]/).filter(s => s.trim().length > 0);
+        const sentences = splitNarrationText(spokenForm(text));
         for (let i = 0; i < sentences.length; i++) {
             const sentence = sentences[i];
             if (!this.isMeditationActive) break;

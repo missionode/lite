@@ -27,6 +27,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/eye-shooter):** dev-mode Contactless Eye Shooter added as a second Play Zone card (explanation-only gaze game, points table, points goal, five languages). App `v4.19`, practice loader `v1.5`, eye-shooter module `v1.0`, style `v2.19`, shell cache `chakra-v5.343`, language cache `v66`.
 
+- **Follow-up (feature/narration-confidence):** all narration in five languages rewritten to be natural, meditative and confident (no hedging, clear benefit, gender-neutral); review fixes applied; engine keeps ? ! tone, breaks long sentences at commas, and applies voice-only respellings (`modules/narration-speech-form.js`). Guide `docs/narration-style.md`. App `v4.20`, media lifecycle `v1.1`, piper narration `v1.1`, speech form `v1.0`, shell cache `chakra-v5.344`, language cache `v67`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

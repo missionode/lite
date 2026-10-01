@@ -141,6 +141,6 @@ assert.deepEqual(fallbackWarnings, [['Timing configuration unavailable; using bu
 assert.match(app, /const timingSettings = window\.ChakraTimingSettings/);
 assert.match(app, /function timing\(section, key, fallback = 0\)\s*\{\s*return timingSettings\.resolve\(/);
 assert.match(app, /function loadTimingConfig\(\)\s*\{\s*timingConfig = await timingSettings\.loadAndApply\(/);
-assert.match(html, /modules\/timing-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.19/);
+assert.match(html, /modules\/timing-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.20/);
 assert.match(serviceWorker, /modules\/timing-settings\.js\?v=1\.0/);
 console.log('Timing settings contract passed: fallbacks, profile overlays, configured bounds, persisted preference clamping, load failure and callback order.');
