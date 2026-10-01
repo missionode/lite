@@ -9,10 +9,11 @@
             return;
         }
         
-        // Upgrade 1: Optimize context for playback fidelity
+        // Playback latency for smooth, glitch-free audio. The device's own
+        // sample rate is used (most phones run 48 kHz), so nothing is
+        // resampled on every sound: less CPU, cleaner sound.
         this.ctx = new (audioWindow.AudioContext || audioWindow.webkitAudioContext)({
-            latencyHint: 'playback',
-            sampleRate: 44100
+            latencyHint: 'playback'
         });
     
         // Prefer the system default output on mobile so Web Audio follows the
@@ -36,15 +37,10 @@
         this.voiceGain = this.ctx.createGain();
         this.voiceGain.gain.value = state.volVoice;
     
-        // Upgrade 2: Studio Harmonic Exciter (Soft Clipper)
-        // Only enabled in 'Open' mode for crispness. Disabled in 'Closed' for warmth.
+        // Clean pass-through (straight-line curve): no added distortion, so
+        // long sessions never sound harsh or tiring.
         this.exciter = this.ctx.createWaveShaper();
-        if (!state.eyesCloseMode) {
-            this.exciter.curve = this.makeDistortionCurve(0.002); 
-        } else {
-            // Straight line curve = no distortion
-            this.exciter.curve = new Float32Array([-1, 1]);
-        }
+        this.exciter.curve = new Float32Array([-1, 1]);
         
         // Upgrade 4: Frequency Carving Filter. Keep the nodes in the graph
         // even when disabled so the mixer can safely change the setting live.
@@ -71,35 +67,64 @@
         this.voiceClarityFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
         this.voiceClarityFilter.Q.setValueAtTime(0.8, this.ctx.currentTime);
         this.voiceClarityFilter.gain.setValueAtTime(0, this.ctx.currentTime);
+
+        // Heavenly voice polish: a small cut of low "mud", a soft de-ess so
+        // "s" sounds never sting, and a gentle air lift for a bright, open
+        // voice. Then a low cut and the voice's own bus, which skips the
+        // Eyes Close softening so words stay clear in every mode.
+        this.voiceMudFilter = this.ctx.createBiquadFilter();
+        this.voiceMudFilter.type = 'peaking';
+        this.voiceMudFilter.frequency.setValueAtTime(320, this.ctx.currentTime);
+        this.voiceMudFilter.Q.setValueAtTime(1.0, this.ctx.currentTime);
+        this.voiceMudFilter.gain.setValueAtTime(-2, this.ctx.currentTime);
+        this.voiceDeEsser = this.ctx.createBiquadFilter();
+        this.voiceDeEsser.type = 'peaking';
+        this.voiceDeEsser.frequency.setValueAtTime(6500, this.ctx.currentTime);
+        this.voiceDeEsser.Q.setValueAtTime(2.5, this.ctx.currentTime);
+        this.voiceDeEsser.gain.setValueAtTime(-3, this.ctx.currentTime);
+        this.voiceAirFilter = this.ctx.createBiquadFilter();
+        this.voiceAirFilter.type = 'highshelf';
+        this.voiceAirFilter.frequency.setValueAtTime(8000, this.ctx.currentTime);
+        this.voiceAirFilter.gain.setValueAtTime(state.eyesCloseMode ? 1 : 2, this.ctx.currentTime);
+        this.voiceLowCut = this.ctx.createBiquadFilter();
+        this.voiceLowCut.type = 'highpass';
+        this.voiceLowCut.frequency.setValueAtTime(90, this.ctx.currentTime);
+        this.voiceLowCut.Q.setValueAtTime(0.707, this.ctx.currentTime);
+        this.voiceBus = this.ctx.createGain();
+        this.voiceBus.gain.setValueAtTime(1, this.ctx.currentTime);
     
         // Voice Space is a diffuse filtered reverb, not a repeating echo. A
         // deterministic impulse makes the tail consistent on every device.
         this.voiceEchoSend = this.ctx.createGain();
         this.voiceEchoSend.gain.setValueAtTime(0, this.ctx.currentTime);
         this.voiceEchoDelay = this.ctx.createDelay(0.5);
-        // Fixed pre-delay separates consonants from ambience without pitch
-        // modulation when switching presets during a spoken phrase.
-        this.voiceEchoDelay.delayTime.setValueAtTime(0.035, this.ctx.currentTime);
+        // Fixed 70 ms pre-delay: each word is heard clean first, then its
+        // halo follows. Never automated, so no pitch wobble.
+        this.voiceEchoDelay.delayTime.setValueAtTime(0.07, this.ctx.currentTime);
         this.voiceEchoLowCut = this.ctx.createBiquadFilter();
         this.voiceEchoLowCut.type = 'highpass';
-        this.voiceEchoLowCut.frequency.setValueAtTime(180, this.ctx.currentTime);
+        this.voiceEchoLowCut.frequency.setValueAtTime(280, this.ctx.currentTime);
         this.voiceEchoLowCut.Q.setValueAtTime(0.707, this.ctx.currentTime);
         this.voiceEchoConvolver = this.ctx.createConvolver();
-        this.voiceEchoConvolver.buffer = this.createDiffuseReverbImpulse(
+        this.voiceEchoConvolver.buffer = this.createHeavenlyImpulse(
             VOICE_REVERB_TAIL_SECONDS,
             VOICE_REVERB_TAIL_DECAY,
             731
         );
         this.voiceEchoFilter = this.ctx.createBiquadFilter();
         this.voiceEchoFilter.type = 'lowpass';
-        this.voiceEchoFilter.frequency.setValueAtTime(3200, this.ctx.currentTime);
+        this.voiceEchoFilter.frequency.setValueAtTime(5500, this.ctx.currentTime);
         this.voiceEchoWetGain = this.ctx.createGain();
         this.voiceEchoWetGain.gain.setValueAtTime(0, this.ctx.currentTime);
+        // Ducks the halo under spoken words; it blooms in the pauses.
+        this.voiceEchoDuck = this.ctx.createGain();
+        this.voiceEchoDuck.gain.setValueAtTime(1, this.ctx.currentTime);
         this.voiceEchoSend.connect(this.voiceEchoLowCut);
         this.voiceEchoLowCut.connect(this.voiceEchoDelay);
         this.voiceEchoDelay.connect(this.voiceEchoConvolver);
         this.voiceEchoConvolver.connect(this.voiceEchoFilter);
         this.voiceEchoFilter.connect(this.voiceEchoWetGain);
+        this.voiceEchoWetGain.connect(this.voiceEchoDuck);
     
         this.lowCutFilter = this.ctx.createBiquadFilter();
         this.lowCutFilter.type = 'highpass';
@@ -120,20 +145,22 @@
         this.eyesCloseFilter.gain.setValueAtTime(0, this.ctx.currentTime);
     
         this.masterCompressor = this.ctx.createDynamicsCompressor();
-        this.masterCompressor.threshold.setValueAtTime(-24, this.ctx.currentTime); 
-        this.masterCompressor.knee.setValueAtTime(30, this.ctx.currentTime); 
-        this.masterCompressor.ratio.setValueAtTime(3.0, this.ctx.currentTime); 
-        this.masterCompressor.attack.setValueAtTime(0.01, this.ctx.currentTime); 
-        this.masterCompressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+        // Gentle glue: slow attack and release so the mix never "breathes"
+        // or pumps when the voice starts and stops.
+        this.masterCompressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+        this.masterCompressor.knee.setValueAtTime(24, this.ctx.currentTime);
+        this.masterCompressor.ratio.setValueAtTime(2.0, this.ctx.currentTime);
+        this.masterCompressor.attack.setValueAtTime(0.03, this.ctx.currentTime);
+        this.masterCompressor.release.setValueAtTime(0.6, this.ctx.currentTime);
     
-        // Final safety stage: catch short peaks from narration, bells, and
-        // overlapping crossfades without changing the musical compressor.
+        // Final safety stage with headroom: a soft knee catches rare peaks
+        // (bells, crossfades) smoothly instead of clamping them hard.
         this.masterLimiter = this.ctx.createDynamicsCompressor();
-        this.masterLimiter.threshold.setValueAtTime(-1.0, this.ctx.currentTime);
-        this.masterLimiter.knee.setValueAtTime(0, this.ctx.currentTime);
-        this.masterLimiter.ratio.setValueAtTime(20, this.ctx.currentTime);
-        this.masterLimiter.attack.setValueAtTime(0.001, this.ctx.currentTime);
-        this.masterLimiter.release.setValueAtTime(0.1, this.ctx.currentTime);
+        this.masterLimiter.threshold.setValueAtTime(-2.0, this.ctx.currentTime);
+        this.masterLimiter.knee.setValueAtTime(2, this.ctx.currentTime);
+        this.masterLimiter.ratio.setValueAtTime(12, this.ctx.currentTime);
+        this.masterLimiter.attack.setValueAtTime(0.003, this.ctx.currentTime);
+        this.masterLimiter.release.setValueAtTime(0.25, this.ctx.currentTime);
     
         this.bgMusicGain = this.ctx.createGain();
         this.bgMusicGain.gain.value = 0;
@@ -165,7 +192,7 @@
         this.musicEchoDelay = this.ctx.createDelay(0.5);
         this.musicEchoDelay.delayTime.setValueAtTime(0.018, this.ctx.currentTime);
         this.musicEchoConvolver = this.ctx.createConvolver();
-        this.musicEchoConvolver.buffer = this.createDiffuseReverbImpulse(
+        this.musicEchoConvolver.buffer = this.createHeavenlyImpulse(
             MUSIC_REVERB_TAIL_SECONDS,
             MUSIC_REVERB_TAIL_DECAY,
             1777
@@ -288,7 +315,8 @@
         this.delayNode = this.ctx.createDelay();
         this.delayNode.delayTime.value = 0.8;
         this.delayFeedback = this.ctx.createGain();
-        this.delayFeedback.gain.value = 0.45;
+        // Softer drone repeats: smooth and spacious, never muddy.
+        this.delayFeedback.gain.value = 0.3;
     
         this.delayNode.connect(this.delayFeedback);
         this.delayFeedback.connect(this.delayNode);
@@ -299,13 +327,18 @@
         this.pannerNode.connect(this.spatialDronePanner);
         this.spatialDronePanner.connect(this.lowCutFilter);
     
-        // Local Piper narration enters the same clarity/comfort chain as the
-        // existing voice mix without being coupled to the drone gain.
+        // Piper narration has its own clean path: tone, polish, low cut,
+        // then the voice bus straight into the master stage. It skips the
+        // shared Eyes Close softening, so words are clear in every mode.
         this.voiceGain.connect(this.voiceWarmthFilter);
         this.voiceWarmthFilter.connect(this.voiceClarityFilter);
-        this.voiceClarityFilter.connect(this.lowCutFilter);
-        this.voiceClarityFilter.connect(this.voiceEchoSend);
-        this.voiceEchoWetGain.connect(this.lowCutFilter);
+        this.voiceClarityFilter.connect(this.voiceMudFilter);
+        this.voiceMudFilter.connect(this.voiceDeEsser);
+        this.voiceDeEsser.connect(this.voiceAirFilter);
+        this.voiceAirFilter.connect(this.voiceLowCut);
+        this.voiceLowCut.connect(this.voiceBus);
+        this.voiceAirFilter.connect(this.voiceEchoSend);
+        this.voiceEchoDuck.connect(this.voiceBus);
         
         let lastNode = this.lowCutFilter;
         // Inject Eyes Close Filter
@@ -327,6 +360,7 @@
             this.exciter.connect(this.masterCompressor);
         }
         
+        this.voiceBus.connect(this.masterCompressor);
         this.masterCompressor.connect(this.masterLimiter);
         // Pause/resume fader: the whole mix fades out before the audio clock
         // is suspended, so mantra, music and voice never cut off abruptly.
@@ -335,21 +369,10 @@
         this.masterLimiter.connect(this.pauseFader);
         this.pauseFader.connect(this.ctx.destination);
     
-        // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
-        if (state.eyesCloseMode && !state.noFrequencyMode) {
-            const anchorOsc = this.ctx.createOscillator();
-            const anchorGain = this.ctx.createGain();
-            anchorOsc.type = 'sine';
-            anchorOsc.frequency.setValueAtTime(40, this.ctx.currentTime); // Root-level 40Hz anchor
-            anchorGain.gain.setValueAtTime(0, this.ctx.currentTime);
-            // Feeble but permanent physical presence
-            anchorGain.gain.linearRampToValueAtTime(0.005, this.ctx.currentTime + 10);
-            anchorOsc.connect(anchorGain);
-            anchorGain.connect(this.masterGain);
-            anchorOsc.start();
-            this.groundingAnchor = { osc: anchorOsc, gain: anchorGain };
-        }
-    
+        // No sub-bass grounding hum: phone speakers cannot play 40 Hz, and it
+        // only pushed the compressor and muddied the drone.
+        this.groundingAnchor = null;
+
         this.mantraGain = this.ctx.createGain();
         this.mantraGain.gain.value = 0;
         
@@ -359,9 +382,10 @@
         // Mantras receive their own long, filtered tail. It is spatialized
         // with the mantra rather than being sent through narration or music.
         this.mantraTailConvolver = this.ctx.createConvolver();
-        this.mantraTailConvolver.buffer = this.createImpulseResponse(
+        this.mantraTailConvolver.buffer = this.createHeavenlyImpulse(
             MANTRA_REVERB_TAIL_SECONDS,
-            MANTRA_REVERB_TAIL_DECAY
+            MANTRA_REVERB_TAIL_DECAY,
+            2029
         );
         this.mantraTailFilter = this.ctx.createBiquadFilter();
         this.mantraTailFilter.type = 'lowpass';

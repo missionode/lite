@@ -12,9 +12,9 @@ const comfort = context.window.ChakraAudioComfortEffects;
 assert.ok(Object.isFrozen(comfort));
 assert.match(app, /toggleEyesCloseMode\(enabled\)\s*\{\s*return audioComfortEffects\.setEyesCloseMode\(this, enabled, state\);/);
 assert.match(app, /toggleAudioFilters\(enabled\)\s*\{\s*return audioComfortEffects\.setAudioFilters\(this, enabled, state\);/);
-assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.0') < html.indexOf('app.js?v=4.22'));
-assert.match(sw, /\.\/modules\/audio-comfort-effects\.js\?v=1\.0/);
-assert.match(sw, /chakra-v5\.350/);
+assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.1') < html.indexOf('app.js?v=4.23'));
+assert.match(sw, /\.\/modules\/audio-comfort-effects\.js\?v=1\.1/);
+assert.match(sw, /chakra-v5\.351/);
 
 function param(value = 100) {
     return { value, events: [], cancelScheduledValues(t) { this.events.push(['cancel', t]); }, setValueAtTime(v, t) { this.value = v; this.events.push(['set', v, t]); }, linearRampToValueAtTime(v, t) { this.value = v; this.events.push(['linear', v, t]); }, exponentialRampToValueAtTime(v, t) { this.value = v; this.events.push(['exponential', v, t]); } };
@@ -24,21 +24,26 @@ function makeOwner() {
     return {
         ctx: { currentTime: 12 }, exciter: {}, eyesCloseFilter: frequency(), bgMusicEQ: { gain: param(), frequency: param(), Q: param() },
         bgMusicHumFilter: { gain: param() }, bgMusicSmoothGain: { gain: param() }, bgMusicLPF: { frequency: param() },
-        presenceFilter: { gain: param() }, mantraFilter: frequency(), makeDistortionCurve: amount => amount
+        presenceFilter: { gain: param() }, mantraFilter: frequency(), voiceAirFilter: { gain: param(2) }, makeDistortionCurve: amount => amount
     };
 }
 
 const owner = makeOwner();
 comfort.setEyesCloseMode(owner, true, { audioFilters: true });
 assert.deepEqual(Array.from(owner.exciter.curve), [-1, 1]);
-assert.equal(owner.eyesCloseFilter.frequency.events.at(-1)[1], 1000);
+assert.equal(owner.eyesCloseFilter.frequency.events.at(-1)[1], 1600, 'Eyes Close softens music/drone/mantra only, not to a muffled 1 kHz');
+assert.equal(owner.voiceAirFilter.gain.events.at(-1)[1], 1, 'the voice keeps a little air with eyes closed');
 assert.deepEqual(owner.bgMusicEQ.gain.events.slice(-3), [['cancel', 12], ['set', 100, 12], ['linear', -24, 14.5]]);
 assert.equal(owner.bgMusicEQ.frequency.events.at(-1)[1], 3000);
 assert.equal(owner.bgMusicEQ.Q.events.at(-1)[1], 0.4);
 assert.equal(owner.bgMusicHumFilter.gain.events.at(-1)[1], -15);
 assert.equal(owner.bgMusicSmoothGain.gain.events.at(-1)[1], 0.6);
 assert.equal(owner.bgMusicLPF.frequency.events.at(-1)[1], 600);
-assert.equal(owner.presenceFilter.gain.events.at(-1)[1], -12);
+assert.equal(owner.presenceFilter.gain.events.at(-1)[1], -6);
+const openOwner = makeOwner();
+comfort.setEyesCloseMode(openOwner, false, { audioFilters: false });
+assert.deepEqual(Array.from(openOwner.exciter.curve), [-1, 1], 'no added distortion in open-eyes mode either');
+assert.equal(openOwner.voiceAirFilter.gain.events.at(-1)[1], 2);
 
 const filterOwner = makeOwner();
 comfort.setAudioFilters(filterOwner, true, { eyesCloseMode: true });

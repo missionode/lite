@@ -24,7 +24,7 @@ const engine = {
     voiceEchoSend:node(),voiceEchoDelay:node(),voiceEchoConvolver:node(),voiceEchoWetGain:node(),voiceEchoFilter:node(),
     setVoiceEcho:method('setVoiceEcho','setMusicEcho'), setSpatialMode:method('setSpatialMode','setVoiceTuning')
 };
-for (const [voice,wet] of Object.entries({off:0,light:.12,spacious:.18})) {
+for (const [voice,wet] of Object.entries({off:0,light:.14,spacious:.22})) {
     engine.setVoiceEcho(voice);
     for (const spatial of modes) {
         engine.setSpatialMode(spatial);

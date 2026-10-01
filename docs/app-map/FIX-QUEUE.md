@@ -30,6 +30,10 @@
 - Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
 - Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
 
+## Completed — Heavenly Sound
+
+- Owner: audio must feel crisp, heavenly and smooth, never a strain, with good performance; update the echo. Voice now bypasses the Eyes Close softening (was low-passed at 1 kHz), gets mud cut / de-ess / air; heavenly echo with pre-delay, darkening tail and duck-under-words; Off / Soft Halo / Heavenly; gentle compressor and soft limiter; no exciter colouring, no 40 Hz hum, softer drone repeats, device sample rate. Guide `docs/heavenly-sound.md`.
+
 ## Completed — Chakra Touch
 
 - Owner-requested dev-mode couples touch game, third Play Zone card. Fixed roles: one Giver, one Receiver for the whole game (Switch in setup; "Play again: <receiver> gives" at the end). Warm / Close / Spicy 18+ (both players confirm adults). The receiver sets a private Yes/Maybe/No map (No never picked, Maybe asks first), outer body only. Rounds: chakra wheel, touch card, 30–60 s timer with eyes closed, More / Just right / Less. Luck cards (Double time, Your choice, Slow motion), letter tracing, always-visible Pause, check-in every 3 rounds. Private summary, nothing saved. Five languages. Role swap removed (owner: not fun). Module `modules/chakra-touch-game.js`, guide `docs/chakra-touch-game.md`, atlas map `chakra-touch`.

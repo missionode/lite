@@ -16,10 +16,12 @@
 
     function setVoiceEcho(owner, mode = 'off', tailSeconds = 5) {
         if (!owner.ctx || !owner.voiceEchoSend || !owner.voiceEchoDelay || !owner.voiceEchoConvolver || !owner.voiceEchoWetGain) return;
+        // Soft Halo (light) and Heavenly (spacious): airy, darkening tails
+        // that start ~70 ms after each word so speech stays crisp.
         const voiceEchoSettings = {
-            off: { wet: 0, filter: 3200 },
-            light: { wet: 0.12, filter: 3000 },
-            spacious: { wet: 0.18, filter: 3600 }
+            off: { wet: 0, filter: 6000 },
+            light: { wet: 0.14, filter: 5500 },
+            spacious: { wet: 0.22, filter: 6500 }
         };
         const requestedMode = Object.prototype.hasOwnProperty.call(voiceEchoSettings, mode) ? mode : 'off';
         const settings = voiceEchoSettings[requestedMode];
@@ -34,5 +36,17 @@
         owner.voiceEchoFilter.frequency.linearRampToValueAtTime(settings.filter, now + 0.25);
     }
 
-    global.ChakraAudioVoiceEffects = Object.freeze({ setVoiceTuning, setVoiceEcho });
+    // Duck the echo return under spoken words (keeps them clear) and let it
+    // bloom softly in the pauses, which gives the voice its halo.
+    const ECHO_DUCK = Object.freeze({ speaking: 0.55, attack: 0.12, release: 0.9 });
+    function setVoiceEchoDuck(owner, speaking) {
+        if (!owner.ctx || !owner.voiceEchoDuck) return;
+        const param = owner.voiceEchoDuck.gain;
+        const now = owner.ctx.currentTime;
+        if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(now);
+        else { param.cancelScheduledValues(now); param.setValueAtTime(param.value, now); }
+        param.linearRampToValueAtTime(speaking ? ECHO_DUCK.speaking : 1, now + (speaking ? ECHO_DUCK.attack : ECHO_DUCK.release));
+    }
+
+    global.ChakraAudioVoiceEffects = Object.freeze({ setVoiceTuning, setVoiceEcho, setVoiceEchoDuck, ECHO_DUCK });
 })(window);

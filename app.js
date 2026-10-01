@@ -174,7 +174,7 @@ function stageFadeSeconds(durationSeconds) {
 async function withAudioStageFade(audioEngine, seconds, action) {
     return mediaLifecycle.withAudioStageFade(audioEngine, seconds, action);
 }
-const VOICE_REVERB_TAIL_SECONDS = 5;
+const VOICE_REVERB_TAIL_SECONDS = 3.5;
 const VOICE_REVERB_TAIL_DECAY = 3.8;
 const MUSIC_REVERB_TAIL_SECONDS = 5;
 const MUSIC_REVERB_TAIL_DECAY = 4.8;
@@ -847,6 +847,8 @@ class AudioEngine {
         this.voicePlaybackActive = active;
         this.voiceExitFade = exitFade;
         this.setVoiceEcho(state.voiceEcho);
+        // Heavenly halo: the echo stays low under words and blooms in pauses.
+        audioVoiceEffects.setVoiceEchoDuck(this, active);
     }
 
     setVoiceEcho(mode = 'off') {
@@ -875,6 +877,10 @@ class AudioEngine {
 
     createDiffuseReverbImpulse(duration, decay, seed) {
         return audioSignalDesign.createDiffuseReverbImpulse(this.ctx, duration, decay, seed);
+    }
+
+    createHeavenlyImpulse(duration, decay, seed) {
+        return audioSignalDesign.createHeavenlyImpulse(this.ctx, duration, decay, seed);
     }
 
     createNoiseBuffer() {
@@ -2260,11 +2266,11 @@ class MeditationController {
             : timing('narration', 'sentenceGap');
         await this.pauseAwareSleep(leadIn * 1000);
 
-        // Activate Frequency Carving: Gentle boost for clarity, or subtle dip for warmth in Closed mode
+        // Frequency carving: the voice now has its own clean path, so this
+        // gently dips music, drone and mantra around 2.5 kHz to make room.
         if (this.audio.voiceCarveFilter) {
             this.audio.voiceCarveFilter.gain.cancelScheduledValues(this.audio.ctx.currentTime);
-            // In Eyes Close mode, we slightly dip the frequency to remove "sharpness"
-            const targetGain = state.eyesCloseMode ? -1.5 : 2; 
+            const targetGain = state.eyesCloseMode ? -3 : -2; 
             this.audio.voiceCarveFilter.gain.linearRampToValueAtTime(targetGain, this.audio.ctx.currentTime + 1.5);
         }
 

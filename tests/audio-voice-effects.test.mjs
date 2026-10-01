@@ -70,9 +70,9 @@ for (const [method, missingNodes] of [
 }
 
 for (const [mode, wet, filter] of [
-    ['off', 0, 3200], ['light', 0.12, 3000], ['spacious', 0.18, 3600],
-    [undefined, 0, 3200], [null, 0, 3200], ['invalid', 0, 3200],
-    ['toString', 0, 3200], ['constructor', 0, 3200], ['__proto__', 0, 3200]
+    ['off', 0, 6000], ['light', 0.14, 5500], ['spacious', 0.22, 6500],
+    [undefined, 0, 6000], [null, 0, 6000], ['invalid', 0, 6000],
+    ['toString', 0, 6000], ['constructor', 0, 6000], ['__proto__', 0, 6000]
 ]) {
     for (const active of [true, false, undefined, 1, 'true']) {
         for (const hold of [false, true]) {
@@ -125,7 +125,7 @@ assert.deepEqual(calls, [
     [adapterOwner, 'off', 8.5], [adapterOwner, 'spacious', 8.5]
 ]);
 const state = { voiceEcho: 'spacious' };
-const playback = method('setVoicePlaybackActive', 'setVoiceEcho', { state });
+const playback = method('setVoicePlaybackActive', 'setVoiceEcho', { state, audioVoiceEffects: effects });
 const owner = makeOwner();
 owner.setVoiceEcho = function(mode) {
     calls.push([mode, this.voicePlaybackActive, this.voiceExitFade]);
@@ -141,12 +141,27 @@ assert.equal(owner.route[4], false);
 assert.equal(owner.route[5], 7.3);
 
 const scripts = [...read('index.html').matchAll(/<script\b[^>]*src="([^"]+)"/g)].map(match => match[1]);
-const moduleUrl = 'modules/audio-voice-effects.js?v=1.0';
+const moduleUrl = 'modules/audio-voice-effects.js?v=1.1';
 assert.equal(scripts.filter(url => url === moduleUrl).length, 1);
-assert.equal(scripts[scripts.indexOf('modules/audio-music-echo.js?v=1.0') + 1], moduleUrl);
+assert.equal(scripts[scripts.indexOf('modules/audio-music-echo.js?v=1.1') + 1], moduleUrl);
 assert.ok(scripts.indexOf(moduleUrl) < scripts.findIndex(url => url.startsWith('app.js?')));
 assert.ok(read('sw.js').includes(`'./${moduleUrl}'`));
 assert.match(app, /const audioVoiceEffects = window\.ChakraAudioVoiceEffects;/);
 assert.match(app, /if \(!audioVoiceEffects\) throw new Error/);
 assert.doesNotMatch(app, /const voiceEchoSettings|const warmthGain|const clarityGain/);
 console.log('Voice effects passed: exact tuning/profile values, guards, route gates/tails, hold/fallback ramps, adapters and shell delivery.');
+
+// Heavenly halo: the echo is ducked under words and blooms in the pauses.
+{
+    const duckEvents = [];
+    const duckParam = { value: 1, cancelScheduledValues() {}, setValueAtTime(v) { this.value = v; }, linearRampToValueAtTime(v, t) { this.value = v; duckEvents.push([v, t]); } };
+    const duckOwner = { ctx: { currentTime: 4 }, voiceEchoDuck: { gain: duckParam } };
+    effects.setVoiceEchoDuck(duckOwner, true);
+    assert.deepEqual(duckEvents.at(-1), [effects.ECHO_DUCK.speaking, 4 + effects.ECHO_DUCK.attack]);
+    effects.setVoiceEchoDuck(duckOwner, false);
+    assert.deepEqual(duckEvents.at(-1), [1, 4 + effects.ECHO_DUCK.release]);
+    assert.ok(effects.ECHO_DUCK.speaking > 0.4 && effects.ECHO_DUCK.speaking < 0.8, 'the halo dips under words but never vanishes');
+    assert.equal(effects.setVoiceEchoDuck({ ctx: null }, true), undefined, 'no context is a no-op');
+    assert.match(app, /audioVoiceEffects\.setVoiceEchoDuck\(this, active\)/, 'every narration clip start and end drives the duck');
+}
+console.log('Voice echo duck passed: halo ducks under words and blooms in pauses.');

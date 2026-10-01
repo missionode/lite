@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: feature/chakra-touch on production 3c78247 (Chakra Touch) · 2026-10-01.
+Source snapshot: feature/heavenly-voice on feature/chakra-touch (production 3c78247) · 2026-10-01.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
@@ -150,14 +150,14 @@ This inventories static UI declarations in the three meditation HTML entry pages
 | [719](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:719) | input | voice-clarity | type=range · min=0 · max=100 · step=1 · value=50 |
 | [720](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:720) | input | voice-warmth | type=range · min=0 · max=100 · step=1 · value=50 |
 | [721](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:721) | input | voice-pace | type=range · min=0.85 · max=1.15 · step=0.05 · value=1 |
-| [722](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:722) | select | voice-echo | off: Off; light: Soft Room; spacious: Temple Air |
+| [722](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:722) | select | voice-echo | off: Off; light: Soft Halo; spacious: Heavenly |
 | [724](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:724) | button | Soft | type=button · label=ui.voicePresetSoft |
 | [725](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:725) | button | Shringara | type=button · label=ui.voicePresetShringara |
 | [726](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:726) | button | Balanced | type=button · label=ui.voicePresetBalanced |
 | [727](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:727) | button | Clear | type=button · label=ui.voicePresetClear |
 | [729](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:729) | button | mixer-voice-preview | type=button · label=ui.previewTunedVoice |
 | [735](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:735) | summary | Background Music ⌄ |  |
-| [740](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:740) | select | music-echo | off: Off; light: Soft Room; spacious: Temple Air |
+| [740](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:740) | select | music-echo | off: Off; light: Soft Halo; spacious: Heavenly |
 | [748](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:748) | select | mixer-spatial-mode | off: Off (Stereo Safe); stereo: Stereo Wide; headphones: Headphone 3D; room: Room Spatial |
 | [760](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:760) | input | audio-filters-toggle | type=checkbox |
 | [761](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:761) | input | eyes-close-mode-toggle | type=checkbox |

@@ -1,7 +1,8 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
 export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-29', commit: 'b967a5f production + uncommitted narration and No Frequency default updates', scope: 'Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run.' };
 meta.date = '2026-10-01';
-meta.commit = 'feature/chakra-touch on production 3c78247 (Chakra Touch)';
+meta.commit = 'feature/heavenly-voice on feature/chakra-touch (production 3c78247)';
+meta.scope += ' Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate.';
 meta.scope += ' Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins.';
 meta.scope += ' Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s.';
 meta.scope += ' Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side.';
@@ -714,3 +715,6 @@ add('self-exploration-challenges','Journeys','Self-Exploration · Confidence Vis
 ],[['gate','confidence','Choose + unlocked'],['gate','secrets','Choose + unlocked'],['gate','final','Choose + unlocked'],['confidence','secrets','Next selected stage'],['secrets','final','Next selected stage'],['final','answer','Countdown completes'],['answer','exit','Yes / No / Skip'],['exit','route','Chakras selected'],['exit','finish','No chakras']],['All visible text and spoken prompts are supplied for English, Malayalam, Hindi, Russian and Tamil. No disclosure is scored or rewarded. The Yes choice does not activate service; information can only be requested from the guide after the session. Browser and device audio verification remain outstanding.']);
 
 export { graphs };
+
+audioMap.source += '; docs/heavenly-sound.md:1';
+audioMap.notes.push('Heavenly Sound (2026-10-01): narration runs warmth → clarity → mud cut (320 Hz −2 dB) → de-ess (6.5 kHz −3 dB) → air shelf (8 kHz +2 dB, +1 dB eyes closed) → 90 Hz low cut → voiceBus → master compressor, skipping the shared Eyes Close lowpass/presence/carve chain. The voice echo send leaves after the air shelf: 280 Hz low cut, fixed 70 ms pre-delay, 3.5 s deterministic heavenly impulse, 5.5–6.5 kHz top, then voiceEchoDuck (55% while a clip plays, back to 100% over 0.9 s) into voiceBus. Eyes Close now softens music/drone/mantra to 1.6 kHz (presence −6 dB). Frequency carving dips non-voice 2.5 kHz during narration. Master compressor −18 dB 2:1 30/600 ms; limiter −2 dB soft knee. Exciter is a clean pass-through, the 40 Hz anchor is removed, drone feedback is 0.30, and the AudioContext uses the device sample rate.');

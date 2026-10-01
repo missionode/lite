@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.350';
+const CACHE_NAME = 'chakra-v5.351';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v72';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v73';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './style.css?v=2.21',
-  './app.js?v=4.22',
+  './app.js?v=4.23',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',
@@ -42,20 +42,20 @@ const ASSETS = [
   './modules/media-lifecycle.js?v=1.1',
   './modules/piper-lifecycle.js?v=1.0',
   './modules/audio-route-lifecycle.js?v=1.0',
-  './modules/audio-engine-initialization.js?v=1.1',
-  './modules/audio-signal-design.js?v=1.0',
+  './modules/audio-engine-initialization.js?v=1.2',
+  './modules/audio-signal-design.js?v=1.1',
   './modules/audio-spatial-geometry.js?v=1.0',
   './modules/audio-elemental-layer.js?v=1.0',
   './modules/audio-tone-playback.js?v=1.0',
-  './modules/audio-comfort-effects.js?v=1.0',
+  './modules/audio-comfort-effects.js?v=1.1',
   './modules/audio-drone-start.js?v=1.0',
   './modules/audio-drone-stop.js?v=1.0',
   './modules/audio-mantra-playback.js?v=1.0',
   './modules/audio-background-music-lifecycle.js?v=1.0',
   './modules/audio-background-music-controls.js?v=1.0',
   './modules/audio-pleasure-ambience.js?v=1.0',
-  './modules/audio-music-echo.js?v=1.0',
-  './modules/audio-voice-effects.js?v=1.0',
+  './modules/audio-music-echo.js?v=1.1',
+  './modules/audio-voice-effects.js?v=1.1',
   './modules/journey-hypnosis-wrapper.js?v=1.0',
   './modules/journey-opening-stage.js?v=1.0',
   './modules/journey-content-loader.js?v=1.0',
@@ -83,7 +83,7 @@ const ASSETS = [
   './modules/care-session.js?v=1.0',
   './modules/chakra-session.js?v=1.1',
   './modules/narration-speech-form.js?v=1.0',
-  './modules/piper-narration.js?v=1.1',
+  './modules/piper-narration.js?v=1.2',
   './modules/guide-controlled-transition.js?v=1.0',
   './modules/session-stop.js?v=1.0',
   './modules/experiment-session.js?v=1.0',

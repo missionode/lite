@@ -94,8 +94,9 @@ assert.match(app, /this\.musicEchoTailGate = null/);
 assert.match(backgroundMusicControls, /function muteForMantra\(owner, duration\)[\s\S]*?setTailGate\(owner, 0, fadeDuration\)/, 'the music tail gate should stop new reverb input without cutting an existing tail');
 assert.match(audioInitialization, /this\.musicEchoWetGain\.connect\(this\.spatialMusicPanner\)/, 'music echo should return beside the dry-music gate so an existing tail can settle naturally');
 assert.match(audioInitialization, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/, 'the complete music bus must enter the shared output chain through spatial routing');
-assert.match(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.voiceEchoSend\)/, 'narration echo should remain on the voice-only path');
-assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 5/, 'narration space uses the requested longer bounded tail');
+assert.match(audioInitialization, /this\.voiceAirFilter\.connect\(this\.voiceEchoSend\)/, 'narration echo should remain on the voice-only path, after the voice polish');
+assert.match(audioInitialization, /this\.voiceEchoDuck\.connect\(this\.voiceBus\)[\s\S]*?this\.voiceBus\.connect\(this\.masterCompressor\)/, 'the voice and its halo skip the Eyes Close softening chain');
+assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 3\.5/, 'narration space uses a 3.5 s heavenly tail that never blurs words');
 assert.match(app, /const MUSIC_REVERB_TAIL_SECONDS = 5/, 'music space uses the requested longer bounded tail');
 assert.doesNotMatch(app, /voiceEchoFeedback|musicEchoFeedback/, 'voice and music space must not contain a repeating feedback loop');
 assert.match(app, /const BACKGROUND_MUSIC_ASSET_VERSION = '20260831\.1'/, 'a committed background-music replacement should have an explicit release version');
@@ -163,8 +164,8 @@ assert.ok(setMusicEchoStart >= 0 && setMusicEchoEnd > setMusicEchoStart, 'setMus
 const setMusicEcho = app.slice(setMusicEchoStart, setMusicEchoEnd);
 assert.match(setMusicEcho, /return audioMusicEcho\.setMusicEcho\(this, mode, MUSIC_REVERB_TAIL_SECONDS\)/);
 assert.match(musicEchoModule, /off: Object\.freeze\(\{ delay: 0\.018, wet: 0, filter: 2800 \}\)/);
-assert.match(musicEchoModule, /light: Object\.freeze\(\{ delay: 0\.018, wet: 0\.12, filter: 2800 \}\)/);
-assert.match(musicEchoModule, /spacious: Object\.freeze\(\{ delay: 0\.035, wet: 0\.18, filter: 3400 \}\)/);
+assert.match(musicEchoModule, /light: Object\.freeze\(\{ delay: 0\.018, wet: 0\.12, filter: 3400 \}\)/);
+assert.match(musicEchoModule, /spacious: Object\.freeze\(\{ delay: 0\.045, wet: 0\.18, filter: 4200 \}\)/);
 assert.match(musicEchoModule, /musicEchoSend\.gain\.linearRampToValueAtTime/);
 assert.match(musicEchoModule, /musicEchoWetGain\.gain\.linearRampToValueAtTime/);
 

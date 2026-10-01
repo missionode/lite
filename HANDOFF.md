@@ -37,7 +37,9 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/chakra-touch):** dev-mode **Chakra Touch** couples touch game as the third Play Zone card. Fixed Giver and Receiver for the whole game (Switch in setup, "Play again: <receiver> gives" at the end); only the receiver sets the private Yes/Maybe/No map; Warm/Close/Spicy 18+, chakra wheel, touch cards, timer, ratings, luck cards, always-visible Pause, check-in every 3 rounds, private summary, nothing saved, five languages. Role swap removed. Guide `docs/chakra-touch-game.md`. App `v4.22`, practice loader `v1.6`, chakra-touch module `v1.1`, style `v2.21`, shell cache `chakra-v5.350`, language cache `v72`.
 
-- **Push status:** production is at `3c78247` (everything up to mantra-fade is live). Push `feature/chakra-touch` to production to release Chakra Touch.
+- **Follow-up (feature/heavenly-voice):** Heavenly Sound. Narration gets its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening deterministic tail, ducked under words and blooming in pauses), echo names Off / Soft Halo / Heavenly in five languages; music and mantra tails use the same impulse; frequency carving now dips non-voice sound; gentler master compressor and soft limiter; exciter clean; 40 Hz anchor removed; drone feedback 0.30; device sample rate. Guide `docs/heavenly-sound.md`. App `v4.23`, audio init `v1.2`, signal design/voice effects/comfort effects/music echo `v1.1`, piper narration `v1.2`, shell cache `chakra-v5.351`, language cache `v73`.
+
+- **Push status:** production is at `3c78247`. Push `feature/heavenly-voice` to production to release Chakra Touch and Heavenly Sound (it contains both).
 
 ## Checkpoint history (production)
 

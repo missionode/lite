@@ -12,8 +12,8 @@ const echo = context.window.ChakraAudioMusicEcho;
 assert.ok(Object.isFrozen(echo));
 assert.ok(Object.isFrozen(echo.PROFILES));
 assert.match(app, /setMusicEcho\(mode = 'light'\) \{\s*return audioMusicEcho\.setMusicEcho\(this, mode, MUSIC_REVERB_TAIL_SECONDS\)/);
-assert.ok(html.indexOf('modules/audio-music-echo.js?v=1.0') < html.indexOf('app.js?v=4.22'));
-assert.match(sw, /\.\/modules\/audio-music-echo\.js\?v=1\.0/);
+assert.ok(html.indexOf('modules/audio-music-echo.js?v=1.1') < html.indexOf('app.js?v=4.23'));
+assert.match(sw, /\.\/modules\/audio-music-echo\.js\?v=1\.1/);
 
 function param(value = 0.3) {
     return {
@@ -35,9 +35,9 @@ function makeOwner() {
 
 for (const [mode, expected] of Object.entries({
     off: { delay: 0.018, wet: 0, filter: 2800, enabled: false },
-    light: { delay: 0.018, wet: 0.12, filter: 2800, enabled: true },
-    spacious: { delay: 0.035, wet: 0.18, filter: 3400, enabled: true },
-    invalid: { delay: 0.018, wet: 0.12, filter: 2800, enabled: true }
+    light: { delay: 0.018, wet: 0.12, filter: 3400, enabled: true },
+    spacious: { delay: 0.045, wet: 0.18, filter: 4200, enabled: true },
+    invalid: { delay: 0.018, wet: 0.12, filter: 3400, enabled: true }
 })) {
     const owner = makeOwner();
     echo.setMusicEcho(owner, mode, 5);

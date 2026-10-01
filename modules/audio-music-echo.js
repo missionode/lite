@@ -3,8 +3,9 @@
 
     const PROFILES = Object.freeze({
         off: Object.freeze({ delay: 0.018, wet: 0, filter: 2800 }),
-        light: Object.freeze({ delay: 0.018, wet: 0.12, filter: 2800 }),
-        spacious: Object.freeze({ delay: 0.035, wet: 0.18, filter: 3400 })
+        // Soft Halo (light) and Heavenly (spacious) on the darkening impulse.
+        light: Object.freeze({ delay: 0.018, wet: 0.12, filter: 3400 }),
+        spacious: Object.freeze({ delay: 0.045, wet: 0.18, filter: 4200 })
     });
     const FALLBACK = PROFILES.light;
 

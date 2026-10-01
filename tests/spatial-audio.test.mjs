@@ -40,13 +40,14 @@ assert.match(app, /pleasure: \{ x: 0, y: 0\.2, z: -7, nearZ: -2\.8 \}/, 'headpho
 assert.match(audioInitialization, /this\.pannerNode\.connect\(this\.spatialDronePanner\)[\s\S]*?this\.spatialDronePanner\.connect\(this\.lowCutFilter\)/);
 assert.match(audioInitialization, /this\.bgMusicBusGain\.connect\(this\.spatialMusicPanner\)[\s\S]*?this\.spatialMusicPanner\.connect\(this\.lowCutFilter\)/);
 assert.match(audioInitialization, /this\.mantraFilter\.connect\(this\.spatialMantraPanner\)[\s\S]*?this\.spatialMantraPanner\.connect\(this\.lowCutFilter\)/);
-assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 5/, 'narration receives the requested longer diffuse tail');
+assert.match(app, /const VOICE_REVERB_TAIL_SECONDS = 3\.5/, 'narration gets a 3.5 s heavenly tail: airy halo without blurring words');
 assert.match(app, /const MUSIC_REVERB_TAIL_SECONDS = 5/, 'background music receives a longer diffuse tail');
 assert.match(app, /const MANTRA_REVERB_TAIL_SECONDS = 7/, 'mantra receives a dedicated extended tail');
 assert.match(audioInitialization, /this\.mantraFilter\.connect\(this\.mantraTailConvolver\)[\s\S]*?this\.mantraTailWetGain\.connect\(this\.spatialMantraPanner\)/, 'mantra tail should share the mantra spatial path without touching narration or music');
 assert.match(audioInitialization, /this\.pleasureGain\.connect\(this\.pleasureBlurDryGain\)[\s\S]*?this\.pleasureSpatialDepthGain\.connect\(this\.spatialPleasurePanner\)[\s\S]*?this\.spatialPleasurePanner\.connect\(this\.lowCutFilter\)/);
 assert.match(app, /this\.setSpatialPosition\(this\.spatialPleasurePanner, configurations\.pleasure, now\)/);
-assert.match(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.lowCutFilter\)/, 'Narration should remain on its centered path');
+assert.match(audioInitialization, /this\.voiceLowCut\.connect\(this\.voiceBus\)/, 'Narration should remain on its centered path');
+assert.doesNotMatch(audioInitialization, /voice\w*\.connect\(this\.spatial\w*Panner\)/, 'Narration never enters a spatial panner');
 assert.doesNotMatch(audioInitialization, /this\.voiceClarityFilter\.connect\(this\.spatial[A-Za-z]+Panner\)/, 'Narration must not be spatialized');
 
 assert.match(audioSpatialGeometry, /function createPanner\(audioContext\)[\s\S]*?createStereoPanner\(\)/, 'Spatial routing needs a stereo fallback');

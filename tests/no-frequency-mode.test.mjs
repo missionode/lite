@@ -45,7 +45,7 @@ assert.match(audioDroneStop, /function stopDrone\(owner\)[\s\S]*?if \(!owner\.ct
 assert.doesNotMatch(mantra, /if \(state\.noFrequencyMode\) return;/, 'No Frequency Mode must not disable recorded mantra tracks');
 assert.match(mantra, /if \(state\.noMantraMode\) return;/, 'mantra tracks should have their own independent disable mode');
 assert.match(bowl, /state\.noFrequencyMode/, 'singing-bowl tones should be silent in No Frequency Mode');
-assert.match(audioInitialization, /if \(state\.eyesCloseMode && !state\.noFrequencyMode\)/, 'Eyes Close anchoring should not create a 40 Hz tone in No Frequency Mode');
+assert.doesNotMatch(audioInitialization, /anchorOsc|frequency\.setValueAtTime\(40,/, 'no 40 Hz grounding tone is created in any mode, so No Frequency Mode stays tone-free');
 const context = vm.createContext({});
 vm.runInContext(audioModeView, context);
 const listeners = new Map();

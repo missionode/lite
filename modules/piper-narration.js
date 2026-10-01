@@ -8,7 +8,7 @@
                 owner.audio.voiceCarveFilter.gain.cancelScheduledValues(owner.audio.ctx.currentTime);
                 owner.audio.voiceCarveFilter.gain.setValueAtTime(owner.audio.voiceCarveFilter.gain.value, owner.audio.ctx.currentTime);
                 owner.audio.voiceCarveFilter.gain.linearRampToValueAtTime(
-                    state.eyesCloseMode ? 0.75 : 1.0,
+                    state.eyesCloseMode ? -3 : -2,
                     owner.audio.ctx.currentTime + 1.2
                 );
             }
