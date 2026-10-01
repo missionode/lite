@@ -32,7 +32,7 @@
 
 ## Completed — Chakra Touch
 
-- Owner-requested dev-mode couples touch game, third Play Zone card. Warm / Close / Spicy 18+ (both partners confirm adults), private Yes/Maybe/No consent map per partner (No never picked, Maybe asks first), outer body only. Rounds: chakra wheel, touch card, 30–60 s timer with eyes closed, More / Just right / Less. Luck cards, letter tracing, always-visible Pause, check-in every 3 rounds. Optional Swap Roles (each plays the partner; ends with "Role swap ends. Back to yourselves." and a reflection). Private summary, nothing saved. Five languages. Module `modules/chakra-touch-game.js`, guide `docs/chakra-touch-game.md`, atlas map `chakra-touch`.
+- Owner-requested dev-mode couples touch game, third Play Zone card. Fixed roles: one Giver, one Receiver for the whole game (Switch in setup; "Play again: <receiver> gives" at the end). Warm / Close / Spicy 18+ (both players confirm adults). The receiver sets a private Yes/Maybe/No map (No never picked, Maybe asks first), outer body only. Rounds: chakra wheel, touch card, 30–60 s timer with eyes closed, More / Just right / Less. Luck cards (Double time, Your choice, Slow motion), letter tracing, always-visible Pause, check-in every 3 rounds. Private summary, nothing saved. Five languages. Role swap removed (owner: not fun). Module `modules/chakra-touch-game.js`, guide `docs/chakra-touch-game.md`, atlas map `chakra-touch`.
 
 ## Completed — Contactless Eye Shooter
 

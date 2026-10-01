@@ -19,7 +19,7 @@ assert.equal(routing.resolveFocusedExperience({ selectedChakraCount: 0, preparat
 assert.match(html, /id="self-exploration-section"[\s\S]*?id="quiet-courage-addon-toggle"[\s\S]*?id="confidence-visualization-addon-toggle"[\s\S]*?id="deep-secrets-addon-toggle"[\s\S]*?id="final-challenge-addon-toggle"[\s\S]*?id="chakra-selection-panel"/);
 assert.match(html, /id="final-challenge-modal"[^>]*role="dialog"[^>]*aria-modal="true"/);
 assert.match(app, /confidenceVisualization: state\.advancedFeaturesUnlocked && getChecked\('confidence-visualization-addon-toggle'\)[\s\S]*?deepSecrets:[\s\S]*?finalChallenge:/);
-assert.match(sw, /chakra-v5\.349[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.0/);
+assert.match(sw, /chakra-v5\.350[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.0/);
 assert.doesNotMatch(practiceSource, /getUserMedia|MediaRecorder|localStorage|indexedDB|fetch\(/, 'spoken self-expression must not capture, persist, or upload speech');
 
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {

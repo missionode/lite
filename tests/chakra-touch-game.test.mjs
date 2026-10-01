@@ -41,7 +41,8 @@ for (let round = 0; round < 14; round += 1) {
     const current = engine.nextRound();
     assert.ok(current, 'rounds run to the chosen total');
     assert.equal(current.zone, 'hands', 'only a non-No zone can be picked');
-    assert.notEqual(current.giver, current.receiver);
+    assert.equal(current.giver, game.GIVER, 'the giver is the same every round');
+    assert.equal(current.receiver, game.RECEIVER, 'the receiver is the same every round');
     engine.rate('more');
 }
 assert.equal(engine.nextRound(), null, 'the game ends after the chosen number of rounds');
@@ -50,8 +51,7 @@ assert.equal(engine.nextRound(), null, 'the game ends after the chosen number of
 engine = game.createEngine({ random: seeded(2) });
 engine.start({ level: 'warm', rounds: 6 });
 for (const zone of warm) engine.setConsent(1, zone, 'no');
-let current;
-do { current = engine.nextRound(); } while (current && current.receiver !== 1);
+let current = engine.nextRound();
 assert.equal(current.zone, null);
 assert.equal(current.skipped, true);
 
@@ -65,23 +65,22 @@ const declined = current.zone;
 engine.declineZone();
 assert.notEqual(engine.game.current.zone, declined);
 
-// Roles alternate; swap-roles prompts only in Swap Roles mode; ratings feed the summary.
-engine = game.createEngine({ random: () => 0.9 });
-engine.start({ level: 'warm', rounds: 6, swapRoles: true, names: ['Asha', 'Ravi'] });
-const givers = [];
-for (let round = 0; round < 6; round += 1) {
+// Fixed roles even with luck cards; no swap card; ratings feed the receiver's summary.
+assert.deepEqual(Array.from(game.LUCK_CARDS), ['doubleTime', 'yourChoice', 'slowMotion']);
+assert.equal(game.SWAP_PROMPTS, undefined, 'role swap is removed');
+engine = game.createEngine({ random: seeded(11) });
+engine.start({ level: 'warm', rounds: 14, names: ['Asha', 'Ravi'] });
+for (let round = 0; round < 14; round += 1) {
     const next = engine.nextRound();
-    givers.push(next.giver);
-    assert.ok(next.swapPrompt, 'Swap Roles adds a prompt every round');
+    assert.equal(next.giver, 0);
+    assert.equal(next.receiver, 1);
+    assert.equal(next.swapPrompt, undefined);
     engine.rate(round % 2 ? 'less' : 'more');
 }
-assert.deepEqual(givers, [0, 1, 0, 1, 0, 1], 'without a luck card the giver alternates');
 const summary = engine.summary();
-assert.equal(summary.length, 2);
-assert.ok(summary.some(player => player.favourites.length > 0), 'the private summary lists "More" places');
-engine = game.createEngine({ random: () => 0.9 });
-engine.start({ level: 'warm', rounds: 6 });
-assert.equal(engine.nextRound().swapPrompt, null, 'no swap prompts unless Swap Roles is on');
+assert.equal(summary.length, 1, 'the summary is only for the receiver');
+assert.equal(summary[0].name, 'Ravi');
+assert.ok(summary[0].favourites.length > 0, 'the private summary lists "More" places');
 
 // Check-in every three rounds; lowering the level removes higher zones.
 engine = game.createEngine({ random: () => 0.9 });
@@ -91,32 +90,35 @@ assert.equal(engine.needsCheckIn(), true);
 assert.equal(engine.lowerLevel(), 'close');
 assert.equal(engine.game.players[0].consent.breasts, undefined, 'lowering the level removes Spicy places');
 
-// UI safety: Pause on every round screen, Spicy needs both partners, hand-off lock, nothing saved.
+// UI safety: Pause on every round screen, Spicy needs both players, hand-off lock, nothing saved.
 assert.match(source, /function pauseButton\(\)/);
 assert.match(source, /withPause && engine\.game \? pauseButton\(\)/, 'Pause is on every in-game screen');
 assert.match(source, /setup\.level === 'spicy' \? showAdultCheck\(\)/);
-assert.match(source, /go\.disabled = !boxes\.every\(item => item\.box\.checked\)/, 'both partners must confirm for Spicy');
-assert.match(source, /consentFor\(0, \(\) => consentFor\(1, startSwapIntro\)\)/, 'each partner sets a private map');
+assert.match(source, /go\.disabled = !boxes\.every\(item => item\.box\.checked\)/, 'both players must confirm for Spicy');
+assert.match(source, /consentFor\(RECEIVER, \(\) => handOff\(GIVER, t\('ui\.ctGiverReady'\), showSpin\)\)/, 'the receiver sets a private map, then the phone goes to the giver');
+assert.match(source, /ct: 'switch-roles'/, 'setup has a Switch button for giver and receiver');
+assert.match(source, /ctAgainSwitched/, 'Play again can switch giver and receiver');
 assert.match(source, /'pointerdown', start/, 'phone hand-offs use press-and-hold');
 assert.doesNotMatch(source, /localStorage|sessionStorage|indexedDB|fetch\(/, 'nothing is saved or sent');
-assert.match(source, /ctSwapEnds/, 'role swap ends with "back to yourselves"');
+assert.doesNotMatch(source, /ctSwap|swapRoles|swapPrompt|swapGiver/, 'role swap is fully removed');
 
 // Dev mode only, in the Play Zone, lazy and offline.
 assert.match(html, /<div id="secret-body-game-panel"[^>]*hidden>[\s\S]*?<button id="open-chakra-touch"[^>]*disabled/);
 assert.match(html, /<section id="chakra-touch-screen" class="screen[^"]*hidden"/);
 assert.match(app, /chakraTouchButton\.disabled = isLocked/);
 assert.match(app, /if \(isLocked && chakraTouchGame\) chakraTouchGame\.close\(\)/);
-assert.match(loader, /'chakra-touch': Object\.freeze\(\{ src: '\.\/modules\/chakra-touch-game\.js\?v=1\.0', globalName: 'ChakraTouchGame' \}\)/);
-assert.match(sw, /'\.\/modules\/chakra-touch-game\.js\?v=1\.0'/);
+assert.match(loader, /'chakra-touch': Object\.freeze\(\{ src: '\.\/modules\/chakra-touch-game\.js\?v=1\.1', globalName: 'ChakraTouchGame' \}\)/);
+assert.match(sw, /'\.\/modules\/chakra-touch-game\.js\?v=1\.1'/);
 
 // Five languages, every key, placeholders kept, and no he/she wording.
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8')).ui;
 const keys = Object.keys(en).filter(key => key.startsWith('ct') || key === 'chakraTouch' || key === 'chakraTouchNote');
-assert.ok(keys.length >= 120);
+assert.ok(keys.length >= 100);
 for (const zone of game.ZONES) assert.ok(keys.includes(`ctZone_${zone.id}`));
 for (const touch of game.TOUCHES) assert.ok(keys.includes(`ctTouch_${touch.id}`) && keys.includes(`ctTouch_${touch.id}_note`));
 for (const card of game.LUCK_CARDS) assert.ok(keys.includes(`ctLuck_${card}`));
-for (const prompt of game.SWAP_PROMPTS) assert.ok(keys.includes(`ctSwapPrompt_${prompt}`));
+assert.ok(!keys.some(key => /^ctSwap(?!itch)|^ctPartner|swapGiver/.test(key)), 'no role-swap or partner keys left');
+for (const key of ['ctGiver', 'ctReceiver', 'ctSwitchRoles', 'ctGiverReady', 'ctAgainSwitched']) assert.ok(keys.includes(key), key);
 const placeholders = value => [...new Set(String(value).match(/\{\{\w+\}\}/g) || [])].sort().join();
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const ui = JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8')).ui;
@@ -127,4 +129,4 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
 }
 assert.doesNotMatch(keys.map(key => en[key]).join(' '), /\b(he|she|him|her|his|hers|man|woman)\b/i, 'gender-neutral wording');
 
-console.log('Chakra Touch passed: heat levels, private consent map, Maybe asks, No never picked, Pause, Spicy double confirm, Swap Roles, check-ins, summary and five languages.');
+console.log('Chakra Touch passed: heat levels, private consent map, Maybe asks, No never picked, Pause, Spicy double confirm, fixed giver and receiver, check-ins, summary and five languages.');

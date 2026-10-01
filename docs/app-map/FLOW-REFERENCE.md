@@ -2,7 +2,7 @@
 
 Source snapshot: feature/chakra-touch on production 3c78247 (Chakra Touch) · 2026-10-01.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with private Yes/Maybe/No maps, Pause, check-ins and optional Swap Roles. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1136,7 +1136,7 @@ flowchart TD
 
 ## Chakra Touch · dev-mode couples touch game
 
-A slow, consent-first touch game for two partners. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. The wheel picks a place, a card picks how to touch, the receiver keeps eyes closed. Nothing is saved.
+A slow, consent-first touch game for two players with fixed roles: one Giver and one Receiver for the whole game. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. The wheel picks a place, a card picks how to touch, the receiver keeps eyes closed. Nothing is saved.
 
 Sources: [modules/chakra-touch-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-touch-game.js:1), [tests/chakra-touch-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/chakra-touch-game.test.mjs:1), [app.js:3022](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3022), [docs/chakra-touch-game.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/chakra-touch-game.md:1).
 
@@ -1145,8 +1145,8 @@ flowchart TD
   locked["Disabled Play Zone card"]
   setup["Setup"]
   adult["Spicy adult check"]
-  consent["Private consent maps"]
-  swapintro["Role swap begins"]
+  consent["Receiver’s private map"]
+  giver["Phone to the giver"]
   spin["Spin the chakra wheel"]
   ask["Maybe: ask first"]
   round["Touch card and timer"]
@@ -1158,10 +1158,9 @@ flowchart TD
   setup -->|"Spicy"| adult
   setup -->|"Warm / Close"| consent
   adult -->|"Both agree"| consent
-  adult -->|"Play Close instead"| setup
-  consent -->|"Swap Roles on"| swapintro
-  consent -->|"Both maps done"| spin
-  swapintro -->|"Continue"| spin
+  adult -->|"Play Close instead"| consent
+  consent -->|"Map done"| giver
+  giver -->|"Giver holds"| spin
   spin -->|"Maybe place"| ask
   spin -->|"Yes place"| round
   ask -->|"Yes, this time"| round
@@ -1175,25 +1174,25 @@ flowchart TD
   checkin -->|"End"| end
   rate -->|"Last round"| end
   paused -->|"End the game"| end
-  end -->|"Play again"| setup
+  end -->|"Play again (switched or same)"| setup
 ```
 
 | Step | Current behavior |
 | --- | --- |
 | Disabled Play Zone card | The Chakra Touch card sits in the dev-mode Play Zone; its Play now button is disabled while locked. Relocking closes the game. |
-| Setup | Partner names, heat level (Warm, Close, Spicy 18+), rounds 6/10/14, touch time 30/45/60 s and optional Swap Roles. |
-| Spicy adult check | Both partners tick “I am an adult and I agree”, or choose Play Close instead. |
-| Private consent maps | Each partner in turn (press-and-hold hand-off lock) marks every place Yes, Maybe or No. Outer body only, no genitals. Warm places start Yes, others Maybe. No is never picked. |
-| Role swap begins | With Swap Roles on: each partner plays the other for the whole game (gender-neutral wording). |
-| Spin the chakra wheel | Givers alternate each round. The wheel stops on a place allowed by the receiver’s map; about one round in five also draws a luck card (Swap, Double time, Your choice, Slow motion). |
+| Setup | Giver and Receiver names with a Switch button, heat level (Warm, Close, Spicy 18+), rounds 6/10/14 and touch time 30/45/60 s. |
+| Spicy adult check | Both players tick “I am an adult and I agree”, or choose Play Close instead. |
+| Receiver’s private map | The phone goes to the receiver (press-and-hold hand-off lock), who marks every place Yes, Maybe or No. Outer body only, no genitals. Warm places start Yes, others Maybe. No is never picked. |
+| Phone to the giver | Hand-off lock: “You give in every round. Keep the phone and follow each card.” No more hand-offs after this. |
+| Spin the chakra wheel | Same giver and receiver every round. The wheel stops on a place the receiver allowed; about one round in five also draws a luck card (Double time, Your choice, Slow motion). |
 | Maybe: ask first | For a Maybe place the receiver answers Yes, this time or Not this time (skips the place). |
-| Touch card and timer | The place in its chakra colour and image, a touch card (feather, palm, circles, letter, breath, receiver’s choice; kiss from Close; slow trail at Spicy), a swap prompt when on, eyes-closed reminder and the timer ring. Pause is always visible. |
+| Touch card and timer | The place in its chakra colour and image, a touch card (feather, palm, circles, letter, breath, receiver’s choice; kiss from Close; slow trail at Spicy), eyes-closed reminder and the timer ring. Pause is always visible. |
 | Paused | Continue, Skip this round or End the game. |
 | Receiver rates | More of this, Just right or Less of this. More of this goes into the private summary. |
 | Check-in every 3 rounds | We are good, Go one level lower, or End the game. |
-| Private summary | Each partner’s favourite places; with Swap Roles: “Role swap ends. Back to yourselves.” and a reflection question. Play again or Back. Nothing saved. |
+| Private summary | The receiver’s favourite places. Play again: <receiver> gives (roles switched), Play again (same roles) or Back. Nothing saved. |
 
-- Dev-mode only; not part of any meditation journey or session statistics. Lazy-loaded through the practice-module loader and offline pre-cached. Places, touches and luck cards live in the module with ui.ct* translations in all five locales.
+- Dev-mode only; not part of any meditation journey or session statistics. Lazy-loaded through the practice-module loader and offline pre-cached. Places, touches and luck cards live in the module with ui.ct* translations in all five locales. Role swap was removed (owner: not fun).
 
 <a id="pitch-mode"></a>
 

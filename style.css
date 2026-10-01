@@ -3460,7 +3460,11 @@ body.sky-canvas-active #particle-canvas {
 .ct-big { width: 100%; min-height: 3.5rem; font-size: 1.15rem; font-weight: 800; background: var(--ct-color) !important; border-color: var(--ct-color) !important; color: #1a0a12 !important; }
 .ct-big:disabled { opacity: 0.45; }
 .ct-pause { align-self: flex-end; margin: -0.4rem -0.2rem -0.4rem 0; min-height: 2.6rem; padding: 0.3rem 0.9rem; border-radius: 999px; border: 2px solid #fff; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 800; cursor: pointer; z-index: 2; }
-.ct-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; width: 100%; }
+.ct-names { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 0.5rem; width: 100%; }
+.ct-role-field { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; text-align: left; opacity: 1; text-transform: none; letter-spacing: normal; font-size: 1rem; }
+.ct-role-tag { align-self: flex-start; padding: 0.2rem 0.7rem; border-radius: 999px; background: var(--ct-color); color: #1a0f24; font-size: 0.85rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+.ct-role-field .ct-name { width: 100%; box-sizing: border-box; border-color: var(--ct-color); }
+.ct-switch { min-height: 3rem; padding: 0 0.7rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.08); color: #fff; font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
 .ct-name { min-height: 3rem; padding: 0 0.8rem; border-radius: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.06); color: #fff; font: inherit; font-size: 1rem; }
 .ct-row { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; text-align: left; }
 .ct-row-label { font-weight: 800; }
@@ -3468,13 +3472,8 @@ body.sky-canvas-active #particle-canvas {
 .ct-choices-wrap { justify-content: center; }
 .ct-choice { flex: 1 1 auto; min-height: 2.9rem; padding: 0.4rem 0.8rem; border-radius: 0.9rem; border: 2px solid rgba(255, 255, 255, 0.22); background: rgba(40, 24, 60, 0.6); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .ct-choice.is-selected { border-color: #fff; background: var(--ct-color); color: #1a0a12; }
-.ct-swap { display: flex; align-items: flex-start; gap: 0.7rem; width: 100%; padding: 0.8rem; box-sizing: border-box; border-radius: 1rem; background: rgba(167, 139, 250, 0.14); border: 1px solid rgba(167, 139, 250, 0.45); text-align: left; cursor: pointer; }
-.ct-swap input { width: 1.4rem; height: 1.4rem; margin-top: 0.15rem; accent-color: #a78bfa; }
-.ct-swap span { display: flex; flex-direction: column; gap: 0.15rem; }
-.ct-swap small { font-size: 0.9rem; opacity: 0.85; }
-.ct-swap, .ct-adult, .ct-swap *, .ct-adult * { text-transform: none; letter-spacing: normal; }
-.ct-swap, .ct-adult { opacity: 1; }
-.ct-swap strong, .ct-adult { font-size: 1rem; line-height: 1.35; color: #fff; }
+.ct-adult, .ct-adult * { text-transform: none; letter-spacing: normal; }
+.ct-adult { opacity: 1; }
 .ct-badge { display: grid; place-items: center; width: 4.4rem; height: 4.4rem; border-radius: 50%; background: #e5484d; font-size: 1.35rem; font-weight: 900; }
 .ct-adult { display: flex; align-items: center; gap: 0.6rem; width: 100%; min-height: 3rem; padding: 0.4rem 0.8rem; box-sizing: border-box; border-radius: 0.9rem; background: rgba(255, 255, 255, 0.07); text-align: left; font-weight: 700; }
 .ct-adult input { width: 1.4rem; height: 1.4rem; accent-color: #e5484d; }
@@ -3508,7 +3507,6 @@ body.sky-canvas-active #particle-canvas {
 .ct-touch strong, .ct-luck strong { font-size: 1.35rem; font-weight: 900; }
 .ct-touch p, .ct-luck p { margin: 0; font-size: 1.05rem; }
 .ct-luck { border: 2px solid #fbbf24; background: linear-gradient(160deg, rgba(251, 191, 36, 0.25), rgba(30, 20, 60, 0.9)); }
-.ct-swap-prompt { margin: 0; padding: 0.7rem 0.9rem; border-radius: 0.9rem; background: rgba(167, 139, 250, 0.2); border: 1px dashed #a78bfa; font-weight: 700; }
 .ct-actions, .ct-ratings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; width: 100%; }
 .ct-ratings { grid-template-columns: 1fr; }
 .ct-actions button { min-height: 3.3rem; font-weight: 800; }
@@ -3518,11 +3516,7 @@ body.sky-canvas-active #particle-canvas {
 .ct-rate-less { background: #e5484d; }
 .ct-timer { --ct-progress: 1; display: grid; place-items: center; width: 13rem; height: 13rem; border-radius: 50%; background: conic-gradient(var(--ct-color) calc(var(--ct-progress) * 360deg), rgba(255, 255, 255, 0.12) 0); }
 .ct-timer-value { display: grid; place-items: center; width: 11.4rem; height: 11.4rem; border-radius: 50%; background: rgba(14, 8, 24, 0.95); font-size: 3.4rem; font-weight: 900; font-variant-numeric: tabular-nums; }
-.ct-swap-orbs { display: flex; gap: 0.4rem; }
-.ct-swap-orbs span { width: 4rem; height: 4rem; border-radius: 50%; background: var(--ct-color); box-shadow: 0 0 26px var(--ct-color); animation: ct-cross 1.6s ease-in-out infinite alternate; }
-.ct-swap-orbs span:last-child { animation-direction: alternate-reverse; }
-@keyframes ct-cross { from { transform: translateX(-1.2rem); } to { transform: translateX(1.2rem); } }
 .ct-end { display: grid; gap: 0.55rem; width: 100%; margin: 0; padding: 0; list-style: none; }
 .ct-end-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.8rem 1rem; border-radius: 1rem; border: 2px solid var(--ct-color); background: color-mix(in srgb, var(--ct-color) 14%, transparent); text-align: left; }
 .ct-end-card strong { font-size: 1.1rem; }
-@media (prefers-reduced-motion: reduce) { .ct-enter, .ct-swap-orbs span { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ct-enter { animation: none; } }

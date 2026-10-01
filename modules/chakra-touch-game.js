@@ -2,12 +2,14 @@
     'use strict';
 
     // Chakra Touch: a dev-mode (Advanced Features) couples touch game based on
-    // sensate focus (slow, no-pressure touch). Two partners take turns: the
-    // wheel picks a body zone (mapped to a chakra), a card picks how to touch,
-    // the receiver keeps eyes closed for a short timer and then rates it.
-    // Consent is built in: each partner privately marks every zone Yes, Maybe
-    // or No; a No zone is never picked and a Maybe zone asks first. A Pause
-    // button is always on screen. Nothing is saved.
+    // sensate focus (slow, no-pressure touch). Roles stay fixed for the whole
+    // game: player 0 is the Giver and player 1 is the Receiver (switch them in
+    // setup or with "Play again"). The wheel picks a body zone (mapped to a
+    // chakra), a card picks how to touch, the receiver keeps eyes closed for a
+    // short timer and then rates it. Consent is built in: the receiver
+    // privately marks every zone Yes, Maybe or No; a No zone is never picked
+    // and a Maybe zone asks first. A Pause button is always on screen.
+    // Nothing is saved.
 
     const LEVELS = Object.freeze(['warm', 'close', 'spicy']);
     const LEVEL_RANK = Object.freeze({ warm: 0, close: 1, spicy: 2 });
@@ -59,9 +61,10 @@
         Object.freeze({ id: 'slowTrail', level: 'spicy' })
     ]);
 
-    const LUCK_CARDS = Object.freeze(['swapGiver', 'doubleTime', 'yourChoice', 'slowMotion']);
+    const LUCK_CARDS = Object.freeze(['doubleTime', 'yourChoice', 'slowMotion']);
     const LUCK_CHANCE = 0.2;
-    const SWAP_PROMPTS = Object.freeze(['touchLike', 'askLike', 'favouriteLine', 'reactLike', 'dressUp']);
+    const GIVER = 0;
+    const RECEIVER = 1;
     const ROUND_OPTIONS = Object.freeze([6, 10, 14]);
     const SECONDS_OPTIONS = Object.freeze([30, 45, 60]);
     const CHECK_IN_EVERY = 3;
@@ -90,13 +93,12 @@
     function createEngine({ random = Math.random } = {}) {
         let game = null;
 
-        function start({ level = 'warm', rounds = 10, seconds = 45, swapRoles = false, names = [] } = {}) {
+        function start({ level = 'warm', rounds = 10, seconds = 45, names = [] } = {}) {
             if (!LEVELS.includes(level)) throw new Error(`Unknown level ${level}`);
             game = {
                 level,
                 totalRounds: ROUND_OPTIONS.includes(rounds) ? rounds : 10,
                 seconds: SECONDS_OPTIONS.includes(seconds) ? seconds : 45,
-                swapRoles: Boolean(swapRoles),
                 players: [0, 1].map(index => ({
                     index,
                     name: String(names[index] || '').trim().slice(0, 24),
@@ -123,15 +125,14 @@
             return zonesForLevel(game.level).filter(zone => consent[zone.id] && consent[zone.id] !== 'no');
         }
 
-        // Next round: alternate giver; a luck card may swap the giver.
+        // Next round: the same giver and receiver every round.
         function nextRound() {
             if (!game || game.finished) return null;
             if (game.round >= game.totalRounds) { game.finished = true; return null; }
             game.round += 1;
-            let giver = (game.round - 1) % 2;
+            const giver = GIVER;
+            const receiver = RECEIVER;
             const luck = random() < LUCK_CHANCE ? pick(LUCK_CARDS, random) : null;
-            if (luck === 'swapGiver') giver = 1 - giver;
-            const receiver = 1 - giver;
             const zones = allowedZones(receiver);
             const zone = zones.length ? pick(zones, random) : null;
             const touch = pick(touchesForLevel(game.level), random);
@@ -145,7 +146,6 @@
                 letter: touch.id === 'letter' ? pick(LETTERS, random) : null,
                 seconds: game.seconds * (luck === 'doubleTime' ? 2 : 1),
                 needsAsk: Boolean(zone) && game.players[receiver].consent[zone.id] === 'maybe',
-                swapPrompt: game.swapRoles ? pick(SWAP_PROMPTS, random) : null,
                 rating: null,
                 skipped: !zone
             };
@@ -215,11 +215,11 @@
             return next;
         }
 
-        // Private "what we liked": each receiver's zones with most "More".
+        // Private "what the receiver liked": zones with most "More".
         function summary() {
             if (!game) return null;
             game.finished = true;
-            return game.players.map(player => ({
+            return [game.players[RECEIVER]].map(player => ({
                 index: player.index,
                 name: player.name,
                 favourites: Object.entries(player.ratings)
@@ -251,7 +251,7 @@
         const view = document.defaultView || global;
         const engine = createEngine({ random });
         const PLAYER_COLORS = ['#ff8a4c', '#a78bfa'];
-        let setup = { level: 'warm', rounds: 10, seconds: 45, swapRoles: false, names: ['', ''] };
+        let setup = { level: 'warm', rounds: 10, seconds: 45, names: ['', ''] };
         let timers = [];
         let tick = null;
         let paused = false;
@@ -284,8 +284,9 @@
         const button = (text, onClick, className = 'primary-btn', dataset) => el('button', { type: 'button', className, text, onClick, dataset });
         const name = index => {
             const typed = engine.game?.players[index]?.name || setup.names[index];
-            return typed || t(index === 0 ? 'ui.ctPartner1' : 'ui.ctPartner2');
+            return typed || roleLabel(index);
         };
+        const roleLabel = index => t(index === GIVER ? 'ui.ctGiver' : 'ui.ctReceiver');
         const zoneName = id => t(`ui.ctZone_${id}`);
         const chakraImage = (chakra, size = 'md') => el('img', {
             className: `ct-chakra-img ct-chakra-img-${size}`,
@@ -367,33 +368,42 @@
         function showSetup() {
             if (!guard()) return;
             engine.reset();
-            const nameInputs = [0, 1].map(index => {
+            // Fixed roles: one Giver, one Receiver, with a Switch button.
+            const inputs = [];
+            const nameFields = [GIVER, RECEIVER].map(index => {
                 const input = el('input', {
                     className: 'ct-name', type: 'text', dataset: { ct: `name-${index}` },
-                    attrs: { maxlength: '24', placeholder: t(index === 0 ? 'ui.ctPartner1' : 'ui.ctPartner2'), 'aria-label': t(index === 0 ? 'ui.ctPartner1' : 'ui.ctPartner2'), autocomplete: 'off' }
+                    attrs: { maxlength: '24', placeholder: roleLabel(index), 'aria-label': roleLabel(index), autocomplete: 'off' }
                 });
                 input.value = setup.names[index];
                 input.addEventListener('input', () => { setup.names[index] = input.value; });
-                return input;
+                inputs[index] = input;
+                return el('label', { className: 'ct-role-field', style: { '--ct-color': PLAYER_COLORS[index] } }, [
+                    el('span', { className: 'ct-role-tag', text: roleLabel(index) }), input
+                ]);
             });
-            const swap = el('input', { type: 'checkbox', dataset: { ct: 'swap-roles' } });
-            swap.checked = setup.swapRoles;
-            swap.addEventListener('change', () => { setup.swapRoles = swap.checked; });
+            const switchRoles = el('button', {
+                type: 'button', className: 'ct-switch', text: t('ui.ctSwitchRoles'), dataset: { ct: 'switch-roles' },
+                attrs: { 'aria-label': t('ui.ctSwitchRoles') },
+                onClick: () => {
+                    setup.names = [setup.names[RECEIVER], setup.names[GIVER]];
+                    inputs.forEach((input, index) => { input.value = setup.names[index]; });
+                }
+            });
             render({ withPause: false },
                 el('h2', { className: 'ct-title', text: t('ui.ctTitle') }),
                 el('p', { className: 'ct-lead', text: t('ui.ctIntro') }),
-                el('div', { className: 'ct-names' }, nameInputs),
+                el('div', { className: 'ct-names' }, [nameFields[0], switchRoles, nameFields[1]]),
                 choiceRow('ui.ctLevel', LEVELS, setup.level, value => { setup.level = value; }, 'level', value => t(`ui.ctLevel_${value}`)),
                 choiceRow('ui.ctRounds', ROUND_OPTIONS, setup.rounds, value => { setup.rounds = value; }, 'rounds', value => String(value)),
                 choiceRow('ui.ctSeconds', SECONDS_OPTIONS, setup.seconds, value => { setup.seconds = value; }, 'seconds', value => fill(t('ui.ctSecondsValue'), { seconds: String(value) })),
-                el('label', { className: 'ct-swap' }, [swap, el('span', {}, [el('strong', { text: t('ui.ctSwapRoles') }), el('small', { text: t('ui.ctSwapRolesNote') })])]),
                 el('p', { className: 'ct-note', text: t('ui.ctSafetyNote') }),
                 button(t('ui.ctStart'), () => (setup.level === 'spicy' ? showAdultCheck() : beginConsent()), 'primary-btn ct-big', { ct: 'start' }),
                 button(t('ui.sbpBack'), close, 'link-btn', { ct: 'back' })
             );
         }
 
-        // Spicy needs both partners to confirm.
+        // Spicy needs both players to confirm.
         function showAdultCheck() {
             if (!guard()) return;
             const boxes = [0, 1].map(index => {
@@ -417,7 +427,8 @@
         function beginConsent() {
             if (!guard()) return;
             engine.start({ ...setup });
-            consentFor(0, () => consentFor(1, startSwapIntro));
+            // Only the receiver sets a private map; then the phone goes to the giver.
+            consentFor(RECEIVER, () => handOff(GIVER, t('ui.ctGiverReady'), showSpin));
         }
 
         // Hand-off lock (press and hold), as in Hush Hush.
@@ -448,7 +459,7 @@
             );
         }
 
-        // Private Yes / Maybe / No map for one partner.
+        // Private Yes / Maybe / No map for the receiver.
         function consentFor(index, done) {
             handOff(index, t('ui.ctConsentPrivate'), () => {
                 const player = engine.game.players[index];
@@ -479,19 +490,6 @@
                     button(t('ui.ctConsentDone'), done, 'primary-btn ct-big', { ct: 'consent-done' })
                 );
             });
-        }
-
-        function startSwapIntro() {
-            if (!guard()) return;
-            if (!engine.game.swapRoles) { showSpin(); return; }
-            render({ color: '#a78bfa', className: 'ct-swap-scene' },
-                el('div', { className: 'ct-swap-orbs', attrs: { 'aria-hidden': 'true' } }, [
-                    el('span', { style: { '--ct-color': PLAYER_COLORS[0] } }), el('span', { style: { '--ct-color': PLAYER_COLORS[1] } })
-                ]),
-                el('h2', { className: 'ct-title', text: t('ui.ctSwapBegins') }),
-                el('p', { className: 'ct-lead', text: fill(t('ui.ctSwapBeginsNote'), { first: name(0), second: name(1) }) }),
-                button(t('ui.ctContinue'), showSpin, 'primary-btn ct-big', { ct: 'continue' })
-            );
         }
 
         // ── Rounds ──
@@ -556,7 +554,6 @@
                     el('p', { text: fill(t(`ui.ctTouch_${round.touch}_note`), { letter: round.letter || '' }) })
                 ]),
                 round.luck === 'slowMotion' ? el('p', { className: 'ct-note', text: t('ui.ctSlowMotionHint') }) : null,
-                round.swapPrompt ? el('p', { className: 'ct-swap-prompt', dataset: { ct: 'swap-prompt' }, text: t(`ui.ctSwapPrompt_${round.swapPrompt}`) }) : null,
                 el('p', { className: 'ct-lead', text: fill(t('ui.ctEyesClosed'), { receiver: name(round.receiver) }) }),
                 button(fill(t('ui.ctStartTimer'), { seconds: String(round.seconds) }), () => showTimer(round.seconds), 'primary-btn ct-big', { ct: 'start-timer' })
             ];
@@ -629,16 +626,15 @@
             if (!guard()) return;
             if (engine.game.round >= engine.game.totalRounds) { showEnd(); return; }
             if (engine.needsCheckIn()) { showCheckIn(); return; }
-            const next = (engine.game.round) % 2;
-            handOff(next, t('ui.ctNextGiverNote'), showSpin);
+            showSpin();
         }
 
         function showCheckIn() {
             render({ color: '#30a46c', withPause: false },
                 el('h2', { text: t('ui.ctCheckInTitle') }),
                 el('p', { className: 'ct-lead', text: t('ui.ctCheckInNote') }),
-                button(t('ui.ctCheckInGood'), () => handOff(engine.game.round % 2, t('ui.ctNextGiverNote'), showSpin), 'primary-btn ct-big', { ct: 'checkin-good' }),
-                engine.game.level !== 'warm' ? button(t('ui.ctCheckInLower'), () => { engine.lowerLevel(); handOff(engine.game.round % 2, t('ui.ctNextGiverNote'), showSpin); }, 'secondary-btn', { ct: 'checkin-lower' }) : null,
+                button(t('ui.ctCheckInGood'), showSpin, 'primary-btn ct-big', { ct: 'checkin-good' }),
+                engine.game.level !== 'warm' ? button(t('ui.ctCheckInLower'), () => { engine.lowerLevel(); showSpin(); }, 'secondary-btn', { ct: 'checkin-lower' }) : null,
                 button(t('ui.ctCheckInEnd'), showEnd, 'link-btn', { ct: 'checkin-end' })
             );
         }
@@ -667,20 +663,20 @@
         function showEnd() {
             if (!guard()) return;
             pausedFrom = null;
-            const swapRoles = engine.game?.swapRoles;
             const results = engine.summary() || [];
             const cards = results.map(result => el('li', { className: 'ct-end-card', style: { '--ct-color': PLAYER_COLORS[result.index] }, dataset: { ct: 'favourites' } }, [
                 el('strong', { text: fill(t('ui.ctLiked'), { name: name(result.index) }) }),
                 el('span', { text: result.favourites.length ? result.favourites.map(zoneName).join(', ') : t('ui.ctLikedNone') })
             ]));
             render({ color: '#a78bfa', withPause: false },
-                swapRoles ? el('div', { className: 'ct-swap-end', dataset: { ct: 'swap-end' } }, [
-                    el('h2', { className: 'ct-title', text: t('ui.ctSwapEnds') }),
-                    el('p', { className: 'ct-lead', text: t('ui.ctSwapReflect') })
-                ]) : el('h2', { className: 'ct-title', text: t('ui.ctEndTitle') }),
+                el('h2', { className: 'ct-title', text: t('ui.ctEndTitle') }),
                 el('p', { className: 'ct-note', text: t('ui.ctEndNote') }),
                 el('ul', { className: 'ct-end' }, cards),
-                button(t('ui.ctPlayAgain'), showSetup, 'primary-btn ct-big', { ct: 'again' }),
+                button(fill(t('ui.ctAgainSwitched'), { name: name(RECEIVER) }), () => {
+                    setup.names = [setup.names[RECEIVER], setup.names[GIVER]];
+                    showSetup();
+                }, 'primary-btn ct-big', { ct: 'again-switched' }),
+                button(t('ui.ctPlayAgain'), showSetup, 'secondary-btn', { ct: 'again' }),
                 button(t('ui.sbpBack'), close, 'link-btn', { ct: 'end-back' })
             );
             engine.reset();
@@ -690,7 +686,7 @@
             if (!isUnlocked()) return false;
             paused = false;
             pausedFrom = null;
-            setup = { level: 'warm', rounds: 10, seconds: 45, swapRoles: false, names: ['', ''] };
+            setup = { level: 'warm', rounds: 10, seconds: 45, names: ['', ''] };
             showScreen(gameScreen);
             showSetup();
             return true;
@@ -709,7 +705,7 @@
     }
 
     global.ChakraTouchGame = Object.freeze({
-        createEngine, mount, LEVELS, ZONES, TOUCHES, LUCK_CARDS, SWAP_PROMPTS, ROUND_OPTIONS, SECONDS_OPTIONS,
+        createEngine, mount, LEVELS, ZONES, TOUCHES, LUCK_CARDS, GIVER, RECEIVER, ROUND_OPTIONS, SECONDS_OPTIONS,
         CHECK_IN_EVERY, RATINGS, CONSENT, zonesForLevel, touchesForLevel, defaultConsent
     });
 })(typeof window === 'undefined' ? globalThis : window);

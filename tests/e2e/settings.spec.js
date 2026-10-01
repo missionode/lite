@@ -450,7 +450,7 @@ test('dev mode Contactless Eye Shooter explains the game from the Play Zone', as
   await expect(page.locator('#lobby-screen')).toBeVisible();
 });
 
-test('dev mode Chakra Touch runs consent maps, rounds with Pause, and the private summary', async ({ page }) => {
+test('dev mode Chakra Touch runs a fixed giver and receiver, the receiver map, Pause and the private summary', async ({ page }) => {
   test.setTimeout(150_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.locator('#save-config').click();
@@ -462,10 +462,14 @@ test('dev mode Chakra Touch runs consent maps, rounds with Pause, and the privat
   await page.locator('#open-chakra-touch').click();
   const game = page.locator('#chakra-touch-screen');
   await expect(game).toBeVisible();
-  await game.locator('[data-ct="name-0"]').fill('Asha');
-  await game.locator('[data-ct="name-1"]').fill('Ravi');
+  await game.locator('[data-ct="name-0"]').fill('Ravi');
+  await game.locator('[data-ct="name-1"]').fill('Asha');
+  // Switch puts Asha as giver and Ravi as receiver.
+  await game.locator('[data-ct="switch-roles"]').click();
+  await expect(game.locator('[data-ct="name-0"]')).toHaveValue('Asha');
+  await expect(game.locator('[data-ct="name-1"]')).toHaveValue('Ravi');
+  await expect(game.locator('[data-ct="swap-roles"]')).toHaveCount(0);
   await game.locator('[data-ct="rounds"][data-value="6"]').click();
-  await game.locator('[data-ct="swap-roles"]').check();
   await game.locator('[data-ct="start"]').click();
   const hold = game.locator('[data-ct="gate-hold"]');
   const holdOpen = async () => {
@@ -473,23 +477,23 @@ test('dev mode Chakra Touch runs consent maps, rounds with Pause, and the privat
     await page.waitForTimeout(1050);
     await hold.dispatchEvent('pointerup', {}, { timeout: 300 }).catch(() => {});
   };
-  // Private consent maps for both partners.
-  for (let partner = 0; partner < 2; partner += 1) {
-    await holdOpen();
-    await expect(game.locator('[data-ct="consent"]').first()).toBeVisible();
-    await game.locator('[data-ct="consent"][data-zone="hair"][data-value="no"]').click();
-    await game.locator('[data-ct="consent-done"]').click();
-  }
-  await expect(game.locator('[data-ct="continue"]')).toBeVisible();
-  await game.locator('[data-ct="continue"]').click();
+  // Only the receiver sets a private map, then the phone goes to the giver.
+  await expect(game.locator('.ct-gate-name')).toHaveText('Ravi');
+  await holdOpen();
+  await expect(game.locator('[data-ct="consent"]').first()).toBeVisible();
+  await game.locator('[data-ct="consent"][data-zone="hair"][data-value="no"]').click();
+  await game.locator('[data-ct="consent-done"]').click();
+  await expect(game.locator('.ct-gate-name')).toHaveText('Asha');
+  await holdOpen();
+  let handOffs = 0;
   let sawPause = false;
   for (let step = 0; step < 200; step += 1) {
     if (await game.locator('[data-ct="favourites"]').count()) break;
-    if (await hold.count()) { await holdOpen(); continue; }
-    if (await game.locator('[data-ct="spin"]:not([disabled])').count()) { await game.locator('[data-ct="spin"]').click(); await page.waitForTimeout(150); continue; }
+    if (await hold.count()) { handOffs += 1; await holdOpen(); continue; }
+    if (await game.locator('[data-ct="spin"]:not([disabled])').count()) {
+      await expect(game.locator('[data-ct="roles"]')).toHaveText(/Asha[\s\S]*Ravi/); await game.locator('[data-ct="spin"]').click(); await page.waitForTimeout(150); continue; }
     if (await game.locator('[data-ct="zone"]').count()) {
       await expect(game.locator('[data-ct="zone"]')).not.toHaveText(/Hair/, { timeout: 1000 });
-      await expect(game.locator('[data-ct="swap-prompt"]')).toBeVisible();
       if (!sawPause) {
         sawPause = true;
         await game.locator('[data-ct="pause"]').click();
@@ -508,8 +512,10 @@ test('dev mode Chakra Touch runs consent maps, rounds with Pause, and the privat
     await page.waitForTimeout(50);
   }
   expect(sawPause).toBe(true);
-  await expect(game.locator('[data-ct="swap-end"]')).toBeVisible();
-  await expect(game.locator('[data-ct="favourites"]')).toHaveCount(2);
+  expect(handOffs).toBe(0);
+  await expect(game.locator('[data-ct="favourites"]')).toHaveCount(1);
+  await expect(game.locator('[data-ct="favourites"]')).toContainText('Ravi');
+  await expect(game.locator('[data-ct="again-switched"]')).toContainText('Ravi');
   await game.locator('[data-ct="end-back"]').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();
 });

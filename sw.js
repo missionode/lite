@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.349';
+const CACHE_NAME = 'chakra-v5.350';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v71';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v72';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -13,7 +13,7 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.20',
+  './style.css?v=2.21',
   './app.js?v=4.22',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
@@ -74,7 +74,7 @@ const ASSETS = [
   './modules/self-exploration-practices.js?v=1.0',
   './modules/secret-body-part-game.js?v=2.0',
   './modules/eye-shooter-game.js?v=1.0',
-  './modules/chakra-touch-game.js?v=1.0',
+  './modules/chakra-touch-game.js?v=1.1',
   './modules/screen-navigation.js?v=1.0',
   './modules/shot-session.js?v=1.0',
   './modules/pitch-mode.js?v=1.0',
