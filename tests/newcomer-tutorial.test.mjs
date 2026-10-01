@@ -46,3 +46,19 @@ assert.match(css, /prefers-reduced-motion:\s*reduce/);
 assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);
 
 console.log('newcomer tutorial contracts passed');
+
+// Chakra orientation: the spoken name matches the name on screen, and each
+// line states the benefit with confidence (no "can be", "is considered").
+const orientation = [['root', 'Root'], ['sacral', 'Sacral'], ['solar', 'Solar'], ['heart', 'Heart'], ['throat', 'Throat'], ['thirdEye', 'ThirdEye'], ['crown', 'Crown']];
+const hedges = { en: /\b(can|may|might)\b|is placed/i, ml: /കാണാം|സൂചിപ്പിക്കാം|ക്ഷണിക്കാം/u, hi: /माना जाता|सकता है/u, ru: /может|располагается/i, ta: /கருதப்படுகிறது|லாம்/u };
+for (const { id, localeSource } of manifest.languages) {
+  const ui = JSON.parse(readFileSync(localeSource, 'utf8')).ui;
+  for (const [nameKey, part] of orientation) {
+    const narration = ui[`newcomer${part}Narration`];
+    assert.doesNotMatch(narration, hedges[id], `${id} ${nameKey} orientation must sound confident`);
+    const sameName = id === 'ru' ? !['solar', 'thirdEye'].includes(nameKey) : true;
+    if (sameName) assert.ok(narration.includes(ui[nameKey]), `${id} ${nameKey}: the voice says the on-screen name "${ui[nameKey]}"`);
+  }
+}
+assert.equal(JSON.parse(readFileSync('locales/en.json', 'utf8')).ui.thirdEye, 'Third Eye');
+console.log('Chakra orientation names match the screen and sound confident in all languages.');

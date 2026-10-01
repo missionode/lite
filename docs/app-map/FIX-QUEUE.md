@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Spelling proofread (all languages)
+
+- Dictionary pass (hunspell en/ru/hi/ml + LibreOffice ta) plus a line-by-line native proofread of all 202 spoken lines per language. 58 fixes: Hindi nukta consistency (क़दम, बाक़ी, ख़ुशी, फ़्लोर) and a plural; Tamil sandhi doubling (மெதுவாகச், ஏற்பத்/ஏற்பச், அடுத்துச், அன்றாடச், சுற்றித்); Russian missing "ли", dashes, "сидеть", chakra capitals; Malayalam consistent വയറ്റിൽ / ബോധപൂർവ്വം; English consistent British spelling (symbolise, visualisation, towards) and pose-name hyphens. Owner-pinned spellings kept (മാർഗദർശി, മാർഗ്ഗനിർദ്ദേശകന്റെ നിർദേശങ്ങൾ).
+
+## Completed — Chakra orientation names
+
+- Newcomer orientation lines now say the same chakra name that is on screen, in a confident voice ("It brings steadiness…" instead of "can be a reminder", "is considered"). Hindi मणिपुर→मणिपूर and हृदय/कंठ चक्र now named अनाहत/विशुद्ध; Tamil chakra scripts name அனாஹதம், விசுத்தி, ஆஜ்ஞா, சஹஸ்ராரம் like the screen; Russian uses "чакра" like the labels; clearer body locations (ml അടിവയർ/മേൽവയർ, hi पेट का निचला/ऊपरी हिस्सा); English "3rd Eye" → "Third Eye".
+
 ## Completed — Confident, natural narration in all five languages
 
 - Owner: narration felt doubtful ("like giving up"), meditators questioned the benefit. All 181 spoken lines per language rewritten as natural spoken language with calm confidence and clear benefit, no medical or magical claims, safety kept briefly. Hedging phrases cut (English 50 → 0, Hindi 90 → 5, Russian 87 → 9, Tamil 128 → ~20 mostly safety/choice). Gender-neutral throughout.

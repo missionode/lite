@@ -29,13 +29,13 @@
     "newcomerNotNow": "Not now",
     "newcomerBodyMap": "A simple attention map: from the base of the spine to the crown of the head.",
     "newcomerOrientationIntro": "Chakra means wheel in Sanskrit. In this traditional practice, the seven chakras form a map of attention along the centre line of the body. We will meet them one at a time, from the base of the spine to the crown of the head.",
-    "newcomerRootNarration": "Root is placed at the base of the spine. It can be a gentle reminder of steadiness and feeling grounded.",
-    "newcomerSacralNarration": "Sacral is placed in the lower abdomen. It can invite awareness of feelings, creativity, and enjoyment.",
-    "newcomerSolarNarration": "Solar is placed in the upper abdomen. It can represent choice, confidence, and purposeful energy.",
-    "newcomerHeartNarration": "Heart is placed at the centre of the chest. It can be a prompt for care, kindness, and connection.",
-    "newcomerThroatNarration": "Throat is placed around the throat. It can bring attention to expression and listening.",
-    "newcomerThirdEyeNarration": "Third Eye is placed at the centre of the forehead. It can invite reflection, attention, and seeing a situation with clarity.",
-    "newcomerCrownNarration": "Crown is placed at the top of the head. It can represent meaning, openness, and a wider perspective.",
+    "newcomerRootNarration": "Root sits at the base of the spine. It brings steadiness and the feeling of solid ground beneath you.",
+    "newcomerSacralNarration": "Sacral sits in the lower belly. It brings ease, creativity, and simple joy.",
+    "newcomerSolarNarration": "Solar Plexus sits in the upper belly. It brings confidence, clear choices, and steady energy.",
+    "newcomerHeartNarration": "Heart sits at the centre of the chest. It brings care, kindness, and warm connection.",
+    "newcomerThroatNarration": "Throat sits at the throat. It brings clear expression and calm listening.",
+    "newcomerThirdEyeNarration": "Third Eye sits at the centre of the forehead. It brings focus, insight, and a clear view of your life.",
+    "newcomerCrownNarration": "Crown sits at the top of the head. It brings peace, openness, and a wider view.",
     "newcomerOrientationClosing": "These are traditional symbols for reflection and focus. Simply follow the centres you selected, at your own ease, and let the practice work gently.",
     "skipCurrentItem": "Skip current item",
     "newcomerGuidedStatus": "A short guided orientation is playing…",
@@ -176,7 +176,7 @@
     ,"visualizationSilence": "Silence"
     ,"visualizationSpaceRace": "Space Race"
     ,"visualizationAmbienceVolume": "Visualization ambience volume"
-    ,"visualizationTitle": "Guided visualization"
+    ,"visualizationTitle": "Guided visualisation"
     ,"visualizationGuidance": "Let your eyes gently shut. Let that experience become a simple scene in your inner mind. Notice where you are, what you see and hear, and how your body feels. Notice how you respond. Let the scene grow clear and familiar, all on its own."
     ,"visualizationIntention": "{{intention}}"
     ,"visualizationReturn": "Now let the scene soften. Slowly open your eyes when you are ready, and bring its calm clarity with you."
@@ -203,7 +203,7 @@
     ,"undoUnlearnDuration": "Duration"
     ,"undoUnlearnTitle": "Undo and unlearn"
     ,"undoUnlearnOpening": "Simply rest with your breath. Your mind can stay quiet and open. Whatever no longer supports you loosens in its own time. Your breath is always here as an anchor. You are free to end this practice whenever you choose."
-    ,"undoUnlearnPhases": ["Every person carries learned habits and unfinished experiences. Acknowledge this gently, with no memory to search for and no story to build.", "Let any part of you that is ready receive self-forgiveness, gently. Self-forgiveness keeps your responsibility and frees you from extra weight.", "If forgiveness from another person matters to you, quietly pray for forgiveness. No one needs to be pictured, named, or contacted. Their response, safety, and freedom of choice remain entirely their own.", "If forgiveness toward someone else is right for you today, allow as much as feels safe. Forgiveness is not approval, and it is not permission for harm.", "Let earlier parts of you receive kindness, without revisiting what they lived through. You did your best with the awareness you had at the time. Offer yourself care now.", "Picture a compassionate witness beside you. This witness reminds you that true responsibility never asks for endless self-punishment.", "Soften your effort. Let your jaw, shoulders, and hands let go of holding. Your breathing becomes easy. Release what is ready to go, gently and naturally.", "Rest in the quiet that follows. Keep what supports you. What no longer serves you grows lighter and lighter in its own time."]
+    ,"undoUnlearnPhases": ["Every person carries learned habits and unfinished experiences. Acknowledge this gently, with no memory to search for and no story to build.", "Let any part of you that is ready receive self-forgiveness, gently. Self-forgiveness keeps your responsibility and frees you from extra weight.", "If forgiveness from another person matters to you, quietly pray for forgiveness. No one needs to be pictured, named, or contacted. Their response, safety, and freedom of choice remain entirely their own.", "If forgiveness towards someone else is right for you today, allow as much as feels safe. Forgiveness is not approval, and it is not permission for harm.", "Let earlier parts of you receive kindness, without revisiting what they lived through. You did your best with the awareness you had at the time. Offer yourself care now.", "Picture a compassionate witness beside you. This witness reminds you that true responsibility never asks for endless self-punishment.", "Soften your effort. Let your jaw, shoulders, and hands let go of holding. Your breathing becomes easy. Release what is ready to go, gently and naturally.", "Rest in the quiet that follows. Keep what supports you. What no longer serves you grows lighter and lighter in its own time."]
     ,"undoUnlearnClosing": "Keep the understanding that serves you. Hold on to your responsibility and your freedom of choice. Move forward lightly, and trust the quiet work of this practice."
     ,"roadmapUndoUnlearn": "Undo and unlearn"
     ,"journeyPreparation": "Journey preparation"
@@ -442,7 +442,7 @@
     ,"solar": "Solar"
     ,"heart": "Heart"
     ,"throat": "Throat"
-    ,"thirdEye": "3rd Eye"
+    ,"thirdEye": "Third Eye"
     ,"crown": "Crown",
     "quietCourageAddon": "Quiet Courage",
     "quietCourageSubtitle": "A private, gentle practice for exploring authentic expression at your own pace.",
@@ -641,7 +641,7 @@
     "pitch_energy_title": "Energy",
     "pitch_energy_opening": "Welcome. Here are two minutes to wake up your body and mind. Sit or stand tall, and let's begin.",
     "pitch_energy_steps": ["Take three short breaths in through your nose, and one long breath out. In, in, in, and out. Go at a comfortable pace.", "Once more. In, in, in, and out. If you feel light-headed, just breathe normally.", "Roll your shoulders back twice, and stretch your arms up high.", "Now bring a small smile to your face. Notice how that feels."],
-    "pitch_energy_closing": "One last deep breath in, and out. You are awake, fresh and ready to go.",
+    "pitch_energy_closing": "One last deep breath in, and out. You are awake, fresh, and ready to go.",
     "pitch_focus_title": "Focus",
     "pitch_focus_opening": "Welcome. Let's use two minutes to clear your mind. Sitting or standing, get comfortable and rest your eyes on one point.",
     "pitch_focus_steps": ["Breathe in and count one, breathe out. Breathe in and count two, breathe out. Breathe in and count three, breathe out.", "If a thought comes, simply notice it, and come back to your breath.", "Now choose one thing you want to do next. Just one.", "See yourself starting it, calm and clear. One thing at a time."],

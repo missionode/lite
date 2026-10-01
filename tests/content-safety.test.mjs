@@ -243,7 +243,7 @@ assert.doesNotMatch(
   'English chakra narration must not add a second Sanskrit chakra name',
 );
 assert.match(scripts.intro.gratitude_en, /full attention to my voice/i);
-assert.match(scripts.intro.moon.waning_en, /waning moon can symbolize return/i);
+assert.match(scripts.intro.moon.waning_en, /waning moon can symboli[sz]e return/i);
 
 assert.match(scripts.hooponopono.intro.en, /optional/i);
 assert.match(scripts.hooponopono.intro.ml, /വേണമെങ്കിൽ മാത്രം/u);

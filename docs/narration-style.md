@@ -26,6 +26,18 @@ Owner direction, October 2026: the guide must sound **natural, meditative and co
   - Malayalam/Tamil: long-vowel bija (വാം, യாம்) → short (വം, யம்).
 - Check a word: `echo "word" | espeak-ng -q -v <en-us|hi|ml|ru|ta> --ipa` (Piper uses espeak-ng phonemes).
 
+## Chakra names (screen and voice must match)
+
+| | English | Malayalam | Hindi | Russian | Tamil |
+|---|---|---|---|---|---|
+| Root | Root | മൂലാധാരം | मूलाधार | Корневая | மூலாதாரம் |
+| Sacral | Sacral | സ്വാധിഷ്ഠാനം | स्वाधिष्ठान | Сакральная | சுவாதிஷ்டானம் |
+| Solar | Solar (voice: Solar Plexus) | മണിപൂരം | मणिपूर | Солнечное сплетение | மணிபூரகம் |
+| Heart | Heart | അനാഹതം | अनाहत (हृदय चक्र) | Сердечная | அனாஹதம் (இதயச் சக்கரம்) |
+| Throat | Throat | വിശുദ്ധി | विशुद्ध (कंठ चक्र) | Горловая | விசுத்தி (தொண்டைச் சக்கரம்) |
+| Third Eye | Third Eye | ആജ്ഞ | आज्ञा | Третий глаз | ஆஜ்ஞா (மூன்றாம் கண் சக்கரம்) |
+| Crown | Crown | സഹസ്രാരം | सहस्रार | Коронная | சஹஸ்ராரம் (கிரீடச் சக்கரம்) |
+
 ## Mantras
 Root Lam, Sacral Vam, Solar Ram, Heart Yam, Throat Ham, Third Eye Om, Crown Aum, High energy Hreem — written in normal case in each script (ml ലം വം രം യം ഹം ഓം ഔം; hi लम् वम् रम् यम् हम् ॐ औम्; ta லம் வம் ரம் யம் ஹம் ஓம் ஔம்; ru Лам Вам Рам Ям Хам Ом Аум).
 
