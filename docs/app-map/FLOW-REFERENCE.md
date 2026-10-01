@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-09-30.
+Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-10-01.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -27,7 +27,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 17. [Ordered Chakra Journey add-ons](#journey-addons)
 18. [Lobby journey roadmap](#journey-roadmap)
 19. [Quiet Courage · private self-expression practice](#quiet-courage)
-20. [Secret Body Part · dev-mode party game](#secret-body-game)
+20. [Hush Hush · dev-mode icebreaker game](#secret-body-game)
 21. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
 22. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
 23. [Pause, stop and live controls](#controls)
@@ -1048,15 +1048,15 @@ flowchart TD
 
 <a id="secret-body-game"></a>
 
-## Secret Body Part · dev-mode party game
+## Hush Hush · dev-mode icebreaker game
 
-A 2–7 player pass-the-phone luck game opened from its own Lobby panel (after the Mood & Relaxation Ambience section) only while Advanced Features (dev mode) is unlocked. Nothing is saved.
+Hush Hush (internal name Secret Body Part): a 2–7 player pass-the-phone luck icebreaker opened from the Play Zone games section in the Lobby (after the Mood & Relaxation Ambience section) only while Advanced Features (dev mode) is unlocked. Nothing is saved.
 
 Sources: [modules/secret-body-part-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/secret-body-part-game.js:1), [tests/secret-body-part-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/secret-body-part-game.test.mjs:1), [app.js:2941](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2941), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1).
 
 ```mermaid
 flowchart TD
-  locked["Hidden Lobby panel"]
+  locked["Hidden Play Zone"]
   setup["Setup"]
   bold["Bold card notice"]
   deal["Deal secret cards"]
@@ -1088,7 +1088,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Hidden Lobby panel | The Secret Body Part Lobby panel (after Mood & Relaxation Ambience, before the session estimate) stays hidden and its button disabled until the current page load unlocks dev mode. Relocking hides it and closes an open game without leaving Settings. |
+| Hidden Play Zone | The Play Zone Lobby section with its Hush Hush card (after Mood & Relaxation Ambience, before the session estimate) stays hidden and its button disabled until the current page load unlocks dev mode. Relocking hides it and closes an open game without leaving Settings. |
 | Setup | Choose 2–7 players and 1–5 rounds. Players are chakras in order: Root, Sacral, Solar, Heart, Throat, Third Eye, Crown. The setup shows how many games were played in a row this page load. |
 | Bold card notice | Before every third consecutive game, ask the group to include the bold Secret Card or play without it. |
 | Deal secret cards | Pass the phone to each chakra player. Tapping the face-down card shows one unique everyday body part; private parts are not in the normal list. In a third consecutive game with the Secret Card accepted, one random player gets it instead. |

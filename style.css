@@ -3297,3 +3297,17 @@ body.sky-canvas-active #particle-canvas {
 
 .secret-body-game-panel { text-align: center; }
 .secret-body-game-panel button { width: 100%; }
+/* Play Zone: one card per game, so more games can sit side by side later. */
+.play-zone-game {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    text-align: center;
+}
+.play-zone-game-name { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.02em; }
+.play-zone-game .mixer-note { margin: 0; }

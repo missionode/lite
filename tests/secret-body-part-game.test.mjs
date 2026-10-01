@@ -153,7 +153,7 @@ const keys = ['sbpTitle', 'sbpIntro', 'sbpPlayers', 'sbpRounds', 'sbpGamesInRow'
     'sbpBoldContinue', 'sbpBoldSkip', 'sbpMemorised', 'sbpPassTo', 'sbpTapCard', 'sbpRound', 'sbpSpin', 'sbpCalled', 'sbpReverseNote',
     'sbpContinue', 'sbpLightningPrompt', 'sbpGuessPrompt', 'sbpHonour', 'sbpRight', 'sbpWrong', 'sbpNobody', 'sbpShielded', 'sbpOut',
     'sbpSurvived', 'sbpNext', 'sbpGrandReveal', 'sbpFakerCaught', 'sbpLuckySurvivor', 'sbpSharpGuesser', 'sbpFakerOfNight', 'sbpPlayAgain', 'sbpBack', 'sbpOpen',
-    'secretBodyGame', 'secretBodyGameNote',
+    'secretBodyGame', 'secretBodyGameNote', 'playZone',
     ...Array.from(game.LUCK_CARDS).flatMap(card => [`sbpLuck_${card}`, `sbpLuck_${card}_note`]),
     ...[...game.PARTS, ...game.SECRET_PARTS].map(part => `sbpPart_${part}`)];
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
@@ -161,4 +161,12 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     for (const key of keys) assert.ok(locale.ui[key], `${language} is missing ui.${key}`);
 }
 
-console.log('Secret Body Part passed: chakra players, secret cards, luck cards, Faker Catch, game-three Secret Card, dev-mode gate and five locales.');
+// Play Zone section: heading on top, Hush Hush card inside, icebreaker subtitle.
+const lobbyHtml = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+assert.match(lobbyHtml, /id="secret-body-game-panel"[^>]*play-zone-panel[\s\S]*?data-i18n="ui\.playZone"[\s\S]*?class="play-zone-game"[\s\S]*?data-i18n="ui\.secretBodyGame"/, 'Play Zone heading sits above the game card');
+const enLocale = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
+assert.equal(enLocale.ui.sbpTitle, 'Hush Hush');
+assert.match(enLocale.ui.secretBodyGameNote, /icebreaker/i);
+assert.doesNotMatch(enLocale.ui.secretBodyGameNote, /dev-mode/i);
+
+console.log('Hush Hush (Secret Body Part module) passed: chakra players, secret cards, luck cards, Faker Catch, game-three Secret Card, dev-mode gate and five locales.');

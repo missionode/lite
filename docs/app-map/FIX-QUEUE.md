@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Play Zone and Hush Hush
+
+- Owner asked for a game-like name and an icebreaker subtitle. The game shows as **Hush Hush** with “The icebreaker game for 2–7 players. Spin, guess, laugh.” in all five languages. The Lobby panel now has a **Play Zone** heading so more games can be added as cards. Internal names and IDs are unchanged.
+
 ## Completed — Pitch Mode works sitting or standing
 
 - Calm, Energy and Focus openings said "sit" only; all four mood openings now welcome sitting or standing in all five languages, and the Malayalam/Tamil Calm step no longer mentions a seat. A test checks every language.

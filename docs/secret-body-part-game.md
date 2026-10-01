@@ -1,11 +1,15 @@
-# Secret Body Part — game guide
+# Hush Hush — game guide
 
-A dev-mode party game for 2–7 players on one phone. Pure luck: no clues. Nothing is saved.
+Shown in the app as **Hush Hush** (Malayalam ഹഷ് ഹഷ്, Hindi हश हश, Tamil ஹஷ் ஹஷ், Russian Тсс-тсс), with the subtitle *“The icebreaker game for 2–7 players. Spin, guess, laugh.”* The code still uses the internal name Secret Body Part (`modules/secret-body-part-game.js`, `ui.sbp*` keys, `#secret-body-game-*` IDs).
+
+A dev-mode icebreaker game for 2–7 players on one phone. Pure luck: no clues. Nothing is saved.
 
 ## Where to find it
 
 1. Unlock dev mode (Advanced Features): Settings → About → tap the app version 7 times → password.
-2. Go to the **Lobby** (Meditation Room screen). Under the **Mood & Relaxation Ambience** section, find the **🎭 Secret Body Part** panel and tap **Play now**.
+2. Go to the **Lobby** (Meditation Room screen). Under the **Mood & Relaxation Ambience** section, find the **🎲 Play Zone** section and tap **Play now** on the **🤫 Hush Hush** card.
+
+Play Zone is the games section. New games are added as more cards inside it (`.play-zone-game`).
 
 The panel is hidden while dev mode is locked. Locking dev mode also closes an open game. **Back to Meditation Room** returns to the Lobby.
 

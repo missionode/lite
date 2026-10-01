@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.16">
+    <link rel="stylesheet" href="style.css?v=2.17">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -570,11 +570,14 @@
                 </div>
             </section>
 
-            <!-- Dev-mode (Advanced Features) Secret Body Part party game. -->
-            <div id="secret-body-game-panel" class="config-group lobby-panel secret-body-game-panel" hidden>
-                <label data-i18n="ui.secretBodyGame">🎭 Secret Body Part</label>
-                <p class="mixer-note" data-i18n="ui.secretBodyGameNote">Dev-mode party game for 2–7 players. Pure luck, nothing saved.</p>
-                <button id="open-secret-body-game" class="secondary-btn" type="button" disabled data-i18n="ui.sbpOpen">Play now</button>
+            <!-- Play Zone: dev-mode (Advanced Features) games section. More games can be added as new .play-zone-game cards. -->
+            <div id="secret-body-game-panel" class="config-group lobby-panel secret-body-game-panel play-zone-panel" hidden>
+                <label data-i18n="ui.playZone">🎲 Play Zone</label>
+                <div class="play-zone-game">
+                    <h3 class="play-zone-game-name" data-i18n="ui.secretBodyGame">🤫 Hush Hush</h3>
+                    <p class="mixer-note" data-i18n="ui.secretBodyGameNote">The icebreaker game for 2–7 players. Spin, guess, laugh.</p>
+                    <button id="open-secret-body-game" class="secondary-btn" type="button" disabled data-i18n="ui.sbpOpen">Play now</button>
+                </div>
             </div>
 
             <div id="session-estimate">~ 36 mins</div>

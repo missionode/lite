@@ -21,6 +21,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/pitch-sit-or-stand):** every 2-Minute Mind Reset opening now welcomes sitting or standing in all five languages. Shell cache `chakra-v5.340`, language cache `v63`.
 
+- **Follow-up (feature/play-zone):** game renamed on screen to **Hush Hush** (icebreaker subtitle, five languages) inside a new dev-mode **Play Zone** Lobby section for future games. Internal module/keys/IDs unchanged. Style `v2.17`, shell cache `chakra-v5.341`, language cache `v64`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration
