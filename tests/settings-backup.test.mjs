@@ -92,7 +92,7 @@ assert.ok(
 );
 assert.match(serviceWorker, /\.\/modules\/journey-routing\.js\?v=1\.3/, 'The journey routing module must remain available offline.');
 assert.ok(
-    html.indexOf('modules/practice-module-loader.js?v=1.3') < html.indexOf('app.js?v=4.18'),
+    html.indexOf('modules/practice-module-loader.js?v=1.4') < html.indexOf('app.js?v=4.18'),
     'The practice loader must load before the app requests selected practice modules.'
 );
 assert.match(serviceWorker, /\.\/modules\/body-scan-practice\.js\?v=1\.0/, 'The Body Scan practice module must remain available offline.');

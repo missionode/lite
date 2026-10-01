@@ -29,13 +29,26 @@ Each player is a chakra, in this order:
 
 ## How to play
 
-1. **Setup:** choose players (2–7) and rounds (1–5).
-2. **Secret cards:** pass the phone. Each player taps their face-down card, remembers the body part, taps **I've memorised it**.
-3. **Spin:** the chakra wheel calls one player. Each round calls every remaining player once.
-4. **Guess:** the other players say one guess each, aloud. The called player taps the word on the 12-word board and marks **✅ Right** or **❌ Wrong** — on their honour.
+1. **Setup:** choose players (2–7) and rounds (1–5). The chakra players appear as tags with their images.
+2. **Secret cards:** a **Pass the phone to <chakra>** screen appears for each player. That player presses and holds **I am <chakra>** for 1 second (a quick tap does nothing). The card flips to show the body part; it hides by itself after 10 seconds. Tap **I've memorised it**.
+3. **Spin (Step 1 of 3):** anyone taps **Spin the chakra wheel**. The wheel has one coloured slice and image per player and stops on the called player. Each round calls every remaining player once.
+4. **Hand the phone over:** the called player holds the phone for the whole turn, opened again with press-and-hold.
+5. **Guess (Step 2 of 3):** a coloured banner says **<CHAKRA> — you hold the phone**. A box shows who is guessing. Guessers only speak. The phone holder taps the word they heard on the 12-word board.
+6. **Right or wrong (Step 3 of 3):** only after a word is picked, the green **✔ Right** and red **✘ Wrong** buttons appear — on the holder's honour.
+7. **Result flash:** a full green or red screen (with a buzz and a short sound) says who got it or who guesses next. It moves on by itself after about 1.5 seconds, or tap **Continue**.
    - Right → the called player is **out**; the guesser gets ⭐.
    - All wrong → the called player survives and gets 🛡️.
-5. **End:** after the last round, or when one player is left.
+8. **End:** after the last round, or when one player is left.
+
+## Why the screens look like this (v2.0)
+
+Owner feedback: players took each other's turns, and small text changes went unnoticed. So:
+
+- **One person, one job per screen.** The phone holder is always the player whose part is being guessed.
+- **Hand-off lock** on every change of hands (press and hold, ~0.9 s).
+- **Whole screen takes the holder's chakra colour and image**, so a turn change is seen from across the room.
+- **Result flash** after every answer; **big luck-card moment**; bigger text (one main instruction per screen); score chips with images, the current player glows.
+- Respects *reduce motion*: the wheel stops at once and animations are off.
 
 ## Luck cards (about 1 spin in 4)
 
@@ -56,18 +69,18 @@ Each player is a chakra, in this order:
 ## Secret Card (every 3rd game in a row)
 
 - The app counts games played back to back on this page load.
-- Before the 3rd game it asks: **include the bold Secret Card** or **play without it**.
+- Before the 3rd game it shows an **18+** notice: play it only if everyone is an adult and happy with it, or **play without it**.
 - If included, one random player gets the Secret Card instead of a normal card.
 - The count resets after that game, or when the app is closed.
 
 ## Card words
 
-- Normal cards: 36 everyday body parts (face, arms, body, legs, organs). Private parts are not in this list.
-- Secret Card words: `SECRET_PARTS` in `modules/secret-body-part-game.js` (currently Chest and Buttocks). To change them, edit that list and add a matching `ui.sbpPart_<id>` translation in all five locale files.
+- Normal cards: 29 outer body parts you can see or touch — Hair, Forehead, Eyebrow, Eyelash, Ear, Nose, Cheek, Chin, Jaw, Lips, Neck, Shoulder, Armpit, Elbow, Wrist, Palm, Thumb, Knuckle, Fingernail, Back, Waist, Navel, Lower stomach, Thigh, Knee, Calf, Ankle, Heel, Toe. No inner organs, no private parts.
+- 18+ Secret Card words (only in the 3rd game in a row, after the group agrees): Pubic mound, Vagina, Breasts, Nipples, Penis. List: `SECRET_PARTS` in `modules/secret-body-part-game.js`. To change them, edit that list and add a matching `ui.sbpPart_<id>` translation in all five locale files.
 
 ## Technical notes
 
-- Module: `modules/secret-body-part-game.js` (lazy-loaded, offline-cached). Pure engine (`createEngine`) plus DOM view (`mount`).
+- Module: `modules/secret-body-part-game.js` v2.0 (lazy-loaded, offline-cached). Chakra images come from `symbols/<chakra>.png` (already offline-cached). `mount()` accepts `holdMs`, `flashMs`, `spinMs` and `cardHideMs` for tuning. Pure engine (`createEngine`) plus DOM view (`mount`).
 - Tests: `tests/secret-body-part-game.test.mjs`, e2e in `tests/e2e/settings.spec.js`.
 - Flow map: `secret-body-game` in `docs/app-map/index.html`.
 - Languages: English, Malayalam, Hindi, Russian, Tamil.

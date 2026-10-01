@@ -357,7 +357,9 @@ test('dev mode reveals Reverse Journey and Self-Exploration, and the roadmap fol
   expect(text.indexOf('Quiet Courage')).toBeLessThan(text.indexOf('Reverse Journey'));
 });
 
-test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides it', async ({ page }) => {
+test('dev mode Hush Hush game plays to the Grand Reveal with hand-off locks and relock hides it', async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.locator('#save-config').click();
   await expect(page.locator('#secret-body-game-panel')).toBeHidden();
   await page.locator('#open-settings').click();
@@ -373,26 +375,53 @@ test('dev mode Secret Body Part game plays to the Grand Reveal and relock hides 
   await expect(game.locator('[data-sbp="players-value"]')).toHaveText('2');
   for (let i = 0; i < 2; i++) await game.locator('[data-sbp="rounds-down"]').click();
   await game.locator('[data-sbp="start"]').click();
-  for (let step = 0; step < 60; step++) {
+
+  // Hand-off lock: a quick tap does not open the card; a 1-second hold does.
+  const hold = game.locator('[data-sbp="gate-hold"]');
+  await expect(hold).toBeVisible();
+  await hold.click();
+  await page.waitForTimeout(300);
+  await expect(game.locator('[data-sbp="card"]')).toHaveCount(0);
+  const holdOpen = async () => {
+    await hold.dispatchEvent('pointerdown');
+    await page.waitForTimeout(1100);
+    await hold.dispatchEvent('pointerup', {}, { timeout: 300 }).catch(() => {});
+  };
+  await holdOpen();
+  await expect(game.locator('[data-sbp="card"]')).toBeVisible();
+  await expect(game.locator('[data-sbp="banner"]')).toBeVisible();
+  await expect(game.locator('.sbp-chakra-img').first()).toHaveAttribute('src', /symbols\/(root|sacral)\.png/);
+
+  let sawGuessScreen = false;
+  for (let step = 0; step < 120; step++) {
     if (await game.locator('[data-sbp="reveal"]').count()) break;
-    if (await game.locator('[data-sbp="card"]').count() && await game.locator('[data-sbp="memorised"]').isHidden()) {
-      await game.locator('[data-sbp="card"]').click();
+    if (await hold.count()) {
+      await holdOpen();
+    } else if (await game.locator('[data-sbp="memorised"]').count()) {
       await game.locator('[data-sbp="memorised"]').click();
-    } else if (await game.locator('[data-sbp="memorised"]').isVisible().catch(() => false)) {
-      await game.locator('[data-sbp="memorised"]').click();
-    } else if (await game.locator('[data-sbp="spin"]').count()) {
+    } else if (await game.locator('[data-sbp="spin"]:not([disabled])').count()) {
       await game.locator('[data-sbp="spin"]').click();
+      await page.waitForTimeout(150);
     } else if (await game.locator('[data-sbp="continue"]').count()) {
       await game.locator('[data-sbp="continue"]').click();
-    } else if (await game.locator('[data-sbp="nobody"]').count()) {
-      await game.locator('[data-sbp="nobody"]').click();
-    } else if (await game.locator('[data-sbp="wrong"]').count()) {
+    } else if (await game.locator('[data-sbp="flash-next"]').count()) {
+      await game.locator('[data-sbp="flash-next"]').click().catch(() => {});
+    } else if (await game.locator('[data-sbp="word"]').count()) {
+      sawGuessScreen = true;
+      await expect(game.locator('[data-sbp="banner"]')).toBeVisible();
+      await expect(game.locator('[data-sbp="verdict"]')).toBeHidden();
+      if (await game.locator('[data-sbp="guesser"]').count()) await game.locator('[data-sbp="guesser"]').first().click();
       await game.locator('[data-sbp="word"]').first().click();
+      await expect(game.locator('[data-sbp="verdict"]')).toBeVisible();
       await game.locator('[data-sbp="wrong"]').click();
+      await expect(game.locator('[data-sbp="flash"]')).toBeVisible();
     } else if (await game.locator('[data-sbp="next"]').count()) {
       await game.locator('[data-sbp="next"]').click();
+    } else {
+      await page.waitForTimeout(100);
     }
   }
+  expect(sawGuessScreen).toBe(true);
   await expect(game.locator('[data-sbp="reveal"]')).toHaveCount(2);
   await game.locator('[data-sbp="back"]').click();
   await expect(page.locator('#lobby-screen')).toBeVisible();

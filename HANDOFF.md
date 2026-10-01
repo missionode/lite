@@ -23,6 +23,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/play-zone):** game renamed on screen to **Hush Hush** (icebreaker subtitle, five languages) inside a new dev-mode **Play Zone** Lobby section for future games. Internal module/keys/IDs unchanged. Style `v2.17`, shell cache `chakra-v5.341`, language cache `v64`.
 
+- **Follow-up (feature/hush-hush-clarity):** Hush Hush v2.0 — hand-off lock, whose-turn banner, chakra images, real wheel, result flash, bigger text; outer-body-part cards; 18+ Secret Card words with adults-only notice. Fixed unclosed 480px media block in `style.css`. Game module `v2.0`, practice loader `v1.4`, style `v2.18`, shell cache `chakra-v5.342`, language cache `v65`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

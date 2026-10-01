@@ -1,8 +1,8 @@
 (function installSecretBodyPartGame(global) {
     'use strict';
 
-    // Secret Body Part: a dev-mode (Advanced Features) party game for 2–7
-    // players. Pure luck: no clues. Nothing is saved; the consecutive-game
+    // Hush Hush (internal name Secret Body Part): a dev-mode (Advanced
+    // Features) icebreaker game for 2–7 players. Pure luck: no clues. Nothing is saved; the consecutive-game
     // counter lives only in memory for the current page load.
 
     const CHAKRAS = Object.freeze([
@@ -15,19 +15,19 @@
         Object.freeze({ id: 'crown', label: 'ui.crown', color: '#e8e1ff', icon: '⚪' })
     ]);
 
-    // Everyday body parts. Private parts are intentionally absent.
+    // Everyday outer body parts you can see or touch. No inner organs and
+    // no private parts.
     const PARTS = Object.freeze([
-        'forehead', 'eyebrow', 'eyelash', 'ear', 'nose', 'cheek', 'chin', 'jaw', 'lips', 'tongue', 'teeth', 'hair',
-        'neck', 'shoulder', 'elbow', 'wrist', 'palm', 'thumb', 'knuckle', 'fingernail',
-        'back', 'spine', 'ribs', 'waist', 'bellyButton',
-        'knee', 'ankle', 'heel', 'toe', 'calf', 'thigh',
-        'heartOrgan', 'lungs', 'brain', 'stomach', 'bones'
+        'hair', 'forehead', 'eyebrow', 'eyelash', 'ear', 'nose', 'cheek', 'chin', 'jaw', 'lips',
+        'neck', 'shoulder', 'armpit', 'elbow', 'wrist', 'palm', 'thumb', 'knuckle', 'fingernail',
+        'back', 'waist', 'navel', 'lowerStomach',
+        'thigh', 'knee', 'calf', 'ankle', 'heel', 'toe'
     ]);
 
-    // Secret Card words, used only in every third consecutive game.
-    // Edit this list to change the Secret Card; add a matching
-    // ui.sbpPart_<id> translation in every locale.
-    const SECRET_PARTS = Object.freeze(['chest', 'buttocks']);
+    // 18+ Secret Card words, offered only before every third consecutive game
+    // and only after the group agrees. Edit this list to change the Secret
+    // Card; add a matching ui.sbpPart_<id> translation in every locale.
+    const SECRET_PARTS = Object.freeze(['pubicMound', 'vagina', 'breasts', 'nipples', 'penis']);
 
     const LUCK_CARDS = Object.freeze(['swap', 'double', 'shield', 'reverse', 'lightning']);
     const LUCK_CHANCE = 0.25;
@@ -283,15 +283,33 @@
     }
 
     // ── View (DOM) ────────────────────────────────────────────────────────
-    function mount({ document = global.document, root, t, showScreen, gameScreen, returnScreen, isUnlocked, random = Math.random } = {}) {
+    // Play rules for the screen (v2.0):
+    //  • One person, one job per screen. The player whose part is being
+    //    guessed always holds the phone; guessers only speak.
+    //  • Every change of hands goes through a hand-off lock: the next
+    //    player presses and holds "I am <chakra>" so a stray tap cannot
+    //    open someone else's screen.
+    //  • Every screen is tinted in the colour of the player who holds the
+    //    phone, with that chakra's image, so a turn change is seen at once.
+    //  • Every answer shows a full-screen result flash (with a buzz).
+    function mount({
+        document = global.document, root, t, showScreen, gameScreen, returnScreen, isUnlocked, random = Math.random,
+        holdMs = 900, flashMs = 1600, spinMs = 2000, cardHideMs = 10000
+    } = {}) {
         if (!document || !root || typeof t !== 'function' || typeof showScreen !== 'function' ||
             !gameScreen || typeof isUnlocked !== 'function') {
-            throw new TypeError('Secret Body Part needs its screen, translator and dev-mode check');
+            throw new TypeError('Hush Hush needs its screen, translator and dev-mode check');
         }
+        const view = document.defaultView || global;
         const engine = createEngine({ random });
         const chakraById = Object.fromEntries(CHAKRAS.map(chakra => [chakra.id, chakra]));
         let setup = { playerCount: 4, rounds: 2 };
         let pendingSecretChoice = true;
+        let timers = [];
+
+        const later = (fn, ms) => { const id = view.setTimeout(fn, ms); timers.push(id); return id; };
+        const clearTimers = () => { timers.forEach(id => view.clearTimeout(id)); timers = []; };
+        const reducedMotion = () => Boolean(view.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
         const el = (tag, options = {}, children = []) => {
             const node = document.createElement(tag);
@@ -299,19 +317,91 @@
             if (options.text !== undefined) node.textContent = options.text;
             if (options.id) node.id = options.id;
             if (options.type) node.type = options.type;
-            if (options.style) Object.assign(node.style, options.style);
+            if (options.style) {
+                Object.entries(options.style).forEach(([key, value]) => {
+                    if (key.startsWith('--')) node.style.setProperty(key, value);
+                    else node.style[key] = value;
+                });
+            }
             if (options.dataset) Object.assign(node.dataset, options.dataset);
+            if (options.attrs) Object.entries(options.attrs).forEach(([key, value]) => node.setAttribute(key, value));
             if (options.onClick) node.addEventListener('click', options.onClick);
             children.forEach(child => child && node.append(child));
             return node;
         };
         const button = (text, onClick, className = 'primary-btn', dataset) => el('button', { type: 'button', className, text, onClick, dataset });
         const partName = id => t(`ui.sbpPart_${id}`);
-        const chakraName = id => `${chakraById[id].icon} ${t(chakraById[id].label)}`;
-        const fill = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.replace(`{{${key}}}`, value), template);
+        const plainName = id => t(chakraById[id].label);
+        const chakraName = id => `${chakraById[id].icon} ${plainName(id)}`;
+        const fill = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.split(`{{${key}}}`).join(value), template);
 
-        function render(...children) {
-            root.replaceChildren(el('div', { className: 'sbp-panel' }, children));
+        // Chakra symbol image used to mark whose screen this is.
+        function chakraImage(id, size = 'md') {
+            return el('img', {
+                className: `sbp-chakra-img sbp-chakra-img-${size}`,
+                attrs: { src: `symbols/${id}.png`, alt: '', 'aria-hidden': 'true', draggable: 'false' },
+                style: { '--sbp-color': chakraById[id].color }
+            });
+        }
+        // Small inline name tag: image + name in the chakra colour.
+        function nameTag(id) {
+            return el('span', { className: 'sbp-name-tag', style: { '--sbp-color': chakraById[id].color } }, [
+                chakraImage(id, 'xs'), el('span', { text: plainName(id) })
+            ]);
+        }
+
+        // Every screen fades in, tinted for the player holding the phone.
+        function render({ owner = null, banner = null, step = null, className = '' } = {}, ...children) {
+            clearTimers();
+            const color = owner ? chakraById[owner].color : '#a78bfa';
+            const panel = el('div', { className: `sbp-panel sbp-enter ${className}`.trim(), style: { '--sbp-color': color } }, [
+                banner,
+                step ? el('span', { className: 'sbp-step-tag', text: fill(t('ui.sbpStep'), { step: String(step[0]), total: String(step[1]) }), dataset: { sbp: 'step' } }) : null,
+                ...children
+            ]);
+            root.replaceChildren(panel);
+            root.closest?.('.screen')?.scrollTo?.(0, 0);
+            const heading = panel.querySelector('h2, .sbp-banner-name');
+            heading?.setAttribute('tabindex', '-1');
+            heading?.focus?.({ preventScroll: true });
+            return panel;
+        }
+
+        // Big top band: "<chakra> — you hold the phone".
+        function holderBanner(id) {
+            return el('div', { className: 'sbp-banner', dataset: { sbp: 'banner', player: id }, attrs: { role: 'status' } }, [
+                chakraImage(id, 'sm'),
+                el('div', { className: 'sbp-banner-text' }, [
+                    el('strong', { className: 'sbp-banner-name', text: plainName(id).toUpperCase() }),
+                    el('span', { text: t('ui.sbpHoldPhone') })
+                ])
+            ]);
+        }
+
+        function buzz(pattern) {
+            try { view.navigator?.vibrate?.(pattern); } catch (error) { /* optional */ }
+        }
+        let audio = null;
+        function chime(good) {
+            try {
+                const Context = view.AudioContext || view.webkitAudioContext;
+                if (!Context) return;
+                audio = audio || new Context();
+                const now = audio.currentTime;
+                (good ? [523.25, 783.99] : [311.13, 233.08]).forEach((freq, index) => {
+                    const osc = audio.createOscillator();
+                    const gain = audio.createGain();
+                    osc.type = good ? 'sine' : 'triangle';
+                    osc.frequency.value = freq;
+                    const start = now + index * 0.14;
+                    gain.gain.setValueAtTime(0.0001, start);
+                    gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.32);
+                    osc.connect(gain).connect(audio.destination);
+                    osc.start(start);
+                    osc.stop(start + 0.35);
+                });
+            } catch (error) { /* sound is optional */ }
         }
 
         function guard() {
@@ -326,36 +416,46 @@
                 const next = Math.min(max, Math.max(min, Number(output.textContent) + delta));
                 output.textContent = String(next);
                 onChange(next);
+                if (testId === 'players') syncPlayerPreview(next);
             };
             return el('div', { className: 'sbp-stepper' }, [
                 el('span', { className: 'sbp-stepper-label', text: t(labelKey) }),
-                button('−', () => change(-1), 'secondary-btn sbp-step', { sbp: `${testId}-down` }),
+                el('button', { type: 'button', className: 'secondary-btn sbp-step', text: '−', onClick: () => change(-1), dataset: { sbp: `${testId}-down` }, attrs: { 'aria-label': `${t(labelKey)} −` } }),
                 output,
-                button('+', () => change(1), 'secondary-btn sbp-step', { sbp: `${testId}-up` })
+                el('button', { type: 'button', className: 'secondary-btn sbp-step', text: '+', onClick: () => change(1), dataset: { sbp: `${testId}-up` }, attrs: { 'aria-label': `${t(labelKey)} +` } })
             ]);
+        }
+
+        let playerPreview = null;
+        function syncPlayerPreview(count) {
+            if (!playerPreview) return;
+            playerPreview.replaceChildren(...CHAKRAS.slice(0, count).map(chakra => nameTag(chakra.id)));
         }
 
         function showSetup() {
             if (!guard()) return;
             const secretNext = engine.nextGameHasSecret();
-            render(
-                el('h2', { text: t('ui.sbpTitle') }),
-                el('p', { className: 'sbp-note', text: t('ui.sbpIntro') }),
+            playerPreview = el('div', { className: 'sbp-player-preview', dataset: { sbp: 'player-preview' } });
+            render({},
+                el('h2', { className: 'sbp-title', text: t('ui.sbpTitle') }),
+                el('p', { className: 'sbp-instruction', text: t('ui.sbpIntro') }),
                 stepper('ui.sbpPlayers', setup.playerCount, MIN_PLAYERS, MAX_PLAYERS, value => { setup.playerCount = value; }, 'players'),
+                playerPreview,
                 stepper('ui.sbpRounds', setup.rounds, MIN_ROUNDS, MAX_ROUNDS, value => { setup.rounds = value; }, 'rounds'),
                 el('p', { className: 'sbp-note', text: fill(t('ui.sbpGamesInRow'), { count: String(engine.consecutiveGames) }) }),
-                button(t('ui.sbpStart'), () => (secretNext ? showBoldNotice() : startGame(true)), 'primary-btn', { sbp: 'start' }),
+                button(t('ui.sbpStart'), () => (secretNext ? showBoldNotice() : startGame(true)), 'primary-btn sbp-big-btn', { sbp: 'start' }),
                 button(t('ui.sbpBack'), close, 'link-btn', { sbp: 'back' })
             );
+            syncPlayerPreview(setup.playerCount);
         }
 
         function showBoldNotice() {
             if (!guard()) return;
-            render(
-                el('div', { className: 'sbp-bold-badge', text: '🔒' }),
+            render({ className: 'sbp-bold' },
+                el('div', { className: 'sbp-bold-badge', text: '18+' }),
                 el('h2', { text: t('ui.sbpBoldTitle') }),
-                el('p', { className: 'sbp-note', text: t('ui.sbpBoldNotice') }),
-                button(t('ui.sbpBoldContinue'), () => startGame(true), 'primary-btn', { sbp: 'bold-continue' }),
+                el('p', { className: 'sbp-instruction', text: t('ui.sbpBoldNotice') }),
+                button(t('ui.sbpBoldContinue'), () => startGame(true), 'primary-btn sbp-big-btn', { sbp: 'bold-continue' }),
                 button(t('ui.sbpBoldSkip'), () => startGame(false), 'secondary-btn', { sbp: 'bold-skip' })
             );
         }
@@ -367,6 +467,48 @@
             revealQueue(engine.game.players.map(candidate => candidate.id), showSpin);
         }
 
+        // Hand-off lock: the named player must press and hold to continue.
+        function handOff(id, { title, note, extra = [] } = {}, onOpen) {
+            if (!guard()) return;
+            const ring = el('span', { className: 'sbp-hold-ring', attrs: { 'aria-hidden': 'true' } });
+            const hold = el('button', {
+                type: 'button', className: 'primary-btn sbp-hold-btn', dataset: { sbp: 'gate-hold', player: id },
+                style: { '--sbp-hold-ms': `${holdMs}ms` }
+            }, [ring, el('span', { text: fill(t('ui.sbpHoldToOpen'), { player: plainName(id) }) })]);
+            let timer = null;
+            let opened = false;
+            const start = event => {
+                if (opened || timer) return;
+                if (event?.type === 'keydown' && event.key !== ' ' && event.key !== 'Enter') return;
+                event?.preventDefault?.();
+                hold.classList.add('is-holding');
+                timer = view.setTimeout(() => {
+                    timer = null;
+                    opened = true;
+                    hold.classList.remove('is-holding');
+                    buzz(30);
+                    onOpen();
+                }, holdMs);
+            };
+            const stop = () => {
+                if (timer) { view.clearTimeout(timer); timer = null; }
+                hold.classList.remove('is-holding');
+            };
+            hold.addEventListener('pointerdown', start);
+            hold.addEventListener('keydown', start);
+            ['pointerup', 'pointerleave', 'pointercancel', 'keyup', 'blur'].forEach(name => hold.addEventListener(name, stop));
+            hold.addEventListener('contextmenu', event => event.preventDefault());
+            render({ owner: id, className: 'sbp-gate' },
+                el('span', { className: 'sbp-kicker', text: title || t('ui.sbpPassKicker') }),
+                chakraImage(id, 'xl'),
+                el('h2', { className: 'sbp-gate-name', text: plainName(id) }),
+                note ? el('p', { className: 'sbp-instruction', text: note }) : null,
+                ...extra,
+                hold,
+                el('p', { className: 'sbp-note', text: t('ui.sbpHoldHint') })
+            );
+        }
+
         // Pass-the-phone private reveal for each listed player.
         function revealQueue(ids, done) {
             const queue = [...ids];
@@ -374,132 +516,246 @@
                 if (!guard()) return;
                 if (!queue.length) { done(); return; }
                 const id = queue.shift();
-                const card = el('button', {
-                    type: 'button', className: 'sbp-card sbp-card-back', text: '?', dataset: { sbp: 'card' },
-                    style: { borderColor: chakraById[id].color }
-                });
-                const memorised = button(t('ui.sbpMemorised'), next, 'primary-btn', { sbp: 'memorised' });
-                memorised.hidden = true;
-                card.addEventListener('click', () => {
-                    const target = engine.game.players.find(candidate => candidate.id === id);
-                    card.classList.remove('sbp-card-back');
-                    card.classList.toggle('sbp-card-secret', Boolean(target.secret));
-                    card.textContent = (target.secret ? '🔒 ' : '') + partName(target.part);
-                    memorised.hidden = false;
-                }, { once: true });
-                render(
-                    el('h2', { text: fill(t('ui.sbpPassTo'), { player: chakraName(id) }) }),
-                    el('p', { className: 'sbp-note', text: t('ui.sbpTapCard') }),
-                    card,
-                    memorised
-                );
+                handOff(id, { note: t('ui.sbpOnlyYou') }, () => showCard(id, next));
             };
             next();
         }
 
-        function scoreStrip() {
-            return el('ol', { className: 'sbp-score' }, engine.game.players.map(candidate => el('li', {
-                className: candidate.out ? 'is-out' : '',
-                style: { borderColor: chakraById[candidate.id].color },
-                text: `${chakraName(candidate.id)} ⭐${candidate.stars} 🛡️${candidate.shields}${candidate.out ? ' ✕' : ''}`
-            })));
+        function showCard(id, next) {
+            if (!guard()) return;
+            const target = engine.game.players.find(candidate => candidate.id === id);
+            const face = el('span', { className: 'sbp-card-face', text: partName(target.part) });
+            const card = el('div', {
+                className: `sbp-card is-flipped${target.secret ? ' sbp-card-secret' : ''}`, dataset: { sbp: 'card' },
+                attrs: { role: 'img', 'aria-label': partName(target.part) }
+            }, [
+                el('span', { className: 'sbp-card-back-face', text: '?' }),
+                el('span', { className: 'sbp-card-front' }, [
+                    target.secret ? el('span', { className: 'sbp-card-lock', text: '18+' }) : null,
+                    chakraImage(id, 'sm'),
+                    face
+                ])
+            ]);
+            const memorised = button(t('ui.sbpMemorised'), next, 'primary-btn sbp-big-btn', { sbp: 'memorised' });
+            const hint = el('p', { className: 'sbp-note', text: t('ui.sbpCardHides') });
+            render({ owner: id, banner: holderBanner(id), className: 'sbp-reveal-step' },
+                el('p', { className: 'sbp-instruction', text: t('ui.sbpYourPart') }),
+                card, memorised, hint
+            );
+            later(() => {
+                card.classList.remove('is-flipped');
+                card.setAttribute('aria-label', '?');
+                hint.textContent = t('ui.sbpCardHidden');
+            }, cardHideMs);
+        }
+
+        function scoreStrip(activeId = null) {
+            return el('ol', { className: 'sbp-score', attrs: { 'aria-label': t('ui.sbpScore') } }, engine.game.players.map(candidate => el('li', {
+                className: `${candidate.out ? 'is-out' : ''}${candidate.id === activeId ? ' is-active' : ''}`.trim(),
+                style: { '--sbp-color': chakraById[candidate.id].color }
+            }, [
+                chakraImage(candidate.id, 'xs'),
+                el('span', { className: 'sbp-score-name', text: plainName(candidate.id) }),
+                el('span', { className: 'sbp-score-count', text: `⭐${candidate.stars} 🛡️${candidate.shields}${candidate.out ? ' ✕' : ''}` })
+            ])));
+        }
+
+        // A real chakra wheel: one slice per active player, it stops on the called player.
+        function wheel(ids) {
+            const slice = 360 / ids.length;
+            const gradient = ids.map((id, index) => `${chakraById[id].color} ${index * slice}deg ${(index + 1) * slice}deg`).join(', ');
+            const disc = el('div', { className: 'sbp-wheel-disc', style: { background: `conic-gradient(${gradient})` } },
+                ids.map((id, index) => el('span', {
+                    className: 'sbp-wheel-slot',
+                    style: { transform: `rotate(${index * slice + slice / 2}deg) translateY(-6.2rem) rotate(${-(index * slice + slice / 2)}deg)` }
+                }, [chakraImage(id, 'sm')])));
+            return { node: el('div', { className: 'sbp-wheel', dataset: { sbp: 'wheel' } }, [el('span', { className: 'sbp-wheel-pointer', attrs: { 'aria-hidden': 'true' } }), disc]), disc, slice };
         }
 
         function showSpin() {
             if (!guard()) return;
             if (engine.settle()) { showReveal(); return; }
-            render(
+            const ids = engine.activePlayers().map(candidate => candidate.id);
+            const spinner = wheel(ids);
+            const spinButton = button(t('ui.sbpSpin'), () => {
+                spinButton.disabled = true;
+                const result = engine.spin();
+                if (!result) { showReveal(); return; }
+                const wheelOwner = result.calledId;
+                const index = Math.max(0, ids.indexOf(wheelOwner));
+                const landing = 360 * 5 + (360 - (index * spinner.slice + spinner.slice / 2));
+                const duration = reducedMotion() ? 0 : spinMs;
+                spinner.disc.style.transition = `transform ${duration}ms cubic-bezier(0.17, 0.67, 0.2, 1)`;
+                spinner.disc.style.transform = `rotate(${landing}deg)`;
+                status.textContent = t('ui.sbpSpinning');
+                later(() => { buzz([40, 40, 40]); showCalled(result); }, duration + (duration ? 250 : 0));
+            }, 'primary-btn sbp-big-btn', { sbp: 'spin' });
+            const status = el('p', { className: 'sbp-instruction', text: t('ui.sbpSpinNote'), attrs: { 'aria-live': 'polite' } });
+            render({ step: [1, 3] },
                 el('h2', { text: fill(t('ui.sbpRound'), { round: String(engine.game.round), total: String(engine.game.totalRounds) }) }),
                 scoreStrip(),
-                el('div', { className: 'sbp-wheel', text: '🎡' }),
-                button(t('ui.sbpSpin'), doSpin, 'primary-btn', { sbp: 'spin' })
+                spinner.node,
+                status,
+                spinButton
             );
         }
 
-        function doSpin() {
+        // Announce the called player and any luck card, then hand the phone over.
+        function showCalled(result) {
             if (!guard()) return;
-            const result = engine.spin();
-            if (!result) { showReveal(); return; }
-            const lines = [el('h2', { text: fill(t('ui.sbpCalled'), { player: chakraName(result.calledId) }) })];
+            const turn = engine.game.turn;
+            const holder = turn.calledId;
+            const lines = [
+                el('span', { className: 'sbp-kicker', text: t('ui.sbpWheelPicked') }),
+                chakraImage(result.calledId, 'xl'),
+                el('h2', { className: 'sbp-gate-name', text: fill(t('ui.sbpCalled'), { player: plainName(result.calledId) }) })
+            ];
             if (result.card) {
-                lines.push(el('div', { className: 'sbp-luck', dataset: { sbp: `luck-${result.card}` } }, [
+                lines.push(el('div', { className: `sbp-luck sbp-luck-${result.card}`, dataset: { sbp: `luck-${result.card}` } }, [
+                    el('span', { className: 'sbp-kicker', text: t('ui.sbpLuckTitle') }),
                     el('strong', { text: t(`ui.sbpLuck_${result.card}`) }),
                     el('p', { text: t(`ui.sbpLuck_${result.card}_note`) })
                 ]));
             }
             if (result.reverseTarget) {
-                lines.push(el('p', { className: 'sbp-note', text: fill(t('ui.sbpReverseNote'), {
-                    player: chakraName(result.calledId), target: chakraName(result.reverseTarget)
+                lines.push(el('p', { className: 'sbp-instruction', text: fill(t('ui.sbpReverseNote'), {
+                    player: plainName(result.calledId), target: plainName(result.reverseTarget)
+                }) }));
+            }
+            if (result.swap) {
+                lines.push(el('p', { className: 'sbp-instruction', dataset: { sbp: 'swap-note' }, text: fill(t('ui.sbpSwapNote'), {
+                    first: plainName(result.swap[0]), second: plainName(result.swap[1])
                 }) }));
             }
             const proceed = () => {
-                if (result.swap) revealQueue(result.swap, showTurn);
-                else showTurn();
+                if (turn.done) { showTurnResult(); return; }
+                const toTurn = () => handOff(holder, { note: t('ui.sbpHolderNote') }, showTurn);
+                if (result.swap) revealQueue(result.swap, toTurn);
+                else toTurn();
             };
-            lines.push(button(t('ui.sbpContinue'), proceed, 'primary-btn', { sbp: 'continue' }));
-            render(...lines);
+            lines.push(button(t('ui.sbpContinue'), proceed, 'primary-btn sbp-big-btn', { sbp: 'continue' }));
+            render({ owner: result.calledId, className: result.card ? 'sbp-called has-luck' : 'sbp-called' }, ...lines);
         }
 
         function showTurn() {
             if (!guard()) return;
             const turn = engine.game.turn;
             if (!turn || turn.done) { showTurnResult(); return; }
-            const board = engine.boardFor(turn.calledId);
+            const holder = turn.calledId;
+            const board = engine.boardFor(holder);
             let selectedPart = null;
             let selectedGuesser = engine.currentGuesser();
             const lightning = turn.mode === 'lightning';
+            const actions = el('div', { className: 'sbp-verdict', hidden: true, dataset: { sbp: 'verdict' } });
+            actions.hidden = true;
             const boardButtons = board.map(part => el('button', {
                 type: 'button', className: 'sbp-word', text: partName(part), dataset: { sbp: 'word', part },
+                attrs: { 'aria-pressed': 'false' },
                 onClick: event => {
                     selectedPart = part;
-                    boardButtons.forEach(item => item.classList.toggle('is-selected', item === event.currentTarget));
+                    boardButtons.forEach(item => {
+                        const on = item === event.currentTarget;
+                        item.classList.toggle('is-selected', on);
+                        item.setAttribute('aria-pressed', String(on));
+                    });
                     syncActions();
                 }
             }));
-            const guesserButtons = lightning ? engine.activePlayers().filter(candidate => candidate.id !== turn.calledId).map(candidate => el('button', {
-                type: 'button', className: 'sbp-guesser', text: chakraName(candidate.id), dataset: { sbp: 'guesser', player: candidate.id },
-                style: { borderColor: chakraById[candidate.id].color },
+            const guesserButtons = lightning ? engine.activePlayers().filter(candidate => candidate.id !== holder).map(candidate => el('button', {
+                type: 'button', className: 'sbp-guesser', dataset: { sbp: 'guesser', player: candidate.id },
+                style: { '--sbp-color': chakraById[candidate.id].color }, attrs: { 'aria-pressed': 'false' },
                 onClick: event => {
                     selectedGuesser = candidate.id;
-                    guesserButtons.forEach(item => item.classList.toggle('is-selected', item === event.currentTarget));
+                    guesserButtons.forEach(item => {
+                        const on = item === event.currentTarget;
+                        item.classList.toggle('is-selected', on);
+                        item.setAttribute('aria-pressed', String(on));
+                    });
                     syncActions();
                 }
-            })) : [];
-            const right = button(t('ui.sbpRight'), () => submit(true), 'primary-btn', { sbp: 'right' });
-            const wrong = button(t('ui.sbpWrong'), () => submit(false), 'secondary-btn', { sbp: 'wrong' });
+            }, [chakraImage(candidate.id, 'xs'), el('span', { text: plainName(candidate.id) })])) : [];
+            const chosen = el('p', { className: 'sbp-chosen', attrs: { 'aria-live': 'polite' } });
+            const right = button(t('ui.sbpRight'), () => submit(true), 'primary-btn sbp-right', { sbp: 'right' });
+            const wrong = button(t('ui.sbpWrong'), () => submit(false), 'secondary-btn sbp-wrong', { sbp: 'wrong' });
+            actions.append(el('p', { className: 'sbp-instruction', text: t('ui.sbpWasItRight') }), chosen, el('div', { className: 'sbp-actions' }, [right, wrong]), el('p', { className: 'sbp-note', text: t('ui.sbpHonour') }));
             function syncActions() {
                 const ready = Boolean(selectedPart && selectedGuesser);
-                right.disabled = !ready;
-                wrong.disabled = !ready;
+                actions.hidden = !ready;
+                if (ready) {
+                    chosen.textContent = `“${partName(selectedPart)}”`;
+                    stepTag && (stepTag.textContent = fill(t('ui.sbpStep'), { step: '3', total: '3' }));
+                    actions.classList.remove('sbp-pop');
+                    void actions.offsetWidth;
+                    actions.classList.add('sbp-pop');
+                    actions.scrollIntoView?.({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' });
+                }
             }
             function submit(claimedRight) {
                 if (!guard()) return;
-                engine.answer({ guesserId: selectedGuesser, guessedPart: selectedPart, claimedRight });
-                showTurn();
+                const guesser = selectedGuesser;
+                engine.answer({ guesserId: guesser, guessedPart: selectedPart, claimedRight });
+                showFlash({ right: claimedRight, guesser, holder });
             }
-            syncActions();
-            const prompt = lightning
-                ? t('ui.sbpLightningPrompt')
-                : fill(t('ui.sbpGuessPrompt'), { player: chakraName(selectedGuesser) });
-            render(
-                el('h2', { text: fill(t('ui.sbpCalled'), { player: chakraName(turn.calledId) }) }),
-                el('p', { className: 'sbp-note', text: prompt }),
+            const guesserLine = lightning
+                ? el('p', { className: 'sbp-instruction', text: t('ui.sbpLightningPrompt') })
+                : el('div', { className: 'sbp-guesser-callout', dataset: { sbp: 'guesser-callout', player: selectedGuesser }, style: { '--sbp-color': chakraById[selectedGuesser].color } }, [
+                    chakraImage(selectedGuesser, 'md'),
+                    el('div', {}, [
+                        el('strong', { text: fill(t('ui.sbpIsGuessing'), { player: plainName(selectedGuesser) }) }),
+                        el('span', { text: t('ui.sbpListenNote') })
+                    ])
+                ]);
+            const panel = render({ owner: holder, banner: holderBanner(holder), step: [2, 3] },
+                guesserLine,
                 lightning ? el('div', { className: 'sbp-guessers' }, guesserButtons) : null,
                 el('div', { className: 'sbp-board' }, boardButtons),
-                el('p', { className: 'sbp-note', text: t('ui.sbpHonour') }),
-                el('div', { className: 'sbp-actions' }, [right, wrong]),
-                lightning ? button(t('ui.sbpNobody'), () => { engine.nobodyGotIt(); showTurn(); }, 'link-btn', { sbp: 'nobody' }) : null
+                actions,
+                lightning ? button(t('ui.sbpNobody'), () => { engine.nobodyGotIt(); showTurnResult(); }, 'link-btn', { sbp: 'nobody' }) : null
             );
+            const stepTag = panel.querySelector('[data-sbp="step"]');
+        }
+
+        // Full-screen result after every answer, auto-continues.
+        function showFlash({ right, guesser, holder }) {
+            if (!guard()) return;
+            const turn = engine.game.turn;
+            const nextGuesser = !turn.done ? engine.currentGuesser() : null;
+            buzz(right ? [60, 40, 60] : 160);
+            chime(right);
+            let headline;
+            let sub;
+            if (right) {
+                headline = fill(t('ui.sbpFlashRight'), { guesser: plainName(guesser) });
+                sub = fill(t('ui.sbpOut'), { player: plainName(holder) });
+            } else if (nextGuesser) {
+                headline = t('ui.sbpFlashWrong');
+                sub = nextGuesser === guesser
+                    ? fill(t('ui.sbpFlashTryAgain'), { player: plainName(nextGuesser) })
+                    : fill(t('ui.sbpFlashNextGuesser'), { player: plainName(nextGuesser) });
+            } else {
+                headline = t('ui.sbpFlashWrong');
+                sub = turn.done ? fill(t('ui.sbpSurvived'), { player: plainName(holder) }) : t('ui.sbpFlashKeepGoing');
+            }
+            const go = () => (turn.done ? showTurnResult() : showTurn());
+            render({ owner: nextGuesser || holder, className: `sbp-flash ${right ? 'is-right' : 'is-wrong'}` },
+                el('div', { className: 'sbp-flash-mark', text: right ? '✔' : '✘', attrs: { 'aria-hidden': 'true' } }),
+                el('h2', { className: 'sbp-flash-title', text: headline, dataset: { sbp: 'flash' } }),
+                nextGuesser ? chakraImage(nextGuesser, 'lg') : null,
+                el('p', { className: 'sbp-flash-sub', text: sub }),
+                button(t('ui.sbpContinue'), go, 'primary-btn sbp-big-btn', { sbp: 'flash-next' })
+            );
+            later(go, flashMs);
         }
 
         function showTurnResult() {
             if (!guard()) return;
             const turn = engine.game.turn;
             const key = turn.mode === 'shield' ? 'ui.sbpShielded' : turn.outcome === 'out' ? 'ui.sbpOut' : 'ui.sbpSurvived';
-            render(
-                el('h2', { text: fill(t(key), { player: chakraName(turn.calledId) }) }),
-                scoreStrip(),
-                button(t('ui.sbpNext'), showSpin, 'primary-btn', { sbp: 'next' })
+            render({ owner: turn.calledId, step: [3, 3], className: turn.outcome === 'out' ? 'sbp-result is-out' : 'sbp-result' },
+                chakraImage(turn.calledId, 'lg'),
+                el('h2', { text: fill(t(key), { player: plainName(turn.calledId) }) }),
+                scoreStrip(turn.calledId),
+                button(t('ui.sbpNext'), showSpin, 'primary-btn sbp-big-btn', { sbp: 'next' })
             );
         }
 
@@ -511,21 +767,22 @@
                 .sort((first, second) => Number(first.secret) - Number(second.secret))
                 .map((candidate, index) => el('li', {
                     className: `sbp-reveal-card${candidate.secret ? ' sbp-card-secret' : ''}${candidate.faker ? ' is-faker' : ''}`,
-                    style: { animationDelay: `${index * 0.35}s`, borderColor: chakraById[candidate.id].color },
+                    style: { animationDelay: `${index * 0.35}s`, '--sbp-color': chakraById[candidate.id].color },
                     dataset: { sbp: 'reveal', player: candidate.id }
                 }, [
-                    el('strong', { text: chakraName(candidate.id) }),
-                    el('span', { text: (candidate.secret ? '🔒 ' : '') + partName(candidate.part) }),
+                    chakraImage(candidate.id, 'sm'),
+                    el('strong', { text: plainName(candidate.id) }),
+                    el('span', { className: 'sbp-reveal-part', text: (candidate.secret ? '18+ · ' : '') + partName(candidate.part) }),
                     candidate.faker ? el('em', { text: t('ui.sbpFakerCaught') }) : null
                 ]));
-            const names = ids => ids.length ? ids.map(chakraName).join(', ') : '—';
-            render(
-                el('h2', { text: t('ui.sbpGrandReveal') }),
+            const names = ids => ids.length ? ids.map(plainName).join(', ') : '—';
+            render({ className: 'sbp-grand' },
+                el('h2', { className: 'sbp-title', text: t('ui.sbpGrandReveal') }),
                 el('ol', { className: 'sbp-reveal' }, cards),
                 el('p', { className: 'sbp-award', text: `${t('ui.sbpLuckySurvivor')}: ${names(summary.luckySurvivors)}` }),
                 el('p', { className: 'sbp-award', text: `${t('ui.sbpSharpGuesser')}: ${names(summary.sharpGuessers)}` }),
                 summary.fakers.length ? el('p', { className: 'sbp-award sbp-faker', dataset: { sbp: 'fakers' }, text: `${t('ui.sbpFakerOfNight')}: ${names(summary.fakers)}` }) : null,
-                button(t('ui.sbpPlayAgain'), () => { engine.reset(); showSetup(); }, 'primary-btn', { sbp: 'again' }),
+                button(t('ui.sbpPlayAgain'), () => { engine.reset(); showSetup(); }, 'primary-btn sbp-big-btn', { sbp: 'again' }),
                 button(t('ui.sbpBack'), close, 'link-btn', { sbp: 'back' })
             );
         }
@@ -539,6 +796,7 @@
         }
 
         function close() {
+            clearTimers();
             engine.reset();
             root.replaceChildren();
             // Only navigate when the game is on screen (a Settings relock must stay put).

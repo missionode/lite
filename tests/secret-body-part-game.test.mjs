@@ -20,7 +20,13 @@ assert.equal(game.MIN_PLAYERS, 2);
 
 // Everyday card list never contains a Secret Card word.
 const secret = new Set(game.SECRET_PARTS);
-assert.ok(game.PARTS.length >= 30, 'enough everyday parts for seven players and a 12-word board');
+assert.ok(game.PARTS.length >= 25, 'enough everyday parts for seven players and a 12-word board');
+// Owner rule: only outer body parts, no inner organs; the owner's picks are in.
+for (const organ of ['heartOrgan', 'lungs', 'brain', 'stomach', 'bones', 'spine', 'ribs', 'tongue', 'teeth']) {
+    assert.ok(!game.PARTS.includes(organ), `${organ} is not an outer body part`);
+}
+for (const part of ['hair', 'ear', 'navel', 'lowerStomach', 'armpit', 'palm']) assert.ok(game.PARTS.includes(part), `${part} is a normal card`);
+assert.deepEqual(Array.from(game.SECRET_PARTS), ['pubicMound', 'vagina', 'breasts', 'nipples', 'penis'], '18+ Secret Card words');
 assert.ok(game.PARTS.every(part => !secret.has(part)), 'normal cards exclude Secret Card words');
 
 // Seeded random for repeatable games.
@@ -145,20 +151,37 @@ assert.match(app, /secretBodyGamePanel\.hidden = isLocked[\s\S]*?secretBodyGameB
 assert.match(app, /returnScreen: lobbyScreen/, 'leaving the game returns to the Lobby');
 assert.match(app, /if \(isLocked && secretBodyGame\) secretBodyGame\.close\(\)/, 'locking dev mode closes an open game');
 assert.match(app, /isUnlocked: \(\) => state\.advancedFeaturesUnlocked/, 'the game checks dev mode itself');
-assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=1\.1', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
-assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=1\.1'/, 'the game works offline');
+assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=2\.0', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
+assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=2\.0'/, 'the game works offline');
 
 // Every locale has every label and part name.
-const keys = ['sbpTitle', 'sbpIntro', 'sbpPlayers', 'sbpRounds', 'sbpGamesInRow', 'sbpStart', 'backToExperiment', 'sbpBoldTitle', 'sbpBoldNotice',
-    'sbpBoldContinue', 'sbpBoldSkip', 'sbpMemorised', 'sbpPassTo', 'sbpTapCard', 'sbpRound', 'sbpSpin', 'sbpCalled', 'sbpReverseNote',
-    'sbpContinue', 'sbpLightningPrompt', 'sbpGuessPrompt', 'sbpHonour', 'sbpRight', 'sbpWrong', 'sbpNobody', 'sbpShielded', 'sbpOut',
+const keys = ['sbpTitle', 'sbpIntro', 'sbpPlayers', 'sbpRounds', 'sbpGamesInRow', 'sbpStart', 'sbpBoldTitle', 'sbpBoldNotice',
+    'sbpBoldContinue', 'sbpBoldSkip', 'sbpMemorised', 'sbpPassTo', 'sbpRound', 'sbpSpin', 'sbpCalled', 'sbpReverseNote',
+    'sbpContinue', 'sbpLightningPrompt', 'sbpHonour', 'sbpRight', 'sbpWrong', 'sbpNobody', 'sbpShielded', 'sbpOut',
     'sbpSurvived', 'sbpNext', 'sbpGrandReveal', 'sbpFakerCaught', 'sbpLuckySurvivor', 'sbpSharpGuesser', 'sbpFakerOfNight', 'sbpPlayAgain', 'sbpBack', 'sbpOpen',
     'secretBodyGame', 'secretBodyGameNote', 'playZone',
+    'sbpStep', 'sbpHoldPhone', 'sbpPassKicker', 'sbpHoldToOpen', 'sbpHoldHint', 'sbpOnlyYou', 'sbpYourPart', 'sbpCardHides', 'sbpCardHidden',
+    'sbpScore', 'sbpSpinNote', 'sbpSpinning', 'sbpWheelPicked', 'sbpLuckTitle', 'sbpSwapNote', 'sbpHolderNote', 'sbpIsGuessing', 'sbpListenNote',
+    'sbpWasItRight', 'sbpFlashRight', 'sbpFlashWrong', 'sbpFlashNextGuesser', 'sbpFlashTryAgain', 'sbpFlashKeepGoing',
     ...Array.from(game.LUCK_CARDS).flatMap(card => [`sbpLuck_${card}`, `sbpLuck_${card}_note`]),
     ...[...game.PARTS, ...game.SECRET_PARTS].map(part => `sbpPart_${part}`)];
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const locale = JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'));
     for (const key of keys) assert.ok(locale.ui[key], `${language} is missing ui.${key}`);
+}
+
+// Clarity rules of the v2.0 screens (owner feedback: turns got taken, changes went unnoticed).
+assert.match(source, /function handOff\(id[\s\S]*?holdMs[\s\S]*?'pointerdown'/, 'every hand-off needs a press-and-hold by the named player');
+assert.match(source, /function revealQueue[\s\S]*?handOff\(id/, 'secret cards open only through the hand-off lock');
+assert.match(source, /handOff\(holder, \{ note: t\('ui\.sbpHolderNote'\) \}, showTurn\)/, 'the guess screen opens only for the player who holds the phone');
+assert.match(source, /function holderBanner\(id\)/, 'a whose-turn banner names the phone holder');
+assert.match(source, /symbols\/\$\{id\}\.png/, 'chakra images mark each player');
+assert.match(source, /function showFlash[\s\S]*?buzz\([\s\S]*?later\(go, flashMs\)/, 'every answer shows a result flash that moves on by itself');
+assert.match(source, /function wheel\(ids\)[\s\S]*?conic-gradient/, 'a real chakra wheel lands on the called player');
+assert.match(source, /actions\.hidden = !ready/, 'Right and Wrong appear only after a word is chosen');
+assert.match(source, /cardHideMs/, 'the secret card hides by itself');
+for (const id of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']) {
+    assert.match(sw, new RegExp(`'\\./symbols/${id}\\.png'`), `${id} chakra image works offline`);
 }
 
 // Play Zone section: heading on top, Hush Hush card inside, icebreaker subtitle.

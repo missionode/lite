@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Hush Hush clarity (v2.0)
+
+- Owner: players took each other's turns and small text changes went unnoticed. Added a press-and-hold hand-off lock on every change of hands, a whose-turn banner, screens tinted in the holder's chakra colour with chakra images, one job per screen (the holder taps; guessers speak), a real chakra wheel, a full-screen result flash with buzz and sound, big luck cards, bigger text and glowing score chips.
+- Cards: organs removed; outer parts only (adds Armpit, Navel, Lower stomach). 18+ Secret Card words now Pubic mound, Vagina, Breasts, Nipples, Penis, with an adults-only consent notice before the third game in a row.
+- Fixed an old unclosed `@media (max-width: 480px)` block in `style.css` that made game, Pitch and Play Zone styles apply only on small phones.
+
 ## Completed — Play Zone and Hush Hush
 
 - Owner asked for a game-like name and an icebreaker subtitle. The game shows as **Hush Hush** with “The icebreaker game for 2–7 players. Spin, guess, laugh.” in all five languages. The Lobby panel now has a **Play Zone** heading so more games can be added as cards. Internal names and IDs are unchanged.

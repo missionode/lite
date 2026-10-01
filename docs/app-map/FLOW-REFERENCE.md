@@ -2,7 +2,7 @@
 
 Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-10-01.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -1058,11 +1058,11 @@ Sources: [modules/secret-body-part-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/
 flowchart TD
   locked["Hidden Play Zone"]
   setup["Setup"]
-  bold["Bold card notice"]
-  deal["Deal secret cards"]
-  spin["Spin the chakra wheel"]
+  bold["18+ card notice"]
+  deal["Deal secret cards (hand-off lock)"]
+  spin["Spin the chakra wheel (Step 1 of 3)"]
   luck["Luck card"]
-  guess["Guess by luck"]
+  guess["Guess by luck (Steps 2–3)"]
   out["Out"]
   survive["Survive"]
   reveal["Grand Reveal and Faker Catch"]
@@ -1074,7 +1074,7 @@ flowchart TD
   deal -->|"All memorised"| spin
   spin -->|"Card drawn"| luck
   spin -->|"No card"| guess
-  luck -->|"Swap · view new cards"| deal
+  luck -->|"Swap · view new cards (hand-off lock)"| deal
   luck -->|"Double / Reverse / Lightning"| guess
   luck -->|"Shield"| survive
   guess -->|"Marked right"| out
@@ -1089,12 +1089,12 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Hidden Play Zone | The Play Zone Lobby section with its Hush Hush card (after Mood & Relaxation Ambience, before the session estimate) stays hidden and its button disabled until the current page load unlocks dev mode. Relocking hides it and closes an open game without leaving Settings. |
-| Setup | Choose 2–7 players and 1–5 rounds. Players are chakras in order: Root, Sacral, Solar, Heart, Throat, Third Eye, Crown. The setup shows how many games were played in a row this page load. |
-| Bold card notice | Before every third consecutive game, ask the group to include the bold Secret Card or play without it. |
-| Deal secret cards | Pass the phone to each chakra player. Tapping the face-down card shows one unique everyday body part; private parts are not in the normal list. In a third consecutive game with the Secret Card accepted, one random player gets it instead. |
-| Spin the chakra wheel | Each round calls every remaining player once in random order. About one spin in four also draws a luck card. |
+| Setup | Choose 2–7 players (shown as chakra image tags) and 1–5 rounds. Players are chakras in order: Root, Sacral, Solar, Heart, Throat, Third Eye, Crown. The setup shows how many games were played in a row this page load. |
+| 18+ card notice | Before every third consecutive game, an 18+ notice asks the group to include the intimate Secret Card only if everyone is an adult and agrees, or play without it. |
+| Deal secret cards (hand-off lock) | A Pass-the-phone screen in each player's chakra colour and image; that player presses and holds “I am <chakra>” (~0.9 s, a quick tap does nothing). The card shows one unique outer body part (no organs, no private parts) and hides itself after 10 s. In a third consecutive game with the 18+ Secret Card accepted, one random player gets an intimate word instead. |
+| Spin the chakra wheel (Step 1 of 3) | A coloured wheel with one chakra slice and image per active player stops on the called player (instant with reduce motion). Each round calls every remaining player once in random order. About one spin in four also draws a luck card, shown as a big card. |
 | Luck card | Swap (two players swap and privately view new cards), Double Guess, Shield (safe this call), Reverse (the called player guesses a random other player) or Lightning (anyone shouts first). |
-| Guess by luck | No clues. The called player records each spoken guess on a 12-word board that always contains the answer and marks it right or wrong on their honour. |
+| Guess by luck (Steps 2–3) | The phone goes to the called player through the hand-off lock and stays with them all turn. A banner says “<CHAKRA> — you hold the phone” and a box names who is guessing. Guessers only speak. The holder taps the heard word on a 12-word board (always contains the answer); only then do green Right / red Wrong appear. Every answer shows a full-screen result flash with a buzz that moves on by itself. |
 | Out | A right answer puts the called player out and gives the guesser a star. |
 | Survive | If every guess misses, or Shield/Lightning ends the call, the called player earns a shield. |
 | Grand Reveal and Faker Catch | After the last round or when one player remains, all cards flip, the Secret Card last. A correct guess that was marked wrong exposes a Faker, who loses all shields. Awards: Lucky Survivor, Sharp Guesser and Faker of the Night. |

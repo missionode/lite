@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const guidedNotingPractice = await practiceModuleLoader\.load\('guided-noting'\)/);
 assert.match(app, /async runNoting\(\) \{[\s\S]*?guidedNotingPractice\.run\(/, 'the existing controller should delegate Guided Noting to its lifecycle owner');
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.3[\s\S]*?app\.js\?v=4.18/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.4[\s\S]*?app\.js\?v=4.18/);
 assert.doesNotMatch(html, /modules\/guided-noting-practice\.js/);
 assert.match(serviceWorker, /modules\/guided-noting-practice\.js\?v=1\.0/);
 const context = vm.createContext({});

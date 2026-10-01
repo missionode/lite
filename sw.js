@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.341';
+const CACHE_NAME = 'chakra-v5.342';
 const PIPER_CACHE_NAME = 'chakra-piper-v11';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v64';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v65';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -13,7 +13,7 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.17',
+  './style.css?v=2.18',
   './app.js?v=4.18',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
@@ -62,7 +62,7 @@ const ASSETS = [
   './modules/journey-routing.js?v=1.3',
   './modules/standard-journey-sequence.js?v=1.0',
   './modules/journey-transition-stages.js?v=1.0',
-  './modules/practice-module-loader.js?v=1.3',
+  './modules/practice-module-loader.js?v=1.4',
   './modules/body-scan-practice.js?v=1.0',
   './modules/guided-noting-practice.js?v=1.0',
   './modules/dharana-practice.js?v=1.0',
@@ -72,7 +72,7 @@ const ASSETS = [
   './modules/undo-unlearn-practice.js?v=1.0',
   './modules/quiet-courage-practice.js?v=1.0',
   './modules/self-exploration-practices.js?v=1.0',
-  './modules/secret-body-part-game.js?v=1.1',
+  './modules/secret-body-part-game.js?v=2.0',
   './modules/screen-navigation.js?v=1.0',
   './modules/shot-session.js?v=1.0',
   './modules/pitch-mode.js?v=1.0',
