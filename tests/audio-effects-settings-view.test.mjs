@@ -82,7 +82,7 @@ assert.equal(state.voiceClarity, 28, 'unknown presets are ignored');
 
 assert.match(appSource, /ChakraAudioEffectsSettingsView\.bind\(\{ document, state, storage: localStorage, audio, normalizeSpatialMode, syncValue \}\)/);
 assert.doesNotMatch(appSource, /const voicePresets = \{/);
-assert.ok(html.indexOf('modules/audio-effects-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.20'));
+assert.ok(html.indexOf('modules/audio-effects-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.21'));
 assert.match(sw, /modules\/audio-effects-settings-view\.js\?v=1\.0/);
 assert.equal(context.window.ChakraAudioEffectsSettingsView.normalizeSpatialMode('room', ['off', 'room'], 'off'), 'room');
 assert.equal(context.window.ChakraAudioEffectsSettingsView.normalizeSpatialMode('invalid', ['off', 'room'], 'off'), 'off');

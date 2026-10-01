@@ -328,7 +328,12 @@
         }
         
         this.masterCompressor.connect(this.masterLimiter);
-        this.masterLimiter.connect(this.ctx.destination);
+        // Pause/resume fader: the whole mix fades out before the audio clock
+        // is suspended, so mantra, music and voice never cut off abruptly.
+        this.pauseFader = this.ctx.createGain();
+        this.pauseFader.gain.setValueAtTime(1, this.ctx.currentTime);
+        this.masterLimiter.connect(this.pauseFader);
+        this.pauseFader.connect(this.ctx.destination);
     
         // Upgrade: Permanent Absolute Grounding Anchor (Closed Eyes Mode)
         if (state.eyesCloseMode && !state.noFrequencyMode) {

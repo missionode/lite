@@ -1,6 +1,7 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
 export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-29', commit: 'b967a5f production + uncommitted narration and No Frequency default updates', scope: 'Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run.' };
 meta.date = '2026-10-01';
+meta.scope += ' Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s.';
 meta.scope += ' Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side.';
 meta.scope += ' Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights).';
 meta.scope += ' Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module).';

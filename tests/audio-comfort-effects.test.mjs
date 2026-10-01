@@ -12,9 +12,9 @@ const comfort = context.window.ChakraAudioComfortEffects;
 assert.ok(Object.isFrozen(comfort));
 assert.match(app, /toggleEyesCloseMode\(enabled\)\s*\{\s*return audioComfortEffects\.setEyesCloseMode\(this, enabled, state\);/);
 assert.match(app, /toggleAudioFilters\(enabled\)\s*\{\s*return audioComfortEffects\.setAudioFilters\(this, enabled, state\);/);
-assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.0') < html.indexOf('app.js?v=4.20'));
+assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.0') < html.indexOf('app.js?v=4.21'));
 assert.match(sw, /\.\/modules\/audio-comfort-effects\.js\?v=1\.0/);
-assert.match(sw, /chakra-v5\.347/);
+assert.match(sw, /chakra-v5\.348/);
 
 function param(value = 100) {
     return { value, events: [], cancelScheduledValues(t) { this.events.push(['cancel', t]); }, setValueAtTime(v, t) { this.value = v; this.events.push(['set', v, t]); }, linearRampToValueAtTime(v, t) { this.value = v; this.events.push(['linear', v, t]); }, exponentialRampToValueAtTime(v, t) { this.value = v; this.events.push(['exponential', v, t]); } };

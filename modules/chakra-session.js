@@ -55,7 +55,13 @@
                 owner.startTimedDrone(chakra.frequency, absoluteIndex, practiceMinutes, durationMode);
             }
 
-            const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000));
+            const transitionSeconds = Math.max(0, timing('transitions', 'chakraPostMantra'));
+            // The mantra leaves over a longer window (a slow fade plus its reverb
+            // tail) that starts before the chant time ends, so it never drops
+            // suddenly and the chakra still takes the same total time.
+            const exitSeconds = Math.max(transitionSeconds, Number(timing('transitions', 'chakraMantraExit', transitionSeconds)) || 0);
+            const chantDurationMs = Math.max(0, (practiceMinutes * 60 * 1000) - (timing('transitions', 'chakraLeadOut') * 1000)
+                - ((exitSeconds - transitionSeconds) * 1000));
             let elapsed = 0;
             while (elapsed < chantDurationMs) {
                 if (!owner.isMeditationActive) break;
@@ -64,9 +70,8 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            const transitionSeconds = Math.max(0, timing('transitions', 'chakraPostMantra'));
-            owner.audio.stopMantraTrack({ stageWindow: transitionSeconds });
-            await owner.pauseAwareSleep(transitionSeconds * 1000);
+            owner.audio.stopMantraTrack({ stageWindow: exitSeconds });
+            await owner.pauseAwareSleep(exitSeconds * 1000);
             if (owner.isMeditationActive) await owner.narrate(localized(chakra, 'affirmation'));
         }
 

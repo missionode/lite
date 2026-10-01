@@ -725,6 +725,7 @@ class AudioEngine {
         // Studio Mastering Nodes
         this.masterCompressor = null;
         this.masterLimiter = null;
+        this.pauseFader = null;
         this.presenceFilter = null;
         this.voiceWarmthFilter = null;
         this.voiceClarityFilter = null;
@@ -1137,7 +1138,8 @@ class MeditationController {
         this.stopStageDrone();
         this.audio.stopFrequencyShot();
         this.audio.stopGuidedTransitionTone();
-        this.audio.stopMantraTrack({ stageWindow: 2 });
+        // Skip still fades the mantra (about 3 s) instead of cutting it.
+        this.audio.stopMantraTrack({ stageWindow: 6 });
         this.audio.stopVisualizationAmbience(2);
         this.visual.stop();
         if (this.guideControlledResolve) this.guideControlledResolve(true);
@@ -2077,11 +2079,36 @@ class MeditationController {
             console.log("Action: Pausing session...");
             if (window.speechSynthesis) window.speechSynthesis.cancel(); 
             piperTTS.setPaused(true);
-            if (this.audio && this.audio.ctx) this.audio.ctx.suspend();
+            this.fadeOutputForPause(true);
         } else {
             console.log("Action: Resuming session...");
             piperTTS.setPaused(false);
-            if (this.audio && this.audio.ctx) this.audio.ctx.resume();
+            this.fadeOutputForPause(false);
+        }
+    }
+
+    // Fade the whole mix out over ~0.8 s, then suspend the audio clock; on
+    // resume, start the clock and fade back in over ~1.2 s.
+    fadeOutputForPause(paused) {
+        const ctx = this.audio?.ctx;
+        if (!ctx) return;
+        const fader = this.audio.pauseFader?.gain;
+        clearTimeout(this.pauseSuspendTimer);
+        if (!fader) {
+            if (paused) ctx.suspend(); else ctx.resume();
+            return;
+        }
+        const ramp = (target, seconds) => {
+            const now = ctx.currentTime;
+            if (fader.cancelAndHoldAtTime) fader.cancelAndHoldAtTime(now);
+            else { fader.cancelScheduledValues(now); fader.setValueAtTime(fader.value, now); }
+            fader.linearRampToValueAtTime(target, now + seconds);
+        };
+        if (paused) {
+            ramp(0, 0.8);
+            this.pauseSuspendTimer = setTimeout(() => { if (this.isPaused) ctx.suspend(); }, 850);
+        } else {
+            Promise.resolve(ctx.resume()).then(() => { if (!this.isPaused) ramp(1, 1.2); });
         }
     }
 

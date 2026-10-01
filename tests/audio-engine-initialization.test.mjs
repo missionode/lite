@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 assert.match(app, /async init\(\)\s*\{\s*return window\.ChakraAudioEngineInitialization\.initialize\(this,/);
-assert.match(html, /modules\/audio-engine-initialization\.js\?v=1\.0[\s\S]*?app\.js\?v=4.20/);
-assert.match(serviceWorker, /chakra-v\d+\.\d+[\s\S]*?modules\/audio-engine-initialization\.js\?v=1\.0/);
+assert.match(html, /modules\/audio-engine-initialization\.js\?v=1\.1[\s\S]*?app\.js\?v=4.21/);
+assert.match(serviceWorker, /chakra-v\d+\.\d+[\s\S]*?modules\/audio-engine-initialization\.js\?v=1\.1/);
 assert.equal(packageJson.scripts['test:audio-engine-initialization'], 'node tests/audio-engine-initialization.test.mjs');
 
 class FakeParam {
@@ -169,7 +169,8 @@ connected(engine.pleasureSpatialDepthGain, engine.spatialPleasurePanner);
 connected(engine.spatialPleasurePanner, engine.lowCutFilter);
 connected(engine.bellGain, engine.masterLimiter);
 connected(engine.masterCompressor, engine.masterLimiter);
-connected(engine.masterLimiter, audioContext.destination);
+connected(engine.masterLimiter, engine.pauseFader);
+connected(engine.pauseFader, audioContext.destination);
 assert.equal(calls.filter(([name]) => name === 'panner').length, 4);
 assert.deepEqual(calls.filter(([name]) => ['eyes', 'voice', 'voice-echo', 'music-echo', 'spatial', 'pleasure'].includes(name)), [
   ['eyes', false], ['voice', 50, 50], ['voice-echo', 'light'], ['music-echo', 'light'], ['spatial', 'off'], ['pleasure', 'gentle']

@@ -10,7 +10,7 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration', 'secret-body-game', 'eye-shooter'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.5[\s\S]*?app\.js\?v=4.20/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.5[\s\S]*?app\.js\?v=4.21/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);

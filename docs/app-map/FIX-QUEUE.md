@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Mantra no longer drops suddenly
+
+- End of each chakra: the mantra used a 2 s fade (half of the 4 s post-mantra gap). It now leaves over a 12 s window (6 s fade + reverb tail) that begins inside the chant time, so the chakra's total time is unchanged (`transitions.chakraMantraExit`, 0 in fast-test).
+- Pause: the audio clock was suspended instantly (hard cut). The whole mix now fades out over 0.8 s before suspending and fades back in over 1.2 s on resume (new `pauseFader` after the master limiter).
+- Skip: mantra fade raised from 1 s to about 3 s. Session stop keeps its 8 s fade.
+
 ## Completed — Clear, translation-friendly assessment questions
 
 - All 28 chakra questions, their 56 answers, the value prompt and the 8 value cards are rewritten in plain, short English with the same meaning, IDs and weights (no idioms; Google Translate friendly). Question bank `?v=1.3`.

@@ -62,6 +62,6 @@ assert.equal(storageValues.get('chakra_vol_visualizationambience'), '0.12', 'exi
 
 assert.match(app, /ChakraAudioVolumeSettingsView\.bind\(\{ document, state, storage: localStorage, audio \}\)/);
 assert.doesNotMatch(app, /const syncVolume = \(key, value, elements\)/);
-assert.ok(html.indexOf('modules/audio-volume-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.20'));
+assert.ok(html.indexOf('modules/audio-volume-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.21'));
 assert.match(sw, /modules\/audio-volume-settings-view\.js\?v=1\.0/);
 console.log('Audio volume settings view passed: paired sliders, persistence keys and seven live audio routes.');

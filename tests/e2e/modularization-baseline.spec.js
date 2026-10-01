@@ -61,7 +61,7 @@ test('records cold, warm and offline startup baseline without starting playback'
     const cache = await caches.open(cacheName);
     const urls = (await cache.keys()).map(request => new URL(request.url).pathname + new URL(request.url).search);
     return {
-      appEntryPresent: urls.includes('/app.js?v=4.20'),
+      appEntryPresent: urls.includes('/app.js?v=4.21'),
       sessionCountdownModulePresent: urls.includes('/modules/session-countdown.js?v=1.1'),
       journeyChromeModulePresent: urls.includes('/modules/journey-chrome.js?v=1.0'),
       videoPreludeModulePresent: urls.includes('/modules/journey-video-prelude.js?v=1.0'),
