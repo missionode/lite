@@ -30,6 +30,10 @@
 - Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
 - Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
 
+## Completed — Chakra Touch
+
+- Owner-requested dev-mode couples touch game, third Play Zone card. Warm / Close / Spicy 18+ (both partners confirm adults), private Yes/Maybe/No consent map per partner (No never picked, Maybe asks first), outer body only. Rounds: chakra wheel, touch card, 30–60 s timer with eyes closed, More / Just right / Less. Luck cards, letter tracing, always-visible Pause, check-in every 3 rounds. Optional Swap Roles (each plays the partner; ends with "Role swap ends. Back to yourselves." and a reflection). Private summary, nothing saved. Five languages. Module `modules/chakra-touch-game.js`, guide `docs/chakra-touch-game.md`, atlas map `chakra-touch`.
+
 ## Completed — Contactless Eye Shooter
 
 - Owner-designed dev-mode gaze game for people with gaze avoidance, as a second Play Zone card. Explanation only (no camera, nothing saved): look at a spot on the partner, hold 3 seconds, blink once, add points. Points 1–5 by difficulty (Eyes and Pubic mound 5). Points goal Short 15 / Medium 30 / Long 50. Five languages. Module `modules/eye-shooter-game.js`, guide `docs/eye-shooter-game.md`, atlas map `eye-shooter`.

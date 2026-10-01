@@ -339,6 +339,7 @@ const settingsManagerScreen = document.getElementById('settings-manager-screen')
 const experimentScreen = document.getElementById('experiment-screen');
 const secretBodyGameScreen = document.getElementById('secret-body-game-screen');
 const eyeShooterScreen = document.getElementById('eye-shooter-screen');
+const chakraTouchScreen = document.getElementById('chakra-touch-screen');
 const skyScreen = document.getElementById('sky-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
@@ -360,7 +361,7 @@ const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
     window,
-    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, eyeShooterScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, eyeShooterScreen, chakraTouchScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
     experimentScreen,
@@ -3017,6 +3018,29 @@ function attachEventListeners() {
             console.error('Contactless Eye Shooter could not start:', error);
         }
     });
+    // Dev-mode Chakra Touch: consent-first couples touch game (lazy module, nothing saved).
+    const chakraTouchButton = document.getElementById('open-chakra-touch');
+    let chakraTouchGame = null;
+    chakraTouchButton?.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            const api = await practiceModuleLoader.load('chakra-touch');
+            if (!chakraTouchGame) {
+                chakraTouchGame = api.mount({
+                    document,
+                    root: document.getElementById('chakra-touch-root'),
+                    t,
+                    showScreen,
+                    gameScreen: chakraTouchScreen,
+                    returnScreen: lobbyScreen,
+                    isUnlocked: () => state.advancedFeaturesUnlocked
+                });
+            }
+            chakraTouchGame.open();
+        } catch (error) {
+            console.error('Chakra Touch could not start:', error);
+        }
+    });
     const experimentActivitySelect = document.getElementById('experiment-activity');
     let intimateServiceUnlocked = false;
     let intimateServiceTapCount = 0;
@@ -3112,6 +3136,8 @@ function attachEventListeners() {
         if (isLocked && secretBodyGame) secretBodyGame.close();
         if (eyeShooterButton) eyeShooterButton.disabled = isLocked;
         if (isLocked && eyeShooterGame) eyeShooterGame.close();
+        if (chakraTouchButton) chakraTouchButton.disabled = isLocked;
+        if (isLocked && chakraTouchGame) chakraTouchGame.close();
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
             experimentCareOptions.hidden = isLocked;

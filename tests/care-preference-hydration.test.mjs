@@ -8,7 +8,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.match(app, /carePreferenceHydration\.hydrate\(\{ state, syncChecked \}\)/);
-assert.match(html, /modules\/care-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4.21/);
+assert.match(html, /modules\/care-preference-hydration\.js\?v=1\.0[\s\S]*?app\.js\?v=4.22/);
 assert.match(sw, /modules\/care-preference-hydration\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:care-preference-hydration'], 'node tests/care-preference-hydration.test.mjs');
 
