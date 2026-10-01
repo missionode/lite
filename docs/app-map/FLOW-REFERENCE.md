@@ -2,7 +2,7 @@
 
 Source snapshot: b967a5f production + uncommitted narration and No Frequency default updates · 2026-10-01.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -28,35 +28,36 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 18. [Lobby journey roadmap](#journey-roadmap)
 19. [Quiet Courage · private self-expression practice](#quiet-courage)
 20. [Hush Hush · dev-mode icebreaker game](#secret-body-game)
-21. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
-22. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
-23. [Pause, stop and live controls](#controls)
-24. [Optional Lobby video introduction](#restart)
-25. [Completion, statistics and external handoff](#completion)
-26. [Scripts, language and timing](#content)
-27. [Narration and fallback](#narration)
-28. [Audio signal architecture](#audio)
-29. [Sound options and live suppression](#sound-options)
-30. [Visuals and browser lifecycle](#visuals)
-31. [Earth observer reference and atmosphere](#earth-atmosphere)
-32. [Thematic solar containment glow](#solar-containment)
-33. [Persistence, caching and network](#storage)
-34. [Failure and recovery map](#recovery)
-35. [Isolated checkpoint delivery](#delivery-workflow)
-36. [Display-language UI renderer](#locale-ui-renderer)
-37. [Timing configuration and saved values](#timing-configuration)
-38. [Automatic journey voice profile](#journey-voice-profile)
-39. [Session-only journey-mode hydration](#session-mode-hydration)
-40. [Mixer preference control hydration](#mixer-preference-hydration)
-41. [Journey selection preference hydration](#journey-selection-hydration)
-42. [Timing preference control hydration](#timing-preference-hydration)
-43. [Appearance preference control hydration](#appearance-preference-hydration)
-44. [Script preference control hydration](#script-preference-hydration)
-45. [Custom meditation script settings](#custom-script-settings)
-46. [Personal-care preference control hydration](#care-preference-hydration)
-47. [Settings backup and restore](#settings-backup)
-48. [Operator-led chakra assessment](#assessment-tournament)
-49. [Frequency repertory handoff](#repertory)
+21. [Contactless Eye Shooter · dev-mode gaze game](#eye-shooter)
+22. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
+23. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
+24. [Pause, stop and live controls](#controls)
+25. [Optional Lobby video introduction](#restart)
+26. [Completion, statistics and external handoff](#completion)
+27. [Scripts, language and timing](#content)
+28. [Narration and fallback](#narration)
+29. [Audio signal architecture](#audio)
+30. [Sound options and live suppression](#sound-options)
+31. [Visuals and browser lifecycle](#visuals)
+32. [Earth observer reference and atmosphere](#earth-atmosphere)
+33. [Thematic solar containment glow](#solar-containment)
+34. [Persistence, caching and network](#storage)
+35. [Failure and recovery map](#recovery)
+36. [Isolated checkpoint delivery](#delivery-workflow)
+37. [Display-language UI renderer](#locale-ui-renderer)
+38. [Timing configuration and saved values](#timing-configuration)
+39. [Automatic journey voice profile](#journey-voice-profile)
+40. [Session-only journey-mode hydration](#session-mode-hydration)
+41. [Mixer preference control hydration](#mixer-preference-hydration)
+42. [Journey selection preference hydration](#journey-selection-hydration)
+43. [Timing preference control hydration](#timing-preference-hydration)
+44. [Appearance preference control hydration](#appearance-preference-hydration)
+45. [Script preference control hydration](#script-preference-hydration)
+46. [Custom meditation script settings](#custom-script-settings)
+47. [Personal-care preference control hydration](#care-preference-hydration)
+48. [Settings backup and restore](#settings-backup)
+49. [Operator-led chakra assessment](#assessment-tournament)
+50. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1101,6 +1102,34 @@ flowchart TD
 | Play again or return | Play again keeps the in-memory consecutive-game count; returning goes back to the Lobby. Closing the app resets everything. |
 
 - Dev-mode only; not part of any meditation journey or session statistics. The module loads lazily through the practice-module loader and is offline pre-cached. Secret Card words live in SECRET_PARTS inside the module with matching ui.sbpPart_* translations in all five locales.
+
+<a id="eye-shooter"></a>
+
+## Contactless Eye Shooter · dev-mode gaze game
+
+A no-touch gaze practice game for two, for people who avoid looking at someone. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. The app only explains the game: no camera, no eye tracking, nothing saved.
+
+Sources: [modules/eye-shooter-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/eye-shooter-game.js:1), [tests/eye-shooter-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/eye-shooter-game.test.mjs:1), [app.js:2963](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2963), [docs/eye-shooter-game.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/eye-shooter-game.md:1).
+
+```mermaid
+flowchart TD
+  locked["Hidden Play Zone card"]
+  explain["Explanation screen"]
+  goal["Choose a points goal"]
+  exit["Got it / Back"]
+  locked -->|"Dev mode unlocked · How to play"| explain
+  explain -->|"Read"| goal
+  goal -->|"Got it"| exit
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Hidden Play Zone card | The Eye Shooter card sits in the dev-mode Play Zone; hidden and its How to play button disabled while locked. Relocking closes the screen. |
+| Explanation screen | What the game is, four shooting steps (pick a spot, hold focus 3 seconds, blink once, add points) and a five-tier points table: 1 Ears/Back/Hair, 2 Nose/Chin/Shoulders, 3 Lips/Navel/Armpits, 4 Breasts, 5 Eyes/Pubic mound. All spots always shown. |
+| Choose a points goal | Short 15, Medium 30 (default) or Long 50. Players keep score themselves. A note asks to play only with a partner who agrees. |
+| Got it / Back | Returns to the Lobby. Nothing is saved. |
+
+
 
 <a id="pitch-mode"></a>
 

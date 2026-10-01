@@ -7,15 +7,15 @@ const index = fs.readFileSync('index.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration', 'secret-body-game'];
+const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration', 'secret-body-game', 'eye-shooter'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.4[\s\S]*?app\.js\?v=4.18/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.5[\s\S]*?app\.js\?v=4.19/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);
 }
-assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.4/);
+assert.match(sw, /modules\/practice-module-loader\.js\?v=1\.5/);
 assert.match(app, /practiceModuleLoader\.selectedModuleIds\(getChecked, \{ advancedFeaturesUnlocked: state\.advancedFeaturesUnlocked \}\)[\s\S]*?await practiceModuleLoader\.loadMany\(selectedModules\)/);
 for (const [toggle, id] of [
     ['body-scan-addon-toggle', 'body-scan'], ['noting-addon-toggle', 'guided-noting'],

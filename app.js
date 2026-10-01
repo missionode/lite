@@ -334,6 +334,7 @@ const configScreen = document.getElementById('config-screen');
 const settingsManagerScreen = document.getElementById('settings-manager-screen');
 const experimentScreen = document.getElementById('experiment-screen');
 const secretBodyGameScreen = document.getElementById('secret-body-game-screen');
+const eyeShooterScreen = document.getElementById('eye-shooter-screen');
 const skyScreen = document.getElementById('sky-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
 const meditationScreen = document.getElementById('meditation-screen');
@@ -355,7 +356,7 @@ const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
     window,
-    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, eyeShooterScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
     experimentScreen,
@@ -2961,6 +2962,29 @@ function attachEventListeners() {
             console.error('Secret Body Part could not start:', error);
         }
     });
+    // Dev-mode Contactless Eye Shooter: explanation-only gaze game (lazy module, nothing saved).
+    const eyeShooterButton = document.getElementById('open-eye-shooter');
+    let eyeShooterGame = null;
+    eyeShooterButton?.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            const api = await practiceModuleLoader.load('eye-shooter');
+            if (!eyeShooterGame) {
+                eyeShooterGame = api.mount({
+                    document,
+                    root: document.getElementById('eye-shooter-root'),
+                    t,
+                    showScreen,
+                    gameScreen: eyeShooterScreen,
+                    returnScreen: lobbyScreen,
+                    isUnlocked: () => state.advancedFeaturesUnlocked
+                });
+            }
+            eyeShooterGame.open();
+        } catch (error) {
+            console.error('Contactless Eye Shooter could not start:', error);
+        }
+    });
     const experimentActivitySelect = document.getElementById('experiment-activity');
     let intimateServiceUnlocked = false;
     let intimateServiceTapCount = 0;
@@ -3054,6 +3078,8 @@ function attachEventListeners() {
         if (secretBodyGamePanel) secretBodyGamePanel.hidden = isLocked;
         if (secretBodyGameButton) secretBodyGameButton.disabled = isLocked;
         if (isLocked && secretBodyGame) secretBodyGame.close();
+        if (eyeShooterButton) eyeShooterButton.disabled = isLocked;
+        if (isLocked && eyeShooterGame) eyeShooterGame.close();
         if (experimentCareOptions && experimentActivitySelect) {
             experimentCareOptions.disabled = isLocked;
             experimentCareOptions.hidden = isLocked;

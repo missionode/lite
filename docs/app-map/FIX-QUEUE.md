@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Contactless Eye Shooter
+
+- Owner-designed dev-mode gaze game for people with gaze avoidance, as a second Play Zone card. Explanation only (no camera, nothing saved): look at a spot on the partner, hold 3 seconds, blink once, add points. Points 1–5 by difficulty (Eyes and Pubic mound 5). Points goal Short 15 / Medium 30 / Long 50. Five languages. Module `modules/eye-shooter-game.js`, guide `docs/eye-shooter-game.md`, atlas map `eye-shooter`.
+
 ## Completed — Hush Hush clarity (v2.0)
 
 - Owner: players took each other's turns and small text changes went unnoticed. Added a press-and-hold hand-off lock on every change of hands, a whose-turn banner, screens tinted in the holder's chakra colour with chakra images, one job per screen (the holder taps; guessers speak), a real chakra wheel, a full-screen result flash with buzz and sound, big luck cards, bigger text and glowing score chips.

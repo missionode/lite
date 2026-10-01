@@ -9,7 +9,7 @@ A dev-mode icebreaker game for 2–7 players on one phone. Pure luck: no clues. 
 1. Unlock dev mode (Advanced Features): Settings → About → tap the app version 7 times → password.
 2. Go to the **Lobby** (Meditation Room screen). Under the **Mood & Relaxation Ambience** section, find the **🎲 Play Zone** section and tap **Play now** on the **🤫 Hush Hush** card.
 
-Play Zone is the games section. New games are added as more cards inside it (`.play-zone-game`).
+Play Zone is the games section. New games are added as more cards inside it (`.play-zone-game`). It also holds **🎯 Contactless Eye Shooter** (see `docs/eye-shooter-game.md`).
 
 The panel is hidden while dev mode is locked. Locking dev mode also closes an open game. **Back to Meditation Room** returns to the Lobby.
 

@@ -431,6 +431,25 @@ test('dev mode Hush Hush game plays to the Grand Reveal with hand-off locks and 
   await expect(page.locator('#secret-body-game-panel')).toBeHidden();
 });
 
+test('dev mode Contactless Eye Shooter explains the game from the Play Zone', async ({ page }) => {
+  await page.locator('#save-config').click();
+  await expect(page.locator('#open-eye-shooter')).toBeHidden();
+  await page.locator('#open-settings').click();
+  await unlockAdvancedFeatures(page);
+  await page.locator('#save-config').click();
+  await expect(page.locator('#open-eye-shooter')).toBeEnabled();
+  await page.locator('#open-eye-shooter').click();
+  const screen = page.locator('#eye-shooter-screen');
+  await expect(screen).toBeVisible();
+  await expect(screen.locator('[data-es="tier"]')).toHaveCount(5);
+  await expect(screen.locator('[data-es="spot"]')).toHaveCount(12);
+  await expect(screen.locator('[data-es="goal"][aria-pressed="true"]')).toHaveAttribute('data-goal', 'medium');
+  await screen.locator('[data-es="goal"][data-goal="long"]').click();
+  await expect(screen.locator('[data-es="goal-note"]')).toContainText('50');
+  await screen.locator('[data-es="done"]').click();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+});
+
 test('Pitch Mode starts a public two-minute demo and keeps Pitch-only voices out of Settings', async ({ page }) => {
   const voiceOptions = await page.locator('#voice-select option').evaluateAll(options => options.map(option => option.value));
   expect(voiceOptions.some(value => /ryan|pratham|dmitri/.test(value))).toBe(false);

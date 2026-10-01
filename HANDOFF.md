@@ -25,6 +25,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/hush-hush-clarity):** Hush Hush v2.0 — hand-off lock, whose-turn banner, chakra images, real wheel, result flash, bigger text; outer-body-part cards; 18+ Secret Card words with adults-only notice. Fixed unclosed 480px media block in `style.css`. Game module `v2.0`, practice loader `v1.4`, style `v2.18`, shell cache `chakra-v5.342`, language cache `v65`.
 
+- **Follow-up (feature/eye-shooter):** dev-mode Contactless Eye Shooter added as a second Play Zone card (explanation-only gaze game, points table, points goal, five languages). App `v4.19`, practice loader `v1.5`, eye-shooter module `v1.0`, style `v2.19`, shell cache `chakra-v5.343`, language cache `v66`.
+
 ## Checkpoint history (production)
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration

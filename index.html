@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.18">
+    <link rel="stylesheet" href="style.css?v=2.19">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -286,6 +286,10 @@
         <!-- Dev-mode (Advanced Features) party game; rendered by modules/secret-body-part-game.js. -->
         <section id="secret-body-game-screen" class="screen settings-screen-container hidden" aria-live="polite">
             <div id="secret-body-game-root"></div>
+        </section>
+
+        <section id="eye-shooter-screen" class="screen settings-screen-container hidden">
+            <div id="eye-shooter-root"></div>
         </section>
 
         <div id="settings-help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-help-title">
@@ -578,6 +582,11 @@
                     <p class="mixer-note" data-i18n="ui.secretBodyGameNote">The icebreaker game for 2–7 players. Spin, guess, laugh.</p>
                     <button id="open-secret-body-game" class="secondary-btn" type="button" disabled data-i18n="ui.sbpOpen">Play now</button>
                 </div>
+                <div class="play-zone-game">
+                    <h3 class="play-zone-game-name" data-i18n="ui.eyeShooter">🎯 Contactless Eye Shooter</h3>
+                    <p class="mixer-note" data-i18n="ui.eyeShooterNote">A gaze game for two. Look, hold, blink — and score.</p>
+                    <button id="open-eye-shooter" class="secondary-btn" type="button" disabled data-i18n="ui.esOpen">How to play</button>
+                </div>
             </div>
 
             <div id="session-estimate">~ 36 mins</div>
@@ -863,7 +872,7 @@
     <script src="modules/journey-routing.js?v=1.3"></script>
     <script src="modules/standard-journey-sequence.js?v=1.0"></script>
     <script src="modules/journey-transition-stages.js?v=1.0"></script>
-    <script src="modules/practice-module-loader.js?v=1.4"></script>
+    <script src="modules/practice-module-loader.js?v=1.5"></script>
     <script src="modules/screen-navigation.js?v=1.0"></script>
     <script src="modules/shot-session.js?v=1.0"></script>
     <script src="modules/pitch-mode.js?v=1.0"></script>
@@ -906,6 +915,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.18"></script>
+    <script src="app.js?v=4.19"></script>
 </body>
 </html>
