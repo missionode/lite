@@ -4,10 +4,11 @@
 
 - All 28 chakra questions, their 56 answers, the value prompt and the 8 value cards are rewritten in plain, short English with the same meaning, IDs and weights (no idioms; Google Translate friendly). Question bank `?v=1.3`.
 
-## Open — Service-fit dot accuracy (owner decision needed)
+## Completed — Service-fit dot, answer order and card repetition
 
-- Every client sees the same 12 value pairs. With that schedule a red dot is mathematically impossible (most cautious possible answers give mean −0.42, threshold −0.5), and a client who leans to pleasure 80% of the time gets green only ~42% of the time.
-- Proposed: use the 12 pleasure-vs-caution pairs (4 positive × 3 cautious values) and colour by count: green ≥ 9 of 12 positive picks, red ≥ 9 of 12 cautious picks, else orange (random answers: 7% green, 7% red; 80% leaners: 80%).
+- Dot rounds now always compare one pleasure-leaning card with one cautious card (all 12 pairs of 4 × 3; the neutral Commitment card is not asked). Dot = green when ≥ 75% of the client's picks lean to pleasure, red when ≥ 75% lean to caution, else orange; Equal/Skip never count; at least 8 picks from 3 cards needed. Red was impossible before. Simulated: random answers 7% green / 2% red; clients who lean one way 8 times in 10 get that colour ~80% of the time (was 42% green, 0% red).
+- No value card appears in two rounds in a row, and each card moves between left and right. Each cautious card still appears 4 times and each pleasure card 3 times, the minimum for 12 informative rounds.
+- Chakra questions show the healthier answer on the right for 13 of 28 questions (stable per question), so "always tap left" no longer works. Bank content version 2026-10-01.1 (older saved sessions restart).
 
 ## Completed — Spelling proofread (all languages)
 

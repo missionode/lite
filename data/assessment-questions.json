@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "2026-09-24.2",
+  "contentVersion": "2026-10-01.1",
   "valuePrompt": "Which of these two matters more to you?",
   "settings": {
     "minimumEvidencePerChakra": 2,
     "valueRounds": 12,
     "minimumDotResponses": 8,
-    "minimumDotDistinctValues": 3
+    "minimumDotDistinctValues": 3,
+    "dotDecisiveShare": 0.75
   },
   "chakras": [
     { "id": "root", "name": "Root Chakra", "archetype": "Steady Grounder", "conversationTopic": "feeling grounded and secure" },

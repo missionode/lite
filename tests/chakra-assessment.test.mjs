@@ -10,12 +10,12 @@ const inlineScripts = scriptTags.map(match => match[1]).filter(source => source.
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.3');
+const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.4');
 const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.0');
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
     'engine and persistence should load before the application');
-assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.3'\)/,
+assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.4'\)/,
     'the UI should fetch the versioned English question bank');
 
 for (const id of [
@@ -69,8 +69,8 @@ assert.doesNotMatch(inlineScripts[0], /startJourney|selectedChakras|journeyConfi
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a return path to the Meditation Room');
 
 for (const asset of [
-    './data/assessment-questions.json?v=1.3',
-    './modules/assessment-tournament.js?v=1.3',
+    './data/assessment-questions.json?v=1.4',
+    './modules/assessment-tournament.js?v=1.4',
     './modules/assessment-persistence.js?v=1.0'
 ]) {
     assert.ok(sw.includes(`'${asset}'`), `${asset} should be available through the app cache`);

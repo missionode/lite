@@ -65,11 +65,27 @@ for (let index = 0; index < bank.settings.valueRounds; index += 1) {
     state = engine.answerItem(bank, state, item, index % 4 === 0 ? engine.RESPONSE_SKIP : item.left.id);
 }
 
-const totals = Object.values(appearances).map(item => item.total);
-assert.ok(Math.max(...totals) - Math.min(...totals) <= 1, 'value opportunities should remain balanced');
+// Every round is pleasure-leaning vs cautious; the neutral card is not asked.
+const positiveIds = bank.values.filter(item => item.operatorSignal >= 1).map(item => item.id);
+const cautiousIds = bank.values.filter(item => item.operatorSignal <= -1).map(item => item.id);
+assert.equal(appearances.commitment.total, 0, 'the neutral value card is not used in dot rounds');
+for (const group of [positiveIds, cautiousIds]) {
+    const totals = group.map(id => appearances[id].total);
+    assert.ok(Math.max(...totals) - Math.min(...totals) <= 1, 'value opportunities should remain balanced within each group');
+}
 Object.entries(appearances).forEach(([id, item]) => {
     assert.ok(Math.abs(item.left - item.right) <= 1, `${id} should be position-counterbalanced`);
 });
+// Owner request: the same card must not keep coming back in a row.
+const schedule = engine.contrastSchedule(bank);
+assert.equal(schedule.length, positiveIds.length * cautiousIds.length, 'every pleasure card meets every cautious card once');
+schedule.forEach(([a, b]) => assert.ok(positiveIds.includes(a) && cautiousIds.includes(b)));
+for (let index = 1; index < schedule.length; index += 1) {
+    assert.equal(schedule[index].some(id => schedule[index - 1].includes(id)), false, `round ${index + 1} repeats a card from the round before`);
+}
+// The healthier chakra answer is not always on the left.
+const swapped = bank.questions.filter(question => engine.choiceOrderSwapped(question.id)).length;
+assert.ok(swapped >= 11 && swapped <= 17, `about half of the questions show the healthier answer on the right (${swapped}/28)`);
 
 const serialized = JSON.stringify(state);
 const restored = engine.restoreState(bank, JSON.parse(serialized));
@@ -236,5 +252,30 @@ let skipped = engine.createState(bank);
 const skippedId = engine.selectNext(bank, skipped).id;
 skipped = engine.answerItem(bank, skipped, engine.selectNext(bank, skipped), engine.RESPONSE_SKIP);
 assert.notEqual(engine.selectNext(bank, skipped).id, skippedId, 'a skipped question must remain consumed and never repeat');
+
+// The dot can now reach all three colours, and random answers stay orange most of the time.
+function simulateDot(chooser, seed) {
+    let value = seed;
+    const random = () => { value = (value * 1103515245 + 12345) % 2147483648; return value / 2147483648; };
+    let sim = engine.createState(bank);
+    for (let step = 0; step < 80; step += 1) {
+        const item = engine.selectNext(bank, sim);
+        if (item.kind === 'complete') break;
+        const response = item.kind === 'value' ? chooser(item, random) : item.choices[0].id;
+        sim = engine.answerItem(bank, sim, item, response);
+    }
+    return engine.buildResult(bank, sim).dot;
+}
+const signalOf = id => bank.values.find(item => item.id === id).operatorSignal;
+const leaning = (towardsPleasure, rate) => (item, random) => {
+    const pleasure = signalOf(item.left.id) > signalOf(item.right.id) ? item.left.id : item.right.id;
+    const caution = pleasure === item.left.id ? item.right.id : item.left.id;
+    const wanted = towardsPleasure ? pleasure : caution;
+    return random() < rate ? wanted : (wanted === pleasure ? caution : pleasure);
+};
+assert.equal(simulateDot(leaning(true, 1), 1), 'green', 'a fully pleasure-leaning client gets green');
+assert.equal(simulateDot(leaning(false, 1), 1), 'red', 'a fully cautious client gets red (was impossible before)');
+const randomDots = Array.from({ length: 40 }, (_, index) => simulateDot((item, random) => (random() < 0.5 ? item.left.id : item.right.id), index + 7));
+assert.ok(randomDots.filter(dot => dot === 'orange').length >= 30, 'random answers stay mostly orange');
 
 console.log('Assessment tournament schema and deterministic engine contract passed.');

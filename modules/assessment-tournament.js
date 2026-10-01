@@ -66,8 +66,44 @@
             invariant(Number.isInteger(settings[key]) && settings[key] > 0, `settings.${key} must be a positive integer`);
         });
         invariant(settings.valueRounds <= 28, 'valueRounds cannot exceed the 28 unique pairs');
+        invariant(settings.valueRounds <= contrastSchedule(bank).length,
+            'valueRounds cannot exceed the pleasure-vs-caution value pairs');
+        if (settings.dotDecisiveShare !== undefined) {
+            invariant(Number.isFinite(settings.dotDecisiveShare) && settings.dotDecisiveShare > 0.5 && settings.dotDecisiveShare <= 1,
+                'settings.dotDecisiveShare must be above 0.5 and at most 1');
+        }
         invariant(settings.minimumDotResponses <= settings.valueRounds, 'minimumDotResponses cannot exceed valueRounds');
         return true;
+    }
+
+    // Value rounds only compare one pleasure-leaning card (signal >= 1) with
+    // one cautious card (signal <= -1), so every answer is informative for
+    // the dot. The order never shows the same card in two rounds in a row.
+    function contrastSchedule(bank) {
+        const positive = bank.values.filter(item => item.operatorSignal >= 1).map(item => item.id);
+        const cautious = bank.values.filter(item => item.operatorSignal <= -1).map(item => item.id);
+        const remaining = [];
+        positive.forEach(a => cautious.forEach(b => remaining.push([a, b])));
+        const order = [];
+        const seen = Object.fromEntries([...positive, ...cautious].map(id => [id, 0]));
+        while (remaining.length) {
+            const last = order.at(-1) || [];
+            const pickIndex = remaining
+                .map((pair, index) => ({ pair, index, clash: pair.some(id => last.includes(id)) ? 1 : 0, load: seen[pair[0]] + seen[pair[1]] }))
+                .sort((x, y) => x.clash - y.clash || x.load - y.load || x.index - y.index)[0].index;
+            const [pair] = remaining.splice(pickIndex, 1);
+            pair.forEach(id => { seen[id] += 1; });
+            order.push(pair);
+        }
+        return order;
+    }
+
+    // The healthier answer is stored first in the bank. Show it on the right
+    // for about half of the questions, so clients cannot learn "left is right".
+    function choiceOrderSwapped(questionId) {
+        let hash = 0;
+        for (const character of String(questionId)) hash = (hash * 31 + character.codePointAt(0)) % 1000003;
+        return hash % 2 === 1;
     }
 
     function createState(bank) {
@@ -165,34 +201,21 @@
         if (state.valueHistory.length >= bank.settings.valueRounds) return null;
         const seen = new Set(state.valueHistory.map(entry => entry.pairId));
         const stats = valueStats(bank, state);
-        const candidates = [];
-        for (let first = 0; first < bank.values.length; first += 1) {
-            for (let second = first + 1; second < bank.values.length; second += 1) {
-                const a = bank.values[first];
-                const b = bank.values[second];
-                const pairId = canonicalPairId(a.id, b.id);
-                if (seen.has(pairId)) continue;
-                candidates.push({ a, b, pairId });
-            }
-        }
-        candidates.sort((left, right) => {
-            const leftMax = Math.max(stats[left.a.id].appearances, stats[left.b.id].appearances);
-            const rightMax = Math.max(stats[right.a.id].appearances, stats[right.b.id].appearances);
-            const leftSum = stats[left.a.id].appearances + stats[left.b.id].appearances;
-            const rightSum = stats[right.a.id].appearances + stats[right.b.id].appearances;
-            return leftMax - rightMax || leftSum - rightSum || left.pairId.localeCompare(right.pairId);
-        });
-        const candidate = candidates[0];
-        if (!candidate) return null;
-        const aBalance = stats[candidate.a.id].left - stats[candidate.a.id].right;
-        const bBalance = stats[candidate.b.id].left - stats[candidate.b.id].right;
+        const pair = contrastSchedule(bank)
+            .map(([a, b]) => ({ a, b, pairId: canonicalPairId(a, b) }))
+            .find(candidate => !seen.has(candidate.pairId));
+        if (!pair) return null;
+        const valuesById = Object.fromEntries(bank.values.map(item => [item.id, item]));
+        // Each card moves between the left and the right side over the rounds.
+        const aBalance = stats[pair.a].left - stats[pair.a].right;
+        const bBalance = stats[pair.b].left - stats[pair.b].right;
         const aOnLeft = aBalance < bBalance || (aBalance === bBalance && state.valueHistory.length % 2 === 0);
-        const left = aOnLeft ? candidate.a : candidate.b;
-        const right = aOnLeft ? candidate.b : candidate.a;
+        const left = valuesById[aOnLeft ? pair.a : pair.b];
+        const right = valuesById[aOnLeft ? pair.b : pair.a];
         return {
             kind: 'value',
-            id: `value:${candidate.pairId}`,
-            pairId: candidate.pairId,
+            id: `value:${pair.pairId}`,
+            pairId: pair.pairId,
             prompt: bank.valuePrompt,
             left: { id: left.id, label: left.label },
             right: { id: right.id, label: right.label }
@@ -238,7 +261,8 @@
             kind: 'question',
             id: question.id,
             prompt: question.prompt,
-            choices: question.choices.map(choice => ({ id: choice.id, label: choice.label })),
+            choices: (choiceOrderSwapped(question.id) ? [...question.choices].reverse() : question.choices)
+                .map(choice => ({ id: choice.id, label: choice.label })),
             coverage: [...question.coverage],
             tier: question.tier
         };
@@ -342,6 +366,10 @@
         });
     }
 
+    // Private service-fit dot. Each round is pleasure-leaning vs cautious, so
+    // the dot counts picks: green when at least 75% of the client's choices
+    // lean to pleasure, red when at least 75% lean to caution, orange
+    // otherwise or when there are too few answers. Equal and Skip never count.
     function dotResult(bank, state) {
         const valuesById = Object.fromEntries(bank.values.map(item => [item.id, item]));
         const selected = state.valueHistory
@@ -351,12 +379,12 @@
         if (selected.length < bank.settings.minimumDotResponses || distinct.size < bank.settings.minimumDotDistinctValues) {
             return DOT_ORANGE;
         }
-        const signals = selected.map(id => valuesById[id].operatorSignal);
-        const mean = signals.reduce((sum, value) => sum + value, 0) / signals.length;
-        const positive = signals.filter(value => value >= 1).length;
-        const cautious = signals.filter(value => value <= -1).length;
-        if (mean >= 0.75 && positive >= 5) return 'green';
-        if (mean <= -0.5 && cautious >= 5) return 'red';
+        const share = bank.settings.dotDecisiveShare ?? 0.75;
+        const needed = Math.ceil(selected.length * share);
+        const positive = selected.filter(id => valuesById[id].operatorSignal >= 1).length;
+        const cautious = selected.filter(id => valuesById[id].operatorSignal <= -1).length;
+        if (positive >= needed) return 'green';
+        if (cautious >= needed) return 'red';
         return DOT_ORANGE;
     }
 
@@ -439,6 +467,8 @@
         answerItem,
         undoLast,
         buildResult,
-        canonicalPairId
+        canonicalPairId,
+        contrastSchedule,
+        choiceOrderSwapped
     });
 })(typeof window === 'undefined' ? globalThis : window);
