@@ -131,6 +131,9 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
         for (const pattern of posture) assert.match(opening, pattern, `${language} ${mood} opening mentions both sitting and standing`);
     }
     assert.doesNotMatch(JSON.stringify(locale.ui.pitch_calm_steps), /ഇരിപ്പിട|இருக்கை/, `${language} Calm does not assume a seat`);
+    // Owner: no repeated breathing cues; each mood uses body, senses, movement or thought instead.
+    const guided = JSON.stringify(Array.from(pitch.MOODS).flatMap(mood => [...locale.ui[`pitch_${mood}_steps`], locale.ui[`pitch_${mood}_closing`]]));
+    assert.doesNotMatch(guided, /breath|ശ്വാസ|ശ്വസി|साँस|вдох|выдох|дыш|மூச்சு|மூச்சை/i, `${language} Pitch steps have no breathing cues`);
     const copy = JSON.stringify(keys.map(key => locale.ui[key]));
     assert.doesNotMatch(copy, /\bheal|\bcure|guarantee/i, `${language} Pitch copy makes no healing claims`);
 }

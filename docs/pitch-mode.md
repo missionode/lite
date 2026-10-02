@@ -29,10 +29,10 @@ Close, Pause and the sound mixer work as usual. There is **no mantra, drone, cha
 
 | Mood | Aim | Guided steps (summary) |
 |---|---|---|
-| 😌 Calm | Slow down, feel light | slow breaths, longer exhale, feel supported, one calm thought |
-| 💪 Courage | Stand tall, feel strong | tall posture, strong breath, remember a hard thing you handled, "one step at a time" |
-| ⚡ Energy | Wake up, feel fresh | three short breaths in and one long out (comfortable pace), shoulder roll and stretch, a small smile |
-| 🎯 Focus | Clear the mind | count three breaths, notice thoughts and return, choose one next task, "one thing at a time" |
+| 😌 Calm | Slow down, feel light | soften jaw and face, loose hands and dropping shoulders, listen to near and far sounds, one calm thought |
+| 💪 Courage | Stand tall, feel strong | tall posture, feet pressed into the ground, remember a hard thing you handled, "one step at a time" |
+| ⚡ Energy | Wake up, feel fresh | three slow shoulder rolls, stretch arms high, shake out hands and wrists, a small smile |
+| 🎯 Focus | Clear the mind | eyes on one point, notice three sounds and return, choose one next task, "one thing at a time" |
 
 Wording stays honest: relax, pause, feel calmer or fresher. No healing or guaranteed-result claims.
 
@@ -59,3 +59,5 @@ The **text follows the selected content language**. The **voice is fixed** — a
 - Text: `ui.pitch_*` keys in all five locale files (`pitch_<mood>_opening`, `_steps` ×4, `_closing`, `_title`, `_label`).
 - Tests: `tests/pitch-mode.test.mjs`; e2e in `tests/e2e/settings.spec.js`.
 - Flow map: `pitch-mode` in `docs/app-map/index.html`.
+
+No breathing cues (owner, 2026-10-02): repeated "breathe in, breathe out" lines felt rushed in two minutes, so every mood now uses body, senses, movement or thought. A test keeps breathing words out of the Pitch steps in all five languages. The quiet gaps between lines (up to 14 seconds, spread evenly) give time to do each step.

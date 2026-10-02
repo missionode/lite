@@ -41,6 +41,8 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/voice-sleep-images):** (1) Clearer first voice download: Settings card (`modules/voice-download-card.js`) with size, "downloads once, then works offline, Wi-Fi is best", mobile-data hint, Download now, MB/percent progress bar, retry message, and a floating progress pill on every screen; "Downloaded" when the model is complete in OPFS. (2) Sleep wind-down: last 3 minutes of the final stage fade the screen to near-black and the music/ambience to silence; taps only peek; Sleep ends with a quiet black goodnight screen (no completion modal, no Earn hand-off, wake lock released). (3) App images as WebP: 16 symbols plus splash, about 19.8 MB → 1.6 MB (PNGs kept in the repo; iOS startup image and manifest icons stay PNG). App `v4.24`, style `v2.22`, piper lifecycle `v1.1`, voice download card `v1.0`, sleep journey/completion view/session stop/yoga session `v1.1`, Hush Hush `v2.1`, Chakra Touch `v1.2`, shell cache `chakra-v5.352`, language cache `v74`.
 
+- **Follow-up (feature/voice-sleep-images, Pitch):** 2-Minute Mind Reset has no breathing cues in any language (owner: repeated breathe in/out felt rushed). Calm: soften face, loose hands, listen to sounds. Courage: posture, feet into the ground, remembered strength. Energy: shoulder rolls, arm stretch, shake out hands. Focus: eyes on one point, three sounds. Openings unchanged (sit or stand). Language cache `v75`.
+
 - **Push status:** production is at `3c78247`. Push `feature/voice-sleep-images` to production to release Chakra Touch, Heavenly Sound and these follow-ups (it contains all of them).
 
 ## Checkpoint history (production)
