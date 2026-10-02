@@ -107,8 +107,8 @@ assert.match(html, /<div id="secret-body-game-panel"[^>]*hidden>[\s\S]*?<button 
 assert.match(html, /<section id="chakra-touch-screen" class="screen[^"]*hidden"/);
 assert.match(app, /chakraTouchButton\.disabled = isLocked/);
 assert.match(app, /if \(isLocked && chakraTouchGame\) chakraTouchGame\.close\(\)/);
-assert.match(loader, /'chakra-touch': Object\.freeze\(\{ src: '\.\/modules\/chakra-touch-game\.js\?v=1\.1', globalName: 'ChakraTouchGame' \}\)/);
-assert.match(sw, /'\.\/modules\/chakra-touch-game\.js\?v=1\.1'/);
+assert.match(loader, /'chakra-touch': Object\.freeze\(\{ src: '\.\/modules\/chakra-touch-game\.js\?v=1\.2', globalName: 'ChakraTouchGame' \}\)/);
+assert.match(sw, /'\.\/modules\/chakra-touch-game\.js\?v=1\.2'/);
 
 // Five languages, every key, placeholders kept, and no he/she wording.
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8')).ui;

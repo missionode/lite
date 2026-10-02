@@ -11,9 +11,9 @@
         'undo-unlearn': Object.freeze({ src: './modules/undo-unlearn-practice.js?v=1.0', globalName: 'ChakraUndoUnlearnPractice' }),
         'quiet-courage': Object.freeze({ src: './modules/quiet-courage-practice.js?v=1.0', globalName: 'ChakraQuietCouragePractice' }),
         'self-exploration': Object.freeze({ src: './modules/self-exploration-practices.js?v=1.0', globalName: 'ChakraSelfExplorationPractices' }),
-        'secret-body-game': Object.freeze({ src: './modules/secret-body-part-game.js?v=2.0', globalName: 'ChakraSecretBodyPartGame' }),
+        'secret-body-game': Object.freeze({ src: './modules/secret-body-part-game.js?v=2.1', globalName: 'ChakraSecretBodyPartGame' }),
         'eye-shooter': Object.freeze({ src: './modules/eye-shooter-game.js?v=1.0', globalName: 'ChakraEyeShooterGame' }),
-        'chakra-touch': Object.freeze({ src: './modules/chakra-touch-game.js?v=1.1', globalName: 'ChakraTouchGame' })
+        'chakra-touch': Object.freeze({ src: './modules/chakra-touch-game.js?v=1.2', globalName: 'ChakraTouchGame' })
     });
     const pending = new Map();
     const selectionOrder = Object.freeze([

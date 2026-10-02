@@ -339,7 +339,7 @@
         function chakraImage(id, size = 'md') {
             return el('img', {
                 className: `sbp-chakra-img sbp-chakra-img-${size}`,
-                attrs: { src: `symbols/${id}.png`, alt: '', 'aria-hidden': 'true', draggable: 'false' },
+                attrs: { src: `symbols/${id}.webp`, alt: '', 'aria-hidden': 'true', draggable: 'false' },
                 style: { '--sbp-color': chakraById[id].color }
             });
         }

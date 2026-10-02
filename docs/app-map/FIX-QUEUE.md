@@ -30,6 +30,12 @@
 - Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
 - Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
 
+## Completed — Voice download, Sleep wind-down, lighter images
+
+- First voice download is clear: size, offline note, Wi-Fi advice, Download now, MB/percent progress in Settings and a floating pill on any screen, retry on failure, "Downloaded" state.
+- Sleep wind-down: final 3 minutes fade to dark and silence; quiet goodnight finish with wake lock released.
+- Images served as WebP (about 92% smaller).
+
 ## Completed — Heavenly Sound
 
 - Owner: audio must feel crisp, heavenly and smooth, never a strain, with good performance; update the echo. Voice now bypasses the Eyes Close softening (was low-passed at 1 kHz), gets mud cut / de-ess / air; heavenly echo with pre-delay, darkening tail and duck-under-words; Off / Soft Halo / Heavenly; gentle compressor and soft limiter; no exciter colouring, no 40 Hz hum, softer drone repeats, device sample rate. Guide `docs/heavenly-sound.md`.

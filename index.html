@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.21">
+    <link rel="stylesheet" href="style.css?v=2.22">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -20,7 +20,7 @@
 </head>
 <body>
     <div id="splash-screen">
-        <img src="Splash-v2.png" alt="Splash Screen">
+        <img src="Splash-v2.webp" alt="Splash Screen">
     </div>
     <div id="sky-backdrop" class="sky-backdrop" aria-hidden="true">
         <div id="nebula-bg"></div>
@@ -65,6 +65,7 @@
                 </select>
                 <small class="voice-download-note" data-i18n="ui.piperCommunityVoiceNote">Community Tamil/Hindi Piper models download about 64 MB the first time you preview or use them. Hindi model redistribution terms still need confirmation.</small>
                 <div id="voice-status" role="status" aria-live="polite" style="display:none; color:#ffa500; font-size:12px; margin-top:5px;"></div>
+                <div id="voice-download-card" class="voice-dl" hidden></div>
                 <button id="test-voice" class="secondary-btn">Preview Voice</button>
             </div>
 
@@ -434,13 +435,13 @@
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
                 <div id="chakra-selection" class="chakra-selection-list">
-                    <label class="checkbox-label"><input type="checkbox" value="root"> <img class="chakra-selection-thumbnail" src="symbols/root.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.root">Root</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <img class="chakra-selection-thumbnail" src="symbols/sacral.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.sacral">Sacral</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="solar"> <img class="chakra-selection-thumbnail" src="symbols/solar.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.solar">Solar</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="heart"> <img class="chakra-selection-thumbnail" src="symbols/heart.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.heart">Heart</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="throat"> <img class="chakra-selection-thumbnail" src="symbols/throat.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.throat">Throat</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <img class="chakra-selection-thumbnail" src="symbols/thirdeye.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.thirdEye">Third Eye</span></label>
-                    <label class="checkbox-label"><input type="checkbox" value="crown"> <img class="chakra-selection-thumbnail" src="symbols/crown.png" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.crown">Crown</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="root"> <img class="chakra-selection-thumbnail" src="symbols/root.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.root">Root</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="sacral"> <img class="chakra-selection-thumbnail" src="symbols/sacral.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.sacral">Sacral</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="solar"> <img class="chakra-selection-thumbnail" src="symbols/solar.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.solar">Solar</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="heart"> <img class="chakra-selection-thumbnail" src="symbols/heart.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.heart">Heart</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="throat"> <img class="chakra-selection-thumbnail" src="symbols/throat.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.throat">Throat</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="thirdeye"> <img class="chakra-selection-thumbnail" src="symbols/thirdeye.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.thirdEye">Third Eye</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="crown"> <img class="chakra-selection-thumbnail" src="symbols/crown.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.crown">Crown</span></label>
                 </div>
                 <label id="reverse-journey-control" class="checkbox-label experience-mode-toggle" hidden><input type="checkbox" id="reverse-journey-toggle" disabled><span data-i18n="ui.reverseJourney">Reverse Journey (Crown ➔ Root)</span></label>
             </div>
@@ -628,7 +629,7 @@
                             <g class="newcomer-aura-node" data-focus="root" transform="translate(170 405)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="sacral" transform="translate(170 345)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="solar" transform="translate(170 285)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="heart" transform="translate(170 225)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="throat" transform="translate(170 165)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="thirdeye" transform="translate(170 105)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g><g class="newcomer-aura-node" data-focus="crown" transform="translate(170 55)"><circle r="16"/><circle class="newcomer-aura-node-core" r="4"/></g>
                         </svg>
                     </div>
-                    <div class="newcomer-chakra-caption" aria-live="polite" aria-atomic="true"><img id="newcomer-chakra-symbol" src="symbols/root.png" alt=""><div><h2 id="newcomer-chakra-name" data-i18n="ui.root">Root</h2><p id="newcomer-chakra-location" data-i18n="ui.newcomerRootLocation">base of spine</p></div></div>
+                    <div class="newcomer-chakra-caption" aria-live="polite" aria-atomic="true"><img id="newcomer-chakra-symbol" src="symbols/root.webp" alt=""><div><h2 id="newcomer-chakra-name" data-i18n="ui.root">Root</h2><p id="newcomer-chakra-location" data-i18n="ui.newcomerRootLocation">base of spine</p></div></div>
                 </div>
                 <p id="newcomer-guided-status" class="newcomer-guided-status" aria-live="polite" hidden></p>
             </div>
@@ -820,6 +821,13 @@
         </div>
 
         <!-- Completion Modal -->
+        <div id="sleep-goodnight" class="sleep-goodnight hidden" role="dialog" aria-labelledby="sleep-goodnight-title">
+            <div class="sleep-goodnight-inner">
+                <h2 id="sleep-goodnight-title" data-i18n="ui.sleepGoodnightTitle">Good night</h2>
+                <p data-i18n="ui.sleepGoodnightNote">Your sleep session has ended. Rest well.</p>
+                <button id="sleep-goodnight-close" class="secondary-btn" type="button" data-i18n="ui.returnToRoom">Return to Room</button>
+            </div>
+        </div>
         <div id="completion-modal" class="modal hidden">
             <div class="gold-burst"></div>
             <div class="modal-content">
@@ -859,7 +867,8 @@
     <script src="modules/app-state.js?v=1.2"></script>
     <script src="modules/content-localization.js?v=1.0"></script>
     <script src="modules/media-lifecycle.js?v=1.1"></script>
-    <script src="modules/piper-lifecycle.js?v=1.0"></script>
+    <script src="modules/piper-lifecycle.js?v=1.1"></script>
+    <script src="modules/voice-download-card.js?v=1.0"></script>
     <script src="modules/audio-route-lifecycle.js?v=1.0"></script>
     <script src="modules/audio-engine-initialization.js?v=1.2"></script>
     <script src="modules/audio-signal-design.js?v=1.1"></script>
@@ -885,18 +894,18 @@
     <script src="modules/screen-navigation.js?v=1.0"></script>
     <script src="modules/shot-session.js?v=1.0"></script>
     <script src="modules/pitch-mode.js?v=1.0"></script>
-    <script src="modules/sleep-journey.js?v=1.0"></script>
-    <script src="modules/yoga-session.js?v=1.0"></script>
+    <script src="modules/sleep-journey.js?v=1.1"></script>
+    <script src="modules/yoga-session.js?v=1.1"></script>
     <script src="modules/care-session.js?v=1.0"></script>
     <script src="modules/chakra-session.js?v=1.1"></script>
     <script src="modules/narration-speech-form.js?v=1.0"></script>
     <script src="modules/piper-narration.js?v=1.2"></script>
     <script src="modules/guide-controlled-transition.js?v=1.0"></script>
-    <script src="modules/session-stop.js?v=1.0"></script>
+    <script src="modules/session-stop.js?v=1.1"></script>
     <script src="modules/experiment-session.js?v=1.0"></script>
     <script src="modules/experiment-settings-view.js?v=1.0"></script>
     <script src="modules/session-transport-controls.js?v=1.0"></script>
-    <script src="modules/completion-view.js?v=1.0"></script>
+    <script src="modules/completion-view.js?v=1.1"></script>
     <script src="modules/settings-help-view.js?v=1.0"></script>
     <script src="modules/visual-comfort-settings-view.js?v=1.0"></script>
     <script src="modules/mixer-view.js?v=1.0"></script>
@@ -925,6 +934,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.23"></script>
+    <script src="app.js?v=4.24"></script>
 </body>
 </html>

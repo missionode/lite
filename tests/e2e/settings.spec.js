@@ -296,6 +296,35 @@ test('keeps Sleep Mode behind the shared Advanced Features unlock', async ({ pag
   await expect(page.locator('#journey-roadmap')).toContainText('Drowsiness');
 });
 
+test('Sleep Mode winds down to dark and ends on a quiet goodnight screen', async ({ page }) => {
+  test.setTimeout(120_000);
+  // Very short stages so the whole Sleep journey runs in seconds.
+  await page.evaluate(() => localStorage.setItem('chakra_time_sleep_stage', '0.05'));
+  await page.goto(fastProfile);
+  await expect(page.locator('#config-screen')).toBeVisible();
+  await unlockAdvancedFeatures(page);
+  await page.locator('#save-config').click();
+  await page.locator('#sleep-mode-toggle').check();
+  await page.locator('#start-meditation').click();
+  await page.locator('#dnd-ok, #dnd-reminder-ok, [data-dnd-ack]').first().click({ timeout: 1500 }).catch(() => {});
+  // The wind-down starts in the final stage: dark fade plus "Drifting into sleep".
+  await expect(page.locator('body')).toHaveClass(/sleep-wind-down/, { timeout: 60_000 });
+  await expect(page.locator('#mantra-display')).toHaveText(/Drifting into sleep|ഉറക്കത്തിലേക്ക്/);
+  // A tap only peeks: the controls come back for a moment.
+  await page.mouse.click(200, 300);
+  await expect(page.locator('body')).toHaveClass(/sleep-peek/);
+  // Quiet finish: dark goodnight screen, no bright completion modal.
+  const goodnight = page.locator('#sleep-goodnight');
+  await expect(goodnight).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('#completion-modal')).toBeHidden();
+  await expect(page.locator('body')).not.toHaveClass(/sleep-wind-down/);
+  await goodnight.click();
+  await expect(goodnight).toHaveClass(/is-awake/);
+  await page.locator('#sleep-goodnight-close').click();
+  await expect(goodnight).toBeHidden();
+  await expect(page.locator('#lobby-screen')).toBeVisible();
+});
+
 test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await page.locator('#save-config').click();
   await page.locator('#high-energy-toggle').check();
@@ -390,7 +419,7 @@ test('dev mode Hush Hush game plays to the Grand Reveal with hand-off locks and 
   await holdOpen();
   await expect(game.locator('[data-sbp="card"]')).toBeVisible();
   await expect(game.locator('[data-sbp="banner"]')).toBeVisible();
-  await expect(game.locator('.sbp-chakra-img').first()).toHaveAttribute('src', /symbols\/(root|sacral)\.png/);
+  await expect(game.locator('.sbp-chakra-img').first()).toHaveAttribute('src', /symbols\/(root|sacral)\.webp/);
 
   let sawGuessScreen = false;
   for (let step = 0; step < 300; step++) {

@@ -6,9 +6,11 @@ const html = fs.readFileSync('index.html', 'utf8');
 const worker = fs.readFileSync('sw.js', 'utf8');
 const appSource = fs.readFileSync('app.js', 'utf8');
 const moduleSource = fs.readFileSync('modules/completion-view.js', 'utf8');
-assert.ok(html.indexOf('modules/completion-view.js?v=1.0') < html.indexOf('app.js?v='));
-assert.match(worker, /modules\/completion-view\.js\?v=1\.0/);
-assert.match(appSource, /finish\(\) \{\s*(?:this\.sessionItemRunner\.reset\(\);\s*)?return window\.ChakraCompletionView\.finish\(this,/);
+assert.ok(html.indexOf('modules/completion-view.js?v=1.1') < html.indexOf('app.js?v='));
+assert.match(worker, /modules\/completion-view\.js\?v=1\.1/);
+assert.match(appSource, /finish\(options = \{\}\) \{\s*(?:this\.sessionItemRunner\.reset\(\);\s*)?return window\.ChakraCompletionView\.finish\(this,/);
+assert.match(appSource, /scheduleEarnHandoff\s*\}, options\);/, 'finish passes its options (quiet Sleep finish) to the view');
+assert.match(html, /id="sleep-goodnight"[\s\S]*?id="sleep-goodnight-close"/);
 
 const context = vm.createContext({ window: {} });
 vm.runInContext(moduleSource, context);
@@ -72,4 +74,19 @@ assert.ok(events.findIndex(event => event[0] === 'music') < events.findIndex(eve
 assert.deepEqual(events.at(-1), ['earn', 'schedule']);
 assert.ok(events.some(event => event[0] === 'completion-modal' && event[1] === 'remove' && event[2] === 'hidden'));
 assert.ok(events.some(event => event[0] === 'app' && event[1] === 'style' && event[2] === '--app-brightness' && event[3] === '1'));
-console.log('Completion session passed: time/stats, ordered audio cleanup, UI restoration and Earn handoff.');
+// Quiet Sleep finish: stats and cleanup as usual, but a dark goodnight
+// screen instead of the bright modal, and no Earn hand-off.
+{
+    events.length = 0;
+    elements.set('sleep-goodnight', { classList: makeClassList('sleep-goodnight') });
+    let cleaned = 0;
+    const sleeper = { ...owner, isMeditationActive: true, sessionStartedAt: 10_000, sleepWindDownCleanup: () => { cleaned += 1; } };
+    view.finish(sleeper, deps, { quiet: true });
+    assert.equal(cleaned, 1, 'the wind-down is cleaned up');
+    assert.deepEqual(state.stats, { journeys: 5, time: 23 }, 'a Sleep session still counts');
+    assert.ok(events.some(event => event[0] === 'wake-lock'), 'the wake lock is released so the phone can sleep');
+    assert.ok(events.some(event => event[0] === 'sleep-goodnight' && event[1] === 'remove' && event.includes('hidden')));
+    assert.ok(!events.some(event => event[0] === 'completion-modal' && event[1] === 'remove'), 'no bright completion modal');
+    assert.ok(!events.some(event => event[0] === 'earn'), 'no Earn hand-off at night');
+}
+console.log('Completion session passed: time/stats, ordered audio cleanup, UI restoration, Earn handoff and quiet Sleep finish.');

@@ -47,9 +47,25 @@
             }
             showScreen(lobbyScreen);
         });
+        // Sleep goodnight screen: stays dark; the first tap only wakes the
+        // text, the button returns to the Meditation Room.
+        const goodnight = document.getElementById('sleep-goodnight');
+        if (goodnight) {
+            goodnight.addEventListener('pointerdown', () => goodnight.classList.add('is-awake'));
+            document.getElementById('sleep-goodnight-close')?.addEventListener('click', () => {
+                goodnight.classList.add('hidden');
+                goodnight.classList.remove('is-awake');
+                const aura = document.getElementById('aura-bg');
+                if (aura) {
+                    aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+                    aura.style.opacity = '1';
+                }
+                showScreen(lobbyScreen);
+            });
+        }
     }
 
-    function finish(owner, deps) {
+    function finish(owner, deps, { quiet = false } = {}) {
         const {
             document, window, state, storage, setText, translate, wakeLock, piperTTS,
             backgroundMusicStopFadeSeconds, visualizationAmbienceExitFadeSeconds,
@@ -78,6 +94,7 @@
         piperTTS.cancel('journey finished', { fadeSeconds: 2 });
         document.getElementById('aura-bg').style.opacity = '0';
         document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active', 'completed'));
+        owner.sleepWindDownCleanup?.();
         state.stats.journeys += 1;
         state.stats.time += sessionMinutes;
         storage.setItem('chakra_stats_journeys', state.stats.journeys);
@@ -93,6 +110,15 @@
         const mixer = document.getElementById('volume-mixer');
         if (mixer) mixer.classList.add('hidden');
 
+        if (quiet) {
+            // Sleep: no bright completion modal and no Earn hand-off. A dark
+            // goodnight screen; the wake lock is already released above.
+            const goodnight = document.getElementById('sleep-goodnight');
+            if (goodnight) {
+                goodnight.classList.remove('hidden', 'is-awake');
+                return;
+            }
+        }
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');

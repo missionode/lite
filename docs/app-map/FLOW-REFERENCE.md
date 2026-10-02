@@ -1,8 +1,8 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: feature/heavenly-voice on feature/chakra-touch (production 3c78247) · 2026-10-02.
+Source snapshot: feature/voice-sleep-images on feature/heavenly-voice (production 3c78247) · 2026-10-02.
 
-Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
+Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
 Open [the interactive atlas](./index.html) for diagrams, node details, source references, SVG export and printing.
 
@@ -628,7 +628,7 @@ flowchart TD
 
 Two independent narration-free experiences.
 
-Sources: [modules/sleep-journey.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/sleep-journey.js:1), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [tests/sleep-journey.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/sleep-journey.test.mjs:1), [app.js:917](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:917), [app.js:1329](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1329), [app.js:1459](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1459).
+Sources: [modules/sleep-journey.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/sleep-journey.js:1), [scripts.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:1), [tests/sleep-journey.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/sleep-journey.test.mjs:1), [modules/completion-view.js:52](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/completion-view.js:52), [app.js:917](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:917), [app.js:1329](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1329), [app.js:1459](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1459).
 
 ```mermaid
 flowchart TD
@@ -636,18 +636,21 @@ flowchart TD
   sleep["Sleep start"]
   music["Music Only start"]
   stages["Five Sleep stages"]
+  winddown["Wind-down (final stage)"]
   loop["Continuous music"]
   gap["Sleep stage gaps"]
   fade["Sleep ending"]
   stop["Manual stop"]
-  complete["Sleep completion"]
+  complete["Sleep completion (quiet)"]
   choose -->|"Sleep"| sleep
   choose -->|"Music Only"| music
   sleep -->|"Valid"| stages
   stages -->|"More stages"| gap
   gap -->|"Next"| stages
-  stages -->|"Last stage"| fade
+  stages -->|"Final 3 minutes"| winddown
+  winddown -->|"Stage ends"| fade
   fade -->|"Done"| complete
+  winddown -->|"Stop"| stop
   music -->|"Ready"| loop
   loop -->|"Stop"| stop
   stages -->|"Stop"| stop
@@ -659,11 +662,12 @@ flowchart TD
 | Sleep start | DND reminder; load content; exactly five valid stage frequencies required. Sleep dimming multiplies user brightness by 0.4 without filtering the app ancestor; fixed controls retain viewport positioning. |
 | Music Only start | Show background symbol; no session countdown; request wake lock. |
 | Five Sleep stages | Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone. |
+| Wind-down (final stage) | In the last 3 minutes of the final stage (or the whole stage if shorter): screen fades to near-black (sleep dimming 0.4 → 0.03), music and ambience drift to silence over the same window, text reads “Drifting into sleep”. Taps on the dark screen only peek (controls back for 6 s); they never press a hidden button. |
 | Continuous music | Background loop and visual pulse continue until user stops. No ordinary completion. |
 | Sleep stage gaps | Stop drone after each stage; actual journey waits 3 seconds between stages. |
-| Sleep ending | Fade background music for 12 seconds, then finish if still active. |
+| Sleep ending | After a wind-down, a 4-second settle (without one, the old 12-second music fade), then a quiet finish if still active. |
 | Manual stop | Shared stop cleanup → Lobby; no completed-journey increment. |
-| Sleep completion | Stats and completion modal; sleep dimming removed. |
+| Sleep completion (quiet) | Stats count; audio stops; wake lock released so the phone can sleep. No bright completion modal and no Earn hand-off: a black goodnight screen (“Good night”, very dim until tapped) with Return to Room → Lobby. |
 
 - Sleep does not narrate. Its actual gap is hardcoded to 3 seconds, while its estimate reads script intervalSeconds. Music Only does not start the optional ambience through its normal route.
 - CP-MOD-157 moves only Sleep journey orchestration behind the existing runSleepJourney adapter. Unlock/start guards, content caching and fetch query, timer initialization, music/ambience startup, five-stage pacing, pause-aware gaps, drone ownership and the 12-second ending fade retain their order. The module remains eager and precached; no performance improvement is claimed.
@@ -1463,12 +1467,13 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322), [app.js:1961](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1961), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/voice-download-card.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/voice-download-card.js:1), [tests/voice-download-card.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/voice-download-card.test.mjs:1), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322), [app.js:1961](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1961), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1).
 
 ```mermaid
 flowchart TD
   text["Localized text"]
   route["Voice engine choice"]
+  download["First voice download"]
   piper["Piper worker"]
   browser["Browser speech"]
   decode["Decode + normalize ahead"]
@@ -1478,6 +1483,8 @@ flowchart TD
   handoff["Finish narration"]
   cancel["Stop / cancellation"]
   text -->|"Narrate"| route
+  route -->|"First use"| download
+  download -->|"Model ready"| piper
   route -->|"Available"| piper
   route -->|"Else"| browser
   piper -->|"Blob"| decode
@@ -1496,6 +1503,7 @@ flowchart TD
 | --- | --- |
 | Localized text | Narration is audio-only: no scrolling text surfaces or Settings toggle. Duck music unless silence requested; spoken audio and deliberate pauses continue unchanged. |
 | Voice engine choice | Use Piper only when selected, supported and configured. |
+| First voice download | Settings shows a Voice download card: “downloads once (~60 MB), then works offline, Wi-Fi is best”, a mobile-data hint, and Download now. While the model downloads (from Settings or when a journey starts) the card and a floating pill on every screen show MB and percent with a progress bar; failure shows a clear retry message. A complete model in the browser’s private storage (OPFS piper folder) shows “Downloaded. Works offline.” |
 | Piper worker | The piper-lifecycle module owns model configuration, serial worker requests, synthesis/decode caching, playback envelopes and cancellation. Text first passes the narration-speech-form module (voice-only respellings: English mantras/Chakra/Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). The media-lifecycle module splits it into sentence pieces that keep their . ? ! । mark (so tone survives); a sentence over 180 Unicode code points breaks at its last comma, semicolon or colon, else a space. A comma-continued piece gets a 0.4s breath instead of the full sentence gap. Prepare first clip, then only one future clip, beginning within twelve seconds of the current clip ending using pause-aware waiting. Reuse phonemizer for at most eight calls or 8,192 input characters before retirement; failed instances are retired. Each inference releases its input/output tensors after WAV creation, including failure cleanup. |
 | Browser speech | Select matching voice and locale; apply pace/pitch/volume; speak each piece from the same spoken-form split. |
 | Decode + normalize ahead | In-memory LRU cache keyed by text, voice definition and synthesis settings: at most 16 MiB and 48 decoded clips. Hits skip synthesis, decoding and normalization; misses prepare ahead. Evict oldest clips; oversized clips play uncached; cancelled preparation is never cached. No disk persistence. Reuse normalization per buffer via WeakMap. After preparation, recheck pause, session activity and Piper cancellation generation before playback. |

@@ -18,7 +18,7 @@ assert.ok(app.indexOf('scriptSourceSettings.bindSourceSelection(') < app.indexOf
 assert.ok(app.indexOf('scriptSourceSettings.bindUpload(') < app.indexOf('scriptSourceSettings.bindUrlFetch('));
 assert.ok(app.indexOf('scriptSourceSettings.bindUrlFetch(') < app.indexOf('bindCareDurationControls'));
 assert.ok(app.indexOf('scriptSourceSettings.bindSourceSelection(') < app.indexOf('bindCareDurationControls'));
-assert.match(html, /modules\/script-source-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.23/);
+assert.match(html, /modules\/script-source-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.24/);
 assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/script-source-settings\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:script-source-settings'], 'node tests/script-source-settings.test.mjs');
 

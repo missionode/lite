@@ -57,7 +57,7 @@ body {
     position: absolute;
     inset: -2rem;
     z-index: -1;
-    background: #000 url('Splash-v2.png') center / cover no-repeat;
+    background: #000 url('Splash-v2.webp') center / cover no-repeat;
     filter: blur(18px) brightness(0.38);
     transform: scale(1.08);
 }
@@ -3520,3 +3520,36 @@ body.sky-canvas-active #particle-canvas {
 .ct-end-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.8rem 1rem; border-radius: 1rem; border: 2px solid var(--ct-color); background: color-mix(in srgb, var(--ct-color) 14%, transparent); text-align: left; }
 .ct-end-card strong { font-size: 1.1rem; }
 @media (prefers-reduced-motion: reduce) { .ct-enter { animation: none; } }
+
+/* ── Voice download card + floating progress pill ─────────────────────────── */
+.voice-dl { margin-top: 0.6rem; padding: 0.75rem 0.9rem; border-radius: 0.9rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16); text-align: left; }
+.voice-dl[data-state="stored"] { border-color: rgba(74, 222, 128, 0.45); }
+.voice-dl[data-state="downloading"] { border-color: rgba(255, 197, 61, 0.55); }
+.voice-dl[data-state="failed"] { border-color: rgba(248, 113, 113, 0.6); }
+.voice-dl-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
+.voice-dl-icon { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: rgba(255, 255, 255, 0.12); font-weight: 900; }
+.voice-dl[data-state="stored"] .voice-dl-icon { background: #30a46c; color: #06140c; }
+.voice-dl-note, .voice-dl-hint, .voice-dl-error { margin: 0.45rem 0 0; font-size: 0.88rem; line-height: 1.4; text-transform: none; letter-spacing: normal; opacity: 1; }
+.voice-dl-hint { opacity: 0.75; }
+.voice-dl-error { color: #fca5a5; font-weight: 700; }
+.voice-dl-bar, .voice-dl-pill-bar { display: block; height: 0.45rem; margin-top: 0.5rem; border-radius: 999px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
+.voice-dl-bar > span, .voice-dl-pill-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffc53d, #ff8a4c); transition: width 0.4s ease; }
+.voice-dl-btn { margin-top: 0.6rem; width: 100%; }
+.voice-dl-pill { position: fixed; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9999; width: min(92vw, 22rem); padding: 0.6rem 0.9rem; border-radius: 1rem; background: rgba(14, 8, 24, 0.92); border: 1px solid rgba(255, 197, 61, 0.5); color: #fff; font-size: 0.85rem; text-align: center; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45); }
+.voice-dl-pill[hidden] { display: none; }
+
+/* ── Sleep wind-down: slow fade to near-black, tap to peek ─────────────────── */
+body.sleep-wind-down #app { --sleep-dimming: 0.03; }
+body.sleep-wind-down #app > .screen { transition: opacity var(--sleep-wind-down-seconds, 180s) linear; }
+body.sleep-wind-down.sleep-dark #app > .screen { transition: opacity 3s ease; }
+body.sleep-wind-down.sleep-peek #app { --sleep-dimming: 0.4; }
+body.sleep-wind-down.sleep-peek #app > .screen { transition: opacity 0.6s ease; }
+body.sleep-wind-down #aura-bg, body.sleep-wind-down #nebula-bg { opacity: 0 !important; transition: opacity 20s linear; }
+
+.sleep-goodnight { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 2rem; background: #000; color: #fff; text-align: center; }
+.sleep-goodnight.hidden { display: none; }
+.sleep-goodnight-inner { max-width: 22rem; opacity: 0.12; transition: opacity 1.2s ease; }
+.sleep-goodnight.is-awake .sleep-goodnight-inner { opacity: 0.85; }
+.sleep-goodnight h2 { margin: 0 0 0.5rem; font-size: 1.6rem; font-weight: 700; }
+.sleep-goodnight p { margin: 0 0 1.2rem; line-height: 1.5; text-transform: none; letter-spacing: normal; }
+body.sleep-wind-down:not(.sleep-peek) #app > .screen { pointer-events: none; }

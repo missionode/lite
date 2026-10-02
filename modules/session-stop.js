@@ -37,6 +37,7 @@
             window.speechSynthesis.cancel();
             piperTTS.cancel('journey stopped', { fadeSeconds: 2 });
             document.body.classList.remove('sleep-mode-active');
+            owner.sleepWindDownCleanup?.();
             const app = document.getElementById('app');
             if (app) app.style.setProperty('--app-brightness', '1');
             const finishAura = document.getElementById('aura-bg');

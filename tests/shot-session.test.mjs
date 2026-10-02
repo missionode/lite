@@ -9,7 +9,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
 assert.match(app, /runShot\(type, customFrequency\)\s*\{\s*return shotSession\.run\(this, type, customFrequency,/);
 assert.match(app, /finishShot\(\)\s*\{\s*return shotSession\.finish\(this,/);
 assert.match(app, /stopShot\(\)\s*\{\s*return shotSession\.stop\(this,/);
-assert.match(html, /modules\/shot-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.23/);
+assert.match(html, /modules\/shot-session\.js\?v=1\.0[\s\S]*?app\.js\?v=4\.24/);
 assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.0/);
 assert.equal(pkg.scripts['test:shot-session'], 'node tests/shot-session.test.mjs');
 

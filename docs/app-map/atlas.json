@@ -2,8 +2,8 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-10-02",
-    "commit": "feature/heavenly-voice on feature/chakra-touch (production 3c78247)",
-    "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
+    "commit": "feature/voice-sleep-images on feature/heavenly-voice (production 3c78247)",
+    "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
     {
@@ -1538,7 +1538,7 @@
       "group": "Journeys",
       "title": "Sleep and Music Only",
       "subtitle": "Two independent narration-free experiences.",
-      "source": "modules/sleep-journey.js:1; scripts.json:1; tests/sleep-journey.test.mjs:1; app.js:917; app.js:1329; app.js:1459",
+      "source": "modules/sleep-journey.js:1; scripts.json:1; tests/sleep-journey.test.mjs:1; modules/completion-view.js:52; app.js:917; app.js:1329; app.js:1459",
       "rows": [
         [
           [
@@ -1566,6 +1566,11 @@
             "Drowsiness 10 → Light Sleep 6 → True Sleep 5 → Deep Sleep 2 → REM Rest 6 Hz (script values). Each uses configured minutes and its own bounded sleep drone."
           ],
           [
+            "winddown",
+            "Wind-down (final stage)",
+            "In the last 3 minutes of the final stage (or the whole stage if shorter): screen fades to near-black (sleep dimming 0.4 → 0.03), music and ambience drift to silence over the same window, text reads “Drifting into sleep”. Taps on the dark screen only peek (controls back for 6 s); they never press a hidden button."
+          ],
+          [
             "loop",
             "Continuous music",
             "Background loop and visual pulse continue until user stops. No ordinary completion."
@@ -1582,7 +1587,7 @@
           [
             "fade",
             "Sleep ending",
-            "Fade background music for 12 seconds, then finish if still active."
+            "After a wind-down, a 4-second settle (without one, the old 12-second music fade), then a quiet finish if still active."
           ],
           [
             "stop",
@@ -1593,8 +1598,8 @@
         [
           [
             "complete",
-            "Sleep completion",
-            "Stats and completion modal; sleep dimming removed."
+            "Sleep completion (quiet)",
+            "Stats count; audio stops; wake lock released so the phone can sleep. No bright completion modal and no Earn hand-off: a black goodnight screen (“Good night”, very dim until tapped) with Return to Room → Lobby."
           ]
         ]
       ],
@@ -1626,13 +1631,23 @@
         ],
         [
           "stages",
+          "winddown",
+          "Final 3 minutes"
+        ],
+        [
+          "winddown",
           "fade",
-          "Last stage"
+          "Stage ends"
         ],
         [
           "fade",
           "complete",
           "Done"
+        ],
+        [
+          "winddown",
+          "stop",
+          "Stop"
         ],
         [
           "music",
@@ -3816,7 +3831,7 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322; app.js:1961; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/voice-download-card.js:1; tests/voice-download-card.test.mjs:1; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322; app.js:1961; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1",
       "rows": [
         [
           [
@@ -3830,6 +3845,11 @@
             "route",
             "Voice engine choice",
             "Use Piper only when selected, supported and configured."
+          ],
+          [
+            "download",
+            "First voice download",
+            "Settings shows a Voice download card: “downloads once (~60 MB), then works offline, Wi-Fi is best”, a mobile-data hint, and Download now. While the model downloads (from Settings or when a journey starts) the card and a floating pill on every screen show MB and percent with a progress bar; failure shows a clear retry message. A complete model in the browser’s private storage (OPFS piper folder) shows “Downloaded. Works offline.”"
           ]
         ],
         [
@@ -3888,6 +3908,16 @@
           "text",
           "route",
           "Narrate"
+        ],
+        [
+          "route",
+          "download",
+          "First use"
+        ],
+        [
+          "download",
+          "piper",
+          "Model ready"
         ],
         [
           "route",

@@ -151,8 +151,8 @@ assert.match(app, /secretBodyGamePanel\.hidden = isLocked[\s\S]*?secretBodyGameB
 assert.match(app, /returnScreen: lobbyScreen/, 'leaving the game returns to the Lobby');
 assert.match(app, /if \(isLocked && secretBodyGame\) secretBodyGame\.close\(\)/, 'locking dev mode closes an open game');
 assert.match(app, /isUnlocked: \(\) => state\.advancedFeaturesUnlocked/, 'the game checks dev mode itself');
-assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=2\.0', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
-assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=2\.0'/, 'the game works offline');
+assert.match(loader, /'secret-body-game': Object\.freeze\(\{ src: '\.\/modules\/secret-body-part-game\.js\?v=2\.1', globalName: 'ChakraSecretBodyPartGame' \}\)/, 'the game module loads lazily');
+assert.match(sw, /'\.\/modules\/secret-body-part-game\.js\?v=2\.1'/, 'the game works offline');
 
 // Every locale has every label and part name.
 const keys = ['sbpTitle', 'sbpIntro', 'sbpPlayers', 'sbpRounds', 'sbpGamesInRow', 'sbpStart', 'sbpBoldTitle', 'sbpBoldNotice',
@@ -175,13 +175,13 @@ assert.match(source, /function handOff\(id[\s\S]*?holdMs[\s\S]*?'pointerdown'/, 
 assert.match(source, /function revealQueue[\s\S]*?handOff\(id/, 'secret cards open only through the hand-off lock');
 assert.match(source, /handOff\(holder, \{ note: t\('ui\.sbpHolderNote'\) \}, showTurn\)/, 'the guess screen opens only for the player who holds the phone');
 assert.match(source, /function holderBanner\(id\)/, 'a whose-turn banner names the phone holder');
-assert.match(source, /symbols\/\$\{id\}\.png/, 'chakra images mark each player');
+assert.match(source, /symbols\/\$\{id\}\.webp/, 'chakra images mark each player');
 assert.match(source, /function showFlash[\s\S]*?buzz\([\s\S]*?later\(go, flashMs\)/, 'every answer shows a result flash that moves on by itself');
 assert.match(source, /function wheel\(ids\)[\s\S]*?conic-gradient/, 'a real chakra wheel lands on the called player');
 assert.match(source, /actions\.hidden = !ready/, 'Right and Wrong appear only after a word is chosen');
 assert.match(source, /cardHideMs/, 'the secret card hides by itself');
 for (const id of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']) {
-    assert.match(sw, new RegExp(`'\\./symbols/${id}\\.png'`), `${id} chakra image works offline`);
+    assert.match(sw, new RegExp(`'\\./symbols/${id}\\.webp'`), `${id} chakra image works offline`);
 }
 
 // Play Zone section: heading on top, Hush Hush card inside, icebreaker subtitle.

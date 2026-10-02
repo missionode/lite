@@ -1411,7 +1411,7 @@ class MeditationController {
         for (let index = 0; index < focus.length && this.isMeditationActive; index += 1) {
             const [chakra, displayNameKey, locationKey] = focus[index];
             if (scene) scene.dataset.activeChakra = chakra;
-            if (symbol) symbol.src = `symbols/${chakra}.png`;
+            if (symbol) symbol.src = `symbols/${chakra}.webp`;
             if (name) name.textContent = t(`ui.${displayNameKey}`);
             if (location) location.textContent = t(`ui.${locationKey}`);
             if (status) status.textContent = `${index + 1} / ${focus.length} · ${t('ui.newcomerGuidedStatus')}`;
@@ -1987,7 +1987,7 @@ class MeditationController {
         // Setup simple UI
         const symbolEl = document.getElementById('chakra-symbol');
         if (symbolEl) {
-            visual.setSymbolImage("symbols/background-only.png", symbolEl);
+            visual.setSymbolImage("symbols/background-only.webp", symbolEl);
             symbolEl.style.opacity = "0.7";
         }
         
@@ -2383,14 +2383,14 @@ class MeditationController {
         return this.runSessionItem('closing silence', () => journeyTransitionStages.runSilence(this, { contentT, timing, setText, document }));
     }
 
-    finish() {
+    finish(options = {}) {
         this.sessionItemRunner.reset();
         return window.ChakraCompletionView.finish(this, {
             document, window, state, storage: localStorage, setText, translate: t, wakeLock, piperTTS,
             backgroundMusicStopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS,
             visualizationAmbienceExitFadeSeconds: VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS,
             scheduleEarnHandoff
-        });
+        }, options);
     }
 
     stop({ preserveScreen = false } = {}) {
@@ -2442,10 +2442,27 @@ function loadJourneyVideoPrelude() {
     });
     return journeyVideoPreludeLoadPromise;
 }
+// First voice download made clear: size, offline note, button, progress.
+const currentVoiceValue = () => (typeof voiceSelect !== 'undefined' && voiceSelect?.value) || state.voiceName;
+const voiceDownloadCard = window.ChakraVoiceDownloadCard.create({
+    document, navigator, t,
+    getDefinition: () => {
+        const value = currentVoiceValue();
+        return isPiperVoice(value) ? getPiperVoiceDefinition(value) : null;
+    },
+    onDownload: async () => {
+        await audio.init();
+        if (!piperTTS.isSupported() || !piperTTS.configure(currentVoiceValue())) throw new Error('Piper unavailable');
+        await piperTTS.warmup();
+    }
+});
 const piperTTS = piperLifecycle.createPiperTTS(audio, {
     voiceIdFromValue: piperVoiceId,
     getVoiceDefinition: voiceId => piperVoiceRegistry.find(voice => voice.id === voiceId) || null,
     setVoiceStatus,
+    onDownloadProgress: (loaded, total) => voiceDownloadCard.progress(loaded, total),
+    onVoiceReady: () => voiceDownloadCard.ready(),
+    onVoiceFailed: () => voiceDownloadCard.failed(),
     translate: t,
     getMeditationSettings: getPiperMeditationSettings,
     getVoiceVolume: () => state.volVoice,
@@ -2607,6 +2624,11 @@ function setupVoices() {
         document, window, state, voiceSelect, piperVoices: selectablePiperVoices(),
         voiceMatchesLanguage, autoSelectVoice, SpeechSynthesisUtteranceCtor: window.SpeechSynthesisUtterance
     });
+    if (voiceSelect && !voiceSelect.dataset.downloadCardBound) {
+        voiceSelect.dataset.downloadCardBound = 'true';
+        voiceSelect.addEventListener('change', () => voiceDownloadCard.refresh());
+    }
+    voiceDownloadCard.refresh();
 }
 
 function autoSelectVoice() {
@@ -2621,6 +2643,7 @@ function autoSelectVoice() {
     if (selected == null) return;
     state.voiceName = selected;
     if (voiceSelect) voiceSelect.value = selected;
+    voiceDownloadCard.refresh();
 }
 
 function applyJourneyVoiceProfile(isHighEnergy) {

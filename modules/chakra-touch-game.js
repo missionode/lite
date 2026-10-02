@@ -290,7 +290,7 @@
         const zoneName = id => t(`ui.ctZone_${id}`);
         const chakraImage = (chakra, size = 'md') => el('img', {
             className: `ct-chakra-img ct-chakra-img-${size}`,
-            attrs: { src: `symbols/${chakra}.png`, alt: '', 'aria-hidden': 'true', draggable: 'false' },
+            attrs: { src: `symbols/${chakra}.webp`, alt: '', 'aria-hidden': 'true', draggable: 'false' },
             style: { '--ct-color': CHAKRAS[chakra].color }
         });
 

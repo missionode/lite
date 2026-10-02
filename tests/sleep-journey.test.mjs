@@ -7,7 +7,7 @@ const source = read('../modules/sleep-journey.js');
 const app = read('../app.js');
 const html = read('../index.html');
 const sw = read('../sw.js');
-const context = vm.createContext({ window: {}, Date });
+const context = vm.createContext({ window: {}, Date, setTimeout: () => 0, clearTimeout: () => {} });
 vm.runInContext(source, context);
 const create = context.window.ChakraSleepJourney.create;
 
@@ -34,7 +34,8 @@ function harness(overrides = {}) {
             startBackgroundMusic: async () => events.push('music-start'),
             startPleasureAmbience: () => events.push('ambience-start'),
             fadeInBackgroundMusic: (...args) => events.push(['music-in', ...args]),
-            fadeOutBackgroundMusic: duration => events.push(['music-out', duration])
+            fadeOutBackgroundMusic: duration => events.push(['music-out', duration]),
+            stopPleasureAmbience: duration => events.push(['ambience-out', duration])
         },
         visual: { startPulsing: color => events.push(['pulse', color]) },
         showDndReminderIfNeeded: () => events.push('dnd'),
@@ -43,14 +44,24 @@ function harness(overrides = {}) {
         startTimedSleepDrone: (...args) => events.push(['drone-start', ...args]),
         stopStageDrone: () => events.push('drone-stop'),
         pauseAwareSleep: async duration => events.push(['wait', duration]),
-        finish: () => { events.push('finish'); owner.isMeditationActive = false; }
+        finish: options => { events.push(['finish', options]); owner.isMeditationActive = false; }
     };
     const deps = {
         state,
         getLanguageConfig: () => ({ contentSource: 'scripts.json?lang=en' }),
         fetch: async url => { events.push(['fetch', url]); return { ok: true, json: async () => ({ sleep_mode: { stages: [{ key: 'drowsiness', frequency: 10 }, { key: 'lightSleep', frequency: 6 }] } }) }; },
         normalizeSleepStages: scripts => scripts.sleep_mode.stages,
-        document: { getElementById: id => id === 'start-meditation' ? button : id === 'controls' ? controls : null },
+        document: {
+            getElementById: id => id === 'start-meditation' ? button : id === 'controls' ? controls : null,
+            body: {
+                classList: { add: (...names) => events.push(['body-add', ...names]), remove: (...names) => events.push(['body-remove', ...names]) },
+                style: { setProperty: (key, value) => events.push(['body-style', key, value]), removeProperty: key => events.push(['body-style-remove', key]) }
+            },
+            addEventListener: type => events.push(['listen', type]),
+            removeEventListener: type => events.push(['unlisten', type])
+        },
+        setTimeout: () => 0,
+        clearTimeout: () => {},
         showScreen: screen => events.push(['screen', screen]),
         meditationScreen: 'meditation-screen',
         setText: (id, value) => events.push(['text', id, value]),
@@ -80,9 +91,23 @@ assert.equal((sw.match(/modules\/sleep-journey\.js/g) || []).length, 1, 'Sleep m
         ['drone-start', 10, 0.01, 'intermediate'],
         ['drone-start', 6, 0.01, 'intermediate']
     ]);
-    assert.deepEqual(h.events.filter(event => Array.isArray(event) && event[0] === 'wait').map(event => event[1]), [600, 3000, 600, 12000]);
+    assert.deepEqual(h.events.filter(event => Array.isArray(event) && event[0] === 'wait').map(event => event[1]), [600, 3000, 600, 4000], 'after the wind-down only a short settle remains');
     assert.ok(h.events.indexOf('music-start') < h.events.findIndex(event => Array.isArray(event) && event[0] === 'music-in'));
-    assert.ok(h.events.indexOf('finish') > h.events.findIndex(event => Array.isArray(event) && event[0] === 'music-out'));
+    const finishIndex = h.events.findIndex(event => Array.isArray(event) && event[0] === 'finish');
+    assert.ok(finishIndex > h.events.findIndex(event => Array.isArray(event) && event[0] === 'music-out'));
+    assert.equal(JSON.stringify(h.events[finishIndex][1]), '{"quiet":true}', 'Sleep ends quietly with no bright completion screen');
+    // Wind-down starts only in the last stage (after the second drone starts).
+    const windIndex = h.events.findIndex(event => Array.isArray(event) && event[0] === 'body-add' && event[1] === 'sleep-wind-down');
+    const lastDrone = h.events.findLastIndex(event => Array.isArray(event) && event[0] === 'drone-start');
+    assert.ok(windIndex > lastDrone, 'wind-down begins in the final stage');
+    assert.deepEqual(h.events.find(event => Array.isArray(event) && event[0] === 'music-out'), ['music-out', 1], 'music drifts to silence over the wind-down window');
+    assert.ok(h.events.some(event => Array.isArray(event) && event[0] === 'ambience-out'));
+    assert.ok(h.events.some(event => Array.isArray(event) && event[0] === 'text' && event[2] === 'ui.sleepWindDown'));
+    assert.ok(h.events.some(event => Array.isArray(event) && event[0] === 'listen' && event[1] === 'pointerdown'), 'a tap brings the controls back for a moment');
+    assert.equal(typeof h.owner.sleepWindDownCleanup, 'function');
+    h.owner.sleepWindDownCleanup();
+    assert.ok(h.events.some(event => Array.isArray(event) && event[0] === 'unlisten'));
+    assert.equal(create().WIND_DOWN_SECONDS, 180);
     assert.equal(h.button.disabled, true);
 }
 
@@ -99,8 +124,8 @@ assert.equal((sw.match(/modules\/sleep-journey\.js/g) || []).length, 1, 'Sleep m
     const h = harness();
     h.owner.pauseAwareSleep = async () => { h.events.push('cancel'); h.owner.isMeditationActive = false; };
     await create().run(h.owner, h.deps);
-    assert.equal(h.events.includes('finish'), false, 'A cancelled session must not finish as naturally completed.');
+    assert.equal(h.events.some(event => Array.isArray(event) && event[0] === 'finish'), false, 'A cancelled session must not finish as naturally completed.');
     assert.equal(h.events.filter(event => Array.isArray(event) && event[0] === 'drone-start').length, 1);
 }
 
-console.log('Sleep journey passed: unlock guard, stage timing, audio fades, content loading and cancellation.');
+console.log('Sleep journey passed: unlock guard, stage timing, wind-down, quiet finish, content loading and cancellation.');

@@ -57,13 +57,13 @@
                 mantraEl.style.color = '#FFD700';
 
                 const imageMap = {
-                    balasana: 'symbols/Balasana.png',
-                    ananda_balasana: 'symbols/ananda_balasana.png',
-                    vrikshasana: 'symbols/Vrikshasana.png',
-                    adho_mukha_svanasana: 'symbols/Downward_dog.png',
-                    marjaryasana: 'symbols/Marjaryasana.png'
+                    balasana: 'symbols/Balasana.webp',
+                    ananda_balasana: 'symbols/ananda_balasana.webp',
+                    vrikshasana: 'symbols/Vrikshasana.webp',
+                    adho_mukha_svanasana: 'symbols/Downward_dog.webp',
+                    marjaryasana: 'symbols/Marjaryasana.webp'
                 };
-                visual.setSymbolImage(imageMap[pose.id] || 'symbols/root.png', symbolEl);
+                visual.setSymbolImage(imageMap[pose.id] || 'symbols/root.webp', symbolEl);
                 symbolEl.style.opacity = '0.9';
 
                 await owner.runSessionItem(`Yoga pose ${pose.id}`, async () => {

@@ -128,6 +128,17 @@
     "piperLoadFailed": "Piper could not load — using browser voice.",
     "piperPreviewFailed": "Piper preview failed — choose a browser fallback voice.",
     "piperCommunityVoiceNote": "Community Tamil/Hindi Piper models download about 64 MB the first time you preview or use them. Hindi model redistribution terms still need confirmation.",
+    "voiceDlTitle": "Voice download",
+    "voiceDlNeeded": "This voice downloads once ({{size}} MB), then works offline. Wi-Fi is best.",
+    "voiceDlStored": "Downloaded. This voice works offline.",
+    "voiceDlButton": "Download now",
+    "voiceDlProgress": "Downloading voice… {{loaded}} of {{total}} MB ({{percent}}%)",
+    "voiceDlKeepOpen": "Keep the app open until it finishes.",
+    "voiceDlMobileData": "You seem to be on mobile data.",
+    "voiceDlFailed": "Download stopped. Check your internet and try again.",
+    "sleepWindDown": "Drifting into sleep",
+    "sleepGoodnightTitle": "Good night",
+    "sleepGoodnightNote": "Your sleep session has ended. Rest well.",
     "practiceLoadFailed": "A selected guided practice could not load. Please check your connection and try again."
     ,"journeys": "Journeys"
     ,"totalTime": "Total Time"

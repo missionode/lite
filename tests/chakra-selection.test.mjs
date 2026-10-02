@@ -22,9 +22,10 @@ assert.doesNotMatch(
 );
 for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown']) {
     assert.match(html, new RegExp(`id="chakra-selection"[\\s\\S]*?value="${chakra}"`), `${chakra} should remain selectable`);
-    assert.match(html, new RegExp(`value="${chakra}"[^>]*>[\\s\\S]*?src="symbols/${chakra}\\.png"[\\s\\S]*?data-i18n="ui\\.(?:root|sacral|solar|heart|throat|thirdEye|crown)"`), `${chakra} should show its own image beside the localized label`);
-    assert.ok(fs.existsSync(new URL(`../symbols/${chakra}.png`, import.meta.url)), `${chakra} thumbnail asset should exist`);
-    assert.ok(serviceWorker.includes(`'./symbols/${chakra}.png'`), `${chakra} thumbnail should remain available offline`);
+    assert.match(html, new RegExp(`value="${chakra}"[^>]*>[\\s\\S]*?src="symbols/${chakra}\\.webp"[\\s\\S]*?data-i18n="ui\\.(?:root|sacral|solar|heart|throat|thirdEye|crown)"`), `${chakra} should show its own image beside the localized label`);
+    assert.ok(fs.existsSync(new URL(`../symbols/${chakra}.webp`, import.meta.url)), `${chakra} thumbnail asset should exist`);
+    assert.ok(fs.statSync(new URL(`../symbols/${chakra}.webp`, import.meta.url)).size < 100 * 1024, `${chakra} thumbnail stays light (WebP)`);
+    assert.ok(serviceWorker.includes(`'./symbols/${chakra}.webp'`), `${chakra} thumbnail should remain available offline`);
 }
 assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /#lobby-screen \.chakra-selection-thumbnail[\s\S]*?object-fit:\s*contain/);
 assert.match(selectionView, /function persist\(\)[\s\S]*?storage\.setItem\('chakra_selected'/, 'Room selection should persist immediately');

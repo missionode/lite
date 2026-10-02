@@ -123,6 +123,9 @@
             voiceIdFromValue: dependencies.voiceIdFromValue || (() => ''),
             getVoiceDefinition: dependencies.getVoiceDefinition || (() => null),
             setVoiceStatus: dependencies.setVoiceStatus || (() => {}),
+            onDownloadProgress: dependencies.onDownloadProgress || (() => {}),
+            onVoiceReady: dependencies.onVoiceReady || (() => {}),
+            onVoiceFailed: dependencies.onVoiceFailed || (() => {}),
             translate: dependencies.translate || (key => key),
             getMeditationSettings: dependencies.getMeditationSettings || (() => ({ lengthScale: 1 })),
             getVoiceVolume: dependencies.getVoiceVolume || (() => 1),
@@ -174,6 +177,7 @@
                     this.worker.onerror = event => {
                         const message = event.message || 'Piper worker failed.';
                         deps.setVoiceStatus(deps.translate('ui.piperFallback'), 'error');
+                        deps.onVoiceFailed();
                         if (this.activeJob) this.finishActive(new Error(message));
                     };
                 }
@@ -217,16 +221,19 @@
                     const loaded = Number(message.loaded) || 0;
                     const percent = total > 0 ? ` ${Math.round((loaded / total) * 100)}%` : '';
                     deps.setVoiceStatus(`${deps.translate('ui.piperPreparing')}${percent}`);
+                    deps.onDownloadProgress(loaded, total);
                     return;
                 }
                 if (!this.activeJob || message.requestId !== this.activeJob.requestId) return;
                 if (message.type === 'ready') {
                     deps.setVoiceStatus(deps.translate('ui.piperReady'), 'ready');
+                    deps.onVoiceReady();
                     this.finishActive(null, true);
                 } else if (message.type === 'audio') {
                     this.finishActive(null, message.audio);
                 } else if (message.type === 'error') {
                     console.error('[Piper] worker error:', message.error || 'Piper synthesis failed.', message);
+                    deps.onVoiceFailed();
                     this.finishActive(new Error(message.error || 'Piper synthesis failed.'));
                 }
             }
