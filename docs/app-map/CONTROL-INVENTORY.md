@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: feature/voice-sleep-images on feature/heavenly-voice (production 3c78247) · 2026-10-02.
+Source snapshot: feature/voice-sleep-images on feature/heavenly-voice (production 3c78247) · 2026-10-03.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
@@ -134,50 +134,51 @@ This inventories static UI declarations in the three meditation HTML entry pages
 | [588](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:588) | button | open-secret-body-game | type=button · label=ui.sbpOpen |
 | [593](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:593) | button | open-eye-shooter | type=button · label=ui.esOpen |
 | [598](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:598) | button | open-chakra-touch | type=button · label=ui.ctOpen |
-| [606](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:606) | button | start-meditation |  |
-| [607](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:607) | button | open-settings |  |
-| [608](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:608) | button | begin-consultation | type=button |
-| [617](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:617) | button | guide-controlled-continue | type=button |
-| [691](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:691) | button | play-journey-video-prelude | type=button · label=ui.playJourneyVideoPrelude |
-| [700](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:700) | button | close-mixer | type=button |
-| [706](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:706) | input | vol-voice | type=range · min=0.2 · max=2 · step=0.1 · value=1.0 |
-| [707](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:707) | input | vol-drone | type=range · min=0.02 · max=0.2 · step=0.01 · value=0.05 |
-| [708](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:708) | input | vol-bell | type=range · min=0.02 · max=0.12 · step=0.01 · value=0.04 |
-| [709](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:709) | input | vol-mantra | type=range · min=0.005 · max=1 · step=0.005 · value=0.35 |
-| [710](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:710) | input | vol-visualization | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.1 |
-| [711](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:711) | input | vol-music | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.2 |
-| [715](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:715) | summary | Voice Tuning ⌄ |  |
-| [720](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:720) | input | voice-clarity | type=range · min=0 · max=100 · step=1 · value=50 |
-| [721](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:721) | input | voice-warmth | type=range · min=0 · max=100 · step=1 · value=50 |
-| [722](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:722) | input | voice-pace | type=range · min=0.85 · max=1.15 · step=0.05 · value=1 |
-| [723](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:723) | select | voice-echo | off: Off; light: Soft Halo; spacious: Heavenly |
-| [725](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:725) | button | Soft | type=button · label=ui.voicePresetSoft |
-| [726](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:726) | button | Shringara | type=button · label=ui.voicePresetShringara |
-| [727](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:727) | button | Balanced | type=button · label=ui.voicePresetBalanced |
-| [728](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:728) | button | Clear | type=button · label=ui.voicePresetClear |
-| [730](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:730) | button | mixer-voice-preview | type=button · label=ui.previewTunedVoice |
-| [736](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:736) | summary | Background Music ⌄ |  |
-| [741](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:741) | select | music-echo | off: Off; light: Soft Halo; spacious: Heavenly |
-| [749](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:749) | select | mixer-spatial-mode | off: Off (Stereo Safe); stereo: Stereo Wide; headphones: Headphone 3D; room: Room Spatial |
-| [761](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:761) | input | audio-filters-toggle | type=checkbox |
-| [762](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:762) | input | eyes-close-mode-toggle | type=checkbox |
-| [764](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:764) | input | brightness-slider | type=range · min=0.1 · max=1 · step=0.05 · value=1 |
-| [768](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:768) | input | mixer-no-frequency-mode-toggle | type=checkbox |
-| [770](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:770) | input | mixer-no-mantra-mode-toggle | type=checkbox |
-| [775](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:775) | button | restart-meditation | type=button · label=ui.restartJourney |
-| [776](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:776) | button | close-mixer-bottom | type=button · label=ui.close |
-| [794](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:794) | button | final-challenge-yes | type=button · label=ui.finalChallengeYes |
-| [795](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:795) | button | final-challenge-no | type=button · label=ui.finalChallengeNo |
-| [796](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:796) | button | final-challenge-skip | type=button · label=ui.skipForNow |
-| [807](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:807) | button | pitch-invite-journey | type=button · label=ui.pitchInviteJourney |
-| [808](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:808) | button | pitch-invite-again | type=button · label=ui.pitchInviteAgain |
-| [815](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:815) | button | btn-mixer | type=button |
-| [816](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:816) | button | pause-meditation | type=button |
-| [817](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:817) | button | skip-meditation | type=button |
-| [820](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:820) | button | stop-meditation | type=button |
-| [828](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:828) | button | sleep-goodnight-close | type=button · label=ui.returnToRoom |
-| [845](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:845) | a | continue-to-earn | href=https://missionode.github.io/earn-app/receive.html?Source=Lite |
-| [849](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:849) | button | close-completion |  |
+| [611](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:611) | button | frequency-reminder-toggle | type=button · label=ui.freqReminderTurnOn |
+| [614](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:614) | button | start-meditation |  |
+| [615](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:615) | button | open-settings |  |
+| [616](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:616) | button | begin-consultation | type=button |
+| [625](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:625) | button | guide-controlled-continue | type=button |
+| [699](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:699) | button | play-journey-video-prelude | type=button · label=ui.playJourneyVideoPrelude |
+| [708](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:708) | button | close-mixer | type=button |
+| [714](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:714) | input | vol-voice | type=range · min=0.2 · max=2 · step=0.1 · value=1.0 |
+| [715](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:715) | input | vol-drone | type=range · min=0.02 · max=0.2 · step=0.01 · value=0.05 |
+| [716](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:716) | input | vol-bell | type=range · min=0.02 · max=0.12 · step=0.01 · value=0.04 |
+| [717](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:717) | input | vol-mantra | type=range · min=0.005 · max=1 · step=0.005 · value=0.35 |
+| [718](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:718) | input | vol-visualization | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.1 |
+| [719](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:719) | input | vol-music | type=range · min=0.02 · max=0.5 · step=0.01 · value=0.2 |
+| [723](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:723) | summary | Voice Tuning ⌄ |  |
+| [728](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:728) | input | voice-clarity | type=range · min=0 · max=100 · step=1 · value=50 |
+| [729](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:729) | input | voice-warmth | type=range · min=0 · max=100 · step=1 · value=50 |
+| [730](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:730) | input | voice-pace | type=range · min=0.85 · max=1.15 · step=0.05 · value=1 |
+| [731](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:731) | select | voice-echo | off: Off; light: Soft Halo; spacious: Heavenly |
+| [733](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:733) | button | Soft | type=button · label=ui.voicePresetSoft |
+| [734](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:734) | button | Shringara | type=button · label=ui.voicePresetShringara |
+| [735](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:735) | button | Balanced | type=button · label=ui.voicePresetBalanced |
+| [736](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:736) | button | Clear | type=button · label=ui.voicePresetClear |
+| [738](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:738) | button | mixer-voice-preview | type=button · label=ui.previewTunedVoice |
+| [744](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:744) | summary | Background Music ⌄ |  |
+| [749](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:749) | select | music-echo | off: Off; light: Soft Halo; spacious: Heavenly |
+| [757](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:757) | select | mixer-spatial-mode | off: Off (Stereo Safe); stereo: Stereo Wide; headphones: Headphone 3D; room: Room Spatial |
+| [769](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:769) | input | audio-filters-toggle | type=checkbox |
+| [770](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:770) | input | eyes-close-mode-toggle | type=checkbox |
+| [772](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:772) | input | brightness-slider | type=range · min=0.1 · max=1 · step=0.05 · value=1 |
+| [776](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:776) | input | mixer-no-frequency-mode-toggle | type=checkbox |
+| [778](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:778) | input | mixer-no-mantra-mode-toggle | type=checkbox |
+| [783](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:783) | button | restart-meditation | type=button · label=ui.restartJourney |
+| [784](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:784) | button | close-mixer-bottom | type=button · label=ui.close |
+| [802](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:802) | button | final-challenge-yes | type=button · label=ui.finalChallengeYes |
+| [803](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:803) | button | final-challenge-no | type=button · label=ui.finalChallengeNo |
+| [804](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:804) | button | final-challenge-skip | type=button · label=ui.skipForNow |
+| [815](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:815) | button | pitch-invite-journey | type=button · label=ui.pitchInviteJourney |
+| [816](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:816) | button | pitch-invite-again | type=button · label=ui.pitchInviteAgain |
+| [823](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:823) | button | btn-mixer | type=button |
+| [824](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:824) | button | pause-meditation | type=button |
+| [825](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:825) | button | skip-meditation | type=button |
+| [828](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:828) | button | stop-meditation | type=button |
+| [836](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:836) | button | sleep-goodnight-close | type=button · label=ui.returnToRoom |
+| [853](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:853) | a | continue-to-earn | href=https://missionode.github.io/earn-app/receive.html?Source=Lite |
+| [857](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:857) | button | close-completion |  |
 
 ## docs/assesment.html
 

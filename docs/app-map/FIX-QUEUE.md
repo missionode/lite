@@ -30,6 +30,10 @@
 - Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
 - Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
 
+## Completed — Lobby frequency reminder
+
+- Owner: No Frequency Mode was only in Settings, so users did not know tones were off. The Lobby now shows the on/off state above Begin with a one-tap switch.
+
 ## Completed — Voice download, Sleep wind-down, lighter images
 
 - First voice download is clear: size, offline note, Wi-Fi advice, Download now, MB/percent progress in Settings and a floating pill on any screen, retry on failure, "Downloaded" state.

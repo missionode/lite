@@ -2814,6 +2814,7 @@ function attachEventListeners() {
         syncChecked('hooponopono-experience-toggle', false);
         syncChecked('yoga-experience-toggle', false);
         state.noFrequencyMode = getChecked('no-frequency-mode-toggle');
+        audioModeSettingsView.renderFrequencyReminder();
         state.eyesCloseMode = getChecked('eyes-close-mode-toggle');
         yogaExperienceSettings.persist({ document, state, storage: localStorage });
         const selectedDeity = document.querySelector('input[name="deity-path"]:checked');
@@ -3540,9 +3541,10 @@ function attachEventListeners() {
 
     const audioModeSettingsView = window.ChakraAudioModeSettingsView.create({
         document, state, storage: localStorage, meditation, audio, syncChecked,
-        syncPleasureAmbienceControl, updateExperienceModeVisibility, updateSessionEstimate
+        syncPleasureAmbienceControl, updateExperienceModeVisibility, updateSessionEstimate, translate: t
     });
     audioModeSettingsView.bindPrimaryControls();
+    audioModeSettingsView.bindLobbyReminder();
     moodAmbienceSettingsView.bindControls({
         document, state, storage: localStorage, audio, meditation, window,
         translate: t, syncControl: syncPleasureAmbienceControl,

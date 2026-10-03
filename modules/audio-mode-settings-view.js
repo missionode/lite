@@ -10,7 +10,8 @@
         syncChecked,
         syncPleasureAmbienceControl,
         updateExperienceModeVisibility,
-        updateSessionEstimate
+        updateSessionEstimate,
+        translate = key => key
     } = {}) {
         if (!document || !state || !storage || !meditation || !audio ||
             typeof syncChecked !== 'function' ||
@@ -39,6 +40,36 @@
             syncPleasureAmbienceControl();
             updateExperienceModeVisibility();
             updateSessionEstimate();
+            renderFrequencyReminder();
+        }
+
+        // Lobby reminder above Begin: shows whether frequency tones (chakra
+        // drones and the 432/528 Hz cues) will play, with a one-tap switch,
+        // so No Frequency Mode is never a hidden setting.
+        function renderFrequencyReminder() {
+            const box = document.getElementById('frequency-reminder');
+            if (!box) return;
+            const off = Boolean(state.noFrequencyMode);
+            box.dataset.state = off ? 'off' : 'on';
+            const set = (id, key) => {
+                const node = document.getElementById(id);
+                if (!node) return;
+                node.setAttribute('data-i18n', key);
+                node.textContent = translate(key);
+            };
+            const icon = box.querySelector('.frequency-reminder-icon');
+            if (icon) icon.textContent = off ? '🔇' : '🎵';
+            set('frequency-reminder-title', off ? 'ui.freqReminderOffTitle' : 'ui.freqReminderOnTitle');
+            set('frequency-reminder-note', off ? 'ui.freqReminderOffNote' : 'ui.freqReminderOnNote');
+            set('frequency-reminder-toggle', off ? 'ui.freqReminderTurnOn' : 'ui.freqReminderTurnOff');
+            document.getElementById('frequency-reminder-toggle')?.setAttribute('aria-pressed', String(!off));
+        }
+
+        function bindLobbyReminder() {
+            document.getElementById('frequency-reminder-toggle')?.addEventListener('click', () => {
+                setNoFrequencyMode(!state.noFrequencyMode);
+            });
+            renderFrequencyReminder();
         }
 
         function setNoMantraMode(enabled) {
@@ -73,7 +104,7 @@
             });
         }
 
-        return Object.freeze({ bindPrimaryControls, bindMixerControls });
+        return Object.freeze({ bindPrimaryControls, bindMixerControls, bindLobbyReminder, renderFrequencyReminder, setNoFrequencyMode });
     }
 
     global.ChakraAudioModeSettingsView = Object.freeze({ create });

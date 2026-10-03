@@ -3553,3 +3553,14 @@ body.sleep-wind-down #aura-bg, body.sleep-wind-down #nebula-bg { opacity: 0 !imp
 .sleep-goodnight h2 { margin: 0 0 0.5rem; font-size: 1.6rem; font-weight: 700; }
 .sleep-goodnight p { margin: 0 0 1.2rem; line-height: 1.5; text-transform: none; letter-spacing: normal; }
 body.sleep-wind-down:not(.sleep-peek) #app > .screen { pointer-events: none; }
+
+/* ── Lobby frequency reminder (No Frequency Mode on/off) ───────────────────── */
+.frequency-reminder { display: flex; align-items: center; gap: 0.7rem; width: 100%; box-sizing: border-box; margin: 0.6rem 0 0.9rem; padding: 0.7rem 0.8rem; border-radius: 1rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.18); text-align: left; }
+.frequency-reminder[data-state="off"] { border-color: rgba(255, 197, 61, 0.5); background: rgba(255, 197, 61, 0.08); }
+.frequency-reminder[data-state="on"] { border-color: rgba(74, 222, 128, 0.45); background: rgba(74, 222, 128, 0.07); }
+.frequency-reminder-icon { flex: 0 0 auto; font-size: 1.4rem; line-height: 1; }
+.frequency-reminder-copy { display: flex; flex-direction: column; gap: 0.15rem; flex: 1 1 auto; min-width: 0; }
+.frequency-reminder-copy strong { font-size: 0.95rem; }
+.frequency-reminder-copy small { font-size: 0.8rem; line-height: 1.35; opacity: 0.8; text-transform: none; letter-spacing: normal; }
+.frequency-reminder-btn { flex: 0 0 auto; min-height: 2.6rem; padding: 0 0.9rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); color: #fff; font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.frequency-reminder[data-state="off"] .frequency-reminder-btn { background: #ffc53d; border-color: #ffc53d; color: #1a1205; }

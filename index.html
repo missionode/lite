@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.22">
+    <link rel="stylesheet" href="style.css?v=2.23">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -602,6 +602,14 @@
             <div id="session-estimate">~ 36 mins</div>
             <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
             <p class="journey-safety-summary" data-i18n="ui.safetySummary">Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time.</p>
+            <div id="frequency-reminder" class="frequency-reminder" data-state="off" role="status" aria-live="polite">
+                <span class="frequency-reminder-icon" aria-hidden="true">🔇</span>
+                <span class="frequency-reminder-copy">
+                    <strong id="frequency-reminder-title" data-i18n="ui.freqReminderOffTitle">Frequency tones are off</strong>
+                    <small id="frequency-reminder-note" data-i18n="ui.freqReminderOffNote">No Frequency Mode is on. Chakra drones and the 432 / 528 Hz cues stay silent.</small>
+                </span>
+                <button id="frequency-reminder-toggle" class="frequency-reminder-btn" type="button" aria-pressed="false" data-i18n="ui.freqReminderTurnOn">Turn on</button>
+            </div>
             <div class="lobby-actions">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
@@ -858,7 +866,7 @@
     <script src="modules/settings-backup.js?v=1.0"></script>
     <script src="modules/settings-manager-view.js?v=1.0"></script>
     <script src="modules/audio-volume-settings-view.js?v=1.0"></script>
-    <script src="modules/audio-mode-settings-view.js?v=1.0"></script>
+    <script src="modules/audio-mode-settings-view.js?v=1.1"></script>
     <script src="modules/journey-preference-settings-view.js?v=1.0"></script>
     <script src="modules/intention-settings-view.js?v=1.0"></script>
     <script src="modules/chakra-selection-view.js?v=1.0"></script>
@@ -934,6 +942,6 @@
     <script src="modules/journey-chrome.js?v=1.0"></script>
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
-    <script src="app.js?v=4.24"></script>
+    <script src="app.js?v=4.25"></script>
 </body>
 </html>
