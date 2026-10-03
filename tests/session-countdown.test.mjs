@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /this\.sessionCountdown = new window\.ChakraSessionCountdown/);
 assert.match(app, /startSessionCountdown\(totalMs\)\s*\{\s*this\.sessionCountdown\.start\(totalMs\);/);
-assert.match(html, /modules\/session-countdown\.js\?v=1\.1[\s\S]*?app\.js\?v=4.25/);
+assert.match(html, /modules\/session-countdown\.js\?v=1\.1[\s\S]*?app\.js\?v=4.26/);
 assert.match(serviceWorker, /modules\/session-countdown\.js\?v=1\.1/);
 assert.equal((html.match(/data-session-countdown/g) || []).length, 1, 'the page contains exactly one timer');
 assert.match(html, /id="controls"[^>]*>[\s\S]*?id="session-countdown"[^>]*data-session-countdown/,

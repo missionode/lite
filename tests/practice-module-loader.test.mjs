@@ -10,7 +10,7 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const practiceIds = ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn', 'quiet-courage', 'self-exploration', 'secret-body-game', 'eye-shooter', 'chakra-touch'];
 const locales = ['en', 'ml', 'hi', 'ru'].map(language => JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8')));
 
-assert.match(index, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.25/);
+assert.match(index, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.26/);
 for (const filename of ['body-scan', 'guided-noting', 'dharana', 'box-breathing', 'visualization', 'hooponopono', 'undo-unlearn']) {
     assert.doesNotMatch(index, new RegExp(`modules/${filename}-practice\\.js`), `${filename} must not load eagerly`);
     assert.match(sw, new RegExp(`modules/${filename}-practice\\.js\\?v=1\\.0`), `${filename} remains offline cached`);
@@ -23,7 +23,7 @@ for (const [toggle, id] of [
     ['visualization-addon-toggle', 'visualization'], ['hooponopono-experience-toggle', 'hooponopono'],
     ['undo-unlearn-addon-toggle', 'undo-unlearn']
 ]) assert.match(source, new RegExp(`${toggle}['\"]?,\\s*['\"]${id}`));
-assert.match(app, /alert\(journeyT\('ui\.practiceLoadFailed'\)\);\s*return;/, 'a failed module load stops the start flow before continuing');
+assert.match(app, /notify\(journeyT\('ui\.practiceLoadFailed'\), 'error'\);\s*return;/, 'a failed module load shows a calm message and stops the start flow');
 assert.equal(packageJson.scripts['test:practice-module-loader'], 'node tests/practice-module-loader.test.mjs');
 assert.ok(locales.every(locale => locale.ui.practiceLoadFailed), 'load failure recovery is localized in every bundled language');
 

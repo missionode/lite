@@ -83,3 +83,21 @@ for (const locale of [en, ml]) {
 }
 
 console.log('Frequency repertory, search and one-second Custom Shot handoff contracts passed.');
+
+// Five languages, a No Frequency note, and the page never changes the app language.
+{
+    const page = fs.readFileSync(new URL('../docs/repertory.html', import.meta.url), 'utf8');
+    const data = JSON.parse(fs.readFileSync(new URL('../data/frequency-repertory.json', import.meta.url), 'utf8'));
+    for (const entry of data.entries) {
+        for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
+            for (const field of ['name', 'focus', 'features']) assert.ok(entry[field]?.[language]?.trim(), `${entry.id} ${field} has ${language}`);
+            if (entry.journeyUse) assert.ok(entry.journeyUse[language]?.trim(), `${entry.id} journeyUse has ${language}`);
+        }
+    }
+    for (const language of ['hi', 'ru', 'ta']) assert.match(page, new RegExp(`\\n      ${language}:\\{"back"`), `${language} page labels exist`);
+    assert.match(page, /noFrequencyNote/, 'Lite tones say they play only when No Frequency Mode is off');
+    assert.doesNotMatch(page, /setItem\('chakra_display_language'/, 'the page never changes the app display language');
+    assert.match(page, /chakra_repertory_language/, 'the page remembers its own language choice');
+}
+console.log('Repertory languages passed: five languages, No Frequency note, app language untouched.');
+

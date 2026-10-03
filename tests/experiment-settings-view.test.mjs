@@ -5,9 +5,9 @@ import vm from 'node:vm';
 const html = readFileSync('index.html', 'utf8');
 const worker = readFileSync('sw.js', 'utf8');
 assert.ok(html.indexOf('modules/experiment-settings-view.js?v=1.0') < html.indexOf('app.js?v='));
-assert.ok(html.indexOf('modules/experiment-session.js?v=1.0') < html.indexOf('app.js?v='));
+assert.ok(html.indexOf('modules/experiment-session.js?v=1.1') < html.indexOf('app.js?v='));
 assert.match(worker, /modules\/experiment-settings-view\.js\?v=1\.0/);
-assert.match(worker, /modules\/experiment-session\.js\?v=1\.0/);
+assert.match(worker, /modules\/experiment-session\.js\?v=1\.1/);
 const handlers = new Map();
 const activity = { value: 'box', addEventListener: (type, fn) => handlers.set(`activity:${type}`, fn) };
 const duration = {

@@ -1,10 +1,22 @@
-// ── GLOBAL ERROR CATCHER (Mobile Debugging) ──────────────────────────────────
+// ── GLOBAL ERROR CATCHER ─────────────────────────────────────────────────────
+// Never interrupt a meditator with a technical pop-up. Errors go to the
+// console and the last one is kept on this device for debugging
+// (localStorage "chakra_last_error"). Real start failures show a calm,
+// translated in-app message from their own handlers.
 window.onerror = function(msg, url, lineNo, columnNo, error) {
-    // Only alert for actual crashes to avoid noise, but ensure we see the "Killer" bugs
-    if (msg.toLowerCase().indexOf("script error") > -1) return;
-    alert("App Error: " + msg + "\nLine: " + lineNo);
+    if (String(msg).toLowerCase().indexOf("script error") > -1) return;
+    console.error('[Lite] error:', msg, `${url}:${lineNo}:${columnNo}`, error);
+    try { localStorage.setItem('chakra_last_error', JSON.stringify({ msg: String(msg), url, lineNo, columnNo, at: new Date().toISOString() })); } catch (storageError) { /* optional */ }
     return false;
 };
+
+// Calm, translated in-app message (replaces the browser alert box).
+function notify(message, tone = 'info') {
+    const translate = typeof t === 'function' ? t : key => key;
+    const okLabel = translate('ui.noticeOk');
+    if (window.ChakraAppNotice) return window.ChakraAppNotice.show(message, { okLabel: okLabel === 'ui.noticeOk' ? 'OK' : okLabel, tone });
+    return window.alert(message);
+}
 
 const MANTRA_AUDIO_MAP = {
     root:        'audio/LAM.mp3',
@@ -349,7 +361,7 @@ const newcomerTutorialScreen = document.getElementById('newcomer-tutorial-screen
 
 function getShotSessionDependencies() {
     return {
-        state, alert: message => window.alert(message), t, document, getLanguageConfig, fetch, normalizeSleepStages,
+        state, alert: message => notify(message), t, document, getLanguageConfig, fetch, normalizeSleepStages,
         shotChakraOrder: SHOT_CHAKRA_ORDER, wakeLock, showScreen, meditationScreen, lobbyScreen, setText, journeyT,
         logError: (...args) => console.error(...args), window
     };
@@ -1164,7 +1176,7 @@ class MeditationController {
             return;
         }
         const reminder = t('ui.journeyVideoPreludeReminder');
-        alert(reminder === 'ui.journeyVideoPreludeReminder' ? DND_REMINDER_FALLBACK : reminder);
+        notify(reminder === 'ui.journeyVideoPreludeReminder' ? DND_REMINDER_FALLBACK : reminder);
     }
 
     estimateStandardJourneySeconds() {
@@ -1601,7 +1613,7 @@ class MeditationController {
             }
         } catch (err) {
             console.error("Critical Start Failure:", err);
-            alert("App Error: " + err.message + "\n\nPlease ensure you have a stable connection and try again.");
+            notify(t('ui.noticeStartFailed'), 'error');
             this.stop();
         } finally {
             this.isStarting = false;
@@ -1626,7 +1638,8 @@ class MeditationController {
             state, document, fetch, getLanguageConfig, wakeLock, setText, showScreen, meditationScreen,
             backgroundMusicEntryFadeSeconds: BACKGROUND_MUSIC_ENTRY_FADE_SECONDS,
             logError: (...args) => console.error(...args),
-            alert: message => window.alert(message),
+            alert: message => notify(message, 'error'),
+            failureMessage: () => t('ui.noticeStartFailed'),
             window, piperTTS, experimentScreen
         });
     }
@@ -3393,7 +3406,7 @@ function attachEventListeners() {
         updateVisibility: updateExperienceModeVisibility, updateSessionEstimate
     });
     lobbyExperienceVisibility.bindShotsToggle({
-        toggle: shotsToggle, state, translate: t,
+        toggle: shotsToggle, state, translate: t, alert: message => notify(message),
         clearMusicOnlyMode, clearHighEnergyMode, clearSleepMode, clearFocusedExperiences,
         clearJourneyAddons, clearIntimateService, resetDurationForType: resetShotDurationForType,
         getShotType: () => shotTypeSelect?.value,
@@ -3419,7 +3432,7 @@ function attachEventListeners() {
         window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 
         if (!shotsToggle || !shotTypeSelect || !Number.isFinite(frequency) || frequency <= 0 || frequency > 20000) {
-            alert(t('ui.shotInvalidFrequency'));
+            notify(t('ui.shotInvalidFrequency'));
             return;
         }
 
@@ -3603,7 +3616,7 @@ function attachEventListeners() {
             selectedChakraCount: state.selectedChakras.length
         });
         if (!validation.valid) {
-            alert("Please select at least one chakra before beginning the journey.");
+            notify(t('ui.noticeSelectChakra'));
             return false;
         }
         return true;
@@ -3627,7 +3640,7 @@ function attachEventListeners() {
                 await practiceModuleLoader.loadMany(selectedModules);
             } catch (error) {
                 console.error('Selected guided practice could not load:', error);
-                alert(journeyT('ui.practiceLoadFailed'));
+                notify(journeyT('ui.practiceLoadFailed'), 'error');
                 return;
             } finally {
                 delete startMeditationBtn.dataset.practiceLoading;
@@ -3685,7 +3698,7 @@ function attachEventListeners() {
         document.body.classList.toggle('sleep-mode-active', state.sleepMode);
         const focusedExperience = meditation.getFocusedExperience();
         if (focusedExperience === 'yoga' && state.selectedYogaPoses.length === 0) {
-            alert('Please select at least one yoga pose in Settings before beginning the Yoga Experience.');
+            notify(t('ui.noticeSelectYogaPose'));
             return;
         }
 
@@ -3707,7 +3720,7 @@ function attachEventListeners() {
             document.body.classList.add('sleep-mode-active');
             meditation.runSleepJourney().catch(err => {
                 console.error('Failed to start Sleep Mode:', err);
-                alert('Failed to start Sleep Mode. Check console.');
+                notify(t('ui.noticeStartFailed'), 'error');
                 meditation.stop();
             });
         } else {
@@ -3719,7 +3732,7 @@ function attachEventListeners() {
             });
             const isHighEnergy = getChecked('high-energy-toggle');
             if (!focusedExperience && !isHighEnergy && order.length === 0) {
-                alert("Please select at least one chakra before beginning the journey.");
+                notify(t('ui.noticeSelectChakra'));
                 return;
             }
             meditation.chakraOrder = order;
@@ -3731,7 +3744,7 @@ function attachEventListeners() {
             }
             meditation.start().catch(err => {
                 console.error("Failed to start meditation:", err);
-                alert("Failed to start meditation. Check console.");
+                notify(t('ui.noticeStartFailed'), 'error');
             });
         }
     });

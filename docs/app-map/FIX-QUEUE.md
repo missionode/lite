@@ -30,6 +30,12 @@
 - Fixed from the narration review: Malayalam Quiet Courage (was about beauty/clothes), വിധിയില്ലാതെ, elbow→wrist in yoga safety; Tamil broken word and Hreem→Om in Third Eye; Hindi masculine narrator/listener forms and Ho'oponopono junk; Russian capital mantras and wrong-stress words; English "close your eyes" and noun lists.
 - Engine: sentence pieces keep `? ! . ।`; long sentences break at commas (0.4 s breath) instead of a mid-phrase 1.5 s pause; new `modules/narration-speech-form.js` voice-only respellings (mantras, Chakra, Sanskrit names, Russian capitals, Hindi/Malayalam/Tamil bija). Guide: `docs/narration-style.md`.
 
+## Completed — Calm messages and repertory languages
+
+- Browser alert boxes replaced by translated in-app messages; no developer text shown to users.
+- Repertory page in five languages, No Frequency note, app language no longer overwritten.
+- Deferred (by choice): lazy-loading locale files; small gain and it would break offline language switching.
+
 ## Completed — Lobby frequency reminder
 
 - Owner: No Frequency Mode was only in Settings, so users did not know tones were off. The Lobby now shows the on/off state above Begin with a one-tap switch.

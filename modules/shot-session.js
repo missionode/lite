@@ -91,7 +91,7 @@
                 if (owner.isMeditationActive) finish(owner, deps);
             } catch (error) {
                 logError('Shot activation failed:', error);
-                alert(`Shot activation failed: ${error.message}`);
+                alert(t('ui.noticeStartFailed') === 'ui.noticeStartFailed' ? `Shot activation failed: ${error.message}` : t('ui.noticeStartFailed'));
                 stop(owner, deps);
             }
         }

@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: feature/voice-sleep-images on feature/heavenly-voice (production 3c78247) · 2026-10-03.
+Source snapshot: feature/notices-repertory on production df8c8c9 · 2026-10-03.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
@@ -204,11 +204,11 @@ This inventories static UI declarations in the three meditation HTML entry pages
 
 | Source | Element | Identifier / label | Choices / bounds / destination |
 | --- | --- | --- | --- |
-| [88](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:88) | a | backLink | href=../index.html |
-| [89](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:89) | button | languageToggle | type=button |
-| [108](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:108) | a | sourceLink |  |
-| [114](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:114) | input | frequencySearch | type=search |
-| [115](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:115) | button | clearSearch | type=button |
+| [90](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:90) | a | backLink | href=../index.html |
+| [91](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:91) | select | languageToggle | en: English; ml: മലയാളം; hi: हिन्दी; ru: Русский; ta: தமிழ் |
+| [110](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:110) | a | sourceLink |  |
+| [116](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:116) | input | frequencySearch | type=search |
+| [117](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:117) | button | clearSearch | type=button |
 
 ## Runtime-generated and relocated controls
 

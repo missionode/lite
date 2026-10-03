@@ -30,6 +30,8 @@
     }
     .back-link{gap:7px}.language-toggle{cursor:pointer;color:var(--gold)}
     .back-link:hover,.language-toggle:hover{border-color:rgba(244,201,107,.5)}
+    select.language-toggle{background:transparent;font:inherit}select.language-toggle option{background:#120c1e;color:#fff}
+    .freq-note{display:block;margin-top:4px;font-size:.78rem;opacity:.75}
     :focus-visible{outline:3px solid rgba(244,201,107,.38);outline-offset:3px}
     .hero{
       position:relative;overflow:hidden;border:1px solid var(--line);border-radius:32px;padding:clamp(25px,6vw,54px);
@@ -86,7 +88,7 @@
   <main class="shell">
     <nav class="topbar" aria-label="Page actions">
       <a class="back-link" href="../index.html" id="backLink">← <span data-copy="back">Return to Room</span></a>
-      <button class="language-toggle" id="languageToggle" type="button" aria-label="Change display language">മലയാളം</button>
+      <select class="language-toggle" id="languageToggle" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option><option value="hi">हिन्दी</option><option value="ru">Русский</option><option value="ta">தமிழ்</option></select>
     </nav>
 
     <header class="hero">
@@ -138,6 +140,7 @@
         referenceTitle:'Frequency Reference',referenceNote:'Search by frequency, focus or commonly associated feature. Every action prepares a one-second Custom Shot.',viewSource:'View source document ↗',searchPlaceholder:'Search Hz, sleep, calm, chakra…',clear:'Clear',
         frequency:'Frequency',identity:'Name & focus',features:'Commonly associated features',family:'Family',action:'Action',brainwave:'Brainwave band',solfeggio:'Solfeggio',tuning:'Musical tuning',wellness:'Mood & relaxation reference',activeInLite:'Configured in Lite',journeyUse:'Lite journey use',prepare:'Prepare 1 sec Shot',
         result:'result',results:'results',noResults:'No matching frequencies found.',loadError:'The frequency repertory could not be loaded. Return to the room and try again.',
+        noFrequencyNote:"Plays in journeys only when No Frequency Mode is off.",languageLabel:"Language",
         referenceCaution:'These descriptions are traditional or commonly reported associations for reference; they are not promises of a medical outcome. Low brainwave-band values are reference tones, not proof that a single audible tone will create that brain state.'
       },
       ml:{
@@ -146,11 +149,20 @@
         referenceTitle:'ആവൃത്തി റഫറൻസ്',referenceNote:'ആവൃത്തി, ഉദ്ദേശ്യം, അല്ലെങ്കിൽ പൊതുവെ ബന്ധിപ്പിക്കുന്ന സവിശേഷത ഉപയോഗിച്ച് തിരയുക. ഓരോ പ്രവർത്തനവും ഒരു സെക്കൻഡ് കസ്റ്റം ഷോട്ട് തയ്യാറാക്കും.',viewSource:'ഉറവിട രേഖ കാണുക ↗',searchPlaceholder:'Hz, ഉറക്കം, ശാന്തത, ചക്രം എന്നിവ തിരയുക…',clear:'മായ്ക്കുക',
         frequency:'ആവൃത്തി',identity:'പേരും ഉദ്ദേശ്യവും',features:'പൊതുവെ ബന്ധിപ്പിക്കുന്ന സവിശേഷതകൾ',family:'വിഭാഗം',action:'പ്രവർത്തനം',brainwave:'ബ്രെയിൻവേവ് പരിധി',solfeggio:'സോൾഫെജിയോ',tuning:'സംഗീത ട്യൂണിങ്',wellness:'മനോഭാവവും ശാന്തതയും റഫറൻസ്',activeInLite:'Lite-ൽ ക്രമീകരിച്ചിട്ടുണ്ട്',journeyUse:'Lite യാത്രയിലെ ഉപയോഗം',prepare:'1 സെക്കൻഡ് ഷോട്ട് തയ്യാറാക്കുക',
         result:'ഫലം',results:'ഫലങ്ങൾ',noResults:'പൊരുത്തപ്പെടുന്ന ആവൃത്തികളൊന്നും കണ്ടെത്തിയില്ല.',loadError:'ആവൃത്തി റിപ്പർട്ടറി ലോഡ് ചെയ്യാനായില്ല. മുറിയിലേക്ക് മടങ്ങി വീണ്ടും ശ്രമിക്കൂ.',
+        noFrequencyNote:"ആവൃത്തിയില്ലാ മോഡ് ഓഫായിരിക്കുമ്പോൾ മാത്രമേ യാത്രകളിൽ ഇത് കേൾക്കൂ.",languageLabel:"ഭാഷ",
         referenceCaution:'ഈ വിവരണങ്ങൾ റഫറൻസിനായുള്ള പരമ്പരാഗതമോ പൊതുവെ പറയപ്പെടുന്നതുമായ ബന്ധങ്ങളാണ്; ഇവ ചികിത്സാഫലം ഉറപ്പുനൽകുന്നില്ല. കുറഞ്ഞ ബ്രെയിൻവേവ് മൂല്യങ്ങൾ റഫറൻസ് ശബ്ദങ്ങളാണ്; ഒരൊറ്റ കേൾവിയാവൃത്തി ആ മാനസികാവസ്ഥ സൃഷ്ടിക്കും എന്നതിന് തെളിവല്ല.'
-      }
+      },
+      hi:{"back": "कमरे में लौटें", "eyebrow": "फ़्रीक्वेंसी संदर्भ लाइब्रेरी", "title": "साउंड शॉट रिपर्टरी", "intro": "ब्रेनवेव बैंड और साउंड-हीलिंग में आम फ़्रीक्वेंसी का खोजने योग्य संदर्भ, उनसे आमतौर पर जुड़ी विशेषताओं के साथ।", "loading": "संदर्भ और सक्रिय स्क्रिप्ट लोड हो रहे हैं…", "loaded": "संदर्भ तैयार · Lite के सक्रिय मान जाँचे गए", "referenceEntries": "संदर्भ प्रविष्टियाँ", "configuredValues": "Lite में सेट मान", "referenceFamilies": "संदर्भ श्रेणियाँ", "referenceTitle": "फ़्रीक्वेंसी संदर्भ", "referenceNote": "फ़्रीक्वेंसी, उद्देश्य या आम विशेषता से खोजें। हर बटन एक सेकंड का कस्टम शॉट तैयार करता है।", "viewSource": "स्रोत दस्तावेज़ देखें ↗", "searchPlaceholder": "Hz, नींद, शांति, चक्र खोजें…", "clear": "साफ़ करें", "frequency": "फ़्रीक्वेंसी", "identity": "नाम और उद्देश्य", "features": "आम तौर पर जुड़ी विशेषताएँ", "family": "श्रेणी", "action": "कार्य", "brainwave": "ब्रेनवेव बैंड", "solfeggio": "सोलफ़ेजियो", "tuning": "संगीत ट्यूनिंग", "wellness": "मूड और आराम संदर्भ", "activeInLite": "Lite में सेट", "journeyUse": "Lite यात्रा में उपयोग", "prepare": "1 सेकंड शॉट तैयार करें", "result": "परिणाम", "results": "परिणाम", "noResults": "कोई मिलती-जुलती फ़्रीक्वेंसी नहीं मिली।", "loadError": "फ़्रीक्वेंसी रिपर्टरी लोड नहीं हो सकी। कमरे में लौटकर फिर कोशिश करें।", "referenceCaution": "ये विवरण संदर्भ के लिए परंपरागत या आम तौर पर बताए गए संबंध हैं; ये किसी चिकित्सीय परिणाम का वादा नहीं हैं। कम ब्रेनवेव मान संदर्भ टोन हैं, इस बात का प्रमाण नहीं कि एक सुनाई देने वाला टोन वह मानसिक अवस्था बना देगा।", "noFrequencyNote": "यात्राओं में यह तभी बजता है जब आवृत्ति-रहित मोड बंद हो।", "languageLabel": "भाषा"},
+      ru:{"back": "Вернуться в комнату", "eyebrow": "Справочник частот", "title": "Репертуар звуковых шотов", "intro": "Справочник с поиском по диапазонам мозговых волн и частотам, популярным в звукотерапии, с их обычно связываемыми свойствами.", "loading": "Загрузка справочника и активных скриптов…", "loaded": "Справочник готов · активные значения Lite проверены", "referenceEntries": "Записи справочника", "configuredValues": "Значения, заданные в Lite", "referenceFamilies": "Группы справочника", "referenceTitle": "Справочник частот", "referenceNote": "Ищите по частоте, цели или связанному свойству. Каждая кнопка готовит односекундный пользовательский шот.", "viewSource": "Открыть источник ↗", "searchPlaceholder": "Поиск: Гц, сон, спокойствие, чакра…", "clear": "Очистить", "frequency": "Частота", "identity": "Название и цель", "features": "Обычно связываемые свойства", "family": "Группа", "action": "Действие", "brainwave": "Диапазон мозговых волн", "solfeggio": "Сольфеджио", "tuning": "Музыкальный строй", "wellness": "Настроение и расслабление", "activeInLite": "Задано в Lite", "journeyUse": "Использование в Lite", "prepare": "Подготовить шот на 1 с", "result": "результат", "results": "результатов", "noResults": "Подходящих частот не найдено.", "loadError": "Не удалось загрузить справочник частот. Вернитесь в комнату и попробуйте снова.", "referenceCaution": "Эти описания — традиционные или часто упоминаемые связи для справки; они не обещают медицинского результата. Низкие значения мозговых волн — опорные тоны, а не доказательство того, что один слышимый тон создаст это состояние мозга.", "noFrequencyNote": "Звучит в сеансах, только когда режим без частот выключен.", "languageLabel": "Язык"},
+      ta:{"back": "அறைக்குத் திரும்பு", "eyebrow": "அதிர்வெண் குறிப்பு நூலகம்", "title": "சவுண்ட் ஷாட் தொகுப்பு", "intro": "மூளை அலை வரம்புகள் மற்றும் ஒலி சிகிச்சையில் பொதுவான அதிர்வெண்களைத் தேடக்கூடிய குறிப்பு, அவற்றுடன் பொதுவாகத் தொடர்புடைய பண்புகளுடன்.", "loading": "குறிப்பும் செயலில் உள்ள ஸ்கிரிப்ட்களும் ஏற்றப்படுகின்றன…", "loaded": "குறிப்பு தயார் · Lite-இன் செயல் மதிப்புகள் சரிபார்க்கப்பட்டன", "referenceEntries": "குறிப்புப் பதிவுகள்", "configuredValues": "Lite-இல் அமைத்த மதிப்புகள்", "referenceFamilies": "குறிப்பு வகைகள்", "referenceTitle": "அதிர்வெண் குறிப்பு", "referenceNote": "அதிர்வெண், நோக்கம் அல்லது பொதுவான பண்பைக் கொண்டு தேடுங்கள். ஒவ்வொரு பொத்தானும் ஒரு வினாடி தனிப்பயன் ஷாட்டைத் தயாரிக்கும்.", "viewSource": "மூல ஆவணத்தைப் பார் ↗", "searchPlaceholder": "Hz, உறக்கம், அமைதி, சக்கரம் தேடுங்கள்…", "clear": "அழி", "frequency": "அதிர்வெண்", "identity": "பெயரும் நோக்கமும்", "features": "பொதுவாகத் தொடர்புடைய பண்புகள்", "family": "வகை", "action": "செயல்", "brainwave": "மூளை அலை வரம்பு", "solfeggio": "சோல்ஃபெஜியோ", "tuning": "இசை ட்யூனிங்", "wellness": "மனநிலை மற்றும் தளர்வு குறிப்பு", "activeInLite": "Lite-இல் அமைக்கப்பட்டது", "journeyUse": "Lite பயணப் பயன்பாடு", "prepare": "1 வினாடி ஷாட் தயாரி", "result": "முடிவு", "results": "முடிவுகள்", "noResults": "பொருந்தும் அதிர்வெண்கள் எதுவும் இல்லை.", "loadError": "அதிர்வெண் தொகுப்பை ஏற்ற முடியவில்லை. அறைக்குத் திரும்பி மீண்டும் முயலுங்கள்.", "referenceCaution": "இந்த விவரங்கள் குறிப்புக்கான பாரம்பரிய அல்லது பொதுவாகச் சொல்லப்படும் தொடர்புகள்; இவை மருத்துவப் பலனுக்கான உறுதிமொழி அல்ல. குறைந்த மூளை அலை மதிப்புகள் குறிப்பு ஒலிகள் மட்டுமே; ஒரே ஒரு கேட்கும் ஒலி அந்த மூளை நிலையை உருவாக்கும் என்பதற்கான சான்று அல்ல.", "noFrequencyNote": "அதிர்வெண் இல்லா முறை முடக்கத்தில் இருக்கும்போது மட்டுமே பயணங்களில் ஒலிக்கும்.", "languageLabel": "மொழி"}
     };
     const FAMILY_COLORS={brainwave:'#7aa2ff',solfeggio:'#f4c96b',tuning:'#72d98b',wellness:'#f39ac5'};
-    let language=localStorage.getItem('chakra_display_language')==='ml'?'ml':'en';
+    // Five languages. The page remembers its own choice and never changes
+    // the app's display language.
+    const LANGUAGES={en:'English',ml:'മലയാളം',hi:'हिन्दी',ru:'Русский',ta:'தமிழ்'};
+    const LOCALES={en:'en-US',ml:'ml-IN',hi:'hi-IN',ru:'ru-RU',ta:'ta-IN'};
+    function readStored(key){try{return localStorage.getItem(key)}catch(error){return null}}
+    let language=[readStored('chakra_repertory_language'),readStored('chakra_display_language')].find(value=>value in LANGUAGES)||'en';
     let catalog=null;
     let activeFrequencies=new Set();
     let query='';
@@ -165,7 +177,7 @@
       ].filter(value=>Number.isFinite(value)&&value>0));
     }
     function searchableText(entry){
-      return [entry.frequencyLabel,entry.shotFrequency,localized(entry.name),localized(entry.focus),localized(entry.features),localized(entry.journeyUse),text(entry.kind),...(entry.searchTerms||[])].join(' ').toLocaleLowerCase(language==='ml'?'ml-IN':'en-US');
+      return [entry.frequencyLabel,entry.shotFrequency,localized(entry.name),localized(entry.focus),localized(entry.features),localized(entry.journeyUse),text(entry.kind),...(entry.searchTerms||[])].join(' ').toLocaleLowerCase(LOCALES[language]);
     }
     function createCell(label,content,className=''){
       const cell=document.createElement('td');cell.dataset.label=label;if(className)cell.className=className;
@@ -178,13 +190,14 @@
       const family=document.createElement('div');const category=document.createElement('span');category.className='category';category.textContent=text(entry.kind);family.append(category);
       if(activeFrequencies.has(Number(entry.shotFrequency))){const active=document.createElement('span');active.className='active-mark';active.textContent='● '+text('activeInLite');family.append(active)}
       if(entry.journeyUse){const use=document.createElement('span');use.className='active-mark';use.textContent='✦ '+text('journeyUse')+': '+localized(entry.journeyUse);family.append(use)}
+      if(entry.journeyUse||activeFrequencies.has(Number(entry.shotFrequency))){const note=document.createElement('span');note.className='freq-note';note.textContent='○ '+text('noFrequencyNote');family.append(note)}
       const shot=document.createElement('a');shot.className='prepare-shot';shot.href=`../index.html?shotFrequency=${encodeURIComponent(entry.shotFrequency)}&shotSource=repertory`;shot.textContent=text('prepare');shot.setAttribute('aria-label',`${text('prepare')}: ${entry.shotFrequency} Hz`);
       row.append(createCell(text('frequency'),frequency),createCell(text('identity'),identity),createCell(text('features'),localized(entry.features),'features'),createCell(text('family'),family),createCell(text('action'),shot));
       return row;
     }
     function render(){
       if(!catalog)return;
-      const needle=query.trim().toLocaleLowerCase(language==='ml'?'ml-IN':'en-US');
+      const needle=query.trim().toLocaleLowerCase(LOCALES[language]);
       const entries=catalog.entries.filter(entry=>!needle||searchableText(entry).includes(needle));
       const rows=document.getElementById('frequencyRows');rows.replaceChildren(...entries.map(createRow));
       document.getElementById('noResults').hidden=entries.length!==0;
@@ -196,10 +209,10 @@
       document.documentElement.lang=language;document.title=text('title');
       document.querySelectorAll('[data-copy]').forEach(node=>{node.textContent=text(node.dataset.copy)});
       document.querySelectorAll('[data-copy-placeholder]').forEach(node=>{node.placeholder=text(node.dataset.copyPlaceholder)});
-      const toggle=document.getElementById('languageToggle');toggle.textContent=language==='en'?'മലയാളം':'English';toggle.setAttribute('aria-label',language==='en'?'Show in Malayalam':'Show in English');
+      const select=document.getElementById('languageToggle');select.value=language;select.setAttribute('aria-label',text('languageLabel'));
       render();
     }
-    document.getElementById('languageToggle').addEventListener('click',()=>{language=language==='en'?'ml':'en';localStorage.setItem('chakra_display_language',language);applyCopy()});
+    document.getElementById('languageToggle').addEventListener('change',event=>{language=event.target.value in LANGUAGES?event.target.value:'en';try{localStorage.setItem('chakra_repertory_language',language)}catch(error){}applyCopy()});
     const search=document.getElementById('frequencySearch');const clear=document.getElementById('clearSearch');
     search.addEventListener('input',event=>{query=event.target.value;clear.hidden=!query;render()});
     clear.addEventListener('click',()=>{query='';search.value='';clear.hidden=true;render();search.focus()});

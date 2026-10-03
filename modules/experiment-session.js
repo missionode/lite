@@ -55,7 +55,7 @@
                 if (owner.isMeditationActive) stop(owner, deps);
             } catch (error) {
                 logError('Experiment activity failed:', error);
-                alert(`Experiment activity failed: ${error.message}`);
+                alert(deps.failureMessage?.() || `Experiment activity failed: ${error.message}`);
                 stop(owner, deps);
             } finally { owner.isStarting = false; }
         }

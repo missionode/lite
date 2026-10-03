@@ -12,7 +12,7 @@ const wrapper = context.window.ChakraJourneyHypnosisWrapper;
 assert.ok(Object.isFrozen(wrapper));
 assert.match(app, /shouldRunHypnosisWrapper\(\) \{\s*return journeyHypnosisWrapper\.shouldRun\(this\)/);
 assert.match(app, /runGuidedTransitionTone\(frequency, durationMs,[\s\S]*?journeyHypnosisWrapper\.runGuidedTransitionTone\(this, frequency/);
-assert.ok(html.indexOf('modules/journey-hypnosis-wrapper.js?v=1.0') < html.indexOf('app.js?v=4.25'));
+assert.ok(html.indexOf('modules/journey-hypnosis-wrapper.js?v=1.0') < html.indexOf('app.js?v=4.26'));
 assert.match(sw, /\.\/modules\/journey-hypnosis-wrapper\.js\?v=1\.0/);
 
 const events = [];
