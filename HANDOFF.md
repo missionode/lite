@@ -47,7 +47,7 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/notices-repertory):** (1) Calm in-app messages (`modules/app-notice.js`) replace all browser alert boxes; texts are translated (choose a chakra, choose a yoga pose, session could not start) and no developer wording ("Check console", "App Error") is shown; the global error handler logs quietly to the console and `localStorage.chakra_last_error`. (2) Repertory page in five languages (labels and all 16 entries), a "plays in journeys only when No Frequency Mode is off" note on Lite tones, and its language picker no longer overwrites the app display language (own key `chakra_repertory_language`). (3) Not done on purpose: loading only one language file at start. The saving is small (about 400 KB once) and it would break switching language offline. App `v4.26`, style `v2.24`, shot/experiment session `v1.1`, app notice `v1.0`, shell cache `chakra-v5.354`, language cache `v78`.
 
-- **Push status:** production is at `df8c8c9`. Push `feature/notices-repertory` to production to release these.
+- **Push status:** production is at `b7b982c`. Everything above is live (pushed 2026-10-03).
 
 ## Checkpoint history (production)
 

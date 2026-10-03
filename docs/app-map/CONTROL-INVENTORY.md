@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: feature/notices-repertory on production df8c8c9 · 2026-10-03.
+Source snapshot: production b7b982c (live: notices, five-language repertory, frequency reminder, voice download, Sleep wind-down, WebP, Heavenly Sound, Chakra Touch) · 2026-10-03.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

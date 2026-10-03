@@ -1,7 +1,7 @@
 // Source-reviewed flow atlas. Each graph lists visual rows and explicit edges.
 export const meta = { title: 'Chakra Meditation · Flow Atlas', date: '2026-09-29', commit: 'b967a5f production + uncommitted narration and No Frequency default updates', scope: 'Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run.' };
 meta.date = '2026-10-03';
-meta.commit = 'feature/notices-repertory on production df8c8c9';
+meta.commit = 'production b7b982c (live: notices, five-language repertory, frequency reminder, voice download, Sleep wind-down, WebP, Heavenly Sound, Chakra Touch)';
 meta.scope += ' Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language.';
 meta.scope += ' Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings.';
 meta.scope += ' 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step.';

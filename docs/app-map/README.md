@@ -13,7 +13,7 @@ Open [index.html](./index.html) in a browser. It is self-contained and needs no 
 
 ## Evidence
 
-Latest update (2026-10-01): branch `feature/notices-repertory` on top of production `df8c8c9` — calm translated messages and five-language repertory; earlier: clearer voice download, Sleep wind-down, WebP images, Heavenly Sound (clear voice bus, heavenly echo, smooth mastering), Play Zone games (Hush Hush v2.0, Contactless Eye Shooter, Chakra Touch), confident five-language narration with the speech-form layer, chakra orientation names, spelling proofread, clearer assessment with the reliable service-fit dot, and smooth mantra exits/pause fades. Atlas verifier passed for all 51 maps.
+Latest update (2026-10-03): production `b7b982c` (live) — calm translated messages and five-language repertory; earlier: clearer voice download, Sleep wind-down, WebP images, Heavenly Sound (clear voice bus, heavenly echo, smooth mastering), Play Zone games (Hush Hush v2.0, Contactless Eye Shooter, Chakra Touch), confident five-language narration with the speech-form layer, chakra orientation names, spelling proofread, clearer assessment with the reliable service-fit dot, and smooth mantra exits/pause fades. Atlas verifier passed for all 51 maps.
 
 Source baseline: production commit `6a0ee84` plus the uncommitted natural-sky update, 2026-09-08. The visuals map describes the new cached renderer, motion lifecycle, lunar texture and illustrative star field. New sky behavior has static/unit evidence; browser preview was declined. This atlas captures source-identified branches and explicitly labels uncertainty; it is not an exhaustive runtime-state proof. Independent settings combine with journey flows rather than appearing as thousands of duplicated diagrams.
 
