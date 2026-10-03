@@ -1621,7 +1621,7 @@ flowchart TD
 | Browser fallback | Uses the available language-matched browser voice, or system default when none is listed. |
 | Preview unavailable | Shown only when Piper and browser speech are both unavailable. |
 | No Frequency ON | Selected by default when no preference is saved; an explicit saved opt-out remains off. When enabled: cancel drone timer; stop drone, frequency Shot, transition tone and ambience; disable Shots and ambience controls. |
-| Lobby frequency reminder | Just above Begin in the Lobby: “Frequency tones are off” (🔇, amber, Turn on) while No Frequency is on, or “Frequency tones are on” (🎵, green, Turn off). The note says chakra drones and the 432 / 528 Hz cues stay silent or will play. One tap uses the same setter as the Settings and mixer toggles: saves chakra_no_frequency_mode, syncs both checkboxes and applies the audio side effects. Saving Settings refreshes it; text follows the display language. |
+| Lobby frequency reminder | Just above Begin in the Lobby: “Frequency tones are off” (🔇, amber, Turn on) while No Frequency is on, or “Frequency tones are on” (🎵, green, Turn off). The note says chakra drones and other tones stay silent or will play. One tap uses the same setter as the Settings and mixer toggles: saves chakra_no_frequency_mode, syncs both checkboxes and applies the audio side effects. Saving Settings refreshes it; text follows the display language. |
 | No Mantra ON | Cancel drone timer; stop drone and mantra; retain spoken guidance and music. |
 | Mood ambience ON | Session-only enablement; starts if active and not Music Only; forces soft blur on. |
 | Ambience source | Saved custom URL if present; otherwise manifest/local audio buffers. Empty URL restores default selection. |

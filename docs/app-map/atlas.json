@@ -4143,7 +4143,7 @@
           [
             "freqreminder",
             "Lobby frequency reminder",
-            "Just above Begin in the Lobby: “Frequency tones are off” (🔇, amber, Turn on) while No Frequency is on, or “Frequency tones are on” (🎵, green, Turn off). The note says chakra drones and the 432 / 528 Hz cues stay silent or will play. One tap uses the same setter as the Settings and mixer toggles: saves chakra_no_frequency_mode, syncs both checkboxes and applies the audio side effects. Saving Settings refreshes it; text follows the display language."
+            "Just above Begin in the Lobby: “Frequency tones are off” (🔇, amber, Turn on) while No Frequency is on, or “Frequency tones are on” (🎵, green, Turn off). The note says chakra drones and other tones stay silent or will play. One tap uses the same setter as the Settings and mixer toggles: saves chakra_no_frequency_mode, syncs both checkboxes and applies the audio side effects. Saving Settings refreshes it; text follows the display language."
           ],
           [
             "nomantra",

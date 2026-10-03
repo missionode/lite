@@ -325,6 +325,39 @@ test('Sleep Mode winds down to dark and ends on a quiet goodnight screen', async
   await expect(page.locator('#lobby-screen')).toBeVisible();
 });
 
+test('Lobby frequency reminder follows No Frequency Mode and switches it both ways', async ({ page }) => {
+  const box = page.locator('#frequency-reminder');
+  const toggle = page.locator('#frequency-reminder-toggle');
+  // Fresh profile: No Frequency Mode is on, so the Lobby says tones are off.
+  await expect(page.locator('#no-frequency-mode-toggle')).toBeChecked();
+  await page.locator('#save-config').click();
+  await expect(box).toHaveAttribute('data-state', 'off');
+  await expect(box).toContainText('Frequency tones are off');
+  await expect(box).not.toContainText('432');
+  // Turn on from the Lobby: Settings and mixer follow, and it is saved.
+  await toggle.click();
+  await expect(box).toHaveAttribute('data-state', 'on');
+  await expect(box).toContainText('Frequency tones are on');
+  await expect(page.locator('#mixer-no-frequency-mode-toggle')).not.toBeChecked();
+  expect(await page.evaluate(() => localStorage.getItem('chakra_no_frequency_mode'))).toBe('false');
+  await page.reload();
+  await expect(page.locator('#splash-screen')).toBeHidden();
+  await page.waitForTimeout(800);
+  // A returning visitor may land straight in the Lobby.
+  if (await page.locator('#save-config').isVisible()) await page.locator('#save-config').click();
+  await expect(box).toHaveAttribute('data-state', 'on');
+  // Turn No Frequency back on from Settings: the Lobby shows tones off again.
+  await page.locator('#open-settings').click();
+  await page.locator('#no-frequency-mode-toggle').check();
+  await page.locator('#save-config').click();
+  await expect(box).toHaveAttribute('data-state', 'off');
+  // And off again from the Lobby.
+  await toggle.click();
+  await expect(box).toHaveAttribute('data-state', 'on');
+  await page.locator('#open-settings').click();
+  await expect(page.locator('#no-frequency-mode-toggle')).not.toBeChecked();
+});
+
 test('keeps HRIM selectable without a time restriction', async ({ page }) => {
   await page.locator('#save-config').click();
   await page.locator('#high-energy-toggle').check();

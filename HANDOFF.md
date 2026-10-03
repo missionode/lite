@@ -43,7 +43,7 @@ This is the authoritative current checkpoint. Read this block first; later secti
 
 - **Follow-up (feature/voice-sleep-images, Pitch):** 2-Minute Mind Reset has no breathing cues in any language (owner: repeated breathe in/out felt rushed). Calm: soften face, loose hands, listen to sounds. Courage: posture, feet into the ground, remembered strength. Energy: shoulder rolls, arm stretch, shake out hands. Focus: eyes on one point, three sounds. Openings unchanged (sit or stand). Language cache `v75`.
 
-- **Follow-up (feature/voice-sleep-images, Lobby reminder):** a frequency reminder sits just above Begin in the Lobby. It shows "Frequency tones are off" (amber, Turn on) while No Frequency Mode is on, or "Frequency tones are on" (green, Turn off), and names the chakra drones and 432 / 528 Hz cues. One tap uses the same setter as Settings and the mixer (saved, synced, audio applied). Five languages. Audio mode settings view `v1.1`, app `v4.25`, style `v2.23`, shell cache `chakra-v5.353`, language cache `v76`.
+- **Follow-up (feature/voice-sleep-images, Lobby reminder):** a frequency reminder sits just above Begin in the Lobby. It shows "Frequency tones are off" (amber, Turn on) while No Frequency Mode is on, or "Frequency tones are on" (green, Turn off), and says the chakra drones and other tones stay silent or will play. One tap uses the same setter as Settings and the mixer (saved, synced, audio applied). Five languages. Audio mode settings view `v1.1`, app `v4.25`, style `v2.23`, shell cache `chakra-v5.353`, language cache `v76`.
 
 - **Push status:** production is at `3c78247`. Push `feature/voice-sleep-images` to production to release Chakra Touch, Heavenly Sound and these follow-ups (it contains all of them).
 
