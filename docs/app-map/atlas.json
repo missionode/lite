@@ -3141,7 +3141,7 @@
       "group": "Journeys",
       "title": "Pitch Mode · 2-Minute Mind Reset",
       "subtitle": "Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.",
-      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1603; app.js:2918; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31",
+      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1603; app.js:2918; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1631",
       "rows": [
         [
           [
@@ -3166,7 +3166,7 @@
           [
             "start",
             "Start the 2-minute clock",
-            "Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone or visual journey. When No Frequency Mode is off, one very soft mood tone fades in over 8 s (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it."
+            "Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone or visual journey. When No Frequency Mode is off, one very soft mood tone plays from the start for the standard Drone Duration window (Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s) with soft fades inside it (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it."
           ]
         ],
         [
@@ -3185,7 +3185,7 @@
           [
             "end",
             "End without statistics",
-            "Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. The mood tone fades out (3 s on a natural finish, 0.3 s on Close)."
+            "Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. Any mood tone still playing fades out (1.5 s on a natural finish, 0.3 s on Close)."
           ]
         ],
         [

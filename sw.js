@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './style.css?v=2.24',
-  './app.js?v=4.27',
+  './app.js?v=4.28',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',

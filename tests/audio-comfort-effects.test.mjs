@@ -12,7 +12,7 @@ const comfort = context.window.ChakraAudioComfortEffects;
 assert.ok(Object.isFrozen(comfort));
 assert.match(app, /toggleEyesCloseMode\(enabled\)\s*\{\s*return audioComfortEffects\.setEyesCloseMode\(this, enabled, state\);/);
 assert.match(app, /toggleAudioFilters\(enabled\)\s*\{\s*return audioComfortEffects\.setAudioFilters\(this, enabled, state\);/);
-assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.1') < html.indexOf('app.js?v=4.27'));
+assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.1') < html.indexOf('app.js?v=4.28'));
 assert.match(sw, /\.\/modules\/audio-comfort-effects\.js\?v=1\.1/);
 assert.match(sw, /chakra-v5\.356/);
 

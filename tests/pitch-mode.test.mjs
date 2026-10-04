@@ -60,16 +60,30 @@ const silent = mockAudio();
 assert.equal(pitch.startMoodTone(silent, 'calm', { noFrequencyMode: true }), false, 'No Frequency Mode on: no tone');
 assert.equal(silent.events.length, 0);
 const toned = mockAudio();
-assert.equal(pitch.startMoodTone(toned, 'focus', { noFrequencyMode: false }), true, 'No Frequency Mode off: the mood tone plays');
+assert.equal(pitch.startMoodTone(toned, 'focus', { noFrequencyMode: false }, 10000), true, 'No Frequency Mode off: the mood tone plays');
 assert.equal(toned.pitchMoodTone.frequency, 852);
-assert.deepEqual(toned.events.find(e => e[0] === 'ramp'), ['ramp', pitch.TONE_LEVEL, 8], 'fades in slowly over 8 s');
+assert.equal(toned.pitchMoodTone.seconds, 10, 'Intermediate: the tone lasts 10 s');
+const ramps = toned.events.filter(e => e[0] === 'ramp');
+assert.deepEqual(ramps[0], ['ramp', pitch.TONE_LEVEL, 1.5], 'soft fade in');
+assert.deepEqual(ramps.at(-1), ['ramp', 0, 10], 'faded out by the end of the Drone Duration window');
+assert.ok(toned.events.some(e => e[0] === 'stop' && e[1] <= 10.1), 'the oscillator stops at the end of the window');
+// Drone Duration: Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s.
+for (const [ms, seconds, fade] of [[4000, 4, 1], [10000, 10, 1.5], [14000, 14, 1.5], [20000, 20, 1.5]]) {
+    const envelope = pitch.toneEnvelope(ms);
+    assert.equal(envelope.seconds, seconds);
+    assert.equal(envelope.fade, fade);
+    assert.ok(envelope.steadyUntil >= envelope.fade, `${seconds} s has a steady middle`);
+}
+assert.equal(pitch.toneEnvelope(600000).seconds, 20, 'never longer than the 20 s drone window');
+assert.match(app, /toneDurationMs: \(\) => getDroneDurationMs\(0, state\.droneDurationMode\)/, 'the tone follows the standard Drone Duration setting');
+assert.match(source, /startMoodTone\(owner\.audio, mood, state, toneDurationMs\(\)\)/);
 assert.equal(typeof toned.stopPitchTone, 'function', 'turning No Frequency Mode on can stop it');
 toned.stopPitchTone();
 assert.equal(toned.pitchMoodTone, null);
 assert.ok(toned.events.some(e => e[0] === 'stop'), 'the tone stops');
 assert.equal(pitch.startMoodTone(mockAudio(), 'rest', { noFrequencyMode: false }), false, 'unknown moods have no tone');
 assert.match(fs.readFileSync(new URL('../modules/audio-mode-settings-view.js', import.meta.url), 'utf8'), /if \(state\.noFrequencyMode\) \{[\s\S]*?audio\.stopPitchTone\?\.\(\);/, 'switching No Frequency Mode on stops the Pitch tone');
-assert.match(source, /fadeInBackgroundMusic\(3\);\s*startMoodTone\(owner\.audio, mood, state\);/, 'the tone starts with the music');
+assert.match(source, /fadeInBackgroundMusic\(3\);\s*startMoodTone\(owner\.audio, mood, state, toneDurationMs\(\)\);/, 'the tone starts with the music');
 assert.match(source, /finally \{\s*stopMoodTone\(owner\.audio, 0\.3\);/, 'the tone always stops when the demo ends');
 
 // Pause spreading keeps the guide inside two minutes.

@@ -68,4 +68,4 @@ Each Pitch line now carries a feeling (warm welcome, settling middle, mood-shape
 
 ## Mood tone
 
-When No Frequency Mode is off, each mood has one very soft background tone (Calm 639 Hz Heart, Courage 396 Hz Root, Energy 528 Hz Solar Plexus, Focus 852 Hz Third Eye) at a third of the chakra drone level. It fades in over 8 s and out at the end. With No Frequency Mode on there is no tone; switching it on mid-session stops the tone at once.
+When No Frequency Mode is off, each mood has one very soft background tone (Calm 639 Hz Heart, Courage 396 Hz Root, Energy 528 Hz Solar Plexus, Focus 852 Hz Third Eye) at a third of the chakra drone level. Like the chakra drones, it follows the standard Drone Duration setting: it plays from the start for Beginner 4 s, Intermediate 10 s, Advanced 14 s or Expert 20 s, with soft fades inside that time. With No Frequency Mode on there is no tone; switching it on mid-session stops the tone at once.

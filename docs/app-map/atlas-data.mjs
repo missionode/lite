@@ -739,11 +739,11 @@ add('narration-feeling','Systems','Narration feelings','Piper has no emotion swi
     const pitchMap = graphs.find(graph => graph.id === 'pitch-mode');
     const guide = pitchMap.rows.flat().find(node => node[0] === 'guide');
     guide[2] += ' Each line carries a narration feeling (see the narration-feeling map): a warm welcome, a settling middle and a close that matches the mood.';
-    pitchMap.source += '; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31';
+    pitchMap.source += '; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1631';
     const startNode = pitchMap.rows.flat().find(node => node[0] === 'start');
-    startNode[2] = startNode[2].replace('No mantra, drone, chakra frequency or visual journey.', 'No mantra, drone or visual journey.') + ' When No Frequency Mode is off, one very soft mood tone fades in over 8 s (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it.';
+    startNode[2] = startNode[2].replace('No mantra, drone, chakra frequency or visual journey.', 'No mantra, drone or visual journey.') + ' When No Frequency Mode is off, one very soft mood tone plays from the start for the standard Drone Duration window (Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s) with soft fades inside it (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it.';
     const endNode = pitchMap.rows.flat().find(node => node[0] === 'end');
-    endNode[2] += ' The mood tone fades out (3 s on a natural finish, 0.3 s on Close).';
+    endNode[2] += ' Any mood tone still playing fades out (1.5 s on a natural finish, 0.3 s on Close).';
     const narrationMap = graphs.find(graph => graph.id === 'narration');
     narrationMap.notes.push('Narration feelings (2026-10-04): an optional bounded per-line preset changes Piper pace, noise_scale, noise_w, clip volume and the pause after the line; see the narration-feeling map. Lines without a feeling are unchanged.');
     narrationMap.source += '; modules/narration-feeling.js:1';

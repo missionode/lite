@@ -36,29 +36,45 @@
     // One very soft background tone per mood, only when No Frequency Mode is
     // off. Symbolic chakra tones already used in Lite: Calm = Heart 639 Hz,
     // Courage = Root 396 Hz, Energy = Solar Plexus 528 Hz, Focus = Third Eye
-    // 852 Hz. A third of the chakra drone level, slow fade in, gentle fade out.
+    // 852 Hz. A third of the chakra drone level. It follows the Drone Duration
+    // setting like the chakra drones: Beginner 4 s, Intermediate 10 s,
+    // Advanced 14 s, Expert 20 s from the start, with soft fades inside that time.
     const MOOD_TONES = Object.freeze({ calm: 639, courage: 396, energy: 528, focus: 852 });
     const TONE_LEVEL = 0.02;
-    const TONE_FADE_IN_S = 8;
-    const TONE_FADE_OUT_S = 3;
+    const TONE_DEFAULT_MS = 4000;
+    const TONE_FADE_OUT_S = 1.5;
 
-    function startMoodTone(audio, mood, state) {
+    // Fades take a quarter of the window each (0.5–1.5 s), so a 4 s tone still swells and settles.
+    function toneEnvelope(durationMs) {
+        const seconds = Math.max(2, Math.min(20, (Number(durationMs) || TONE_DEFAULT_MS) / 1000));
+        const fade = Math.min(1.5, Math.max(0.5, seconds * 0.25));
+        return { seconds, fade, steadyUntil: seconds - fade };
+    }
+
+    function startMoodTone(audio, mood, state, durationMs = TONE_DEFAULT_MS) {
         stopMoodTone(audio, 0.05);
         const frequency = MOOD_TONES[mood];
         if (state?.noFrequencyMode || !frequency || !audio?.ctx || !audio.masterGain) return false;
         const ctx = audio.ctx;
         const now = ctx.currentTime;
+        const { seconds, fade, steadyUntil } = toneEnvelope(durationMs);
         const oscillator = ctx.createOscillator();
         const gain = ctx.createGain();
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(frequency, now);
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(TONE_LEVEL, now + TONE_FADE_IN_S);
+        gain.gain.linearRampToValueAtTime(TONE_LEVEL, now + fade);
+        gain.gain.setValueAtTime(TONE_LEVEL, now + steadyUntil);
+        gain.gain.linearRampToValueAtTime(0, now + seconds);
         oscillator.connect(gain);
         gain.connect(audio.masterGain);
         oscillator.start(now);
-        oscillator.onended = () => { try { oscillator.disconnect(); gain.disconnect(); } catch (error) { /* already gone */ } };
-        audio.pitchMoodTone = { oscillator, gain, frequency };
+        oscillator.stop(now + seconds + 0.05);
+        oscillator.onended = () => {
+            try { oscillator.disconnect(); gain.disconnect(); } catch (error) { /* already gone */ }
+            if (audio.pitchMoodTone?.oscillator === oscillator) audio.pitchMoodTone = null;
+        };
+        audio.pitchMoodTone = { oscillator, gain, frequency, seconds };
         // Turning No Frequency Mode on mid-session stops it at once.
         audio.stopPitchTone = (fade = 0.3) => stopMoodTone(audio, fade);
         return true;
@@ -124,7 +140,8 @@
         async function start(owner, mood, deps) {
             const {
                 state, document, piperTTS, isPiperVoice, wakeLock, showScreen, meditationScreen,
-                setText, journeyT, setVoiceStatus, t, logError, now = () => Date.now()
+                setText, journeyT, setVoiceStatus, t, logError, now = () => Date.now(),
+                toneDurationMs = () => TONE_DEFAULT_MS
             } = deps;
             if (!MOODS.includes(mood)) return false;
             if (owner.isStarting || owner.isMeditationActive || owner.isShotActive) return false;
@@ -164,7 +181,7 @@
                 document.getElementById('controls')?.classList.remove('hidden');
                 setText('pause-meditation', 'II');
                 owner.audio.fadeInBackgroundMusic(3);
-                startMoodTone(owner.audio, mood, state);
+                startMoodTone(owner.audio, mood, state, toneDurationMs());
 
                 showScreen(meditationScreen);
                 owner.visual?.stop?.();
@@ -210,6 +227,6 @@
     }
 
     global.ChakraPitchMode = Object.freeze({
-        create, MOODS, MOOD_TONES, TONE_LEVEL, startMoodTone, stopMoodTone, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
+        create, MOODS, MOOD_TONES, TONE_LEVEL, toneEnvelope, startMoodTone, stopMoodTone, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
     });
 })(typeof window === 'undefined' ? globalThis : window);

@@ -1630,7 +1630,9 @@ class MeditationController {
     async startPitch(mood) {
         return pitchMode.start(this, mood, {
             state, document, piperTTS, isPiperVoice, wakeLock, showScreen, meditationScreen,
-            setText, journeyT, setVoiceStatus, t, logError: (...args) => console.error(...args)
+            setText, journeyT, setVoiceStatus, t, logError: (...args) => console.error(...args),
+            // The mood tone follows the standard Drone Duration setting.
+            toneDurationMs: () => getDroneDurationMs(0, state.droneDurationMode)
         });
     }
 

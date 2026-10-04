@@ -11,7 +11,7 @@ context.window = context;
 vm.runInNewContext(source, context);
 const { loadAndValidate } = context.ChakraJourneyContentLoader;
 assert.match(app, /journeyContentLoader\.loadAndValidate\(/);
-assert.ok(html.indexOf('modules/journey-content-loader.js?v=1.0') < html.indexOf('app.js?v=4.27'));
+assert.ok(html.indexOf('modules/journey-content-loader.js?v=1.0') < html.indexOf('app.js?v=4.28'));
 assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?\.\/modules\/journey-content-loader\.js\?v=1\.0/);
 
 const valid = { lang: 'en' };

@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const undoUnlearnPractice = await practiceModuleLoader\.load\('undo-unlearn'\)/);
 assert.match(app, /async runUndoUnlearn\(\) \{[\s\S]*?undoUnlearnPractice\.run\(/);
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.27/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.28/);
 assert.doesNotMatch(html, /modules\/undo-unlearn-practice\.js/);
 assert.match(serviceWorker, /modules\/undo-unlearn-practice\.js\?v=1\.0/);
 
