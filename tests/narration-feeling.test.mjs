@@ -78,4 +78,47 @@ assert.ok(html.indexOf('modules/narration-feeling.js?v=1.0') < html.indexOf('mod
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(sw, /'\.\/modules\/narration-feeling\.js\?v=1\.0'/, 'works offline');
 assert.match(sw, /chakra-piper-v12/, 'the changed Piper runtime is fetched fresh');
+// scripts.json: every narrated field in every language has a feeling.
+const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
+assert.ok(scripts.feelings && typeof scripts.feelings === 'object', 'scripts.json has a feelings block');
+for (const [key, name] of Object.entries(scripts.feelings)) {
+    if (key.startsWith('_')) continue;
+    assert.ok(feeling.NAMES.includes(name), `scripts.json feeling ${key} = ${name} is a known feeling`);
+}
+const languages = ['en', 'ml', 'hi', 'ru', 'ta'];
+const notSpoken = /(^|\.)(title|name|_note)$/;
+const fields = [];
+const walk = (value, segments) => {
+    if (typeof value === 'string') {
+        const leaf = segments.at(-1);
+        if (languages.includes(leaf) || /_(en|ml|hi|ru|ta)$/.test(leaf) || languages.includes(segments.at(-2))) fields.push({ segments, text: value });
+    } else if (Array.isArray(value)) value.forEach((item, index) => walk(item, [...segments, String(index)]));
+    else if (value && typeof value === 'object') for (const [key, item] of Object.entries(value)) if (key !== 'feelings') walk(item, [...segments, key]);
+};
+walk(scripts, []);
+let checked = 0;
+for (const { segments, text } of fields) {
+    const key = feeling.fieldKey(segments);
+    if (notSpoken.test(key) || !text.trim()) continue;
+    assert.ok(feeling.fromScripts(scripts, text), `${segments.join('.')} (${key}) has a feeling`);
+    checked++;
+}
+assert.ok(checked >= 250, `checked ${checked} narrated lines across five languages`);
+// The same field has the same feeling in every language.
+for (const language of languages) {
+    assert.equal(feeling.fromScripts(scripts, scripts.root[`meditation_${language}`]), 'grounding');
+    assert.equal(feeling.fromScripts(scripts, scripts.crown[`meditation_${language}`]), 'still');
+    assert.equal(feeling.fromScripts(scripts, scripts.hooponopono.phrases[language][2]), 'tender');
+    assert.equal(feeling.fromScripts(scripts, scripts.closing[language]), 'return');
+}
+// Titles and names are shown on screen and get no feeling; text added after a line still matches.
+assert.equal(feeling.fromScripts(scripts, scripts.massage.title.en), null);
+assert.equal(feeling.fromScripts(scripts, scripts.high_energy.intention_en.replace('{{intention}}', 'peace')), 'warm');
+assert.equal(feeling.fromScripts(scripts, 'Something no script says.'), null);
+assert.equal(feeling.fromScripts(null, 'x'), null);
+assert.match(app, /tagged\.feeling \|\| narrationFeeling\.fromScripts\(this\.scripts, text\)/, 'journeys look up the feeling of each script line');
+for (const fixture of ['demo-script.json', 'test-script.json']) {
+    const other = JSON.parse(fs.readFileSync(new URL(`../${fixture}`, import.meta.url), 'utf8'));
+    assert.deepEqual(other.feelings, scripts.feelings, `${fixture} uses the same feelings as scripts.json`);
+}
 console.log('narration feeling: ok');

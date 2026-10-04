@@ -2269,7 +2269,7 @@ flowchart TD
 
 Piper has no emotion switch, so each line can carry a small bounded feeling: pace, liveliness, rhythm, closeness and the silence after it.
 
-Sources: [modules/narration-feeling.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/narration-feeling.js:1), [tests/narration-feeling.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-feeling.test.mjs:1), [app.js:2248](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2248), [modules/piper-narration.js:6](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:6), [modules/piper-lifecycle.js:248](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:248), [piper/runtime/piper-tts-web.js:336](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:336), [modules/pitch-mode.js:131](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:131), [docs/narration-feeling.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/narration-feeling.md:1).
+Sources: [modules/narration-feeling.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/narration-feeling.js:1), [tests/narration-feeling.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-feeling.test.mjs:1), [app.js:2248](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2248), [modules/piper-narration.js:6](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:6), [modules/piper-lifecycle.js:248](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:248), [piper/runtime/piper-tts-web.js:336](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:336), [modules/pitch-mode.js:131](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:131), [scripts.json:2](/Users/lekshmisyam/Desktop/Ikigai/lite/scripts.json:2), [docs/narration-feeling.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/narration-feeling.md:1).
 
 ```mermaid
 flowchart TD
@@ -2290,7 +2290,7 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Narration line | A script line arrives at narrate(). It may start with a tag such as [tender]; only the six known feelings are removed, so the tag is never spoken or shown. A caller (Pitch Mode) can also pass the feeling directly. |
+| Narration line | A script line arrives at narrate(). It may start with a tag such as [tender]; only the six known feelings are removed, so the tag is never spoken or shown. A caller (Pitch Mode) can also pass the feeling directly. Otherwise the line is looked up in the feelings block of the active script (scripts.json, demo-script.json, test-script.json or a custom script): one feeling per field for all five languages, matched by exact text or its first 48 characters. |
 | Pick the preset | warm, tender, grounding, still, return or uplift. Values are clamped: pace 0.85–1.08, liveliness 0.75–1.12, rhythm 0.75–1.1, closeness 0.8–1.0, pause after 0–2 s. Unknown feeling: none. |
 | No feeling | Lines without a feeling use the Settings pace and the voice defaults, exactly as before. |
 | Shape the voice | Length scale = Settings value ÷ pace (still capped by the voice limit); Piper noise_scale × liveliness and noise_w × rhythm, clamped again inside the runtime (0.75–1.12). Cached clips are keyed by these settings. |
@@ -2298,7 +2298,7 @@ flowchart TD
 | Let it land | After the line, wait the extra pause (not after a fade-out or mantra hand-off). |
 | Pitch arcs | 2-Minute Mind Reset: Calm warm → grounding → tender → still → still → return; Courage warm → grounding → grounding → warm → uplift → uplift; Energy warm → uplift → uplift → warm → uplift → uplift; Focus warm → grounding → still → still → grounding → return. |
 
-- Pilot: only Pitch Mode passes feelings today. Other journeys can opt in later by tagging lines; untagged lines are unchanged.
+- Pitch Mode passes feelings per line. Journeys use the scripts.json feelings block: intro and moon lines, all seven chakra meditations and affirmations, closing, High Energy, Ho’oponopono, Corpse Pose, the four care sessions and Yoga (titles and names stay plain). Narration that lives in the locale files (orientation, safety, sleep stages, practices) has no feeling yet.
 - Evidence: unit tests for limits, tags, settings, arcs and wiring. Not yet verified: listening on a phone in all five languages (Ryan, Pratham, Dmitri, Arjun, Rasa may react differently).
 
 <a id="settings-backup"></a>

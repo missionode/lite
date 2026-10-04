@@ -2055,8 +2055,14 @@ class MeditationController {
     }
 
     async narrateSoft(text) {
+        let feeling = null;
+        if (narrationFeeling) {
+            const tagged = narrationFeeling.parse(text);
+            text = tagged.text;
+            feeling = tagged.feeling || narrationFeeling.fromScripts(this.scripts, text);
+        }
         if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, false, false, 1); }
+            try { return await this.narrateWithPiper(text, false, false, 1, 'normal', 'none', feeling); }
             catch (error) {
                 console.error('[Piper] soft narration failed:', error);
                 if (!this.isMeditationActive) return;
@@ -2211,8 +2217,14 @@ class MeditationController {
     }
 
     async narrateFeeble(text) {
+        let feeling = null;
+        if (narrationFeeling) {
+            const tagged = narrationFeeling.parse(text);
+            text = tagged.text;
+            feeling = tagged.feeling || narrationFeeling.fromScripts(this.scripts, text);
+        }
         if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, false, false, 0.9); }
+            try { return await this.narrateWithPiper(text, false, false, 0.9, 'normal', 'none', feeling); }
             catch (error) {
                 console.error('[Piper] feeble narration failed:', error);
                 if (!this.isMeditationActive) return;
@@ -2250,7 +2262,7 @@ class MeditationController {
         if (narrationFeeling) {
             const tagged = narrationFeeling.parse(text);
             text = tagged.text;
-            feeling = feeling || tagged.feeling;
+            feeling = feeling || tagged.feeling || narrationFeeling.fromScripts(this.scripts, text);
         }
         if (this.shouldUsePiper()) {
             try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing, transition, feeling); }

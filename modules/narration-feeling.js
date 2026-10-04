@@ -74,5 +74,62 @@
         });
     }
 
-    global.ChakraNarrationFeeling = Object.freeze({ LIMITS, PRESETS, NAMES, PITCH_ARCS, preset, parse, voiceSettings, pitchArc });
+    // scripts.json carries a top-level "feelings" block: one feeling per
+    // narration field, the same for every language, for example
+    //   "root.meditation": "grounding", "hooponopono.phrases.*": "tender".
+    // Keys drop the language ("meditation_en" → "meditation", ".en" → gone);
+    // "*" matches one list index or chakra name. Text is matched exactly,
+    // or by its opening words when a session adds text after it.
+    const LANGUAGE = /^(en|ml|hi|ru|ta)$/;
+    const PREFIX_LENGTH = 48;
+    const indexes = new WeakMap();
+
+    function fieldKey(segments) {
+        return segments.filter(segment => !LANGUAGE.test(segment))
+            .map(segment => segment.replace(/_(en|ml|hi|ru|ta)$/, ''))
+            .join('.');
+    }
+
+    function feelingForKey(feelings, key) {
+        if (PRESETS[feelings[key]]) return feelings[key];
+        const parts = key.split('.');
+        for (const [pattern, name] of Object.entries(feelings)) {
+            if (!pattern.includes('*') || !PRESETS[name]) continue;
+            const wanted = pattern.split('.');
+            if (wanted.length === parts.length && wanted.every((part, index) => part === '*' || part === parts[index])) return name;
+        }
+        return null;
+    }
+
+    function indexScripts(scripts) {
+        const exact = new Map();
+        const prefix = new Map();
+        const feelings = scripts && typeof scripts.feelings === 'object' ? scripts.feelings : null;
+        if (!feelings) return { exact, prefix };
+        const walk = (value, segments) => {
+            if (typeof value === 'string') {
+                const name = feelingForKey(feelings, fieldKey(segments));
+                const text = value.trim();
+                if (!name || !text) return;
+                exact.set(text, name);
+                if (text.length >= PREFIX_LENGTH) prefix.set(text.slice(0, PREFIX_LENGTH), name);
+            } else if (Array.isArray(value)) {
+                value.forEach((item, index) => walk(item, [...segments, String(index)]));
+            } else if (value && typeof value === 'object') {
+                for (const [key, item] of Object.entries(value)) if (key !== 'feelings') walk(item, [...segments, key]);
+            }
+        };
+        walk(scripts, []);
+        return { exact, prefix };
+    }
+
+    function fromScripts(scripts, text) {
+        if (!scripts || typeof scripts !== 'object') return null;
+        if (!indexes.has(scripts)) indexes.set(scripts, indexScripts(scripts));
+        const { exact, prefix } = indexes.get(scripts);
+        const value = String(text ?? '').trim();
+        return exact.get(value) || (value.length >= PREFIX_LENGTH ? prefix.get(value.slice(0, PREFIX_LENGTH)) : null) || null;
+    }
+
+    global.ChakraNarrationFeeling = Object.freeze({ LIMITS, PRESETS, NAMES, PITCH_ARCS, preset, parse, voiceSettings, pitchArc, fieldKey, fromScripts });
 })(typeof window === 'undefined' ? globalThis : window);

@@ -5819,13 +5819,13 @@
       "group": "Systems",
       "title": "Narration feelings",
       "subtitle": "Piper has no emotion switch, so each line can carry a small bounded feeling: pace, liveliness, rhythm, closeness and the silence after it.",
-      "source": "modules/narration-feeling.js:1; tests/narration-feeling.test.mjs:1; app.js:2248; modules/piper-narration.js:6; modules/piper-lifecycle.js:248; piper/runtime/piper-tts-web.js:336; modules/pitch-mode.js:131; docs/narration-feeling.md:1",
+      "source": "modules/narration-feeling.js:1; tests/narration-feeling.test.mjs:1; app.js:2248; modules/piper-narration.js:6; modules/piper-lifecycle.js:248; piper/runtime/piper-tts-web.js:336; modules/pitch-mode.js:131; scripts.json:2; docs/narration-feeling.md:1",
       "rows": [
         [
           [
             "line",
             "Narration line",
-            "A script line arrives at narrate(). It may start with a tag such as [tender]; only the six known feelings are removed, so the tag is never spoken or shown. A caller (Pitch Mode) can also pass the feeling directly."
+            "A script line arrives at narrate(). It may start with a tag such as [tender]; only the six known feelings are removed, so the tag is never spoken or shown. A caller (Pitch Mode) can also pass the feeling directly. Otherwise the line is looked up in the feelings block of the active script (scripts.json, demo-script.json, test-script.json or a custom script): one feeling per field for all five languages, matched by exact text or its first 48 characters."
           ]
         ],
         [
@@ -5902,7 +5902,7 @@
         ]
       ],
       "notes": [
-        "Pilot: only Pitch Mode passes feelings today. Other journeys can opt in later by tagging lines; untagged lines are unchanged.",
+        "Pitch Mode passes feelings per line. Journeys use the scripts.json feelings block: intro and moon lines, all seven chakra meditations and affirmations, closing, High Energy, Ho’oponopono, Corpse Pose, the four care sessions and Yoga (titles and names stay plain). Narration that lives in the locale files (orientation, safety, sleep stages, practices) has no feeling yet.",
         "Evidence: unit tests for limits, tags, settings, arcs and wiring. Not yet verified: listening on a phone in all five languages (Ryan, Pratham, Dmitri, Arjun, Rasa may react differently)."
       ]
     },

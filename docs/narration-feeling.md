@@ -34,6 +34,30 @@ The runtime clamps liveliness and rhythm again (0.75–1.12) and keeps the exist
 - Energy: warm → uplift → uplift → warm → uplift → uplift
 - Focus: warm → grounding → still → still → grounding → return
 
+## Feelings in the journey scripts
+
+`scripts.json` (and `demo-script.json`, `test-script.json`) start with a `feelings` block: one feeling per narration field, the same for all five languages. Keys drop the language (`meditation_en` → `meditation`, `.en` → nothing); `*` matches a list index. When a journey speaks a line, Lite finds its field by exact text, or by its first 48 characters when the session adds text after it (for example a personal intention).
+
+| Part | Feeling |
+| --- | --- |
+| Gratitude, returning welcome, waxing and full moon | warm |
+| New and waning moon | tender |
+| Root meditation and affirmation | grounding |
+| Sacral | tender meditation, warm affirmation |
+| Solar Plexus | warm meditation, uplift affirmation |
+| Heart | tender |
+| Throat | warm |
+| Third Eye, Crown | still |
+| Closing and its affirmation | return |
+| High Energy | warm intention, uplift meditation and affirmation |
+| Ho'oponopono | tender intro and phrases, return closing |
+| Corpse Pose | still intro, return transition |
+| Care sessions (bath, perineal, assisted bathing) | warm intro, grounding instructions, tender reminder |
+| Massage | warm intro, tender instructions and reminder |
+| Yoga | warm intro and next-pose prompt, grounding preparation and pose descriptions, return at the end |
+
+Titles and names are shown on screen and have no feeling. A custom script can carry its own `feelings` block. Narration stored in the locale files (newcomer orientation, safety line, sleep stages, focused practices) has no feeling yet.
+
 ## Tagging other scripts later
 
 Any narration line may start with a tag, for example `[tender] Let your shoulders soften.` Only the six names above are recognised; the tag is removed before speaking and never shown. Untagged lines behave exactly as before. Tag the same line in all five languages.
