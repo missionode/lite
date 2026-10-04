@@ -1,5 +1,26 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Separate time for each chakra (2026-10-04)
+
+- Lobby switch "Set time for each chakra" under Core Practice Duration (core kept as the base; off by default; normal chakra journeys only). Seven rows 1–7 min; unchanged chakras follow the core; Reset all to core.
+- "Fill times from assessment": focus chakras with enough answers get core + 50 % (max 7 min) as a suggestion; applied only on Apply. Map `per-chakra-time`.
+
+## Completed — 2-Minute Mind Reset fades (2026-10-04)
+
+- Music fades in over 5 s with the aura; after the last line a 6 s outro fades music, aura and mood tone together before the invite.
+
+## Completed — Benefits and safety FAQ (2026-10-04)
+
+- Medical clarity moved out of the practice into a six-question FAQ (five languages) opened from Settings; disclaimers removed from narration, Lobby notes and the repertory. Map `benefits-safety`.
+
+## Completed — Pitch mood tone (2026-10-04)
+
+- One very soft tone per mood (639/396/528/852 Hz) only when No Frequency Mode is off, following the Drone Duration window.
+
+## Completed — Narration feelings (2026-10-04)
+
+- Six bounded feelings (pace, liveliness, rhythm, closeness, pause); Pitch arcs per line; journey scripts carry a `feelings` block for all five languages. Map `narration-feeling`.
+
 ## Completed — Mantra no longer drops suddenly
 
 - End of each chakra: the mantra used a 2 s fade (half of the 4 s post-mantra gap). It now leaves over a 12 s window (6 s fade + reverb tail) that begins inside the chant time, so the chakra's total time is unchanged (`transitions.chakraMantraExit`, 0 in fast-test).
