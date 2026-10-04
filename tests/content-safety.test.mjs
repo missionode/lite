@@ -251,7 +251,8 @@ assert.match(scripts.closing.en, /awareness you cultivated/i);
 assert.match(scripts.closing.ml, /വളർത്തിയ അവബോധം/u);
 assert.match(scripts.bath_session.intro.en, /sadhak guide/i);
 assert.match(scripts.bath_session.intro.ml, /മാർഗ്ഗനിർദ്ദേശകന്റെ നിർദേശങ്ങൾ/u);
-assert.match(scripts.yoga.intro.en, /stop for pain/i);
+assert.match(scripts.yoga.intro.en, /pain, simply stop and rest/i);
+assert.doesNotMatch(JSON.stringify(scripts.yoga.intro), /health advice|doctor|врач|மருத்துவ ஆலோசனை|ആരോഗ്യ നിർദ്ദേശ|स्वास्थ्य सलाह/, 'yoga narration has no medical-advice disclaimer (it lives in Benefits and safety)');
 assert.match(scripts.yoga.intro.ml, /വേദന/u);
 
 console.log('Content safety contract passed for English and Malayalam.');

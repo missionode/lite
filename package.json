@@ -131,6 +131,7 @@
     "test:celestial-presence": "node tests/celestial-presence.test.mjs",
     "test:night-sky": "node tests/night-sky.test.mjs",
     "test:narration-feeling": "node tests/narration-feeling.test.mjs",
+    "test:benefits-safety": "node tests/benefits-safety.test.mjs",
     "test:sky-astronomy": "node tests/sky-astronomy.test.mjs",
     "test:model-routing": "python3 -m unittest Loop/tests/test_codex_model_router.py",
     "test:e2e": "playwright test",

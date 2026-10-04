@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.24">
+    <link rel="stylesheet" href="style.css?v=2.25">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -37,6 +37,7 @@
                 <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
             </div>
             <p class="subtitle">Set your preferences for a guided experience</p>
+            <button id="benefits-safety-button" class="benefits-safety-link" type="button" data-i18n="ui.faqButton">Benefits and safety</button>
             
             <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
                 <span data-i18n="ui.journeys">Journeys</span>: <span id="stat-journeys">0</span> | <span data-i18n="ui.totalTime">Total Time</span>: <span id="stat-time">0</span> <span data-i18n="ui.minutes">mins</span>
@@ -307,7 +308,30 @@
                     <p data-i18n="ui.settingsHelpYoga">Yoga Experience is selected in the Lobby. Its optional care stages are configured here.</p>
                     <p data-i18n="ui.settingsHelpModes">Music Only and High Energy are selected in the Lobby. High Energy is available from 3:30 AM until 6:00 PM; from 6:00 PM, Sleep Mode is offered at journey start.</p>
                     <p><span data-i18n="ui.settingsHelpAudioCredit">Pleasure ambience audio (audio/pleasure.mp3): supplied from Wikimedia Commons under CC0 1.0 Universal. Attribution is not legally required by CC0, but this credit is retained for provenance.</span> <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer" data-i18n="ui.cc0Details">CC0 details</a></p>
+                    <p><button id="settings-help-faq" class="benefits-safety-link" type="button" data-i18n="ui.faqButton">Benefits and safety</button></p>
                     <p data-i18n="ui.settingsHelpSave">Save the settings to enter the Lobby. You can review the final mode and timing there before beginning.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="benefits-safety-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="benefits-safety-title">
+            <div class="modal-content settings-help-content benefits-safety-content">
+                <button id="benefits-safety-close" class="sleep-mode-prompt-close" type="button" aria-label="Close" data-i18n-aria-label="ui.close">×</button>
+                <h2 id="benefits-safety-title" data-i18n="ui.faqTitle">Benefits and safety</h2>
+                <p class="benefits-safety-intro" data-i18n="ui.faqIntro"></p>
+                <div class="settings-help-list benefits-safety-list">
+                    <h3 data-i18n="ui.faqQ1"></h3>
+                    <p data-i18n="ui.faqA1"></p>
+                    <h3 data-i18n="ui.faqQ2"></h3>
+                    <p data-i18n="ui.faqA2"></p>
+                    <h3 data-i18n="ui.faqQ3"></h3>
+                    <p data-i18n="ui.faqA3"></p>
+                    <h3 data-i18n="ui.faqQ4"></h3>
+                    <p data-i18n="ui.faqA4"></p>
+                    <h3 data-i18n="ui.faqQ5"></h3>
+                    <p data-i18n="ui.faqA5"></p>
+                    <h3 data-i18n="ui.faqQ6"></h3>
+                    <p data-i18n="ui.faqA6"></p>
                 </div>
             </div>
         </div>
@@ -915,7 +939,7 @@
     <script src="modules/experiment-settings-view.js?v=1.0"></script>
     <script src="modules/session-transport-controls.js?v=1.0"></script>
     <script src="modules/completion-view.js?v=1.1"></script>
-    <script src="modules/settings-help-view.js?v=1.0"></script>
+    <script src="modules/settings-help-view.js?v=1.1"></script>
     <script src="modules/visual-comfort-settings-view.js?v=1.0"></script>
     <script src="modules/mixer-view.js?v=1.0"></script>
     <script src="modules/media-controls-view.js?v=1.0"></script>

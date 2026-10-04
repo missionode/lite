@@ -4,8 +4,8 @@ import vm from 'node:vm';
 
 const html = readFileSync('index.html', 'utf8');
 const worker = readFileSync('sw.js', 'utf8');
-assert.ok(html.indexOf('modules/settings-help-view.js?v=1.0') < html.indexOf('app.js?v='), 'help module must load before the app');
-assert.match(worker, /modules\/settings-help-view\.js\?v=1\.0/, 'help module must be precached offline');
+assert.ok(html.indexOf('modules/settings-help-view.js?v=1.1') < html.indexOf('app.js?v='), 'help module must load before the app');
+assert.match(worker, /modules\/settings-help-view\.js\?v=1\.1/, 'help module must be precached offline');
 
 const events = new Map();
 const classes = new Set(['hidden']);

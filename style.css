@@ -3572,3 +3572,10 @@ body.sleep-wind-down:not(.sleep-peek) #app > .screen { pointer-events: none; }
 .app-notice-ok { align-self: flex-end; min-height: 2.6rem; min-width: 5.5rem; padding: 0 1.1rem; border-radius: 999px; border: none; background: #a78bfa; color: #160d24; font: inherit; font-weight: 800; cursor: pointer; }
 @keyframes app-notice-in { from { opacity: 0; transform: translate(-50%, -0.6rem); } to { opacity: 1; transform: translate(-50%, 0); } }
 @media (prefers-reduced-motion: reduce) { .app-notice { animation: none; } }
+
+/* Benefits and safety (FAQ) */
+.benefits-safety-link { background: none; border: none; color: var(--accent-color, #fbbf24); text-decoration: underline; font-size: 0.9rem; cursor: pointer; padding: 0.25rem 0; margin: 0 0 0.75rem; }
+.benefits-safety-content { max-height: 85vh; overflow-y: auto; }
+.benefits-safety-intro { opacity: 0.8; margin-bottom: 0.75rem; }
+.benefits-safety-list h3 { font-size: 1rem; margin: 1rem 0 0.35rem; }
+.benefits-safety-list p { margin: 0 0 0.5rem; line-height: 1.5; }

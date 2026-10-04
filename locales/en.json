@@ -14,7 +14,7 @@
     "newcomerLead": "You do not need prior knowledge or a special feeling. This is a calm practice of noticing your body, breath and attention.",
     "newcomerReassurance": "There is no right way to experience this. Keep what feels useful, and let the rest pass by.",
     "newcomerCentresTitle": "The seven centres, in simple words",
-    "newcomerCentresNote": "“Chakra” is a traditional map for reflection. These are prompts for attention, not medical facts or something you must feel.",
+    "newcomerCentresNote": "“Chakra” is a traditional map for reflection. Simply rest your attention on each centre and notice what you feel.",
     "newcomerRoot": "body, steadiness and feeling supported",
     "newcomerSacral": "feelings, ease and creativity",
     "newcomerSolar": "confidence, choice and inner strength",
@@ -170,6 +170,21 @@
     ,"settingsHelpAudioCredit": "Pleasure ambience audio (audio/pleasure.mp3): supplied from Wikimedia Commons under CC0 1.0 Universal. Attribution is not legally required by CC0, but this credit is retained for provenance."
     ,"cc0Details": "CC0 details"
     ,"settingsHelpSave": "Save the settings to enter the Lobby. You can review the final mode and timing there before beginning."
+    ,"faqButton": "Benefits and safety"
+    ,"faqTitle": "Benefits and safety"
+    ,"faqIntro": "Answers to the questions people ask most."
+    ,"faqQ1": "What can this practice do for me?"
+    ,"faqA1": "Regular practice helps many people feel calmer, sleep more easily, focus more clearly and feel closer to themselves. Many feel a lighter mood from the first session, and the change grows with regular practice."
+    ,"faqQ2": "How does it work?"
+    ,"faqA2": "The voice, music and tones guide your attention away from worry and into your body. This turns on the body's natural relaxation response. Your trust matters too: when you expect to feel better, mind and body respond more strongly. This is the well-known placebo effect, a real and helpful power of your own mind."
+    ,"faqQ3": "What are the chakras and frequencies?"
+    ,"faqA3": "Chakras are a traditional yoga map for placing attention on different areas of the body and of life. The frequencies are traditional, symbolic tones that support focus and mood. Their benefit comes through relaxation, attention and expectation."
+    ,"faqQ4": "Is this a medical treatment?"
+    ,"faqA4": "No. This is a wellbeing and meditation practice. It does not diagnose or treat illness and does not replace your doctor, medicine or therapy. Keep following any care you already receive."
+    ,"faqQ5": "Who should take extra care?"
+    ,"faqA5": "If you are pregnant, or have epilepsy, a heart condition, sensitivity to sound, or a recent injury or surgery, practise gently and check with your doctor before Yoga or long sessions. You can turn the frequency tones off with No Frequency Mode."
+    ,"faqQ6": "What if I feel uncomfortable during a session?"
+    ,"faqA6": "Open your eyes, pause or stop at any time. In Yoga, stop and rest if you feel pain, dizziness, weakness or loss of balance. If difficult feelings stay or grow, talk to someone you trust or a qualified professional."
     ,"presidingDeities": "Presiding Deities"
     ,"aboutApp": "About"
     ,"appVersion": "App version"
@@ -411,7 +426,7 @@
     ,"shotFrequency": "Frequency (Hz)"
     ,"shotDuration": "Shot Duration (seconds)"
     ,"shotsHelp": "One short frequency-only activation. No narration or background music. Sound Shots use Shot Duration; chakra Drone Duration modes do not apply."
-    ,"moodRelaxationShotNote": "221.23 Hz · A contemplative tone sometimes associated with sensual relaxation and connection; evidence for a frequency-specific effect is limited."
+    ,"moodRelaxationShotNote": "221.23 Hz · A contemplative tone associated with sensual relaxation and connection."
     ,"frequencyRepertory": "View Frequency Repertory"
     ,"activateMeditationShot": "Activate Meditation Shot"
     ,"activateHighEnergyShot": "Activate High Energy Shot"

@@ -750,3 +750,16 @@ add('narration-feeling','Systems','Narration feelings','Piper has no emotion swi
 }
 meta.date = '2026-10-04';
 meta.commit = 'production ab5f251 + uncommitted Pitch mood tone (feature/narration-feeling)';
+
+// Benefits and safety (FAQ), 2026-10-04: medical clarity moved out of the practice.
+add('benefits-safety','Supporting pages','Benefits and safety (FAQ)','One calm page for benefits and medical clarity, so the practice itself speaks only of benefits.','modules/settings-help-view.js:1; tests/benefits-safety.test.mjs:1; index.html:40; locales/en.json:173',[
+ [['open','Open the page','Settings shows a “Benefits and safety” link under the title; the Settings help (?) links to it too. The help closes when the FAQ opens.']],
+ [['benefits','Benefits','What the practice can do: calmer, easier sleep, clearer focus, closer to yourself; grows with regular practice.'],['how','How it works','Attention into the body, the natural relaxation response, and expectation — the placebo effect, explained as a real power of your own mind.']],
+ [['symbols','Chakras and frequencies','A traditional map and symbolic tones; their benefit comes through relaxation, attention and expectation.'],['medical','Not a treatment','Clear statement: wellbeing practice, does not diagnose or treat illness, does not replace a doctor, medicine or therapy.']],
+ [['care','Extra care and comfort','Pregnancy, epilepsy, heart condition, sound sensitivity, recent injury or surgery: practise gently, ask a doctor before Yoga or long sessions; No Frequency Mode turns tones off. Pause or stop any time; full Yoga stop list; talk to someone if difficult feelings stay.']],
+ [['close','Close','× or tap outside returns to Settings.']]
+],[['open','benefits','Read'],['open','how','Read'],['benefits','symbols','Next'],['how','medical','Next'],['symbols','care','Next'],['medical','care','Next'],['care','close','Done']],[
+ 'Owner decision (2026-10-04): clients felt distress from “not medical” lines in the practice. Removed from narration and Lobby text: chakra note (“not medical facts”), Yoga “health advice” and the long stop list (narration keeps “if you feel any pain, simply stop and rest”), the 221.23 Hz evidence line, and the repertory medical caution (now points here). Five languages.',
+ 'Evidence: unit tests for keys, links and removed disclaimers. Not yet verified in a browser on a phone.'
+]);
+meta.commit = 'production 4108ba0 + uncommitted Drone Duration tone and Benefits and safety (feature/narration-feeling)';

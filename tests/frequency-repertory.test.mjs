@@ -51,7 +51,8 @@ assert.match(page, /text\('journeyUse'\)/, 'the optional journey-use note should
 assert.match(page, /id="noResults"/, 'search should provide a clear empty state');
 assert.match(page, /shotFrequency=\$\{encodeURIComponent\(entry\.shotFrequency\)\}&shotSource=repertory/, 'every repertory CTA should carry only the chosen frequency and source');
 assert.match(page, /Prepare 1 sec Shot/, 'the CTA should state its one-second result');
-assert.match(page, /not promises of a medical outcome/, 'reference associations should not be presented as medical guarantees');
+assert.match(page, /Their benefit comes through relaxation, focused attention and your own expectation\. Read more in Benefits and safety, in Settings\./, 'the repertory points to Benefits and safety instead of a medical disclaimer');
+assert.doesNotMatch(page, /medical outcome|ചികിത്സാഫലം|चिकित्सीय परिणाम|медицинского результата|மருத்துவப் பலன்/, 'no medical disclaimer on the repertory page');
 assert.match(page, /chakra_display_language/, 'the repertory should follow and update the app display language');
 assert.match(page, /href="\.\.\/index\.html"/, 'the repertory should provide a Return to Room action');
 
