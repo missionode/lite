@@ -83,7 +83,12 @@ assert.equal(toned.pitchMoodTone, null);
 assert.ok(toned.events.some(e => e[0] === 'stop'), 'the tone stops');
 assert.equal(pitch.startMoodTone(mockAudio(), 'rest', { noFrequencyMode: false }), false, 'unknown moods have no tone');
 assert.match(fs.readFileSync(new URL('../modules/audio-mode-settings-view.js', import.meta.url), 'utf8'), /if \(state\.noFrequencyMode\) \{[\s\S]*?audio\.stopPitchTone\?\.\(\);/, 'switching No Frequency Mode on stops the Pitch tone');
-assert.match(source, /fadeInBackgroundMusic\(3\);\s*startMoodTone\(owner\.audio, mood, state, toneDurationMs\(\)\);/, 'the tone starts with the music');
+assert.match(source, /fadeInBackgroundMusic\(MUSIC_FADE_IN_S\);\s*startMoodTone\(owner\.audio, mood, state, toneDurationMs\(\)\);/, 'the tone starts with the music');
+// Gentle fade in and fade out.
+assert.equal(pitch.MUSIC_FADE_IN_S, 5, 'music fades in over 5 s, with the 5 s aura fade');
+assert.equal(pitch.OUTRO_FADE_S, 6, 'a 6 s outro after the last line');
+assert.ok(pitch.OUTRO_FADE_S * 1000 < pitch.INVITE_RESERVE_MS, 'the outro fits inside the reserve before two minutes');
+assert.match(source, /fadeOutBackgroundMusic\?\.\(OUTRO_FADE_S\);\s*stopMoodTone\(owner\.audio\);[\s\S]*?fadingAura\.style\.opacity = '0';\s*await owner\.pauseAwareSleep\(OUTRO_FADE_S \* 1000\);[\s\S]*?owner\.stop\(\);/, 'music, tone and aura fade out together before the session ends');
 assert.match(source, /finally \{\s*stopMoodTone\(owner\.audio, 0\.3\);/, 'the tone always stops when the demo ends');
 
 // Pause spreading keeps the guide inside two minutes.
@@ -159,7 +164,7 @@ assert.ok(shots > 0 && panel > shots && room > panel, 'Pitch Mode sits between S
 assert.doesNotMatch(html.slice(panel, html.indexOf('>', panel)), /hidden|disabled/, 'Pitch Mode is visible in normal mode');
 for (const mood of pitch.MOODS) assert.match(html, new RegExp(`data-pitch-mood="${mood}"`));
 assert.match(html, /id="pitch-invite"[^>]*class="modal hidden"|class="modal hidden"[^>]*id="pitch-invite"/);
-assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.2'/, 'Pitch Mode works offline');
+assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.3'/, 'Pitch Mode works offline');
 assert.match(app, /startPitch\(mood\)[\s\S]*?pitchMode\.start\(this, mood,/);
 
 // Every language has every label and full script.

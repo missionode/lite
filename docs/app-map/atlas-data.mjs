@@ -743,7 +743,8 @@ add('narration-feeling','Systems','Narration feelings','Piper has no emotion swi
     const startNode = pitchMap.rows.flat().find(node => node[0] === 'start');
     startNode[2] = startNode[2].replace('No mantra, drone, chakra frequency or visual journey.', 'No mantra, drone or visual journey.') + ' When No Frequency Mode is off, one very soft mood tone plays from the start for the standard Drone Duration window (Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s) with soft fades inside it (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it.';
     const endNode = pitchMap.rows.flat().find(node => node[0] === 'end');
-    endNode[2] += ' Any mood tone still playing fades out (1.5 s on a natural finish, 0.3 s on Close).';
+    endNode[2] += ' Outro first: music fades out over 6 s, the aura fades with it and any mood tone fades (1.5 s); then the session stops. Close fades the tone in 0.3 s.';
+    startNode[2] += ' Music fades in over 5 s together with the 5 s aura fade.';
     const narrationMap = graphs.find(graph => graph.id === 'narration');
     narrationMap.notes.push('Narration feelings (2026-10-04): an optional bounded per-line preset changes Piper pace, noise_scale, noise_w, clip volume and the pause after the line; see the narration-feeling map. Lines without a feeling are unchanged.');
     narrationMap.source += '; modules/narration-feeling.js:1';

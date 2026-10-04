@@ -3166,7 +3166,7 @@
           [
             "start",
             "Start the 2-minute clock",
-            "Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone or visual journey. When No Frequency Mode is off, one very soft mood tone plays from the start for the standard Drone Duration window (Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s) with soft fades inside it (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it."
+            "Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone or visual journey. When No Frequency Mode is off, one very soft mood tone plays from the start for the standard Drone Duration window (Beginner 4 s, Intermediate 10 s, Advanced 14 s, Expert 20 s) with soft fades inside it (Calm 639 Hz, Courage 396 Hz, Energy 528 Hz, Focus 852 Hz, a third of the chakra drone level); with No Frequency Mode on there is no tone. Turning No Frequency Mode on mid-session stops it. Music fades in over 5 s together with the 5 s aura fade."
           ]
         ],
         [
@@ -3185,7 +3185,7 @@
           [
             "end",
             "End without statistics",
-            "Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. Any mood tone still playing fades out (1.5 s on a natural finish, 0.3 s on Close)."
+            "Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. Outro first: music fades out over 6 s, the aura fades with it and any mood tone fades (1.5 s); then the session stops. Close fades the tone in 0.3 s."
           ]
         ],
         [

@@ -24,6 +24,10 @@
     // The spoken guide ends with room for the invite before the 2-minute mark.
     const INVITE_RESERVE_MS = 12000;
     const MIN_GAP_MS = 2500;
+    // Gentle edges: music fades in with the aura at the start; after the last
+    // line, music, aura and tone fade out together before the invite appears.
+    const MUSIC_FADE_IN_S = 5;
+    const OUTRO_FADE_S = 6;
     const MAX_GAP_MS = 14000;
 
     const MOOD_AURA = Object.freeze({
@@ -180,7 +184,7 @@
                 owner.startSessionCountdown(SESSION_MS);
                 document.getElementById('controls')?.classList.remove('hidden');
                 setText('pause-meditation', 'II');
-                owner.audio.fadeInBackgroundMusic(3);
+                owner.audio.fadeInBackgroundMusic(MUSIC_FADE_IN_S);
                 startMoodTone(owner.audio, mood, state, toneDurationMs());
 
                 showScreen(meditationScreen);
@@ -204,8 +208,16 @@
                 }
 
                 if (owner.isMeditationActive) {
-                    // No completion statistics: a demo is not a journey.
+                    // Outro: fade music, aura and tone together, then end quietly.
+                    owner.audio.fadeOutBackgroundMusic?.(OUTRO_FADE_S);
                     stopMoodTone(owner.audio);
+                    const fadingAura = document.getElementById('aura-bg');
+                    if (fadingAura) fadingAura.style.opacity = '0';
+                    await owner.pauseAwareSleep(OUTRO_FADE_S * 1000);
+                }
+
+                if (owner.isMeditationActive) {
+                    // No completion statistics: a demo is not a journey.
                     owner.stop();
                     restoreVoice();
                     await showInvite(document);
@@ -227,6 +239,6 @@
     }
 
     global.ChakraPitchMode = Object.freeze({
-        create, MOODS, MOOD_TONES, TONE_LEVEL, toneEnvelope, startMoodTone, stopMoodTone, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
+        create, MOODS, MUSIC_FADE_IN_S, OUTRO_FADE_S, MOOD_TONES, TONE_LEVEL, toneEnvelope, startMoodTone, stopMoodTone, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
     });
 })(typeof window === 'undefined' ? globalThis : window);
