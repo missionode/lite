@@ -65,3 +65,7 @@ No breathing cues (owner, 2026-10-02): repeated "breathe in, breathe out" lines 
 ## Narration feelings
 
 Each Pitch line now carries a feeling (warm welcome, settling middle, mood-shaped close). See `docs/narration-feeling.md`.
+
+## Mood tone
+
+When No Frequency Mode is off, each mood has one very soft background tone (Calm 639 Hz Heart, Courage 396 Hz Root, Energy 528 Hz Solar Plexus, Focus 852 Hz Third Eye) at a third of the chakra drone level. It fades in over 8 s and out at the end. With No Frequency Mode on there is no tone; switching it on mid-session stops the tone at once.

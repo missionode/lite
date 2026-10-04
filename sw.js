@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.355';
+const CACHE_NAME = 'chakra-v5.356';
 const PIPER_CACHE_NAME = 'chakra-piper-v12';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v78';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
@@ -27,7 +27,7 @@ const ASSETS = [
   './modules/settings-backup.js?v=1.0',
   './modules/settings-manager-view.js?v=1.0',
   './modules/audio-volume-settings-view.js?v=1.0',
-  './modules/audio-mode-settings-view.js?v=1.1',
+  './modules/audio-mode-settings-view.js?v=1.2',
   './modules/settings-help-view.js?v=1.0',
   './modules/visual-comfort-settings-view.js?v=1.0',
   './modules/mixer-view.js?v=1.0',
@@ -80,7 +80,7 @@ const ASSETS = [
   './modules/screen-navigation.js?v=1.0',
   './modules/shot-session.js?v=1.1',
   './modules/narration-feeling.js?v=1.0',
-  './modules/pitch-mode.js?v=1.1',
+  './modules/pitch-mode.js?v=1.2',
   './modules/sleep-journey.js?v=1.1',
   './modules/yoga-session.js?v=1.1',
   './modules/care-session.js?v=1.0',

@@ -49,7 +49,7 @@ assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?#lobby-scree
 const stylesheetUrl = html.match(/href="(style\.css\?v=[^"]+)"/)?.[1];
 assert.ok(stylesheetUrl, 'HTML loads a versioned theme stylesheet');
 assert.ok(serviceWorker.includes(`'./${stylesheetUrl}'`), 'offline shell precaches the same stylesheet version');
-assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.355'/);
+assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.356'/);
 assert.match(html, /id="sky-backdrop"[\s\S]*?id="particle-canvas"/);
 assert.match(html, /id="open-sky-observatory"[\s\S]*?id="sky-screen"[\s\S]*?id="sky-location-status"[\s\S]*?id="close-sky-screen"/);
 assert.match(html, /href="style\.css\?v=2\.24"/);

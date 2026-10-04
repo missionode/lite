@@ -34,6 +34,7 @@
                 audio.stopFrequencyShot();
                 audio.stopGuidedTransitionTone();
                 audio.stopPleasureAmbience();
+                audio.stopPitchTone?.();
             } else if (state.moodRelaxationIntentionEnabled && meditation.isMeditationActive && !state.bgMusicMode) {
                 void audio.startPleasureAmbience();
             }

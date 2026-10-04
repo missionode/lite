@@ -41,7 +41,36 @@ assert.match(app, /registry: selectablePiperVoices\(\)/, 'automatic voice choice
 assert.equal(pitch.fixedVoiceFor('xx'), 'piper:en_US-ryan-medium', 'unknown languages use the English fixed voice');
 
 // Guided voice only: no mantra, drone, frequency or chakra audio.
-assert.doesNotMatch(source, /startMantra|startStageDrone|startTimedDrone|startFrequencyShot|meditateOnChakra|playMantra/, 'Pitch Mode never starts mantra, drone or frequency audio');
+assert.doesNotMatch(source, /startMantra|startStageDrone|startTimedDrone|startFrequencyShot|meditateOnChakra|playMantra/, 'Pitch Mode never starts mantra, drone or chakra Shot audio');
+
+// One very soft tone per mood, tied to No Frequency Mode.
+assert.deepEqual({ ...pitch.MOOD_TONES }, { calm: 639, courage: 396, energy: 528, focus: 852 });
+assert.ok(pitch.TONE_LEVEL <= 0.02, 'the mood tone stays at or below a third of the chakra drone level (0.06)');
+function mockAudio() {
+    const events = [];
+    const param = () => ({ value: 0, setValueAtTime(v) { this.value = v; events.push(['set', v]); }, linearRampToValueAtTime(v, t) { this.value = v; events.push(['ramp', v, t]); }, cancelScheduledValues() {} });
+    const ctx = {
+        currentTime: 0,
+        createOscillator() { const o = { type: '', frequency: param(), connect() {}, disconnect() {}, start() { events.push(['start']); }, stop(t) { events.push(['stop', t]); } }; return o; },
+        createGain() { return { gain: param(), connect() {}, disconnect() {} }; }
+    };
+    return { ctx, masterGain: {}, events };
+}
+const silent = mockAudio();
+assert.equal(pitch.startMoodTone(silent, 'calm', { noFrequencyMode: true }), false, 'No Frequency Mode on: no tone');
+assert.equal(silent.events.length, 0);
+const toned = mockAudio();
+assert.equal(pitch.startMoodTone(toned, 'focus', { noFrequencyMode: false }), true, 'No Frequency Mode off: the mood tone plays');
+assert.equal(toned.pitchMoodTone.frequency, 852);
+assert.deepEqual(toned.events.find(e => e[0] === 'ramp'), ['ramp', pitch.TONE_LEVEL, 8], 'fades in slowly over 8 s');
+assert.equal(typeof toned.stopPitchTone, 'function', 'turning No Frequency Mode on can stop it');
+toned.stopPitchTone();
+assert.equal(toned.pitchMoodTone, null);
+assert.ok(toned.events.some(e => e[0] === 'stop'), 'the tone stops');
+assert.equal(pitch.startMoodTone(mockAudio(), 'rest', { noFrequencyMode: false }), false, 'unknown moods have no tone');
+assert.match(fs.readFileSync(new URL('../modules/audio-mode-settings-view.js', import.meta.url), 'utf8'), /if \(state\.noFrequencyMode\) \{[\s\S]*?audio\.stopPitchTone\?\.\(\);/, 'switching No Frequency Mode on stops the Pitch tone');
+assert.match(source, /fadeInBackgroundMusic\(3\);\s*startMoodTone\(owner\.audio, mood, state\);/, 'the tone starts with the music');
+assert.match(source, /finally \{\s*stopMoodTone\(owner\.audio, 0\.3\);/, 'the tone always stops when the demo ends');
 
 // Pause spreading keeps the guide inside two minutes.
 assert.equal(pitch.gapBefore({ now: 0, narrationEndsAt: 50000, linesLeft: 5 }), 10000);
@@ -116,7 +145,7 @@ assert.ok(shots > 0 && panel > shots && room > panel, 'Pitch Mode sits between S
 assert.doesNotMatch(html.slice(panel, html.indexOf('>', panel)), /hidden|disabled/, 'Pitch Mode is visible in normal mode');
 for (const mood of pitch.MOODS) assert.match(html, new RegExp(`data-pitch-mood="${mood}"`));
 assert.match(html, /id="pitch-invite"[^>]*class="modal hidden"|class="modal hidden"[^>]*id="pitch-invite"/);
-assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.1'/, 'Pitch Mode works offline');
+assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.2'/, 'Pitch Mode works offline');
 assert.match(app, /startPitch\(mood\)[\s\S]*?pitchMode\.start\(this, mood,/);
 
 // Every language has every label and full script.

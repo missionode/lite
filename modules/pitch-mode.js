@@ -2,7 +2,8 @@
     'use strict';
 
     // Pitch Mode: public, 2-minute "Choose Your Feeling" demo sessions.
-    // Voice-guided only (no mantra, drone or chakra frequency). The text
+    // Voice-guided (no mantra, drone or chakra journey). One very soft
+    // background tone per mood plays only when No Frequency Mode is off. The text
     // follows the selected content language, but the voice is FIXED per
     // language and never follows the Settings voice or pace.
 
@@ -31,6 +32,51 @@
         energy: 'radial-gradient(circle at center, rgba(245, 101, 101, 0.42), transparent 70%)',
         focus: 'radial-gradient(circle at center, rgba(127, 156, 245, 0.45), transparent 70%)'
     });
+
+    // One very soft background tone per mood, only when No Frequency Mode is
+    // off. Symbolic chakra tones already used in Lite: Calm = Heart 639 Hz,
+    // Courage = Root 396 Hz, Energy = Solar Plexus 528 Hz, Focus = Third Eye
+    // 852 Hz. A third of the chakra drone level, slow fade in, gentle fade out.
+    const MOOD_TONES = Object.freeze({ calm: 639, courage: 396, energy: 528, focus: 852 });
+    const TONE_LEVEL = 0.02;
+    const TONE_FADE_IN_S = 8;
+    const TONE_FADE_OUT_S = 3;
+
+    function startMoodTone(audio, mood, state) {
+        stopMoodTone(audio, 0.05);
+        const frequency = MOOD_TONES[mood];
+        if (state?.noFrequencyMode || !frequency || !audio?.ctx || !audio.masterGain) return false;
+        const ctx = audio.ctx;
+        const now = ctx.currentTime;
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(frequency, now);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(TONE_LEVEL, now + TONE_FADE_IN_S);
+        oscillator.connect(gain);
+        gain.connect(audio.masterGain);
+        oscillator.start(now);
+        oscillator.onended = () => { try { oscillator.disconnect(); gain.disconnect(); } catch (error) { /* already gone */ } };
+        audio.pitchMoodTone = { oscillator, gain, frequency };
+        // Turning No Frequency Mode on mid-session stops it at once.
+        audio.stopPitchTone = (fade = 0.3) => stopMoodTone(audio, fade);
+        return true;
+    }
+
+    function stopMoodTone(audio, fadeSeconds = TONE_FADE_OUT_S) {
+        const tone = audio?.pitchMoodTone;
+        if (!tone || !audio.ctx) return false;
+        audio.pitchMoodTone = null;
+        const now = audio.ctx.currentTime;
+        try {
+            tone.gain.gain.cancelScheduledValues(now);
+            tone.gain.gain.setValueAtTime(Math.max(0, tone.gain.gain.value), now);
+            tone.gain.gain.linearRampToValueAtTime(0, now + fadeSeconds);
+            tone.oscillator.stop(now + fadeSeconds + 0.05);
+        } catch (error) { /* already stopped */ }
+        return true;
+    }
 
     function fixedVoiceFor(language) {
         return FIXED_VOICES[language] || FIXED_VOICES.en;
@@ -118,6 +164,7 @@
                 document.getElementById('controls')?.classList.remove('hidden');
                 setText('pause-meditation', 'II');
                 owner.audio.fadeInBackgroundMusic(3);
+                startMoodTone(owner.audio, mood, state);
 
                 showScreen(meditationScreen);
                 owner.visual?.stop?.();
@@ -141,6 +188,7 @@
 
                 if (owner.isMeditationActive) {
                     // No completion statistics: a demo is not a journey.
+                    stopMoodTone(owner.audio);
                     owner.stop();
                     restoreVoice();
                     await showInvite(document);
@@ -151,6 +199,7 @@
                 if (owner.isMeditationActive) owner.stop();
                 return false;
             } finally {
+                stopMoodTone(owner.audio, 0.3);
                 restoreVoice();
                 owner.isPitchActive = false;
                 owner.isStarting = false;
@@ -161,6 +210,6 @@
     }
 
     global.ChakraPitchMode = Object.freeze({
-        create, MOODS, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
+        create, MOODS, MOOD_TONES, TONE_LEVEL, startMoodTone, stopMoodTone, FIXED_VOICES, FIXED_PACE, SESSION_MS, INVITE_RESERVE_MS, fixedVoiceFor, gapBefore, scriptFor
     });
 })(typeof window === 'undefined' ? globalThis : window);
