@@ -17,6 +17,7 @@
         ta: 'piper:ta_IN-rasa_male-medium'
     });
     const FIXED_PACE = 1;
+    const narrationFeeling = global.ChakraNarrationFeeling || null;
 
     const SESSION_MS = 120000;
     // The spoken guide ends with room for the invite before the 2-minute mark.
@@ -126,10 +127,12 @@
                 owner.isStarting = false;
 
                 const lines = scriptFor(mood, journeyT);
+                // Each line gets a feeling: warm welcome, settling middle, mood-shaped close.
+                const feelings = narrationFeeling ? narrationFeeling.pitchArc(mood, lines.length) : [];
                 const narrationEndsAt = owner.sessionStartedAt + SESSION_MS - INVITE_RESERVE_MS;
                 for (let index = 0; index < lines.length; index++) {
                     if (!owner.isMeditationActive) break;
-                    await owner.narrate(lines[index], false);
+                    await owner.narrate(lines[index], false, false, 'normal', 'none', feelings[index] || null);
                     if (!owner.isMeditationActive) break;
                     if (index < lines.length - 1) {
                         await owner.pauseAwareSleep(gapBefore({ now: now(), narrationEndsAt, linesLeft: lines.length - 1 - index }));

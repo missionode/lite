@@ -42,3 +42,7 @@ Owner direction, October 2026: the guide must sound **natural, meditative and co
 Root Lam, Sacral Vam, Solar Ram, Heart Yam, Throat Ham, Third Eye Om, Crown Aum, High energy Hreem — written in normal case in each script (ml ലം വം രം യം ഹം ഓം ഔം; hi लम् वम् रम् यम् हम् ॐ औम्; ta லம் வம் ரம் யம் ஹம் ஓம் ஔம்; ru Лам Вам Рам Ям Хам Ом Аум).
 
 Tests: `tests/narration-speech-form.test.mjs`, `tests/english-chakra-qualities.test.mjs`, `tests/content-safety.test.mjs`.
+
+## Feelings
+
+A line may start with a feeling tag such as `[tender]` (warm, tender, grounding, still, return, uplift). The tag is never spoken. See `docs/narration-feeling.md`.

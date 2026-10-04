@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production b7b982c (live: notices, five-language repertory, frequency reminder, voice download, Sleep wind-down, WebP, Heavenly Sound, Chakra Touch) · 2026-10-03.
+Source snapshot: production b7b982c + uncommitted narration feelings (feature/narration-feeling) · 2026-10-04.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -56,9 +56,10 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 46. [Script preference control hydration](#script-preference-hydration)
 47. [Custom meditation script settings](#custom-script-settings)
 48. [Personal-care preference control hydration](#care-preference-hydration)
-49. [Settings backup and restore](#settings-backup)
-50. [Operator-led chakra assessment](#assessment-tournament)
-51. [Frequency repertory handoff](#repertory)
+49. [Narration feelings](#narration-feeling)
+50. [Settings backup and restore](#settings-backup)
+51. [Operator-led chakra assessment](#assessment-tournament)
+52. [Frequency repertory handoff](#repertory)
 
 <a id="curriculum-branding"></a>
 
@@ -1204,7 +1205,7 @@ flowchart TD
 
 Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.
 
-Sources: [modules/pitch-mode.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:1), [tests/pitch-mode.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/pitch-mode.test.mjs:1), [app.js:1603](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1603), [app.js:2918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2918), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1), [docs/pitch-mode.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/pitch-mode.md:1).
+Sources: [modules/pitch-mode.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:1), [tests/pitch-mode.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/pitch-mode.test.mjs:1), [app.js:1603](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1603), [app.js:2918](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2918), [piper-models.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-models.json:1), [docs/pitch-mode.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/pitch-mode.md:1), [modules/narration-feeling.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/narration-feeling.js:1).
 
 ```mermaid
 flowchart TD
@@ -1233,7 +1234,7 @@ flowchart TD
 | Borrow the fixed voice | For this session only, switch to the fixed male Piper voice for the content language (English Ryan, Hindi Pratham, Russian Dmitri, Malayalam Arjun, Tamil Rasa) at a fixed pace. The Settings voice and pace are ignored and never saved over. |
 | Prepare the voice | The first use in a language downloads that voice (about 60 MB); if it cannot load, the browser voice for the language is used. |
 | Start the 2-minute clock | Start music, wake lock and the two-minute on-screen countdown. Show the meditation screen with the mood title and aura. No mantra, drone, chakra frequency or visual journey. |
-| Guided lines | Speak the opening, four guided steps and closing in the selected content language. Every opening invites the listener to sit or stand (demos are often standing); no step assumes a chair. Quiet gaps are spread so the voice ends about 12 seconds before two minutes. No breathing cues: Calm softens face, hands and shoulders and listens to sounds; Courage uses posture, feet on the ground and a remembered strength; Energy uses shoulder rolls, an arm stretch and shaking out the hands; Focus rests the eyes on one point and notices three sounds. Gaps up to 14 seconds give time to do each step. |
+| Guided lines | Speak the opening, four guided steps and closing in the selected content language. Every opening invites the listener to sit or stand (demos are often standing); no step assumes a chair. Quiet gaps are spread so the voice ends about 12 seconds before two minutes. No breathing cues: Calm softens face, hands and shoulders and listens to sounds; Courage uses posture, feet on the ground and a remembered strength; Energy uses shoulder rolls, an arm stretch and shaking out the hands; Focus rests the eyes on one point and notices three sounds. Gaps up to 14 seconds give time to do each step. Each line carries a narration feeling (see the narration-feeling map): a warm welcome, a settling middle and a close that matches the mood. |
 | Close early | The standard Close control stops the demo at any time; pause and the mixer work as usual. |
 | End without statistics | Stop the session with the shared stop (no completion statistics) and restore the Settings voice and pace. |
 | Invite | Show “That was 2 minutes. Imagine what 20 minutes could do.” with Begin a full journey (scrolls to the Meditation Room) or Try another feeling (scrolls back to the moods). |
@@ -1467,7 +1468,7 @@ flowchart TD
 
 Piper synthesis pipeline versus browser speech.
 
-Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/voice-download-card.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/voice-download-card.js:1), [tests/voice-download-card.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/voice-download-card.test.mjs:1), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322), [app.js:1961](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1961), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1).
+Sources: [modules/media-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-lifecycle.js:1), [modules/piper-lifecycle.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:1), [modules/voice-download-card.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/voice-download-card.js:1), [tests/voice-download-card.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/voice-download-card.test.mjs:1), [piper-worker.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper-worker.js:1), [piper/runtime/bounded-phonemizer.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/bounded-phonemizer.js:1), [piper/runtime/piper-tts-web.js:322](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:322), [app.js:1961](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1961), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1), [modules/piper-narration.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:1), [tests/long-narration.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/long-narration.test.mjs:1), [tests/narration-audio-only.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-audio-only.test.mjs:1), [modules/narration-feeling.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/narration-feeling.js:1).
 
 ```mermaid
 flowchart TD
@@ -1516,6 +1517,7 @@ flowchart TD
 - Browser speech is outside the Web Audio effects chain. Voice Space/Warmth/Clarity processing applies to Piper audio; browser voice capabilities differ. Soft and interval prompts use related wrappers.
 - CP-MOD-129–151 moves Piper model lookup, supported pace bounds, cadence settings, browser voice locale/gender and voice selection, registry loading, voice picker option rendering, browser voice-change refresh and silent discovery warm-up into the existing Piper lifecycle owner. The app still supplies locale policy and voice defaults; voice synthesis/playback remain unchanged. Voice-status presentation is owned by media-controls view.
 - CP-MOD-161: `piper-narration.js` owns Piper sentence sequencing behind the stable controller adapter. One sentence is prepared ahead during playback; generation cancellation, pause handling, browser-speech fallback, sentence/exit gaps and long final fades remain intact. The script stays eagerly loaded and cached for offline use. No performance gain is claimed.
+- Narration feelings (2026-10-04): an optional bounded per-line preset changes Piper pace, noise_scale, noise_w, clip volume and the pause after the line; see the narration-feeling map. Lines without a feeling are unchanged.
 
 <a id="audio"></a>
 
@@ -2260,6 +2262,44 @@ flowchart TD
 | Continue startup | Session-only mode reset, Advanced Features visibility and care execution remain unchanged. |
 
 - The module only synchronizes controls. It does not persist values, unlock Intimate Service, authorize a session or execute care. Eager/offline-pre-cached; no performance claim.
+
+<a id="narration-feeling"></a>
+
+## Narration feelings
+
+Piper has no emotion switch, so each line can carry a small bounded feeling: pace, liveliness, rhythm, closeness and the silence after it.
+
+Sources: [modules/narration-feeling.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/narration-feeling.js:1), [tests/narration-feeling.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/narration-feeling.test.mjs:1), [app.js:2248](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2248), [modules/piper-narration.js:6](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-narration.js:6), [modules/piper-lifecycle.js:248](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/piper-lifecycle.js:248), [piper/runtime/piper-tts-web.js:336](/Users/lekshmisyam/Desktop/Ikigai/lite/piper/runtime/piper-tts-web.js:336), [modules/pitch-mode.js:131](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/pitch-mode.js:131), [docs/narration-feeling.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/narration-feeling.md:1).
+
+```mermaid
+flowchart TD
+  line["Narration line"]
+  preset["Pick the preset"]
+  none["No feeling"]
+  voice["Shape the voice"]
+  play["Play closer or softer"]
+  land["Let it land"]
+  pitch["Pitch arcs"]
+  line -->|"Tag or caller feeling"| preset
+  line -->|"No feeling"| none
+  preset -->|"Bounded values"| voice
+  voice -->|"Clip ready"| play
+  play -->|"Line ends"| land
+  pitch -->|"One feeling per line"| line
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Narration line | A script line arrives at narrate(). It may start with a tag such as [tender]; only the six known feelings are removed, so the tag is never spoken or shown. A caller (Pitch Mode) can also pass the feeling directly. |
+| Pick the preset | warm, tender, grounding, still, return or uplift. Values are clamped: pace 0.85–1.08, liveliness 0.75–1.12, rhythm 0.75–1.1, closeness 0.8–1.0, pause after 0–2 s. Unknown feeling: none. |
+| No feeling | Lines without a feeling use the Settings pace and the voice defaults, exactly as before. |
+| Shape the voice | Length scale = Settings value ÷ pace (still capped by the voice limit); Piper noise_scale × liveliness and noise_w × rhythm, clamped again inside the runtime (0.75–1.12). Cached clips are keyed by these settings. |
+| Play closer or softer | Each clip plays at volume × closeness through the Heavenly Sound voice bus. |
+| Let it land | After the line, wait the extra pause (not after a fade-out or mantra hand-off). |
+| Pitch arcs | 2-Minute Mind Reset: Calm warm → grounding → tender → still → still → return; Courage warm → grounding → grounding → warm → uplift → uplift; Energy warm → uplift → uplift → warm → uplift → uplift; Focus warm → grounding → still → still → grounding → return. |
+
+- Pilot: only Pitch Mode passes feelings today. Other journeys can opt in later by tagging lines; untagged lines are unchanged.
+- Evidence: unit tests for limits, tags, settings, arcs and wiring. Not yet verified: listening on a phone in all five languages (Ryan, Pratham, Dmitri, Arjun, Rasa may react differently).
 
 <a id="settings-backup"></a>
 

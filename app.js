@@ -129,6 +129,7 @@ const narrationSpeechForm = window.ChakraNarrationSpeechForm;
 if (!narrationSpeechForm) throw new Error('Narration speech-form module is unavailable.');
 // Voice-only respellings (mantras, Sanskrit names); screen text is unchanged.
 const spokenForm = text => narrationSpeechForm.spokenForm(text, state.language);
+const narrationFeeling = window.ChakraNarrationFeeling || null;
 const piperNarration = window.ChakraPiperNarration?.create();
 if (!piperNarration) throw new Error('Piper narration module is unavailable.');
 const guideControlledTransition = window.ChakraGuideControlledTransition?.create();
@@ -2040,8 +2041,9 @@ class MeditationController {
         return isPiperVoice(state.voiceName) && piperTTS.isSupported() && piperTTS.configure(state.voiceName);
     }
 
-    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal', transition = 'none') {
+    async narrateWithPiper(text, fadeOut = false, keepSilence = false, volumeScale = 1, pacing = 'normal', transition = 'none', feeling = null) {
         return piperNarration.run(this, text, fadeOut, keepSilence, volumeScale, pacing, transition, {
+            feeling: feeling && narrationFeeling ? narrationFeeling.preset(feeling) : null,
             state, piperTTS, timing, splitNarrationText, spokenForm,
             isContinuationPiece: mediaLifecycle.isContinuationPiece,
             piperClipFadeSeconds: PIPER_CLIP_FADE_SECONDS,
@@ -2243,9 +2245,15 @@ class MeditationController {
         });
     }
 
-    async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal', transition = 'none') {
+    async narrate(text, fadeOut = false, keepSilence = false, pacing = 'normal', transition = 'none', feeling = null) {
+        // A leading [feeling] tag in a script line chooses the feeling and is never spoken.
+        if (narrationFeeling) {
+            const tagged = narrationFeeling.parse(text);
+            text = tagged.text;
+            feeling = feeling || tagged.feeling;
+        }
         if (this.shouldUsePiper()) {
-            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing, transition); }
+            try { return await this.narrateWithPiper(text, fadeOut, keepSilence, 1, pacing, transition, feeling); }
             catch (error) {
                 console.error('[Piper] narration failed:', error);
                 if (!this.isMeditationActive) return;
@@ -2478,6 +2486,7 @@ const piperTTS = piperLifecycle.createPiperTTS(audio, {
     onVoiceFailed: () => voiceDownloadCard.failed(),
     translate: t,
     getMeditationSettings: getPiperMeditationSettings,
+    feelingSettings: (base, feeling) => narrationFeeling ? narrationFeeling.voiceSettings(base, feeling) : base,
     getVoiceVolume: () => state.volVoice,
     WorkerConstructor: window.Worker,
     WebAssemblyRuntime: window.WebAssembly,

@@ -9,6 +9,7 @@ const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const registry = JSON.parse(fs.readFileSync(new URL('../piper-models.json', import.meta.url), 'utf8')).voices;
 
 const context = vm.createContext({ Math, Date, Promise, setTimeout });
+vm.runInContext(fs.readFileSync(new URL('../modules/narration-feeling.js', import.meta.url), 'utf8'), context);
 vm.runInContext(source, context);
 const pitch = context.ChakraPitchMode;
 assert.ok(Object.isFrozen(pitch));
@@ -70,7 +71,7 @@ const owner = {
     audio: { init: async () => {}, startBackgroundMusic: async () => {}, fadeInBackgroundMusic() {} },
     visual: { stop() {} },
     startSessionCountdown(ms) { this.countdown = ms; },
-    narrate: async text => { spoken.push({ text, voice: state.voiceName, pace: state.voicePace }); clock += 6000; },
+    narrate: async (text, fadeOut, keepSilence, pacing, transition, feeling) => { spoken.push({ text, voice: state.voiceName, pace: state.voicePace, feeling }); clock += 6000; },
     pauseAwareSleep: async ms => { clock += ms; },
     stop() { this.isMeditationActive = false; this.stopped = (this.stopped || 0) + 1; },
     finish() { throw new Error('Pitch Mode must not record journey statistics'); }
@@ -102,6 +103,7 @@ assert.equal(owner.stopped, 1, 'the demo ends with stop(), so no statistics are 
 assert.equal(spoken.length, 6, 'opening, four steps and closing are spoken');
 assert.ok(spoken.every(line => line.voice === 'piper:hi_IN-pratham-medium' && line.pace === 1), 'every line uses the fixed Hindi voice at a fixed pace');
 assert.equal(spoken[0].text, hindi.ui.pitch_energy_opening, 'the text follows the selected language');
+assert.deepEqual(spoken.map(line => line.feeling), ['warm', 'uplift', 'uplift', 'warm', 'uplift', 'uplift'], 'each Energy line has its feeling');
 assert.equal(configured[0], 'piper:hi_IN-pratham-medium');
 assert.equal(configured.at(-1), 'piper:hi_IN-priyamvada-medium', 'Piper is switched back to the Settings voice');
 assert.equal(state.voicePace, 0.7);
@@ -114,7 +116,7 @@ assert.ok(shots > 0 && panel > shots && room > panel, 'Pitch Mode sits between S
 assert.doesNotMatch(html.slice(panel, html.indexOf('>', panel)), /hidden|disabled/, 'Pitch Mode is visible in normal mode');
 for (const mood of pitch.MOODS) assert.match(html, new RegExp(`data-pitch-mood="${mood}"`));
 assert.match(html, /id="pitch-invite"[^>]*class="modal hidden"|class="modal hidden"[^>]*id="pitch-invite"/);
-assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.0'/, 'Pitch Mode works offline');
+assert.match(sw, /'\.\/modules\/pitch-mode\.js\?v=1\.1'/, 'Pitch Mode works offline');
 assert.match(app, /startPitch\(mood\)[\s\S]*?pitchMode\.start\(this, mood,/);
 
 // Every language has every label and full script.

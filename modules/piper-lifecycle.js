@@ -128,6 +128,7 @@
             onVoiceFailed: dependencies.onVoiceFailed || (() => {}),
             translate: dependencies.translate || (key => key),
             getMeditationSettings: dependencies.getMeditationSettings || (() => ({ lengthScale: 1 })),
+            feelingSettings: dependencies.feelingSettings || null,
             getVoiceVolume: dependencies.getVoiceVolume || (() => 1),
             WorkerConstructor: dependencies.WorkerConstructor || global.Worker,
             WebAssemblyRuntime: dependencies.WebAssemblyRuntime || global.WebAssembly,
@@ -243,8 +244,14 @@
                 return this.request('warmup');
             }
 
-            synthesize(text) {
-                return this.request('synthesize', { text, settings: deps.getMeditationSettings() });
+            // Voice settings for one line: Settings pace, plus a narration feeling when given.
+            settingsFor(feeling) {
+                const base = deps.getMeditationSettings();
+                return feeling && deps.feelingSettings ? deps.feelingSettings(base, feeling) : base;
+            }
+
+            synthesize(text, settings = this.settingsFor(null)) {
+                return this.request('synthesize', { text, settings });
             }
 
             getNormalizationGain(buffer) {
@@ -277,16 +284,17 @@
                 return await this.audio.ctx.decodeAudioData(arrayBuffer) || null;
             }
 
-            async prepare(text) {
+            async prepare(text, feeling = null) {
                 const generation = this.generation;
-                const key = JSON.stringify([this.voiceId, this.voiceDefinition, deps.getMeditationSettings(), text]);
+                const settings = this.settingsFor(feeling);
+                const key = JSON.stringify([this.voiceId, this.voiceDefinition, settings, text]);
                 if (this.clipCache.has(key)) {
                     const hit = this.clipCache.get(key);
                     this.clipCache.delete(key);
                     this.clipCache.set(key, hit);
                     return hit.buffer;
                 }
-                const blob = await this.synthesize(text);
+                const blob = await this.synthesize(text, settings);
                 if (generation !== this.generation) throw new Error('Narration cancelled');
                 const buffer = await this.decode(blob);
                 if (generation !== this.generation) throw new Error('Narration cancelled');

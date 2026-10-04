@@ -331,7 +331,13 @@ const _TtsSession = class _TtsSession {
     const speakerId = 0;
     const sampleRate = __privateGet(this, _modelConfig).audio.sample_rate;
     const inference = __privateGet(this, _modelConfig).inference;
-    const noiseScale = inference.noise_scale;
+    // Narration feelings may ask for a calmer or livelier voice; the factors
+    // are bounded so the voice never strains or crackles.
+    const feelingFactor = (value) => {
+      const factor = Number(value);
+      return Number.isFinite(factor) ? Math.max(0.75, Math.min(1.12, factor)) : 1;
+    };
+    const noiseScale = inference.noise_scale * feelingFactor(settings.noiseScaleFactor);
     // A registered voice may request a slightly longer meditation cadence,
     // but the runtime never accepts an unbounded length scale from the UI.
     const requestedLengthScaleMax = Number(settings.lengthScaleMax);
@@ -339,7 +345,7 @@ const _TtsSession = class _TtsSession {
       ? Math.max(1.35, Math.min(1.5, requestedLengthScaleMax))
       : 1.35;
     const lengthScale = Math.max(0.75, Math.min(lengthScaleMax, Number(settings.lengthScale) || inference.length_scale));
-    const noiseW = inference.noise_w;
+    const noiseW = inference.noise_w * feelingFactor(settings.noiseWFactor);
     const session = __privateGet(this, _ortSession);
     const feeds = {
       input: new (__privateGet(this, _ort)).Tensor("int64", phonemeIds, [1, phonemeIds.length]),

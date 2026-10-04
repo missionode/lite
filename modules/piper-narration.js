@@ -1,7 +1,9 @@
 (function () {
     function create() {
         async function run(owner, text, fadeOut, keepSilence, volumeScale, pacing, transition, deps) {
-            const { state, piperTTS, timing, splitNarrationText, spokenForm = value => value, isContinuationPiece = () => false, piperClipFadeSeconds, mantraFadeSeconds, setVoiceStatus, fallbackMessage, setTimeout } = deps;
+            const { state, piperTTS, timing, splitNarrationText, spokenForm = value => value, isContinuationPiece = () => false, piperClipFadeSeconds, mantraFadeSeconds, setVoiceStatus, fallbackMessage, setTimeout, feeling = null } = deps;
+            // Feeling (optional): bounded preset from modules/narration-feeling.js.
+            const closeness = feeling ? feeling.closeness : 1;
             if (!text || (!owner.isMeditationActive && !fadeOut)) return;
             if (!keepSilence) owner.audio.fadeInBackgroundMusic(6, true);
             if (owner.audio.voiceCarveFilter) {
@@ -24,7 +26,7 @@
             const sentences = splitNarrationText(spokenForm(text));
             const generation = piperTTS.generation;
             const queueSynthesis = sentence => {
-                const job = piperTTS.prepare(sentence);
+                const job = piperTTS.prepare(sentence, feeling);
                 job.catch(() => {});
                 return job;
             };
@@ -53,7 +55,7 @@
                         pending.catch(() => {});
                     }
                     const isFinalClip = i === sentences.length - 1;
-                    await piperTTS.playBuffer(buffer, volumeScale, {
+                    await piperTTS.playBuffer(buffer, volumeScale * closeness, {
                         fadeOutSeconds: isFinalClip && (transition === 'mantra' || fadeOut)
                             ? mantraFadeSeconds
                             : piperClipFadeSeconds
@@ -71,6 +73,11 @@
                     const gap = isContinuationPiece(sentences[i]) ? Math.min(sentenceGap, 0.4) : sentenceGap;
                     await owner.pauseAwareSleep(gap * 1000);
                 }
+            }
+
+            // A feeling may ask for a little more silence so the line can land.
+            if (feeling?.pauseAfter && owner.isMeditationActive && !fadeOut && transition !== 'mantra') {
+                await owner.pauseAwareSleep(feeling.pauseAfter * 1000);
             }
 
             if (fadeOut) {

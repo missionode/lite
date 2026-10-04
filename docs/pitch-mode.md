@@ -61,3 +61,7 @@ The **text follows the selected content language**. The **voice is fixed** — a
 - Flow map: `pitch-mode` in `docs/app-map/index.html`.
 
 No breathing cues (owner, 2026-10-02): repeated "breathe in, breathe out" lines felt rushed in two minutes, so every mood now uses body, senses, movement or thought. A test keeps breathing words out of the Pitch steps in all five languages. The quiet gaps between lines (up to 14 seconds, spread evenly) give time to do each step.
+
+## Narration feelings
+
+Each Pitch line now carries a feeling (warm welcome, settling middle, mood-shaped close). See `docs/narration-feeling.md`.

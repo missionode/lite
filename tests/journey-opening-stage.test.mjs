@@ -11,7 +11,7 @@ vm.runInContext(source, context);
 const opening = context.window.ChakraJourneyOpeningStage;
 assert.ok(Object.isFrozen(opening));
 assert.match(app, /runGratitude\(isHighEnergy = false\) \{\s*return (?:this\.runSessionItem\('Gratitude and intention', \(\) => )?journeyOpeningStage\.run\(this, isHighEnergy/);
-assert.ok(html.indexOf('modules/journey-opening-stage.js?v=1.0') < html.indexOf('app.js?v=4.26'));
+assert.ok(html.indexOf('modules/journey-opening-stage.js?v=1.0') < html.indexOf('app.js?v=4.27'));
 assert.match(sw, /\.\/modules\/journey-opening-stage\.js\?v=1\.0/);
 
 function makeHarness({ highEnergy = false, returning = false, intention = '', active = true } = {}) {

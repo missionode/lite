@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const visualizationPractice = await practiceModuleLoader\.load\('visualization'\)/);
 assert.match(app, /async runVisualization\(\) \{[\s\S]*?visualizationPractice\.run\(/, 'the controller should delegate Visualization lifecycle');
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.26/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.6[\s\S]*?app\.js\?v=4.27/);
 assert.doesNotMatch(html, /modules\/visualization-practice\.js/);
 assert.match(serviceWorker, /modules\/visualization-practice\.js\?v=1\.0/);
 
