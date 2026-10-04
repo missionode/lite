@@ -3579,3 +3579,18 @@ body.sleep-wind-down:not(.sleep-peek) #app > .screen { pointer-events: none; }
 .benefits-safety-intro { opacity: 0.8; margin-bottom: 0.75rem; }
 .benefits-safety-list h3 { font-size: 1rem; margin: 1rem 0 0.35rem; }
 .benefits-safety-list p { margin: 0 0 0.5rem; line-height: 1.5; }
+
+/* Separate time for each chakra (Lobby, under Core Practice Duration) */
+.per-chakra-time-control { display: flex; flex-direction: column; gap: 0.5rem; }
+.per-chakra-time-control[hidden] { display: none; }
+.per-chakra-time-rows { display: flex; flex-direction: column; gap: 0.35rem; }
+.per-chakra-time-rows[hidden] { display: none; }
+.per-chakra-time-row { display: grid; grid-template-columns: 1fr 2.4rem minmax(6.5rem, auto) 2.4rem; align-items: center; gap: 0.4rem; }
+.per-chakra-time-row.is-off { opacity: 0.45; }
+.per-chakra-time-name { font-size: 0.95rem; }
+.per-chakra-time-value { text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.per-chakra-time-step { min-height: 2.4rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: inherit; font-size: 1.1rem; cursor: pointer; }
+.per-chakra-time-step:disabled { opacity: 0.35; cursor: default; }
+.per-chakra-time-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.per-chakra-time-actions[hidden] { display: none; }
+.per-chakra-time-status:empty { display: none; }

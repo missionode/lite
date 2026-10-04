@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const droneDurationSettingsView = window\.ChakraDroneDurationSettingsView/);
 assert.match(app, /function syncDroneDurationModeControls\(\)\s*\{[\s\S]*?droneDurationSettingsView\.sync\(/);
 assert.match(app, /droneDurationSettingsView\.bindSelection\(/);
-assert.match(html, /modules\/drone-duration-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.28/);
+assert.match(html, /modules\/drone-duration-settings-view\.js\?v=1\.0[\s\S]*?app\.js\?v=4.29/);
 assert.match(serviceWorker, /modules\/drone-duration-settings-view\.js\?v=1\.0/);
 
 const context = vm.createContext({});

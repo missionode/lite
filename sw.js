@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.357';
+const CACHE_NAME = 'chakra-v5.358';
 const PIPER_CACHE_NAME = 'chakra-piper-v12';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v79';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v80';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -13,8 +13,8 @@ const ASSETS = [
   './data/frequency-repertory.json',
   './timing-config.json',
   './audio/ambience-manifest.json',
-  './style.css?v=2.25',
-  './app.js?v=4.28',
+  './style.css?v=2.26',
+  './app.js?v=4.29',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.0',
   './modules/ambient-particle-field.js?v=1.1',
@@ -37,7 +37,9 @@ const ASSETS = [
   './modules/chakra-selection-view.js?v=1.0',
   './modules/audio-effects-settings-view.js?v=1.0',
   './modules/journey-preparation-selection.js?v=1.1',
-  './modules/app-state.js?v=1.2',
+  './modules/chakra-timing.js?v=1.0',
+  './modules/chakra-timing-view.js?v=1.0',
+  './modules/app-state.js?v=1.3',
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.1',
   './modules/piper-lifecycle.js?v=1.2',
@@ -84,7 +86,7 @@ const ASSETS = [
   './modules/sleep-journey.js?v=1.1',
   './modules/yoga-session.js?v=1.1',
   './modules/care-session.js?v=1.0',
-  './modules/chakra-session.js?v=1.1',
+  './modules/chakra-session.js?v=1.2',
   './modules/narration-speech-form.js?v=1.0',
   './modules/piper-narration.js?v=1.3',
   './modules/guide-controlled-transition.js?v=1.0',
@@ -93,12 +95,12 @@ const ASSETS = [
   './modules/experiment-settings-view.js?v=1.0',
   './modules/session-transport-controls.js?v=1.0',
   './modules/completion-view.js?v=1.1',
-  './modules/session-estimate.js?v=1.1',
+  './modules/session-estimate.js?v=1.2',
   './modules/session-countdown.js?v=1.1',
   './modules/session-item-runner.js?v=1.0',
   './modules/mood-ambience-settings-view.js?v=1.0',
   './modules/drone-duration-settings-view.js?v=1.0',
-  './modules/lobby-experience-visibility.js?v=1.1',
+  './modules/lobby-experience-visibility.js?v=1.2',
   './modules/yoga-experience-settings.js?v=1.0',
   './modules/range-controls.js?v=1.0',
   './modules/journey-roadmap.js?v=1.1',

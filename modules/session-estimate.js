@@ -1,6 +1,15 @@
 (function installSessionEstimate(global) {
     'use strict';
 
+    // Minutes for one chakra: its own time when "Set time for each chakra" is on, else the core time.
+    const ALL_CHAKRAS = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'];
+    function chakraMinutes(state, key, demo) {
+        return global.ChakraTiming ? global.ChakraTiming.minutesFor(state, key, { demo: Boolean(demo) }) : state.timePerChakra;
+    }
+    function chakraMinutesTotal(state, keys, demo) {
+        return (keys || []).reduce((sum, key) => sum + chakraMinutes(state, key, demo), 0);
+    }
+
     function estimateNarrationDurationSeconds(textValue, pacing = 'normal', {
         isPiperVoice = () => false,
         getPiperMeditationPaceMultiplier = () => 1,
@@ -85,7 +94,7 @@
 
         selected.forEach(([key, chakra], index) => {
             seconds += narration(localized(chakra, 'meditation'), 'mantra');
-            seconds += Math.max(0, state.timePerChakra * 60 - timing('transitions', 'chakraLeadOut'));
+            seconds += Math.max(0, chakraMinutes(state, key, isDemoScriptSelected?.()) * 60 - timing('transitions', 'chakraLeadOut'));
             seconds += timing('transitions', 'chakraPostMantra');
             seconds += narration(localized(chakra, 'affirmation'));
             if (index < selected.length - 1) {
@@ -120,7 +129,8 @@
         readNumber,
         countYogaPoses,
         estimateStandardJourneySeconds,
-        chakraCount
+        chakraCount,
+        chakraOrder = null
     }) {
         if (!state || typeof timing !== 'function' || typeof isChecked !== 'function' ||
             typeof readNumber !== 'function' || typeof countYogaPoses !== 'function' ||
@@ -160,7 +170,7 @@
             if (state.perinealCareEnabled) seconds += state.timePerinealCare;
             if (state.massageEnabled) {
                 const massageChakras = 7;
-                seconds += (massageChakras * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                seconds += (chakraMinutesTotal(state, ALL_CHAKRAS.slice(0, massageChakras)) + massageChakras * timing('estimate', 'chakraStageOverhead')
                     + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
             }
             if (state.assistedBathingEnabled) seconds += state.timeAssistedBathing;
@@ -183,7 +193,9 @@
             : 0;
         const estimateMinutes = isHighEnergy
             ? state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra')
-            : chakraCount * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+            : (Array.isArray(chakraOrder) && chakraOrder.length === chakraCount
+                ? chakraMinutesTotal(state, chakraOrder, isDemoScriptSelected?.())
+                : chakraCount * state.timePerChakra) + chakraCount * timing('estimate', 'chakraStageOverhead')
                 + (state.timeIcebreaker / 60)
                 + timing('estimate', 'baseOverhead')
                 + timing('estimate', 'normalExtra')
@@ -250,7 +262,7 @@
             let seconds = 0;
             if (checked('perineal-care-toggle')) seconds += state.timePerinealCare;
             if (checked('massage-toggle')) {
-                seconds += (7 * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+                seconds += (chakraMinutesTotal(state, ALL_CHAKRAS) + 7 * timing('estimate', 'chakraStageOverhead')
                     + (state.timeIcebreaker / 60) + timing('estimate', 'baseOverhead') + timing('estimate', 'normalExtra')) * 60;
             }
             if (checked('assisted-bathing-toggle')) seconds += state.timeAssistedBathing;
@@ -285,10 +297,10 @@
                 + (checked('undo-unlearn-addon-toggle') ? readNumber('undo-unlearn-duration', 8) : 0);
         const estimate = isHigh
             ? Math.round(state.timeHighEnergy + (state.timeIcebreaker / 60) + timing('estimate', 'highEnergyExtra'))
-            : Math.round(state.selectedChakras.length * (state.timePerChakra + timing('estimate', 'chakraStageOverhead'))
+            : Math.round(chakraMinutesTotal(state, state.selectedChakras, isDemoScriptSelected()) + state.selectedChakras.length * timing('estimate', 'chakraStageOverhead')
                 + (state.timeIcebreaker / 60) + overhead + timing('estimate', 'normalExtra') + hypnosisWrapperMinutes + addonMinutes);
         return `~ ${estimate} min session`;
     }
 
-    global.ChakraSessionEstimate = Object.freeze({ resolve, estimateStandardJourneySeconds, resolveDurationMs, estimateNarrationDurationSeconds });
+    global.ChakraSessionEstimate = Object.freeze({ chakraMinutes, chakraMinutesTotal, resolve, estimateStandardJourneySeconds, resolveDurationMs, estimateNarrationDurationSeconds });
 })(typeof window === 'undefined' ? globalThis : window);

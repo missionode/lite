@@ -106,6 +106,9 @@
         if (normalDuration) normalDuration.style.display = shots || focusedExperience || !highEnergy ? (focusedExperience ? 'none' : 'flex') : 'none';
         if (highEnergyDuration) highEnergyDuration.style.display = shots || focusedExperience ? 'none' : (highEnergy ? 'flex' : 'none');
         if (droneDuration && !shots) droneDuration.hidden = musicOnly || noFrequencyMode || focusedExperience;
+        // Separate chakra times: only for normal chakra journeys (not Shots, Sleep, HRIM, Music Only, focused experiences or demo scripts).
+        const perChakraTime = document.getElementById('per-chakra-time-control');
+        if (perChakraTime) perChakraTime.hidden = shots || sleep || highEnergy || musicOnly || focusedExperience || isDemoScriptSelected();
         if (durationLabel) durationLabel.textContent = translate(shots ? 'ui.shotDuration' : (sleep ? 'ui.sleepStageDuration' : 'ui.corePracticeDuration'));
         if (timeInput) {
             const definition = shots ? timingConfig.journey?.shotDuration : sleep ? timingConfig.journey?.sleepStageDuration : timingConfig.journey?.timePerChakra;

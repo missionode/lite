@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production 4108ba0 + uncommitted Drone Duration tone and Benefits and safety (feature/narration-feeling) · 2026-10-04.
+Source snapshot: production 7447826 + uncommitted Pitch fades and separate chakra times (feature/narration-feeling) · 2026-10-04.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -32,35 +32,36 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 22. [Chakra Touch · dev-mode couples touch game](#chakra-touch)
 23. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
 24. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
-25. [Pause, stop and live controls](#controls)
-26. [Optional Lobby video introduction](#restart)
-27. [Completion, statistics and external handoff](#completion)
-28. [Scripts, language and timing](#content)
-29. [Narration and fallback](#narration)
-30. [Audio signal architecture](#audio)
-31. [Sound options and live suppression](#sound-options)
-32. [Visuals and browser lifecycle](#visuals)
-33. [Earth observer reference and atmosphere](#earth-atmosphere)
-34. [Thematic solar containment glow](#solar-containment)
-35. [Persistence, caching and network](#storage)
-36. [Failure and recovery map](#recovery)
-37. [Isolated checkpoint delivery](#delivery-workflow)
-38. [Display-language UI renderer](#locale-ui-renderer)
-39. [Timing configuration and saved values](#timing-configuration)
-40. [Automatic journey voice profile](#journey-voice-profile)
-41. [Session-only journey-mode hydration](#session-mode-hydration)
-42. [Mixer preference control hydration](#mixer-preference-hydration)
-43. [Journey selection preference hydration](#journey-selection-hydration)
-44. [Timing preference control hydration](#timing-preference-hydration)
-45. [Appearance preference control hydration](#appearance-preference-hydration)
-46. [Script preference control hydration](#script-preference-hydration)
-47. [Custom meditation script settings](#custom-script-settings)
-48. [Personal-care preference control hydration](#care-preference-hydration)
-49. [Narration feelings](#narration-feeling)
-50. [Settings backup and restore](#settings-backup)
-51. [Operator-led chakra assessment](#assessment-tournament)
-52. [Frequency repertory handoff](#repertory)
-53. [Benefits and safety (FAQ)](#benefits-safety)
+25. [Separate time for each chakra](#per-chakra-time)
+26. [Pause, stop and live controls](#controls)
+27. [Optional Lobby video introduction](#restart)
+28. [Completion, statistics and external handoff](#completion)
+29. [Scripts, language and timing](#content)
+30. [Narration and fallback](#narration)
+31. [Audio signal architecture](#audio)
+32. [Sound options and live suppression](#sound-options)
+33. [Visuals and browser lifecycle](#visuals)
+34. [Earth observer reference and atmosphere](#earth-atmosphere)
+35. [Thematic solar containment glow](#solar-containment)
+36. [Persistence, caching and network](#storage)
+37. [Failure and recovery map](#recovery)
+38. [Isolated checkpoint delivery](#delivery-workflow)
+39. [Display-language UI renderer](#locale-ui-renderer)
+40. [Timing configuration and saved values](#timing-configuration)
+41. [Automatic journey voice profile](#journey-voice-profile)
+42. [Session-only journey-mode hydration](#session-mode-hydration)
+43. [Mixer preference control hydration](#mixer-preference-hydration)
+44. [Journey selection preference hydration](#journey-selection-hydration)
+45. [Timing preference control hydration](#timing-preference-hydration)
+46. [Appearance preference control hydration](#appearance-preference-hydration)
+47. [Script preference control hydration](#script-preference-hydration)
+48. [Custom meditation script settings](#custom-script-settings)
+49. [Personal-care preference control hydration](#care-preference-hydration)
+50. [Narration feelings](#narration-feeling)
+51. [Settings backup and restore](#settings-backup)
+52. [Operator-led chakra assessment](#assessment-tournament)
+53. [Frequency repertory handoff](#repertory)
+54. [Benefits and safety (FAQ)](#benefits-safety)
 
 <a id="curriculum-branding"></a>
 
@@ -1283,6 +1284,50 @@ flowchart TD
 | Standalone completion | If none were selected, complete the standalone practices. |
 
 - All visible text and spoken prompts are supplied for English, Malayalam, Hindi, Russian and Tamil. No disclosure is scored or rewarded. The Yes choice does not activate service; information can only be requested from the guide after the session. Browser and device audio verification remain outstanding.
+
+<a id="per-chakra-time"></a>
+
+## Separate time for each chakra
+
+Optional own time per chakra under Core Practice Duration, with autofill from the chakra assessment.
+
+Sources: [modules/chakra-timing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing.js:1), [modules/chakra-timing-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing-view.js:1), [tests/chakra-timing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/chakra-timing.test.mjs:1), [index.html:491](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:491), [app.js:2563](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2563), [modules/chakra-session.js:39](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-session.js:39), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/lobby-experience-visibility.js:111](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:111).
+
+```mermaid
+flowchart TD
+  core["Core Practice Duration"]
+  switch["Set time for each chakra"]
+  off["Switch off"]
+  rows["Seven rows"]
+  reset["Reset all to core"]
+  suggest["Fill times from assessment"]
+  apply["Apply these times"]
+  run["Journey runs"]
+  core -->|"Optional"| switch
+  switch -->|"Off"| off
+  switch -->|"On"| rows
+  rows -->|"Reset"| reset
+  rows -->|"Assessment"| suggest
+  suggest -->|"Suggestion shown"| apply
+  apply -->|"Adjust"| rows
+  rows -->|"Begin"| run
+  off -->|"Begin"| run
+  reset -->|"Back to core"| rows
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Core Practice Duration | Kept as the base (1–7 min, 0.5 steps). Every chakra without its own time follows it, so moving the core moves them too. |
+| Set time for each chakra | Lobby switch under Core Practice Duration, off by default. Shown only for normal chakra journeys: hidden for Shots, Sleep, HRIM, Music Only, focused experiences and demo scripts. |
+| Switch off | Every chakra uses Core Practice Duration, exactly as before. |
+| Seven rows | Root → Crown with − / time / + (1–7 min, 0.5 steps). Rows of chakras not in the journey are dimmed. “· core” marks a chakra still following the core. |
+| Reset all to core | All chakras follow Core Practice Duration again. |
+| Fill times from assessment | Reads the assessment saved on this device. If it has clear focus chakras with enough answers, shows a suggestion: focus chakras get the core time + 50 % (max 7 min); others follow the core. No clear focus or no assessment: a calm message, nothing changes. |
+| Apply these times | One tap applies the suggestion; every chakra can still be adjusted. |
+| Journey runs | Each chakra chants for its own time (Reverse Journey and Massage too). Drone exposure keeps its own Drone Duration window. The Lobby estimate and session countdown add up each chakra’s time. |
+
+- Saved on this device as chakra_per_chakra_time_enabled and chakra_per_chakra_times (included in settings backup). Five languages.
+- Evidence: unit tests (limits, follow-core, demo, estimate, autofill rules, wiring) and a local browser run: switch, rows, + on Heart (estimate 36 → 37 min), no-assessment message, and a simulated finished assessment suggesting Solar and Throat 7 min, applied only after Apply (estimate 64 → 68 min), no page errors. Not yet checked on a phone.
 
 <a id="controls"></a>
 

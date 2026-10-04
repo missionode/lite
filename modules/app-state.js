@@ -40,6 +40,9 @@
             displayLanguage: get('chakra_display_language') || 'en',
             voiceName: get('chakra_voice') || 'piper:ml_IN-arjun-medium',
             timePerChakra: parseFloat(get('chakra_time')) || 5.0,
+            // Optional time for each chakra; null follows Core Practice Duration.
+            perChakraTimeEnabled: get('chakra_per_chakra_time_enabled') === 'true',
+            perChakraTimes: global.ChakraTiming ? global.ChakraTiming.normalizeTimes(get('chakra_per_chakra_times')) : {},
             timeHighEnergy: parseFloat(get('chakra_time_high_energy')) || 5.0,
             droneDurationMode: normalizeDroneDurationMode(get('chakra_drone_duration_mode')),
             hrimDroneDurationMode: normalizeHrimDroneDurationMode(get('chakra_hrim_drone_duration_mode')),

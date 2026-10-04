@@ -185,7 +185,7 @@ assert.ok(
 );
 assert.match(meditationBlock, /'normal',\s*'mantra'/, 'chakra narration should use the coordinated mantra transition profile');
 assert.match(meditationBlock, /if \(!state\.noMantraMode && owner\.audio\.mantraLoop\) \{[\s\S]*?owner\.startTimedDrone\(/, 'the drone must be conditional on active mantra playback');
-assert.match(meditationBlock, /key === 'high_energy' \? state\.timeHighEnergy : state\.timePerChakra/, 'normal and HRIM paths should use their active practice durations');
+assert.match(meditationBlock, /key === 'high_energy' \? state\.timeHighEnergy\s*: \(typeof chakraMinutes === 'function' \? chakraMinutes\(key\) : state\.timePerChakra\)/, 'normal and HRIM paths should use their active practice durations (each chakra may have its own time)');
 assert.match(app, /if \(!this\.isPaused\) remaining -= step;/, 'pausing the journey should pause the drone timer');
 assert.match(app, /generation !== this\.droneTimerGeneration/, 'a stale timer must not stop a later chakra drone');
 assert.match(app, /chakra_drone_duration_mode/, 'the selected mode should persist locally');

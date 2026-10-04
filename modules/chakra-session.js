@@ -1,7 +1,7 @@
 (function () {
     function create() {
         async function run(owner, chakra, key, deps) {
-            const { state, document, visual, localized, timing, setTimeout } = deps;
+            const { state, document, visual, localized, timing, setTimeout, chakraMinutes } = deps;
             if (!owner.isMeditationActive) return;
             const symbolEl = document.getElementById('chakra-symbol');
             symbolEl.style.opacity = '';
@@ -35,7 +35,8 @@
             const absoluteIndex = ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 'crown'].indexOf(key);
             const practiceMinutes = owner.isExperimentActive && owner.experimentDuration != null && (key === 'high_energy' || owner.chakraOrder.length === 1)
                 ? owner.experimentDuration
-                : key === 'high_energy' ? state.timeHighEnergy : state.timePerChakra;
+                : key === 'high_energy' ? state.timeHighEnergy
+                    : (typeof chakraMinutes === 'function' ? chakraMinutes(key) : state.timePerChakra);
             const durationMode = key === 'high_energy' ? state.hrimDroneDurationMode : state.droneDurationMode;
 
             if (!state.eyesCloseMode) visual.startPulsing(chakra.color);

@@ -575,7 +575,9 @@ function updateJourneyRoadmap() {
     journeyRoadmap.render({ document, state, isChecked: getChecked, translate: t });
 }
 
+let chakraTimingView = null;
 function applyLocaleUI() {
+    chakraTimingView?.render();
     particleField.updateSkyLocationStatus();
     particleField.celestialLayerKey = null;
     if (particleField.started) particleField.draw(performance.now(), false);
@@ -1213,7 +1215,8 @@ class MeditationController {
             readNumber: (id, fallback) => Number(document.getElementById(id)?.value || fallback),
             countYogaPoses: () => document.querySelectorAll('#yoga-pose-selection input:checked').length,
             estimateStandardJourneySeconds: () => this.estimateStandardJourneySeconds(),
-            chakraCount: this.chakraOrder.length
+            chakraCount: this.chakraOrder.length,
+            chakraOrder: this.chakraOrder
         });
     }
 
@@ -2215,7 +2218,7 @@ class MeditationController {
     }
 
     async meditateOnChakra(chakra, key) {
-        return this.runSessionItem(`chakra ${key}`, () => chakraSession.run(this, chakra, key, { state, document, visual, localized, timing, setTimeout }));
+        return this.runSessionItem(`chakra ${key}`, () => chakraSession.run(this, chakra, key, { state, document, visual, localized, timing, setTimeout, chakraMinutes: getChakraPracticeMinutes }));
     }
 
     async narrateFeeble(text) {
@@ -2555,6 +2558,14 @@ const audioPleasureAmbience = audioPleasureAmbienceModule.create({
     }
 });
 
+// Practice minutes for one chakra: its own time when "Set time for each
+// chakra" is on (normal journeys only), otherwise Core Practice Duration.
+function getChakraPracticeMinutes(key) {
+    return window.ChakraTiming
+        ? window.ChakraTiming.minutesFor(state, key, { demo: isDemoScriptSelected() })
+        : state.timePerChakra;
+}
+
 function isDemoScriptSelected() {
     return scriptSourceSettings.isDemoScriptSelected(state, DEMO_SCRIPT_ID, DEMO_CORE_DURATION_SECONDS);
 }
@@ -2835,6 +2846,24 @@ function attachEventListeners() {
     const chakraSelectionView = window.ChakraSelectionView.create({
         document, state, storage: localStorage, updateSessionEstimate, updateJourneyRoadmap
     });
+    chakraTimingView = window.ChakraTimingView && window.ChakraTiming ? window.ChakraTimingView.create({
+        document, state, storage: localStorage, timing: window.ChakraTiming, translate: t,
+        range: timingConfig.journey?.timePerChakra || window.ChakraTiming.DEFAULT_RANGE,
+        onChange: () => updateSessionEstimate(),
+        loadAssessment: window.ChakraTimingView.assessmentLoader({
+            storage: localStorage,
+            fetch: (url) => fetch(url),
+            loadScript: (src) => new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            }),
+            engineUrl: './modules/assessment-tournament.js?v=1.4',
+            bankUrl: './data/assessment-questions.json?v=1.4'
+        })
+    }) : null;
 
     saveConfigBtn.addEventListener('click', () => {
         chakraSelectionView.persist();
@@ -3596,6 +3625,10 @@ function attachEventListeners() {
         cb.addEventListener('change', updateSessionEstimate);
     });
     chakraSelectionView.bindPersistence();
+    if (chakraTimingView) {
+        chakraTimingView.bind();
+        document.querySelectorAll('#chakra-selection input[type="checkbox"]').forEach(input => input.addEventListener('change', () => chakraTimingView.render()));
+    }
     screenNavigation.bindLobbyActions({
         settingsButton: openSettingsBtn,
         experimentButton: document.getElementById('open-experiment-mode'),

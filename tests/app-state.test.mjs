@@ -46,9 +46,9 @@ assert.equal(defaults.spatialMode, 'off');
 assert.equal(defaults.noFrequencyMode, true, 'No Frequency Mode should default on when the user has no saved preference');
 assert.match(html, /id="no-frequency-mode-toggle" checked/, 'Settings should show No Frequency Mode selected by default');
 assert.match(html, /id="mixer-no-frequency-mode-toggle" checked/, 'Journey Tuning should mirror the default selection');
-assert.match(html, /modules\/app-state\.js\?v=1\.2/);
-assert.match(serviceWorker, /modules\/app-state\.js\?v=1\.2/);
-assert.match(serviceWorker, /chakra-v5\.357/);
+assert.match(html, /modules\/app-state\.js\?v=1\.3/);
+assert.match(serviceWorker, /modules\/app-state\.js\?v=1\.3/);
+assert.match(serviceWorker, /chakra-v5\.358/);
 assert.equal(defaults.visualEffect, 'natural');
 for (const key of ['sleepMode', 'boxBreathingExperienceEnabled', 'hooponoponoExperienceEnabled', 'yogaExperienceEnabled', 'moodRelaxationIntentionEnabled', 'advancedFeaturesUnlocked', 'bgMusicMode', 'highEnergyEnabled', 'sleepExperienceEnabled']) {
     assert.equal(defaults[key], false, `${key} must begin as session-only false`);
