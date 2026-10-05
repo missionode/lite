@@ -36,6 +36,8 @@
   --color-cta-end: #d9ad65;
   --color-cta-border: rgba(255, 229, 184, 0.85);
   --color-on-gold: #17130c;
+  --color-gold-focus: #e2c77e;
+  --color-surface-secondary-btn: rgba(19, 22, 34, 0.96);
   --color-focus: rgba(169, 217, 223, 0.75);
   --color-chakra-root: #e5484d;
   --color-chakra-sacral: #f76b15;
@@ -366,4 +368,167 @@
   .benefits-safety-intro { opacity: 0.8; margin-bottom: 0.75rem; }
   .benefits-safety-list h3 { font-size: 1rem; margin: 1rem 0 0.35rem; }
   .benefits-safety-list p { margin: 0 0 0.5rem; line-height: 1.5; }
+}
+
+/* ── Settings and Sky Observatory — moved from style.css, phase 2 ──────────
+   .ds-settings on #config-screen, .ds-sky on #sky-screen. Settings now uses
+   the same ink, muted and gold primary button as the Lobby (one set of
+   colours); fields follow the design-system Field (gold chevron, gold focus). */
+@layer components {
+  .sky-settings-entry { margin-top: 1rem; }
+  .sky-settings-entry .mixer-note { margin: 0 0 0.8rem; }
+  .ds-settings #open-sky-observatory { width: 100%; }
+
+  @supports selector(#app:has(.ds-settings)) {
+    #app:has(> .ds-settings:not(.hidden)) {
+      width: min(100%, 1040px);
+      max-width: 1040px;
+      padding: clamp(1rem, 3vw, 2.5rem);
+      text-align: left;
+    }
+  }
+  .ds-settings {
+    width: min(100%, 900px);
+    margin-inline: auto;
+    gap: 1rem;
+    align-items: stretch;
+    color: var(--tw-color-ink);
+  }
+  .ds-settings > h1,
+  .ds-settings > .settings-title-row { text-align: center; }
+
+  /* Panel (design system: Panel, Settings variant) */
+  .ds-settings > .config-group {
+    padding: clamp(0.95rem, 2vw, 1.3rem);
+    border: 1px solid var(--tw-color-border-gold);
+    border-radius: var(--tw-radius-settings);
+    background: var(--tw-color-surface-settings);
+    box-shadow: var(--tw-shadow-settings);
+  }
+  .ds-settings .settings-panel {
+    margin-top: 0.25rem;
+    padding-top: 0.85rem;
+    border-top-color: rgba(202, 172, 105, 0.2);
+  }
+  .ds-settings .mixer-note,
+  .ds-settings .subtitle { color: var(--tw-color-muted); opacity: 1; }
+  .ds-settings .checkbox-label,
+  .ds-settings .radio-label { color: var(--tw-color-ink); opacity: 1; }
+  .ds-settings .settings-panel > label:first-child,
+  .ds-settings .config-group > label:first-child { color: var(--tw-color-gold-label); opacity: 1; }
+
+  /* Field (design system: Field) */
+  .ds-settings select,
+  .ds-settings input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  .ds-settings textarea {
+    border: 1px solid var(--tw-color-border-field);
+    border-radius: var(--tw-radius-field);
+    background-color: var(--tw-color-surface-field);
+    color: var(--tw-color-ink);
+  }
+  /* Select chevron in design-system gold (was the old amber). */
+  .ds-settings .config-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%23e8c27e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6'/%3E%3C/svg%3E");
+  }
+  .ds-settings select:focus-visible,
+  .ds-settings input:focus-visible,
+  .ds-settings textarea:focus-visible,
+  .ds-settings button:focus-visible {
+    outline: 2px solid var(--tw-color-gold-focus);
+    outline-offset: 3px;
+  }
+
+  /* Buttons (design system: Button, Settings) */
+  .ds-settings .secondary-btn {
+    border-color: rgba(202, 172, 105, 0.52);
+    background: var(--tw-color-surface-secondary-btn);
+    color: var(--tw-color-ink);
+    backdrop-filter: none;
+    text-transform: none;
+    letter-spacing: 0.03em;
+    font-size: 0.86rem;
+  }
+  /* One gold primary button across the app (design system: Button primary). */
+  .ds-settings .primary-btn {
+    border: 1px solid var(--tw-color-cta-border);
+    background: linear-gradient(135deg, var(--tw-color-cta-start), var(--tw-color-cta-end));
+    color: var(--tw-color-on-gold);
+    box-shadow: var(--tw-shadow-cta);
+    min-height: 56px;
+    border-radius: var(--tw-radius-cta);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  /* Sky Observatory page */
+  .ds-sky.sky-screen {
+    position: relative;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    gap: 0;
+    padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1.25rem, env(safe-area-inset-bottom, 0px));
+    text-align: center;
+  }
+  .sky-observatory-panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 42rem);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 1.6rem);
+    border: 1px solid rgba(202, 172, 105, 0.48);
+    border-radius: var(--tw-radius-panel);
+    background: var(--tw-color-surface-settings);
+    color: var(--tw-color-ink);
+    box-shadow: var(--tw-shadow-sky);
+  }
+  .sky-observatory-panel .sky-eyebrow {
+    margin: 0 0 0.35rem;
+    color: var(--tw-color-gold-eyebrow);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .sky-observatory-panel h1 {
+    margin: 0 0 0.55rem;
+    color: var(--tw-color-ink);
+    font-size: clamp(1.45rem, 4vw, 2.15rem);
+    letter-spacing: 0.04em;
+  }
+  .sky-location-status,
+  .sky-chart-note {
+    max-width: 58ch;
+    margin: 0.45rem auto;
+    color: var(--tw-color-muted);
+    font-size: clamp(0.78rem, 2vw, 0.92rem);
+    line-height: 1.5;
+  }
+  .sky-observatory-panel #close-sky-screen {
+    min-height: 46px;
+    margin-top: 0.8rem;
+    border-color: rgba(202, 172, 105, 0.55);
+    color: var(--tw-color-ink);
+  }
+  @supports selector(#app:has(.ds-sky)) {
+    #app:has(> .ds-sky:not(.hidden)) {
+      width: 100%;
+      max-width: none;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .sky-observatory-panel { border-radius: 16px; }
+    .ds-sky.sky-screen { padding-inline: 0.75rem; }
+    .ds-settings { padding-inline: 0.8rem; }
+    .ds-settings > .config-group { border-radius: 15px; }
+  }
 }

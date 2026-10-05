@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.27">
-    <link rel="stylesheet" href="tailwind.css?v=1.0">
+    <link rel="stylesheet" href="style.css?v=2.28">
+    <link rel="stylesheet" href="tailwind.css?v=1.1">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -32,7 +32,7 @@
         <div id="aura-bg"></div>
 
         <!-- Configuration Screen -->
-        <section id="config-screen" class="screen settings-screen-container">
+        <section id="config-screen" class="screen settings-screen-container ds-settings">
             <div class="settings-title-row">
                 <h1 id="app-title">Chakra Meditation</h1>
                 <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
@@ -234,7 +234,7 @@
             <button id="open-experiment-mode" class="link-btn" type="button" data-i18n="ui.experimentMode">Experiment Mode</button>
         </section>
 
-        <section id="sky-screen" class="screen sky-screen hidden" aria-labelledby="sky-screen-title">
+        <section id="sky-screen" class="screen sky-screen hidden ds-sky" aria-labelledby="sky-screen-title">
             <div class="sky-observatory-panel" data-sky-obstacle>
                 <p class="sky-eyebrow" data-i18n="ui.skyObservatoryEyebrow">A live view from Earth</p>
                 <h1 id="sky-screen-title" data-i18n="ui.skyObservatoryTitle">Sky Observatory</h1>

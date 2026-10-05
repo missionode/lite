@@ -31,8 +31,8 @@ On a Mac, run `npm install` once in the project folder before `npm run build:css
 | --- | --- | --- |
 | 0 | Install Tailwind v4, tokens from the design system, `tw:` prefix, legacy layer, offline cache, tests | **Done** (2026-10-05) — pixel-identical screenshots |
 | 1 | Lobby (Cosmic Observatory block, ~310 lines out of `style.css`), per-chakra time panel, Benefits and safety styles; Inter 500/600/700 loaded; FAQ link uses Settings gold instead of the old amber | **Done** (2026-10-05) — Lobby pixel-identical; only the per-chakra rows changed slightly (design-system borders) |
-| 2 | Settings and the Sky Observatory panel (`surface-settings`, `border-gold`, Field component); merge the near-duplicate Settings colours into one set | Next session |
-| 3 | Shared pieces: modals (help, FAQ, notices, invite), toggles, range sliders, segmented options (Drone Duration), steppers | Later |
+| 2 | Settings and the Sky Observatory page (`.ds-settings`, `.ds-sky`); merged the near-duplicate Settings colours into the Lobby set (one ink, one muted, one gold primary button in sentence case); select chevron and focus in design-system gold | **Done** (2026-10-05) — Lobby, Sky and FAQ unchanged; Settings shows the intended changes (brighter gold Save button, gold chevrons) |
+| 3 | Shared pieces: modals (help, FAQ, notices, invite), toggles, range sliders, segmented options (Drone Duration), steppers; Settings title and stats bar still use the old letter-spaced violet and amber | Next session |
 | 4 | Journey screens (meditation, chakra, Pitch, Sleep wind-down, completion): retire legacy violet `#7c3aed` and amber `#fbbf24` | Later |
 | 5 | Practice and support screens (Yoga, care sessions, games in Play Zone, repertory page, assessment page) | Later |
 | 6 | Turn on Tailwind preflight, delete what is left of `style.css`, remove the legacy layer | Last |
@@ -43,7 +43,7 @@ Each phase is one session of work with its own screenshots, tests and push.
 
 - Add Tamil (the app has five languages; the README lists four).
 - Mark the Inter weight gap as fixed (500/600/700 now load).
-- Merge `ink`/`ink-settings`, `gold`/`gold-label`, the two CTA gradients when Settings moves (phase 2).
+- Merged in the app (phase 2): `ink-settings` → `ink`, `muted-settings` → `muted`, the Settings CTA gradient → the one primary gradient. Update the design system the same way. `gold-label` stays as the heading role.
 - Add components the app already uses: Switch/Toggle, Range slider, Modal, Stepper (per-chakra time), Segmented options, Notice.
 - Keep `tailwind/input.css` `@theme` and the design system `tokens.json` in step: change a token in both, then rebuild.
 

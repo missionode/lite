@@ -1,12 +1,16 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Tailwind phase 2 (2026-10-05)
+
+- Settings and Sky Observatory on design-system tokens; duplicate Settings colours merged; Save button matches the Lobby gold primary; gold select chevrons and focus.
+
 ## Completed — Tailwind phase 0–1 (2026-10-05)
 
 - Tailwind v4 set up on the Lite design system (tokens, `tw:` prefix, legacy layer, offline cache, tests). Lobby, per-chakra time and FAQ styles moved; Inter 500/600/700 loaded. Map `styling-system`; roadmap `docs/tailwind-roadmap.md`.
 
-## Proposed — Tailwind phases 2–6
+## Proposed — Tailwind phases 3–6
 
-- Settings and Sky panel; shared modals and controls; journey screens (retire violet/amber); practice and support screens; preflight and removal of `style.css`. See `docs/tailwind-roadmap.md`.
+- Shared modals and controls (also the Settings title and stats bar); journey screens (retire violet/amber); practice and support screens; preflight and removal of `style.css`. See `docs/tailwind-roadmap.md`.
 
 ## Completed — Separate time for each chakra (2026-10-04)
 

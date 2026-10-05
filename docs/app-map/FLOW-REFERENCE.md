@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production 0abdd75 + uncommitted Tailwind phase 0–1 (feature/narration-feeling) · 2026-10-05.
+Source snapshot: production 0abdd75 + uncommitted Tailwind phases 0–2 (feature/narration-feeling) · 2026-10-05.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -2363,12 +2363,15 @@ flowchart TD
   legacy["style.css (legacy layer)"]
   tw["tailwind.css"]
   lobby["Lobby (phase 1)"]
+  settings["Settings and Sky (phase 2)"]
   next["Next phases"]
   tokens -->|"Rebuild"| build
   build -->|"Output"| tw
   legacy -->|"Overridden by"| tw
   tw -->|"Styles"| lobby
+  tw -->|"Styles"| settings
   lobby -->|"Then"| next
+  settings -->|"Then"| next
 ```
 
 | Step | Current behavior |
@@ -2378,6 +2381,7 @@ flowchart TD
 | style.css (legacy layer) | Wrapped in @layer legacy and loaded first, so it always loses to Tailwind. Screens not yet moved still use it. |
 | tailwind.css | Components layer (.ds-lobby, per-chakra rows, FAQ) and tw: utilities used in markup. |
 | Lobby (phase 1) | .ds-lobby on the Lobby section; column placement by tw:lobby2:col-…, chakra grid tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7. |
+| Settings and Sky (phase 2) | .ds-settings on Settings and .ds-sky on the Sky page: Settings panels, fields (gold chevron, gold focus) and the same gold primary button as the Lobby; one ink and one muted colour app-wide. |
 | Next phases | Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md). |
 
 - Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, offline cache, fresh-build match); Lobby screenshots at 390 / 760 / 1280 px identical before and after; Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there).

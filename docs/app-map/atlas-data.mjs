@@ -783,9 +783,9 @@ add('styling-system','Systems','Styling: design system and Tailwind','How screen
  [['tokens','Design system tokens','Colours, Inter font, spacing s1–s6, radii, shadows from the Lite design system, in @theme of tailwind/input.css. Only design-system colours exist.']],
  [['build','Build','npm run build:css → tailwind.css (minified, committed, precached for offline). No CDN, nothing compiles in the browser.']],
  [['legacy','style.css (legacy layer)','Wrapped in @layer legacy and loaded first, so it always loses to Tailwind. Screens not yet moved still use it.'],['tw','tailwind.css','Components layer (.ds-lobby, per-chakra rows, FAQ) and tw: utilities used in markup.']],
- [['lobby','Lobby (phase 1)','.ds-lobby on the Lobby section; column placement by tw:lobby2:col-…, chakra grid tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7.'],['next','Next phases','Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md).']]
-],[['tokens','build','Rebuild'],['build','tw','Output'],['legacy','tw','Overridden by'],['tw','lobby','Styles'],['lobby','next','Then']],[
+ [['lobby','Lobby (phase 1)','.ds-lobby on the Lobby section; column placement by tw:lobby2:col-…, chakra grid tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7.'],['settings','Settings and Sky (phase 2)','.ds-settings on Settings and .ds-sky on the Sky page: Settings panels, fields (gold chevron, gold focus) and the same gold primary button as the Lobby; one ink and one muted colour app-wide.'],['next','Next phases','Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md).']]
+],[['tokens','build','Rebuild'],['build','tw','Output'],['legacy','tw','Overridden by'],['tw','lobby','Styles'],['tw','settings','Styles'],['lobby','next','Then'],['settings','next','Then']],[
  'Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, offline cache, fresh-build match); Lobby screenshots at 390 / 760 / 1280 px identical before and after; Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there).'
 ]);
 meta.date = '2026-10-05';
-meta.commit = 'production 0abdd75 + uncommitted Tailwind phase 0–1 (feature/narration-feeling)';
+meta.commit = 'production 0abdd75 + uncommitted Tailwind phases 0–2 (feature/narration-feeling)';

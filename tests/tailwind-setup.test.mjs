@@ -31,8 +31,8 @@ for (const [name, value] of [['sky', '#000000'], ['ink', '#f4f1ea'], ['muted', '
 // Cascade: style.css is wrapped in the legacy layer and loads before tailwind.css.
 assert.match(css, /^\/\*[\s\S]*?\*\/\n@layer legacy \{\n/, 'style.css opens the legacy layer');
 assert.match(css, /\n\}\n$/, 'and closes it at the end');
-assert.ok(html.indexOf('href="style.css?v=') < html.indexOf('href="tailwind.css?v=1.0"'), 'tailwind.css loads after style.css');
-assert.match(sw, /'\.\/tailwind\.css\?v=1\.0'/, 'tailwind.css works offline');
+assert.ok(html.indexOf('href="style.css?v=') < html.indexOf('href="tailwind.css?v=1.1"'), 'tailwind.css loads after style.css');
+assert.match(sw, /'\.\/tailwind\.css\?v=1\.1'/, 'tailwind.css works offline');
 assert.doesNotMatch(html, /cdn\.tailwindcss\.com/, 'no runtime CDN build');
 
 // The committed build contains the Lobby and the utilities the markup uses.
@@ -50,4 +50,13 @@ if (fs.existsSync(cli)) {
     assert.equal(result.status, 0, result.stderr);
     assert.equal(fs.readFileSync(out, 'utf8'), built, 'tailwind.css is out of date: run npm run build:css');
 }
+// Phase 2: Settings and Sky Observatory on the design system; duplicate colours merged.
+assert.match(html, /id="config-screen" class="screen settings-screen-container ds-settings"/);
+assert.match(html, /id="sky-screen" class="screen sky-screen hidden ds-sky"/);
+assert.match(input, /\.ds-settings > \.config-group \{[\s\S]*?var\(--tw-color-surface-settings\)/);
+assert.match(input, /\.ds-settings \.primary-btn \{[\s\S]*?var\(--tw-color-cta-start\), var\(--tw-color-cta-end\)[\s\S]*?text-transform: none;/, 'Settings uses the one gold primary button');
+assert.doesNotMatch(input, /ink-settings|muted-settings|cta-settings/, 'one ink, one muted, one gold button');
+assert.match(input, /stroke='%23e8c27e'/, 'select chevron in design-system gold');
+assert.doesNotMatch(css, /#config-screen > \.config-group\s*\{|\.sky-observatory-panel\s*\{|--cosmic-panel:/, 'old Settings and Sky block gone from style.css');
+assert.match(html, /href="tailwind\.css\?v=1\.1"/);
 console.log('tailwind setup: ok');
