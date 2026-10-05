@@ -191,31 +191,31 @@ This inventories static UI declarations in the three meditation HTML entry pages
 
 | Source | Element | Identifier / label | Choices / bounds / destination |
 | --- | --- | --- | --- |
-| [121](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:121) | button | fontDown | type=button |
-| [122](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:122) | button | fontReset | type=button |
-| [123](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:123) | button | fontUp | type=button |
-| [126](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:126) | button | translateBtn | type=button |
-| [133](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:133) | a | ← Meditation Room | href=../index.html |
-| [144](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:144) | a | Return to Settings | href=../index.html |
-| [149](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:149) | button | retryButton | type=button |
-| [156](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:156) | button | choiceLeft | type=button |
-| [157](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:157) | button | choiceRight | type=button |
-| [160](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:160) | button | equalChoice | type=button |
-| [161](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:161) | button | skipChoice | type=button |
-| [162](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:162) | button | undoAnswer | type=button |
-| [193](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:193) | button | undoResult | type=button |
-| [194](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:194) | button | newAssessment | type=button |
-| [195](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:195) | a | Return to Meditation Room | href=../index.html |
+| [125](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:125) | button | fontDown | type=button |
+| [126](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:126) | button | fontReset | type=button |
+| [127](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:127) | button | fontUp | type=button |
+| [130](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:130) | button | translateBtn | type=button |
+| [137](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:137) | a | ← Meditation Room | href=../index.html |
+| [148](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:148) | a | Return to Settings | href=../index.html |
+| [153](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:153) | button | retryButton | type=button |
+| [160](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:160) | button | choiceLeft | type=button |
+| [161](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:161) | button | choiceRight | type=button |
+| [164](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:164) | button | equalChoice | type=button |
+| [165](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:165) | button | skipChoice | type=button |
+| [166](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:166) | button | undoAnswer | type=button |
+| [197](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:197) | button | undoResult | type=button |
+| [198](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:198) | button | newAssessment | type=button |
+| [199](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:199) | a | Return to Meditation Room | href=../index.html |
 
 ## docs/repertory.html
 
 | Source | Element | Identifier / label | Choices / bounds / destination |
 | --- | --- | --- | --- |
-| [90](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:90) | a | backLink | href=../index.html |
-| [91](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:91) | select | languageToggle | en: English; ml: മലയാളം; hi: हिन्दी; ru: Русский; ta: தமிழ் |
-| [110](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:110) | a | sourceLink |  |
-| [116](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:116) | input | frequencySearch | type=search |
-| [117](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:117) | button | clearSearch | type=button |
+| [94](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:94) | a | backLink | href=../index.html |
+| [95](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:95) | select | languageToggle | en: English; ml: മലയാളം; hi: हिन्दी; ru: Русский; ta: தமிழ் |
+| [114](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:114) | a | sourceLink |  |
+| [120](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:120) | input | frequencySearch | type=search |
+| [121](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/repertory.html:121) | button | clearSearch | type=button |
 
 ## Runtime-generated and relocated controls
 

@@ -31,8 +31,8 @@ for (const [name, value] of [['sky', '#000000'], ['ink', '#f4f1ea'], ['muted', '
 // Cascade: style.css is wrapped in the legacy layer and loads before tailwind.css.
 assert.match(css, /^\/\*[\s\S]*?\*\/\n@layer ds-base, legacy;\n@layer legacy \{\n/, 'style.css declares the layer order and opens the legacy layer');
 assert.match(css, /\n\}\n$/, 'and closes it at the end');
-assert.ok(html.indexOf('href="style.css?v=') < html.indexOf('href="tailwind.css?v=1.4"'), 'tailwind.css loads after style.css');
-assert.match(sw, /'\.\/tailwind\.css\?v=1\.4'/, 'tailwind.css works offline');
+assert.ok(html.indexOf('href="style.css?v=') < html.indexOf('href="tailwind.css?v=1.5"'), 'tailwind.css loads after style.css');
+assert.match(sw, /'\.\/tailwind\.css\?v=1\.5'/, 'tailwind.css works offline');
 assert.doesNotMatch(html, /cdn\.tailwindcss\.com/, 'no runtime CDN build');
 
 // The committed build contains the Lobby and the utilities the markup uses.
@@ -58,7 +58,7 @@ assert.match(input, /\.ds-settings \.primary-btn \{[\s\S]*?var\(--tw-color-cta-s
 assert.doesNotMatch(input, /ink-settings|muted-settings|cta-settings/, 'one ink, one muted, one gold button');
 assert.match(input, /stroke='%23e8c27e'/, 'select chevron in design-system gold');
 assert.doesNotMatch(css, /#config-screen > \.config-group\s*\{|\.sky-observatory-panel\s*\{|--cosmic-panel:/, 'old Settings and Sky block gone from style.css');
-assert.match(html, /href="tailwind\.css\?v=1\.4"/);
+assert.match(html, /href="tailwind\.css\?v=1\.5"/);
 // Phase 3: shared pieces on design-system tokens, in ds-base with the element defaults they compete with.
 for (const selector of ['.primary-btn {', '.secondary-btn {', 'input[type="range"]::-webkit-slider-runnable-track {', '.range-step {', '.checkbox-label {', '.drone-duration-copy {', '.modal-content {', '.app-notice {', '* {', 'label {']) {
     assert.ok(input.includes(selector), `ds-base has ${selector}`);
@@ -77,4 +77,17 @@ assert.doesNotMatch(appJs + chromeModules, /#7c3aed|#fbbf24|124, *58, *237/i, 'n
 assert.match(css, /--text-color: var\(--tw-color-ink\);[\s\S]*?--accent-color: var\(--tw-color-gold\);[\s\S]*?--glass-bg: var\(--tw-color-tile\);/, 'legacy variables come from design-system tokens');
 assert.match(css, /--primary-color: #a9d9df;/, 'calm sky-teal default; the chakra colour replaces it during a journey');
 assert.match(css, /#breathing-circle \{[\s\S]*?var\(--tw-color-gold-glow\), var\(--tw-color-gold\) 60%/, 'gold breathing orb');
+// Phase 5: practice and support screens.
+for (const id of ['settings-manager-screen', 'experiment-screen']) assert.match(html, new RegExp(`id="${id}" class="[^"]*ds-settings`), `${id} uses .ds-settings`);
+assert.match(html, /id="icebreaker-screen" class="[^"]*ds-support/, 'Arriving uses .ds-support');
+assert.match(html, /id="newcomer-tutorial-title" class="tw:sr-only"/, 'orientation title is screen-reader only (sr-only was never defined)');
+assert.match(input, /\.ds-settings \.config-group select \{[\s\S]*?background-repeat: no-repeat;/, 'single gold chevron on every .ds-settings select');
+assert.doesNotMatch(css, /rgba\((220, 205, 255|233, 220, 255|237, 233, 254|168, 145, 255|36, 28, 70|16, 12, 36|30, 20, 60),/, 'no lavender or violet surfaces in support screens');
+for (const page of ['docs/assesment.html', 'docs/repertory.html']) {
+    const doc = read(page);
+    assert.match(doc, /--ink:#f4f1ea;/, `${page} ink from the design system`);
+    assert.match(doc, /--gold:#e8c27e;/, `${page} gold from the design system`);
+    assert.match(doc, /family=Inter/, `${page} loads Inter`);
+    assert.doesNotMatch(doc, /rgba\((126,87,194|90,61,151|169,139,255|24,19,45),|#6f4cae|#090713|#0d0a14/, `${page} has no violet surfaces`);
+}
 console.log('tailwind setup: ok');

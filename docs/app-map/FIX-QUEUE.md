@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Tailwind phase 5, practice and support screens (2026-10-05)
+
+- Manage Settings, Experiment Mode, Arriving, Final Challenge, Pitch moods, orientation, Play Zone chrome, Assessment and Repertory pages on design-system colours; orientation title hidden for sight users as intended.
+
 ## Completed — Tailwind phase 4, journey colours (2026-10-05)
 
 - Legacy violet and amber retired; journey screens, glows and controls on design-system gold/ink/tile; calm sky-teal default under the chakra colour.
@@ -20,9 +24,9 @@
 
 - Tailwind v4 set up on the Lite design system (tokens, `tw:` prefix, legacy layer, offline cache, tests). Lobby, per-chakra time and FAQ styles moved; Inter 500/600/700 loaded. Map `styling-system`; roadmap `docs/tailwind-roadmap.md`.
 
-## Proposed — Tailwind phases 5–6
+## Proposed — Tailwind phase 6
 
-- practice and support screens; preflight and removal of `style.css`. See `docs/tailwind-roadmap.md`.
+- preflight and removal of `style.css`. See `docs/tailwind-roadmap.md`.
 
 ## Completed — Separate time for each chakra (2026-10-04)
 

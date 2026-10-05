@@ -428,6 +428,11 @@
   /* Select chevron in design-system gold (was the old amber). */
   .ds-settings .config-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%23e8c27e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 42px 12px 14px;
   }
   .ds-settings select:focus-visible,
   .ds-settings input:focus-visible,
@@ -908,4 +913,46 @@
     text-align: center;
   }
   .ds-settings #stats-display { align-self: center; font-size: 0.8rem; opacity: 1 !important; }
+}
+
+/* Practice and support screens (phase 5): Arriving (icebreaker) title and
+   subtitle on design-system ink/muted, sentence case. Manage Settings and
+   Experiment Mode use .ds-settings. */
+@layer components {
+  .ds-support > h1 {
+    color: var(--tw-color-ink);
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.2;
+    text-transform: none;
+  }
+  /* Manage Settings: backup file field stacks under its label, full width. */
+  .ds-settings #settings-import-control {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .ds-settings #settings-import-control .secondary-btn {
+    width: 100%;
+    max-width: none;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+  .ds-settings input[type="file"] {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 10px 12px;
+  }
+  .ds-support > .subtitle {
+    color: var(--tw-color-muted);
+    opacity: 1;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+  }
 }

@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.30">
-    <link rel="stylesheet" href="tailwind.css?v=1.4">
+    <link rel="stylesheet" href="style.css?v=2.31">
+    <link rel="stylesheet" href="tailwind.css?v=1.5">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -244,7 +244,7 @@
             </div>
         </section>
 
-        <section id="settings-manager-screen" class="screen settings-screen-container hidden">
+        <section id="settings-manager-screen" class="screen settings-screen-container hidden ds-settings">
             <div class="settings-title-row"><h1 data-i18n="ui.manageSettings">Manage Settings</h1></div>
             <p class="subtitle" data-i18n="ui.manageSettingsSubtitle">Create a portable backup of this app’s saved settings, or restore one on this device.</p>
             <div class="config-group settings-panel">
@@ -262,7 +262,7 @@
             <button id="close-settings-manager" class="link-btn" type="button" data-i18n="ui.backToSettings">Back to Settings</button>
         </section>
 
-        <section id="experiment-screen" class="screen settings-screen-container hidden">
+        <section id="experiment-screen" class="screen settings-screen-container hidden ds-settings">
             <div class="settings-title-row"><h1 data-i18n="ui.experimentMode">Experiment Mode</h1></div>
             <p class="subtitle" data-i18n="ui.experimentSubtitle">Run one isolated guide activity. It does not change the journey plan or history.</p>
             <div class="config-group settings-panel">
@@ -658,7 +658,7 @@
         </section>
 
         <!-- Icebreaker Screen -->
-        <section id="icebreaker-screen" class="screen hidden">
+        <section id="icebreaker-screen" class="screen hidden ds-support">
             <h1 id="icebreaker-title">Arriving</h1>
             <p id="icebreaker-subtitle" class="subtitle">Breathe and settle into the space</p>
             <div id="icebreaker-timer" style="font-size: 1.2rem; opacity: 0.5; margin-top: 2rem;">60</div>
@@ -667,7 +667,7 @@
 
         <section id="newcomer-tutorial-screen" class="screen newcomer-tutorial-screen hidden" aria-labelledby="newcomer-tutorial-title">
             <div class="newcomer-tutorial-content">
-                <h1 id="newcomer-tutorial-title" class="sr-only">Chakra orientation</h1>
+                <h1 id="newcomer-tutorial-title" class="tw:sr-only">Chakra orientation</h1>
                 <div id="newcomer-body-map" class="newcomer-body-map">
                     <div class="newcomer-aura-scene" id="newcomer-aura-scene" data-active-chakra="root" aria-hidden="true">
                         <svg viewBox="0 0 340 480" role="presentation" focusable="false">

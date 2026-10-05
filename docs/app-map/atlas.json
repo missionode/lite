@@ -6076,9 +6076,14 @@
             "Legacy violet and amber retired: style.css variables point at design-system tokens (ink, gold, tile); breathing orb, timer, dots and icon buttons in gold; calm default colour sky teal, replaced by the chakra colour during a journey; script-set aura glows in soft gold."
           ],
           [
+            "support",
+            "Practice and support (phase 5)",
+            "Manage Settings and Experiment Mode on .ds-settings; Arriving on .ds-support; Final Challenge, Pitch moods, orientation scene and Play Zone chrome on design-system colours; Assessment and Repertory pages on design-system ink, gold, surfaces and Inter."
+          ],
+          [
             "next",
-            "Next phases",
-            "Practice and support screens, then preflight and removal of style.css (docs/tailwind-roadmap.md)."
+            "Next phase",
+            "Phase 6: turn on preflight, delete what is left of style.css, remove the legacy layer (docs/tailwind-roadmap.md)."
           ]
         ]
       ],
@@ -6120,6 +6125,11 @@
         ],
         [
           "journey",
+          "support",
+          "Then"
+        ],
+        [
+          "support",
           "next",
           "Then"
         ],
