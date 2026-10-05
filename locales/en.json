@@ -307,6 +307,7 @@
     ,"perChakraTimeNoAssessment": "No finished assessment on this device yet. Complete the chakra assessment first."
     ,"perChakraTimeApplied": "Times applied. You can still adjust each chakra."
     ,"perChakraTimeResetDone": "All chakras now follow Core Practice Duration."
+    ,"perChakraTimeNoneSelected": "Choose chakras in Chakra Journey first; their times appear here."
     ,"hrimActivationDuration": "HRIM Activation Duration (minutes)"
     ,"droneDurationMode": "Drone Duration"
     ,"droneBeginner": "Beginner"

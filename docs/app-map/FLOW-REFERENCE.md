@@ -1299,7 +1299,7 @@ flowchart TD
   core["Core Practice Duration"]
   switch["Set time for each chakra"]
   off["Switch off"]
-  rows["Seven rows"]
+  rows["Rows for chosen chakras"]
   reset["Reset all to core"]
   suggest["Fill times from assessment"]
   apply["Apply these times"]
@@ -1321,14 +1321,14 @@ flowchart TD
 | Core Practice Duration | Kept as the base (1–7 min, 0.5 steps). Every chakra without its own time follows it, so moving the core moves them too. |
 | Set time for each chakra | Lobby switch under Core Practice Duration, off by default. Shown only for normal chakra journeys: hidden for Shots, Sleep, HRIM, Music Only, focused experiences and demo scripts. |
 | Switch off | Every chakra uses Core Practice Duration, exactly as before. |
-| Seven rows | Root → Crown with − / time / + (1–7 min, 0.5 steps). Rows of chakras not in the journey are dimmed. “· core” marks a chakra still following the core. |
+| Rows for chosen chakras | One row per chakra chosen in Chakra Journey (Root → Crown order) with − / time / + (1–7 min, 0.5 steps); rows update when chakras are ticked or unticked. None chosen: a short message. A hidden chakra keeps its saved time. “· core” marks a chakra still following the core. |
 | Reset all to core | All chakras follow Core Practice Duration again. |
 | Fill times from assessment | Reads the assessment saved on this device. If it has clear focus chakras with enough answers, shows a suggestion: focus chakras get the core time + 50 % (max 7 min); others follow the core. No clear focus or no assessment: a calm message, nothing changes. |
 | Apply these times | One tap applies the suggestion; every chakra can still be adjusted. |
 | Journey runs | Each chakra chants for its own time (Reverse Journey and Massage too). Drone exposure keeps its own Drone Duration window. The Lobby estimate and session countdown add up each chakra’s time. |
 
 - Saved on this device as chakra_per_chakra_time_enabled and chakra_per_chakra_times (included in settings backup). Five languages.
-- Evidence: unit tests (limits, follow-core, demo, estimate, autofill rules, wiring) and a local browser run: switch, rows, + on Heart (estimate 36 → 37 min), no-assessment message, and a simulated finished assessment suggesting Solar and Throat 7 min, applied only after Apply (estimate 64 → 68 min), no page errors. Not yet checked on a phone.
+- Evidence: unit tests (limits, follow-core, demo, estimate, autofill rules, wiring) and a local browser run: switch, rows, + on Heart (estimate 36 → 37 min), no-assessment message, and a simulated finished assessment suggesting Solar and Throat 7 min, applied only after Apply (estimate 64 → 68 min), no page errors. Rows-for-chosen-chakras checked in a local browser (Root, Heart, Crown → 3 rows; none → message). Not yet checked on a phone.
 
 <a id="controls"></a>
 

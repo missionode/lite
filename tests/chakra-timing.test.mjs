@@ -75,12 +75,14 @@ assert.match(app, /window\.ChakraTiming\.minutesFor\(state, key, \{ demo: isDemo
 assert.match(read('modules/lobby-experience-visibility.js'), /perChakraTime\.hidden = shots \|\| sleep \|\| highEnergy \|\| musicOnly \|\| focusedExperience \|\| isDemoScriptSelected\(\)/, 'only normal chakra journeys show the panel');
 const view = read('modules/chakra-timing-view.js');
 assert.match(view, /chakraAssessmentTournamentV1/, 'reads the assessment saved on this device');
+assert.match(view, /const shown = timing\.CHAKRA_IDS\.filter\(id => selected\.has\(id\)\);[\s\S]*?for \(const id of shown\)/, 'only chakras chosen in Chakra Journey get a row');
+assert.doesNotMatch(view, /is-off/, 'unselected chakras are not shown at all');
 assert.match(view, /applyButton\?\.addEventListener\('click', \(\) => \{\s*if \(!pending\) return;/, 'nothing is applied without the Apply tap');
 const sw = read('sw.js');
-for (const file of ['chakra-timing.js?v=1.0', 'chakra-timing-view.js?v=1.0']) assert.ok(sw.includes(`./modules/${file}`), `${file} works offline`);
+for (const file of ['chakra-timing.js?v=1.0', 'chakra-timing-view.js?v=1.1']) assert.ok(sw.includes(`./modules/${file}`), `${file} works offline`);
 
 const keys = ['perChakraTimeToggle', 'perChakraTimeNote', 'perChakraTimeCore', 'perChakraTimeReset', 'perChakraTimeFromAssessment', 'perChakraTimeApply',
-    'perChakraTimeChecking', 'perChakraTimeSuggestion', 'perChakraTimeNoFocus', 'perChakraTimeNoAssessment', 'perChakraTimeApplied', 'perChakraTimeResetDone'];
+    'perChakraTimeChecking', 'perChakraTimeSuggestion', 'perChakraTimeNoFocus', 'perChakraTimeNoAssessment', 'perChakraTimeApplied', 'perChakraTimeResetDone', 'perChakraTimeNoneSelected'];
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const ui = JSON.parse(read(`locales/${language}.json`)).ui;
     for (const key of keys) assert.ok(ui[key]?.trim(), `${language} has ui.${key}`);

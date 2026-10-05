@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Per-chakra rows only for chosen chakras (2026-10-05)
+
+- "Set time for each chakra" shows rows only for chakras chosen in Chakra Journey; none chosen shows a short message. Map `per-chakra-time`.
+
 ## Completed — Tailwind phase 3, shared pieces (2026-10-05)
 
 - Buttons, sliders, steppers, chips, Drone Duration segments, modals, help/FAQ tiles and notices on design-system tokens (ds-base layer); Settings title and stats bar in sentence case.

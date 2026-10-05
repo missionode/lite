@@ -266,6 +266,7 @@
     "perChakraTimeNoAssessment": "इस डिवाइस पर अभी कोई पूरा आकलन नहीं है। पहले चक्र आकलन पूरा करें।",
     "perChakraTimeApplied": "समय लागू हो गए। आप हर चक्र को अब भी बदल सकते हैं।",
     "perChakraTimeResetDone": "अब सभी चक्र मुख्य अभ्यास अवधि का पालन करते हैं।",
+    "perChakraTimeNoneSelected": "पहले चक्र यात्रा में चक्र चुनें; उनका समय यहाँ दिखेगा।",
     "hrimActivationDuration": "ह्रीं सक्रियण अवधि (मिनट)",
     "droneDurationMode": "ड्रोन अवधि",
     "droneBeginner": "आरंभिक",

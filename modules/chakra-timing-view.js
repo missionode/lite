@@ -40,11 +40,19 @@
             if (!rows) return;
             const selected = new Set(state.selectedChakras || []);
             rows.innerHTML = '';
-            for (const id of timing.CHAKRA_IDS) {
+            // Only the chakras chosen in Chakra Journey get a row (Root → Crown order).
+            const shown = timing.CHAKRA_IDS.filter(id => selected.has(id));
+            if (!shown.length) {
+                const empty = document.createElement('p');
+                empty.className = 'mixer-note per-chakra-time-empty';
+                empty.textContent = t('ui.perChakraTimeNoneSelected');
+                rows.append(empty);
+            }
+            for (const id of shown) {
                 const own = state.perChakraTimes?.[id];
                 const minutes = timing.minutesFor(state, id);
                 const row = document.createElement('div');
-                row.className = 'per-chakra-time-row' + (selected.has(id) ? '' : ' is-off');
+                row.className = 'per-chakra-time-row';
                 row.dataset.chakra = id;
                 const name = document.createElement('span');
                 name.className = 'per-chakra-time-name';

@@ -337,7 +337,6 @@
   .per-chakra-time-actions[hidden] { display: none; }
   .per-chakra-time-rows { display: flex; flex-direction: column; gap: 0.35rem; }
   .per-chakra-time-row { display: grid; grid-template-columns: 1fr 2.4rem minmax(6.5rem, auto) 2.4rem; align-items: center; gap: 0.4rem; }
-  .per-chakra-time-row.is-off { opacity: 0.45; }
   .per-chakra-time-name { font-size: 0.95rem; color: var(--tw-color-ink); }
   .per-chakra-time-value { text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--tw-color-ink); }
   .per-chakra-time-step {
