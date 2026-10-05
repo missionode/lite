@@ -1,0 +1,50 @@
+# Tailwind CSS roadmap
+
+Owner decision (2026-10-05): option A — set up Tailwind on the Lite design system and move the Lobby first; other screens follow in later sessions.
+
+## How it is set up
+
+| Part | What |
+| --- | --- |
+| Tailwind | v4.3.3 CLI (`tailwindcss`, `@tailwindcss/cli` dev dependencies). No CDN, nothing runs in the browser. |
+| Entry | `tailwind/input.css` — design tokens (`@theme`), Lobby and newer components (`@layer components`). |
+| Output | `tailwind.css` (minified, committed, precached offline). Rebuild after every change: `npm run build:css` (or `npm run watch:css`). |
+| Tokens | Colours, font, spacing (`s1`–`s6`), radii, shadows and breakpoints copied from the **Lite** design system (Claude Design System artifact). Only design-system colours exist: Tailwind's default palette is removed. |
+| Prefix | Every utility starts with `tw:` (for example `tw:grid-cols-2`, `tw:lobby2:col-[2]`), so nothing collides with old class names such as `hidden` or `container`. |
+| Cascade | `style.css` is wrapped in `@layer legacy`; Tailwind's layers come after it, so new styles always win without `!important` or ID selectors. No preflight reset yet (old CSS still owns element styles). |
+| Breakpoints | `tile4` = 560px (4 chakra tiles), `lobby2` = 920px (two-column Lobby), plus Tailwind's defaults. |
+| Safety net | `tests/tailwind-setup.test.mjs` checks the pipeline, tokens, cascade, offline cache and that `tailwind.css` matches a fresh build. Screens are compared with before/after screenshots at phone, tablet and desktop widths. |
+
+On a Mac, run `npm install` once in the project folder before `npm run build:css` (the CLI uses a platform-specific binary).
+
+## Rules while moving a screen
+
+1. Keep DOM order, IDs, `data-i18n` keys and the classes view modules toggle (`hidden`, `chip-active`, `is-off`, …).
+2. Layout and one-off spacing go in markup as `tw:` utilities; repeated patterns become components in `@layer components` using the token variables (`var(--tw-color-…)`).
+3. Delete the screen's old rules from `style.css` in the same change.
+4. Screenshots before and after (390 / 760 / 1280 px); differences must be intended.
+5. Bump `tailwind.css`, `style.css` and shell-cache versions; update tests, atlas, handoff and fix queue.
+
+## Roadmap
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 0 | Install Tailwind v4, tokens from the design system, `tw:` prefix, legacy layer, offline cache, tests | **Done** (2026-10-05) — pixel-identical screenshots |
+| 1 | Lobby (Cosmic Observatory block, ~310 lines out of `style.css`), per-chakra time panel, Benefits and safety styles; Inter 500/600/700 loaded; FAQ link uses Settings gold instead of the old amber | **Done** (2026-10-05) — Lobby pixel-identical; only the per-chakra rows changed slightly (design-system borders) |
+| 2 | Settings and the Sky Observatory panel (`surface-settings`, `border-gold`, Field component); merge the near-duplicate Settings colours into one set | Next session |
+| 3 | Shared pieces: modals (help, FAQ, notices, invite), toggles, range sliders, segmented options (Drone Duration), steppers | Later |
+| 4 | Journey screens (meditation, chakra, Pitch, Sleep wind-down, completion): retire legacy violet `#7c3aed` and amber `#fbbf24` | Later |
+| 5 | Practice and support screens (Yoga, care sessions, games in Play Zone, repertory page, assessment page) | Later |
+| 6 | Turn on Tailwind preflight, delete what is left of `style.css`, remove the legacy layer | Last |
+
+Each phase is one session of work with its own screenshots, tests and push.
+
+## Design system follow-ups (Claude Design System "Lite")
+
+- Add Tamil (the app has five languages; the README lists four).
+- Mark the Inter weight gap as fixed (500/600/700 now load).
+- Merge `ink`/`ink-settings`, `gold`/`gold-label`, the two CTA gradients when Settings moves (phase 2).
+- Add components the app already uses: Switch/Toggle, Range slider, Modal, Stepper (per-chakra time), Segmented options, Notice.
+- Keep `tailwind/input.css` `@theme` and the design system `tokens.json` in step: change a token in both, then rebuild.
+
+Note: `npm audit` reports a high-severity `braces` issue inside `@parcel/watcher`, used only by the Tailwind CLI watch mode on the developer machine. It is never shipped to users. Re-check when Tailwind releases an update.

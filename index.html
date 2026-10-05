@@ -7,9 +7,10 @@
     <!-- Google Fonts for Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="style.css?v=2.26">
+    <link rel="stylesheet" href="style.css?v=2.27">
+    <link rel="stylesheet" href="tailwind.css?v=1.0">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -355,9 +356,9 @@
         </div>
 
         <!-- Lobby Screen -->
-        <section id="lobby-screen" class="screen lobby-shell hidden">
+        <section id="lobby-screen" class="screen lobby-shell hidden ds-lobby">
             <h1 id="sound-healing-title" data-i18n="ui.soundHealing" hidden>Sound Shot</h1>
-            <div id="shots-control" class="shots-control lobby-panel" hidden>
+            <div id="shots-control" class="shots-control lobby-panel tw:lobby2:col-[1/-1]" hidden>
                 <label class="shots-toggle-label">
                     <input type="checkbox" id="shots-toggle" disabled>
                     <span data-i18n="ui.shotsMode">⚡ Shots</span>
@@ -391,8 +392,8 @@
                     <button type="button" class="pitch-mood" data-pitch-mood="focus" data-i18n="ui.pitch_focus_label">🎯 Focus</button>
                 </div>
             </div>
-            <h1 id="lobby-title">Meditation Room</h1>
-            <div id="journey-preparation-addons" class="config-group lobby-experience-mode lobby-panel">
+            <h1 id="lobby-title" class="tw:lobby2:col-[1/-1]">Meditation Room</h1>
+            <div id="journey-preparation-addons" class="config-group lobby-experience-mode lobby-panel tw:lobby2:col-[1]">
                 <label data-i18n="ui.journeyPreparation">Journey preparation</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="box-breathing-experience-toggle"><span data-i18n="ui.boxBreathingExperience">Box Breathing</span></label>
@@ -455,10 +456,10 @@
                     </div>
                 </div>
             </div>
-            <div id="chakra-selection-panel" class="config-group lobby-chakra-selection lobby-panel">
+            <div id="chakra-selection-panel" class="config-group lobby-chakra-selection lobby-panel tw:lobby2:col-[1/-1]">
                 <label data-i18n="ui.chakraJourney">Chakra Journey</label>
                 <p class="chakra-selection-help" data-i18n="ui.chakraSelectionHelp">Choose the centres to include in this journey. You can adjust them here before beginning.</p>
-                <div id="chakra-selection" class="chakra-selection-list">
+                <div id="chakra-selection" class="chakra-selection-list tw:grid-cols-2 tw:tile4:grid-cols-4 tw:lobby2:grid-cols-7">
                     <label class="checkbox-label"><input type="checkbox" value="root"> <img class="chakra-selection-thumbnail" src="symbols/root.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.root">Root</span></label>
                     <label class="checkbox-label"><input type="checkbox" value="sacral"> <img class="chakra-selection-thumbnail" src="symbols/sacral.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.sacral">Sacral</span></label>
                     <label class="checkbox-label"><input type="checkbox" value="solar"> <img class="chakra-selection-thumbnail" src="symbols/solar.webp" alt="" aria-hidden="true" width="30" height="30" decoding="async"> <span data-i18n="ui.solar">Solar</span></label>
@@ -469,7 +470,7 @@
                 </div>
                 <label id="reverse-journey-control" class="checkbox-label experience-mode-toggle" hidden><input type="checkbox" id="reverse-journey-toggle" disabled><span data-i18n="ui.reverseJourney">Reverse Journey (Crown ➔ Root)</span></label>
             </div>
-            <div id="journey-integration-addons" class="config-group lobby-experience-mode lobby-panel">
+            <div id="journey-integration-addons" class="config-group lobby-experience-mode lobby-panel tw:lobby2:col-[1]">
                 <label data-i18n="ui.journeyIntegration">Journey integration</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="hooponopono-experience-toggle"><span data-i18n="ui.hooponoponoExperience">Ho'oponopono</span></label>
@@ -482,7 +483,7 @@
                     </div>
                 </div>
             </div>
-            <div class="time-selector lobby-panel lobby-duration-panel">
+            <div class="time-selector lobby-panel lobby-duration-panel tw:lobby2:col-[2]">
                 <label for="time-per-chakra" data-i18n="ui.corePracticeDuration">Core Practice Duration (minutes)</label>
                 <input type="range" id="time-per-chakra" min="1" max="7" value="1" step="0.5">
                 <span id="time-display">5.0 mins</span>
@@ -503,13 +504,13 @@
                 <button id="per-chakra-time-apply" type="button" class="primary-btn" data-i18n="ui.perChakraTimeApply" hidden>Apply these times</button>
             </div>
 
-            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control lobby-panel lobby-duration-panel">
+            <div id="high-energy-duration-control" class="time-selector high-energy-duration-control lobby-panel lobby-duration-panel tw:lobby2:col-[2]">
                 <label for="time-high-energy" data-i18n="ui.hrimActivationDuration">HRIM Activation Duration (minutes)</label>
                 <input type="range" id="time-high-energy" min="1" max="30" value="5" step="1">
                 <span id="high-energy-time-display">5 mins</span>
             </div>
 
-            <fieldset id="drone-duration-control" class="drone-duration-control lobby-panel" aria-describedby="drone-duration-help drone-duration-summary">
+            <fieldset id="drone-duration-control" class="drone-duration-control lobby-panel tw:lobby2:col-[2]" aria-describedby="drone-duration-help drone-duration-summary">
                 <legend data-i18n="ui.droneDurationMode">Drone Duration</legend>
                 <div class="drone-duration-options">
                     <label class="drone-duration-option">
@@ -536,13 +537,13 @@
             </fieldset>
 
             <!-- Intention Seed -->
-            <div id="intention-config-group" class="config-group lobby-panel" style="margin-top: 1rem;">
+            <div id="intention-config-group" class="config-group lobby-panel tw:lobby2:col-[1]" style="margin-top: 1rem;">
                 <label for="intention-input" id="intention-label" data-i18n="ui.intentionPrompt">What are you calling in today?</label>
                 <input type="text" id="intention-input" value="" placeholder="e.g. peace, clarity, gentle strength..." autocomplete="off">
             </div>
 
             <!-- Session preferences -->
-            <div id="journey-preferences-group" class="config-group lobby-panel" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
+            <div id="journey-preferences-group" class="config-group lobby-panel tw:lobby2:col-[1/-1]" style="margin-top: 0.75rem; align-items:center; flex-direction: row; flex-wrap: wrap; gap: 1rem 1.5rem; justify-content: center;">
                 <label class="checkbox-label" style="font-size: 1rem; padding: 12px 24px;">
                     <input type="checkbox" id="returning-journey-toggle">
                     <span id="returning-journey-label">Returning Journey</span>
@@ -553,7 +554,7 @@
                 </label>
             </div>
 
-            <div id="experience-mode-group" class="config-group lobby-experience-mode lobby-panel">
+            <div id="experience-mode-group" class="config-group lobby-experience-mode lobby-panel tw:lobby2:col-[2]">
                 <label data-i18n="ui.experienceMode">Experience Mode</label>
                 <div class="experience-mode-options">
                     <label class="checkbox-label experience-mode-toggle">
@@ -574,9 +575,9 @@
                     </label>
                 </div>
             </div>
-            <div id="yoga-experience-panel-host" aria-live="polite"></div>
+            <div id="yoga-experience-panel-host" aria-live="polite" class="tw:lobby2:col-[1/-1]"></div>
 
-            <section id="intimate-service-panel" class="config-group lobby-intimate-service lobby-panel" aria-live="polite" hidden>
+            <section id="intimate-service-panel" class="config-group lobby-intimate-service lobby-panel tw:lobby2:col-[1/-1]" aria-live="polite" hidden>
                 <label data-i18n="ui.intimateService">Intimate Service</label>
                 <p class="mixer-note" data-i18n="ui.intimateServiceNote">Select the care stages needed for this guided service. Their order is always Perineal Care, Massage, then Assisted Bathing.</p>
                 <div class="experience-mode-options">
@@ -638,9 +639,9 @@
                 </div>
             </div>
 
-            <div id="session-estimate">~ 36 mins</div>
-            <div id="journey-roadmap" class="journey-roadmap" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
-            <p class="journey-safety-summary" data-i18n="ui.safetySummary">Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time.</p>
+            <div id="session-estimate" class="tw:lobby2:col-[1/-1]">~ 36 mins</div>
+            <div id="journey-roadmap" class="journey-roadmap tw:lobby2:col-[1/-1]" role="status" aria-live="polite" data-i18n-aria-label="ui.journeyRoadmap" aria-label="Journey roadmap"></div>
+            <p class="journey-safety-summary tw:lobby2:col-[1/-1]" data-i18n="ui.safetySummary">Settle into a comfortable position and begin when you are ready to be guided. Keep your breathing natural; you may adjust your position at any time.</p>
             <div id="frequency-reminder" class="frequency-reminder" data-state="off" role="status" aria-live="polite">
                 <span class="frequency-reminder-icon" aria-hidden="true">🔇</span>
                 <span class="frequency-reminder-copy">
@@ -649,7 +650,7 @@
                 </span>
                 <button id="frequency-reminder-toggle" class="frequency-reminder-btn" type="button" aria-pressed="false" data-i18n="ui.freqReminderTurnOn">Turn on</button>
             </div>
-            <div class="lobby-actions">
+            <div class="lobby-actions tw:lobby2:col-[1/-1]">
                 <button id="start-meditation" class="primary-btn">Begin Journey</button>
                 <button id="open-settings" class="link-btn">Settings</button>
                 <button id="begin-consultation" class="secondary-btn consultation-btn" type="button" hidden disabled aria-disabled="true">Begin Session Consultation</button>

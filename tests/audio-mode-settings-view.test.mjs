@@ -107,7 +107,7 @@ console.log('Audio mode settings view passed: mirrored Lobby/mixer controls, per
     assert.equal(nodes.get('frequency-reminder-toggle').attrs['aria-pressed'], 'true');
 }
 const lobbyHtml = readFileSync('index.html', 'utf8');
-assert.match(lobbyHtml, /id="frequency-reminder"[\s\S]*?id="frequency-reminder-toggle"[\s\S]*?<div class="lobby-actions">\s*<button id="start-meditation"/, 'the reminder sits just above Begin');
+assert.match(lobbyHtml, /id="frequency-reminder"[\s\S]*?id="frequency-reminder-toggle"[\s\S]*?<div class="lobby-actions[^"]*">\s*<button id="start-meditation"/, 'the reminder sits just above Begin');
 const appSource = readFileSync('app.js', 'utf8');
 assert.match(appSource, /audioModeSettingsView\.bindLobbyReminder\(\)/);
 assert.match(appSource, /state\.noFrequencyMode = getChecked\('no-frequency-mode-toggle'\);\s*audioModeSettingsView\.renderFrequencyReminder\(\);/, 'saving Settings refreshes the reminder');

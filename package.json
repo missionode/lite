@@ -133,13 +133,18 @@
     "test:narration-feeling": "node tests/narration-feeling.test.mjs",
     "test:benefits-safety": "node tests/benefits-safety.test.mjs",
     "test:chakra-timing": "node tests/chakra-timing.test.mjs",
+    "test:tailwind-setup": "node tests/tailwind-setup.test.mjs",
     "test:sky-astronomy": "node tests/sky-astronomy.test.mjs",
     "test:model-routing": "python3 -m unittest Loop/tests/test_codex_model_router.py",
+    "build:css": "tailwindcss -i tailwind/input.css -o tailwind.css --minify",
+    "watch:css": "tailwindcss -i tailwind/input.css -o tailwind.css --watch",
     "test:e2e": "playwright test",
     "test:e2e:modularization-baseline": "playwright test tests/e2e/modularization-baseline.spec.js tests/e2e/practice-modules-lazy-load.spec.js tests/e2e/optional-video-lazy-load.spec.js",
     "test:e2e:ui": "playwright test --ui"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0"
+    "@playwright/test": "^1.52.0",
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
   }
 }

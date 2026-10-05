@@ -1,0 +1,369 @@
+/* Lite — Tailwind CSS entry (v4). Build: npm run build:css → tailwind.css
+   Design tokens come from the Lite design system (Claude Design System
+   artifact "Lite", tokens.json). style.css is wrapped in @layer legacy, so
+   these layers always win over old rules while screens move across.
+   No preflight: the legacy stylesheet still owns base element styles. */
+@layer legacy, theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(utilities) source(none) prefix(tw);
+
+/* Only scan app markup and view modules (never docs, branding or Loop). */
+@source "../index.html";
+@source "../modules";
+@source "../app.js";
+
+@theme static {
+  /* Only design-system colours: no default Tailwind palette. */
+  --color-*: initial;
+  --color-sky: #000000;
+  --color-surface: rgba(8, 15, 26, 0.96);
+  --color-surface-raised: rgba(15, 24, 38, 0.96);
+  --color-surface-settings: rgba(8, 12, 23, 0.96);
+  --color-surface-field: rgba(3, 7, 15, 0.94);
+  --color-tile: rgba(255, 255, 255, 0.035);
+  --color-tile-selected: rgba(232, 194, 126, 0.14);
+  --color-border: rgba(192, 207, 225, 0.22);
+  --color-border-gold: rgba(202, 172, 105, 0.34);
+  --color-border-field: rgba(195, 199, 216, 0.25);
+  --color-ink: #f4f1ea;
+  --color-muted: #c3cedb;
+  --color-gold: #e8c27e;
+  --color-gold-glow: #f5dfb1;
+  --color-gold-label: #d4b875;
+  --color-gold-eyebrow: #cdb77f;
+  --color-cta-start: #f0d49e;
+  --color-cta-end: #d9ad65;
+  --color-cta-border: rgba(255, 229, 184, 0.85);
+  --color-on-gold: #17130c;
+  --color-focus: rgba(169, 217, 223, 0.75);
+  --color-chakra-root: #e5484d;
+  --color-chakra-sacral: #f76b15;
+  --color-chakra-solar: #ffc53d;
+  --color-chakra-heart: #30a46c;
+  --color-chakra-throat: #0090ff;
+  --color-chakra-thirdeye: #8e4ec6;
+  --color-chakra-crown: #e8e1ff;
+
+  --font-sans: Inter, Manjari, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Design-system spacing steps (s1–s6); Tailwind's numeric scale stays available. */
+  --spacing-s1: 0.55rem;
+  --spacing-s2: 0.7rem;
+  --spacing-s3: 1rem;
+  --spacing-s4: 1.45rem;
+  --spacing-s5: 1.75rem;
+  --spacing-s6: 2.75rem;
+
+  --radius-field: 11px;
+  --radius-tile: 13px;
+  --radius-roadmap: 14px;
+  --radius-cta: 15px;
+  --radius-settings: 18px;
+  --radius-panel: 20px;
+
+  --shadow-panel: 0 14px 34px rgba(0, 0, 0, 0.2);
+  --shadow-settings: 0 10px 28px rgba(0, 0, 0, 0.2);
+  --shadow-sky: 0 12px 38px rgba(0, 0, 0, 0.32);
+  --shadow-cta: 0 8px 24px rgba(10, 8, 5, 0.22);
+
+  --breakpoint-tile4: 560px;
+  --breakpoint-lobby2: 920px;
+}
+
+/* ── Lobby (Cosmic Observatory) — moved from style.css, phase 1 ─────────────
+   Built from the design-system tokens. Column placement at 920px+ is set
+   with tw: utilities in index.html (tw:lobby2:col-…); the chakra grid uses
+   tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7. View modules
+   keep owning state; IDs, data-i18n keys and DOM order are unchanged. */
+@layer components {
+  .ds-lobby {
+    /* Older shared rules read these variables; inside the Lobby they map to tokens. */
+    --lobby-ink: var(--tw-color-ink);
+    --lobby-muted: var(--tw-color-muted);
+    --lobby-gold: var(--tw-color-gold);
+    --lobby-surface: var(--tw-color-surface);
+    --lobby-surface-raised: var(--tw-color-surface-raised);
+    --lobby-border: var(--tw-color-border);
+    --text-color: var(--tw-color-ink);
+    --accent-color: var(--tw-color-gold);
+    --accent-glow: var(--tw-color-gold-glow);
+    --glass-bg: var(--tw-color-surface-raised);
+    --glass-border: var(--tw-color-border);
+    width: 100%;
+    min-width: 0;
+    gap: 1rem;
+    align-items: stretch;
+    text-align: left;
+  }
+  .ds-lobby:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .ds-lobby > * { min-width: 0; }
+
+  .ds-lobby #lobby-title {
+    margin: 0;
+    color: var(--tw-color-ink);
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.2;
+    text-align: left;
+    text-transform: none;
+  }
+
+  /* Panel (design system: Panel) */
+  .ds-lobby .lobby-panel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    padding: clamp(1rem, 2vw, var(--tw-spacing-s4));
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-panel);
+    background: var(--tw-color-surface);
+    box-shadow: var(--tw-shadow-panel);
+    color: var(--tw-color-ink);
+    text-align: left;
+    backdrop-filter: none;
+  }
+  .ds-lobby .lobby-panel > label:first-child,
+  .ds-lobby .drone-duration-control legend {
+    padding-inline: 0;
+    color: var(--tw-color-ink);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+    opacity: 1;
+    text-align: left;
+    text-transform: none;
+  }
+  .ds-lobby .lobby-panel p,
+  .ds-lobby .drone-duration-help { color: var(--tw-color-muted); opacity: 1; }
+
+  .ds-lobby #chakra-selection-panel { text-align: left; }
+  .ds-lobby #chakra-selection-panel .chakra-selection-help {
+    color: var(--tw-color-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: left;
+    opacity: 1;
+  }
+
+  /* Chakra tile (design system: ChakraTile); columns come from tw: utilities. */
+  .ds-lobby .chakra-selection-list { display: grid; gap: var(--tw-spacing-s1); }
+  .ds-lobby .chakra-selection-list .checkbox-label {
+    min-width: 0;
+    min-height: 52px;
+    justify-content: flex-start;
+    gap: 0.65rem;
+    padding: 0.7rem 0.8rem;
+    border-color: var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+    color: var(--tw-color-ink);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .ds-lobby .chakra-selection-list .checkbox-label.chip-active {
+    border-color: var(--tw-color-gold);
+    background: var(--tw-color-tile-selected);
+    color: var(--tw-color-ink);
+    box-shadow: inset 0 0 0 1px rgba(232, 194, 126, 0.12);
+  }
+  .ds-lobby .chakra-selection-list .checkbox-label input { flex: 0 0 auto; accent-color: var(--tw-color-gold); }
+  .ds-lobby .chakra-selection-thumbnail {
+    display: block;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 5px rgba(232, 194, 126, 0.22));
+  }
+  .ds-lobby .chakra-selection-list .checkbox-label > span[data-i18n] { min-width: 0; }
+
+  .ds-lobby .experience-mode-options { justify-content: flex-start; gap: var(--tw-spacing-s1); }
+  .ds-lobby .experience-mode-toggle {
+    justify-content: flex-start;
+    min-height: 48px;
+    margin: 0;
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+    color: var(--tw-color-ink);
+    letter-spacing: 0.01em;
+    text-align: left;
+  }
+
+  /* Focus ring (design system: focus) */
+  .ds-lobby .experience-mode-toggle:focus-within,
+  .ds-lobby .checkbox-label:focus-within,
+  .ds-lobby select:focus-visible,
+  .ds-lobby input:focus-visible,
+  .ds-lobby button:focus-visible {
+    outline: 3px solid var(--tw-color-focus);
+    outline-offset: 3px;
+  }
+
+  .ds-lobby .time-selector { gap: 0.9rem; padding: clamp(1rem, 2vw, var(--tw-spacing-s4)); }
+  .ds-lobby .time-selector > label {
+    color: var(--tw-color-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+    opacity: 1;
+    text-align: left;
+    text-transform: none;
+  }
+  .ds-lobby #time-display,
+  .ds-lobby #high-energy-time-display { color: var(--tw-color-gold); text-shadow: none; }
+
+  .ds-lobby .drone-duration-control { padding: clamp(1rem, 2vw, var(--tw-spacing-s4)); }
+  .ds-lobby .drone-duration-option input:checked + .drone-duration-copy {
+    border-color: var(--tw-color-gold);
+    background: rgba(232, 194, 126, 0.15);
+    color: var(--tw-color-ink);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .ds-lobby #intention-config-group > label {
+    color: var(--tw-color-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    opacity: 1;
+    text-transform: none;
+  }
+
+  /* Pill (design system: Pill) */
+  .ds-lobby #session-estimate {
+    width: fit-content;
+    max-width: 100%;
+    justify-self: center;
+    margin: 0;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: 999px;
+    background: var(--tw-color-surface);
+    color: var(--tw-color-muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.025em;
+    opacity: 1;
+    text-shadow: none;
+  }
+
+  .ds-lobby .journey-roadmap {
+    max-width: none;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-roadmap);
+    background: var(--tw-color-surface);
+    color: var(--tw-color-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+    text-align: left;
+  }
+  .ds-lobby .journey-safety-summary {
+    color: var(--tw-color-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  /* Buttons (design system: Button primary / secondary) */
+  .ds-lobby .lobby-actions { margin: 0; gap: var(--tw-spacing-s2); }
+  .ds-lobby .lobby-actions .primary-btn {
+    min-height: 56px;
+    border: 1px solid var(--tw-color-cta-border);
+    border-radius: var(--tw-radius-cta);
+    background: linear-gradient(135deg, var(--tw-color-cta-start), var(--tw-color-cta-end));
+    box-shadow: var(--tw-shadow-cta);
+    color: var(--tw-color-on-gold);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    transition: filter 160ms ease, border-color 160ms ease;
+  }
+  .ds-lobby .lobby-actions .primary-btn:hover { filter: brightness(1.06); }
+  .ds-lobby .lobby-actions .link-btn,
+  .ds-lobby .lobby-actions .consultation-btn {
+    min-height: 48px;
+    border-color: var(--tw-color-border);
+    color: var(--tw-color-ink);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  @supports selector(#app:has(.ds-lobby)) {
+    #app:has(> .ds-lobby:not(.hidden)) {
+      width: min(100%, 1440px);
+      max-width: 1440px;
+      padding: clamp(1rem, 3vw, var(--tw-spacing-s6));
+      text-align: left;
+    }
+    @media (min-width: 920px) {
+      .ds-lobby:not(.hidden) {
+        grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.8fr);
+        column-gap: clamp(1rem, 2vw, var(--tw-spacing-s5));
+        row-gap: 1rem;
+      }
+    }
+  }
+
+  @media (max-width: 559px) {
+    .ds-lobby { gap: 0.8rem; padding-inline: 0.85rem; }
+    .ds-lobby .lobby-panel { padding: 1rem; border-radius: 17px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds-lobby .lobby-actions .primary-btn { transition: none; }
+  }
+}
+
+/* ── Newer components, moved from style.css onto design-system tokens ──── */
+@layer components {
+  /* Separate time for each chakra (Lobby): rows use the Stepper pattern. */
+  .per-chakra-time-control { display: flex; flex-direction: column; gap: 0.5rem; }
+  .per-chakra-time-control[hidden],
+  .per-chakra-time-rows[hidden],
+  .per-chakra-time-actions[hidden] { display: none; }
+  .per-chakra-time-rows { display: flex; flex-direction: column; gap: 0.35rem; }
+  .per-chakra-time-row { display: grid; grid-template-columns: 1fr 2.4rem minmax(6.5rem, auto) 2.4rem; align-items: center; gap: 0.4rem; }
+  .per-chakra-time-row.is-off { opacity: 0.45; }
+  .per-chakra-time-name { font-size: 0.95rem; color: var(--tw-color-ink); }
+  .per-chakra-time-value { text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--tw-color-ink); }
+  .per-chakra-time-step {
+    min-height: 2.4rem;
+    border-radius: var(--tw-radius-field);
+    border: 1px solid var(--tw-color-border);
+    background: var(--tw-color-tile);
+    color: var(--tw-color-ink);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+  .per-chakra-time-step:disabled { opacity: 0.35; cursor: default; }
+  .per-chakra-time-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .per-chakra-time-status:empty { display: none; }
+
+  /* Benefits and safety (Settings): the link uses the Settings gold, not the old amber. */
+  .benefits-safety-link {
+    background: none;
+    border: none;
+    color: var(--tw-color-gold-label);
+    text-decoration: underline;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    margin: 0 0 0.75rem;
+  }
+  .benefits-safety-content { max-height: 85vh; overflow-y: auto; }
+  .benefits-safety-intro { opacity: 0.8; margin-bottom: 0.75rem; }
+  .benefits-safety-list h3 { font-size: 1rem; margin: 1rem 0 0.35rem; }
+  .benefits-safety-list p { margin: 0 0 0.5rem; line-height: 1.5; }
+}

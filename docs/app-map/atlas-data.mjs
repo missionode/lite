@@ -777,3 +777,15 @@ add('per-chakra-time','Journeys','Separate time for each chakra','Optional own t
  'Evidence: unit tests (limits, follow-core, demo, estimate, autofill rules, wiring) and a local browser run: switch, rows, + on Heart (estimate 36 → 37 min), no-assessment message, and a simulated finished assessment suggesting Solar and Throat 7 min, applied only after Apply (estimate 64 → 68 min), no page errors. Not yet checked on a phone.'
 ]);
 meta.commit = 'production 7447826 + uncommitted Pitch fades and separate chakra times (feature/narration-feeling)';
+
+// Styling system (2026-10-05): Tailwind v4 on the Lite design system, phase 0 + Lobby phase 1.
+add('styling-system','Systems','Styling: design system and Tailwind','How screens get their look: design-system tokens, Tailwind build and the legacy stylesheet.','tailwind/input.css:1; tailwind.css:1; style.css:4; index.html:12; index.html:359; tests/tailwind-setup.test.mjs:1; docs/tailwind-roadmap.md:1',[
+ [['tokens','Design system tokens','Colours, Inter font, spacing s1–s6, radii, shadows from the Lite design system, in @theme of tailwind/input.css. Only design-system colours exist.']],
+ [['build','Build','npm run build:css → tailwind.css (minified, committed, precached for offline). No CDN, nothing compiles in the browser.']],
+ [['legacy','style.css (legacy layer)','Wrapped in @layer legacy and loaded first, so it always loses to Tailwind. Screens not yet moved still use it.'],['tw','tailwind.css','Components layer (.ds-lobby, per-chakra rows, FAQ) and tw: utilities used in markup.']],
+ [['lobby','Lobby (phase 1)','.ds-lobby on the Lobby section; column placement by tw:lobby2:col-…, chakra grid tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7.'],['next','Next phases','Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md).']]
+],[['tokens','build','Rebuild'],['build','tw','Output'],['legacy','tw','Overridden by'],['tw','lobby','Styles'],['lobby','next','Then']],[
+ 'Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, offline cache, fresh-build match); Lobby screenshots at 390 / 760 / 1280 px identical before and after; Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there).'
+]);
+meta.date = '2026-10-05';
+meta.commit = 'production 0abdd75 + uncommitted Tailwind phase 0–1 (feature/narration-feeling)';

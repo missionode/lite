@@ -7,7 +7,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 const navigation = fs.readFileSync(new URL('../modules/screen-navigation.js', import.meta.url), 'utf8');
 const ambientField = fs.readFileSync(new URL('../modules/ambient-particle-field.js', import.meta.url), 'utf8');
 
-assert.match(html, /<section id="lobby-screen" class="screen lobby-shell hidden">/);
+assert.match(html, /<section id="lobby-screen" class="screen lobby-shell hidden ds-lobby">/);
 for (const id of [
     'journey-preparation-addons',
     'chakra-selection-panel',
@@ -39,21 +39,25 @@ for (const id of [
 }
 
 assert.match(html, /id="chakra-selection"[\s\S]*?value="root"[\s\S]*?value="sacral"[\s\S]*?value="solar"[\s\S]*?value="heart"[\s\S]*?value="throat"[\s\S]*?value="thirdeye"[\s\S]*?value="crown"/);
-assert.match(css, /#lobby-screen\s*\{[\s\S]*?--lobby-surface:\s*rgba\(8,\s*15,\s*26,\s*0\.96\)/);
-assert.match(css, /#lobby-screen \.lobby-panel\s*\{/);
-assert.match(css, /@supports selector\(#app:has\(#lobby-screen\)\)/);
-assert.match(css, /@media \(min-width: 560px\) and \(max-width: 919px\)[\s\S]*?#lobby-screen \.chakra-selection-list/);
-assert.match(css, /@media \(max-width: 559px\)[\s\S]*?#lobby-screen \.lobby-panel/);
-assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?#lobby-screen/);
+// Lobby styles live in the Tailwind entry (design-system tokens) since phase 1.
+const tw = fs.readFileSync(new URL('../tailwind/input.css', import.meta.url), 'utf8');
+assert.match(tw, /--color-surface:\s*rgba\(8,\s*15,\s*26,\s*0\.96\)/, 'surface token from the design system');
+assert.match(tw, /\.ds-lobby \{[\s\S]*?--lobby-surface: var\(--tw-color-surface\)/);
+assert.match(tw, /\.ds-lobby \.lobby-panel \{/);
+assert.match(tw, /@supports selector\(#app:has\(\.ds-lobby\)\)/);
+assert.match(html, /id="chakra-selection" class="chakra-selection-list tw:grid-cols-2 tw:tile4:grid-cols-4 tw:lobby2:grid-cols-7"/, 'chakra grid: 2 / 4 (560px+) / 7 (920px+) columns');
+assert.match(tw, /@media \(max-width: 559px\)[\s\S]*?\.ds-lobby \.lobby-panel/);
+assert.match(tw, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.ds-lobby/);
+assert.doesNotMatch(css, /#lobby-screen \.lobby-panel\s*\{/, 'the old Lobby block is gone from style.css');
 
 const stylesheetUrl = html.match(/href="(style\.css\?v=[^"]+)"/)?.[1];
 assert.ok(stylesheetUrl, 'HTML loads a versioned theme stylesheet');
 assert.ok(serviceWorker.includes(`'./${stylesheetUrl}'`), 'offline shell precaches the same stylesheet version');
-assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.358'/);
+assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.359'/);
 assert.match(html, /id="sky-backdrop"[\s\S]*?id="particle-canvas"/);
 assert.match(html, /id="open-sky-observatory"[\s\S]*?id="sky-screen"[\s\S]*?id="sky-location-status"[\s\S]*?id="close-sky-screen"/);
-assert.match(html, /href="style\.css\?v=2\.26"/);
-assert.match(serviceWorker, /'\.\/style\.css\?v=2\.26'/);
+assert.match(html, /href="style\.css\?v=2\.27"/);
+assert.match(serviceWorker, /'\.\/style\.css\?v=2\.27'/);
 assert.match(navigation, /openSkyButton\?\.addEventListener\('click', \(\) => showScreen\(skyScreen\)\)/);
 assert.match(navigation, /closeSkyButton\?\.addEventListener\('click', \(\) => showScreen\(configScreen\)\)/);
 assert.match(ambientField, /isSkyPageActive\(\)\s*\{\s*return document\.body\.classList\.contains\('sky-canvas-active'\)/);

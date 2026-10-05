@@ -27,7 +27,7 @@ for (const chakra of ['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye', 
     assert.ok(fs.statSync(new URL(`../symbols/${chakra}.webp`, import.meta.url)).size < 100 * 1024, `${chakra} thumbnail stays light (WebP)`);
     assert.ok(serviceWorker.includes(`'./symbols/${chakra}.webp'`), `${chakra} thumbnail should remain available offline`);
 }
-assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /#lobby-screen \.chakra-selection-thumbnail[\s\S]*?object-fit:\s*contain/);
+assert.match(fs.readFileSync(new URL('../tailwind/input.css', import.meta.url), 'utf8'), /\.ds-lobby \.chakra-selection-thumbnail[\s\S]*?object-fit:\s*contain/);
 assert.match(selectionView, /function persist\(\)[\s\S]*?storage\.setItem\('chakra_selected'/, 'Room selection should persist immediately');
 assert.match(app, /chakraSelectionView\.bindPersistence\(\)/, 'Room selection should bind persistence on change');
 assert.match(app, /chakraSelectionView\.bindChipDisplay\(\)/, 'Room selection should retain its active chip display');
