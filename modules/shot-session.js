@@ -39,7 +39,7 @@
                 setText('mantra-display', journeyT('ui.shotsMode'));
                 // Shots intentionally have no narration, so they must not leave
                 // a looping narration marquee on screen.
-                owner.visual.startPulsing('#7c3aed');
+                owner.visual.startPulsing('#e8c27e');
 
                 let stages;
                 if (type === 'meditation') {

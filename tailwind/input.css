@@ -574,7 +574,7 @@
       transition: border 0.3s ease;
   }
   select:focus {
-      border-color: var(--primary-color);
+      border-color: var(--tw-color-gold-focus);
   }
 
   /* Button (design system: Button) — one gold primary, quiet secondary, link. */

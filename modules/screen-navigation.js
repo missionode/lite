@@ -30,14 +30,14 @@
                 showScreen(lobbyScreen);
                 const aura = document.getElementById('aura-bg');
                 if (aura) {
-                    aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+                    aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(232,194,126,0.12) 0%, transparent 55%)';
                     aura.style.opacity = '1';
                 }
             } else {
                 showScreen(configScreen);
                 const aura = document.getElementById('aura-bg');
                 if (aura) {
-                    aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)';
+                    aura.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(232,194,126,0.14) 0%, transparent 55%)';
                     aura.style.opacity = '1';
                 }
             }

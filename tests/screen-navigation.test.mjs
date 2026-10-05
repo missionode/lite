@@ -8,8 +8,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const screenNavigationModule = window\.ChakraScreenNavigation/);
 assert.match(app, /function showScreen\(screen\)\s*\{\s*screenNavigation\.showScreen\(screen\);\s*\}/);
-assert.match(html, /modules\/screen-navigation\.js\?v=1\.0[\s\S]*?app\.js\?v=4.29/);
-assert.match(serviceWorker, /modules\/screen-navigation\.js\?v=1\.0/);
+assert.match(html, /modules\/screen-navigation\.js\?v=1\.1[\s\S]*?app\.js\?v=4.30/);
+assert.match(serviceWorker, /modules\/screen-navigation\.js\?v=1\.1/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -138,8 +138,8 @@ for (const configured of [null, '', 'true', 'false']) {
         assert.equal(destination.scrollTop, 0);
         if (aura) {
             assert.equal(aura.style.background, configured
-                ? 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)'
-                : 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.3) 0%, transparent 55%)');
+                ? 'radial-gradient(ellipse at 50% 100%, rgba(232,194,126,0.12) 0%, transparent 55%)'
+                : 'radial-gradient(ellipse at 50% 0%, rgba(232,194,126,0.14) 0%, transparent 55%)');
             assert.equal(aura.style.opacity, '1');
         }
     }

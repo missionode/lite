@@ -2018,7 +2018,7 @@ class MeditationController {
         // Start background music loop
         await this.audio.startBackgroundMusic();
         this.audio.fadeInBackgroundMusic(BACKGROUND_MUSIC_ENTRY_FADE_SECONDS, false);
-        this.visual.startPulsing("#7c3aed"); // Standard meditation pulse
+        this.visual.startPulsing("#e8c27e"); // Standard meditation pulse
         
         // Reuse the global controls so Music Only has a visible stop/pause path.
         const controls = document.getElementById('controls');
@@ -2902,7 +2902,7 @@ function attachEventListeners() {
         localStorage.setItem('chakra_configured', 'true');
         showScreen(lobbyScreen);
         const aura = document.getElementById('aura-bg');
-        aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.25) 0%, transparent 55%)';
+        aura.style.background = 'radial-gradient(ellipse at 50% 100%, rgba(232,194,126,0.12) 0%, transparent 55%)';
         aura.style.opacity = '1';
     });
 

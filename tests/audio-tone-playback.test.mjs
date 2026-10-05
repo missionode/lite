@@ -101,7 +101,7 @@ assert.match(app, /startGuidedTransitionTone\(frequency, durationMs\)\s*\{\s*ret
 assert.match(app, /playSingingBowl\(\)\s*\{\s*return audioTonePlayback\.playSingingBowl\(this, state\);/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.0') < html.indexOf('app.js?v=4.29'));
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.0') < html.indexOf('app.js?v=4.30'));
 assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.0/);
 
 console.log('Audio tone playback contract passed: validation, Shot envelopes, transition fades, state cleanup and suppression.');

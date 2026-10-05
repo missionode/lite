@@ -2365,6 +2365,7 @@ flowchart TD
   lobby["Lobby (phase 1)"]
   settings["Settings and Sky (phase 2)"]
   shared["Shared pieces (phase 3)"]
+  journey["Journey colours (phase 4)"]
   next["Next phases"]
   tokens -->|"Rebuild"| build
   build -->|"Output"| tw
@@ -2372,6 +2373,8 @@ flowchart TD
   tw -->|"Styles"| lobby
   tw -->|"Styles"| settings
   tokens -->|"Defaults"| shared
+  tokens -->|"Variables"| journey
+  journey -->|"Then"| next
   lobby -->|"Then"| next
   settings -->|"Then"| next
 ```
@@ -2385,7 +2388,8 @@ flowchart TD
 | Lobby (phase 1) | .ds-lobby on the Lobby section; column placement by tw:lobby2:col-…, chakra grid tw:grid-cols-2 / tw:tile4:grid-cols-4 / tw:lobby2:grid-cols-7. |
 | Settings and Sky (phase 2) | .ds-settings on Settings and .ds-sky on the Sky page: Settings panels, fields (gold chevron, gold focus) and the same gold primary button as the Lobby; one ink and one muted colour app-wide. |
 | Shared pieces (phase 3) | ds-base layer (below legacy): element defaults, gold primary/secondary/link buttons, gold range sliders, steppers, chips, Drone Duration segments, modals, help/FAQ tiles and notices on design-system tokens. |
-| Next phases | Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md). |
+| Journey colours (phase 4) | Legacy violet and amber retired: style.css variables point at design-system tokens (ink, gold, tile); breathing orb, timer, dots and icon buttons in gold; calm default colour sky teal, replaced by the chakra colour during a journey; script-set aura glows in soft gold. |
+| Next phases | Practice and support screens, then preflight and removal of style.css (docs/tailwind-roadmap.md). |
 
 - Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, offline cache, fresh-build match); Lobby screenshots at 390 / 760 / 1280 px identical before and after; Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there).
 

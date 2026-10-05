@@ -114,7 +114,7 @@
             status.dataset.availability = 'unavailable';
             status.textContent = unavailableMessage;
             status.hidden = false;
-            status.style.color = '#fbbf24';
+            status.style.color = '#e8c27e';
         } else if (status?.dataset.availability === 'unavailable') {
             delete status.dataset.availability;
             status.hidden = true;

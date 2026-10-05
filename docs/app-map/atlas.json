@@ -6071,9 +6071,14 @@
             "ds-base layer (below legacy): element defaults, gold primary/secondary/link buttons, gold range sliders, steppers, chips, Drone Duration segments, modals, help/FAQ tiles and notices on design-system tokens."
           ],
           [
+            "journey",
+            "Journey colours (phase 4)",
+            "Legacy violet and amber retired: style.css variables point at design-system tokens (ink, gold, tile); breathing orb, timer, dots and icon buttons in gold; calm default colour sky teal, replaced by the chakra colour during a journey; script-set aura glows in soft gold."
+          ],
+          [
             "next",
             "Next phases",
-            "Settings, shared modals and controls, journey screens, practice screens, then preflight and removal of style.css (docs/tailwind-roadmap.md)."
+            "Practice and support screens, then preflight and removal of style.css (docs/tailwind-roadmap.md)."
           ]
         ]
       ],
@@ -6107,6 +6112,16 @@
           "tokens",
           "shared",
           "Defaults"
+        ],
+        [
+          "tokens",
+          "journey",
+          "Variables"
+        ],
+        [
+          "journey",
+          "next",
+          "Then"
         ],
         [
           "lobby",
