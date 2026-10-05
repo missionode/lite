@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const navigation = fs.readFileSync(new URL('../modules/screen-navigation.js', import.meta.url), 'utf8');
-const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+const styles = fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8');
 
 assert.match(app, /function showScreen\(screen\)\s*\{\s*screenNavigation\.showScreen\(screen\);\s*\}/, 'the app should delegate navigation to its owner');
 assert.match(navigation, /screen\.scrollTop = 0[\s\S]*?document\.scrollingElement\.scrollTop = 0[\s\S]*?window\.scrollTo\(0, 0\)/, 'screen navigation should reset section and document scroll');

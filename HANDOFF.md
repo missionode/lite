@@ -1,8 +1,19 @@
 # Chakra Meditation — Active Handoff
 
-## CURRENT RESUME — 2026-09-30
+## CURRENT RESUME — 2026-10-05
 
 This is the authoritative current checkpoint. Read this block first; later sections are history.
+
+**Now (read this first)**
+
+- **Branch:** `feature/narration-feeling`. **Production:** `5111f65` (owner pushed; Tailwind phases 0–5, per-chakra rows for chosen chakras, Pitch fades, separate chakra times, Benefits and safety are live).
+- **Local, not pushed:** Tailwind phase 6 (one stylesheet, preflight on) and the per-chakra panel padding fix. Push: `cd ~/Desktop/Ikigai/lite && git push origin feature/narration-feeling:production`.
+- **Styling:** `tailwind.css` is the only stylesheet (`?v=2.0`). Build with `npm run build:css` (run `npm install` once on the Mac). Edit `tailwind/input.css` (tokens, ds-base, components) or `tailwind/legacy.css` (old screen rules, was `style.css`). Roadmap: `docs/tailwind-roadmap.md`. Atlas map `styling-system`.
+- **Versions:** app `v4.30`, `tailwind.css?v=2.0`, shell cache `chakra-v5.365`, language cache `chakra-language-v81`, `chakra-timing-view.js?v=1.1`.
+- **Checks:** 135/135 unit tests; atlas rebuilt (55 maps); before/after screenshots of 17 screens at 390/1280 px match except the intended changes. Not yet checked on a phone.
+- **Next:** owner phone check after push. Optional: rewrite `tailwind/legacy.css` screen by screen (phase 7); design-system artifact follow-ups (Tamil, new components, merged colours).
+
+**Earlier in this block (2026-09-30 release and its follow-ups)**
 
 - **Release:** `release/port-local-features-2026-09-30`, built from `origin/production` `74e2ba4`. The owner asked to merge and push everything. A direct merge of the old local `modularize` checkout gave 78 conflicts, so the owner chose to port only features production lacked.
 - **Ported:** Advanced Features (dev mode) Quiet Courage (with its symbolic 396 Hz cue) and the Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; session-only dev-mode Reverse Journey (Crown → Root for selected chakras); Lobby roadmap now follows runtime order (Intention before preparation practices); Malayalam wording simplifications on keys production had not changed (the pre-practice guide line, gratitude and waning-moon lines keep the committed wording by owner choice); Tamil Ho'oponopono phrases; assessment question wording `2026-09-24.2`; Lite Loop/AGENTS docs and tracks.
@@ -60,7 +71,9 @@ This is the authoritative current checkpoint. Read this block first; later secti
 - **Follow-up (per-chakra rows):** "Set time for each chakra" now lists only the chakras chosen in Chakra Journey (was: all seven, unchosen dimmed). None chosen shows a short message (`ui.perChakraTimeNoneSelected`, five languages). Saved times of hidden chakras are kept. `chakra-timing-view.js?v=1.1`, `tailwind.css?v=1.3`, shell cache `chakra-v5.362`, language cache `v81`. 135/135 unit tests; local browser check passed.
 - **Follow-up (Tailwind phase 4, journey colours):** legacy violet `#7c3aed` and amber `#fbbf24` retired. `style.css` variables now use design-system tokens (`--text-color` ink, `--accent-color` gold, glass = tile); all amber literals → gold; violet glows/dots/icon buttons and the breathing orb → gold; default `--primary-color` → sky teal `#a9d9df` (chakra colour still replaces it in a journey); script-set aura glows (screen navigation, completion, stop, Music Only, Shots pulse) → soft gold. Game palettes and Dharana shape colours kept (content). App `v4.30`, style `v2.30`, `tailwind.css?v=1.4`, screen-navigation `v1.1`, session-stop/completion-view/shot-session `v1.2`, mood-ambience view `v1.1`, shell cache `chakra-v5.363`. 135/135 unit tests; before/after screenshots checked (Lobby, Settings, breathing, meditation, tutorial). Next: phase 5 practice and support screens.
 - **Follow-up (Tailwind phase 5, practice and support):** Manage Settings and Experiment Mode now use `.ds-settings` (sentence-case titles, single gold chevron, stacked backup-file field with full-width Import button); Arriving uses `.ds-support`; lavender/violet surfaces in Final Challenge, Pitch moods, orientation scene and Play Zone chrome mapped to design-system ink/gold/surfaces (per-player and rating colours kept); `sr-only` was never defined, so the orientation title showed on screen — now `tw:sr-only`. `docs/assesment.html` and `docs/repertory.html` on design-system ink, gold, surfaces and Inter with the gold primary button; the assessment's agreed lower/mixed/higher colours kept (test-pinned). Style `v2.31`, `tailwind.css?v=1.5`, shell cache `chakra-v5.364`. 135/135 unit tests; before/after screenshots checked. Next: phase 6 (preflight, remove `style.css`).
-- **Push status:** production is at `b83ec2d` (phases 0–1 live). Phases 2–5 and the per-chakra rows fix are local until the owner pushes.
+- **Follow-up (per-chakra panel padding):** "Set time for each chakra" rows are now padded tiles (like the checkbox tiles) with more space between them; on wide screens the panel sits under Core Practice Duration (`tw:lobby2:col-[2]`).
+- **Follow-up (Tailwind phase 6, one stylesheet):** `style.css` moved unchanged to `tailwind/legacy.css` (git mv; line numbers kept) and is bundled into `tailwind.css`; `index.html` and `sw.js` no longer load it. Tailwind preflight on in the lowest layer (`theme, base, ds-base, legacy, components, utilities`); ds-base keeps the old browser defaults (line height normal, h2–h6 sizes, list markers, inline images) so screens do not shift. Intended changes: links in design-system gold, styled backup-file picker button, frequency reminder (off) and voice download in gold instead of solar yellow. Legacy layer kept (screen-by-screen rewrite is optional phase 7). Tests now read `tailwind/legacy.css`. `tailwind.css?v=2.0`, shell cache `chakra-v5.365`. Atlas index.html line refs refreshed.
+- **Push status:** production is at `5111f65` (phases 0–5 live). Phase 6 and the per-chakra panel padding are local until the owner pushes.
 
 ## Checkpoint history (production)
 

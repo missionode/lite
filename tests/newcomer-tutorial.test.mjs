@@ -40,7 +40,7 @@ assert.ok(
 assert.match(app, /runSessionItem\('newcomer orientation', \(\) => this\.runNewcomerGuidedOrientation\(\)\)/);
 assert.match(app, /contentT\(narrationKey\)[\s\S]*?if \(!this\.isMeditationActive\) return;[\s\S]*?showScreen\(icebreakerScreen\)/);
 assert.match(app, /newcomerOrientationIntro/);
-const css = readFileSync('style.css', 'utf8');
+const css = readFileSync('tailwind/legacy.css', 'utf8');
 assert.match(css, /newcomer-aura-scene\[data-active-chakra="root"\]/);
 assert.match(css, /prefers-reduced-motion:\s*reduce/);
 assert.match(start, /newcomerChoice === 'guided'[\s\S]*?runNewcomerGuidedOrientation\(\)/);

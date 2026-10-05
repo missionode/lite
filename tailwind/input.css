@@ -1,12 +1,15 @@
-/* Lite — Tailwind CSS entry (v4). Build: npm run build:css → tailwind.css
-   Design tokens come from the Lite design system (Claude Design System
-   artifact "Lite", tokens.json). style.css is wrapped in @layer legacy, so
-   these layers always win over old rules while screens move across.
-   No preflight: the legacy stylesheet still owns base element styles. */
-@layer ds-base, legacy, theme, base, components, utilities;
+/* Lite — Tailwind CSS entry (v4). Build: npm run build:css → tailwind.css,
+   the app's only stylesheet. Design tokens come from the Lite design system
+   (Claude Design System artifact "Lite", tokens.json).
+   Layer order: Tailwind preflight (base) first, then ds-base (element
+   defaults and shared pieces), legacy (screen rules not yet rewritten,
+   tailwind/legacy.css), then components and utilities, which always win. */
+@layer theme, base, ds-base, legacy, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities) source(none) prefix(tw);
+@import "./legacy.css";
 
 /* Only scan app markup and view modules (never docs, branding or Loop). */
 @source "../index.html";
@@ -335,8 +338,20 @@
   .per-chakra-time-control[hidden],
   .per-chakra-time-rows[hidden],
   .per-chakra-time-actions[hidden] { display: none; }
-  .per-chakra-time-rows { display: flex; flex-direction: column; gap: 0.35rem; }
-  .per-chakra-time-row { display: grid; grid-template-columns: 1fr 2.4rem minmax(6.5rem, auto) 2.4rem; align-items: center; gap: 0.4rem; }
+  .per-chakra-time-control { gap: 0.75rem; }
+  .per-chakra-time-rows { display: flex; flex-direction: column; gap: 0.5rem; }
+  /* Each row is a tile like the checkbox tiles, so names never touch the panel edge. */
+  .per-chakra-time-row {
+    display: grid;
+    grid-template-columns: 1fr 2.4rem minmax(6.5rem, auto) 2.4rem;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.6rem 0.5rem 0.9rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+  }
+  .per-chakra-time-actions { padding-top: 0.25rem; }
   .per-chakra-time-name { font-size: 0.95rem; color: var(--tw-color-ink); }
   .per-chakra-time-value { text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--tw-color-ink); }
   .per-chakra-time-step {
@@ -541,8 +556,21 @@
    App-wide defaults for buttons, sliders, steppers, chips, segmented
    options, modals and notices, on design-system tokens. They sit in the
    lowest layer (ds-base, below legacy) so screen-specific rules that are
-   still in style.css keep winning until their screen moves. */
+   still in tailwind/legacy.css keep winning until their screen moves. */
 @layer ds-base {
+  /* Phase 6: Tailwind preflight is on (base layer, below this one). Where
+     it differs from the browser defaults the screens were built on, keep
+     the old defaults so nothing shifts; links use design-system gold. */
+  html, :host { line-height: normal; }
+  h2 { font-size: 1.5em; font-weight: 700; }
+  h3 { font-size: 1.17em; font-weight: 700; }
+  h4 { font-weight: 700; }
+  h5 { font-size: 0.83em; font-weight: 700; }
+  h6 { font-size: 0.67em; font-weight: 700; }
+  a { color: var(--tw-color-gold); text-decoration: underline; }
+  ol { list-style: decimal; }
+  ul { list-style: disc; }
+  img, svg, video, canvas, audio, iframe, embed, object { display: inline; vertical-align: baseline; }
   /* Element defaults moved from style.css (phase 3) so component defaults
      below compete with them by specificity, as they did before. */
   * {
@@ -947,6 +975,17 @@
     min-width: 0;
     box-sizing: border-box;
     padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  .ds-settings input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 6px 14px;
+    border: 1px solid var(--tw-color-border-gold);
+    border-radius: 999px;
+    background: var(--tw-color-surface-secondary-btn);
+    color: var(--tw-color-ink);
+    font: inherit;
+    cursor: pointer;
   }
   .ds-support > .subtitle {
     color: var(--tw-color-muted);

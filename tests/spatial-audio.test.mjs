@@ -8,7 +8,7 @@ const audioVoiceEffects = fs.readFileSync(new URL('../modules/audio-voice-effect
 const audioEffectsSettingsView = fs.readFileSync(new URL('../modules/audio-effects-settings-view.js', import.meta.url), 'utf8');
 const audioPleasureAmbience = fs.readFileSync(new URL('../modules/audio-pleasure-ambience.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+const styles = fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8');
 const en = JSON.parse(fs.readFileSync(new URL('../locales/en.json', import.meta.url), 'utf8'));
 const ml = JSON.parse(fs.readFileSync(new URL('../locales/ml.json', import.meta.url), 'utf8'));
 

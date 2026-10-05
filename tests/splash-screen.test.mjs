@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const styles = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+const styles = fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8');
 
 assert.match(html, /id="splash-screen"[\s\S]*?src="Splash-v2\.webp"/, 'The redesigned splash image should load at launch (light WebP)');
 assert.ok(fs.statSync(new URL('../Splash-v2.webp', import.meta.url)).size < 300 * 1024, 'the splash image stays light');

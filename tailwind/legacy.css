@@ -1,6 +1,6 @@
-/* Legacy stylesheet, wrapped in a cascade layer so Tailwind (tailwind.css,
-   loaded after this file) always wins while screens move to the design system.
-   See docs/tailwind-roadmap.md. */
+/* Screen rules not yet rewritten as Tailwind components (was style.css).
+   Bundled into tailwind.css by the build (phase 6); there is no separate
+   stylesheet any more. Lowest-but-one layer: design-system layers win. */
 @layer ds-base, legacy;
 @layer legacy {
 :root {
@@ -2677,7 +2677,7 @@ body.sky-canvas-active #particle-canvas {
 /* ── Voice download card + floating progress pill ─────────────────────────── */
 .voice-dl { margin-top: 0.6rem; padding: 0.75rem 0.9rem; border-radius: 0.9rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.16); text-align: left; }
 .voice-dl[data-state="stored"] { border-color: rgba(74, 222, 128, 0.45); }
-.voice-dl[data-state="downloading"] { border-color: rgba(255, 197, 61, 0.55); }
+.voice-dl[data-state="downloading"] { border-color: rgba(232, 194, 126, 0.55); }
 .voice-dl[data-state="failed"] { border-color: rgba(248, 113, 113, 0.6); }
 .voice-dl-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
 .voice-dl-icon { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: rgba(255, 255, 255, 0.12); font-weight: 900; }
@@ -2686,9 +2686,9 @@ body.sky-canvas-active #particle-canvas {
 .voice-dl-hint { opacity: 0.75; }
 .voice-dl-error { color: #fca5a5; font-weight: 700; }
 .voice-dl-bar, .voice-dl-pill-bar { display: block; height: 0.45rem; margin-top: 0.5rem; border-radius: 999px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
-.voice-dl-bar > span, .voice-dl-pill-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffc53d, #ff8a4c); transition: width 0.4s ease; }
+.voice-dl-bar > span, .voice-dl-pill-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--tw-color-cta-start), var(--tw-color-cta-end)); transition: width 0.4s ease; }
 .voice-dl-btn { margin-top: 0.6rem; width: 100%; }
-.voice-dl-pill { position: fixed; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9999; width: min(92vw, 22rem); padding: 0.6rem 0.9rem; border-radius: 1rem; background: rgba(8, 15, 26, 0.92); border: 1px solid rgba(255, 197, 61, 0.5); color: #fff; font-size: 0.85rem; text-align: center; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45); }
+.voice-dl-pill { position: fixed; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9999; width: min(92vw, 22rem); padding: 0.6rem 0.9rem; border-radius: 1rem; background: rgba(8, 15, 26, 0.92); border: 1px solid rgba(232, 194, 126, 0.5); color: #fff; font-size: 0.85rem; text-align: center; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45); }
 .voice-dl-pill[hidden] { display: none; }
 
 /* ── Sleep wind-down: slow fade to near-black, tap to peek ─────────────────── */
@@ -2709,14 +2709,14 @@ body.sleep-wind-down:not(.sleep-peek) #app > .screen { pointer-events: none; }
 
 /* ── Lobby frequency reminder (No Frequency Mode on/off) ───────────────────── */
 .frequency-reminder { display: flex; align-items: center; gap: 0.7rem; width: 100%; box-sizing: border-box; margin: 0.6rem 0 0.9rem; padding: 0.7rem 0.8rem; border-radius: 1rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.18); text-align: left; }
-.frequency-reminder[data-state="off"] { border-color: rgba(255, 197, 61, 0.5); background: rgba(255, 197, 61, 0.08); }
+.frequency-reminder[data-state="off"] { border-color: rgba(232, 194, 126, 0.5); background: rgba(232, 194, 126, 0.08); }
 .frequency-reminder[data-state="on"] { border-color: rgba(74, 222, 128, 0.45); background: rgba(74, 222, 128, 0.07); }
 .frequency-reminder-icon { flex: 0 0 auto; font-size: 1.4rem; line-height: 1; }
 .frequency-reminder-copy { display: flex; flex-direction: column; gap: 0.15rem; flex: 1 1 auto; min-width: 0; }
 .frequency-reminder-copy strong { font-size: 0.95rem; }
 .frequency-reminder-copy small { font-size: 0.8rem; line-height: 1.35; opacity: 0.8; text-transform: none; letter-spacing: normal; }
 .frequency-reminder-btn { flex: 0 0 auto; min-height: 2.6rem; padding: 0 0.9rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); color: #fff; font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
-.frequency-reminder[data-state="off"] .frequency-reminder-btn { background: #ffc53d; border-color: #ffc53d; color: #1a1205; }
+.frequency-reminder[data-state="off"] .frequency-reminder-btn { background: linear-gradient(135deg, var(--tw-color-cta-start), var(--tw-color-cta-end)); border-color: var(--tw-color-cta-border); color: var(--tw-color-on-gold); }
 
 /* ── In-app notice (replaces browser alert boxes) ──────────────────────────── */
 .app-notice-error { border-color: rgba(248, 113, 113, 0.65); }

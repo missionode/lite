@@ -138,7 +138,7 @@ await denied.tap();
 assert.equal(denied.get('intimate-service-panel').hidden,true,'Wrong password keeps Advanced Features locked.');
 assert.match(source,/globalThis\.crypto\?\.subtle[\s\S]*?digest\('SHA-256'/,'Advanced password verification must use Web Crypto.');
 assert.match(html, /id="advanced-password-input" type="password"[\s\S]*?id="advanced-password-reveal"[\s\S]*?Hold to reveal password/, 'The Advanced Features unlock must use a masked password field with a press-and-hold reveal control.');
-assert.match(fs.readFileSync('style.css','utf8'), /\.advanced-password-entry input \{[\s\S]*?min-height: 48px;[\s\S]*?border: 1px solid rgba\(232, 194, 126, 0\.46\)[\s\S]*?background: rgba\(4, 8, 24, 0\.84\)[\s\S]*?\.advanced-password-entry input:focus/, 'The password field must have its own visible dark-sky styling and focus treatment.');
+assert.match(fs.readFileSync('tailwind/legacy.css','utf8'), /\.advanced-password-entry input \{[\s\S]*?min-height: 48px;[\s\S]*?border: 1px solid rgba\(232, 194, 126, 0\.46\)[\s\S]*?background: rgba\(4, 8, 24, 0\.84\)[\s\S]*?\.advanced-password-entry input:focus/, 'The password field must have its own visible dark-sky styling and focus treatment.');
 console.log('Advanced unlock passed: silent taps, password gate, countdown, timeout, re-lock, reload and translations.');
 const experimentSession=fs.readFileSync('modules/experiment-session.js','utf8');
 assert.match(source,/startExperiment\(activity\)\s*\{\s*return experimentSession\.start\(this, activity,/,'The controller must preserve its stable experiment-start adapter.');

@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Tailwind phase 6, one stylesheet (2026-10-05)
+
+- `style.css` retired (rules now `tailwind/legacy.css`, bundled into `tailwind.css`); preflight on with old browser defaults kept; per-chakra rows as padded tiles under Core Practice Duration.
+
 ## Completed — Tailwind phase 5, practice and support screens (2026-10-05)
 
 - Manage Settings, Experiment Mode, Arriving, Final Challenge, Pitch moods, orientation, Play Zone chrome, Assessment and Repertory pages on design-system colours; orientation title hidden for sight users as intended.
@@ -24,9 +28,9 @@
 
 - Tailwind v4 set up on the Lite design system (tokens, `tw:` prefix, legacy layer, offline cache, tests). Lobby, per-chakra time and FAQ styles moved; Inter 500/600/700 loaded. Map `styling-system`; roadmap `docs/tailwind-roadmap.md`.
 
-## Proposed — Tailwind phase 6
+## Proposed — Tailwind phase 7 (optional)
 
-- preflight and removal of `style.css`. See `docs/tailwind-roadmap.md`.
+- Rewrite `tailwind/legacy.css` into components screen by screen when a screen is touched; remove the legacy layer when empty. See `docs/tailwind-roadmap.md`.
 
 ## Completed — Separate time for each chakra (2026-10-04)
 

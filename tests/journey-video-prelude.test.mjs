@@ -8,7 +8,7 @@ const yogaSession = fs.readFileSync(new URL('../modules/yoga-session.js', import
 const careSession = fs.readFileSync(new URL('../modules/care-session.js', import.meta.url), 'utf8');
 const journeyChrome = fs.readFileSync(new URL('../modules/journey-chrome.js', import.meta.url), 'utf8');
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const css = fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+const css = fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
     JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))

@@ -45,7 +45,7 @@ assert.match(dharanaPractice, /--focus-anchor-duration[\s\S]*?is-focusing[\s\S]*
 assert.match(html, /id="journey-preparation-addons"[\s\S]*?id="self-exploration-section"[\s\S]*?id="quiet-courage-addon-toggle"[\s\S]*?id="chakra-selection-panel"/, 'Self-Exploration sits below Journey Preparation; Quiet Courage precedes chakra selection');
 assert.match(html, /id="body-scan-duration"[\s\S]*?value="3"[\s\S]*?value="5" selected[\s\S]*?value="8"/, 'Body Scan should offer 3, 5 and 8 minute durations');
 assert.match(app, /async runBodyScan\(\)[\s\S]*?bodyScanRegions[\s\S]*?bodyScanPractice\.run[\s\S]*?bodyScanOpening[\s\S]*?bodyScanClosing/, 'The controller should pass localized Body Scan content into its practice owner');
-assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /\.body-scan-scene[\s\S]*?background:\s*#000/, 'Body Scan should use a pitch-black fade');
+assert.match(fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8'), /\.body-scan-scene[\s\S]*?background:\s*#000/, 'Body Scan should use a pitch-black fade');
 assert.doesNotMatch(html, /body-scan-figure|body-scan-light/, 'Body Scan must not display a body figure or scanning light');
 assert.doesNotMatch(bodyScanPractice, /requestAnimationFrame|setInterval/, 'Body Scan must not add a recurring visual loop');
 assert.match(html, /id="noting-duration"[\s\S]*?value="2"[\s\S]*?value="4" selected[\s\S]*?value="6"/, 'Guided Noting should offer 2, 4 and 6 minute durations');
@@ -69,7 +69,7 @@ const addonClearBody = app.slice(app.indexOf('function clearJourneyAddons'), app
     assert.match(addonClearBody, new RegExp(feature, 'i'), `Exclusive modes must still clear ${feature}`);
 }
 assert.match(dharanaPractice, /focusAnchor\?\.classList\.add\('is-releasing'\)[\s\S]*?Promise\.all\([\s\S]*?narrate\(closing\)[\s\S]*?sleep\(4000\)/, 'Dharana should visually release while its closing narration plays');
-assert.match(fs.readFileSync(new URL('../style.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
+assert.match(fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8'), /body\.dharana-active #chakra-container[\s\S]*?background:\s*#000[\s\S]*?\.focus-anchor\.is-releasing[\s\S]*?opacity:\s*0/, 'Dharana should enter a pitch-black full-screen scene and fade its anchor away');
 assert.match(app, /journeyRouting\.buildChakraOrder\([\s\S]*?focusedExperience[\s\S]*?massage-toggle[\s\S]*?selectedChakras/, 'Guided starts should delegate chakra-order selection to the journey-routing owner');
 assert.match(journeyRoadmap, /translate\('ui\.roadmapIntention'\)[\s\S]*?labels\.push\(translate\('ui\.roadmapBoxBreathing'\)\)[\s\S]*?labels\.push\(translate\(reverse \? 'ui\.reverseJourney' : 'ui\.roadmapChakras'\)\)[\s\S]*?labels\.push\(translate\('ui\.roadmapHooponopono'\)\)/, 'The roadmap should follow the runtime: Intention, then preparation, then chakras, then integration');
 

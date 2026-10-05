@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const app=fs.readFileSync('app.js','utf8');
 const piperNarration=fs.readFileSync('modules/piper-narration.js','utf8');
-for(const file of ['app.js','index.html','style.css']) {
+for(const file of ['app.js','index.html','tailwind/legacy.css']) {
     assert.doesNotMatch(fs.readFileSync(file,'utf8'),/narration-scroll|data-narration-text|narrationTickerReadOrder|showNarrationText|refreshNarrationTicker/);
 }
 assert.match(app,/async narrateWithPiper/);

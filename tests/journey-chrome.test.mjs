@@ -49,7 +49,7 @@ assert.equal(body.classList.contains('journey-controls-active'),false);
 assert.equal(body.classList.contains('journey-cursor-hidden'),false);
 assert.equal(timers.size,0,'Session exit clears idle/hide timers');
 console.log('Journey chrome passed: idle cursor, hover, keyboard, touch, mixer and exit cleanup.');
-const css=fs.readFileSync('style.css','utf8');
+const css=fs.readFileSync('tailwind/legacy.css','utf8');
 assert.doesNotMatch(css,/body\.sleep-mode-active #app\s*\{[^}]*\bfilter\s*:/,'Sleep cannot create a fixed-position containing block');
 assert.doesNotMatch(css,/body\.eyes-close-mode\s*\{[^}]*\bfilter\s*:/,'Eyes Close cannot rebase fixed controls either');
 assert.match(css,/--sleep-dimming:\s*0\.4/);
