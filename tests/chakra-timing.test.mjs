@@ -89,3 +89,6 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     assert.match(ui.perChakraTimeSuggestion, /\{list\}/, `${language} suggestion keeps its {list} placeholder`);
 }
 console.log('chakra timing: ok');
+// The switch is a checkbox tile: the panel-heading rule must not strip its padding.
+{ const twInput = fs.readFileSync(new URL('../tailwind/input.css', import.meta.url), 'utf8');
+  assert.match(twInput, /\.ds-lobby \.lobby-panel > label:first-child:not\(\.checkbox-label\)/, 'checkbox tile keeps its padding'); }

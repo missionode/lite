@@ -130,7 +130,8 @@
     text-align: left;
     backdrop-filter: none;
   }
-  .ds-lobby .lobby-panel > label:first-child,
+  /* Panel headings only: a checkbox tile as first child keeps its own padding. */
+  .ds-lobby .lobby-panel > label:first-child:not(.checkbox-label),
   .ds-lobby .drone-duration-control legend {
     padding-inline: 0;
     color: var(--tw-color-ink);
