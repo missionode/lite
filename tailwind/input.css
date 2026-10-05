@@ -3,7 +3,7 @@
    artifact "Lite", tokens.json). style.css is wrapped in @layer legacy, so
    these layers always win over old rules while screens move across.
    No preflight: the legacy stylesheet still owns base element styles. */
-@layer legacy, theme, base, components, utilities;
+@layer ds-base, legacy, theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme) prefix(tw);
 @import "tailwindcss/utilities.css" layer(utilities) source(none) prefix(tw);
@@ -531,4 +531,382 @@
     .ds-settings { padding-inline: 0.8rem; }
     .ds-settings > .config-group { border-radius: 15px; }
   }
+}
+
+/* ── Shared pieces (phase 3) ─────────────────────────────────────────────
+   App-wide defaults for buttons, sliders, steppers, chips, segmented
+   options, modals and notices, on design-system tokens. They sit in the
+   lowest layer (ds-base, below legacy) so screen-specific rules that are
+   still in style.css keep winning until their screen moves. */
+@layer ds-base {
+  /* Element defaults moved from style.css (phase 3) so component defaults
+     below compete with them by specificity, as they did before. */
+  * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+  }
+  label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.6;
+  }
+  h1 {
+      font-weight: 200;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+      color: var(--text-color);
+  }
+  select {
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      outline: none;
+      backdrop-filter: blur(10px);
+      transition: border 0.3s ease;
+  }
+  select:focus {
+      border-color: var(--primary-color);
+  }
+
+  /* Button (design system: Button) — one gold primary, quiet secondary, link. */
+  .primary-btn {
+    min-height: 56px;
+    margin-top: 1rem;
+    padding: 14px 20px;
+    border: 1px solid var(--tw-color-cta-border);
+    border-radius: var(--tw-radius-cta);
+    background: linear-gradient(135deg, var(--tw-color-cta-start), var(--tw-color-cta-end));
+    box-shadow: var(--tw-shadow-cta);
+    color: var(--tw-color-on-gold);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: filter 160ms ease, transform 160ms ease;
+  }
+  .primary-btn:hover { filter: brightness(1.06); }
+  .primary-btn:active { transform: scale(0.98); }
+  .secondary-btn {
+    min-height: 48px;
+    padding: 10px 20px;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: transparent;
+    color: var(--tw-color-ink);
+    font-size: 0.86rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .link-btn {
+    min-height: 48px;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    color: var(--tw-color-ink);
+    opacity: 0.8;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: opacity 0.3s;
+  }
+  .primary-btn:focus-visible,
+  .secondary-btn:focus-visible,
+  .link-btn:focus-visible { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; }
+
+  /* Range slider (design system: Range) — gold fill on a quiet track. */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    touch-action: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--tw-color-gold) 0%, var(--tw-color-gold) var(--range-fill, 65%), rgba(192, 207, 225, 0.18) var(--range-fill, 65%));
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    margin-top: -9px;
+    border: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--tw-color-gold-glow), var(--tw-color-gold));
+    box-shadow: 0 0 0 4px rgba(232, 194, 126, 0.16);
+  }
+  input[type="range"]::-moz-range-track { height: 6px; border-radius: 4px; background: rgba(192, 207, 225, 0.18); }
+  input[type="range"]::-moz-range-progress { height: 6px; border-radius: 4px; background: var(--tw-color-gold); }
+  input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: var(--tw-color-gold);
+    box-shadow: 0 0 0 4px rgba(232, 194, 126, 0.16);
+    cursor: pointer;
+  }
+  input[type="range"]:focus-visible { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; border-radius: 6px; }
+
+  /* Stepper (design system: Stepper) — − value + under a slider. */
+  .range-min,
+  .range-max { color: var(--tw-color-muted); white-space: nowrap; }
+  .range-current {
+    width: auto !important;
+    min-width: 70px;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid rgba(232, 194, 126, 0.45);
+    border-radius: 999px;
+    color: var(--tw-color-gold);
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .range-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgba(232, 194, 126, 0.35);
+    border-radius: 50%;
+    background: rgba(232, 194, 126, 0.08);
+    color: var(--tw-color-gold);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .range-step:hover:not(:disabled),
+  .range-step:focus-visible:not(:disabled) { background: rgba(232, 194, 126, 0.2); border-color: var(--tw-color-gold); }
+  .range-step:focus-visible { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; }
+  .range-step:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Chip / toggle (design system: Switch-style checkbox tile). */
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+    color: var(--tw-color-ink);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    opacity: 1;
+    cursor: pointer;
+  }
+  .checkbox-label input { width: 18px; height: 18px; accent-color: var(--tw-color-gold); cursor: pointer; }
+  .checkbox-label.chip-active {
+    border-color: var(--tw-color-gold);
+    background: var(--tw-color-tile-selected);
+    color: var(--tw-color-ink);
+    box-shadow: inset 0 0 0 1px rgba(232, 194, 126, 0.12);
+  }
+  .checkbox-label:focus-within { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; }
+
+  /* Segmented options (design system: Segmented) — Drone Duration. */
+  .drone-duration-control {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 1.15rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-panel);
+    background: var(--tw-color-surface);
+  }
+  .drone-duration-control legend {
+    padding: 0 0.45rem;
+    color: var(--tw-color-ink);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    text-transform: none;
+  }
+  .drone-duration-copy {
+    display: flex;
+    min-height: 68px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    padding: 0.65rem 0.45rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+    color: var(--tw-color-muted);
+    text-align: center;
+    transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+  }
+  .drone-duration-copy strong { max-width: 100%; overflow-wrap: anywhere; font-size: 0.78rem; }
+  .drone-duration-copy small { color: var(--tw-color-gold); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+  .drone-duration-option input:checked + .drone-duration-copy {
+    border-color: var(--tw-color-gold);
+    background: var(--tw-color-tile-selected);
+    color: var(--tw-color-ink);
+  }
+  .drone-duration-option input:focus-visible + .drone-duration-copy { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; }
+  .drone-duration-help,
+  .drone-duration-summary { margin: 0.75rem 0 0; line-height: 1.45; text-align: center; }
+  .drone-duration-help { color: var(--tw-color-muted); font-size: 0.78rem; }
+  .drone-duration-summary { color: var(--tw-color-gold); font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* Modal (design system: Modal) */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: none;
+    animation: fadeIn 1s ease-out;
+  }
+  .modal-content {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    max-width: 400px;
+    padding: 3rem;
+    border: 1px solid var(--tw-color-border-gold);
+    border-radius: 24px;
+    background: var(--tw-color-surface-settings);
+    box-shadow: 0 18px 56px rgba(0, 0, 0, 0.42);
+    color: var(--tw-color-ink);
+    text-align: center;
+  }
+  .sleep-mode-prompt-close {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.75rem;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--tw-color-border);
+    border-radius: 50%;
+    background: var(--tw-color-tile);
+    color: var(--tw-color-ink);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .sleep-mode-prompt-close:hover { background: rgba(255, 255, 255, 0.1); }
+  .sleep-mode-prompt-close:focus-visible { outline: 3px solid var(--tw-color-focus); outline-offset: 3px; }
+  /* Help and FAQ entries: quiet tiles (no left-border cards). */
+  .settings-help-list p {
+    margin: 0;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  .help-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid rgba(232, 194, 126, 0.45);
+    border-radius: 50%;
+    background: rgba(232, 194, 126, 0.1);
+    color: var(--tw-color-gold);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  /* Notice (design system: Notice) — calm in-app messages. */
+  .app-notice {
+    position: fixed;
+    left: 50%;
+    top: calc(1.2rem + env(safe-area-inset-top, 0px));
+    transform: translateX(-50%);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    width: min(92vw, 24rem);
+    box-sizing: border-box;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--tw-color-border-gold);
+    border-radius: var(--tw-radius-settings);
+    background: var(--tw-color-surface-settings);
+    color: var(--tw-color-ink);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    animation: app-notice-in 0.35s ease;
+  }
+  .app-notice-ok {
+    align-self: flex-end;
+    min-height: 44px;
+    min-width: 5.5rem;
+    padding: 0 1.1rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--tw-color-gold);
+    color: var(--tw-color-on-gold);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Journey count and time (Settings) — a quiet pill. */
+  #stats-display {
+    padding: 6px 14px;
+    border: 1px solid var(--tw-color-border);
+    border-radius: 999px;
+    background: var(--tw-color-surface);
+    color: var(--tw-color-muted);
+  }
+  #stats-display span { color: var(--tw-color-gold); opacity: 1; }
+}
+
+/* Settings title and subtitle (design system: title / body). */
+@layer components {
+  .ds-settings .settings-title-row h1 {
+    color: var(--tw-color-ink);
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.2;
+    text-transform: none;
+  }
+  .ds-settings > .subtitle {
+    color: var(--tw-color-muted);
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    text-align: center;
+  }
+  .ds-settings #stats-display { align-self: center; font-size: 0.8rem; opacity: 1 !important; }
 }
