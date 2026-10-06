@@ -4,11 +4,11 @@
 
 At the start of a new task in this repository, after context compaction, or when resuming a handoff:
 
-1. Read the `CURRENT RESUME` block at the top of `HANDOFF.md` before selecting work. It is the active checkpoint; older `NOW`, `NEXT`, `LOCAL` and release entries below the history heading are historical context.
+1. Read `HANDOFF.md` (short: CURRENT RESUME, recent changes, project facts, working rules) before selecting work. Its CURRENT RESUME block is the active checkpoint. Older checkpoints are in `docs/handoff-archive/` as history only; never restart work from them.
 2. Read `Loop/README.md` and follow `Loop/loop.md`, `Loop/EFFICIENT-WORKFLOW.md` and `.loop/workflow.md`. Load the Lite-specific technology/communication guide and affected atlas/track only when relevant. Apply this project profile even if the installed Loop plugin is older.
 3. Verify the current repository root, branch, working-tree changes and relevant source before trusting recorded status. Local remote-tracking refs are last-known information until refreshed; permission/network failures are session-specific evidence.
 4. Pick up the recorded next action within the owner's existing authorization, unless the newest request changes the task. Do not restart completed checkpoints, ask the user to repeat known requirements, restore intentionally removed files, or interpret a postponed feature as approved.
-5. Before handing off, update the same `CURRENT RESUME` block with the objective, completed work, exact next action, relevant files, latest validation and limits, approvals and local-versus-published status. Preserve historical entries below it. Do not create competing current-state documents.
+5. Before handing off, update the same `CURRENT RESUME` block with the objective, completed work, exact next action, relevant files, latest validation and limits, approvals and local-versus-published status. Keep `HANDOFF.md` short (about 150 lines; see its "How to update" section); move old detail to `docs/handoff-archive/`. Do not create competing current-state documents.
 
 This is context pickup when an assistant session is opened or resumed in this repository. It does not schedule background work or launch a new task by itself.
 

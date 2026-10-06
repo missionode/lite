@@ -379,7 +379,7 @@ add('delivery-workflow','Systems','Isolated checkpoint delivery','Approved proje
  [['implement','Focused implementation','Make one coherent checkpoint; use deterministic tools and targeted tests. Avoid duplicate agents and background overhead.']],
  [['review','Two-stage review','First requirements/scope; then correctness, maintainability, accessibility, security, performance and regression risk.']],
  [['sync','Atlas + handoff + checkpoint','Synchronize affected flows and continuity; run fresh applicable checks and record limitations.']],
- [['reset','Durable session reset','Update the single CURRENT RESUME block in HANDOFF.md. AGENTS.md directs new/resumed sessions to it: verify the checkout, load the Lite profile and pick up the next authorized action. Historical NOW/NEXT headings do not restart completed work; no background task is launched.']],
+ [['reset','Durable session reset','Update the single CURRENT RESUME block in HANDOFF.md. AGENTS.md directs new/resumed sessions to it: verify the checkout, load the Lite profile and pick up the next authorized action. Older checkpoints live in docs/handoff-archive/ as history and do not restart completed work; no background task is launched.']],
  [['pr','Focused pull request','Include only intended files, evidence, performance impact, manual checks and rollback boundary. External actions follow approval gates.']],
  [['merge','Approved integration merge','Merge into the integration branch, then fast-forward the local workspace without overwriting unrelated changes.']],
  [['regress','Combined regression gate','Exercise integrated behavior, localization, errors, atlas and relevant performance before release consideration.']],

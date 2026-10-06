@@ -4978,7 +4978,7 @@
           [
             "reset",
             "Durable session reset",
-            "Update the single CURRENT RESUME block in HANDOFF.md. AGENTS.md directs new/resumed sessions to it: verify the checkout, load the Lite profile and pick up the next authorized action. Historical NOW/NEXT headings do not restart completed work; no background task is launched."
+            "Update the single CURRENT RESUME block in HANDOFF.md. AGENTS.md directs new/resumed sessions to it: verify the checkout, load the Lite profile and pick up the next authorized action. Older checkpoints live in docs/handoff-archive/ as history and do not restart completed work; no background task is launched."
           ]
         ],
         [
