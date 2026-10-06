@@ -10,7 +10,7 @@ const inlineScripts = scriptTags.map(match => match[1]).filter(source => source.
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.5');
+const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.6');
 const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.1');
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
@@ -72,7 +72,7 @@ assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a retur
 
 for (const asset of [
     './data/assessment-questions.json?v=1.4',
-    './modules/assessment-tournament.js?v=1.5',
+    './modules/assessment-tournament.js?v=1.6',
     './modules/assessment-persistence.js?v=1.1'
 ]) {
     assert.ok(sw.includes(`'${asset}'`), `${asset} should be available through the app cache`);

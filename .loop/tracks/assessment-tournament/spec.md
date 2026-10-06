@@ -58,6 +58,10 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 
 Owner decision: the assessment entry is public. Without Advanced Features it runs chakra questions only and shows chakra results (no value rounds, no dot, no placeholder). Value rounds and the private dot require Advanced Features through the short same-tab grant read at page load. Stored value answers stay hidden and unused when locked. This supersedes the "single entry only while Advanced Features is unlocked" and "access required" statements in the next section.
 
+## Amendment 2026-10-06 — answers behind lower signals (read-only)
+
+Owner decision: the result has a collapsed, read-only section listing each answered question whose chosen answer gave a chakra the lower weight, with the higher-support option, so the evaluator can advise the meditator. Same in public and developer mode. No change control and no recalculation. Value-pair answers are not listed. Wording stays neutral: today's answers only, not mistakes, scores, a diagnosis or a recommendation.
+
 ## Local integration — Advanced Features, undo and rapport guidance
 
 - The assessment has exactly one in-app entry point: the Lobby consultation CTA, available only while Advanced Features is unlocked. Settings has no assessment link. The Lobby entry creates a 15-minute same-tab grant; relocking revokes it, and direct page entry without it remains on an access-required view without fetching the question bank. This is a client-side feature gate, not server authentication.

@@ -98,6 +98,12 @@
     .support-legend-title{color:var(--ink);font-weight:750}
     .result-card.focus-candidate{border-color:rgba(232,194,126,.7);box-shadow:0 0 0 1px rgba(232,194,126,.12)}
     .result-note{color:var(--muted);font-size:.88em;margin:14px 2px 0}
+    .answer-review{margin:16px 0 0;border:1px solid var(--line);border-radius:18px;padding:4px 16px;background:rgba(255,255,255,.03)}
+    .answer-review summary{cursor:pointer;min-height:46px;display:flex;align-items:center;font-weight:750;color:var(--ink)}
+    .answer-review summary:focus-visible{outline:3px solid rgba(169,217,223,.6);outline-offset:3px;border-radius:12px}
+    .answer-review-list{margin:0 0 12px;padding-left:20px;display:grid;gap:14px}
+    .answer-review-list li{padding-left:4px}.answer-review-prompt{font-weight:750;margin-bottom:6px}
+    .answer-review-line{color:var(--muted);font-size:.92em;margin:2px 0}.answer-review-line strong{color:var(--ink);font-weight:700}
     .archetypes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:26px 0}
     .archetype{padding:8px 12px;border-radius:99px;background:rgba(169,217,223,.12);border:1px solid rgba(169,217,223,.24)}
     .rapport-card{margin:24px 0;padding:20px;border:1px solid rgba(232,194,126,.28);border-radius:18px;background:rgba(232,194,126,.055)}
@@ -176,6 +182,11 @@
         </div>
         <div class="chakra-results" id="chakraResults"></div>
         <p class="result-note" id="resultNote"></p>
+        <details class="answer-review" id="lowAnswers" hidden>
+          <summary id="lowAnswersSummary">Answers behind lower signals</summary>
+          <p class="result-note" id="lowAnswersNote"></p>
+          <ol class="answer-review-list" id="lowAnswersList"></ol>
+        </details>
         <section class="rapport-card" aria-labelledby="sessionFocusHeading">
           <h3 id="sessionFocusHeading">Possible session focus</h3>
           <p id="sessionFocus" aria-live="polite"></p>
@@ -198,7 +209,7 @@
     <p class="privacy">Responses stay on this device. The assessment is separate from the meditation journey and does not start or configure a session.</p>
   </main>
 
-  <script src="../modules/assessment-tournament.js?v=1.5"></script>
+  <script src="../modules/assessment-tournament.js?v=1.6"></script>
   <script src="../modules/assessment-persistence.js?v=1.1"></script>
   <script>
     (() => {
@@ -206,7 +217,7 @@
       const elements = Object.fromEntries([
         'loadingView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
         'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','undoAnswer','undoResult','saveStatus',
-        'chakraResults','resultNote','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
+        'chakraResults','resultNote','lowAnswers','lowAnswersSummary','lowAnswersNote','lowAnswersList','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
         'fontDown','fontReset','fontUp'
         ,'translationCache'
       ].map(id => [id, document.getElementById(id)]));
@@ -282,7 +293,7 @@
           'There is not enough answered evidence to suggest a focus. Ask the client what would feel most useful today.',
           'The answers do not point to one clear lowest area. Ask the client what would feel most useful today.',
           'Responses counted:','and','These labels summarize answers from this assessment only; they are not a validated measure or diagnosis.',
-          'Possible discussion focus']
+          'Possible discussion focus','Answers behind lower signals','Read-only, for the guide’s conversation with the meditator. These are today’s answers only; they are not mistakes, scores or a diagnosis. Nothing here changes the result.','Answered','Higher-support option','Chakra']
           .forEach((label,index) => registerTranslation(`ui:${index}`, label));
       }
 
@@ -397,6 +408,23 @@
           }
           elements.chakraResults.appendChild(card);
         });
+        const reviewItems = result.lowSupportAnswers || [];
+        elements.lowAnswersList.replaceChildren();
+        elements.lowAnswers.hidden = reviewItems.length === 0;
+        elements.lowAnswers.open = false;
+        if (reviewItems.length) {
+          elements.lowAnswersSummary.textContent = `${translation('ui:24','Answers behind lower signals')} (${reviewItems.length})`;
+          elements.lowAnswersNote.textContent = translation('ui:25','Read-only, for the guide’s conversation with the meditator. These are today’s answers only; they are not mistakes, scores or a diagnosis. Nothing here changes the result.');
+          reviewItems.forEach(entry => {
+            const row = document.createElement('li');
+            appendTextElement(row, 'div', 'answer-review-prompt', translation(`question:${entry.questionId}:prompt`, entry.prompt));
+            const names = entry.chakraIds.map((id, index) => translation(`chakra:name:${id}`, entry.chakraNames[index])).join(', ');
+            appendTextElement(row, 'div', 'answer-review-line', `${translation('ui:28','Chakra')}: ${names}`);
+            appendTextElement(row, 'div', 'answer-review-line', `${translation('ui:26','Answered')}: ${translation(`question:${entry.questionId}:choice:${entry.answered.id}`, entry.answered.label)}`);
+            appendTextElement(row, 'div', 'answer-review-line', `${translation('ui:27','Higher-support option')}: ${translation(`question:${entry.questionId}:choice:${entry.higherSupport.id}`, entry.higherSupport.label)}`);
+            elements.lowAnswersList.appendChild(row);
+          });
+        }
         elements.resultNote.textContent = translation('ui:22','These labels summarize answers from this assessment only; they are not a validated measure or diagnosis.');
         const focusNames = result.focusAreas.map(area => translation(`chakra:name:${area.id}`, area.name));
         if (result.focusStatus === 'candidate' && focusNames.length === 1) {

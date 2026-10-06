@@ -312,4 +312,29 @@ assert.equal(undoneInPublic.valueHistory.length, devState.valueHistory.length, '
 assert.equal(undoneInPublic.answeredIds.length, devState.answeredIds.length - 1, 'public undo removes the latest chakra question');
 assert.ok(engine.buildResult(bank, devState).dot, 'the dot returns when developer mode is active again');
 
+// Read-only answer review: choices that gave a chakra the lower weight, with the higher-support option; same in both modes.
+let reviewSeed = engine.createState(bank);
+const reviewQuestion = engine.selectNext(bank, reviewSeed);
+const reviewLowChoice = reviewQuestion.choices.find(choice => (choice.weights?.[reviewQuestion.coverage[0]] ?? 0.5) < 0.5)
+    || bank.questions.find(q => q.id === reviewQuestion.id).choices.find(choice => choice.weights[reviewQuestion.coverage[0]] === 0);
+reviewSeed = engine.answerItem(bank, reviewSeed, reviewQuestion, reviewLowChoice.id);
+const reviewResult = engine.buildResult(bank, reviewSeed);
+assert.equal(reviewResult.lowSupportAnswers.length, 1, 'a lower-weight answer is listed');
+const reviewEntry = reviewResult.lowSupportAnswers[0];
+assert.equal(reviewEntry.questionId, reviewQuestion.id);
+assert.equal(reviewEntry.answered.id, reviewLowChoice.id);
+assert.notEqual(reviewEntry.higherSupport.id, reviewLowChoice.id, 'the higher-support option differs from the answer given');
+assert.deepEqual(engine.buildResult(bank, reviewSeed, pub).lowSupportAnswers, reviewResult.lowSupportAnswers, 'the review is identical in public and developer mode');
+const reviewEqual = engine.answerItem(bank, engine.createState(bank), engine.selectNext(bank, engine.createState(bank)), engine.RESPONSE_EQUAL);
+assert.equal(engine.buildResult(bank, reviewEqual).lowSupportAnswers.length, 0, 'equal answers are not listed');
+const reviewSkip = engine.answerItem(bank, engine.createState(bank), engine.selectNext(bank, engine.createState(bank)), engine.RESPONSE_SKIP);
+assert.equal(engine.buildResult(bank, reviewSkip).lowSupportAnswers.length, 0, 'skipped answers are not listed');
+const reviewStrong = engine.createState(bank);
+const reviewStrongItem = engine.selectNext(bank, reviewStrong);
+const reviewHighChoice = bank.questions.find(q => q.id === reviewStrongItem.id).choices.find(choice => choice.weights[reviewStrongItem.coverage[0]] === 1);
+assert.equal(engine.buildResult(bank, engine.answerItem(bank, reviewStrong, reviewStrongItem, reviewHighChoice.id)).lowSupportAnswers.length, 0, 'higher-support answers are not listed');
+const reviewSource = fs.readFileSync(new URL('../docs/assesment.html', import.meta.url), 'utf8');
+assert.match(reviewSource, /<details class="answer-review" id="lowAnswers" hidden>/, 'the review is a collapsible section');
+assert.doesNotMatch(reviewSource.slice(reviewSource.indexOf('id="lowAnswers"'), reviewSource.indexOf('</details>', reviewSource.indexOf('id="lowAnswers"'))), /<button|<input|<select/, 'the review has no controls to change an answer');
+
 console.log('Assessment tournament schema and deterministic engine contract passed.');

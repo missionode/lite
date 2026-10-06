@@ -392,6 +392,36 @@
         return DOT_ORANGE;
     }
 
+    // Read-only review for the guide: every answered choice that gave a chakra the
+    // lower weight, with the higher-support option of the same question. Equal and
+    // skipped questions are not listed. Works the same in public and developer mode.
+    function lowSupportAnswers(bank, state) {
+        const chakraNames = Object.fromEntries(bank.chakras.map(item => [item.id, item.name]));
+        const questionsById = Object.fromEntries(bank.questions.map(item => [item.id, item]));
+        const items = [];
+        state.answeredIds.forEach(id => {
+            const question = questionsById[id];
+            const response = state.answers[id];
+            if (!question || response === RESPONSE_EQUAL || response === RESPONSE_SKIP) return;
+            const selected = question.choices.find(choice => choice.id === response);
+            if (!selected) return;
+            const lowChakras = question.coverage.filter(chakraId => (selected.weights[chakraId] ?? 0.5) < 0.5);
+            if (!lowChakras.length) return;
+            const higher = question.choices.find(choice => choice !== selected
+                && lowChakras.every(chakraId => (choice.weights[chakraId] ?? 0.5) > (selected.weights[chakraId] ?? 0.5)));
+            if (!higher) return;
+            items.push({
+                questionId: question.id,
+                prompt: question.prompt,
+                chakraIds: lowChakras,
+                chakraNames: lowChakras.map(chakraId => chakraNames[chakraId]),
+                answered: { id: selected.id, label: selected.label },
+                higherSupport: { id: higher.id, label: higher.label }
+            });
+        });
+        return items;
+    }
+
     function statusFor(score, evidenceCount, minimumEvidence) {
         if (evidenceCount < minimumEvidence) return 'Not enough answers';
         if (score >= 0.67) return 'Higher answer-support signal';
@@ -453,6 +483,7 @@
             rapportCue: rapportChakra?.conversationTopic
                 ? { chakraId: rapportChakra.id, topic: rapportChakra.conversationTopic }
                 : null,
+            lowSupportAnswers: lowSupportAnswers(bank, state),
             dot: includeValues ? dotResult(bank, state) : null,
             progress: {
                 questionsConsumed: state.answeredIds.length,
