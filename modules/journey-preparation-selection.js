@@ -46,8 +46,7 @@
             [toggles.undoUnlearn, 'undo-unlearn-options'],
             [toggles.quietCourage, 'quiet-courage-options'],
             [toggles.confidenceVisualization, 'confidence-visualization-options'],
-            [toggles.deepSecrets, 'deep-secrets-options'],
-            [toggles.finalChallenge, null]
+            [toggles.deepSecrets, 'deep-secrets-options']
         ];
         optionToggles.forEach(([toggle, optionsId]) => {
             toggle?.addEventListener('change', event => {

@@ -50,7 +50,6 @@
             if (isChecked('quiet-courage-addon-toggle')) standalone.push(translate('ui.roadmapQuietCourage'));
             if (isChecked('confidence-visualization-addon-toggle')) standalone.push(translate('ui.roadmapConfidenceVisualization'));
             if (isChecked('deep-secrets-addon-toggle')) standalone.push(translate('ui.roadmapDeepSecrets'));
-            if (isChecked('final-challenge-addon-toggle')) standalone.push(translate('ui.roadmapFinalChallenge'));
             if (isChecked('hooponopono-experience-toggle')) standalone.push(translate('ui.roadmapHooponopono'));
             if (isChecked('undo-unlearn-addon-toggle')) standalone.push(translate('ui.roadmapUndoUnlearn'));
             if (standalone.length) return withOptionalVideo(standalone);
@@ -71,7 +70,6 @@
         if (isChecked('quiet-courage-addon-toggle')) labels.push(translate('ui.roadmapQuietCourage'));
         if (isChecked('confidence-visualization-addon-toggle')) labels.push(translate('ui.roadmapConfidenceVisualization'));
         if (isChecked('deep-secrets-addon-toggle')) labels.push(translate('ui.roadmapDeepSecrets'));
-        if (isChecked('final-challenge-addon-toggle')) labels.push(translate('ui.roadmapFinalChallenge'));
         // Dev-mode Reverse Journey names its Crown → Root direction.
         const reverse = state.advancedFeaturesUnlocked && isChecked('reverse-journey-toggle');
         labels.push(translate(reverse ? 'ui.reverseJourney' : 'ui.roadmapChakras'));

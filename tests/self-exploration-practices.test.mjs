@@ -14,12 +14,13 @@ const routing = routingContext.ChakraJourneyRouting;
 const planned = routing.buildPreparationStagePlan({
     noting: true, quietCourage: true, confidenceVisualization: true, deepSecrets: true, finalChallenge: true
 });
-assert.deepEqual(Array.from(planned), ['noting', 'quietCourage', 'confidenceVisualization', 'deepSecrets', 'finalChallenge']);
+assert.deepEqual(Array.from(planned), ['noting', 'quietCourage', 'confidenceVisualization', 'deepSecrets'], 'the optional-service offer is no longer a journey stage');
 assert.equal(routing.resolveFocusedExperience({ selectedChakraCount: 0, preparationSelected: true }), 'preparation');
-assert.match(html, /id="self-exploration-section"[\s\S]*?id="quiet-courage-addon-toggle"[\s\S]*?id="confidence-visualization-addon-toggle"[\s\S]*?id="deep-secrets-addon-toggle"[\s\S]*?id="final-challenge-addon-toggle"[\s\S]*?id="chakra-selection-panel"/);
-assert.match(html, /id="final-challenge-modal"[^>]*role="dialog"[^>]*aria-modal="true"/);
-assert.match(app, /confidenceVisualization: state\.advancedFeaturesUnlocked && getChecked\('confidence-visualization-addon-toggle'\)[\s\S]*?deepSecrets:[\s\S]*?finalChallenge:/);
-assert.match(sw, /chakra-v5\.370[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.0/);
+assert.match(html, /id="self-exploration-section"[\s\S]*?id="quiet-courage-addon-toggle"[\s\S]*?id="confidence-visualization-addon-toggle"[\s\S]*?id="deep-secrets-addon-toggle"[\s\S]*?id="chakra-selection-panel"/);
+assert.doesNotMatch(html, /final-challenge/, 'the Final Challenge journey step and its modal are gone');
+assert.match(html, /id="optional-service-info-panel"[^>]*hidden/, 'the optional-service card is a standalone Lobby card, hidden by default');
+assert.doesNotMatch(app, /finalChallenge/, 'no journey runner for the optional-service offer');
+assert.match(sw, /chakra-v5\.371[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.1/);
 assert.doesNotMatch(practiceSource, /getUserMedia|MediaRecorder|localStorage|indexedDB|fetch\(/, 'spoken self-expression must not capture, persist, or upload speech');
 
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
@@ -27,9 +28,9 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     for (const key of [
         'confidenceVisualizationAddon', 'confidenceVisualizationOpening', 'confidenceVisualizationSteps', 'confidenceVisualizationClosing',
         'deepSecretsAddon', 'deepSecretsOpening', 'deepSecretsInvitation', 'deepSecretsClosing',
-        'finalChallengeQuestion', 'finalChallengeYes', 'finalChallengeNo', 'skipForNow',
-        'finalChallengeYesFeedback', 'finalChallengeNoFeedback', 'finalChallengeSkipFeedback', 'selfExplorationStep',
-        'roadmapConfidenceVisualization', 'roadmapDeepSecrets', 'roadmapFinalChallenge'
+        'optionalServiceTitle', 'optionalServiceNote', 'optionalServiceQuestion', 'optionalServiceYes', 'optionalServiceNo', 'skipForNow',
+        'optionalServiceYesFeedback', 'optionalServiceNoFeedback', 'selfExplorationStep',
+        'roadmapConfidenceVisualization', 'roadmapDeepSecrets'
     ]) assert.ok(ui[key], `${language} requires ${key}`);
     assert.equal(ui.confidenceVisualizationSteps.length, 3);
 }
@@ -48,30 +49,6 @@ function element() {
     };
 }
 
-const modal = element(), countdown = element(), question = element(), yes = element(), no = element(), skip = element(), feedback = element();
-let countdownTicks = 0;
-const result = await practice.finalChallenge({
-    elements: { modal, countdown, question, yes, no, skip, feedback },
-    copy: { yesFeedback: 'after-session-info', noFeedback: 'continue', skipFeedback: 'continue' },
-    isActive: () => true,
-    sleep: async ms => {
-        if (ms === 1000) countdownTicks++;
-        if (ms === 200) yes.listeners.get('click')?.();
-    }
-});
-assert.equal(countdownTicks, 5, 'The final question follows the short five-second countdown.');
-assert.equal(result, 'yes');
-assert.equal(feedback.textContent, 'after-session-info');
-assert.equal(modal.classList.contains('hidden'), true, 'The dialog closes after the transient choice.');
-assert.equal(yes.listeners.size, 0, 'Choice handlers are removed after the task.');
+assert.equal(practice.finalChallenge, undefined, 'the practice module no longer offers a Final Challenge');
 
-const cancelElements = { modal: element(), countdown: element(), question: element(), yes: element(), no: element(), skip: element(), feedback: element() };
-let active = true, ticks = 0;
-const cancelled = practice.finalChallenge({
-    elements: cancelElements, copy: {}, isActive: () => active,
-    sleep: async () => { if (++ticks === 2) active = false; }
-});
-assert.equal(await cancelled, null, 'Journey stop/skip cancels the countdown without opening the question.');
-assert.equal(cancelElements.modal.classList.contains('hidden'), true, 'Cancellation always closes the popup.');
-
-console.log('Self-Exploration challenges pass: ordered/standalone route, five-language copy, no capture/storage, transient choice and cancellation cleanup.');
+console.log('Self-Exploration practices pass: ordered/standalone route, five-language copy, no capture/storage; the optional-service offer is a standalone Lobby card, not a journey stage.');

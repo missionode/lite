@@ -52,9 +52,9 @@ assert.deepEqual(
 assert.deepEqual(
     Array.from(routing.buildPreparationStagePlan({
         box: true, visualization: true, dharana: true, bodyScan: true, noting: true, quietCourage: true,
-        confidenceVisualization: true, deepSecrets: true, finalChallenge: true
+        confidenceVisualization: true, deepSecrets: true, finalChallenge: true /* retired: ignored */
     })),
-    ['box', 'visualization', 'dharana', 'bodyScan', 'noting', 'quietCourage', 'confidenceVisualization', 'deepSecrets', 'finalChallenge']
+    ['box', 'visualization', 'dharana', 'bodyScan', 'noting', 'quietCourage', 'confidenceVisualization', 'deepSecrets']
 );
 assert.deepEqual(
     Array.from(routing.buildPreparationStagePlan({ visualization: true, bodyScan: true })),

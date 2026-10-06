@@ -30,7 +30,7 @@
         const standalonePreparation = state.selectedChakras.length === 0 && ([
             'box-breathing-experience-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle',
             'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle', 'noting-addon-toggle'
-        ].some(id => getChecked(id)) || state.selectedChakras.length === 0 && state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'].some(id => getChecked(id)));
+        ].some(id => getChecked(id)) || state.selectedChakras.length === 0 && state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle'].some(id => getChecked(id)));
         const focusedExperience = getChecked('yoga-experience-toggle') || intimateService || standalonePreparation;
         const dharanaOptions = document.getElementById('dharana-options');
         if (dharanaOptions) dharanaOptions.hidden = !getChecked('dharana-addon-toggle') || getChecked('shots-toggle');
@@ -50,7 +50,7 @@
         if (quietCourageToggle) quietCourageToggle.disabled = !state.advancedFeaturesUnlocked;
         const quietCourageOptions = document.getElementById('quiet-courage-options');
         if (quietCourageOptions) quietCourageOptions.hidden = !getChecked('quiet-courage-addon-toggle') || getChecked('shots-toggle');
-        for (const id of ['confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle']) {
+        for (const id of ['confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle']) {
             const toggle = document.getElementById(id);
             if (toggle) toggle.disabled = !state.advancedFeaturesUnlocked;
         }

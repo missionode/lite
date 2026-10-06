@@ -13,7 +13,7 @@ function checkbox() {
 const toggles = {
     boxBreathing: checkbox(), hooponopono: checkbox(), dharana: checkbox(), visualization: checkbox(),
     bodyScan: checkbox(), noting: checkbox(), undoUnlearn: checkbox(), quietCourage: checkbox(),
-    confidenceVisualization: checkbox(), deepSecrets: checkbox(), finalChallenge: checkbox()
+    confidenceVisualization: checkbox(), deepSecrets: checkbox()
 };
 for (const id of ['dharana-options', 'visualization-options', 'body-scan-options', 'noting-options', 'undo-unlearn-options', 'quiet-courage-options', 'confidence-visualization-options', 'deep-secrets-options']) {
     elements.set(id, { hidden: true });
@@ -55,7 +55,7 @@ for (const [key, id] of [
     ['dharana', 'dharana-options'], ['visualization', 'visualization-options'],
     ['bodyScan', 'body-scan-options'], ['noting', 'noting-options'], ['undoUnlearn', 'undo-unlearn-options'],
     ['quietCourage', 'quiet-courage-options'], ['confidenceVisualization', 'confidence-visualization-options'],
-    ['deepSecrets', 'deep-secrets-options'], ['finalChallenge', null]
+    ['deepSecrets', 'deep-secrets-options']
 ]) {
     change(toggles[key], true);
     if (id) assert.equal(elements.get(id).hidden, false, `${key} options appear when selected`);
@@ -120,7 +120,7 @@ assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?undoUn
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindPrimaryModeToggles\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindDurationRefresh\(/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bindVisualizationAmbiencePreference\(/);
-assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.1') < html.indexOf('app.js?v=4.30'));
-assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.1/);
+assert.ok(html.indexOf('modules/journey-preparation-selection.js?v=1.2') < html.indexOf('app.js?v=4.31'));
+assert.match(sw, /modules\/journey-preparation-selection\.js\?v=1\.2/);
 assert.match(appSource, /ChakraJourneyPreparationSelection\.bind\([\s\S]*?quietCourage: quietCourageAddonToggle/);
 console.log('Journey preparation selection passed: standalone stages, nested options, mutual-exclusion clears and updates.');

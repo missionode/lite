@@ -27,8 +27,7 @@
         // Dev-mode (Advanced Features) practices load only while unlocked.
         Object.freeze(['quiet-courage-addon-toggle', 'quiet-courage', true]),
         Object.freeze(['confidence-visualization-addon-toggle', 'self-exploration', true]),
-        Object.freeze(['deep-secrets-addon-toggle', 'self-exploration', true]),
-        Object.freeze(['final-challenge-addon-toggle', 'self-exploration', true])
+        Object.freeze(['deep-secrets-addon-toggle', 'self-exploration', true])
     ]);
 
     function selectedModuleIds(isChecked, { advancedFeaturesUnlocked = false } = {}) {

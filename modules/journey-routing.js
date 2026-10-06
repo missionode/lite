@@ -6,7 +6,7 @@
     ]);
     const PREPARATION_STAGE_ORDER = Object.freeze([
         'box', 'visualization', 'dharana', 'bodyScan', 'noting', 'quietCourage',
-        'confidenceVisualization', 'deepSecrets', 'finalChallenge'
+        'confidenceVisualization', 'deepSecrets'
     ]);
 
     function resolveFocusedExperience({
@@ -63,11 +63,10 @@
         noting = false,
         quietCourage = false,
         confidenceVisualization = false,
-        deepSecrets = false,
-        finalChallenge = false
+        deepSecrets = false
     } = {}) {
         if (highEnergy) return [];
-        const selected = { box, visualization, dharana, bodyScan, noting, quietCourage, confidenceVisualization, deepSecrets, finalChallenge };
+        const selected = { box, visualization, dharana, bodyScan, noting, quietCourage, confidenceVisualization, deepSecrets };
         return PREPARATION_STAGE_ORDER.filter(stage => selected[stage]);
     }
 

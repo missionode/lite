@@ -12,7 +12,7 @@ const roadmapKeys = [
     'roadmapLightSleep', 'roadmapTrueSleep', 'roadmapDeepSleep', 'roadmapRemRest', 'roadmapIntention', 'roadmapHrim',
     'roadmapClosing', 'roadmapBoxBreathing', 'roadmapVisualization', 'roadmapDharana', 'roadmapBodyScan',
     'roadmapNoting', 'roadmapHooponopono', 'roadmapUndoUnlearn', 'roadmapQuietCourage', 'roadmapConfidenceVisualization',
-    'roadmapDeepSecrets', 'roadmapFinalChallenge', 'roadmapReturning', 'roadmapArrival', 'roadmapChakras'
+    'roadmapDeepSecrets', 'roadmapReturning', 'roadmapArrival', 'roadmapChakras'
 ];
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const locale = JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'));
@@ -21,8 +21,8 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
 assert.match(app, /const journeyRoadmap = window\.ChakraJourneyRoadmap/);
 assert.match(app, /function getJourneyRoadmapLabels\(\)\s*\{\s*return journeyRoadmap\.resolveLabels\(/);
 assert.match(app, /function updateJourneyRoadmap\(\)\s*\{\s*journeyRoadmap\.render\(/);
-assert.match(html, /modules\/journey-roadmap\.js\?v=1\.1[\s\S]*?app\.js\?v=4.30/);
-assert.match(serviceWorker, /chakra-v5.370[\s\S]*?modules\/journey-roadmap\.js\?v=1\.1/);
+assert.match(html, /modules\/journey-roadmap\.js\?v=1\.2[\s\S]*?app\.js\?v=4.31/);
+assert.match(serviceWorker, /chakra-v5.371[\s\S]*?modules\/journey-roadmap\.js\?v=1\.2/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -50,11 +50,11 @@ assert.deepEqual(plain(resolve(['high-energy-toggle'])), ['roadmapIntention', 'r
 assert.deepEqual(plain(resolve([
     'box-breathing-experience-toggle', 'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle',
     'noting-addon-toggle', 'quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle',
-    'final-challenge-addon-toggle', 'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle'
+    'hooponopono-experience-toggle', 'undo-unlearn-addon-toggle'
 ], { selectedChakras: [], journeyVideoPreludeEnabled: true })), [
     'roadmapVideoIntroduction', 'roadmapBoxBreathing', 'roadmapVisualization', 'roadmapDharana',
     'roadmapBodyScan', 'roadmapNoting', 'roadmapQuietCourage', 'roadmapConfidenceVisualization', 'roadmapDeepSecrets',
-    'roadmapFinalChallenge', 'roadmapHooponopono', 'roadmapUndoUnlearn'
+    'roadmapHooponopono', 'roadmapUndoUnlearn'
 ]);
 assert.deepEqual(plain(resolve([
     'box-breathing-experience-toggle', 'visualization-addon-toggle', 'dharana-addon-toggle', 'body-scan-addon-toggle',
@@ -66,10 +66,10 @@ assert.deepEqual(plain(resolve([
 ]);
 // Dev-mode add-ons with a chakra: they run after Intention and before Chakras, like the other practices.
 assert.deepEqual(plain(resolve([
-    'quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'
+    'quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle'
 ])), [
     'roadmapArrival', 'roadmapIntention', 'roadmapQuietCourage', 'roadmapConfidenceVisualization',
-    'roadmapDeepSecrets', 'roadmapFinalChallenge', 'roadmapChakras', 'roadmapClosing'
+    'roadmapDeepSecrets', 'roadmapChakras', 'roadmapClosing'
 ]);
 assert.deepEqual(plain(resolve(['reverse-journey-toggle'], { advancedFeaturesUnlocked: true })), [
     'roadmapArrival', 'roadmapIntention', 'reverseJourney', 'roadmapClosing'

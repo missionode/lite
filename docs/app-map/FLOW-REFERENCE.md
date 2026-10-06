@@ -31,7 +31,7 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 21. [Contactless Eye Shooter · dev-mode gaze game](#eye-shooter)
 22. [Chakra Touch · dev-mode couples touch game](#chakra-touch)
 23. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
-24. [Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge](#self-exploration-challenges)
+24. [Self-Exploration · Confidence Visualization, Deep Secrets and the standalone optional-service card](#self-exploration-challenges)
 25. [Separate time for each chakra](#per-chakra-time)
 26. [Pause, stop and live controls](#controls)
 27. [Optional Lobby video introduction](#restart)
@@ -425,7 +425,7 @@ flowchart TD
 | Shots | Validate custom Hz: finite, >0 and ≤20,000. Initialize audio and run Shot. |
 | Music Only | Start indefinite music with common controls. |
 | Sleep | Load and validate five stages; start silent narration-free journey. |
-| Focused practice | Yoga and Intimate Care are standalone routes. With no chakra selected, Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Advanced Features-only Self-Exploration (Quiet Courage, Confidence Visualization, Deep Secrets, Final Challenge), Ho’oponopono and Undo & Unlearn run as standalone preparation sessions in the displayed order; Ho’oponopono and Undo & Unlearn follow the chakra loop when chakras are selected. |
+| Focused practice | Yoga and Intimate Care are standalone routes. With no chakra selected, Box Breathing, Visualization, Dharana, Body Scan, Guided Noting, Advanced Features-only Self-Exploration (Quiet Courage, Confidence Visualization, Deep Secrets), Ho’oponopono and Undo & Unlearn run as standalone preparation sessions in the displayed order; Ho’oponopono and Undo & Unlearn follow the chakra loop when chakras are selected. |
 | Guided meditation | HRIM bypasses chakra selection; standard requires chakras unless a standalone preparation practice is selected. |
 | Shared guided start | DND reminder, scripts, validation, audio, Piper warmup, wake lock, timers, selected routine. |
 
@@ -915,7 +915,7 @@ flowchart TD
 
 ## Ordered Chakra Journey add-ons
 
-Box → Visualization → Dharana → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → Final Challenge → chakras; the same selected route drives its displayed estimate and countdown.
+Box → Visualization → Dharana → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → chakras; the same selected route drives its displayed estimate and countdown.
 
 Sources: [modules/journey-routing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-routing.js:1), [modules/journey-preparation-selection.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-preparation-selection.js:1), [modules/quiet-courage-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/quiet-courage-practice.js:1), [modules/self-exploration-practices.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/self-exploration-practices.js:1), [modules/practice-module-loader.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/practice-module-loader.js:1), [modules/lobby-experience-visibility.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:1), [modules/journey-roadmap.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-roadmap.js:1), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [index.html:362](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:362), [tests/self-exploration-practices.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/self-exploration-practices.test.mjs:1), [modules/quiet-courage-practice.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/quiet-courage-practice.js:1), [tests/quiet-courage-practice.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/quiet-courage-practice.test.mjs:1), [app.js:1497](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1497), [app.js:2475](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2475).
 
@@ -937,8 +937,8 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Preparation add-ons | All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions; its new module owns the timed narration, cancellation guard and black-scene fade/cleanup while the controller supplies localized copy and app services. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. Quiet Courage uses a subtle 396 Hz Root-associated symbolic tone at its opening; its fade-in/out duration exactly follows Drone Duration (4/10/14/20 seconds), and No Frequency suppresses it. This is an aesthetic grounding cue, not a proven therapeutic frequency. When no chakras are selected, these sessions and Ho’oponopono/Undo & Unlearn run alone; the roadmap shows only the selected standalone stages. With chakras selected, preparation precedes the chakra journey and integration practices follow it. The separate Self-Exploration section appears directly below Journey Preparation when Advanced Features is unlocked; its ordered options follow Quiet Courage, then Confidence Visualization, Deep Secrets and Final Challenge after Guided Noting and before chakras. These may run without chakra selection. |
-| Self-Exploration | A separate Advanced Features-only section directly below Journey Preparation. Quiet Courage comes first, then Confidence Visualization, Deep Secrets and Final Challenge. Selected items follow Guided Noting and precede chakras; any combination can run without chakra selection. Relocking clears all selections. See the Self-Exploration challenges map. |
+| Preparation add-ons | All selectors remain independently combinable. Runtime/Lobby order is Box, Visualization, Dharana, Body Scan, then Guided Noting. Body Scan offers 3/5/8 minutes and eight non-corrective head-to-toe regions; its new module owns the timed narration, cancellation guard and black-scene fade/cleanup while the controller supplies localized copy and app services. Guided Noting offers 2/4/6 minutes, neutral private labels, four spaced reminders, permission to return to breath or stop, and a label-free closing. Quiet Courage uses a subtle 396 Hz Root-associated symbolic tone at its opening; its fade-in/out duration exactly follows Drone Duration (4/10/14/20 seconds), and No Frequency suppresses it. This is an aesthetic grounding cue, not a proven therapeutic frequency. When no chakras are selected, these sessions and Ho’oponopono/Undo & Unlearn run alone; the roadmap shows only the selected standalone stages. With chakras selected, preparation precedes the chakra journey and integration practices follow it. The separate Self-Exploration section appears directly below Journey Preparation when Advanced Features is unlocked; its ordered options follow Quiet Courage, then Confidence Visualization and Deep Secrets after Guided Noting and before chakras. These may run without chakra selection. |
+| Self-Exploration | A separate Advanced Features-only section directly below Journey Preparation. Quiet Courage comes first, then Confidence Visualization and Deep Secrets. Selected items follow Guided Noting and precede chakras; any combination can run without chakra selection. Relocking clears all selections. See the Self-Exploration challenges map. |
 | Chakra Journey | One or more selected chakras run in the usual chosen order. |
 | Integration add-ons | After the final chakra, optional Ho’oponopono runs first, then optional Undo & Unlearn, before silence, Closing and Emergence. Undo & Unlearn offers 5/8/12 minutes and never asks the meditator to identify, recall, speak, type or mentally answer anything. |
 | Replacement experiences | Yoga remains a standalone pose-based experience; HRIM, Sleep, Music Only, Shots and Intimate Service also replace the normal Chakra Journey. |
@@ -1004,14 +1004,14 @@ flowchart TD
 | Sleep | Sleep → Drowsiness → Light Sleep → True Sleep → Deep Sleep → REM Rest. |
 | HRIM | Intention → HRIM → Closing. |
 | Standalone preparation | Box → Visualization → Focused Attention → Body Scan → Guided Noting → Ho’oponopono → Undo & Unlearn; only selected stages are included. |
-| Standard guided journey | Arrival or Returning → Intention → selected preparation practices (Box → Visualization → Focused Attention → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → Final Challenge) → Chakras (shown as “Reverse Journey (Crown ➔ Root)” when dev-mode Reverse Journey is checked) → optional Ho’oponopono → optional Undo & Unlearn → Closing. This matches the runtime, where preparation practices run after the opening and Intention stage. |
+| Standard guided journey | Arrival or Returning → Intention → selected preparation practices (Box → Visualization → Focused Attention → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets) → Chakras (shown as “Reverse Journey (Crown ➔ Root)” when dev-mode Reverse Journey is checked) → optional Ho’oponopono → optional Undo & Unlearn → Closing. This matches the runtime, where preparation practices run after the opening and Intention stage. |
 | Optional introduction | When the Lobby video preference is enabled, prepend the translated Video Introduction label; this preview label does not play the video. |
 | Render | Resolve every label through the current display-language translator and join with the existing » separator. |
 | Roadmap unavailable | If the preview element is absent, return without changing anything. |
 
 - The roadmap is a localized preview only. Begin validation and actual dispatch remain in the app/routing owner. Current behavior falls back to standard guided labels when no chakra is selected and no standalone add-on is checked; this preview does not itself enforce Begin eligibility.
 - Quiet Courage is included after Guided Noting and before chakras, or among selected standalone preparation stages when no chakra is chosen. Its displayed name and roadmap follow Display Language.
-- Confidence Visualization, Deep Secrets, and Final Challenge follow Quiet Courage in order and are included in both chakra and standalone preparation roadmaps. Final Challenge responses are transient and not saved.
+- Confidence Visualization and Deep Secrets follow Quiet Courage in order and are included in both chakra and standalone preparation roadmaps. The optional-service offer is no longer a journey stage (see the Self-Exploration map).
 
 <a id="quiet-courage"></a>
 
@@ -1246,7 +1246,7 @@ flowchart TD
 
 <a id="self-exploration-challenges"></a>
 
-## Self-Exploration · Confidence Visualization, Deep Secrets and Final Challenge
+## Self-Exploration · Confidence Visualization, Deep Secrets and the standalone optional-service card
 
 Advanced Features-only optional stages after Quiet Courage and before chakras; individually selectable and available as standalone preparation.
 
@@ -1257,18 +1257,17 @@ flowchart TD
   gate["Advanced Features gate"]
   confidence["Confidence Visualization"]
   secrets["Deep Secrets · Speak or Stay Silent"]
-  final["Final Challenge"]
+  final["Optional service information (not a journey stage)"]
   answer["Transient choice"]
   exit["Skip / Stop / Continue"]
   route["Chakra journey"]
   finish["Standalone completion"]
   gate -->|"Choose + unlocked"| confidence
   gate -->|"Choose + unlocked"| secrets
-  gate -->|"Choose + unlocked"| final
+  gate -->|"Developer mode on and not care first (Lobby card)"| final
   confidence -->|"Next selected stage"| secrets
-  secrets -->|"Next selected stage"| final
-  final -->|"Countdown completes"| answer
-  answer -->|"Yes / No / Skip"| exit
+  secrets -->|"Skip / Stop / Continue"| exit
+  final -->|"Meditator chooses"| answer
   exit -->|"Chakras selected"| route
   exit -->|"No chakras"| finish
 ```
@@ -1278,13 +1277,13 @@ flowchart TD
 | Advanced Features gate | Choices are session-only and cleared on relock. Selected practice module loads lazily at Begin and is precached for offline use. |
 | Confidence Visualization | A fully clothed, non-explicit self-kindness visualization with a localized step counter. No appearance ideal, body inspection, touching, disclosure, or real-world action. Choose 3/5/8 minutes. |
 | Deep Secrets · Speak or Stay Silent | Speaking is optional; fiction/metaphor, silence, skip or stop are welcome. Localized narration says in first person “I won’t record or save what you say here.” The PWA does not request microphone access or capture, transcribe, store or upload speech; an in-room listener may hear. Choose 3/4/6 minutes. |
-| Final Challenge | One checklist task appears after a calm 5-second countdown. No flashing, sound, penalty or deadline. Yes / No / Skip are equal and none is preselected. |
-| Transient choice | Yes only invites the meditator to ask the guide for information after the session. No and Skip continue neutrally. No storage, analytics, assessment, operator record, booking or automatic upsell. |
+| Optional service information (not a journey stage) | The offer no longer appears inside any journey. In developer mode only, a standalone Lobby card, separate from the meditation, reads: entirely optional, nothing booked, saved or shared. Yes / No are equal and none is preselected. No countdown, no challenge framing. Hidden when developer mode is locked and for a client the assessment marked care first. |
+| Transient choice | Yes only tells the meditator they may ask their guide for information whenever they like. No thanks the meditator. No storage, analytics, assessment, operator record, booking or automatic upsell. |
 | Skip / Stop / Continue | Each stage is skippable; cancellation closes its UI and uses the current session exit path. Load failure uses the shared localized recovery notice. |
 | Chakra journey | If chakras were selected, continue to the selected chakra stages. |
 | Standalone completion | If none were selected, complete the standalone practices. |
 
-- All visible text and spoken prompts are supplied for English, Malayalam, Hindi, Russian and Tamil. No disclosure is scored or rewarded. The Yes choice does not activate service; information can only be requested from the guide after the session. Browser and device audio verification remain outstanding.
+- All visible text and spoken prompts are supplied for English, Malayalam, Hindi, Russian and Tamil. No disclosure is scored or rewarded. The Yes choice does not activate or book anything; information can only be requested from the guide, outside the app. The offer is never part of a journey. Browser and device audio verification remain outstanding.
 
 <a id="per-chakra-time"></a>
 
@@ -2510,7 +2509,7 @@ flowchart TD
 | Answers behind lower signals | Collapsed, read-only section under the results (same in public and developer mode). Lists each answered question whose chosen answer gave a chakra the lower weight: the question, the chakra(s), the answer given and the higher-support option, so the guide can talk it through with the meditator. No change or recalculation, no controls; equal, skipped and higher-support answers are not listed; value-pair answers are not listed. Neutral wording: today’s answers only, not mistakes, scores or a diagnosis. |
 | Conversation cue | Show the best-supported chakra topic only when minimum response coverage exists; it is a prompt based on this assessment, not a character/behavior prediction. Never use values or the private dot. |
 | Gentle icebreaker | Pair the topic with an open question inviting the client to choose what feels useful. Insufficient evidence receives a generic client-led question. |
-| Value summary and care-first note (developer mode only) | With developer mode active, the result shows in plain words the value cards the client chose most (no colour, no score, no hidden weights) and, only when the published rule is met, a labelled care-first note for the operator: go slowly and suggest no service today. The rule (bank settings): at least 4 answered rounds that include Emotional Safety or Independence, and at least 75% of them choose that card; Equal and Skip never count. Being unflagged says nothing either way. The flag is protective only: it never means ready or suitable, and it never promotes anything. Same-tab hand-off: a care-first client is not asked the optional-service question of the Final Challenge; Clear for New Client and relocking developer mode clear it. |
+| Value summary and care-first note (developer mode only) | With developer mode active, the result shows in plain words the value cards the client chose most (no colour, no score, no hidden weights) and, only when the published rule is met, a labelled care-first note for the operator: go slowly and suggest no service today. The rule (bank settings): at least 4 answered rounds that include Emotional Safety or Independence, and at least 75% of them choose that card; Equal and Skip never count. Being unflagged says nothing either way. The flag is protective only: it never means ready or suitable, and it never promotes anything. Same-tab hand-off: the optional-service Lobby card is hidden for a care-first client. The flag survives page loads (developer mode itself resets on every load); only Clear for New Client or an explicit relock clears it, or closing the tab. |
 | Clear for New Client | Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client. |
 | Translate dynamically rendered content | Existing Google Translate widget offers English, Malayalam, Hindi, Russian and Tamil, using an off-screen translated-string cache for upcoming prompts and results; network required. |
 | Failure and exit | Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress. |

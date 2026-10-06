@@ -89,7 +89,6 @@
         if (isChecked('quiet-courage-addon-toggle')) seconds += readNumber('quiet-courage-duration', 5) * 60;
         if (isChecked('confidence-visualization-addon-toggle')) seconds += readNumber('confidence-visualization-duration', 5) * 60;
         if (isChecked('deep-secrets-addon-toggle')) seconds += readNumber('deep-secrets-duration', 4) * 60;
-        if (isChecked('final-challenge-addon-toggle')) seconds += 8;
         seconds += timing('transitions', 'postBreathing');
 
         selected.forEach(([key, chakra], index) => {
@@ -154,10 +153,9 @@
             const quietCourageMinutes = isChecked('quiet-courage-addon-toggle') ? readNumber('quiet-courage-duration', 5) : 0;
             const confidenceVisualizationMinutes = isChecked('confidence-visualization-addon-toggle') ? readNumber('confidence-visualization-duration', 5) : 0;
             const deepSecretsMinutes = isChecked('deep-secrets-addon-toggle') ? readNumber('deep-secrets-duration', 4) : 0;
-            const finalChallengeSeconds = isChecked('final-challenge-addon-toggle') ? 8 : 0;
             const hooponoponoSeconds = isChecked('hooponopono-experience-toggle') ? 4 * 60 : 0;
             const undoSeconds = isChecked('undo-unlearn-addon-toggle') ? readNumber('undo-unlearn-duration', 8) * 60 : 0;
-            return Math.max(1, boxSeconds + (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes + quietCourageMinutes + confidenceVisualizationMinutes + deepSecretsMinutes) * 60 + hooponoponoSeconds + undoSeconds + finalChallengeSeconds) * 1000;
+            return Math.max(1, boxSeconds + (visualizationMinutes + dharanaMinutes + bodyScanMinutes + notingMinutes + quietCourageMinutes + confidenceVisualizationMinutes + deepSecretsMinutes) * 60 + hooponoponoSeconds + undoSeconds) * 1000;
         }
         if (focusedExperience === 'yoga') {
             let seconds = state.timeYogaPrep + countYogaPoses() * (state.timeYogaPose + timing('estimate', 'yogaPoseTransitionEstimate'));
@@ -245,7 +243,6 @@
             const minutes = readNumber('deep-secrets-duration', 4);
             return `~ ${minutes} min ${translate('ui.deepSecretsAddon').toLowerCase()}`;
         }
-        if (checked('final-challenge-addon-toggle')) return `~ 8 sec ${translate('ui.finalChallengeAddon').toLowerCase()}`;
         if (checked('visualization-addon-toggle')) {
             const minutes = readNumber('visualization-duration', 2);
             return `~ ${minutes} min ${translate('ui.visualizationAddon').toLowerCase()}`;
@@ -292,7 +289,6 @@
                 + (checked('quiet-courage-addon-toggle') ? readNumber('quiet-courage-duration', 5) : 0)
                 + (checked('confidence-visualization-addon-toggle') ? readNumber('confidence-visualization-duration', 5) : 0)
                 + (checked('deep-secrets-addon-toggle') ? readNumber('deep-secrets-duration', 4) : 0)
-                + (checked('final-challenge-addon-toggle') ? 8 / 60 : 0)
                 + (checked('hooponopono-experience-toggle') ? 4 : 0)
                 + (checked('undo-unlearn-addon-toggle') ? readNumber('undo-unlearn-duration', 8) : 0);
         const estimate = isHigh

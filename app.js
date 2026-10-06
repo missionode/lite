@@ -1664,8 +1664,7 @@ class MeditationController {
             noting: getChecked('noting-addon-toggle'),
             quietCourage: state.advancedFeaturesUnlocked && getChecked('quiet-courage-addon-toggle'),
             confidenceVisualization: state.advancedFeaturesUnlocked && getChecked('confidence-visualization-addon-toggle'),
-            deepSecrets: state.advancedFeaturesUnlocked && getChecked('deep-secrets-addon-toggle'),
-            finalChallenge: state.advancedFeaturesUnlocked && getChecked('final-challenge-addon-toggle')
+            deepSecrets: state.advancedFeaturesUnlocked && getChecked('deep-secrets-addon-toggle')
         });
         const runners = {
             box: () => this.runSessionItem('Box Breathing', () => this.runBoxBreathing()),
@@ -1675,8 +1674,7 @@ class MeditationController {
             noting: () => this.runSessionItem('Guided Noting', () => this.runNoting()),
             quietCourage: () => this.runSessionItem('Quiet Courage', () => this.runQuietCourage()),
             confidenceVisualization: () => this.runSessionItem('Confidence Visualization', () => this.runConfidenceVisualization()),
-            deepSecrets: () => this.runSessionItem('Deep Secrets', () => this.runDeepSecrets()),
-            finalChallenge: () => this.runSessionItem('Final Challenge', () => this.runFinalChallenge())
+            deepSecrets: () => this.runSessionItem('Deep Secrets', () => this.runDeepSecrets())
         };
         await journeyRouting.executePreparationStages(stages, runners, () => this.isMeditationActive);
     }
@@ -1827,33 +1825,6 @@ class MeditationController {
             sleep: milliseconds => this.pauseAwareSleep(milliseconds),
             isActive: () => this.isMeditationActive
         });
-    }
-
-    async runFinalChallenge() {
-        if (!state.advancedFeaturesUnlocked || !getChecked('final-challenge-addon-toggle')) return;
-        // Protective: a client the assessment marked "care first" is not asked about the optional service.
-        try { if (sessionStorage.getItem('chakra_assessment_care_first') === '1') return; } catch (error) { /* no flag */ }
-        const practice = await practiceModuleLoader.load('self-exploration');
-        const result = await practice.finalChallenge({
-            elements: {
-                modal: document.getElementById('final-challenge-modal'),
-                countdown: document.getElementById('final-challenge-countdown'),
-                question: document.getElementById('final-challenge-question'),
-                yes: document.getElementById('final-challenge-yes'),
-                no: document.getElementById('final-challenge-no'),
-                skip: document.getElementById('final-challenge-skip'),
-                feedback: document.getElementById('final-challenge-feedback')
-            },
-            copy: {
-                yesFeedback: journeyT('ui.finalChallengeYesFeedback'),
-                noFeedback: journeyT('ui.finalChallengeNoFeedback'),
-                skipFeedback: journeyT('ui.finalChallengeSkipFeedback')
-            },
-            sleep: milliseconds => this.pauseAwareSleep(milliseconds),
-            isActive: () => this.isMeditationActive
-        });
-        // The answer is intentionally ephemeral and is never saved or exposed to the operator.
-        return result;
     }
 
     async runVisualization() {
@@ -2208,7 +2179,7 @@ class MeditationController {
             yogaSelected: getChecked('yoga-experience-toggle'),
             intimateSelected: getChecked('perineal-care-toggle') || getChecked('massage-toggle') || getChecked('assisted-bathing-toggle'),
             selectedChakraCount: state.selectedChakras.length,
-            preparationSelected: getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('undo-unlearn-addon-toggle') || getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle') || (state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle', 'final-challenge-addon-toggle'].some(id => getChecked(id)))
+            preparationSelected: getChecked('box-breathing-experience-toggle') || getChecked('hooponopono-experience-toggle') || getChecked('undo-unlearn-addon-toggle') || getChecked('dharana-addon-toggle') || getChecked('visualization-addon-toggle') || getChecked('body-scan-addon-toggle') || getChecked('noting-addon-toggle') || (state.advancedFeaturesUnlocked && ['quiet-courage-addon-toggle', 'confidence-visualization-addon-toggle', 'deep-secrets-addon-toggle'].some(id => getChecked(id)))
         });
     }
 
@@ -2942,7 +2913,6 @@ function attachEventListeners() {
     const quietCourageAddonToggle = document.getElementById('quiet-courage-addon-toggle');
     const confidenceVisualizationAddonToggle = document.getElementById('confidence-visualization-addon-toggle');
     const deepSecretsAddonToggle = document.getElementById('deep-secrets-addon-toggle');
-    const finalChallengeAddonToggle = document.getElementById('final-challenge-addon-toggle');
     const yogaExperienceToggle = document.getElementById('yoga-experience-toggle');
     const corpsePoseToggle = document.getElementById('corpse-pose-toggle');
     const highEnergyToggle = document.getElementById('high-energy-toggle');
@@ -3063,8 +3033,7 @@ function attachEventListeners() {
     const selfExplorationAddonToggles = [
         document.getElementById('quiet-courage-addon-toggle'),
         document.getElementById('confidence-visualization-addon-toggle'),
-        document.getElementById('deep-secrets-addon-toggle'),
-        document.getElementById('final-challenge-addon-toggle')
+        document.getElementById('deep-secrets-addon-toggle')
     ].filter(Boolean);
     const intimateServicePanel = document.getElementById('intimate-service-panel');
     const experimentCareOptions = document.getElementById('experiment-care-group');
@@ -3138,6 +3107,31 @@ function attachEventListeners() {
             console.error('Chakra Touch could not start:', error);
         }
     });
+    // Dev-mode optional service information: a standalone Lobby card, never part of a
+    // journey. Entirely optional; nothing is saved. Hidden for a client the assessment
+    // marked "care first", and whenever developer mode is locked.
+    const optionalServicePanel = document.getElementById('optional-service-info-panel');
+    const optionalServiceYes = document.getElementById('optional-service-info-yes');
+    const optionalServiceNo = document.getElementById('optional-service-info-no');
+    const optionalServiceFeedback = document.getElementById('optional-service-info-feedback');
+    function optionalServiceHidden() {
+        if (!state.advancedFeaturesUnlocked) return true;
+        try { return sessionStorage.getItem('chakra_assessment_care_first') === '1'; } catch (error) { return false; }
+    }
+    function syncOptionalServiceInfo() {
+        const hidden = optionalServiceHidden();
+        if (optionalServicePanel) optionalServicePanel.hidden = hidden;
+        if (optionalServiceYes) optionalServiceYes.disabled = hidden;
+        if (optionalServiceNo) optionalServiceNo.disabled = hidden;
+        if (hidden && optionalServiceFeedback) { optionalServiceFeedback.hidden = true; optionalServiceFeedback.textContent = ''; }
+    }
+    function answerOptionalServiceInfo(key) {
+        if (optionalServiceHidden() || !optionalServiceFeedback) return;
+        optionalServiceFeedback.textContent = t(key);
+        optionalServiceFeedback.hidden = false;
+    }
+    optionalServiceYes?.addEventListener('click', () => answerOptionalServiceInfo('ui.optionalServiceYesFeedback'));
+    optionalServiceNo?.addEventListener('click', () => answerOptionalServiceInfo('ui.optionalServiceNoFeedback'));
     const experimentActivitySelect = document.getElementById('experiment-activity');
     let intimateServiceUnlocked = false;
     let intimateServiceTapCount = 0;
@@ -3181,7 +3175,7 @@ function attachEventListeners() {
         state.advancedFeaturesUnlocked = !isLocked;
         if (isLocked) cancelEarnHandoff();
         if (isLocked) {
-            try { sessionStorage.removeItem('chakra_assessment_access_until'); sessionStorage.removeItem('chakra_assessment_care_first'); } catch (error) { /* optional session handoff */ }
+            try { sessionStorage.removeItem('chakra_assessment_access_until'); } catch (error) { /* optional session handoff */ }
             state.moodRelaxationIntentionEnabled = false;
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);
@@ -3229,6 +3223,7 @@ function attachEventListeners() {
         if (isLocked && secretBodyGame) secretBodyGame.close();
         if (eyeShooterButton) eyeShooterButton.disabled = isLocked;
         if (isLocked && eyeShooterGame) eyeShooterGame.close();
+        syncOptionalServiceInfo();
         if (chakraTouchButton) chakraTouchButton.disabled = isLocked;
         if (isLocked && chakraTouchGame) chakraTouchGame.close();
         if (experimentCareOptions && experimentActivitySelect) {
@@ -3314,6 +3309,8 @@ function attachEventListeners() {
         if (advancedFeaturesToggle.checked) return;
         resetUnlockTaps();
         clearIntimateService();
+        // An explicit relock ends this client's care-first protection with the session.
+        try { sessionStorage.removeItem('chakra_assessment_care_first'); } catch (error) { /* optional */ }
         setIntimateServiceLocked(true);
         updateExperienceModeVisibility();
         updateSessionEstimate();
@@ -3429,8 +3426,7 @@ function attachEventListeners() {
             undoUnlearn: undoUnlearnAddonToggle,
             quietCourage: quietCourageAddonToggle,
             confidenceVisualization: confidenceVisualizationAddonToggle,
-            deepSecrets: deepSecretsAddonToggle,
-            finalChallenge: finalChallengeAddonToggle
+            deepSecrets: deepSecretsAddonToggle
         },
         clearMusicOnlyMode,
         clearHighEnergyMode,

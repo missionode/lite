@@ -449,10 +449,6 @@
                             <label><span data-i18n="ui.deepSecretsDuration">Duration</span><select id="deep-secrets-duration"><option value="3">3 min</option><option value="4" selected>4 min</option><option value="6">6 min</option></select></label>
                         </div>
                     </div>
-                    <div class="journey-addon-control">
-                        <label class="checkbox-label experience-mode-toggle"><input type="checkbox" id="final-challenge-addon-toggle" disabled><span data-i18n="ui.finalChallengeAddon">Final Challenge</span></label>
-                        <p class="mixer-note" data-i18n="ui.finalChallengeSubtitle">One optional question. No answer is saved, and you may skip it.</p>
-                    </div>
                 </div>
             </div>
             <div id="chakra-selection-panel" class="config-group lobby-chakra-selection lobby-panel tw:lobby2:col-[1/-1]">
@@ -616,6 +612,17 @@
                     <div id="pleasure-ambience-blur-level-control" class="mixer-row range-control" hidden><label for="pleasure-ambience-blur-level" data-i18n="ui.pleasureAmbienceBlurLevel">Blur Intensity</label><input id="pleasure-ambience-blur-level" type="range" min="10" max="65" step="5" value="35" aria-describedby="pleasure-ambience-blur-level-note"><div class="range-meta"><button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button><span class="range-min" data-i18n="ui.pleasureAmbienceBlurMin">Min 10%</span><output id="pleasure-ambience-blur-level-value" class="range-current">35%</output><span class="range-max" data-i18n="ui.pleasureAmbienceBlurMax">Max 65%</span><button type="button" class="range-step range-increment" aria-label="Increase value">+</button></div><p id="pleasure-ambience-blur-level-note" class="mixer-note" data-i18n="ui.pleasureAmbienceBlurLevelNote">Higher values soften more of the source while retaining a dry signal for clarity. The default is a moderate, spacious blur.</p></div>
                     <div id="mood-relaxation-ambience-level-control" class="mixer-row range-control" hidden><label for="mood-relaxation-ambience-level" data-i18n="ui.moodRelaxationAmbienceLevel">Ambience Level</label><input id="mood-relaxation-ambience-level" type="range" min="0.2" max="7.0" step="0.1" value="0.3" aria-describedby="mood-relaxation-ambience-level-note"><div class="range-meta"><button type="button" class="range-step range-decrement" aria-label="Decrease value">−</button><span class="range-min" data-i18n="ui.moodRelaxationAmbienceMin">Min 0.2%</span><output id="mood-relaxation-ambience-level-value" class="range-current">0.3%</output><span class="range-max" data-i18n="ui.moodRelaxationAmbienceMax">Max 7.0%</span><button type="button" class="range-step range-increment" aria-label="Increase value">+</button></div><p id="mood-relaxation-ambience-level-note" class="mixer-note" data-i18n="ui.moodRelaxationAmbienceLevelNote">This is a bounded source level from 0.2% to 7.0%, not a calibrated decibel reading. Above 5.0%, confirm before increasing. Actual loudness depends on the device and output volume.</p></div>
                 </div>
+            </section>
+
+            <section id="optional-service-info-panel" class="config-group lobby-panel tw:lobby2:col-[1/-1]" aria-live="polite" hidden>
+                <label data-i18n="ui.optionalServiceTitle">Optional service information</label>
+                <p class="mixer-note" data-i18n="ui.optionalServiceNote">Separate from your meditation and entirely optional. Nothing is booked, saved or shared.</p>
+                <p class="mixer-note" data-i18n="ui.optionalServiceQuestion">Would you like to learn about the optional intimate-care service?</p>
+                <div class="experience-mode-options">
+                    <button id="optional-service-info-yes" class="secondary-btn" type="button" disabled data-i18n="ui.optionalServiceYes">Yes, I’d like information</button>
+                    <button id="optional-service-info-no" class="secondary-btn" type="button" disabled data-i18n="ui.optionalServiceNo">No, thank you</button>
+                </div>
+                <p id="optional-service-info-feedback" class="mixer-note" aria-live="polite" hidden></p>
             </section>
 
             <!-- Play Zone: dev-mode (Advanced Features) games section. More games can be added as new .play-zone-game cards. -->
@@ -828,25 +835,6 @@
         <!-- Hover or tap the bottom edge to reveal journey controls. -->
         <div id="fullscreen-controls-reveal-zone" aria-hidden="true"></div>
 
-        <div id="final-challenge-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="final-challenge-title" aria-describedby="final-challenge-subtitle">
-            <div class="modal-content self-exploration-challenge">
-                <p class="challenge-kicker" data-i18n="ui.finalChallengeKicker">FINAL CHALLENGE</p>
-                <h2 id="final-challenge-title" data-i18n="ui.finalChallengeTitle">A choice, entirely yours</h2>
-                <p id="final-challenge-subtitle" data-i18n="ui.finalChallengeSubtitle">One optional question. No answer is saved, and you may skip it.</p>
-                <ol class="challenge-checklist"><li><span>1</span><span data-i18n="ui.finalChallengeTask">Choose whether you would like information about the optional intimate service.</span></li></ol>
-                <p id="final-challenge-countdown" class="challenge-countdown" aria-live="off">5</p>
-                <div id="final-challenge-question" class="hidden">
-                    <p class="challenge-question" data-i18n="ui.finalChallengeQuestion">Would you like to learn about the optional intimate service?</p>
-                    <div class="challenge-actions">
-                        <button id="final-challenge-yes" type="button" class="primary-btn" data-i18n="ui.finalChallengeYes">Yes, I’d like information</button>
-                        <button id="final-challenge-no" type="button" class="secondary-btn" data-i18n="ui.finalChallengeNo">No, thank you</button>
-                        <button id="final-challenge-skip" type="button" class="secondary-btn" data-i18n="ui.skipForNow">Skip for now</button>
-                    </div>
-                </div>
-                <p id="final-challenge-feedback" class="mixer-note hidden" aria-live="polite"></p>
-            </div>
-        </div>
-
         <div id="pitch-invite" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pitch-invite-title">
             <div class="modal-content pitch-invite">
                 <h2 id="pitch-invite-title" data-i18n="ui.pitchInviteTitle">That was 2 minutes.</h2>
@@ -910,7 +898,7 @@
     <script src="modules/intention-settings-view.js?v=1.0"></script>
     <script src="modules/chakra-selection-view.js?v=1.0"></script>
     <script src="modules/audio-effects-settings-view.js?v=1.0"></script>
-    <script src="modules/journey-preparation-selection.js?v=1.1"></script>
+    <script src="modules/journey-preparation-selection.js?v=1.2"></script>
     <script src="modules/chakra-timing.js?v=1.0"></script>
     <script src="modules/chakra-timing-view.js?v=1.1"></script>
     <script src="modules/app-state.js?v=1.3"></script>
@@ -936,10 +924,10 @@
     <script src="modules/journey-hypnosis-wrapper.js?v=1.0"></script>
     <script src="modules/journey-opening-stage.js?v=1.0"></script>
     <script src="modules/journey-content-loader.js?v=1.0"></script>
-    <script src="modules/journey-routing.js?v=1.3"></script>
+    <script src="modules/journey-routing.js?v=1.4"></script>
     <script src="modules/standard-journey-sequence.js?v=1.0"></script>
     <script src="modules/journey-transition-stages.js?v=1.0"></script>
-    <script src="modules/practice-module-loader.js?v=1.6"></script>
+    <script src="modules/practice-module-loader.js?v=1.7"></script>
     <script src="modules/screen-navigation.js?v=1.1"></script>
     <script src="modules/shot-session.js?v=1.2"></script>
     <script src="modules/narration-feeling.js?v=1.0"></script>
@@ -960,15 +948,15 @@
     <script src="modules/visual-comfort-settings-view.js?v=1.0"></script>
     <script src="modules/mixer-view.js?v=1.0"></script>
     <script src="modules/media-controls-view.js?v=1.0"></script>
-    <script src="modules/session-estimate.js?v=1.2"></script>
+    <script src="modules/session-estimate.js?v=1.3"></script>
     <script src="modules/session-countdown.js?v=1.1"></script>
     <script src="modules/session-item-runner.js?v=1.0"></script>
     <script src="modules/mood-ambience-settings-view.js?v=1.1"></script>
     <script src="modules/drone-duration-settings-view.js?v=1.0"></script>
-    <script src="modules/lobby-experience-visibility.js?v=1.2"></script>
+    <script src="modules/lobby-experience-visibility.js?v=1.3"></script>
     <script src="modules/yoga-experience-settings.js?v=1.0"></script>
     <script src="modules/range-controls.js?v=1.0"></script>
-    <script src="modules/journey-roadmap.js?v=1.1"></script>
+    <script src="modules/journey-roadmap.js?v=1.2"></script>
     <script src="modules/locale-ui-renderer.js?v=1.0"></script>
     <script src="modules/timing-settings.js?v=1.0"></script>
     <script src="modules/timing-settings-view.js?v=1.0"></script>
@@ -985,6 +973,6 @@
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
     <script src="modules/app-notice.js?v=1.0"></script>
-    <script src="app.js?v=4.30"></script>
+    <script src="app.js?v=4.31"></script>
 </body>
 </html>
