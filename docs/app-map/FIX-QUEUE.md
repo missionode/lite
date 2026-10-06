@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Completed — Atlas source references refreshed (2026-10-06)
+
+- Many `app.js` line references were stale after the modularization (some past the end of the file). All 556 references now point at the matching code (remapped by exact source line, or to the module the code moved to).
+
+## Completed — Per-chakra switch padding (2026-10-05)
+
+- The "Set time for each chakra" checkbox touched the panel edge (panel-heading rule removed its padding); the rule now skips checkbox tiles.
+
 ## Completed — Tailwind phase 6, one stylesheet (2026-10-05)
 
 - `style.css` retired (rules now `tailwind/legacy.css`, bundled into `tailwind.css`); preflight on with old browser defaults kept; per-chakra rows as padded tiles under Core Practice Duration.

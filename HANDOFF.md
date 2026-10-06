@@ -1,17 +1,18 @@
 # Chakra Meditation — Active Handoff
 
-## CURRENT RESUME — 2026-10-05
+## CURRENT RESUME — 2026-10-06
 
 This is the authoritative current checkpoint. Read this block first; later sections are history.
 
 **Now (read this first)**
 
-- **Branch:** `feature/narration-feeling`. **Production:** `5111f65` (owner pushed; Tailwind phases 0–5, per-chakra rows for chosen chakras, Pitch fades, separate chakra times, Benefits and safety are live).
-- **Local, not pushed:** Tailwind phase 6 (one stylesheet, preflight on) and the per-chakra panel padding fix. Push: `cd ~/Desktop/Ikigai/lite && git push origin feature/narration-feeling:production`.
-- **Styling:** `tailwind.css` is the only stylesheet (`?v=2.0`). Build with `npm run build:css` (run `npm install` once on the Mac). Edit `tailwind/input.css` (tokens, ds-base, components) or `tailwind/legacy.css` (old screen rules, was `style.css`). Roadmap: `docs/tailwind-roadmap.md`. Atlas map `styling-system`.
-- **Versions:** app `v4.30`, `tailwind.css?v=2.1`, shell cache `chakra-v5.366`, language cache `chakra-language-v81`, `chakra-timing-view.js?v=1.1`.
-- **Checks:** 135/135 unit tests; atlas rebuilt (55 maps); before/after screenshots of 17 screens at 390/1280 px match except the intended changes. Not yet checked on a phone.
-- **Next:** owner phone check after push. Optional: rewrite `tailwind/legacy.css` screen by screen (phase 7); design-system artifact follow-ups (Tamil, new components, merged colours).
+- **Branch:** `feature/narration-feeling`. **Production:** `b1c9e30` — everything on this branch is live (narration feelings, Pitch mood tone and fades, Benefits and safety, separate chakra times with rows only for chosen chakras, Tailwind phases 0–6, per-chakra padding fix).
+- **Local, not pushed:** documentation only (this handoff, `AGENTS.md` styling section, atlas source-reference refresh, fix queue). Push: `cd ~/Desktop/Ikigai/lite && git push origin feature/narration-feeling:production`.
+- **Styling:** `tailwind.css` is the only stylesheet (`?v=2.1`). Build with `npm run build:css` (run `npm install` once on the Mac). Edit `tailwind/input.css` (tokens, ds-base, components) or `tailwind/legacy.css` (old screen rules, was `style.css`). Roadmap: `docs/tailwind-roadmap.md`. Atlas map `styling-system`.
+- **Versions:** app `v4.30`, `tailwind.css?v=2.1`, shell cache `chakra-v5.366`, language cache `chakra-language-v81`, piper cache `chakra-piper-v12`, `chakra-timing-view.js?v=1.1`.
+- **Checks:** 135/135 unit tests; atlas 55 maps, verifier passed; all 556 atlas source references point at real code (refreshed 2026-10-06 after the modularization moved code). Not yet checked on a phone.
+- **Waiting on the owner:** phone check of the new look; listening check of narration feelings (Pitch moods and one journey — say which feel too strong or weak).
+- **Optional next:** rewrite `tailwind/legacy.css` screen by screen (phase 7); design-system artifact follow-ups (Tamil, new components, merged colours).
 
 **Earlier in this block (2026-09-30 release and its follow-ups)**
 
@@ -73,9 +74,17 @@ This is the authoritative current checkpoint. Read this block first; later secti
 - **Follow-up (Tailwind phase 5, practice and support):** Manage Settings and Experiment Mode now use `.ds-settings` (sentence-case titles, single gold chevron, stacked backup-file field with full-width Import button); Arriving uses `.ds-support`; lavender/violet surfaces in Final Challenge, Pitch moods, orientation scene and Play Zone chrome mapped to design-system ink/gold/surfaces (per-player and rating colours kept); `sr-only` was never defined, so the orientation title showed on screen — now `tw:sr-only`. `docs/assesment.html` and `docs/repertory.html` on design-system ink, gold, surfaces and Inter with the gold primary button; the assessment's agreed lower/mixed/higher colours kept (test-pinned). Style `v2.31`, `tailwind.css?v=1.5`, shell cache `chakra-v5.364`. 135/135 unit tests; before/after screenshots checked. Next: phase 6 (preflight, remove `style.css`).
 - **Follow-up (per-chakra panel padding):** the switch checkbox had no left padding (the panel-heading rule `.lobby-panel > label:first-child` set `padding-inline: 0` on it); that rule now skips checkbox tiles, so the checkbox sits 13px in like every other tile. The rows are now padded tiles (like the checkbox tiles) with more space between them; on wide screens the panel sits under Core Practice Duration (`tw:lobby2:col-[2]`).
 - **Follow-up (Tailwind phase 6, one stylesheet):** `style.css` moved unchanged to `tailwind/legacy.css` (git mv; line numbers kept) and is bundled into `tailwind.css`; `index.html` and `sw.js` no longer load it. Tailwind preflight on in the lowest layer (`theme, base, ds-base, legacy, components, utilities`); ds-base keeps the old browser defaults (line height normal, h2–h6 sizes, list markers, inline images) so screens do not shift. Intended changes: links in design-system gold, styled backup-file picker button, frequency reminder (off) and voice download in gold instead of solar yellow. Legacy layer kept (screen-by-screen rewrite is optional phase 7). Tests now read `tailwind/legacy.css`. `tailwind.css?v=2.1`, shell cache `chakra-v5.366`. Atlas index.html line refs refreshed.
-- **Push status:** production is at `5111f65` (phases 0–5 live). Phase 6 and the per-chakra panel padding (`tailwind.css?v=2.1`, shell cache `chakra-v5.366`) are local until the owner pushes.
+- **Push status:** production is at `b1c9e30` (all of the above is live). Only the 2026-10-06 documentation sync is local.
 
 ## Checkpoint history (production)
+
+### RELEASE CHECKPOINT — Narration feelings, chakra times and Tailwind design system (production `b1c9e30`, 2026-10-05)
+
+- Pushed by the owner in steps (`b83ec2d` → `5111f65` → `b1c9e30`) from `feature/narration-feeling`.
+- Narration feelings (six presets, `feelings` block in the script files); Pitch mood tone and 5 s / 6 s fades; Benefits and safety FAQ (no "not medical" lines inside practices).
+- Separate time for each chakra (switch under Core Practice Duration, assessment autofill, rows only for chosen chakras, padded tiles).
+- Tailwind v4 on the Lite design system, phases 0–6: tokens and `tw:` prefix, Lobby, Settings and Sky, shared pieces, journey colours (violet and amber retired), practice and support screens and pages, one stylesheet with preflight.
+- Evidence: unit tests 135/135, atlas verifier, before/after screenshots in Chromium. Not checked on a phone or by listening.
 
 ### RELEASE CHECKPOINT — No Frequency default and centering-breath narration
 

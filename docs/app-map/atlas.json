@@ -1,8 +1,8 @@
 {
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
-    "date": "2026-10-05",
-    "commit": "production 5111f65 (Tailwind phases 0–5 live) + Tailwind phase 6 and per-chakra panel padding (feature/narration-feeling)",
+    "date": "2026-10-06",
+    "commit": "production b1c9e30 (feature/narration-feeling pushed: Tailwind phases 0–6, per-chakra rows and padding) + uncommitted atlas source-reference refresh",
     "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
@@ -124,7 +124,7 @@
       "group": "Start here",
       "title": "The whole application",
       "subtitle": "Navigation, journey families, supporting systems, and exits.",
-      "source": "index.html:1; modules/screen-navigation.js:1; modules/ambient-particle-field.js:1; tests/screen-navigation.test.mjs:1; app.js:2502; app.js:2663",
+      "source": "index.html:1; modules/screen-navigation.js:1; modules/ambient-particle-field.js:1; tests/screen-navigation.test.mjs:1; app.js:2185; app.js:2981",
       "rows": [
         [
           [
@@ -542,7 +542,7 @@
       "group": "Start here",
       "title": "Startup and first visit",
       "subtitle": "Loading order and optional browser capabilities.",
-      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/settings-help-view.js:1; tests/settings-help-view.test.mjs:1; index.html:147; app.js:2502; app.js:2510; app.js:2663",
+      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/settings-help-view.js:1; tests/settings-help-view.test.mjs:1; index.html:147; app.js:2185; app.js:1873; app.js:2981",
       "rows": [
         [
           [
@@ -813,7 +813,7 @@
       "group": "Journeys",
       "title": "Mode selection and start routing",
       "subtitle": "Mutual exclusion, validation, selected practice loading, dispatch priority, and the tested Sleep/Shot change guards.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1392; app.js:1459; app.js:1601; app.js:2663",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; tests/journey-preparation-selection.test.mjs:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; tests/lobby-experience-visibility.test.mjs:1; modules/chakra-selection-view.js:1; tests/chakra-selection-view.test.mjs:1; modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1441; app.js:1537; app.js:1700; app.js:2981",
       "rows": [
         [
           [
@@ -1003,7 +1003,7 @@
       "group": "Journeys",
       "title": "Standard chakra journey",
       "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
-      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/session-item-runner.js:1; tests/session-item-runner.test.mjs:1; index.html:447; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1601; app.js:1634; app.js:1653; app.js:1875; app.js:1994; app.js:1998; app.js:2059; app.js:2095; app.js:2254; app.js:2258",
+      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/session-item-runner.js:1; tests/session-item-runner.test.mjs:1; index.html:447; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1700; app.js:1710; app.js:1752; app.js:2074; app.js:1417; app.js:1419; app.js:2295; app.js:1514; app.js:2510",
       "rows": [
         [
           [
@@ -1309,7 +1309,7 @@
       "group": "Journeys",
       "title": "Inside one chakra",
       "subtitle": "Narration, audio handoff, bounded exposure, and loop transitions.",
-      "source": "modules/ambient-particle-field.js:136; app.js:2160; app.js:2246; app.js:2270; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1",
+      "source": "modules/ambient-particle-field.js:165; app.js:2396; app.js:2498; app.js:2526; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1",
       "rows": [
         [
           [
@@ -1445,7 +1445,7 @@
       "group": "Journeys",
       "title": "HRIM activation",
       "subtitle": "A dedicated high-energy journey using one stage.",
-      "source": "app.js:1420; app.js:1638; app.js:2136; app.js:2270",
+      "source": "app.js:1497; app.js:1714; app.js:2372; app.js:2526",
       "rows": [
         [
           [
@@ -1538,7 +1538,7 @@
       "group": "Journeys",
       "title": "Sleep and Music Only",
       "subtitle": "Two independent narration-free experiences.",
-      "source": "modules/sleep-journey.js:1; scripts.json:1; tests/sleep-journey.test.mjs:1; modules/completion-view.js:52; app.js:917; app.js:1329; app.js:1459",
+      "source": "modules/sleep-journey.js:1; scripts.json:1; tests/sleep-journey.test.mjs:1; modules/completion-view.js:52; app.js:949; app.js:1378; app.js:1537",
       "rows": [
         [
           [
@@ -1675,7 +1675,7 @@
       "group": "Journeys",
       "title": "Box breathing and Ho’oponopono",
       "subtitle": "Standalone practices launched through shared guided startup.",
-      "source": "app.js:1420; app.js:1644; app.js:1673; app.js:1696; app.js:1719; app.js:1748; app.js:2178",
+      "source": "modules/journey-transition-stages.js:25; app.js:1497; app.js:1743; app.js:1701; app.js:1887; app.js:1714; app.js:1939; app.js:2414",
       "rows": [
         [
           [
@@ -1789,7 +1789,7 @@
       "group": "Journeys",
       "title": "Yoga experience",
       "subtitle": "Advanced Features-gated rest, bathing, selected poses and shared master-mode behavior.",
-      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; index.html:447; timing-config.json:1; app.js:1536; app.js:1886; app.js:1935; app.js:1982; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
+      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; index.html:447; timing-config.json:1; app.js:1177; modules/shot-session.js:59; app.js:2007; app.js:2206; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -1940,7 +1940,7 @@
       "group": "Journeys",
       "title": "Intimate Service and massage",
       "subtitle": "All seven nonempty combinations follow this ordered composition.",
-      "source": "app.js:1849; app.js:1853; app.js:1857; app.js:1861; app.js:2190; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
+      "source": "modules/shot-session.js:21; app.js:1983; app.js:1995; app.js:2054; app.js:2427; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -2081,7 +2081,7 @@
       "group": "Journeys",
       "title": "Sound Shots",
       "subtitle": "Six types, confirmation, frequency validation, and distinct finish behavior.",
-      "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:256; app.js:1398; app.js:3361",
+      "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:256; app.js:1475; app.js:1392",
       "rows": [
         [
           [
@@ -2208,7 +2208,7 @@
       "group": "Journeys",
       "title": "Experiment activities",
       "subtitle": "Isolated activities and return behavior.",
-      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; index.html:209; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; app.js:1605; app.js:1615",
+      "source": "modules/screen-navigation.js:1; tests/screen-navigation.test.mjs:1; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; modules/experiment-settings-view.js:1; tests/experiment-settings-view.test.mjs:1; index.html:209; modules/experiment-session.js:1; tests/experiment-session.test.mjs:1; app.js:1704; app.js:1714",
       "rows": [
         [
           [
@@ -2325,7 +2325,7 @@
       "group": "Journeys",
       "title": "Ordered Chakra Journey add-ons",
       "subtitle": "Box → Visualization → Dharana → Body Scan → Guided Noting → Quiet Courage → Confidence Visualization → Deep Secrets → Final Challenge → chakras; the same selected route drives its displayed estimate and countdown.",
-      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/quiet-courage-practice.js:1; modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; modules/journey-roadmap.js:1; modules/session-estimate.js:1; index.html:362; tests/self-exploration-practices.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1420; app.js:2237",
+      "source": "modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/quiet-courage-practice.js:1; modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/lobby-experience-visibility.js:1; modules/journey-roadmap.js:1; modules/session-estimate.js:1; index.html:362; tests/self-exploration-practices.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; app.js:1497; app.js:2475",
       "rows": [
         [
           [
@@ -2410,7 +2410,7 @@
       "group": "Journeys",
       "title": "Lobby journey roadmap",
       "subtitle": "Localized, display-only summary of the currently selected Lobby route.",
-      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; modules/self-exploration-practices.js:1; tests/self-exploration-practices.test.mjs:1; app.js:529; app.js:1420",
+      "source": "modules/journey-roadmap.js:1; tests/journey-roadmap.test.mjs:1; modules/journey-preference-settings-view.js:1; tests/journey-preference-settings-view.test.mjs:1; modules/quiet-courage-practice.js:1; tests/quiet-courage-practice.test.mjs:1; modules/self-exploration-practices.js:1; tests/self-exploration-practices.test.mjs:1; app.js:551; app.js:1497",
       "rows": [
         [
           [
@@ -2725,7 +2725,7 @@
       "group": "Journeys",
       "title": "Hush Hush · dev-mode icebreaker game",
       "subtitle": "Hush Hush (internal name Secret Body Part): a 2–7 player pass-the-phone luck icebreaker opened from the Play Zone games section in the Lobby (after the Mood & Relaxation Ambience section) only while Advanced Features (dev mode) is unlocked. Nothing is saved.",
-      "source": "modules/secret-body-part-game.js:1; tests/secret-body-part-game.test.mjs:1; app.js:2941; modules/practice-module-loader.js:1",
+      "source": "modules/secret-body-part-game.js:1; tests/secret-body-part-game.test.mjs:1; app.js:3070; modules/practice-module-loader.js:1",
       "rows": [
         [
           [
@@ -2893,7 +2893,7 @@
       "group": "Journeys",
       "title": "Contactless Eye Shooter · dev-mode gaze game",
       "subtitle": "A no-touch gaze practice game for two, for people who avoid looking at someone. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. The app only explains the game: no camera, no eye tracking, nothing saved.",
-      "source": "modules/eye-shooter-game.js:1; tests/eye-shooter-game.test.mjs:1; app.js:2963; docs/eye-shooter-game.md:1",
+      "source": "modules/eye-shooter-game.js:1; tests/eye-shooter-game.test.mjs:1; app.js:3094; docs/eye-shooter-game.md:1",
       "rows": [
         [
           [
@@ -2948,7 +2948,7 @@
       "group": "Journeys",
       "title": "Chakra Touch · dev-mode couples touch game",
       "subtitle": "A slow, consent-first touch game for two players with fixed roles: one Giver and one Receiver for the whole game. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. The wheel picks a place, a card picks how to touch, the receiver keeps eyes closed. Nothing is saved.",
-      "source": "modules/chakra-touch-game.js:1; tests/chakra-touch-game.test.mjs:1; app.js:3022; docs/chakra-touch-game.md:1",
+      "source": "modules/chakra-touch-game.js:1; tests/chakra-touch-game.test.mjs:1; app.js:3117; docs/chakra-touch-game.md:1",
       "rows": [
         [
           [
@@ -3141,7 +3141,7 @@
       "group": "Journeys",
       "title": "Pitch Mode · 2-Minute Mind Reset",
       "subtitle": "Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.",
-      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1603; app.js:2918; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1631",
+      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1633; app.js:3047; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1634",
       "rows": [
         [
           [
@@ -3480,7 +3480,7 @@
       "group": "Live session",
       "title": "Pause, stop and live controls",
       "subtitle": "Shared interaction and cancellation behavior.",
-      "source": "modules/journey-chrome.js:1; modules/session-countdown.js:1; tests/session-countdown.test.mjs:1; modules/journey-video-prelude.js:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/mixer-view.js:1; tests/mixer-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; app.js:2070; app.js:2323; app.js:2663; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1",
+      "source": "modules/journey-chrome.js:1; modules/session-countdown.js:1; tests/session-countdown.test.mjs:1; modules/journey-video-prelude.js:1; modules/session-transport-controls.js:1; tests/session-transport-controls.test.mjs:1; modules/mixer-view.js:1; tests/mixer-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; app.js:1489; app.js:2587; app.js:2981; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1; modules/session-stop.js:1; tests/session-stop.test.mjs:1",
       "rows": [
         [
           [
@@ -3615,7 +3615,7 @@
       "group": "Live session",
       "title": "Optional Lobby video introduction",
       "subtitle": "An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.",
-      "source": "modules/journey-video-prelude.js:1; modules/journey-preference-settings-view.js:1; sw.js:1; app.js:3381; app.js:3392",
+      "source": "modules/journey-video-prelude.js:1; modules/journey-preference-settings-view.js:1; sw.js:1; app.js:3831; app.js:3842",
       "rows": [
         [
           [
@@ -3733,7 +3733,7 @@
       "group": "Live session",
       "title": "Completion, statistics and external handoff",
       "subtitle": "Different end states are intentionally visible here.",
-      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; index.html:878; app.js:2468; tests/completion-session.test.mjs:1; tests/journey-completion-handoff.test.mjs:1",
+      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; index.html:878; app.js:2426; tests/completion-session.test.mjs:1; tests/journey-completion-handoff.test.mjs:1",
       "rows": [
         [
           [
@@ -3824,7 +3824,7 @@
       "group": "Systems",
       "title": "Scripts, language and timing",
       "subtitle": "Content selection, validation, fallback and demo behavior.",
-      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; scripts.json:1; language-manifest.json:1; app.js:470; app.js:533; app.js:550",
+      "source": "modules/content-localization.js:1; modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; scripts.json:1; language-manifest.json:1; app.js:492; app.js:555; app.js:438",
       "rows": [
         [
           [
@@ -3946,7 +3946,7 @@
       "group": "Systems",
       "title": "Narration and fallback",
       "subtitle": "Piper synthesis pipeline versus browser speech.",
-      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/voice-download-card.js:1; tests/voice-download-card.test.mjs:1; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322; app.js:1961; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/narration-feeling.js:1",
+      "source": "modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/voice-download-card.js:1; tests/voice-download-card.test.mjs:1; piper-worker.js:1; piper/runtime/bounded-phonemizer.js:1; piper/runtime/piper-tts-web.js:322; app.js:1865; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/piper-narration.js:1; tests/long-narration.test.mjs:1; tests/narration-audio-only.test.mjs:1; modules/narration-feeling.js:1",
       "rows": [
         [
           [
@@ -4107,7 +4107,7 @@
       "group": "Systems",
       "title": "Audio signal architecture",
       "subtitle": "Logical buses; shared filters are expanded in selected-node details.",
-      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-comfort-effects.js:1; modules/audio-drone-start.js:1; modules/audio-drone-stop.js:1; modules/audio-mantra-playback.js:1; modules/audio-background-music-lifecycle.js:1; modules/audio-background-music-controls.js:1; modules/audio-music-echo.js:1; modules/audio-voice-effects.js:1; modules/audio-pleasure-ambience.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; tests/audio-tone-playback.test.mjs:1; tests/audio-comfort-effects.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; app.js:648; app.js:732; docs/heavenly-sound.md:1",
+      "source": "modules/audio-engine-initialization.js:1; modules/audio-signal-design.js:1; modules/audio-spatial-geometry.js:1; modules/audio-elemental-layer.js:1; modules/audio-tone-playback.js:1; modules/audio-comfort-effects.js:1; modules/audio-drone-start.js:1; modules/audio-drone-stop.js:1; modules/audio-mantra-playback.js:1; modules/audio-background-music-lifecycle.js:1; modules/audio-background-music-controls.js:1; modules/audio-music-echo.js:1; modules/audio-voice-effects.js:1; modules/audio-pleasure-ambience.js:1; modules/media-lifecycle.js:1; modules/piper-lifecycle.js:1; modules/audio-route-lifecycle.js:1; tests/audio-tone-playback.test.mjs:1; tests/audio-comfort-effects.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; app.js:612; app.js:758; docs/heavenly-sound.md:1",
       "rows": [
         [
           [
@@ -4224,7 +4224,7 @@
       "group": "Systems",
       "title": "Sound options and live suppression",
       "subtitle": "What changes when sound settings are toggled.",
-      "source": "modules/app-state.js:1; tests/app-state.test.mjs:1; modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:1039; app.js:1058; app.js:2663",
+      "source": "modules/app-state.js:1; tests/app-state.test.mjs:1; modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:2452; app.js:1090; app.js:2981",
       "rows": [
         [
           [
@@ -4398,7 +4398,7 @@
       "group": "Systems",
       "title": "Visuals and browser lifecycle",
       "subtitle": "Natural sky, chakra imagery, immersion and optional capabilities.",
-      "source": "modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; modules/visual-comfort-settings-view.js:1; tests/visual-comfort-settings-view.test.mjs:1; sky-astronomy.js:1; night-sky.js:1; tailwind/legacy.css:1; celestial-presence.js:1; app.js:1420; app.js:2468",
+      "source": "modules/journey-video-prelude.js:1; modules/ambient-particle-field.js:1; modules/visual-engine.js:1; modules/visual-comfort-settings-view.js:1; tests/visual-comfort-settings-view.test.mjs:1; sky-astronomy.js:1; night-sky.js:1; tailwind/legacy.css:1; celestial-presence.js:1; app.js:1497; app.js:1116",
       "rows": [
         [
           [
@@ -4540,7 +4540,7 @@
       "group": "Systems",
       "title": "Earth observer reference and atmosphere",
       "subtitle": "A permanent centered observer anchor below the horizon.",
-      "source": "modules/ambient-particle-field.js:162; modules/ambient-particle-field.js:195; modules/ambient-particle-field.js:230",
+      "source": "modules/ambient-particle-field.js:78; modules/ambient-particle-field.js:216; modules/ambient-particle-field.js:251",
       "rows": [
         [
           [
@@ -4612,7 +4612,7 @@
       "group": "Systems",
       "title": "Thematic solar containment glow",
       "subtitle": "A visual-only warm containment layer surrounding the daytime Sun.",
-      "source": "modules/ambient-particle-field.js:70; modules/ambient-particle-field.js:253",
+      "source": "modules/ambient-particle-field.js:297; modules/ambient-particle-field.js:492",
       "rows": [
         [
           [
@@ -5121,7 +5121,7 @@
       "group": "Systems",
       "title": "Display-language UI renderer",
       "subtitle": "Owns localized UI painting and the language, display-language and voice preference change bindings; sky redraws and journey routing remain app-owned.",
-      "source": "modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; app.js:559",
+      "source": "modules/locale-ui-renderer.js:1; tests/locale-ui-renderer.test.mjs:1; modules/piper-lifecycle.js:95; app.js:583",
       "rows": [
         [
           [
@@ -5219,7 +5219,7 @@
       "group": "Systems",
       "title": "Timing configuration and saved values",
       "subtitle": "The ordered setup path for timing-config.json, named profiles, slider bounds, persisted durations and duration-control event handling.",
-      "source": "modules/timing-settings.js:1; modules/timing-settings-view.js:1; modules/drone-duration-settings-view.js:1; tests/timing-settings.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; timing-config.json:1; modules/session-estimate.js:1; tests/session-estimate.test.mjs:1; app.js:426; app.js:2740; app.js:1420",
+      "source": "modules/timing-settings.js:1; modules/timing-settings-view.js:1; modules/drone-duration-settings-view.js:1; tests/timing-settings.test.mjs:1; tests/timing-settings-view.test.mjs:1; tests/drone-duration-settings-view.test.mjs:1; timing-config.json:1; modules/session-estimate.js:1; tests/session-estimate.test.mjs:1; app.js:446; app.js:3144; app.js:1497",
       "rows": [
         [
           [
@@ -5297,7 +5297,7 @@
       "group": "Systems",
       "title": "Automatic journey voice profile",
       "subtitle": "Chooses and applies the established voice profile at journey start.",
-      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; app.js:1420; app.js:2623",
+      "source": "modules/journey-voice-profile.js:1; tests/journey-voice-profile.test.mjs:1; modules/piper-lifecycle.js:85; app.js:1497; app.js:2937",
       "rows": [
         [
           [
@@ -5366,7 +5366,7 @@
       "group": "Systems",
       "title": "Session-only journey-mode hydration",
       "subtitle": "App-load behavior for session-only mode controls and retired selection keys.",
-      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:103",
+      "source": "modules/session-mode-hydration.js:1; tests/session-mode-hydration.test.mjs:1; app.js:119",
       "rows": [
         [
           [
@@ -5435,7 +5435,7 @@
       "group": "Systems",
       "title": "Mixer preference control hydration",
       "subtitle": "Copies already-loaded preference state into audio and ambience controls in established order.",
-      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:104",
+      "source": "modules/mixer-preference-hydration.js:1; tests/mixer-preference-hydration.test.mjs:1; app.js:120",
       "rows": [
         [
           [
@@ -5492,7 +5492,7 @@
       "group": "Systems",
       "title": "Journey selection preference hydration",
       "subtitle": "Restores the persisted chakra/intention and related pre-journey controls before mode state and validation.",
-      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:105",
+      "source": "modules/journey-selection-hydration.js:1; tests/journey-selection-hydration.test.mjs:1; app.js:121",
       "rows": [
         [
           [
@@ -5561,7 +5561,7 @@
       "group": "Systems",
       "title": "Timing preference control hydration",
       "subtitle": "Restores timing slider values and their associated display labels without owning timing configuration.",
-      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:2719",
+      "source": "modules/timing-preference-hydration.js:1; tests/timing-preference-hydration.test.mjs:1; app.js:2764",
       "rows": [
         [
           [
@@ -5618,7 +5618,7 @@
       "group": "Systems",
       "title": "Appearance preference control hydration",
       "subtitle": "Applies persisted visual-effect and brightness preferences to their existing controls and display surfaces.",
-      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:106",
+      "source": "modules/appearance-preference-hydration.js:1; tests/appearance-preference-hydration.test.mjs:1; app.js:122",
       "rows": [
         [
           [
@@ -5675,7 +5675,7 @@
       "group": "Systems",
       "title": "Script preference control hydration",
       "subtitle": "Restores the selected script source and updates the custom-script presentation without owning journey-time script loading.",
-      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:2712",
+      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:3031",
       "rows": [
         [
           [
@@ -5877,7 +5877,7 @@
       "group": "Systems",
       "title": "Personal-care preference control hydration",
       "subtitle": "Restores saved personal-care toggle values without changing session authorization or care execution.",
-      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:107",
+      "source": "modules/care-preference-hydration.js:1; tests/care-preference-hydration.test.mjs:1; app.js:123",
       "rows": [
         [
           [
@@ -5934,7 +5934,7 @@
       "group": "Systems",
       "title": "Narration feelings",
       "subtitle": "Piper has no emotion switch, so each line can carry a small bounded feeling: pace, liveliness, rhythm, closeness and the silence after it.",
-      "source": "modules/narration-feeling.js:1; tests/narration-feeling.test.mjs:1; app.js:2248; modules/piper-narration.js:6; modules/piper-lifecycle.js:248; piper/runtime/piper-tts-web.js:336; modules/pitch-mode.js:131; scripts.json:2; docs/narration-feeling.md:1",
+      "source": "modules/narration-feeling.js:1; tests/narration-feeling.test.mjs:1; modules/experiment-session.js:40; modules/piper-narration.js:6; modules/piper-lifecycle.js:248; piper/runtime/piper-tts-web.js:336; modules/pitch-mode.js:199; scripts.json:2; docs/narration-feeling.md:1",
       "rows": [
         [
           [
@@ -6155,7 +6155,7 @@
         ]
       ],
       "notes": [
-        "Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, offline cache, fresh-build match); Lobby screenshots at 390 / 760 / 1280 px identical before and after; Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there)."
+        "Evidence: tests/tailwind-setup.test.mjs (pipeline, tokens, cascade, preflight, one stylesheet, offline cache, fresh-build match); before/after screenshots for every phase (phase 6: 17 screens at 390 / 1280 px identical except the intended gold links, file picker and reminder); not yet checked on a phone. Phase 0: Playwright e2e: 29 passed, the same 8 tests fail with and without this change in the sandbox (missing audio/video/voice files there)."
       ]
     },
     {
@@ -6163,7 +6163,7 @@
       "group": "Supporting pages",
       "title": "Settings backup and restore",
       "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.",
-      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; index.html:214; app.js:2829",
+      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; index.html:214; app.js:3333",
       "rows": [
         [
           [
@@ -6276,7 +6276,7 @@
       "group": "Supporting pages",
       "title": "Operator-led chakra assessment",
       "subtitle": "Single Lobby entry point, Advanced Features-gated interview with undo, per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.",
-      "source": "index.html:514; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1; app.js:3332",
+      "source": "index.html:514; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1; app.js:3776",
       "rows": [
         [
           [
@@ -6514,7 +6514,7 @@
       "group": "Supporting pages",
       "title": "Frequency repertory handoff",
       "subtitle": "Searchable reference → prepared custom Shot → explicit activation.",
-      "source": "docs/repertory.html:153; app.js:3256",
+      "source": "docs/repertory.html:169; app.js:3289",
       "rows": [
         [
           [

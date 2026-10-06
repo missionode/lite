@@ -34,6 +34,12 @@ The owner has designated `docs/app-map/index.html` as the project's shared visua
 
 For a change that does not affect flows, confirm that the atlas remains accurate; do not invent a flow change merely to edit a diagram. Feature work is not complete while its corresponding map is stale. If source and map disagree, inspect the implementation and reconcile them explicitly.
 
+## Styling (Tailwind on the Lite design system)
+
+- `tailwind.css` is the app's only stylesheet. Never edit it by hand; run `npm run build:css` (run `npm install` once first) and commit the result.
+- Edit `tailwind/input.css` for design tokens (`@theme`), shared defaults (`@layer ds-base`) and screen components (`@layer components`); old screen rules not yet rewritten live in `tailwind/legacy.css`.
+- Use only design-system colours (`var(--tw-color-…)`) and `tw:`-prefixed utilities. After a change, bump `tailwind.css?v=` in `index.html` and `sw.js` and the shell cache, and compare screenshots before and after. Rules: `docs/tailwind-roadmap.md`.
+
 ## Route model intensity automatically
 
 Use the local Loop model router for meaningful project work. The default route is `--task-class auto`, which classifies the bounded task from the actual prompt and selects the least-cost capable Codex model and reasoning effort from `Loop/config/model-routing.json`.

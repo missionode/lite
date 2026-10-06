@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: production 5111f65 (Tailwind phases 0–5 live) + Tailwind phase 6 and per-chakra panel padding (feature/narration-feeling) · 2026-10-05.
+Source snapshot: production b1c9e30 (feature/narration-feeling pushed: Tailwind phases 0–6, per-chakra rows and padding) + uncommitted atlas source-reference refresh · 2026-10-06.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 
