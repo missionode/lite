@@ -2,7 +2,7 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-10-06",
-    "commit": "production edf1577 + uncommitted read-only answer review on the assessment result; Continue to Earn and the assessment value rounds/dot gated on developer mode; assessment entry public; earlier Tailwind phases 0–6, per-chakra times, Benefits and safety, narration feelings and Pitch mood tone",
+    "commit": "production c4885d0 (live) + uncommitted ethics fix: neutral value rounds, plain value summary and a protective care-first flag replace the hidden-weight colour dot",
     "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
@@ -6276,7 +6276,7 @@
       "id": "assessment-tournament",
       "group": "Supporting pages",
       "title": "Operator-led chakra assessment",
-      "subtitle": "Single public Lobby entry point; interview with undo (value rounds and dot only in developer mode), per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.",
+      "subtitle": "Single public Lobby entry point; interview with undo (value rounds, value summary and care-first note only in developer mode), per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.",
       "source": "index.html:514; docs/assesment.html:1; modules/assessment-tournament.js:1; data/assessment-questions.json:1; sw.js:1; app.js:3776",
       "rows": [
         [
@@ -6304,7 +6304,7 @@
           [
             "handoff",
             "Developer-mode grant",
-            "A valid 15-minute sessionStorage grant, read once when the page loads, adds the value rounds and the private dot. It is not re-checked mid-interview; a reload after expiry returns to the public assessment. Client-side only; not server authentication."
+            "A valid 15-minute sessionStorage grant, read once when the page loads, adds the value rounds, the value summary and the care-first note. It is not re-checked mid-interview; a reload after expiry returns to the public assessment. Client-side only; not server authentication."
           ]
         ],
         [
@@ -6330,7 +6330,7 @@
           [
             "coverage",
             "Adaptive coverage",
-            "Balance evidence across seven chakras with unused unique prompts. Questions and answers are plain, short, translation-friendly English; the healthier answer is shown on the right for 13 of 28 questions (stable per question). Value rounds (developer mode only): “Which of these two matters more to you?”, always one pleasure-leaning card vs one cautious card (12 pairs; neutral Loyalty card not asked), never the same card in two rounds in a row, each card alternating sides."
+            "Balance evidence across seven chakras with unused unique prompts. Questions and answers are plain, short, translation-friendly English; the healthier answer is shown on the right for 13 of 28 questions (stable per question). Value rounds (developer mode only): “Which of these two matters more to you?”, 12 published neutral pairs from the bank (`valuePairs`) in which every card appears three times, the two care-first cards never meet, never the same card in two rounds in a row, each card alternating sides. A short disclosure line tells the client the guide sees a summary of these choices. No card carries a hidden weight."
           ]
         ],
         [
@@ -6363,8 +6363,8 @@
         [
           [
             "dot",
-            "Private service-fit signal (developer mode only)",
-            "With developer mode active, alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. Value rounds are always one pleasure-leaning vs one cautious card (no card twice in a row). Green when at least 75% of picks lean to pleasure, red when at least 75% lean to caution, otherwise orange; Equal/Skip never count. It does not activate or promise service."
+            "Value summary and care-first note (developer mode only)",
+            "With developer mode active, the result shows in plain words the value cards the client chose most (no colour, no score, no hidden weights) and, only when the published rule is met, a labelled care-first note for the operator: go slowly and suggest no service today. The rule (bank settings): at least 4 answered rounds that include Emotional Safety or Independence, and at least 75% of them choose that card; Equal and Skip never count. Being unflagged says nothing either way. The flag is protective only: it never means ready or suitable, and it never promotes anything. Same-tab hand-off: a care-first client is not asked the optional-service question of the Final Challenge; Clear for New Client and relocking developer mode clear it."
           ]
         ],
         [

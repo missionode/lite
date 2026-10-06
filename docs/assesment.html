@@ -111,10 +111,9 @@
     .rapport-card blockquote{margin:0;padding-left:14px;border-left:2px solid var(--gold);font-size:1.05em}
     .result-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
     .primary{border-color:rgba(255,229,184,.85);background:linear-gradient(135deg,#f0d49e,#d9ad65);color:#17130c;font-weight:700;padding-inline:22px}
-    .operator-dot{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 4px rgba(255,255,255,.05),0 0 18px currentColor}
-    .operator-dot.green{color:#66dc82;background:repeating-linear-gradient(45deg,#58c872 0 3px,#8bea9f 3px 5px)}
-    .operator-dot.orange{color:#f1ad4d;background:repeating-linear-gradient(45deg,#dc8e31 0 3px,#ffd083 3px 5px)}
-    .operator-dot.red{color:#ed6a71;background:repeating-linear-gradient(45deg,#d24f58 0 3px,#ff9499 3px 5px)}
+    .value-disclosure{max-width:680px;margin:-8px auto 18px;text-align:center;color:var(--muted);font-size:.88em}
+    .value-summary-list{margin:0 0 10px;padding-left:20px}
+    .care-first-note{margin:12px 0 0;padding:12px 14px;border-left:3px solid var(--support-higher);border-radius:10px;background:rgba(123,216,206,.08);color:var(--ink)}
     .privacy{margin:24px auto 0;max-width:680px;color:var(--muted);font-size:.84em;text-align:center}
     @media(max-width:650px){
       .shell{padding-top:8px}.toolbar{margin-bottom:18px}.brand{font-size:.9em}.font-tools{display:none}
@@ -157,6 +156,7 @@
         <div class="progress-head"><span id="progressLabel">Starting</span><span id="stageLabel"></span></div>
         <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
         <h2 class="prompt" id="questionPrompt" tabindex="-1"></h2>
+        <p class="value-disclosure" id="valueDisclosure" hidden></p>
         <div class="choices" id="choiceList">
           <button class="choice" id="choiceLeft" type="button"><span class="choice-key">OPTION 1</span><span class="choice-copy"></span></button>
           <button class="choice" id="choiceRight" type="button"><span class="choice-key">OPTION 2</span><span class="choice-copy"></span></button>
@@ -192,6 +192,11 @@
           <p id="sessionFocus" aria-live="polite"></p>
         </section>
         <div class="archetypes" id="archetypeResults"></div>
+        <section class="rapport-card" id="valueSummary" aria-labelledby="valueSummaryHeading" hidden>
+          <h3 id="valueSummaryHeading">What mattered most today</h3>
+          <ul class="value-summary-list" id="valueSummaryList"></ul>
+          <p class="care-first-note" id="careFirstNote" hidden></p>
+        </section>
         <section class="rapport-card" aria-live="polite" aria-labelledby="rapportHeading">
           <h3 id="rapportHeading">Conversation cue — not a prediction</h3>
           <p id="rapportInsight"></p>
@@ -199,7 +204,6 @@
           <blockquote id="rapportIcebreaker"></blockquote>
         </section>
         <div class="result-actions">
-          <span class="operator-dot" id="operatorDot" aria-hidden="true"></span>
           <button class="quiet" id="undoResult" type="button">Undo last response</button>
           <button class="primary" id="newAssessment" type="button">Clear for New Client</button>
           <a class="quiet" href="../index.html">Return to Meditation Room</a>
@@ -209,7 +213,7 @@
     <p class="privacy">Responses stay on this device. The assessment is separate from the meditation journey and does not start or configure a session.</p>
   </main>
 
-  <script src="../modules/assessment-tournament.js?v=1.6"></script>
+  <script src="../modules/assessment-tournament.js?v=1.7"></script>
   <script src="../modules/assessment-persistence.js?v=1.1"></script>
   <script>
     (() => {
@@ -217,7 +221,7 @@
       const elements = Object.fromEntries([
         'loadingView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
         'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','undoAnswer','undoResult','saveStatus',
-        'chakraResults','resultNote','lowAnswers','lowAnswersSummary','lowAnswersNote','lowAnswersList','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
+        'chakraResults','resultNote','lowAnswers','lowAnswersSummary','lowAnswersNote','lowAnswersList','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','valueDisclosure','valueSummary','valueSummaryList','careFirstNote','valueSummaryHeading','newAssessment','resultTitle','translateBtn','google_translate_element',
         'fontDown','fontReset','fontUp'
         ,'translationCache'
       ].map(id => [id, document.getElementById(id)]));
@@ -293,7 +297,7 @@
           'There is not enough answered evidence to suggest a focus. Ask the client what would feel most useful today.',
           'The answers do not point to one clear lowest area. Ask the client what would feel most useful today.',
           'Responses counted:','and','These labels summarize answers from this assessment only; they are not a validated measure or diagnosis.',
-          'Possible discussion focus','Answers behind lower signals','Read-only, for the guide’s conversation with the meditator. These are today’s answers only; they are not mistakes, scores or a diagnosis. Nothing here changes the result.','Answered','Higher-support option','Chakra']
+          'Possible discussion focus','Answers behind lower signals','Read-only, for the guide’s conversation with the meditator. These are today’s answers only; they are not mistakes, scores or a diagnosis. Nothing here changes the result.','Answered','Higher-support option','Chakra','What mattered most today','Care first: this client often chose Emotional Safety or Independence. Go slowly, check what feels comfortable, and do not suggest any service today.','These questions help your guide understand what matters to you today. Your guide sees a summary of the choices you make here.']
           .forEach((label,index) => registerTranslation(`ui:${index}`, label));
       }
 
@@ -303,6 +307,7 @@
       }
 
       function renderNext({ focus = false } = {}) {
+        syncCareFirstFlag();
         item = window.ChakraAssessmentTournament.selectNext(bank, state, engineOptions());
         if (item.kind === 'complete') {
           renderResult();
@@ -312,6 +317,8 @@
         const completed = progressCount();
         elements.undoAnswer.hidden = completed === 0;
         elements.progressLabel.textContent = `${completed} ${translation('ui:0','completed')}`;
+        elements.valueDisclosure.hidden = item.kind !== 'value';
+        if (item.kind === 'value') elements.valueDisclosure.textContent = translation('ui:31','These questions help your guide understand what matters to you today. Your guide sees a summary of the choices you make here.');
         elements.stageLabel.textContent = item.kind === 'value' ? translation('ui:2','Values reflection') : translation('ui:1','Chakra reflection');
         const maximumSteps = bank.questions.length + (developerMode ? bank.settings.valueRounds : 0);
         elements.progressBar.style.width = `${Math.min(100, Math.round((completed / maximumSteps) * 100))}%`;
@@ -373,6 +380,17 @@
         if (className) node.className = className;
         node.textContent = value;
         parent.appendChild(node);
+      }
+
+      // Protective hand-off to the app (same tab): a care-first client is not shown the
+      // optional-service step of the Final Challenge. Cleared by Clear for New Client
+      // and whenever developer mode is locked.
+      function syncCareFirstFlag() {
+        try {
+          const flagged = developerMode && window.ChakraAssessmentTournament.careFirstResult(bank, state, engineOptions()) === true;
+          if (flagged) window.sessionStorage.setItem('chakra_assessment_care_first', '1');
+          else window.sessionStorage.removeItem('chakra_assessment_care_first');
+        } catch (error) { /* blocked session storage: no flag */ }
       }
 
       function renderResult() {
@@ -451,9 +469,16 @@
           elements.rapportInsight.textContent = translation('ui:13','There is not enough answered evidence for a specific topic. Begin with an open, client-led question.');
           elements.rapportIcebreaker.textContent = translation('ui:14','What would make this session feel useful and comfortable for you today?');
         }
-        // The dot exists only in developer mode; otherwise nothing takes its place.
-        elements.operatorDot.hidden = !result.dot;
-        elements.operatorDot.className = result.dot ? `operator-dot ${result.dot}` : 'operator-dot';
+        // Developer mode only: the values the client chose, in words, and a protective
+        // care-first note. Otherwise nothing takes their place.
+        const summaryCards = result.valueSummary || [];
+        elements.valueSummary.hidden = !developerMode || (summaryCards.length === 0 && !result.careFirst);
+        elements.valueSummaryList.replaceChildren();
+        summaryCards.forEach(card => appendTextElement(elements.valueSummaryList, 'li', '', translation(`value:label:${card.id}`, card.label)));
+        elements.valueSummaryHeading.textContent = translation('ui:29','What mattered most today');
+        elements.careFirstNote.hidden = !result.careFirst;
+        elements.careFirstNote.textContent = result.careFirst ? translation('ui:30','Care first: this client often chose Emotional Safety or Independence. Go slowly, check what feels comfortable, and do not suggest any service today.') : '';
+        syncCareFirstFlag();
         show(elements.resultView);
         elements.resultTitle.focus();
       }
@@ -467,7 +492,7 @@
         developerMode = hasAdvancedAccess();
         show(elements.loadingView);
         try {
-          const response = await fetch('../data/assessment-questions.json?v=1.4');
+          const response = await fetch('../data/assessment-questions.json?v=1.5');
           if (!response.ok) throw new Error('The assessment question set is unavailable.');
           bank = await response.json();
           window.ChakraAssessmentTournament.validateBank(bank);
@@ -494,6 +519,7 @@
       elements.newAssessment.addEventListener('click', () => {
         if (!window.confirm('Clear this assessment before beginning with a new client?')) return;
         const cleared = persistence.clear();
+        try { window.sessionStorage.removeItem('chakra_assessment_care_first'); } catch (error) { /* optional */ }
         state = window.ChakraAssessmentTournament.createState(bank);
         storageNotice = cleared ? '' : translation('ui:6','New assessment started; device storage could not be cleared.');
         renderNext({ focus: true });

@@ -65,24 +65,25 @@ for (let index = 0; index < bank.settings.valueRounds; index += 1) {
     state = engine.answerItem(bank, state, item, index % 4 === 0 ? engine.RESPONSE_SKIP : item.left.id);
 }
 
-// Every round is pleasure-leaning vs cautious; the neutral card is not asked.
-const positiveIds = bank.values.filter(item => item.operatorSignal >= 1).map(item => item.id);
-const cautiousIds = bank.values.filter(item => item.operatorSignal <= -1).map(item => item.id);
-assert.equal(appearances.commitment.total, 0, 'the neutral value card is not used in dot rounds');
-for (const group of [positiveIds, cautiousIds]) {
-    const totals = group.map(id => appearances[id].total);
-    assert.ok(Math.max(...totals) - Math.min(...totals) <= 1, 'value opportunities should remain balanced within each group');
-}
+// Value rounds are neutral priority questions: every card appears equally often,
+// no card carries a hidden weight, and the two care-first cards never meet.
+assert.equal(bank.values.some(item => 'operatorSignal' in item), false, 'no hidden per-card weights remain in the bank');
+const careFirstIds = bank.values.filter(item => item.careFirst).map(item => item.id);
+assert.deepEqual(careFirstIds.sort(), ['emotional-safety', 'independence'], 'the published care-first cards are Emotional Safety and Independence');
+const appearanceTotals = Object.values(appearances).map(item => item.total);
+assert.equal(new Set(appearanceTotals).size, 1, 'every value card appears equally often');
 Object.entries(appearances).forEach(([id, item]) => {
     assert.ok(Math.abs(item.left - item.right) <= 1, `${id} should be position-counterbalanced`);
 });
 // Owner request: the same card must not keep coming back in a row.
 const schedule = engine.contrastSchedule(bank);
-assert.equal(schedule.length, positiveIds.length * cautiousIds.length, 'every pleasure card meets every cautious card once');
-schedule.forEach(([a, b]) => assert.ok(positiveIds.includes(a) && cautiousIds.includes(b)));
+assert.equal(schedule.length, bank.settings.valueRounds, 'one round per published value pair');
+assert.equal(schedule.some(pair => pair.every(id => careFirstIds.includes(id))), false, 'the care-first cards are never set against each other');
 for (let index = 1; index < schedule.length; index += 1) {
     assert.equal(schedule[index].some(id => schedule[index - 1].includes(id)), false, `round ${index + 1} repeats a card from the round before`);
 }
+assert.throws(() => engine.validateBank({ ...bank, valuePairs: [...bank.valuePairs.slice(1), bank.valuePairs[1]] }), /repeated|same number/, 'a repeated or unbalanced pair is rejected');
+assert.throws(() => engine.validateBank({ ...bank, valuePairs: [...bank.valuePairs.slice(0, 11), ['independence', 'emotional-safety']] }), /care-first|same number/, 'the care-first cards cannot be paired');
 // The healthier chakra answer is not always on the left.
 const swapped = bank.questions.filter(question => engine.choiceOrderSwapped(question.id)).length;
 assert.ok(swapped >= 11 && swapped <= 17, `about half of the questions show the healthier answer on the right (${swapped}/28)`);
@@ -191,7 +192,7 @@ const forcedValueState = {
 };
 const firstValue = engine.selectNext(bank, forcedValueState);
 const afterOneValue = engine.answerItem(bank, forcedValueState, firstValue, firstValue.left.id);
-assert.equal(engine.buildResult(bank, afterOneValue).dot, 'orange', 'one value answer can never create a decisive dot');
+assert.equal(engine.buildResult(bank, afterOneValue).careFirst, false, 'one value answer can never raise the care-first flag');
 
 function valueEntry(firstId, secondId, response) {
     return {
@@ -202,35 +203,27 @@ function valueEntry(firstId, secondId, response) {
     };
 }
 
-const positiveState = {
+const careRounds = bank.valuePairs.filter(pair => pair.some(id => careFirstIds.includes(id)));
+assert.equal(careRounds.length, 6, 'six rounds include a care-first card');
+const pick = (pair, wantCare) => pair.find(id => careFirstIds.includes(id) === wantCare);
+const careFirstState = {
     ...forcedValueState,
-    valueHistory: [
-        valueEntry('sensual-joy', 'independence', 'sensual-joy'),
-        valueEntry('sensual-joy', 'social-approval', 'sensual-joy'),
-        valueEntry('sensual-joy', 'emotional-safety', 'sensual-joy'),
-        valueEntry('luxury', 'independence', 'luxury'),
-        valueEntry('luxury', 'social-approval', 'luxury'),
-        valueEntry('spontaneity', 'independence', 'spontaneity'),
-        valueEntry('spontaneity', 'emotional-safety', 'spontaneity'),
-        valueEntry('romantic-idealism', 'social-approval', 'romantic-idealism')
-    ]
+    valueHistory: careRounds.map(pair => valueEntry(pair[0], pair[1], pick(pair, true)))
 };
-assert.equal(engine.buildResult(bank, positiveState).dot, 'green', 'several consistent independent value signals may produce green');
-
-const cautiousState = {
+assert.equal(engine.buildResult(bank, careFirstState).careFirst, true, 'consistently choosing Emotional Safety or Independence raises the care-first flag');
+assert.equal(engine.careFirstResult(bank, careFirstState), true);
+const otherState = {
     ...forcedValueState,
-    valueHistory: [
-        valueEntry('independence', 'sensual-joy', 'independence'),
-        valueEntry('independence', 'luxury', 'independence'),
-        valueEntry('social-approval', 'sensual-joy', 'social-approval'),
-        valueEntry('social-approval', 'luxury', 'social-approval'),
-        valueEntry('emotional-safety', 'sensual-joy', 'emotional-safety'),
-        valueEntry('emotional-safety', 'luxury', 'emotional-safety'),
-        valueEntry('independence', 'spontaneity', 'independence'),
-        valueEntry('social-approval', 'romantic-idealism', 'social-approval')
-    ]
+    valueHistory: careRounds.map(pair => valueEntry(pair[0], pair[1], pick(pair, false)))
 };
-assert.equal(engine.buildResult(bank, cautiousState).dot, 'red', 'several consistent independent cautious signals may produce red');
+assert.equal(engine.buildResult(bank, otherState).careFirst, false, 'choosing the other cards raises no flag (no flag says nothing either way)');
+const fewState = { ...forcedValueState, valueHistory: careRounds.slice(0, 3).map(pair => valueEntry(pair[0], pair[1], pick(pair, true))) };
+assert.equal(engine.buildResult(bank, fewState).careFirst, false, 'too few answers raise no flag');
+const equalHeavy = { ...forcedValueState, valueHistory: careRounds.map((pair, index) => valueEntry(pair[0], pair[1], index < 3 ? engine.RESPONSE_EQUAL : pick(pair, true))) };
+assert.equal(engine.buildResult(bank, equalHeavy).careFirst, false, 'Equal answers never count toward the flag');
+const summary = engine.buildResult(bank, careFirstState).valueSummary;
+assert.ok(summary.length >= 1 && summary.every(card => card.id && card.label), 'the result lists the chosen values in words');
+assert.equal(JSON.stringify(engine.buildResult(bank, careFirstState)).includes('operatorSignal'), false);
 
 let uncertainState = engine.createState(bank);
 while (true) {
@@ -253,32 +246,7 @@ const skippedId = engine.selectNext(bank, skipped).id;
 skipped = engine.answerItem(bank, skipped, engine.selectNext(bank, skipped), engine.RESPONSE_SKIP);
 assert.notEqual(engine.selectNext(bank, skipped).id, skippedId, 'a skipped question must remain consumed and never repeat');
 
-// The dot can now reach all three colours, and random answers stay orange most of the time.
-function simulateDot(chooser, seed) {
-    let value = seed;
-    const random = () => { value = (value * 1103515245 + 12345) % 2147483648; return value / 2147483648; };
-    let sim = engine.createState(bank);
-    for (let step = 0; step < 80; step += 1) {
-        const item = engine.selectNext(bank, sim);
-        if (item.kind === 'complete') break;
-        const response = item.kind === 'value' ? chooser(item, random) : item.choices[0].id;
-        sim = engine.answerItem(bank, sim, item, response);
-    }
-    return engine.buildResult(bank, sim).dot;
-}
-const signalOf = id => bank.values.find(item => item.id === id).operatorSignal;
-const leaning = (towardsPleasure, rate) => (item, random) => {
-    const pleasure = signalOf(item.left.id) > signalOf(item.right.id) ? item.left.id : item.right.id;
-    const caution = pleasure === item.left.id ? item.right.id : item.left.id;
-    const wanted = towardsPleasure ? pleasure : caution;
-    return random() < rate ? wanted : (wanted === pleasure ? caution : pleasure);
-};
-assert.equal(simulateDot(leaning(true, 1), 1), 'green', 'a fully pleasure-leaning client gets green');
-assert.equal(simulateDot(leaning(false, 1), 1), 'red', 'a fully cautious client gets red (was impossible before)');
-const randomDots = Array.from({ length: 40 }, (_, index) => simulateDot((item, random) => (random() < 0.5 ? item.left.id : item.right.id), index + 7));
-assert.ok(randomDots.filter(dot => dot === 'orange').length >= 30, 'random answers stay mostly orange');
-
-// Public (not developer mode) assessment: chakra questions only, no value rounds, no dot.
+// Public (not developer mode) assessment: chakra questions only, no value rounds, no care-first flag.
 const pub = { includeValues: false };
 let publicState = engine.createState(bank);
 const publicKinds = new Set();
@@ -290,7 +258,8 @@ for (let step = 0; step < 80; step += 1) {
 }
 assert.deepEqual([...publicKinds], ['question'], 'the public assessment never shows a value round');
 const publicResult = engine.buildResult(bank, publicState, pub);
-assert.equal(publicResult.dot, null, 'the public result has no dot');
+assert.equal(publicResult.careFirst, null, 'the public result has no care-first flag');
+assert.equal(publicResult.valueSummary, null, 'the public result has no value summary');
 assert.equal(publicResult.complete, true, 'the public assessment completes on chakra questions alone');
 assert.equal(publicResult.progress.valuePairsConsumed, 0);
 assert.throws(() => engine.answerItem(bank, engine.createState(bank), { kind: 'value', id: 'x', pairId: 'x' }, 'x', pub), /not available in the public assessment/);
@@ -302,15 +271,16 @@ for (let step = 0; step < 80; step += 1) {
     if (item.kind === 'complete') break;
     devState = engine.answerItem(bank, devState, item, item.kind === 'value' ? item.left.id : item.choices[0].id);
 }
-assert.ok(devState.valueHistory.length > 0 && engine.buildResult(bank, devState).dot, 'developer mode still produces the dot');
+assert.ok(devState.valueHistory.length > 0 && Array.isArray(engine.buildResult(bank, devState).valueSummary), 'developer mode still produces the value summary');
 const hiddenView = engine.buildResult(bank, devState, pub);
-assert.equal(hiddenView.dot, null, 'locked developer mode hides the dot');
+assert.equal(hiddenView.careFirst, null, 'locked developer mode hides the care-first flag');
+assert.equal(hiddenView.valueSummary, null);
 assert.equal(hiddenView.progress.valuePairsConsumed, 0);
 assert.equal(engine.restoreState(bank, devState, pub).valueHistory.length, devState.valueHistory.length, 'stored value answers are kept');
 const undoneInPublic = engine.undoLast(bank, devState, pub);
 assert.equal(undoneInPublic.valueHistory.length, devState.valueHistory.length, 'public undo never removes a hidden value answer');
 assert.equal(undoneInPublic.answeredIds.length, devState.answeredIds.length - 1, 'public undo removes the latest chakra question');
-assert.ok(engine.buildResult(bank, devState).dot, 'the dot returns when developer mode is active again');
+assert.ok(Array.isArray(engine.buildResult(bank, devState).valueSummary), 'the value summary returns when developer mode is active again');
 
 // Read-only answer review: choices that gave a chakra the lower weight, with the higher-support option; same in both modes.
 let reviewSeed = engine.createState(bank);

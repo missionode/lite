@@ -58,6 +58,10 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 
 Owner decision: the assessment entry is public. Without Advanced Features it runs chakra questions only and shows chakra results (no value rounds, no dot, no placeholder). Value rounds and the private dot require Advanced Features through the short same-tab grant read at page load. Stored value answers stay hidden and unused when locked. This supersedes the "single entry only while Advanced Features is unlocked" and "access required" statements in the next section.
 
+## Amendment 2026-10-06 (ethics) — neutral values, no hidden weights, care-first flag
+
+Supersedes the unlabelled green/orange/red dot and the pleasure-versus-caution pairing. Value rounds are neutral priority pairs listed in the bank (each card equally often; the two care-first cards never meet). No per-card hidden weights. A short disclosure precedes the value rounds. In developer mode the result shows the chosen values in words and, only when the published rule is met, a labelled protective "care first" note meaning "go slowly; suggest no service today". It never signals readiness or suitability. A care-first client is not shown the optional-service question in the Final Challenge. Value rounds stay developer-mode only. Still not consent, a diagnosis or a recommendation.
+
 ## Amendment 2026-10-06 — answers behind lower signals (read-only)
 
 Owner decision: the result has a collapsed, read-only section listing each answered question whose chosen answer gave a chakra the lower weight, with the higher-support option, so the evaluator can advise the meditator. Same in public and developer mode. No change control and no recalculation. Value-pair answers are not listed. Wording stays neutral: today's answers only, not mistakes, scores, a diagnosis or a recommendation.

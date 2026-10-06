@@ -57,45 +57,57 @@
         bank.values.forEach(item => {
             invariant(typeof item.label === 'string' && item.label.trim(), `${item.id}.label is required`);
             invariant(typeof item.archetype === 'string' && item.archetype.trim(), `${item.id}.archetype is required`);
-            invariant(Number.isFinite(item.operatorSignal) && item.operatorSignal >= -2 && item.operatorSignal <= 2, `${item.id}.operatorSignal is outside -2..2`);
+            invariant(item.careFirst === undefined || typeof item.careFirst === 'boolean', `${item.id}.careFirst must be true or absent`);
         });
 
         const settings = bank.settings;
         invariant(isPlainObject(settings), 'settings are required');
-        ['minimumEvidencePerChakra', 'valueRounds', 'minimumDotResponses', 'minimumDotDistinctValues'].forEach(key => {
+        ['minimumEvidencePerChakra', 'valueRounds', 'careFirstMinimumResponses'].forEach(key => {
             invariant(Number.isInteger(settings[key]) && settings[key] > 0, `settings.${key} must be a positive integer`);
         });
-        invariant(settings.valueRounds <= 28, 'valueRounds cannot exceed the 28 unique pairs');
-        invariant(settings.valueRounds <= contrastSchedule(bank).length,
-            'valueRounds cannot exceed the pleasure-vs-caution value pairs');
-        if (settings.dotDecisiveShare !== undefined) {
-            invariant(Number.isFinite(settings.dotDecisiveShare) && settings.dotDecisiveShare > 0.5 && settings.dotDecisiveShare <= 1,
-                'settings.dotDecisiveShare must be above 0.5 and at most 1');
-        }
-        invariant(settings.minimumDotResponses <= settings.valueRounds, 'minimumDotResponses cannot exceed valueRounds');
+        invariant(Array.isArray(bank.valuePairs), 'valuePairs are required');
+        const knownValues = new Set(bank.values.map(item => item.id));
+        const careFirstIds = new Set(bank.values.filter(item => item.careFirst).map(item => item.id));
+        const seenPairs = new Set();
+        const appearances = Object.fromEntries([...knownValues].map(id => [id, 0]));
+        bank.valuePairs.forEach(pair => {
+            invariant(Array.isArray(pair) && pair.length === 2 && pair.every(id => knownValues.has(id)) && pair[0] !== pair[1], 'each value pair needs two different known cards');
+            const key = canonicalPairId(pair[0], pair[1]);
+            invariant(!seenPairs.has(key), `value pair ${key} is repeated`);
+            invariant(!(careFirstIds.has(pair[0]) && careFirstIds.has(pair[1])), `value pair ${key} must not set two care-first cards against each other`);
+            seenPairs.add(key);
+            pair.forEach(id => { appearances[id] += 1; });
+        });
+        invariant(new Set(Object.values(appearances)).size === 1, 'every value card must appear in the same number of pairs');
+        invariant(settings.valueRounds === bank.valuePairs.length, 'valueRounds must equal the number of value pairs');
+        invariant(careFirstIds.size > 0, 'at least one care-first value card is required');
+        invariant(Number.isFinite(settings.careFirstShare) && settings.careFirstShare > 0.5 && settings.careFirstShare <= 1, 'settings.careFirstShare must be above 0.5 and at most 1');
+        invariant(settings.careFirstMinimumResponses <= careFirstRoundCount(bank), 'careFirstMinimumResponses cannot exceed the rounds that include a care-first card');
         return true;
     }
 
-    // Value rounds only compare one pleasure-leaning card (signal >= 1) with
-    // one cautious card (signal <= -1), so every answer is informative for
-    // the dot. The order never shows the same card in two rounds in a row.
+    // Value rounds come from the bank's published `valuePairs`: neutral priority
+    // questions in which every card appears equally often. The order never shows
+    // the same card in two rounds in a row.
     function contrastSchedule(bank) {
-        const positive = bank.values.filter(item => item.operatorSignal >= 1).map(item => item.id);
-        const cautious = bank.values.filter(item => item.operatorSignal <= -1).map(item => item.id);
-        const remaining = [];
-        positive.forEach(a => cautious.forEach(b => remaining.push([a, b])));
+        const remaining = bank.valuePairs.map(pair => [...pair]);
         const order = [];
-        const seen = Object.fromEntries([...positive, ...cautious].map(id => [id, 0]));
+        const seen = Object.fromEntries(bank.values.map(item => [item.id, 0]));
         while (remaining.length) {
             const last = order.at(-1) || [];
             const pickIndex = remaining
-                .map((pair, index) => ({ pair, index, clash: pair.some(id => last.includes(id)) ? 1 : 0, load: seen[pair[0]] + seen[pair[1]] }))
+                .map((pair, index) => ({ index, clash: pair.some(id => last.includes(id)) ? 1 : 0, load: seen[pair[0]] + seen[pair[1]] }))
                 .sort((x, y) => x.clash - y.clash || x.load - y.load || x.index - y.index)[0].index;
             const [pair] = remaining.splice(pickIndex, 1);
             pair.forEach(id => { seen[id] += 1; });
             order.push(pair);
         }
         return order;
+    }
+
+    function careFirstRoundCount(bank) {
+        const careFirstIds = new Set(bank.values.filter(item => item.careFirst).map(item => item.id));
+        return bank.valuePairs.filter(pair => pair.some(id => careFirstIds.has(id))).length;
     }
 
     // The healthier answer is stored first in the bank. Show it on the right
@@ -370,26 +382,24 @@
         }, options);
     }
 
-    // Private service-fit dot. Each round is pleasure-leaning vs cautious, so
-    // the dot counts picks: green when at least 75% of the client's choices
-    // lean to pleasure, red when at least 75% lean to caution, orange
-    // otherwise or when there are too few answers. Equal and Skip never count.
-    function dotResult(bank, state) {
-        const valuesById = Object.fromEntries(bank.values.map(item => [item.id, item]));
-        const selected = state.valueHistory
-            .map(entry => entry.response)
-            .filter(response => valuesById[response]);
-        const distinct = new Set(selected);
-        if (selected.length < bank.settings.minimumDotResponses || distinct.size < bank.settings.minimumDotDistinctValues) {
-            return DOT_ORANGE;
-        }
-        const share = bank.settings.dotDecisiveShare ?? 0.75;
-        const needed = Math.ceil(selected.length * share);
-        const positive = selected.filter(id => valuesById[id].operatorSignal >= 1).length;
-        const cautious = selected.filter(id => valuesById[id].operatorSignal <= -1).length;
-        if (positive >= needed) return 'green';
-        if (cautious >= needed) return 'red';
-        return DOT_ORANGE;
+    // Care-first flag (protective only). It means "go slowly and do not make an
+    // offer today": the client mostly chose Emotional Safety or Independence when
+    // one of them was in the pair. Not being flagged says nothing either way.
+    // Equal and Skip never count. The rule is published in the bank settings.
+    function careFirstResult(bank, stateCandidate, options = {}) {
+        if (options.includeValues === false) return null;
+        const state = restoreState(bank, stateCandidate, options);
+        const careFirstIds = new Set(bank.values.filter(item => item.careFirst).map(item => item.id));
+        let answered = 0;
+        let careFirstPicks = 0;
+        state.valueHistory.forEach(entry => {
+            if (entry.response !== entry.leftId && entry.response !== entry.rightId) return;
+            if (![entry.leftId, entry.rightId].some(id => careFirstIds.has(id))) return;
+            answered += 1;
+            if (careFirstIds.has(entry.response)) careFirstPicks += 1;
+        });
+        if (answered < bank.settings.careFirstMinimumResponses) return false;
+        return careFirstPicks >= Math.ceil(answered * bank.settings.careFirstShare);
     }
 
     // Read-only review for the guide: every answered choice that gave a chakra the
@@ -464,11 +474,11 @@
             }
         }
         const valueWins = valueStats(bank, state);
-        const leadingValues = !includeValues ? [] : [...bank.values]
+        const rankedValueCards = !includeValues ? [] : [...bank.values]
             .sort((a, b) => valueWins[b.id].wins - valueWins[a.id].wins || a.id.localeCompare(b.id))
-            .filter(item => valueWins[item.id].wins > 0)
-            .slice(0, 2)
-            .map(item => item.archetype);
+            .filter(item => valueWins[item.id].wins > 0);
+        const leadingValues = rankedValueCards.slice(0, 2).map(item => item.archetype);
+        const leadingValueCards = rankedValueCards.slice(0, 3).map(item => ({ id: item.id, label: item.label }));
         const leadingChakras = [...chakras].sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, 2).map(item => item.archetype);
         const bestSupportedChakra = chakras
             .filter(item => item.evidenceCount >= bank.settings.minimumEvidencePerChakra)
@@ -484,7 +494,8 @@
                 ? { chakraId: rapportChakra.id, topic: rapportChakra.conversationTopic }
                 : null,
             lowSupportAnswers: lowSupportAnswers(bank, state),
-            dot: includeValues ? dotResult(bank, state) : null,
+            careFirst: includeValues ? careFirstResult(bank, state, options) : null,
+            valueSummary: includeValues ? leadingValueCards : null,
             progress: {
                 questionsConsumed: state.answeredIds.length,
                 valuePairsConsumed: includeValues ? state.valueHistory.length : 0
@@ -503,6 +514,7 @@
         answerItem,
         undoLast,
         buildResult,
+        careFirstResult,
         canonicalPairId,
         contrastSchedule,
         choiceOrderSwapped

@@ -10,18 +10,18 @@ const inlineScripts = scriptTags.map(match => match[1]).filter(source => source.
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.6');
+const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.7');
 const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.1');
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
     'engine and persistence should load before the application');
-assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.4'\)/,
+assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?v=1\.5'\)/,
     'the UI should fetch the versioned English question bank');
 
 for (const id of [
     'loadingView', 'errorView', 'interviewView', 'resultView', 'progressLabel', 'progressBar',
     'questionPrompt', 'choiceLeft', 'choiceRight', 'equalChoice', 'skipChoice', 'saveStatus',
-    'chakraResults', 'resultNote', 'sessionFocus', 'supportLegend', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
+    'chakraResults', 'resultNote', 'sessionFocus', 'supportLegend', 'archetypeResults', 'newAssessment', 'undoAnswer', 'undoResult',
     'rapportInsight', 'rapportIcebreaker'
 ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `${id} should remain in the tournament shell`);
@@ -35,10 +35,13 @@ assert.match(inlineScripts[0], /persistence\.load\(bank, engineOptions\(\)\)/, '
 assert.match(inlineScripts[0], /persistence\.save\(bank, state, engineOptions\(\)\)/, 'each answer should be persisted');
 assert.match(inlineScripts[0], /persistence\.clear\(\)/, 'new-client reset should clear tournament and legacy data');
 assert.match(inlineScripts[0], /ChakraAssessmentTournament\.undoLast\(bank, state, engineOptions\(\)\)/, 'the assessment should undo and persist its latest response');
-assert.match(inlineScripts[0], /chakra_assessment_access_until/, 'developer-mode extras (value rounds and dot) should follow a short-lived Advanced Features handoff');
+assert.match(inlineScripts[0], /chakra_assessment_access_until/, 'developer-mode extras (value rounds and summary) should follow a short-lived Advanced Features handoff');
 assert.doesNotMatch(inlineScripts[0], /accessRequiredView/, 'the assessment is public; there is no access-required view');
 assert.match(inlineScripts[0], /developerMode = hasAdvancedAccess\(\)/, 'developer mode is read once when the page loads');
-assert.match(inlineScripts[0], /operatorDot\.hidden = !result\.dot/, 'the dot is hidden when the result has none');
+assert.doesNotMatch(inlineScripts[0], /operatorDot/, 'the unlabelled colour dot is retired');
+assert.match(inlineScripts[0], /elements\.valueSummary\.hidden = !developerMode/, 'the value summary and care-first note are developer-mode only');
+assert.match(inlineScripts[0], /chakra_assessment_care_first/, 'the protective care-first flag is handed to the app through the session');
+assert.match(inlineScripts[0], /elements\.valueDisclosure\.hidden = item\.kind !== 'value'/, 'the value rounds are disclosed to the client');
 assert.match(html, /Conversation cue — not a prediction/, 'rapport guidance should not claim to predict character or behavior');
 assert.match(inlineScripts[0], /window\.confirm\('Clear this assessment/, 'new-client clearing should be deliberate');
 
@@ -63,7 +66,8 @@ assert.match(inlineScripts[0], /supportLevelByStatus/, 'the three-step cue shoul
 assert.match(inlineScripts[0], /Possible discussion focus/, 'a highlighted focus candidate should also receive a readable label');
 assert.match(inlineScripts[0], /translation\(`question:\$\{item\.id\}:prompt`, item\.prompt\)/,
     'later prompts should reuse Google-translated cache entries');
-assert.match(html, /id="operatorDot" aria-hidden="true"/, 'the operator indicator should remain an unlabelled visual dot');
+assert.doesNotMatch(html, /operator-dot|id="operatorDot"/, 'no unlabelled colour dot remains in the page');
+assert.match(html, /id="careFirstNote"[^>]*hidden/, 'the care-first note starts hidden');
 assert.match(html, /Responses stay on this device/, 'the local-data boundary should be visible');
 assert.match(html, /separate from the meditation journey/, 'assessment should remain separate from journey configuration');
 assert.doesNotMatch(inlineScripts[0], /startJourney|selectedChakras|journeyConfig/,
@@ -71,8 +75,8 @@ assert.doesNotMatch(inlineScripts[0], /startJourney|selectedChakras|journeyConfi
 assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a return path to the Meditation Room');
 
 for (const asset of [
-    './data/assessment-questions.json?v=1.4',
-    './modules/assessment-tournament.js?v=1.6',
+    './data/assessment-questions.json?v=1.5',
+    './modules/assessment-tournament.js?v=1.7',
     './modules/assessment-persistence.js?v=1.1'
 ]) {
     assert.ok(sw.includes(`'${asset}'`), `${asset} should be available through the app cache`);

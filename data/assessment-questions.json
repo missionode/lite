@@ -1,13 +1,12 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "2026-10-01.1",
+  "contentVersion": "2026-10-06.1",
   "valuePrompt": "Which of these two matters more to you?",
   "settings": {
     "minimumEvidencePerChakra": 2,
     "valueRounds": 12,
-    "minimumDotResponses": 8,
-    "minimumDotDistinctValues": 3,
-    "dotDecisiveShare": 0.75
+    "careFirstMinimumResponses": 4,
+    "careFirstShare": 0.75
   },
   "chakras": [
     { "id": "root", "name": "Root Chakra", "archetype": "Steady Grounder", "conversationTopic": "feeling grounded and secure" },
@@ -19,14 +18,19 @@
     { "id": "crown", "name": "Crown Chakra", "archetype": "Meaning Seeker", "conversationTopic": "meaning and personal values" }
   ],
   "values": [
-    { "id": "sensual-joy", "label": "Enjoying pleasure through the senses", "archetype": "Embodied Observer", "operatorSignal": 2 },
-    { "id": "luxury", "label": "Luxury and comfort", "archetype": "Receptive Collaborator", "operatorSignal": 1 },
-    { "id": "independence", "label": "Freedom to do things my way", "archetype": "Independent Navigator", "operatorSignal": -1 },
-    { "id": "spontaneity", "label": "Doing fun things without planning", "archetype": "Creative Explorer", "operatorSignal": 1 },
-    { "id": "commitment", "label": "Loyalty and keeping promises", "archetype": "Thoughtful Trust Builder", "operatorSignal": 0 },
-    { "id": "social-approval", "label": "Being liked and accepted by others", "archetype": "Compassionate Connector", "operatorSignal": -1 },
-    { "id": "emotional-safety", "label": "Feeling emotionally safe", "archetype": "Clear Preference Communicator", "operatorSignal": -1 },
-    { "id": "romantic-idealism", "label": "Deep romantic love", "archetype": "Meaning Seeker", "operatorSignal": 1 }
+    { "id": "sensual-joy", "label": "Enjoying pleasure through the senses", "archetype": "Embodied Observer" },
+    { "id": "luxury", "label": "Luxury and comfort", "archetype": "Receptive Collaborator" },
+    { "id": "independence", "label": "Freedom to do things my way", "archetype": "Independent Navigator", "careFirst": true },
+    { "id": "spontaneity", "label": "Doing fun things without planning", "archetype": "Creative Explorer" },
+    { "id": "commitment", "label": "Loyalty and keeping promises", "archetype": "Thoughtful Trust Builder" },
+    { "id": "social-approval", "label": "Being liked and accepted by others", "archetype": "Compassionate Connector" },
+    { "id": "emotional-safety", "label": "Feeling emotionally safe", "archetype": "Clear Preference Communicator", "careFirst": true },
+    { "id": "romantic-idealism", "label": "Deep romantic love", "archetype": "Meaning Seeker" }
+  ],
+  "valuePairs": [
+    ["sensual-joy", "luxury"], ["luxury", "independence"], ["independence", "spontaneity"], ["spontaneity", "commitment"],
+    ["commitment", "social-approval"], ["social-approval", "emotional-safety"], ["emotional-safety", "romantic-idealism"], ["romantic-idealism", "sensual-joy"],
+    ["sensual-joy", "spontaneity"], ["luxury", "emotional-safety"], ["independence", "social-approval"], ["commitment", "romantic-idealism"]
   ],
   "questions": [
     { "id": "root-1", "tier": "core", "coverage": ["root"], "prompt": "When life changes, what helps you more?", "choices": [{ "id": "steady", "label": "Taking one small, steady step", "weights": { "root": 1 } }, { "id": "control", "label": "Waiting until everything is under control", "weights": { "root": 0 } }] },

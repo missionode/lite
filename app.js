@@ -1831,6 +1831,8 @@ class MeditationController {
 
     async runFinalChallenge() {
         if (!state.advancedFeaturesUnlocked || !getChecked('final-challenge-addon-toggle')) return;
+        // Protective: a client the assessment marked "care first" is not asked about the optional service.
+        try { if (sessionStorage.getItem('chakra_assessment_care_first') === '1') return; } catch (error) { /* no flag */ }
         const practice = await practiceModuleLoader.load('self-exploration');
         const result = await practice.finalChallenge({
             elements: {
@@ -3179,7 +3181,7 @@ function attachEventListeners() {
         state.advancedFeaturesUnlocked = !isLocked;
         if (isLocked) cancelEarnHandoff();
         if (isLocked) {
-            try { sessionStorage.removeItem('chakra_assessment_access_until'); } catch (error) { /* optional session handoff */ }
+            try { sessionStorage.removeItem('chakra_assessment_access_until'); sessionStorage.removeItem('chakra_assessment_care_first'); } catch (error) { /* optional session handoff */ }
             state.moodRelaxationIntentionEnabled = false;
             audio.stopPleasureAmbience();
             syncChecked('mood-relaxation-intention-toggle', false);

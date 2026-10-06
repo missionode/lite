@@ -53,7 +53,7 @@ assert.doesNotMatch(css, /#lobby-screen \.lobby-panel\s*\{/, 'the old Lobby bloc
 const stylesheetUrl = html.match(/href="(tailwind\.css\?v=[^"]+)"/)?.[1];
 assert.ok(stylesheetUrl, 'HTML loads a versioned theme stylesheet');
 assert.ok(serviceWorker.includes(`'./${stylesheetUrl}'`), 'offline shell precaches the same stylesheet version');
-assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.369'/);
+assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.370'/);
 assert.match(html, /id="sky-backdrop"[\s\S]*?id="particle-canvas"/);
 assert.match(html, /id="open-sky-observatory"[\s\S]*?id="sky-screen"[\s\S]*?id="sky-location-status"[\s\S]*?id="close-sky-screen"/);
 assert.doesNotMatch(html, /style\.css/, 'one stylesheet: tailwind.css (phase 6)');
