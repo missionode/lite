@@ -4,8 +4,8 @@ import vm from 'node:vm';
 
 const html = readFileSync('index.html', 'utf8');
 const worker = readFileSync('sw.js', 'utf8');
-assert.ok(html.indexOf('modules/completion-view.js?v=1.2') < html.indexOf('app.js?v='));
-assert.match(worker, /modules\/completion-view\.js\?v=1\.2/);
+assert.ok(html.indexOf('modules/completion-view.js?v=1.3') < html.indexOf('app.js?v='));
+assert.match(worker, /modules\/completion-view\.js\?v=1\.3/);
 const events = new Map();
 const calls = [];
 const modalClasses = [];
@@ -48,7 +48,14 @@ const fakeWindow = {
     clearTimeout(id) { timers.delete(id); }
 };
 let language = 'en';
-const handoff = context.ChakraCompletionView.createEarnHandoff({ document: earnDocument, window: fakeWindow, getLanguage: () => language });
+let developerMode = false;
+const handoff = context.ChakraCompletionView.createEarnHandoff({ document: earnDocument, window: fakeWindow, getLanguage: () => language, isDeveloperMode: () => developerMode });
+assert.equal(handoff.canUse(), false, 'Earn is hidden unless developer mode is active');
+handoff.schedule();
+assert.equal(timers.size, 0);
+assert.equal(earnLink.hidden, true);
+assert.equal(context.ChakraCompletionView.createEarnHandoff({ document: earnDocument, window: fakeWindow, getLanguage: () => 'en' }).canUse(), false, 'default is locked');
+developerMode = true;
 assert.equal(handoff.canUse(), true);
 handoff.schedule();
 assert.equal(timers.get(1).delay, 3000);
@@ -60,6 +67,11 @@ handoff.cancel();
 assert.equal(timers.size, 0);
 assert.equal(earnLink.hidden, true);
 assert.deepEqual(handoffClasses.at(-1), ['add', 'hidden']);
+handoff.schedule();
+developerMode = false;
+timers.get(Math.max(...timers.keys())).callback();
+assert.equal(earnLink.hidden, true, 'relocking before the reveal keeps the link hidden');
+developerMode = true;
 language = 'hi';
 assert.equal(handoff.canUse(), false, 'Hindi keeps the Earn handoff disabled');
 handoff.schedule();

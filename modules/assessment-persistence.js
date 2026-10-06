@@ -15,19 +15,19 @@
             return engine.createState(bank);
         }
 
-        function load(bank) {
+        function load(bank, options) {
             try {
                 const raw = storage?.getItem?.(STATE_KEY);
                 if (!raw) return { state: fresh(bank), resumed: false, available: typeof storage?.getItem === 'function' };
-                const state = engine.restoreState(bank, JSON.parse(raw));
+                const state = engine.restoreState(bank, JSON.parse(raw), options);
                 return { state, resumed: hasProgress(state), available: true };
             } catch (error) {
                 return { state: fresh(bank), resumed: false, available: false };
             }
         }
 
-        function save(bank, candidate) {
-            const state = engine.restoreState(bank, candidate);
+        function save(bank, candidate, options) {
+            const state = engine.restoreState(bank, candidate, options);
             try {
                 storage?.setItem?.(STATE_KEY, JSON.stringify(state));
                 return { state, persisted: typeof storage?.setItem === 'function' };

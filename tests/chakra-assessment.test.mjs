@@ -10,8 +10,8 @@ const inlineScripts = scriptTags.map(match => match[1]).filter(source => source.
 assert.equal(inlineScripts.length, 1, 'assessment should have one inline application script');
 new vm.Script(inlineScripts[0], { filename: 'assessment-inline.js' });
 
-const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.4');
-const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.0');
+const enginePosition = html.indexOf('../modules/assessment-tournament.js?v=1.5');
+const persistencePosition = html.indexOf('../modules/assessment-persistence.js?v=1.1');
 const inlinePosition = html.indexOf('<script>', persistencePosition);
 assert.ok(enginePosition > 0 && persistencePosition > enginePosition && inlinePosition > persistencePosition,
     'engine and persistence should load before the application');
@@ -19,7 +19,7 @@ assert.match(inlineScripts[0], /fetch\('\.\.\/data\/assessment-questions\.json\?
     'the UI should fetch the versioned English question bank');
 
 for (const id of [
-    'loadingView', 'accessRequiredView', 'errorView', 'interviewView', 'resultView', 'progressLabel', 'progressBar',
+    'loadingView', 'errorView', 'interviewView', 'resultView', 'progressLabel', 'progressBar',
     'questionPrompt', 'choiceLeft', 'choiceRight', 'equalChoice', 'skipChoice', 'saveStatus',
     'chakraResults', 'resultNote', 'sessionFocus', 'supportLegend', 'archetypeResults', 'operatorDot', 'newAssessment', 'undoAnswer', 'undoResult',
     'rapportInsight', 'rapportIcebreaker'
@@ -31,12 +31,14 @@ assert.match(inlineScripts[0], /\.textContent\s*=/, 'dynamic copy should be inse
 assert.match(inlineScripts[0], /document\.createElement\(/, 'result cards should use DOM construction');
 assert.match(inlineScripts[0], /replaceChildren\(\)/, 'new results should replace old DOM safely');
 assert.doesNotMatch(inlineScripts[0], /innerHTML/, 'question-bank content must never be inserted with innerHTML');
-assert.match(inlineScripts[0], /persistence\.load\(bank\)/, 'an interrupted interview should resume locally');
-assert.match(inlineScripts[0], /persistence\.save\(bank, state\)/, 'each answer should be persisted');
+assert.match(inlineScripts[0], /persistence\.load\(bank, engineOptions\(\)\)/, 'an interrupted interview should resume locally');
+assert.match(inlineScripts[0], /persistence\.save\(bank, state, engineOptions\(\)\)/, 'each answer should be persisted');
 assert.match(inlineScripts[0], /persistence\.clear\(\)/, 'new-client reset should clear tournament and legacy data');
-assert.match(inlineScripts[0], /ChakraAssessmentTournament\.undoLast\(bank, state\)/, 'the assessment should undo and persist its latest response');
-assert.match(inlineScripts[0], /chakra_assessment_access_until/, 'direct assessment access should require a short-lived Advanced Features handoff');
-assert.match(inlineScripts[0], /show\(elements\.accessRequiredView\)/, 'locked direct access should show a safe return path');
+assert.match(inlineScripts[0], /ChakraAssessmentTournament\.undoLast\(bank, state, engineOptions\(\)\)/, 'the assessment should undo and persist its latest response');
+assert.match(inlineScripts[0], /chakra_assessment_access_until/, 'developer-mode extras (value rounds and dot) should follow a short-lived Advanced Features handoff');
+assert.doesNotMatch(inlineScripts[0], /accessRequiredView/, 'the assessment is public; there is no access-required view');
+assert.match(inlineScripts[0], /developerMode = hasAdvancedAccess\(\)/, 'developer mode is read once when the page loads');
+assert.match(inlineScripts[0], /operatorDot\.hidden = !result\.dot/, 'the dot is hidden when the result has none');
 assert.match(html, /Conversation cue — not a prediction/, 'rapport guidance should not claim to predict character or behavior');
 assert.match(inlineScripts[0], /window\.confirm\('Clear this assessment/, 'new-client clearing should be deliberate');
 
@@ -70,8 +72,8 @@ assert.match(html, /href="\.\.\/index\.html"/, 'assessment should retain a retur
 
 for (const asset of [
     './data/assessment-questions.json?v=1.4',
-    './modules/assessment-tournament.js?v=1.4',
-    './modules/assessment-persistence.js?v=1.0'
+    './modules/assessment-tournament.js?v=1.5',
+    './modules/assessment-persistence.js?v=1.1'
 ]) {
     assert.ok(sw.includes(`'${asset}'`), `${asset} should be available through the app cache`);
 }

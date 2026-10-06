@@ -278,4 +278,38 @@ assert.equal(simulateDot(leaning(false, 1), 1), 'red', 'a fully cautious client 
 const randomDots = Array.from({ length: 40 }, (_, index) => simulateDot((item, random) => (random() < 0.5 ? item.left.id : item.right.id), index + 7));
 assert.ok(randomDots.filter(dot => dot === 'orange').length >= 30, 'random answers stay mostly orange');
 
+// Public (not developer mode) assessment: chakra questions only, no value rounds, no dot.
+const pub = { includeValues: false };
+let publicState = engine.createState(bank);
+const publicKinds = new Set();
+for (let step = 0; step < 80; step += 1) {
+    const item = engine.selectNext(bank, publicState, pub);
+    if (item.kind === 'complete') break;
+    publicKinds.add(item.kind);
+    publicState = engine.answerItem(bank, publicState, item, item.choices[0].id, pub);
+}
+assert.deepEqual([...publicKinds], ['question'], 'the public assessment never shows a value round');
+const publicResult = engine.buildResult(bank, publicState, pub);
+assert.equal(publicResult.dot, null, 'the public result has no dot');
+assert.equal(publicResult.complete, true, 'the public assessment completes on chakra questions alone');
+assert.equal(publicResult.progress.valuePairsConsumed, 0);
+assert.throws(() => engine.answerItem(bank, engine.createState(bank), { kind: 'value', id: 'x', pairId: 'x' }, 'x', pub), /not available in the public assessment/);
+
+// Value answers given in developer mode stay stored but hidden and unused in public view, and return with developer mode.
+let devState = engine.createState(bank);
+for (let step = 0; step < 80; step += 1) {
+    const item = engine.selectNext(bank, devState);
+    if (item.kind === 'complete') break;
+    devState = engine.answerItem(bank, devState, item, item.kind === 'value' ? item.left.id : item.choices[0].id);
+}
+assert.ok(devState.valueHistory.length > 0 && engine.buildResult(bank, devState).dot, 'developer mode still produces the dot');
+const hiddenView = engine.buildResult(bank, devState, pub);
+assert.equal(hiddenView.dot, null, 'locked developer mode hides the dot');
+assert.equal(hiddenView.progress.valuePairsConsumed, 0);
+assert.equal(engine.restoreState(bank, devState, pub).valueHistory.length, devState.valueHistory.length, 'stored value answers are kept');
+const undoneInPublic = engine.undoLast(bank, devState, pub);
+assert.equal(undoneInPublic.valueHistory.length, devState.valueHistory.length, 'public undo never removes a hidden value answer');
+assert.equal(undoneInPublic.answeredIds.length, devState.answeredIds.length - 1, 'public undo removes the latest chakra question');
+assert.ok(engine.buildResult(bank, devState).dot, 'the dot returns when developer mode is active again');
+
 console.log('Assessment tournament schema and deterministic engine contract passed.');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.366';
+const CACHE_NAME = 'chakra-v5.368';
 const PIPER_CACHE_NAME = 'chakra-piper-v12';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v81';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
@@ -6,8 +6,8 @@ const ASSETS = [
   './',
   './index.html',
   './docs/assesment.html',
-  './modules/assessment-tournament.js?v=1.4',
-  './modules/assessment-persistence.js?v=1.0',
+  './modules/assessment-tournament.js?v=1.5',
+  './modules/assessment-persistence.js?v=1.1',
   './data/assessment-questions.json?v=1.4',
   './docs/repertory.html',
   './data/frequency-repertory.json',
@@ -94,7 +94,7 @@ const ASSETS = [
   './modules/experiment-session.js?v=1.1',
   './modules/experiment-settings-view.js?v=1.0',
   './modules/session-transport-controls.js?v=1.0',
-  './modules/completion-view.js?v=1.2',
+  './modules/completion-view.js?v=1.3',
   './modules/session-estimate.js?v=1.2',
   './modules/session-countdown.js?v=1.1',
   './modules/session-item-runner.js?v=1.0',

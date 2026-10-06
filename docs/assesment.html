@@ -142,11 +142,6 @@
 
     <section class="panel" aria-live="polite">
       <div id="loadingView" class="loading">Preparing the assessment…</div>
-      <div id="accessRequiredView" class="loading" hidden>
-        <strong>Advanced Features required</strong>
-        <p>Unlock Advanced Features in Settings to open the operator assessment.</p>
-        <a class="quiet" href="../index.html">Return to Settings</a>
-      </div>
       <div id="errorView" class="error" hidden>
         <strong>Assessment could not be prepared.</strong>
         <span id="errorMessage">Please refresh and try again.</span>
@@ -203,13 +198,13 @@
     <p class="privacy">Responses stay on this device. The assessment is separate from the meditation journey and does not start or configure a session.</p>
   </main>
 
-  <script src="../modules/assessment-tournament.js?v=1.4"></script>
-  <script src="../modules/assessment-persistence.js?v=1.0"></script>
+  <script src="../modules/assessment-tournament.js?v=1.5"></script>
+  <script src="../modules/assessment-persistence.js?v=1.1"></script>
   <script>
     (() => {
       'use strict';
       const elements = Object.fromEntries([
-        'loadingView','accessRequiredView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
+        'loadingView','errorView','errorMessage','retryButton','interviewView','resultView','progressLabel','stageLabel',
         'progressBar','questionPrompt','choiceLeft','choiceRight','equalChoice','skipChoice','undoAnswer','undoResult','saveStatus',
         'chakraResults','resultNote','sessionFocus','archetypeResults','rapportInsight','rapportIcebreaker','operatorDot','newAssessment','resultTitle','translateBtn','google_translate_element',
         'fontDown','fontReset','fontUp'
@@ -226,9 +221,15 @@
       try { deviceStorage = window.localStorage; } catch (error) { /* continue in memory */ }
 
       function show(view) {
-        [elements.loadingView, elements.accessRequiredView, elements.errorView, elements.interviewView, elements.resultView]
+        [elements.loadingView, elements.errorView, elements.interviewView, elements.resultView]
           .forEach(node => { node.hidden = node !== view; });
       }
+
+      // Developer mode (Advanced Features) is signalled by the Lobby's 15-minute
+      // same-tab grant. Without it the public assessment runs: chakra questions
+      // only, no value rounds and no dot. Checked once when the page loads.
+      let developerMode = false;
+      const engineOptions = () => ({ includeValues: developerMode });
 
       function hasAdvancedAccess() {
         try {
@@ -240,7 +241,7 @@
       }
 
       function progressCount() {
-        return state.answeredIds.length + state.valueHistory.length;
+        return state.answeredIds.length + (developerMode ? state.valueHistory.length : 0);
       }
 
       function registerTranslation(key, value) {
@@ -291,7 +292,7 @@
       }
 
       function renderNext({ focus = false } = {}) {
-        item = window.ChakraAssessmentTournament.selectNext(bank, state);
+        item = window.ChakraAssessmentTournament.selectNext(bank, state, engineOptions());
         if (item.kind === 'complete') {
           renderResult();
           return;
@@ -301,7 +302,7 @@
         elements.undoAnswer.hidden = completed === 0;
         elements.progressLabel.textContent = `${completed} ${translation('ui:0','completed')}`;
         elements.stageLabel.textContent = item.kind === 'value' ? translation('ui:2','Values reflection') : translation('ui:1','Chakra reflection');
-        const maximumSteps = bank.questions.length + bank.settings.valueRounds;
+        const maximumSteps = bank.questions.length + (developerMode ? bank.settings.valueRounds : 0);
         elements.progressBar.style.width = `${Math.min(100, Math.round((completed / maximumSteps) * 100))}%`;
         const choices = item.kind === 'value' ? [item.left, item.right] : item.choices;
         if (item.kind === 'value') {
@@ -323,8 +324,8 @@
         [elements.choiceLeft, elements.choiceRight, elements.equalChoice, elements.skipChoice]
           .forEach(button => { button.disabled = true; });
         try {
-          state = window.ChakraAssessmentTournament.answerItem(bank, state, item, response);
-          const saved = persistence.save(bank, state);
+          state = window.ChakraAssessmentTournament.answerItem(bank, state, item, response, engineOptions());
+          const saved = persistence.save(bank, state, engineOptions());
           state = saved.state;
           storageNotice = saved.persisted ? translation('ui:3','Saved on this device') : translation('ui:4','Continuing without device storage');
           window.setTimeout(() => {
@@ -344,8 +345,8 @@
       function undoLastResponse() {
         if (answering || !state || progressCount() === 0) return;
         try {
-          state = window.ChakraAssessmentTournament.undoLast(bank, state);
-          const saved = persistence.save(bank, state);
+          state = window.ChakraAssessmentTournament.undoLast(bank, state, engineOptions());
+          const saved = persistence.save(bank, state, engineOptions());
           state = saved.state;
           storageNotice = saved.persisted
             ? translation('ui:9','Last response undone. You can review that choice again.')
@@ -364,7 +365,7 @@
       }
 
       function renderResult() {
-        const result = window.ChakraAssessmentTournament.buildResult(bank, state);
+        const result = window.ChakraAssessmentTournament.buildResult(bank, state, engineOptions());
         const focusIds = new Set(result.focusAreas.map(area => area.id));
         const supportLevelByStatus = {
           'Lower answer-support signal':'lower',
@@ -422,7 +423,9 @@
           elements.rapportInsight.textContent = translation('ui:13','There is not enough answered evidence for a specific topic. Begin with an open, client-led question.');
           elements.rapportIcebreaker.textContent = translation('ui:14','What would make this session feel useful and comfortable for you today?');
         }
-        elements.operatorDot.className = `operator-dot ${result.dot}`;
+        // The dot exists only in developer mode; otherwise nothing takes its place.
+        elements.operatorDot.hidden = !result.dot;
+        elements.operatorDot.className = result.dot ? `operator-dot ${result.dot}` : 'operator-dot';
         show(elements.resultView);
         elements.resultTitle.focus();
       }
@@ -433,10 +436,7 @@
       }
 
       async function start() {
-        if (!hasAdvancedAccess()) {
-          show(elements.accessRequiredView);
-          return;
-        }
+        developerMode = hasAdvancedAccess();
         show(elements.loadingView);
         try {
           const response = await fetch('../data/assessment-questions.json?v=1.4');
@@ -445,7 +445,7 @@
           window.ChakraAssessmentTournament.validateBank(bank);
           primeTranslationCache();
           persistence = window.ChakraAssessmentPersistence.create(deviceStorage, window.ChakraAssessmentTournament);
-          const restored = persistence.load(bank);
+          const restored = persistence.load(bank, engineOptions());
           state = restored.state;
           storageNotice = restored.resumed
             ? translation('ui:5','Previous assessment resumed on this device')

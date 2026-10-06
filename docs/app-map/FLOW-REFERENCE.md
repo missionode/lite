@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production b1c9e30 (feature/narration-feeling pushed: Tailwind phases 0–6, per-chakra rows and padding) + uncommitted atlas source-reference refresh · 2026-10-06.
+Source snapshot: production b1c9e30 + uncommitted Earn handoff and assessment value rounds/dot gated on developer mode; assessment entry made public · 2026-10-06.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -152,7 +152,7 @@ flowchart TD
 | --- | --- |
 | Open app | Browser or installed PWA; local preferences and cached assets influence startup. |
 | Settings | First visit or Lobby → Settings. Languages, voice, sound, visuals, timing and scripts; Advanced Features controls operator-only tools. Settings includes a localized CTA to the dedicated Sky Observatory. |
-| Meditation Room | Main mode selection, chakra choices, intention and duration. Consultation entry is hidden and disabled until Advanced Features is unlocked. |
+| Meditation Room | Main mode selection, chakra choices, intention and duration. The assessment entry is public; only its value rounds and dot need Advanced Features. |
 | Manage Settings | Public settings import and Advanced Features-protected export. |
 | Experiments | Settings → isolated activity → return to Experiment screen. See Experiments map. |
 | Sky Observatory | Settings → Open Sky Observatory. Only this page animates the astronomy canvas; journey/support pages show a static frame, while Lobby/Settings remain clear. Back to Settings stops it. |
@@ -1439,14 +1439,14 @@ flowchart TD
   stats["Save local statistics"]
   modal["Completion modal"]
   return["Return to Room"]
-  hi["Hindi meditation"]
-  earn["Other languages"]
+  hi["Not eligible"]
+  earn["Developer mode and not Hindi"]
   natural -->|"finish()"| cleanup
   cleanup -->|"Update"| stats
   stats -->|"Show"| modal
   modal -->|"Return"| return
-  modal -->|"Language hi"| hi
-  modal -->|"Other language"| earn
+  modal -->|"Dev mode locked or Hindi"| hi
+  modal -->|"Dev mode active, other language"| earn
 ```
 
 | Step | Current behavior |
@@ -1456,12 +1456,13 @@ flowchart TD
 | Save local statistics | Increment journey count and add rounded wall-clock minutes since start, minimum one. Pause time is included. |
 | Completion modal | Show completion message, totals, session time and Return to Room. |
 | Return to Room | Cancel pending Earn reveal; hide modal; open Lobby. |
-| Hindi meditation | No Earn link. Eligibility uses meditation language, not display language. |
-| Other languages | After 3 seconds reveal native Continue to Earn link; user click navigates externally. |
+| Not eligible | No Earn link when developer mode (Advanced Features) is locked, or when the meditation language is Hindi (eligibility uses meditation language, not display language). Locking developer mode also cancels a pending reveal. |
+| Developer mode and not Hindi | After 3 seconds, if developer mode is still active, reveal native Continue to Earn link; user click navigates externally. |
 
 - Earn destination is https://missionode.github.io/earn-app/receive.html?Source=Lite. No automatic navigation. Shots, manual stops, and experiments do not use this stats/completion path.
 - CP-MOD-129–148 moves Earn-link delay, Hindi exclusion, cancellation/hide, delayed reveal and focus into the completion owner. Completion order and user-initiated navigation are unchanged.
 - CP-MOD-164: the existing completion owner now performs the controller’s natural completion cleanup, stats and modal setup. Standard, HRIM, focused and Sleep entry routes remain unchanged; this is ownership only.
+- Continue to Earn is a developer-mode feature: the link is scheduled and revealed only while Advanced Features is unlocked (and never for Hindi). Locking Advanced Features cancels a pending reveal; the link stays hidden by default.
 
 <a id="content"></a>
 
@@ -2445,16 +2446,16 @@ flowchart TD
 
 ## Operator-led chakra assessment
 
-Single Lobby entry point, Advanced Features-gated interview with undo, per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.
+Single public Lobby entry point; interview with undo (value rounds and dot only in developer mode), per-chakra response coverage, a cautious lowest-support conversation prompt, rapport cue and icebreaker.
 
 Sources: [index.html:514](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:514), [docs/assesment.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/assesment.html:1), [modules/assessment-tournament.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/assessment-tournament.js:1), [data/assessment-questions.json:1](/Users/lekshmisyam/Desktop/Ikigai/lite/data/assessment-questions.json:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:3776](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3776).
 
 ```mermaid
 flowchart TD
-  entry["Lobby consultation CTA"]
-  gate["Advanced Features gate"]
-  locked["Access required"]
-  handoff["Short same-tab handoff"]
+  entry["Lobby assessment CTA"]
+  gate["Developer-mode check"]
+  locked["Public assessment"]
+  handoff["Developer-mode grant"]
   restore["Restore current client"]
   interview["One prompt at a time"]
   undo["Undo last response"]
@@ -2463,16 +2464,15 @@ flowchart TD
   focus["Possible session focus"]
   rapport["Conversation cue"]
   icebreaker["Gentle icebreaker"]
-  dot["Private service-fit signal"]
+  dot["Private service-fit signal (developer mode only)"]
   clear["Clear for New Client"]
   translate["Translate dynamically rendered content"]
   failure["Failure and exit"]
-  entry -->|"CTA click when unlocked"| gate
-  entry -->|"CTA unavailable while locked"| locked
-  gate -->|"Advanced Features unlocked"| handoff
-  gate -->|"Relocked / grant unavailable"| locked
-  locked -->|"Return to Lobby"| entry
-  handoff -->|"Open assessment"| restore
+  entry -->|"CTA click"| gate
+  gate -->|"Unlocked: grant written"| handoff
+  gate -->|"Locked: grant cleared"| locked
+  locked -->|"Open public assessment"| restore
+  handoff -->|"Open with value rounds and dot"| restore
   restore -->|"Valid / fresh"| interview
   interview -->|"Answer / equal / skip"| coverage
   interview -->|"Undo requested"| undo
@@ -2495,19 +2495,19 @@ flowchart TD
 
 | Step | Current behavior |
 | --- | --- |
-| Lobby consultation CTA | The one entry point is Lobby → Begin Session Consultation. No duplicate assessment link appears in Settings. |
-| Advanced Features gate | The Lobby CTA becomes available only after the shared password unlock. Relock clears any pending grant. |
-| Access required | If opened without a valid same-tab grant, show a locked message and offer return to the Lobby. |
-| Short same-tab handoff | A valid entry writes a 15-minute sessionStorage grant. Direct access without a current grant stays locked and does not fetch the question bank. Client-side only; not server authentication. |
+| Lobby assessment CTA | The one entry point is Lobby → Begin Session Consultation. It is visible and enabled for everyone, with or without developer mode. No duplicate assessment link appears in Settings. |
+| Developer-mode check | On click: if Advanced Features is unlocked, write a 15-minute same-tab grant; if locked, clear any grant. Relock also clears a pending grant. Then open the page. |
+| Public assessment | Without a valid grant (also a direct page visit, a reload after the grant expired, or a relock): chakra questions and the seven chakra results only. No value rounds, no dot, and no placeholder where the dot would be. Value answers already stored are kept hidden and unused; undo only removes chakra questions. |
+| Developer-mode grant | A valid 15-minute sessionStorage grant, read once when the page loads, adds the value rounds and the private dot. It is not re-checked mid-interview; a reload after expiry returns to the public assessment. Client-side only; not server authentication. |
 | Restore current client | Resume only sanitized, version-compatible local state. Invalid or stale state starts fresh; storage denial continues in memory. |
 | One prompt at a time | Show one neutral prompt and two native answer cards. Every answered, equal or skipped prompt is consumed and never repeated. Chronological history supports one-step undo. |
 | Undo last response | Remove the latest answer or value-pair response and deliberately offer that item again; reconstruct response order for legacy saved state. |
-| Adaptive coverage | Balance evidence across seven chakras with unused unique prompts. Questions and answers are plain, short, translation-friendly English; the healthier answer is shown on the right for 13 of 28 questions (stable per question). Value rounds: “Which of these two matters more to you?”, always one pleasure-leaning card vs one cautious card (12 pairs; neutral Loyalty card not asked), never the same card in two rounds in a row, each card alternating sides. |
+| Adaptive coverage | Balance evidence across seven chakras with unused unique prompts. Questions and answers are plain, short, translation-friendly English; the healthier answer is shown on the right for 13 of 28 questions (stable per question). Value rounds (developer mode only): “Which of these two matters more to you?”, always one pleasure-leaning card vs one cautious card (12 pairs; neutral Loyalty card not asked), never the same card in two rounds in a row, each card alternating sides. |
 | Assessment complete | Show seven relative answer-support labels and response counts, plus up to three positive archetypes. Each card has a labeled three-step visual cue: muted lavender Lower, soft amber Mixed, cool aqua Higher. Incomplete evidence is neutral, not colored as a score. No percentage confidence. Operator reflection aid only. |
 | Possible session focus | After minimum evidence across all seven chakras, show lowest-support chakra(s) as tentative candidates; near-ties within 0.10 are grouped. Candidate cards receive a gold outline and readable “Possible discussion focus” tag. Insufficient or non-differentiating evidence gets client-led wording. |
 | Conversation cue | Show the best-supported chakra topic only when minimum response coverage exists; it is a prompt based on this assessment, not a character/behavior prediction. Never use values or the private dot. |
 | Gentle icebreaker | Pair the topic with an open question inviting the client to choose what feels useful. Insufficient evidence receives a generic client-led question. |
-| Private service-fit signal | Alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. Value rounds are always one pleasure-leaning vs one cautious card (no card twice in a row). Green when at least 75% of picks lean to pleasure, red when at least 75% lean to caution, otherwise orange; Equal/Skip never count. It does not activate or promise service. |
+| Private service-fit signal (developer mode only) | With developer mode active, alongside results show one small patterned green/orange/red dot with no text label; only trained operators interpret it. Value rounds are always one pleasure-leaning vs one cautious card (no card twice in a row). Green when at least 75% of picks lean to pleasure, red when at least 75% lean to caution, otherwise orange; Equal/Skip never count. It does not activate or promise service. |
 | Clear for New Client | Ask confirmation; accepted clears current and retired assessment records then renders a new first prompt. Cancel preserves the current client. |
 | Translate dynamically rendered content | Existing Google Translate widget offers English, Malayalam, Hindi, Russian and Tamil, using an off-screen translated-string cache for upcoming prompts and results; network required. |
 | Failure and exit | Malformed question bank blocks safely; missing/invalid saved state resets; blocked localStorage falls back to memory; leaving page preserves valid local progress. |

@@ -14,7 +14,7 @@ assert.match(app, /toggleEyesCloseMode\(enabled\)\s*\{\s*return audioComfortEffe
 assert.match(app, /toggleAudioFilters\(enabled\)\s*\{\s*return audioComfortEffects\.setAudioFilters\(this, enabled, state\);/);
 assert.ok(html.indexOf('modules/audio-comfort-effects.js?v=1.1') < html.indexOf('app.js?v=4.30'));
 assert.match(sw, /\.\/modules\/audio-comfort-effects\.js\?v=1\.1/);
-assert.match(sw, /chakra-v5\.366/);
+assert.match(sw, /chakra-v5\.368/);
 
 function param(value = 100) {
     return { value, events: [], cancelScheduledValues(t) { this.events.push(['cancel', t]); }, setValueAtTime(v, t) { this.value = v; this.events.push(['set', v, t]); }, linearRampToValueAtTime(v, t) { this.value = v; this.events.push(['linear', v, t]); }, exponentialRampToValueAtTime(v, t) { this.value = v; this.events.push(['exponential', v, t]); } };

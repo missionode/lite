@@ -27,7 +27,8 @@ const earnLink = { hidden: true, classList: { add() {}, remove() {} }, focus() {
 const handoffPolicy = completionContext.ChakraCompletionView.createEarnHandoff({
     document: { getElementById: id => id === 'continue-to-earn' ? earnLink : null },
     window: { setTimeout: (fn, delay) => { timers.set(++timerId, { fn, delay }); return timerId; }, clearTimeout: id => timers.delete(id) },
-    getLanguage: () => 'en'
+    getLanguage: () => 'en',
+    isDeveloperMode: () => true
 });
 handoffPolicy.schedule();
 assert.equal(timers.get(1).delay, 3000, 'the closing blessing remains visible briefly');

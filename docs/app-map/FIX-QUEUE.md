@@ -1,5 +1,14 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Assessment open to everyone; value rounds and dot only in developer mode (2026-10-06)
+
+- Owner decision: "Begin Session Consultation" is now visible and enabled without developer mode. The public assessment asks chakra questions only and shows the seven chakra results; the value rounds ("Which of these two matters more to you?") and the private dot appear only while Advanced Features is unlocked. The page reads the 15-minute same-tab grant once at load; a direct visit, an expired grant or a relock gives the public version (no "access required" screen, no dot placeholder). Value answers already stored are kept hidden and unused, and public undo never removes them. Engine option `includeValues`, modules `assessment-tournament.js` v1.5 and `assessment-persistence.js` v1.1, shell cache `chakra-v5.368`; atlas map `assessment-tournament`. Unit tests only; browser check open. Not committed or pushed.
+- Limit: if hidden value answers exist and the public view adds more chakra answers, undo history after a later return to developer mode can be shorter than the full order (answers and the dot are unaffected).
+
+## Completed locally — Continue to Earn only in developer mode (2026-10-06)
+
+- The completion screen's Continue to Earn link is scheduled and revealed only while Advanced Features (developer mode) is unlocked; it stays hidden otherwise and for Hindi meditation. Locking developer mode cancels a pending reveal. Module `completion-view.js` v1.3, shell cache `chakra-v5.367`; atlas map `completion`. Unit tests only; browser and device check open. Not committed or pushed.
+
 ## Completed — Atlas source references refreshed (2026-10-06)
 
 - Many `app.js` line references were stale after the modularization (some past the end of the file). All 556 references now point at the matching code (remapped by exact source line, or to the module the code moved to).

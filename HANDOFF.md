@@ -7,8 +7,8 @@ Short, current and complete. Older checkpoints and release notes: `docs/handoff-
 This is the active checkpoint. Read it first. Update this block (do not add a second one) before every handoff.
 
 - **Branch:** `feature/narration-feeling`. **Production:** `b1c9e30` — everything on this branch is live (see "Recent changes").
-- **Local, not pushed:** documentation clean-up (this file, the archive, `AGENTS.md`). Push: `cd ~/Desktop/Ikigai/lite && git push origin feature/narration-feeling:production`.
-- **Versions:** app `v4.30`, `tailwind.css?v=2.1`, shell cache `chakra-v5.366`, language cache `chakra-language-v81`, piper cache `chakra-piper-v12`, `chakra-timing-view.js?v=1.1`.
+- **Local, not committed or pushed (two changes):** (1) Continue to Earn shows only while developer mode (Advanced Features) is unlocked, never for Hindi; locking cancels a pending reveal. (2) The assessment is public: the Lobby button is always visible; value rounds and the private dot appear only in developer mode (public view = chakra questions and results). Files: `modules/completion-view.js`, `modules/assessment-tournament.js`, `modules/assessment-persistence.js`, `docs/assesment.html`, `app.js`, `index.html`, `sw.js`, tests, atlas maps `completion` and `assessment-tournament`, `FIX-QUEUE.md`, assessment `spec.md`. 134/135 unit tests pass; `tailwind-setup` fails only because the native `lightningcss` module is missing here (`npm install`). Not checked in a browser or on a phone. Commit and push are the owner's call.
+- **Versions:** app `v4.30`, `tailwind.css?v=2.1`, shell cache `chakra-v5.368`, `completion-view.js?v=1.3`, `assessment-tournament.js?v=1.5`, `assessment-persistence.js?v=1.1`, language cache `chakra-language-v81`, piper cache `chakra-piper-v12`, `chakra-timing-view.js?v=1.1`.
 - **Checks:** 135/135 unit tests; atlas 55 maps, verifier passed, all 556 source references point at real code. Before/after screenshots in Chromium for every styling phase. Not yet checked on a phone or by listening.
 - **Waiting on the owner:**
   1. Phone check of the new look (reload the PWA once so it picks up `tailwind.css?v=2.1`).

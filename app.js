@@ -418,7 +418,7 @@ const setText = (id, txt) => {
     if (el) el.textContent = txt;
 };
 
-const earnHandoff = window.ChakraCompletionView.createEarnHandoff({ document, window, getLanguage: () => state.language });
+const earnHandoff = window.ChakraCompletionView.createEarnHandoff({ document, window, getLanguage: () => state.language, isDeveloperMode: () => state.advancedFeaturesUnlocked });
 function cancelEarnHandoff() { earnHandoff.cancel(); }
 function canUseEarnHandoff() { return earnHandoff.canUse(); }
 function scheduleEarnHandoff() { earnHandoff.schedule(); }
@@ -3177,11 +3177,7 @@ function attachEventListeners() {
     function setIntimateServiceLocked(isLocked) {
         intimateServiceUnlocked = !isLocked;
         state.advancedFeaturesUnlocked = !isLocked;
-        if (beginConsultationBtn) {
-            beginConsultationBtn.hidden = isLocked;
-            beginConsultationBtn.disabled = isLocked;
-            beginConsultationBtn.setAttribute('aria-disabled', String(isLocked));
-        }
+        if (isLocked) cancelEarnHandoff();
         if (isLocked) {
             try { sessionStorage.removeItem('chakra_assessment_access_until'); } catch (error) { /* optional session handoff */ }
             state.moodRelaxationIntentionEnabled = false;
@@ -3637,9 +3633,11 @@ function attachEventListeners() {
         closeSkyButton: document.getElementById('close-sky-screen')
     });
     beginConsultationBtn?.addEventListener('click', () => {
-        if (!state.advancedFeaturesUnlocked) return;
+        // The assessment is public. Only developer mode (Advanced Features)
+        // adds the value rounds and the private dot, through a short grant.
         try {
-            sessionStorage.setItem('chakra_assessment_access_until', String(Date.now() + 15 * 60 * 1000));
+            if (state.advancedFeaturesUnlocked) sessionStorage.setItem('chakra_assessment_access_until', String(Date.now() + 15 * 60 * 1000));
+            else sessionStorage.removeItem('chakra_assessment_access_until');
             window.location.href = './docs/assesment.html';
         } catch (error) {
             showUnlockToast(t('ui.operatorAssessmentUnavailable'));

@@ -118,7 +118,10 @@
         };
     }
 
-    function restoreState(bank, candidate) {
+    // `includeValues: false` is the public (not developer-mode) view: the value
+    // rounds and the dot are skipped. Stored value answers are kept untouched
+    // and unused, so they return if developer mode is active again.
+    function restoreState(bank, candidate, { includeValues = true } = {}) {
         validateBank(bank);
         if (!isPlainObject(candidate) || candidate.schemaVersion !== 1 || candidate.contentVersion !== bank.contentVersion) {
             return createState(bank);
@@ -150,7 +153,7 @@
             seenPairs.add(pairId);
         });
         const restored = { schemaVersion: 1, contentVersion: bank.contentVersion, answers, answeredIds, valueHistory, history: [] };
-        restored.history = reconstructResponseHistory(bank, restored);
+        restored.history = reconstructResponseHistory(bank, restored, includeValues);
         return restored;
     }
 
@@ -268,18 +271,18 @@
         };
     }
 
-    function selectNextFromState(bank, state) {
+    function selectNextFromState(bank, state, includeValues = true) {
         const coverageQuestion = nextCoverageQuestion(bank, state);
         if (coverageQuestion) return questionItem(coverageQuestion);
-        const valuePair = nextValuePair(bank, state);
+        const valuePair = includeValues ? nextValuePair(bank, state) : null;
         if (valuePair) return valuePair;
         const tieBreaker = nextTieBreaker(bank, state);
         return tieBreaker ? questionItem(tieBreaker) : { kind: 'complete', id: 'complete' };
     }
 
-    function selectNext(bank, stateCandidate) {
+    function selectNext(bank, stateCandidate, options = {}) {
         validateBank(bank);
-        return selectNextFromState(bank, restoreState(bank, stateCandidate));
+        return selectNextFromState(bank, restoreState(bank, stateCandidate, options), options.includeValues !== false);
     }
 
     function applyAnswer(bank, state, item, response) {
@@ -317,14 +320,14 @@
         throw new Error(`Assessment item cannot be answered: ${item.kind}`);
     }
 
-    function reconstructResponseHistory(bank, target) {
+    function reconstructResponseHistory(bank, target, includeValues = true) {
         const questionIds = new Set(target.answeredIds);
         const valuesByPair = new Map(target.valueHistory.map(entry => [entry.pairId, entry]));
         let replay = createState(bank);
         const history = [];
         const maxSteps = bank.questions.length + bank.settings.valueRounds;
         for (let step = 0; step < maxSteps; step += 1) {
-            const item = selectNextFromState(bank, replay);
+            const item = selectNextFromState(bank, replay, includeValues);
             if (item.kind === 'complete') break;
             let response;
             if (item.kind === 'question') {
@@ -341,14 +344,15 @@
         return history;
     }
 
-    function answerItem(bank, stateCandidate, item, response) {
+    function answerItem(bank, stateCandidate, item, response, options = {}) {
         validateBank(bank);
-        return applyAnswer(bank, restoreState(bank, stateCandidate), item, response);
+        invariant(item.kind !== 'value' || options.includeValues !== false, 'value rounds are not available in the public assessment');
+        return applyAnswer(bank, restoreState(bank, stateCandidate, options), item, response);
     }
 
-    function undoLast(bank, stateCandidate) {
+    function undoLast(bank, stateCandidate, options = {}) {
         validateBank(bank);
-        const state = restoreState(bank, stateCandidate);
+        const state = restoreState(bank, stateCandidate, options);
         const last = state.history[state.history.length - 1];
         if (!last) return state;
         if (last.kind === 'question') {
@@ -358,12 +362,12 @@
                 ...state,
                 answers,
                 answeredIds: state.answeredIds.filter(id => id !== last.id)
-            });
+            }, options);
         }
         return restoreState(bank, {
             ...state,
             valueHistory: state.valueHistory.filter(entry => entry.pairId !== last.id)
-        });
+        }, options);
     }
 
     // Private service-fit dot. Each round is pleasure-leaning vs cautious, so
@@ -395,9 +399,10 @@
         return 'Lower answer-support signal';
     }
 
-    function buildResult(bank, stateCandidate) {
+    function buildResult(bank, stateCandidate, options = {}) {
         validateBank(bank);
-        const state = restoreState(bank, stateCandidate);
+        const includeValues = options.includeValues !== false;
+        const state = restoreState(bank, stateCandidate, options);
         const totals = questionScore(bank, state);
         const chakraById = Object.fromEntries(bank.chakras.map(item => [item.id, item]));
         const chakras = CHAKRA_IDS.map(id => {
@@ -429,7 +434,7 @@
             }
         }
         const valueWins = valueStats(bank, state);
-        const leadingValues = [...bank.values]
+        const leadingValues = !includeValues ? [] : [...bank.values]
             .sort((a, b) => valueWins[b.id].wins - valueWins[a.id].wins || a.id.localeCompare(b.id))
             .filter(item => valueWins[item.id].wins > 0)
             .slice(0, 2)
@@ -440,7 +445,7 @@
             .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))[0];
         const rapportChakra = bestSupportedChakra && chakraById[bestSupportedChakra.id];
         return {
-            complete: selectNext(bank, state).kind === 'complete',
+            complete: selectNext(bank, state, options).kind === 'complete',
             chakras,
             focusAreas,
             focusStatus,
@@ -448,10 +453,10 @@
             rapportCue: rapportChakra?.conversationTopic
                 ? { chakraId: rapportChakra.id, topic: rapportChakra.conversationTopic }
                 : null,
-            dot: dotResult(bank, state),
+            dot: includeValues ? dotResult(bank, state) : null,
             progress: {
                 questionsConsumed: state.answeredIds.length,
-                valuePairsConsumed: state.valueHistory.length
+                valuePairsConsumed: includeValues ? state.valueHistory.length : 0
             }
         };
     }

@@ -1,8 +1,8 @@
 (function installCompletionView(global) {
     'use strict';
 
-    function createEarnHandoff({ document = global.document, window = global, getLanguage, delayMs = 3000 } = {}) {
-        if (!document || !window || typeof getLanguage !== 'function' || !Number.isFinite(delayMs) || delayMs < 0) {
+    function createEarnHandoff({ document = global.document, window = global, getLanguage, isDeveloperMode = () => false, delayMs = 3000 } = {}) {
+        if (!document || !window || typeof getLanguage !== 'function' || typeof isDeveloperMode !== 'function' || !Number.isFinite(delayMs) || delayMs < 0) {
             throw new TypeError('Earn handoff requires document, window, language and delay services');
         }
         let timer = null;
@@ -17,12 +17,14 @@
                 link.classList.add('hidden');
             }
         }
-        function canUse() { return getLanguage() !== 'hi'; }
+        // Earn is a developer-mode (Advanced Features) handoff; Hindi stays excluded.
+        function canUse() { return isDeveloperMode() === true && getLanguage() !== 'hi'; }
         function schedule() {
             cancel();
             if (!canUse()) return;
             timer = window.setTimeout(() => {
                 timer = null;
+                if (!canUse()) return;
                 const link = document.getElementById('continue-to-earn');
                 if (!link) return;
                 link.hidden = false;

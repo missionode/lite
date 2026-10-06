@@ -54,6 +54,10 @@ Steady Grounder, Creative Explorer, Purposeful Achiever, Compassionate Connector
 - Each result card uses a three-segment indicator with muted lavender for Lower, soft amber for Mixed and cool aqua for Higher. The textual category remains visible; color is not the only carrier of meaning. Insufficient evidence has a neutral unlit indicator.
 - Possible discussion-focus cards receive a separate gold outline and readable tag. This cue is not a chakra-strength scale, validated measurement, diagnosis or automatic recommendation.
 
+## Amendment 2026-10-06 — public assessment, developer-mode extras
+
+Owner decision: the assessment entry is public. Without Advanced Features it runs chakra questions only and shows chakra results (no value rounds, no dot, no placeholder). Value rounds and the private dot require Advanced Features through the short same-tab grant read at page load. Stored value answers stay hidden and unused when locked. This supersedes the "single entry only while Advanced Features is unlocked" and "access required" statements in the next section.
+
 ## Local integration — Advanced Features, undo and rapport guidance
 
 - The assessment has exactly one in-app entry point: the Lobby consultation CTA, available only while Advanced Features is unlocked. Settings has no assessment link. The Lobby entry creates a 15-minute same-tab grant; relocking revokes it, and direct page entry without it remains on an access-required view without fetching the question bank. This is a client-side feature gate, not server authentication.

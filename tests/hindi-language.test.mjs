@@ -197,7 +197,8 @@ vm.runInContext(completionView, completionContext);
 const handoff = completionContext.ChakraCompletionView.createEarnHandoff({
     document: { getElementById: () => earnLink },
     window: { clearTimeout() {}, setTimeout() { scheduledCallbacks++; return 1; } },
-    getLanguage: () => 'hi'
+    getLanguage: () => 'hi',
+    isDeveloperMode: () => true
 });
 handoff.schedule();
 assert.equal(scheduledCallbacks, 0, 'Hindi must never schedule the delayed Earn handoff.');
