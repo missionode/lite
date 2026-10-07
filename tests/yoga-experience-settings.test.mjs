@@ -11,7 +11,7 @@ assert.match(app, /yogaExperienceSettings\.persist\(\{ document, state, storage:
 assert.match(app, /yogaExperienceSettings\.syncTimingRows\(\{ document, getChecked \}\)/);
 assert.match(app, /yogaExperienceSettings\.bindSetupChangeControls\(/);
 assert.match(app, /yogaExperienceSettings\.bindAdvancedToggle\(/);
-assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.31/);
+assert.match(html, /modules\/yoga-experience-settings\.js\?v=1\.0[\s\S]*?app\.js\?v=4.32/);
 assert.match(serviceWorker, /modules\/yoga-experience-settings\.js\?v=1\.0/);
 
 const context = vm.createContext({});

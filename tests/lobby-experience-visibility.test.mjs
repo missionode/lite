@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperienceVisibility/);
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
 assert.match(app, /lobbyExperienceVisibility\.bindShotTypeChange\(/);
-assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.3[\s\S]*?app\.js\?v=4.31/);
+assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.3[\s\S]*?app\.js\?v=4.32/);
 assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.3/);
 
 const context = vm.createContext({});

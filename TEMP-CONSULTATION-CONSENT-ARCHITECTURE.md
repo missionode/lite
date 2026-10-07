@@ -1,5 +1,8 @@
 # Temporary Consultation and Consent Architecture Plan
 
+> **Update 2026-10-07 (owner decision): recorded consent is dropped.** Consent should be natural and based on trust, so video or audio consent recording is no longer planned. The trust-building role-play game **Walk in My Shoes** (`docs/role-play-game.md`) replaces it in the Play Zone. The sections below on recording, the consent prompter and video sharing are **superseded**; the intake form, session plan and safety rules remain a reference only. Whether a short, unrecorded, in-person agreement is needed before physical care stages is a separate, open owner decision.
+
+
 ## Status
 
 Planning only. No consultation, recording, sharing, or modularization implementation has started.

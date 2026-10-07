@@ -20,7 +20,7 @@ assert.match(html, /id="self-exploration-section"[\s\S]*?id="quiet-courage-addon
 assert.doesNotMatch(html, /final-challenge/, 'the Final Challenge journey step and its modal are gone');
 assert.match(html, /id="optional-service-info-panel"[^>]*hidden/, 'the optional-service card is a standalone Lobby card, hidden by default');
 assert.doesNotMatch(app, /finalChallenge/, 'no journey runner for the optional-service offer');
-assert.match(sw, /chakra-v5\.371[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.1/);
+assert.match(sw, /chakra-v5\.372[\s\S]*?modules\/self-exploration-practices\.js\?v=1\.1/);
 assert.doesNotMatch(practiceSource, /getUserMedia|MediaRecorder|localStorage|indexedDB|fetch\(/, 'spoken self-expression must not capture, persist, or upload speech');
 
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {

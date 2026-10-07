@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production c4885d0 (live) + uncommitted ethics fix: neutral value rounds, plain value summary and a protective care-first flag replace the hidden-weight colour dot · 2026-10-06.
+Source snapshot: production (live): Walk in My Shoes role-play game, shared wake-lock module and an offline-version fix for the Self-Exploration module, on top of cd5308f · 2026-10-06.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -29,40 +29,41 @@ Open [the interactive atlas](./index.html) for diagrams, node details, source re
 19. [Quiet Courage · private self-expression practice](#quiet-courage)
 20. [Hush Hush · dev-mode icebreaker game](#secret-body-game)
 21. [Contactless Eye Shooter · dev-mode gaze game](#eye-shooter)
-22. [Chakra Touch · dev-mode couples touch game](#chakra-touch)
-23. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
-24. [Self-Exploration · Confidence Visualization, Deep Secrets and the standalone optional-service card](#self-exploration-challenges)
-25. [Separate time for each chakra](#per-chakra-time)
-26. [Pause, stop and live controls](#controls)
-27. [Optional Lobby video introduction](#restart)
-28. [Completion, statistics and external handoff](#completion)
-29. [Scripts, language and timing](#content)
-30. [Narration and fallback](#narration)
-31. [Audio signal architecture](#audio)
-32. [Sound options and live suppression](#sound-options)
-33. [Visuals and browser lifecycle](#visuals)
-34. [Earth observer reference and atmosphere](#earth-atmosphere)
-35. [Thematic solar containment glow](#solar-containment)
-36. [Persistence, caching and network](#storage)
-37. [Failure and recovery map](#recovery)
-38. [Isolated checkpoint delivery](#delivery-workflow)
-39. [Display-language UI renderer](#locale-ui-renderer)
-40. [Timing configuration and saved values](#timing-configuration)
-41. [Automatic journey voice profile](#journey-voice-profile)
-42. [Session-only journey-mode hydration](#session-mode-hydration)
-43. [Mixer preference control hydration](#mixer-preference-hydration)
-44. [Journey selection preference hydration](#journey-selection-hydration)
-45. [Timing preference control hydration](#timing-preference-hydration)
-46. [Appearance preference control hydration](#appearance-preference-hydration)
-47. [Script preference control hydration](#script-preference-hydration)
-48. [Custom meditation script settings](#custom-script-settings)
-49. [Personal-care preference control hydration](#care-preference-hydration)
-50. [Narration feelings](#narration-feeling)
-51. [Styling: design system and Tailwind](#styling-system)
-52. [Settings backup and restore](#settings-backup)
-53. [Operator-led chakra assessment](#assessment-tournament)
-54. [Frequency repertory handoff](#repertory)
-55. [Benefits and safety (FAQ)](#benefits-safety)
+22. [Walk in My Shoes · dev-mode role-play acting game](#role-play)
+23. [Chakra Touch · dev-mode couples touch game](#chakra-touch)
+24. [Pitch Mode · 2-Minute Mind Reset](#pitch-mode)
+25. [Self-Exploration · Confidence Visualization, Deep Secrets and the standalone optional-service card](#self-exploration-challenges)
+26. [Separate time for each chakra](#per-chakra-time)
+27. [Pause, stop and live controls](#controls)
+28. [Optional Lobby video introduction](#restart)
+29. [Completion, statistics and external handoff](#completion)
+30. [Scripts, language and timing](#content)
+31. [Narration and fallback](#narration)
+32. [Audio signal architecture](#audio)
+33. [Sound options and live suppression](#sound-options)
+34. [Visuals and browser lifecycle](#visuals)
+35. [Earth observer reference and atmosphere](#earth-atmosphere)
+36. [Thematic solar containment glow](#solar-containment)
+37. [Persistence, caching and network](#storage)
+38. [Failure and recovery map](#recovery)
+39. [Isolated checkpoint delivery](#delivery-workflow)
+40. [Display-language UI renderer](#locale-ui-renderer)
+41. [Timing configuration and saved values](#timing-configuration)
+42. [Automatic journey voice profile](#journey-voice-profile)
+43. [Session-only journey-mode hydration](#session-mode-hydration)
+44. [Mixer preference control hydration](#mixer-preference-hydration)
+45. [Journey selection preference hydration](#journey-selection-hydration)
+46. [Timing preference control hydration](#timing-preference-hydration)
+47. [Appearance preference control hydration](#appearance-preference-hydration)
+48. [Script preference control hydration](#script-preference-hydration)
+49. [Custom meditation script settings](#custom-script-settings)
+50. [Personal-care preference control hydration](#care-preference-hydration)
+51. [Narration feelings](#narration-feeling)
+52. [Styling: design system and Tailwind](#styling-system)
+53. [Settings backup and restore](#settings-backup)
+54. [Operator-led chakra assessment](#assessment-tournament)
+55. [Frequency repertory handoff](#repertory)
+56. [Benefits and safety (FAQ)](#benefits-safety)
 
 <a id="curriculum-branding"></a>
 
@@ -1139,6 +1140,43 @@ flowchart TD
 | Got it / Back | Returns to the Lobby. Nothing is saved. |
 
 
+
+<a id="role-play"></a>
+
+## Walk in My Shoes · dev-mode role-play acting game
+
+A trust-building role-play for two to four players. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. Players agree to play, finalise their roles, choose a timer and press Play; the screen stays awake and a soft chime ends the role play. Nothing is recorded or saved.
+
+Sources: [modules/role-play-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/role-play-game.js:1), [modules/wake-lock.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/wake-lock.js:1), [tests/role-play-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/role-play-game.test.mjs:1), [app.js:3080](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3080), [docs/role-play-game.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/role-play-game.md:1).
+
+```mermaid
+flowchart TD
+  locked["Hidden Play Zone card"]
+  roles["Choose players, scene and roles"]
+  timer["Choose the time"]
+  play["Role play running"]
+  chime["Time is up"]
+  again["Swap roles and play again"]
+  locked -->|"Dev mode unlocked · Play now"| roles
+  roles -->|"Everyone happy · roles set"| timer
+  timer -->|"Change roles"| roles
+  timer -->|"Play"| play
+  play -->|"Timer reaches zero"| chime
+  play -->|"Stop"| roles
+  chime -->|"Swap roles"| again
+  again -->|"Choose the time"| timer
+```
+
+| Step | Current behavior |
+| --- | --- |
+| Hidden Play Zone card | The Walk in My Shoes card sits in the dev-mode Play Zone; hidden and its Play now button disabled while locked. Relocking closes the game and releases the screen. |
+| Choose players, scene and roles | Two to four players with optional names. Scenes: Radha and Krishna, Storyteller and Listener, Teacher and Curious Student, Guide and Traveller, Interviewer and Guest, Old Friends Meeting Again. With more than two players only Radha and Krishna is offered and the extra players join as their friends. Each player taps that they are happy to play (not recorded); choosing a role swaps it with its holder so the scene is always complete. The roles are finalised with Roles are set. |
+| Choose the time | 5, 10 (default), 15, 20 or 30 minutes. Play appears only after the roles are final; Change roles goes back. |
+| Role play running | Pressing Play primes the audio inside the tap, asks the shared wake lock to keep the screen awake and starts a countdown from a real end time (accurate even if the browser slows a background tab). Pause and Resume keep the remaining time; Stop ends the role play without a sound and returns to the roles. |
+| Time is up | At zero the timer stops, a soft three-note chime plays, the device vibrates briefly where supported, the wake lock is released and the closing screen shows three gentle reflection prompts. |
+| Swap roles and play again | Rotates the roles one place and returns to the timer step. Back to Meditation Room returns to the Lobby. Nothing is saved. |
+
+- Roles and the opt-in tap are not recorded or stored; there is no camera, microphone or storage. The shared wake lock lives in modules/wake-lock.js and is also used by journeys. Sound needs the Play tap on phones. Wording in Malayalam, Hindi, Russian and Tamil is a draft awaiting native review; browser and device checks are outstanding.
 
 <a id="chakra-touch"></a>
 

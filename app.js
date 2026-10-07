@@ -352,6 +352,7 @@ const settingsManagerScreen = document.getElementById('settings-manager-screen')
 const experimentScreen = document.getElementById('experiment-screen');
 const secretBodyGameScreen = document.getElementById('secret-body-game-screen');
 const eyeShooterScreen = document.getElementById('eye-shooter-screen');
+const rolePlayScreen = document.getElementById('role-play-screen');
 const chakraTouchScreen = document.getElementById('chakra-touch-screen');
 const skyScreen = document.getElementById('sky-screen');
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -374,7 +375,7 @@ const screenNavigation = screenNavigationModule.create({
     body: document.body,
     document,
     window,
-    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, eyeShooterScreen, chakraTouchScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
+    screens: [configScreen, settingsManagerScreen, experimentScreen, secretBodyGameScreen, eyeShooterScreen, rolePlayScreen, chakraTouchScreen, skyScreen, lobbyScreen, meditationScreen, breathingScreen, icebreakerScreen, newcomerTutorialScreen],
     lobbyScreen,
     configScreen,
     experimentScreen,
@@ -2410,18 +2411,8 @@ class MeditationController {
     }
 }
 
-// Wake Lock Manager
-class WakeLockManager {
-    constructor() { this.wakeLock = null; }
-    async request() {
-        if ('wakeLock' in navigator) {
-            try { this.wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
-        }
-    }
-    release() { if (this.wakeLock !== null) { this.wakeLock.release(); this.wakeLock = null; } }
-}
-
-const wakeLock = new WakeLockManager();
+// Shared Screen Wake Lock (journeys and games): see modules/wake-lock.js.
+const wakeLock = window.ChakraWakeLock.create({ navigator, document });
 const audio = new AudioEngine();
 const journeyChrome = new window.ChakraJourneyChrome();
 const particleField = new window.AmbientParticleField();
@@ -2487,7 +2478,7 @@ const meditation = new MeditationController(audio, visual);
 
 document.addEventListener('visibilitychange', async () => {
     document.documentElement.classList.toggle('page-hidden', document.hidden);
-    if (wakeLock.wakeLock !== null && document.visibilityState === 'visible') await wakeLock.request();
+    await wakeLock.reacquire();
 });
 document.documentElement.classList.toggle('page-hidden', document.hidden);
 
@@ -3084,6 +3075,30 @@ function attachEventListeners() {
             console.error('Contactless Eye Shooter could not start:', error);
         }
     });
+    // Dev-mode Walk in My Shoes: role-play acting game with a timer (lazy module, nothing saved).
+    const rolePlayButton = document.getElementById('open-role-play');
+    let rolePlayGame = null;
+    rolePlayButton?.addEventListener('click', async () => {
+        if (!state.advancedFeaturesUnlocked) return;
+        try {
+            const api = await practiceModuleLoader.load('role-play');
+            if (!rolePlayGame) {
+                rolePlayGame = api.mount({
+                    document,
+                    root: document.getElementById('role-play-root'),
+                    t,
+                    showScreen,
+                    gameScreen: rolePlayScreen,
+                    returnScreen: lobbyScreen,
+                    isUnlocked: () => state.advancedFeaturesUnlocked,
+                    wakeLock
+                });
+            }
+            rolePlayGame.open();
+        } catch (error) {
+            console.error('Walk in My Shoes could not start:', error);
+        }
+    });
     // Dev-mode Chakra Touch: consent-first couples touch game (lazy module, nothing saved).
     const chakraTouchButton = document.getElementById('open-chakra-touch');
     let chakraTouchGame = null;
@@ -3224,6 +3239,8 @@ function attachEventListeners() {
         if (eyeShooterButton) eyeShooterButton.disabled = isLocked;
         if (isLocked && eyeShooterGame) eyeShooterGame.close();
         syncOptionalServiceInfo();
+        if (rolePlayButton) rolePlayButton.disabled = isLocked;
+        if (isLocked && rolePlayGame) rolePlayGame.close();
         if (chakraTouchButton) chakraTouchButton.disabled = isLocked;
         if (isLocked && chakraTouchGame) chakraTouchGame.close();
         if (experimentCareOptions && experimentActivitySelect) {

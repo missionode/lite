@@ -2,7 +2,7 @@
 
 Open [index.html](./index.html) in a browser. It is self-contained and needs no server or internet connection.
 
-- 55 selectable maps covering navigation, journey branches, live controls, supporting pages and runtime services.
+- 56 selectable maps covering navigation, journey branches, live controls, supporting pages and runtime services.
 - Select any step to inspect its behavior and incoming/outgoing connections.
 - Numbered arrows correspond to the expandable connection list.
 - Save the current map as SVG, or use Print / Save all as PDF to print the entire atlas.
@@ -13,7 +13,7 @@ Open [index.html](./index.html) in a browser. It is self-contained and needs no 
 
 ## Evidence
 
-Latest update (2026-10-06): application code is production `edf1577` (live): Continue to Earn and the assessment value rounds and private dot now need developer mode (the assessment itself is public); earlier in the same line: Tailwind design-system styling phases 0–6, separate time for each chakra, Benefits and safety FAQ, narration feelings and Pitch mood tone. The atlas has 55 maps; the 2026-10-06 handoff records that the verifier passed for all 55 maps and all 556 source references point at real code (not re-run for this documentation-only refresh). Earlier history of each feature is in [FIX-QUEUE.md](./FIX-QUEUE.md).
+Latest update (2026-10-06): application code is production `edf1577` (live): Continue to Earn and the assessment value rounds and private dot now need developer mode (the assessment itself is public); earlier in the same line: Tailwind design-system styling phases 0–6, separate time for each chakra, Benefits and safety FAQ, narration feelings and Pitch mood tone. The atlas has 56 maps; the 2026-10-06 handoff records that the verifier passed for all 55 maps and all 556 source references point at real code (not re-run for this documentation-only refresh). Earlier history of each feature is in [FIX-QUEUE.md](./FIX-QUEUE.md).
 
 Sky baseline (2026-09-08, production `6a0ee84` plus the natural-sky update, since released): the visuals map describes the new cached renderer, motion lifecycle, lunar texture and illustrative star field. New sky behavior has static/unit evidence; browser preview was declined. This atlas captures source-identified branches and explicitly labels uncertainty; it is not an exhaustive runtime-state proof. Independent settings combine with journey flows rather than appearing as thousands of duplicated diagrams.
 

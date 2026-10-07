@@ -14,7 +14,7 @@ assert.match(app, /ChakraTimingSettingsView\.bindHighEnergyDurationControl\(/);
 assert.ok(app.indexOf('bindTransitionDurationControls(') < app.indexOf('scriptSourceSettings.bindSourceSelection(')
     && app.indexOf('scriptSourceSettings.bindSourceSelection(') < app.indexOf('bindCareDurationControls('),
 'transition and care listener attachment stay on their original sides of custom-script handlers');
-assert.ok(html.indexOf('modules/timing-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.31'));
+assert.ok(html.indexOf('modules/timing-settings-view.js?v=1.0') < html.indexOf('app.js?v=4.32'));
 assert.match(serviceWorker, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/timing-settings-view\.js\?v=1\.0/);
 assert.equal(packageJson.scripts['test:timing-settings-view'], 'node tests/timing-settings-view.test.mjs');
 
