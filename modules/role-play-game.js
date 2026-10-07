@@ -2,12 +2,13 @@
     'use strict';
 
     // Walk in My Shoes: a developer-mode (Advanced Features) role-play acting
-    // game for the Play Zone. Players agree to play, finalise their roles,
-    // choose a timer and press Play. The screen stays awake while the timer
-    // runs; at zero a soft chime plays and the role play ends. Nothing is
-    // saved and nothing is recorded.
+    // game for the Play Zone. Players agree to play and finalise their roles;
+    // there is no script, they invent the story themselves. A spinner wheel
+    // decides how long the role play lasts (nobody picks the time). At zero a
+    // soft chime plays and the role play ends. The screen stays awake while it
+    // runs. Nothing is saved and nothing is recorded.
 
-    // More than two players: only the Radha and Krishna scene is offered; the
+    // Three or more players: only the Radha and Krishna scene is offered; the
     // extra players join as their friends.
     const GROUP_SCENE = 'radha-krishna';
     const SCENES = Object.freeze([
@@ -18,10 +19,14 @@
         Object.freeze({ id: 'interview', roles: Object.freeze(['interviewer', 'guest']) }),
         Object.freeze({ id: 'old-friends', roles: Object.freeze(['oldFriend', 'returnedFriend']) })
     ]);
-    const TIMER_MINUTES = Object.freeze([5, 10, 15, 20, 30]);
-    const DEFAULT_MINUTES = 10;
+    // The wheel's slices. The spinner decides; nobody chooses the time.
+    const WHEEL_MINUTES = Object.freeze([5, 10, 15, 20, 30]);
+    const WHEEL_COLORS = Object.freeze(['#d94a4a', '#e9892e', '#d9b53a', '#43a96b', '#4a90d9']);
+    const SPIN_MS = 4200;
+    // Player choices: 2, 3, or 3+ (four or more, set with the stepper).
     const MIN_PLAYERS = 2;
-    const MAX_PLAYERS = 4;
+    const MIN_GROUP_PLAYERS = 4;
+    const MAX_PLAYERS = 8;
     const CLOSING_PROMPTS = Object.freeze(['rpClosing1', 'rpClosing2', 'rpClosing3']);
 
     function sceneById(id) {
@@ -46,6 +51,12 @@
     function formatClock(totalSeconds) {
         const seconds = Math.max(0, Math.round(totalSeconds));
         return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+    }
+
+    // Where the wheel stops so the pointer rests on slice `index` after five turns.
+    function landingAngle(index, sliceCount) {
+        const slice = 360 / sliceCount;
+        return 360 * 5 + (360 - (index * slice + slice / 2));
     }
 
     // A soft three-note bell made with Web Audio, so no sound file is needed.
@@ -93,12 +104,17 @@
     }
 
     const FIELD_STYLE = 'box-sizing:border-box;width:100%;min-height:2.75rem;padding:.55rem .8rem;color:#fff;background:#0f1826;border:1px solid rgba(255,255,255,.35);border-radius:.8rem;font:inherit;';
+    const SLOT_TEXT_STYLE = 'display:block;width:3rem;text-align:center;font-weight:900;font-size:1.15rem;color:#fff;text-shadow:0 1px 4px #000;';
 
     function mount({
         document = global.document, root, t, showScreen, gameScreen, returnScreen, isUnlocked, wakeLock,
         now = () => Date.now(),
         setInterval: startInterval = (fn, ms) => global.setInterval(fn, ms),
         clearInterval: stopInterval = id => global.clearInterval(id),
+        setTimeout: later = (fn, ms) => global.setTimeout(fn, ms),
+        clearTimeout: cancelLater = id => global.clearTimeout(id),
+        random = () => Math.random(),
+        reducedMotion = () => Boolean(global.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches),
         AudioContextCtor = global.AudioContext || global.webkitAudioContext,
         vibrate = pattern => global.navigator?.vibrate?.(pattern)
     } = {}) {
@@ -125,7 +141,8 @@
         let step = 'idle';
         let sceneId = SCENES[0].id;
         let players = [];
-        let minutes = DEFAULT_MINUTES;
+        let minutes = null; // set only by the wheel
+        let spinTimer = null;
         let timerId = null;
         let endAt = 0;
         let remainingMs = 0;
@@ -150,24 +167,54 @@
             focusHeading(panel);
             root.closest?.('.screen')?.scrollTo?.(0, 0);
         }
+        function cancelSpin() {
+            if (spinTimer !== null) {
+                cancelLater(spinTimer);
+                spinTimer = null;
+            }
+        }
         function roleCards() {
             return el('ul', { className: 'es-steps', dataset: { rp: 'cards' } }, players.map((player, index) => el('li', {}, [
                 el('span', { className: 'es-step-num', text: String(index + 1) }),
                 el('span', { text: `${displayName(player, index)} — ${t(`ui.rpRole_${player.role}`)}` })
             ])));
         }
-        function countButtons() {
-            const buttons = [2, 3, 4].map(count => el('button', {
-                type: 'button', className: 'es-goal', dataset: { rp: 'count', count: String(count) },
-                attrs: { 'aria-pressed': String(count === players.length) },
+
+        // Players: 2, 3, or 3+ (four or more, with a stepper).
+        function countSection() {
+            const count = players.length;
+            const options = [
+                { id: '2', label: '2', on: count === 2, set: () => 2 },
+                { id: '3', label: '3', on: count === 3, set: () => 3 },
+                { id: '3plus', label: t('ui.rpPlayersMore'), on: count >= MIN_GROUP_PLAYERS, set: () => Math.max(MIN_GROUP_PLAYERS, count) }
+            ];
+            const buttons = options.map(option => el('button', {
+                type: 'button', className: 'es-goal', dataset: { rp: 'count', count: option.id },
+                attrs: { 'aria-pressed': String(option.on) },
                 onClick: () => {
-                    if (count === players.length) return;
-                    sceneId = count > 2 ? GROUP_SCENE : sceneId;
-                    resetPlayers(count);
+                    const next = option.set();
+                    if (next === players.length) return;
+                    sceneId = next > 2 ? GROUP_SCENE : sceneId;
+                    resetPlayers(next);
                     renderRoles();
                 }
-            }, [el('strong', { text: String(count) }), el('span', { text: t('ui.rpPlayersWord') })]));
-            return el('div', { className: 'es-goals', dataset: { rp: 'counts' } }, buttons);
+            }, [el('strong', { text: option.label }), el('span', { text: t('ui.rpPlayersWord') })]));
+            buttons.forEach((button, index) => button.classList.toggle('is-selected', options[index].on));
+            const children = [el('div', { className: 'es-goals', dataset: { rp: 'counts' } }, buttons)];
+            if (count >= MIN_GROUP_PLAYERS) {
+                const change = delta => () => {
+                    const next = Math.min(MAX_PLAYERS, Math.max(MIN_GROUP_PLAYERS, players.length + delta));
+                    if (next === players.length) return;
+                    resetPlayers(next);
+                    renderRoles();
+                };
+                children.push(el('div', { className: 'es-goals', dataset: { rp: 'stepper' }, style: 'grid-template-columns:3rem 1fr 3rem;align-items:center;' }, [
+                    el('button', { type: 'button', className: 'es-goal', text: '−', dataset: { rp: 'fewer' }, attrs: { 'aria-label': t('ui.rpFewer') }, onClick: change(-1) }),
+                    el('p', { text: `${count} ${t('ui.rpMorePlayers')}`, dataset: { rp: 'group-count' }, attrs: { 'aria-live': 'polite' }, style: 'margin:0;font-weight:800;' }),
+                    el('button', { type: 'button', className: 'es-goal', text: '+', dataset: { rp: 'more' }, attrs: { 'aria-label': t('ui.rpMore') }, onClick: change(1) })
+                ]));
+            }
+            return el('section', { className: 'es-section' }, [el('h3', { text: t('ui.rpPlayersTitle') }), ...children]);
         }
 
         function sceneSelect() {
@@ -222,12 +269,17 @@
         }
 
         let setButton = null;
+        function rolesReady() {
+            return players.length >= MIN_PLAYERS && players.every(player => player.agreed) && rolesAreComplete(sceneId, players.map(player => player.role));
+        }
         function syncSet() {
-            if (setButton) setButton.disabled = !(players.length >= MIN_PLAYERS && players.every(player => player.agreed) && rolesAreComplete(sceneId, players.map(player => player.role)));
+            if (setButton) setButton.disabled = !rolesReady();
         }
 
         function renderRoles() {
+            cancelSpin();
             step = 'roles';
+            minutes = null;
             setButton = el('button', {
                 type: 'button', className: 'primary-btn es-done', text: t('ui.rpRolesSet'), dataset: { rp: 'roles-set' },
                 attrs: { disabled: 'true' }, onClick: renderTimer
@@ -236,12 +288,12 @@
                 el('h2', { className: 'es-title', text: t('ui.rpTitle') }),
                 el('p', { className: 'es-lead', text: t('ui.rpLead') }),
                 el('p', { className: 'es-tip', text: t('ui.rpSafety') }),
-                el('section', { className: 'es-section' }, [el('h3', { text: t('ui.rpPlayersTitle') }), countButtons()]),
+                countSection(),
                 el('section', { className: 'es-section' }, [
                     el('h3', { text: t('ui.rpSceneTitle') }),
                     sceneSelect(),
                     players.length > 2 ? el('p', { className: 'es-tip', text: t('ui.rpGroupNote') }) : null,
-                    el('p', { className: 'es-partner', dataset: { rp: 'starter' }, text: t(`ui.rpStarter_${sceneId}`) })
+                    el('p', { className: 'es-partner', dataset: { rp: 'own-story' }, text: t('ui.rpOwnStory') })
                 ]),
                 el('section', { className: 'es-section' }, [el('h3', { text: t('ui.rpRolesTitle') }), ...players.map(playerRow)]),
                 setButton,
@@ -251,31 +303,65 @@
             syncSet();
         }
 
-        function timerButtons() {
-            const buttons = TIMER_MINUTES.map(value => el('button', {
-                type: 'button', className: 'es-goal', dataset: { rp: 'minutes', minutes: String(value) },
-                attrs: { 'aria-pressed': String(value === minutes) },
-                onClick: () => {
-                    minutes = value;
-                    buttons.forEach(button => {
-                        const on = button.dataset.minutes === String(minutes);
-                        button.classList.toggle('is-selected', on);
-                        button.setAttribute('aria-pressed', String(on));
-                    });
-                }
-            }, [el('strong', { text: String(value) }), el('span', { text: t('ui.rpMinutes') })]));
-            buttons.forEach(button => button.classList.toggle('is-selected', button.dataset.minutes === String(minutes)));
-            return el('div', { className: 'es-goals', dataset: { rp: 'timers' } }, buttons);
+        // The timer is decided by a spinner wheel, never chosen.
+        function timerWheel() {
+            const slice = 360 / WHEEL_MINUTES.length;
+            const gradient = WHEEL_MINUTES.map((value, index) => `${WHEEL_COLORS[index % WHEEL_COLORS.length]} ${index * slice}deg ${(index + 1) * slice}deg`).join(', ');
+            const disc = el('div', {
+                className: 'sbp-wheel-disc', style: `background:conic-gradient(${gradient});`, dataset: { rp: 'wheel-disc' }
+            }, WHEEL_MINUTES.map((value, index) => {
+                const angle = index * slice + slice / 2;
+                return el('span', {
+                    className: 'sbp-wheel-slot', dataset: { rp: 'slice', minutes: String(value) },
+                    style: `transform:rotate(${angle}deg) translateY(-6.2rem) rotate(${-angle}deg);`
+                }, [el('span', { text: String(value), style: SLOT_TEXT_STYLE })]);
+            }));
+            return {
+                disc,
+                node: el('div', { className: 'sbp-wheel', dataset: { rp: 'wheel' }, attrs: { 'aria-hidden': 'true' } }, [
+                    el('span', { className: 'sbp-wheel-pointer', attrs: { 'aria-hidden': 'true' } }), disc
+                ])
+            };
         }
 
         function renderTimer() {
-            if (!(players.length >= MIN_PLAYERS && players.every(player => player.agreed) && rolesAreComplete(sceneId, players.map(player => player.role)))) return renderRoles();
+            if (!rolesReady()) return renderRoles();
+            cancelSpin();
             step = 'timer';
+            minutes = null;
+            const spinner = timerWheel();
+            const status = el('p', { className: 'es-partner', dataset: { rp: 'spin-status' }, text: t('ui.rpSpinNote'), attrs: { 'aria-live': 'polite' } });
+            const playButton = el('button', {
+                type: 'button', className: 'primary-btn es-done', text: t('ui.rpPlay'), dataset: { rp: 'play' }, onClick: start
+            });
+            playButton.hidden = true;
+            const spinButton = el('button', {
+                type: 'button', className: 'primary-btn es-done', text: t('ui.rpSpin'), dataset: { rp: 'spin' },
+                onClick: () => {
+                    if (minutes !== null || spinTimer !== null) return;
+                    spinButton.disabled = true;
+                    const index = Math.min(WHEEL_MINUTES.length - 1, Math.floor(random() * WHEEL_MINUTES.length));
+                    const duration = reducedMotion() ? 0 : SPIN_MS;
+                    spinner.disc.style.transition = `transform ${duration}ms cubic-bezier(0.17, 0.67, 0.2, 1)`;
+                    spinner.disc.style.transform = `rotate(${landingAngle(index, WHEEL_MINUTES.length)}deg)`;
+                    status.textContent = t('ui.rpSpinning');
+                    spinTimer = later(() => {
+                        spinTimer = null;
+                        minutes = WHEEL_MINUTES[index];
+                        status.textContent = fill(t('ui.rpSpunTime'), { n: String(minutes) });
+                        spinButton.hidden = true;
+                        playButton.hidden = false;
+                        vibrate([40, 40, 40]);
+                    }, duration + (duration ? 250 : 0));
+                }
+            });
             show(el('div', { className: 'es-panel', dataset: { rp: 'timer' } }, [
                 el('h2', { className: 'es-title', text: t('ui.rpTimerTitle') }),
                 el('section', { className: 'es-section' }, [el('h3', { text: t('ui.rpRolesTitle') }), roleCards()]),
-                el('section', { className: 'es-section' }, [el('h3', { text: t('ui.rpTimerPick') }), timerButtons()]),
-                el('button', { type: 'button', className: 'primary-btn es-done', text: t('ui.rpPlay'), dataset: { rp: 'play' }, onClick: start }),
+                spinner.node,
+                status,
+                spinButton,
+                playButton,
                 el('button', { type: 'button', className: 'link-btn', text: t('ui.rpChangeRoles'), dataset: { rp: 'change-roles' }, onClick: renderRoles })
             ]));
         }
@@ -300,7 +386,7 @@
         }
 
         async function start() {
-            if (!isUnlocked() || step !== 'timer') return;
+            if (!isUnlocked() || step !== 'timer' || minutes === null) return;
             chime.prime();
             remainingMs = minutes * 60 * 1000;
             endAt = now() + remainingMs;
@@ -337,7 +423,7 @@
                 el('h2', { className: 'es-title', text: t(`ui.rpScene_${sceneId}`) }),
                 clockNode,
                 roleCards(),
-                el('p', { className: 'es-partner', text: t(`ui.rpStarter_${sceneId}`) }),
+                el('p', { className: 'es-partner', text: t('ui.rpOwnStory') }),
                 pauseButton,
                 el('button', { type: 'button', className: 'link-btn', text: t('ui.rpStop'), dataset: { rp: 'stop' }, onClick: stop })
             ]));
@@ -380,7 +466,7 @@
             ]));
         }
 
-        // Swap roles: the roles move one place along, then the timer step again.
+        // Swap roles: the roles move one place along, then the wheel decides a new time.
         function playAgain() {
             const roles = players.map(player => player.role);
             roles.unshift(roles.pop());
@@ -394,16 +480,18 @@
             sceneId = SCENES[0].id;
             players = [];
             resetPlayers(MIN_PLAYERS);
-            minutes = DEFAULT_MINUTES;
+            minutes = null;
             showScreen(gameScreen);
             renderRoles();
             return true;
         }
 
         function close() {
+            cancelSpin();
             endPlay();
             chime.dispose();
             step = 'idle';
+            minutes = null;
             root.replaceChildren();
             if (returnScreen && !gameScreen.classList.contains('hidden')) showScreen(returnScreen);
         }
@@ -412,13 +500,14 @@
             open, close,
             get step() { return step; },
             get sceneId() { return sceneId; },
+            get minutes() { return minutes; },
             get roles() { return players.map(player => player.role); },
             get startedRoles() { return startedRoles ? [...startedRoles] : null; }
         });
     }
 
     global.ChakraRolePlayGame = Object.freeze({
-        mount, createChime, roleList, rolesAreComplete, formatClock,
-        SCENES, GROUP_SCENE, TIMER_MINUTES, DEFAULT_MINUTES, MIN_PLAYERS, MAX_PLAYERS
+        mount, createChime, roleList, rolesAreComplete, formatClock, landingAngle,
+        SCENES, GROUP_SCENE, WHEEL_MINUTES, MIN_PLAYERS, MIN_GROUP_PLAYERS, MAX_PLAYERS
     });
 })(typeof window === 'undefined' ? globalThis : window);

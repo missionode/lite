@@ -1,6 +1,6 @@
 # Walk in My Shoes — game guide
 
-A dev-mode (Advanced Features) **role-play acting game** for two to four players, built to grow trust. Players take roles, speak and act as that person would, and a timer ends the role play with a soft chime. Nothing is recorded or saved: no camera, no microphone, no storage.
+A dev-mode (Advanced Features) **role-play acting game** for two or more players, built to grow trust. Players take roles and speak and act as that person would. There is **no script: the players invent the story**. A **spinner wheel decides the time**, and a soft chime ends the role play. Nothing is recorded or saved: no camera, no microphone, no storage.
 
 ## Where to find it
 
@@ -11,12 +11,12 @@ The card is hidden while dev mode is locked. Locking dev mode closes the game an
 
 ## How to play
 
-1. **Players** — choose 2, 3 or 4 players. Names are optional.
-2. **Scene and roles** — choose a scene, then give each player a role (picking a role swaps it with whoever had it, so the scene is always complete). Each player taps *I'm happy to play*. This tap is not recorded.
+1. **Players** — choose **2**, **3** or **3+** (3+ starts at four players; use − and + for up to eight). Names are optional.
+2. **Scene and roles** — choose a scene, then give each player a role (picking a role swaps it with whoever had it, so the scene is always complete). Each player taps *I'm happy to play*. This tap is not recorded. There is no story text: decide the story together as you play.
 3. **Roles are set** — only after everyone is happy and the roles are complete.
-4. **Time** — 5, 10 (default), 15, 20 or 30 minutes. Press **Play**.
+4. **Spin for the time** — nobody picks the time. Tap **Spin the timer**; the wheel (5, 10, 15, 20 or 30 minutes) turns and lands on a random slice. The time it lands on is fixed. **Play** appears once the wheel has stopped.
 5. **Role play** — the screen stays awake and the clock counts down. **Pause** and **Resume** keep the remaining time. **Stop** ends it at once, without a sound.
-6. **Time is up** — a soft chime plays, then three kind prompts (what you enjoyed about each other's role, what you noticed in yourself, one word for how you feel). **Swap roles and play again** rotates the roles.
+6. **Time is up** — a soft chime plays, then three kind prompts (what you enjoyed about each other's role, what you noticed in yourself, one word for how you feel). **Swap roles and play again** rotates the roles and the wheel decides a new time.
 
 ## Scenes
 
@@ -29,7 +29,7 @@ The card is hidden while dev mode is locked. Locking dev mode closes the game an
 | The Interviewer and the Guest | Interviewer, Guest |
 | Old Friends Meeting Again | Old Friend, Returning Friend |
 
-With **more than two players only Radha and Krishna** is played; the other players join as their friends. Each scene shows a short opening line.
+With **three or more players only Radha and Krishna** is played; the other players join as their friends. Scenes carry no story: they only name the roles.
 
 ## Safety and trust
 
@@ -39,8 +39,9 @@ With **more than two players only Radha and Krishna** is played; the other playe
 
 ## Technical notes
 
-- Module: `modules/role-play-game.js` v1.0 (lazy-loaded through the practice loader as `role-play`, offline-cached).
+- Module: `modules/role-play-game.js` v1.1 (lazy-loaded through the practice loader as `role-play`, offline-cached).
 - Wake lock: the shared `modules/wake-lock.js` v1.0 (`ChakraWakeLock.create`), also used by journeys. It re-acquires the lock when the page becomes visible again.
+- Wheel: reuses the Hush Hush wheel styles (`sbp-wheel`); about four seconds of spin, none when the device asks for reduced motion; the random slice is chosen before the spin and the time is fixed after it.
 - Timer: runs from a real end time, so it stays accurate even when the browser slows a background tab.
 - Sound: a Web Audio three-note bell (no audio file). The audio is armed inside the Play tap because phones only allow sound after a tap. A short vibration is used where supported.
 - Styling reuses the Eye Shooter panel styles; the form fields carry small inline styles because the CSS build was unavailable. Move them into `tailwind/legacy.css` on the next styling pass.

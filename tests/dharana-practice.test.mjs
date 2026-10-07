@@ -8,7 +8,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(app, /const dharanaPractice = await practiceModuleLoader\.load\('dharana'\)/);
 assert.match(app, /async runDharana\(\) \{[\s\S]*?dharanaPractice\.run\(/, 'the controller should delegate Dharana lifecycle to its owner');
-assert.match(html, /modules\/practice-module-loader\.js\?v=1\.8[\s\S]*?app\.js\?v=4.32/);
+assert.match(html, /modules\/practice-module-loader\.js\?v=1\.9[\s\S]*?app\.js\?v=4.32/);
 assert.doesNotMatch(html, /modules\/dharana-practice\.js/);
 assert.match(serviceWorker, /modules\/dharana-practice\.js\?v=1\.0/);
 

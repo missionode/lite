@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production (live): Walk in My Shoes role-play game, shared wake-lock module and an offline-version fix for the Self-Exploration module, on top of cd5308f · 2026-10-06.
+Source snapshot: production (live): Walk in My Shoes role-play game (players 2/3/3+, no scripted story, spinner-wheel timer), shared wake-lock module and an offline-version fix, on top of cd5308f · 2026-10-06.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -1145,7 +1145,7 @@ flowchart TD
 
 ## Walk in My Shoes · dev-mode role-play acting game
 
-A trust-building role-play for two to four players. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. Players agree to play, finalise their roles, choose a timer and press Play; the screen stays awake and a soft chime ends the role play. Nothing is recorded or saved.
+A trust-building role-play for two or more players. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. Players agree to play and finalise their roles, a spinner wheel decides the time, the screen stays awake and a soft chime ends the role play. There is no script: the players invent the story. Nothing is recorded or saved.
 
 Sources: [modules/role-play-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/role-play-game.js:1), [modules/wake-lock.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/wake-lock.js:1), [tests/role-play-game.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/role-play-game.test.mjs:1), [app.js:3080](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3080), [docs/role-play-game.md:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/role-play-game.md:1).
 
@@ -1153,28 +1153,28 @@ Sources: [modules/role-play-game.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/mo
 flowchart TD
   locked["Hidden Play Zone card"]
   roles["Choose players, scene and roles"]
-  timer["Choose the time"]
+  wheel["Spin for the time"]
   play["Role play running"]
   chime["Time is up"]
   again["Swap roles and play again"]
   locked -->|"Dev mode unlocked · Play now"| roles
-  roles -->|"Everyone happy · roles set"| timer
-  timer -->|"Change roles"| roles
-  timer -->|"Play"| play
+  roles -->|"Everyone happy · roles set"| wheel
+  wheel -->|"Change roles"| roles
+  wheel -->|"Wheel stopped · Play"| play
   play -->|"Timer reaches zero"| chime
   play -->|"Stop"| roles
   chime -->|"Swap roles"| again
-  again -->|"Choose the time"| timer
+  again -->|"Spin again"| wheel
 ```
 
 | Step | Current behavior |
 | --- | --- |
-| Hidden Play Zone card | The Walk in My Shoes card sits in the dev-mode Play Zone; hidden and its Play now button disabled while locked. Relocking closes the game and releases the screen. |
-| Choose players, scene and roles | Two to four players with optional names. Scenes: Radha and Krishna, Storyteller and Listener, Teacher and Curious Student, Guide and Traveller, Interviewer and Guest, Old Friends Meeting Again. With more than two players only Radha and Krishna is offered and the extra players join as their friends. Each player taps that they are happy to play (not recorded); choosing a role swaps it with its holder so the scene is always complete. The roles are finalised with Roles are set. |
-| Choose the time | 5, 10 (default), 15, 20 or 30 minutes. Play appears only after the roles are final; Change roles goes back. |
+| Hidden Play Zone card | The Walk in My Shoes card sits in the dev-mode Play Zone; hidden and its Play now button disabled while locked. Relocking closes the game, cancels a spinning wheel and releases the screen. |
+| Choose players, scene and roles | Players: 2, 3 or 3+ (3+ starts at four and a stepper goes up to eight). Optional names. Scenes: Radha and Krishna, Storyteller and Listener, Teacher and Curious Student, Guide and Traveller, Interviewer and Guest, Old Friends Meeting Again. With three or more players only Radha and Krishna is offered and the extra players join as their friends. No story is supplied: the players decide it themselves. Each player taps that they are happy to play (not recorded); choosing a role swaps it with its holder so the scene is always complete. The roles are finalised with Roles are set. |
+| Spin for the time | Nobody chooses the time. A spinner wheel with five slices (5, 10, 15, 20, 30 minutes) turns for about four seconds (no motion with reduced-motion) and lands on a random slice; the time is then fixed. It can be spun only once per round. Play appears only after the wheel has stopped; Change roles goes back and cancels a spin. |
 | Role play running | Pressing Play primes the audio inside the tap, asks the shared wake lock to keep the screen awake and starts a countdown from a real end time (accurate even if the browser slows a background tab). Pause and Resume keep the remaining time; Stop ends the role play without a sound and returns to the roles. |
 | Time is up | At zero the timer stops, a soft three-note chime plays, the device vibrates briefly where supported, the wake lock is released and the closing screen shows three gentle reflection prompts. |
-| Swap roles and play again | Rotates the roles one place and returns to the timer step. Back to Meditation Room returns to the Lobby. Nothing is saved. |
+| Swap roles and play again | Rotates the roles one place and returns to the wheel for a new time. Back to Meditation Room returns to the Lobby. Nothing is saved. |
 
 - Roles and the opt-in tap are not recorded or stored; there is no camera, microphone or storage. The shared wake lock lives in modules/wake-lock.js and is also used by journeys. Sound needs the Play tap on phones. Wording in Malayalam, Hindi, Russian and Tamil is a draft awaiting native review; browser and device checks are outstanding.
 
