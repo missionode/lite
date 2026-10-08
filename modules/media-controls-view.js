@@ -35,6 +35,17 @@
                 .then(prelude => prelude.previewAudio())
                 .catch(error => logger.warn('Video audio preview unavailable:', error));
         });
+        // Lobby: play the video introduction on its own with the same prelude. Its
+        // full-screen overlay closes back to the Lobby when the video ends.
+        const playIntroduction = document.getElementById('play-video-introduction');
+        playIntroduction?.addEventListener('click', () => {
+            if (playIntroduction.disabled) return;
+            playIntroduction.disabled = true;
+            void loadJourneyVideoPrelude()
+                .then(prelude => prelude.play())
+                .catch(error => logger.warn('Video introduction unavailable:', error))
+                .finally(() => { playIntroduction.disabled = false; });
+        });
         document.getElementById('preview-visualization-ambience')?.addEventListener('click', () => {
             void audio.previewVisualizationAmbience();
         });

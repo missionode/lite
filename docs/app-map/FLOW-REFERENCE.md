@@ -1,6 +1,6 @@
 # Chakra Meditation · Flow Atlas
 
-Source snapshot: production (live): Walk in My Shoes role-play game (players 2/3/3+, no scripted story, spinner-wheel timer), shared wake-lock module and an offline-version fix, on top of cd5308f · 2026-10-06.
+Source snapshot: production 2a2fca5 (live) + Lobby Play introduction button (local commit, not yet pushed) · 2026-10-06.
 
 Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored.
 
@@ -1422,13 +1422,14 @@ flowchart TD
 
 ## Optional Lobby video introduction
 
-An explicit Lobby preference plays the cinematic introduction before one journey start; Restart stays immediate.
+An explicit Lobby preference plays the cinematic introduction before one journey start; a Lobby Play introduction button plays it on its own and returns to the Meditation Room; Restart stays immediate.
 
-Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/journey-preference-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-preference-settings-view.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:3844](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3844), [app.js:3855](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3855).
+Sources: [modules/journey-video-prelude.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-video-prelude.js:1), [modules/media-controls-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/media-controls-view.js:1), [modules/journey-preference-settings-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/journey-preference-settings-view.js:1), [sw.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/sw.js:1), [app.js:3844](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3844), [app.js:3855](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:3855).
 
 ```mermaid
 flowchart TD
   lobby["Lobby → Include video introduction"]
+  direct["Lobby → ▶ Play introduction"]
   buffer["Prepare and buffer"]
   ready["Begin introduction"]
   hold["Image hold → playback"]
@@ -1436,6 +1437,7 @@ flowchart TD
   end["Normal video ending"]
   error["Unavailable video"]
   dispatch["Begin journey"]
+  room["Back to the Meditation Room"]
   lobby -->|"Option selected + Begin"| buffer
   buffer -->|"Ready / timeout"| ready
   ready -->|"User clicks"| hold
@@ -1446,11 +1448,15 @@ flowchart TD
   hold -->|"Failure"| error
   end -->|"Reminder acknowledged"| dispatch
   error -->|"Normal reminder remains"| dispatch
+  direct -->|"Play introduction"| buffer
+  end -->|"Direct play ended"| room
+  error -->|"Direct play unavailable"| room
 ```
 
 | Step | Current behavior |
 | --- | --- |
 | Lobby → Include video introduction | The option carries a localized “Cosmic Consciousness Introduction” subtitle. Its persisted choice defaults OFF and appears in the roadmap for every supported journey family. A normal journey with no selected chakras is rejected at the original Begin click, before video preparation. |
+| Lobby → ▶ Play introduction | A button beside the option plays the same prelude on its own, whether or not the option is ticked. It does not start, pause or stop a journey and is disabled while the video runs (media-controls-view owns it). |
 | Prepare and buffer | Paused/silent video with meditator image. Target 4 / 6 / 8 seconds by connection, with stability check. |
 | Begin introduction | Reveal button when ready OR after the 90-second bounded wait. Explicit user action required. |
 | Image hold → playback | Hold image 3 seconds, then video; remove the readiness-only dark shade. The meditator image and video render fully opaque. Loading and Begin content uses a near-solid dark backing with sharp white text for readability. The prelude is outside ordinary screen dimming, so saved brightness, Sleep and Eyes Close cannot make it translucent. Audio fades in over 2.4 seconds using separate video volume. |
@@ -1458,6 +1464,7 @@ flowchart TD
 | Normal video ending | Final 0.25-second audiovisual fade; acknowledge DND reminder. |
 | Unavailable video | Missing media, preparation failure, media error or rejected play: unavailable result; error path fades 1.2 seconds. |
 | Begin journey | Continue through the current Lobby mode selection exactly once. Restart bypasses this optional prelude and relaunches directly. |
+| Back to the Meditation Room | After a direct play the overlay closes over the unchanged Lobby; the play button is ready again. The DND reminder is not acknowledged, so a later journey still shows it. |
 
 - No skip control and no automatic fullscreen. The video URL is absent at initial page load and attached only when this opted-in introduction starts. A buffer countdown reports seconds of media still needed, not a measured wall-clock download ETA. Settings audio preview is separate and also opts into loading the video: play 8 seconds, fade and reset without starting a journey.
 

@@ -1,6 +1,14 @@
 # Fix queue derived from the flow atlas
 
-## Completed locally — Journey option settings keep their spacing (2026-10-08)
+## Completed locally — Play the video introduction from the Lobby (2026-10-08)
+
+- Owner request: a **▶ Play introduction** button beside "Include video introduction" plays the same video prelude on its own; when it ends (or is unavailable) the overlay closes and the Meditation Room is shown again. It does not start a journey and is disabled while playing. Owner: `modules/media-controls-view.js` (v1.1, which already owns the Settings video preview). Label in five languages (`ui.playVideoIntroduction`; ml/hi/ru/ta draft). Shell cache `chakra-v5.375`, language cache `chakra-language-v85`; atlas map `restart`. Checked in the browser at 375 px: loading → Begin introduction → video → back in the Lobby, no journey started. Unit test in `tests/media-controls-view.test.mjs`.
+
+## Open — Video introduction waits the full 90 seconds on a slow connection (found 2026-10-08)
+
+- When the browser reports a slow link (downlink under 3 Mbps), the prelude waits for 8 seconds of buffer, but a paused video only pre-buffers about 4 seconds, so "Begin introduction" appears only after the 90-second limit. Seen in the in-app browser (reported 3g). Applies to the journey path too; not changed here. Proposed: cap the target at what the browser buffers while paused, or reveal Begin once the clip can play through.
+
+## Released — Journey option settings keep their spacing (production `2a2fca5`, 2026-10-08)
 
 - Ticking a journey option (Guided Visualization, Focused Attention, Body Scan, Guided Noting, the Self-Exploration options, Undo & Unlearn) showed its settings with no layout: "Duration" / "Background score" labels and dropdowns ran inline, wrapped into each other and had no padding. They now sit in a padded tile like the checkbox tiles, one label and field per row (`tailwind/input.css`, `.ds-lobby .journey-addon-control .dharana-options`). `tailwind.css?v=2.2`, shell cache `chakra-v5.374`. Checked in the browser at phone width (375 px) before and after for Journey preparation and Journey integration; the Self-Exploration options use the same rule but were not opened (developer mode). No flow change, so the atlas maps are unchanged.
 - `npm install` was run once (lockfile unchanged), so `npm run build:css` and the `tailwind-setup` test now work on this Mac: 136/136 unit tests pass.
