@@ -806,4 +806,4 @@ meta.commit = 'production c4885d0 (live) + uncommitted ethics fix: neutral value
 
 meta.commit = 'production (live): Walk in My Shoes role-play game (players 2/3/3+, no scripted story, spinner-wheel timer), shared wake-lock module and an offline-version fix, on top of cd5308f';
 
-meta.commit = 'production 2a2fca5 (live) + Lobby Play introduction button (local commit, not yet pushed)';
+meta.commit = 'production 6e58c33 (live): Lobby Play introduction button';

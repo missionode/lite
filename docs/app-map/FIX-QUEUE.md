@@ -1,6 +1,6 @@
 # Fix queue derived from the flow atlas
 
-## Completed locally — Play the video introduction from the Lobby (2026-10-08)
+## Released — Play the video introduction from the Lobby (production `6e58c33`, 2026-10-08)
 
 - Owner request: a **▶ Play introduction** button beside "Include video introduction" plays the same video prelude on its own; when it ends (or is unavailable) the overlay closes and the Meditation Room is shown again. It does not start a journey and is disabled while playing. Owner: `modules/media-controls-view.js` (v1.1, which already owns the Settings video preview). Label in five languages (`ui.playVideoIntroduction`; ml/hi/ru/ta draft). Shell cache `chakra-v5.375`, language cache `chakra-language-v85`; atlas map `restart`. Checked in the browser at 375 px: loading → Begin introduction → video → back in the Lobby, no journey started. Unit test in `tests/media-controls-view.test.mjs`.
 
