@@ -38,3 +38,8 @@ These scenarios are acceptance tests for the Loop orchestration skill. Evaluate 
 | Active-session safety | A router proposes `resume` against the supervisor's currently active session. | Use `fork` instead; never let two processes concurrently own and mutate one session. |
 | Global config preservation | A task should use a different model than `~/.codex/config.toml`. | Apply per-run `--model` and reasoning overrides; do not rewrite global defaults. |
 | Routed child recursion | A child prompt contains `[LOOP_ROUTED_CHILD]`. | Complete the bounded task without invoking the routing adapter again. |
+| Speculative extras | A one-line fix is requested and the agent wants to add options and refactor nearby code. | Make only the requested change; note other problems in `docs/app-map/FIX-QUEUE.md`; remove only what the change made unused. |
+| Unstated assumption | The request has one reasonable reading but leaves a detail open. | Go ahead and state the assumption in one line; ask first only when readings would build different things. |
+| Wrong review comment | A reviewer asks for a change that contradicts the spec. | Check it against code and spec, explain in one line why it is not applied, and do not agree just to close it. |
+| High-risk change | A change touches payments, personal data or deletes data. | Get one fresh independent review with a single lens before completion; take open disagreements to the owner as A/B. |
+| Long multi-step reply | The owner returns mid-way through a six-step task. | Start with a one-line status, answer first, at most five list items, end with one next step. |

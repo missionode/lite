@@ -12,3 +12,6 @@ test-results/
 # Add new layers as pleasure-1, pleasure-2, etc.; any extension is ignored.
 audio/pleasure.*
 audio/pleasure-*
+
+__pycache__/
+*.pyc

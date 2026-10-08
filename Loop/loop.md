@@ -8,6 +8,7 @@ This is Lite's project-local collaboration policy. It applies to the meditation 
 - [Efficient workflow](./EFFICIENT-WORKFLOW.md): bounded context, execution costs, repeatable checks and concise continuity.
 - [Project delivery workflow](../.loop/workflow.md): isolation, model routing, review and release procedure.
 - [Technology stack](./TECH-STACK.md) and [communication architecture](./communication-architecture.md): Lite's current implementation.
+- [Owner communication](./OWNER-COMMUNICATION.md): plain words, A/B/C options, focus-friendly replies, honest status and the release boundary.
 - [HANDOFF.md](../HANDOFF.md): current checkpoint, decisions, evidence, outstanding work and historical references.
 - [Flow atlas](../docs/app-map/index.html), [atlas source](../docs/app-map/atlas-data.mjs) and [fix queue](../docs/app-map/FIX-QUEUE.md): delivered flows and separately marked plans.
 - [Delivery lifecycle](./DELIVERY-WORKFLOW.md) and [model routing](./MODEL-ROUTING.md): supporting procedures, applied only where relevant.
@@ -32,6 +33,13 @@ Recheck files before editing when another actor may have changed them. Preserve 
 6. Run applicable checks, inspect errors and record limitations.
 7. Update the affected atlas, track and handoff. Commit only intended validated files when the environment permits; publish only within the owner's authorization.
 
+### Craft rules for every change
+
+- **Say your assumption.** When you go ahead on a reasonable reading, state the assumption in one line. When two readings would build different things, ask first.
+- **Simplest thing that works.** No features, options, abstractions or error handling for cases that cannot happen unless the task needs them. If the change could be much shorter, make it shorter.
+- **Surgical edits.** Touch only the lines the task needs. Do not reformat, rename or refactor nearby code. Remove only what your own change made unused. Note other problems in `docs/app-map/FIX-QUEUE.md` instead of fixing them on the side.
+- **Done means a check passes.** Before coding, turn the task into a check (a test, a command or a screenshot) that fails or is missing now and will pass when the work is right. Loop until it passes.
+
 After three failed debugging hypotheses, reassess the cause before adding more changes. Small wording/documentation changes need proportionate verification, not a new testing framework or repeated full-suite runs.
 
 ## Efficient execution and routing
@@ -53,7 +61,7 @@ Delegated work gets a compact packet: objective, exact files, constraints, expec
 - Preserve stage order, pause, skip, close, audio fades and cleanup. Avoid duplicate listeners, unbounded queues and unnecessary background loops.
 - Keep all supported UI and narration languages synchronized; display and meditation language are separate choices.
 - Follow the sky and visual requirements in `AGENTS.md`. Confirm whether a redesign change is planned or delivered before changing protected behavior.
-- Use the existing CSS and components. New design decisions follow approved project references, not an unrelated framework example.
+- Styling uses Tailwind on the Lite design system: tokens and components in `tailwind/input.css`, old screen rules in `tailwind/legacy.css`, built to `tailwind.css` (see `AGENTS.md` → Styling). New design decisions follow the Lite design system, not an unrelated framework example.
 - Treat imported JSON and URLs as untrusted input. Validate them through the existing owners.
 - Preserve local settings/assessment storage boundaries and the current Advanced Features gate. Client-side gating is not server authentication.
 - Consent capture remains postponed pending renewed owner approval. Keep proposals separate from current functionality.
