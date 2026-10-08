@@ -36,8 +36,16 @@ Recheck files before editing when another actor may have changed them. Preserve 
 ### Craft rules for every change
 
 - **Say your assumption.** When you go ahead on a reasonable reading, state the assumption in one line. When two readings would build different things, ask first.
-- **Simplest thing that works.** No features, options, abstractions or error handling for cases that cannot happen unless the task needs them. If the change could be much shorter, make it shorter.
-- **Surgical edits.** Touch only the lines the task needs. Do not reformat, rename or refactor nearby code. Remove only what your own change made unused. Note other problems in `docs/app-map/FIX-QUEUE.md` instead of fixing them on the side.
+- **Simplest thing that works.** No features, options, abstractions or error handling for cases that cannot happen unless the task needs them. If the change could be much shorter, make it shorter. Before writing new code, stop at the first step that fits:
+  1. Is it needed now? If not, skip it and say so in one line.
+  2. Does the language's standard library do it?
+  3. Does the platform do it natively (a built-in input, a database rule, an OS setting)?
+  4. Does a package the project already has do it? Add a new package only with a reason (approval gate when it needs the network).
+  5. Only then write the smallest code that works.
+- **Never trim the safety net.** Simplicity never removes input checks at trust boundaries, error handling that prevents data loss, security, accessibility or privacy protections.
+- **Mark deliberate shortcuts.** When you knowingly take a simpler route with a limit, leave a short code comment starting `Known limit:` and add a line to `docs/app-map/FIX-QUEUE.md`, so it is found later.
+- **Surgical edits.** Before removing or changing odd-looking code, find out why it exists (history, tests, map notes); remove it only when the reason is gone. Touch only the lines the task needs. Do not reformat, rename or refactor nearby code. Remove only what your own change made unused. Note other problems in `docs/app-map/FIX-QUEUE.md` instead of fixing them on the side.
+- **Check the real docs.** For an API, package or platform feature you are not sure about, read its current official documentation or the installed version's source; do not code from memory.
 - **Done means a check passes.** Before coding, turn the task into a check (a test, a command or a screenshot) that fails or is missing now and will pass when the work is right. Loop until it passes.
 
 After three failed debugging hypotheses, reassess the cause before adding more changes. Small wording/documentation changes need proportionate verification, not a new testing framework or repeated full-suite runs.
@@ -86,6 +94,8 @@ For documentation-only work, check accuracy, links, diffs and affected generatio
 ## Flow atlas maintenance
 
 Inspect affected maps before a behavior change. Update `docs/app-map/atlas-data.mjs` with executable guards, defaults, exits, persistence and failure paths. Keep proposed behavior in `FIX-QUEUE.md`.
+
+Separate fact from guess: a step inferred but not yet read in code ends with `(inferred)` until checked. Look in the atlas and track before searching files. Keep every `file:line` source pointing at the code it describes; the build now stops on a reference that is out of range or lands on a blank or closing line, so re-point it when code moves.
 
 Regenerate with `node docs/app-map/build-atlas.mjs`; check affected source references and snapshot metadata. Label uncommitted work accurately. Use `verify-atlas.mjs` for structural/interface changes when browser execution is authorized; otherwise report the validation boundary explicitly. When runtime flow is unchanged, update only relevant descriptions or confirm the map remains accurate.
 

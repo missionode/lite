@@ -110,7 +110,7 @@ Review in this order:
 1. `SPEC_COMPLIANCE` — required behavior, acceptance criteria, scope, exclusions, and evidence.
 2. `QUALITY_AND_RISK` — correctness, maintainability, security, privacy, performance, accessibility, operations, and tests.
 
-Critical or high-severity findings block completion. Record medium and low findings with disposition. A model or sub-agent report is advisory evidence; the supervisor verifies the actual diff, files, and test output.
+Approve a change when it clearly improves the code and meets the spec, even if it is not perfect; polish goes to the fix queue. Critical or high-severity findings block completion. Record medium and low findings with disposition. A model or sub-agent report is advisory evidence; the supervisor verifies the actual diff, files, and test output.
 
 ### Receiving review
 

@@ -43,3 +43,8 @@ These scenarios are acceptance tests for the Loop orchestration skill. Evaluate 
 | Wrong review comment | A reviewer asks for a change that contradicts the spec. | Check it against code and spec, explain in one line why it is not applied, and do not agree just to close it. |
 | High-risk change | A change touches payments, personal data or deletes data. | Get one fresh independent review with a single lens before completion; take open disagreements to the owner as A/B. |
 | Long multi-step reply | The owner returns mid-way through a six-step task. | Start with a one-line status, answer first, at most five list items, end with one next step. |
+| Reinvented wheel | The task needs a date input and the agent starts a custom picker. | Use the platform's built-in control or an existing package first; write custom code only when they do not fit, and say why. |
+| Trimmed safety | A "simpler" version drops input validation at an API boundary. | Keep validation, data-loss handling, security and accessibility; simplify elsewhere. |
+| Odd old code | A strange-looking guard sits in code the task touches. | Find out why it exists (history, tests, notes) before removing it. |
+| Weak atlas reference | A delivered map points at a blank line after code moved. | Atlas status reports it; re-point the reference to the code it describes in the same change. |
+| Open gateway | A local AI gateway listens on all interfaces with body logging on. | Bind to 127.0.0.1, require a key, turn body logging off before routing project work through it. |

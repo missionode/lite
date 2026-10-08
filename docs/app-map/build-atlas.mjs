@@ -20,7 +20,10 @@ for (const graph of graphs) {
   for (const reference of graph.source.split('; ')) {
     const [file,line] = reference.split(':');
     const source = fs.readFileSync(path.resolve(directory, '../..', file),'utf8');
-    if (+line > source.split('\n').length) throw new Error(`Invalid reference ${reference}`);
+    const lines = source.split('\n');
+    if (+line > lines.length) throw new Error(`Invalid reference ${reference}`);
+    // A reference must land on real code, not a blank or closing line (catches drift after code moves).
+    if (+line > 1 && (lines[+line - 1] || '').replace(/[\s{}()\[\];,]/g, '').length < 3) throw new Error(`Weak reference ${reference} in ${graph.id}: re-point it to the code it describes`);
   }
 }
 const data = JSON.stringify({meta,graphs}).replaceAll('<','\\u003c');
