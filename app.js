@@ -2424,7 +2424,7 @@ function loadJourneyVideoPrelude() {
     if (journeyVideoPreludeLoadPromise) return journeyVideoPreludeLoadPromise;
     const script = document.createElement('script');
     script.async = true;
-    script.src = new URL('./modules/journey-video-prelude.js?v=1.0', document.baseURI).href;
+    script.src = new URL('./modules/journey-video-prelude.js?v=1.1', document.baseURI).href;
     journeyVideoPreludeLoadPromise = new Promise((resolve, reject) => {
         script.onload = () => {
             const Prelude = window.ChakraJourneyVideoPrelude;

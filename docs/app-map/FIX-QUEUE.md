@@ -1,12 +1,16 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Video introduction: any orientation and a loading meter (2026-10-08)
+
+- Owner request: the video introduction follows the device's orientation and is responsive. The opening image and the video now fill the screen in any orientation (`object-fit: cover`): sideways shows the whole 16:9 frame, upright trims the sides instead of black bands. The loading card fits short sideways screens (max height, scrolls). `manifest.json` now says `"orientation": "any"` so the installed app always turns with the device. A loading progress meter (bar, percentage, accessible progressbar) shows the buffered share and reaches 100% when Begin introduction appears. Files: `tailwind/legacy.css`, `index.html`, `modules/journey-video-prelude.js` v1.1, `manifest.json`, label `ui.journeyVideoPreludeProgress` in five languages (ml/hi/ru/ta draft). Versions: `tailwind.css?v=2.3`, app v4.33, shell cache `chakra-v5.376`, language cache `chakra-language-v86`; atlas map `restart`. Checked in the browser at 375×812 and 812×375 (loading card, meter, image and video). This replaces the earlier rule "keep the complete 16:9 frame with letterboxing".
+
 ## Released — Play the video introduction from the Lobby (production `6e58c33`, 2026-10-08)
 
 - Owner request: a **▶ Play introduction** button beside "Include video introduction" plays the same video prelude on its own; when it ends (or is unavailable) the overlay closes and the Meditation Room is shown again. It does not start a journey and is disabled while playing. Owner: `modules/media-controls-view.js` (v1.1, which already owns the Settings video preview). Label in five languages (`ui.playVideoIntroduction`; ml/hi/ru/ta draft). Shell cache `chakra-v5.375`, language cache `chakra-language-v85`; atlas map `restart`. Checked in the browser at 375 px: loading → Begin introduction → video → back in the Lobby, no journey started. Unit test in `tests/media-controls-view.test.mjs`.
 
 ## Open — Video introduction waits the full 90 seconds on a slow connection (found 2026-10-08)
 
-- When the browser reports a slow link (downlink under 3 Mbps), the prelude waits for 8 seconds of buffer, but a paused video only pre-buffers about 4 seconds, so "Begin introduction" appears only after the 90-second limit. Seen in the in-app browser (reported 3g). Applies to the journey path too; not changed here. Proposed: cap the target at what the browser buffers while paused, or reveal Begin once the clip can play through.
+- When the browser reports a slow link (downlink under 3 Mbps), the prelude waits for 8 seconds of buffer, but a paused video only pre-buffers about 4 seconds, so "Begin introduction" appears only after the 90-second limit. Seen in the in-app browser (reported 3g). Applies to the journey path too; not changed here. Since 2026-10-08 the loading meter makes this visible: it stops near 50% until the wait ends (`Known limit:` comment in `journey-video-prelude.js`). Proposed: cap the target at what the browser buffers while paused, or reveal Begin once the clip can play through.
 
 ## Released — Journey option settings keep their spacing (production `2a2fca5`, 2026-10-08)
 

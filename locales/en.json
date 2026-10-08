@@ -380,6 +380,7 @@
     ,"restartConfirm": "Restart this journey from the beginning? Your settings will be preserved."
     ,"journeyVideoPreludeReminder": "Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions."
     ,"journeyVideoPreludeLoading": "Loading the video—please be patient. Begin introduction will appear when playback is ready."
+    ,"journeyVideoPreludeProgress": "Video loading progress"
     ,"playJourneyVideoPrelude": "Begin introduction"
     ,"voiceTuning": "Voice Tuning"
     ,"voiceClarity": "Clarity"

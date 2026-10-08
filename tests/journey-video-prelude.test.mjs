@@ -10,7 +10,7 @@ const journeyChrome = fs.readFileSync(new URL('../modules/journey-chrome.js', im
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../tailwind/legacy.css', import.meta.url), 'utf8');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-const locales = ['en', 'ml', 'ru', 'hi'].map(language =>
+const locales = ['en', 'ml', 'ru', 'hi', 'ta'].map(language =>
     JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8'))
 );
 
@@ -24,7 +24,15 @@ assert.doesNotMatch(html, /<source[^>]+src="video\/generate\.mp4"/, 'the browser
 assert.match(html, /id="journey-video-prelude-ready"[\s\S]*?data-i18n="ui\.journeyVideoPreludeReminder"[\s\S]*?data-i18n="ui\.journeyVideoPreludeLoading"[\s\S]*?id="play-journey-video-prelude"[\s\S]*?data-i18n="ui\.playJourneyVideoPrelude"/, 'the prelude should show the interruption reminder, loading status, and explicit localized Play control');
 assert.doesNotMatch(html, /skip-journey-video-prelude/, 'the prelude should not offer a skip path once the guide begins it');
 assert.match(css, /\.journey-video-prelude\s*\{[\s\S]*?position:\s*fixed[\s\S]*?inset:\s*0[\s\S]*?z-index:\s*100100/, 'the video prelude should fill the application viewport');
-assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*contain[\s\S]*?aspect-ratio:\s*16 \/ 9[\s\S]*?background:\s*#000[\s\S]*?transition:\s*opacity 2\.4s/, 'the video should preserve the complete original proportion with cinematic letterboxing');
+assert.match(css, /\.journey-video-prelude video\s*\{[\s\S]*?object-fit:\s*cover[\s\S]*?background:\s*#000[\s\S]*?transition:\s*opacity 2\.4s/, 'the video fills the screen in any orientation (owner decision 2026-10-08: no black bands; upright screens trim the sides)');
+assert.doesNotMatch(css.slice(css.indexOf('.journey-video-prelude video {'), css.indexOf('}', css.indexOf('.journey-video-prelude video {'))), /aspect-ratio|object-fit:\s*contain/, 'the video no longer letterboxes to a fixed 16:9 box');
+assert.match(css, /\.journey-video-prelude-meditator\s*\{[\s\S]*?inset:\s*0[\s\S]*?width:\s*100%[\s\S]*?height:\s*100%[\s\S]*?object-fit:\s*cover/, 'the opening image fills the screen the same way');
+assert.match(css, /\.journey-video-prelude-ready\s*\{[\s\S]*?max-height:\s*calc\(100dvh - 2rem\)[\s\S]*?overflow-y:\s*auto/, 'the loading card fits short landscape screens');
+assert.match(fs.readFileSync(new URL('../manifest.json', import.meta.url), 'utf8'), /"orientation":\s*"any"/, 'the installed app turns with the device');
+assert.match(html, /id="journey-video-prelude-loading"[\s\S]*?id="journey-video-prelude-progress" class="journey-video-prelude-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"[\s\S]*?id="journey-video-prelude-percent"[\s\S]*?id="play-journey-video-prelude"/, 'a progress meter shows the loading status');
+assert.match(prelude, /setProgress\(percent\) \{[\s\S]*?style\.width[\s\S]*?aria-valuenow[\s\S]*?progressPercent\.textContent/, 'the meter shows a bar, an accessible value and a percentage');
+assert.match(prelude, /const updateProgress = \(\) => \{[\s\S]*?getBufferedAheadSeconds\(\) \/ target[\s\S]*?const updateBufferCountdown = \(\) => \{\s*updateProgress\(\);/, 'the meter follows the measured buffer on every loading tick');
+assert.match(prelude, /bufferVideoToSafePoint\(\)\.then[\s\S]*?setProgress\(100\)/, 'the meter reaches 100% when Begin introduction appears');
 assert.match(css, /#app:fullscreen\s*\{[\s\S]*?height:\s*100vh[\s\S]*?min-height:\s*100vh/, 'fullscreen should use a stable viewport height');
 assert.match(css, /#app:fullscreen \.journey-video-prelude\s*\{[\s\S]*?width:\s*100%[\s\S]*?height:\s*100%/, 'the prelude should fill the stable fullscreen container');
 assert.match(css, /\.journey-video-prelude\.is-playing \.journey-video-prelude-ready[\s\S]*?backdrop-filter:\s*none[\s\S]*?box-shadow:\s*none/, 'playback should remove expensive loading-card compositing');
@@ -62,7 +70,7 @@ assert.match(prelude, /class JourneyVideoPrelude[\s\S]*?async previewAudio\(\)[\
 assert.doesNotMatch(app, /fadeJourneyVideoPrelude\(state\.volMusic, JOURNEY_VIDEO_PRELUDE_FADE_IN_SECONDS\)/, 'video playback must not follow the background Music Volume');
 assert.doesNotMatch(app, /requestFullscreen\(|webkitEnterFullscreen/, 'the prelude should not trigger automatic fullscreen');
 assert.match(app, /state\.journeyVideoPreludeEnabled && !bypassLobbyVideoPreludeOnce[\s\S]*?await loadJourneyVideoPrelude\(\)[\s\S]*?prelude\.play\(\)[\s\S]*?startMeditationBtn\.click\(\)/, 'the selected Lobby video should load on demand, run once and then enter the normal journey dispatcher');
-assert.match(app, /let journeyVideoPrelude = null[\s\S]*?function loadJourneyVideoPrelude\(\)[\s\S]*?journeyVideoPreludeLoadPromise[\s\S]*?script\.src = new URL\('\.\/modules\/journey-video-prelude\.js\?v=1\.0'[\s\S]*?journeyVideoPreludeLoadPromise = null/, 'the optional controller should load once on demand and reset its promise after failure');
+assert.match(app, /let journeyVideoPrelude = null[\s\S]*?function loadJourneyVideoPrelude\(\)[\s\S]*?journeyVideoPreludeLoadPromise[\s\S]*?script\.src = new URL\('\.\/modules\/journey-video-prelude\.js\?v=1\.1'[\s\S]*?journeyVideoPreludeLoadPromise = null/, 'the optional controller should load once on demand and reset its promise after failure');
 assert.doesNotMatch(app, /new JourneyVideoPrelude\(audio\)/, 'the optional controller must not be constructed eagerly at startup');
 assert.match(prelude, /window\.ChakraJourneyVideoPrelude = JourneyVideoPrelude/, 'the optional controller must expose its constructor to the loader');
 assert.match(app, /function validateLobbyStartBeforePrelude\(\)[\s\S]*?journeyRouting\.resolveLaunchRoute[\s\S]*?journeyRouting\.validateLobbyStart[\s\S]*?notify\(t\(.ui\.noticeSelectChakra.\)\)[\s\S]*?startMeditationBtn\.addEventListener\('click', async \(\) => \{[\s\S]*?if \(!validateLobbyStartBeforePrelude\(\)\) return;[\s\S]*?state\.journeyVideoPreludeEnabled/,
@@ -90,6 +98,7 @@ assert.doesNotMatch(css, /session-countdown-layer/, 'fullscreen no longer mainta
 for (const locale of locales) {
     assert.ok(locale.ui.journeyVideoPreludeReminder?.trim(), 'each shipped locale needs the interruption reminder');
     assert.ok(locale.ui.journeyVideoPreludeLoading?.trim(), 'each shipped locale needs the video loading status');
+    assert.ok(locale.ui.journeyVideoPreludeProgress?.trim(), 'each shipped locale names the loading meter');
     assert.ok(locale.ui.playJourneyVideoPrelude?.trim(), 'each shipped locale needs the explicit Play label');
     assert.ok(locale.ui.includeVideoIntroduction?.trim(), 'each shipped locale needs the Lobby video-introduction option');
     assert.ok(locale.ui.videoIntroductionSubtitle?.trim(), 'each shipped locale needs the Cosmic Consciousness subtitle');

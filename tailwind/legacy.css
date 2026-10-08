@@ -444,10 +444,10 @@ body {
     inset: 0;
     width: 100%;
     height: 100%;
-    /* Keep the complete original 16:9 frame. Different screen proportions
-       receive black letterboxing instead of cropping or stretching the video. */
-    object-fit: contain;
-    aspect-ratio: 16 / 9;
+    /* Fill the screen in any orientation and turn with the device (owner
+       decision 2026-10-08): sideways shows the whole 16:9 frame, upright
+       screens trim the sides instead of showing black bands. */
+    object-fit: cover;
     background: #000;
     z-index: 1;
     opacity: 0;
@@ -460,9 +460,10 @@ body {
 .journey-video-prelude-meditator {
     position: absolute;
     z-index: 2;
-    width: 100vw;
-    height: 100dvh;
-    object-fit: contain;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     opacity: 0;
     transform: scale(1.015);
     transition: opacity 2.8s ease, transform 4s ease;
@@ -516,6 +517,8 @@ body {
     display: grid;
     gap: 1rem;
     width: min(31rem, calc(100vw - 2.5rem));
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
     padding: 1.3rem;
     border: 1px solid rgba(255, 255, 255, 0.65);
     border-radius: 1.25rem;
@@ -537,6 +540,29 @@ body {
 .journey-video-prelude-loading {
     color: rgba(255, 255, 255, 0.78);
     font-size: 0.92rem !important;
+}
+
+.journey-video-prelude-progress {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.journey-video-prelude-progress > span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #fff;
+    transition: width 0.4s ease;
+}
+
+.journey-video-prelude-ready .journey-video-prelude-percent {
+    margin-top: -0.5rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .journey-video-prelude-play {

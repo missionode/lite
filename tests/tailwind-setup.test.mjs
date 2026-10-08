@@ -30,7 +30,7 @@ for (const [name, value] of [['sky', '#000000'], ['ink', '#f4f1ea'], ['muted', '
 // Cascade (phase 6): one stylesheet. Preflight on in base; legacy rules bundled from tailwind/legacy.css.
 assert.ok(!fs.existsSync(new URL('../style.css', import.meta.url)), 'style.css is gone');
 assert.doesNotMatch(html + sw, /style\.css/, 'nothing loads or precaches style.css');
-assert.match(html, /<link rel="stylesheet" href="tailwind\.css\?v=2\.2">/);
+assert.match(html, /<link rel="stylesheet" href="tailwind\.css\?v=2\.3">/);
 assert.match(input, /@layer theme, base, ds-base, legacy, components, utilities;/, 'layer order: preflight lowest, design-system layers win');
 assert.match(input, /@import "tailwindcss\/preflight\.css" layer\(base\);/, 'preflight on');
 assert.match(input, /@import "\.\/legacy\.css";/, 'legacy rules bundled into the build');
@@ -41,7 +41,7 @@ assert.match(css, /\n\}\n$/, 'and closes it at the end');
     assert.ok(order.every((at, i) => at >= 0 && (i === 0 || at > order[i - 1])), 'built layers appear in cascade order');
 }
 assert.match(input, /html, :host \{ line-height: normal; \}[\s\S]*?h2 \{ font-size: 1\.5em; font-weight: 700; \}[\s\S]*?a \{ color: var\(--tw-color-gold\); text-decoration: underline; \}/, 'old browser defaults kept above preflight; links in gold');
-assert.match(sw, /'\.\/tailwind\.css\?v=2\.2'/, 'tailwind.css works offline');
+assert.match(sw, /'\.\/tailwind\.css\?v=2\.3'/, 'tailwind.css works offline');
 assert.doesNotMatch(html, /cdn\.tailwindcss\.com/, 'no runtime CDN build');
 
 // The committed build contains the Lobby and the utilities the markup uses.
@@ -67,7 +67,7 @@ assert.match(input, /\.ds-settings \.primary-btn \{[\s\S]*?var\(--tw-color-cta-s
 assert.doesNotMatch(input, /ink-settings|muted-settings|cta-settings/, 'one ink, one muted, one gold button');
 assert.match(input, /stroke='%23e8c27e'/, 'select chevron in design-system gold');
 assert.doesNotMatch(css, /#config-screen > \.config-group\s*\{|\.sky-observatory-panel\s*\{|--cosmic-panel:/, 'old Settings and Sky block gone from style.css');
-assert.match(html, /href="tailwind\.css\?v=2\.2"/);
+assert.match(html, /href="tailwind\.css\?v=2\.3"/);
 // Phase 3: shared pieces on design-system tokens, in ds-base with the element defaults they compete with.
 for (const selector of ['.primary-btn {', '.secondary-btn {', 'input[type="range"]::-webkit-slider-runnable-track {', '.range-step {', '.checkbox-label {', '.drone-duration-copy {', '.modal-content {', '.app-notice {', '* {', 'label {']) {
     assert.ok(input.includes(selector), `ds-base has ${selector}`);

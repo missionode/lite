@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="tailwind.css?v=2.2">
+    <link rel="stylesheet" href="tailwind.css?v=2.3">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -751,6 +751,8 @@
             <div id="journey-video-prelude-ready" class="journey-video-prelude-ready">
                 <p data-i18n="ui.journeyVideoPreludeReminder">Before we begin: Please ensure 'Do Not Disturb' is enabled on your device to prevent interruptions.</p>
                 <p id="journey-video-prelude-loading" class="journey-video-prelude-loading" aria-live="polite" data-i18n="ui.journeyVideoPreludeLoading">Loading the video—please be patient. Begin introduction will appear when playback is ready. <span id="journey-video-prelude-buffer-countdown"></span></p>
+                <div id="journey-video-prelude-progress" class="journey-video-prelude-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria-label="ui.journeyVideoPreludeProgress" aria-label="Video loading progress" hidden><span></span></div>
+                <p id="journey-video-prelude-percent" class="journey-video-prelude-percent" aria-hidden="true" hidden>0%</p>
                 <button id="play-journey-video-prelude" class="journey-video-prelude-play" type="button" data-i18n="ui.playJourneyVideoPrelude">Begin introduction</button>
             </div>
         </section>
@@ -983,6 +985,6 @@
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
     <script src="modules/app-notice.js?v=1.0"></script>
-    <script src="app.js?v=4.32"></script>
+    <script src="app.js?v=4.33"></script>
 </body>
 </html>

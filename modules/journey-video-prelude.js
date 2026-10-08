@@ -7,6 +7,9 @@ class JourneyVideoPrelude {
         this.playButton = document.getElementById('play-journey-video-prelude');
         this.loadingStatus = document.getElementById('journey-video-prelude-loading');
         this.bufferCountdown = document.getElementById('journey-video-prelude-buffer-countdown');
+        this.progress = document.getElementById('journey-video-prelude-progress');
+        this.progressFill = this.progress?.querySelector('span');
+        this.progressPercent = document.getElementById('journey-video-prelude-percent');
         this.previewTimer = null;
         this.activePlayback = null;
     }
@@ -30,6 +33,19 @@ class JourneyVideoPrelude {
         if (!source) return false;
         this.media.src = source;
         return true;
+    }
+
+    // Loading meter: share of the buffer target already downloaded.
+    setProgress(percent) {
+        const value = Math.max(0, Math.min(100, Math.round(percent)));
+        if (this.progressFill) this.progressFill.style.width = `${value}%`;
+        this.progress?.setAttribute('aria-valuenow', String(value));
+        if (this.progressPercent) this.progressPercent.textContent = `${value}%`;
+    }
+
+    showProgress(visible) {
+        if (this.progress) this.progress.hidden = !visible;
+        if (this.progressPercent) this.progressPercent.hidden = !visible;
     }
 
     getBufferedAheadSeconds() {
@@ -157,6 +173,7 @@ class JourneyVideoPrelude {
                 this.overlay.classList.add('hidden');
                 if (this.playButton) this.playButton.hidden = true;
                 if (this.loadingStatus) this.loadingStatus.hidden = true;
+                this.showProgress(false);
                 resolve(reason);
             };
             const onTimeUpdate = () => {
@@ -221,7 +238,19 @@ class JourneyVideoPrelude {
             this.overlay.classList.add('is-meditator');
             if (this.playButton) this.playButton.hidden = true;
             if (this.loadingStatus) this.loadingStatus.hidden = false;
+            this.setProgress(0);
+            this.showProgress(true);
+            const updateProgress = () => {
+                const target = Math.min(
+                    this.getVideoBufferTargetSeconds(),
+                    Number.isFinite(this.media.duration) ? Math.max(2, this.media.duration) : JOURNEY_VIDEO_PRELUDE_BUFFER_MAX_SECONDS
+                );
+                // Known limit: holds at 99% during the short stability check, and on a slow link a paused video may
+                // not buffer the full target, so the meter can stop below 100% until the 90-second wait ends.
+                this.setProgress(Math.min(99, (this.getBufferedAheadSeconds() / target) * 100));
+            };
             const updateBufferCountdown = () => {
+                updateProgress();
                 if (!this.bufferCountdown) return;
                 const target = Math.min(
                     this.getVideoBufferTargetSeconds(),
@@ -244,11 +273,15 @@ class JourneyVideoPrelude {
                     void complete('unavailable', JOURNEY_VIDEO_PRELUDE_FAILURE_FADE_SECONDS);
                     return;
                 }
+                if (bufferCountdownTimer) clearInterval(bufferCountdownTimer);
+                bufferCountdownTimer = null;
+                this.setProgress(100);
                 if (this.playButton) {
                     this.playButton.hidden = false;
                     this.playButton.focus();
                 }
                 if (this.loadingStatus) this.loadingStatus.hidden = true;
+                this.showProgress(false);
             });
         }).finally(() => { this.activePlayback = null; });
 
