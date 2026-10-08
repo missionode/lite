@@ -73,7 +73,7 @@ assert.match(app, /QUIET_COURAGE_SUPPORT_FREQUENCY_HZ = 396/);
 assert.match(app, /const supportToneDurationMs = getDroneDurationMs\(minutes, state\.droneDurationMode\)/);
 assert.match(app, /startSupportTone: \(\) => state\.noFrequencyMode\s*\? false\s*: this\.audio\.startGuidedTransitionTone\(QUIET_COURAGE_SUPPORT_FREQUENCY_HZ, supportToneDurationMs\)/);
 assert.match(app, /stopSupportTone: \(\) => this\.audio\.stopGuidedTransitionTone\(0\.8\)/);
-assert.match(serviceWorker, /chakra-v5\.373[\s\S]*?quiet-courage-practice\.js\?v=1\.0/);
+assert.match(serviceWorker, /chakra-v5\.374[\s\S]*?quiet-courage-practice\.js\?v=1\.0/);
 
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     const locale = JSON.parse(fs.readFileSync(`locales/${language}.json`, 'utf8'));

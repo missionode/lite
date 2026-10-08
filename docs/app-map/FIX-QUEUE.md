@@ -1,5 +1,14 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Journey option settings keep their spacing (2026-10-08)
+
+- Ticking a journey option (Guided Visualization, Focused Attention, Body Scan, Guided Noting, the Self-Exploration options, Undo & Unlearn) showed its settings with no layout: "Duration" / "Background score" labels and dropdowns ran inline, wrapped into each other and had no padding. They now sit in a padded tile like the checkbox tiles, one label and field per row (`tailwind/input.css`, `.ds-lobby .journey-addon-control .dharana-options`). `tailwind.css?v=2.2`, shell cache `chakra-v5.374`. Checked in the browser at phone width (375 px) before and after for Journey preparation and Journey integration; the Self-Exploration options use the same rule but were not opened (developer mode). No flow change, so the atlas maps are unchanged.
+- `npm install` was run once (lockfile unchanged), so `npm run build:css` and the `tailwind-setup` test now work on this Mac: 136/136 unit tests pass.
+
+## Open — Chakra tile names break mid-word on phones (found 2026-10-08)
+
+- At 375 px the Chakra Journey tiles split names ("Throa / t", "Crow / n") because the tile text uses `overflow-wrap: anywhere`. Not fixed yet; proposed: let names wrap only between words.
+
 ## Released — Walk in My Shoes update: players 2/3/3+, no scripted story, spinner-wheel timer (2026-10-07)
 
 - Owner changes after the first release: (1) players are **2**, **3** or **3+** (3+ starts at four with a stepper up to eight; with three or more players only Radha and Krishna is offered, the rest are Friends); (2) the scripted opening stories are removed, so the players invent the story; (3) the timer is no longer a choice: a **spinner wheel** (5/10/15/20/30 minutes) decides it once per round and the time is then fixed, Play appears only after the wheel stops, and Swap roles and play again spins again. Locale keys `rpStarter_*` and `rpTimerPick` removed; `rpSpin`, `rpSpinning`, `rpSpinNote`, `rpSpunTime`, `rpOwnStory`, `rpPlayersMore`, `rpMorePlayers`, `rpFewer`, `rpMore` added in five languages (draft wording for ml/hi/ru/ta). `role-play-game.js` v1.1, `practice-module-loader.js` v1.9, shell cache `chakra-v5.373`, language cache `chakra-language-v84`; atlas map `role-play`; guide `docs/role-play-game.md`.

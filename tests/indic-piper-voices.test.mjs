@@ -49,7 +49,7 @@ assert.match(app, /piper-models\.json\?v=4/);
 assert.match(serviceWorker, /chakra-piper-v12/);
 assert.match(serviceWorker, /chakra-language-v84/);
 assert.match(serviceWorker, /LANGUAGE_ASSETS\s*=\s*\['\.\/language-manifest\.json\?v=2',\s*'\.\/locales\/ta\.json'\]/);
-assert.match(serviceWorker, /chakra-v5\.373/);
+assert.match(serviceWorker, /chakra-v5\.374/);
 assert.doesNotMatch(serviceWorker, /hostname\s*===\s*['"]huggingface\.co['"]/, 'ONNX downloads are not duplicated in Service Worker storage');
 assert.match(html, /data-i18n="ui\.piperCommunityVoiceNote"/);
 

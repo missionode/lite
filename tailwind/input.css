@@ -368,6 +368,27 @@
   .per-chakra-time-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .per-chakra-time-status:empty { display: none; }
 
+  /* Settings under a ticked journey option (Duration, Background score, Focus anchor…):
+     a padded tile like the checkbox tiles, one label and field per row. */
+  .ds-lobby .journey-addon-control .dharana-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--tw-color-border);
+    border-radius: var(--tw-radius-tile);
+    background: var(--tw-color-tile);
+  }
+  .ds-lobby .journey-addon-control .dharana-options[hidden] { display: none; }
+  .ds-lobby .journey-addon-control .dharana-options > label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .ds-lobby .journey-addon-control .dharana-options select { min-width: 7rem; letter-spacing: 0.02em; }
+
   /* Benefits and safety (Settings): the link uses the Settings gold, not the old amber. */
   .benefits-safety-link {
     background: none;
