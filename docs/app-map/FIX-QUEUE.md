@@ -1,6 +1,6 @@
 # Fix queue derived from the flow atlas
 
-## Completed locally — Video introduction: any orientation and a loading meter (2026-10-08)
+## Released — Video introduction: any orientation and a loading meter (production `a176eb3`, 2026-10-08)
 
 - Owner request: the video introduction follows the device's orientation and is responsive. The opening image and the video now fill the screen in any orientation (`object-fit: cover`): sideways shows the whole 16:9 frame, upright trims the sides instead of black bands. The loading card fits short sideways screens (max height, scrolls). `manifest.json` now says `"orientation": "any"` so the installed app always turns with the device. A loading progress meter (bar, percentage, accessible progressbar) shows the buffered share and reaches 100% when Begin introduction appears. Files: `tailwind/legacy.css`, `index.html`, `modules/journey-video-prelude.js` v1.1, `manifest.json`, label `ui.journeyVideoPreludeProgress` in five languages (ml/hi/ru/ta draft). Versions: `tailwind.css?v=2.3`, app v4.33, shell cache `chakra-v5.376`, language cache `chakra-language-v86`; atlas map `restart`. Checked in the browser at 375×812 and 812×375 (loading card, meter, image and video). This replaces the earlier rule "keep the complete 16:9 frame with letterboxing".
 
