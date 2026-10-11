@@ -33,6 +33,22 @@
       "source": "https://huggingface.co/rhasspy/piper-voices"
     },
     {
+      "id": "ml_IN-syam-custom",
+      "language": "ml",
+      "locale": "ml-IN",
+      "label": "Piper Malayalam — Syam (Custom, experimental)",
+      "gender": "male",
+      "modelPath": "ml/ml_IN/syam/custom/voice.onnx",
+      "configPath": "ml/ml_IN/syam/custom/voice.onnx.json",
+      "modelBaseUrl": "./piper/models",
+      "phonemizerVoice": "ml",
+      "modelSize": 63516077,
+      "modelLfsOid": "2559d4d43d836cb5ff91e34717d311fbce56fb687a04e8db68195f2a60b822f8",
+      "quality": "custom",
+      "license": "Owner's own voice and model (Ikigai); interim model, listening quality not yet reviewed",
+      "source": "Ikigai custom training, 2026-10-11"
+    },
+    {
       "id": "en_US-lessac-medium",
       "language": "en",
       "locale": "en-US",

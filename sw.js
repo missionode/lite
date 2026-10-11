@@ -1,5 +1,5 @@
-const CACHE_NAME = 'chakra-v5.376';
-const PIPER_CACHE_NAME = 'chakra-piper-v12';
+const CACHE_NAME = 'chakra-v5.377';
+const PIPER_CACHE_NAME = 'chakra-piper-v13';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v86';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './tailwind.css?v=2.3',
-  './app.js?v=4.33',
+  './app.js?v=4.34',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.1',
   './modules/ambient-particle-field.js?v=1.1',
@@ -43,7 +43,7 @@ const ASSETS = [
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.1',
   './modules/piper-lifecycle.js?v=1.2',
-  './modules/voice-download-card.js?v=1.0',
+  './modules/voice-download-card.js?v=1.1',
   './modules/app-notice.js?v=1.0',
   './modules/audio-route-lifecycle.js?v=1.0',
   './modules/audio-engine-initialization.js?v=1.2',

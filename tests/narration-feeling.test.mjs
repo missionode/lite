@@ -77,7 +77,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.ok(html.indexOf('modules/narration-feeling.js?v=1.0') < html.indexOf('modules/pitch-mode.js'), 'feelings load before Pitch Mode');
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 assert.match(sw, /'\.\/modules\/narration-feeling\.js\?v=1\.0'/, 'works offline');
-assert.match(sw, /chakra-piper-v12/, 'the changed Piper runtime is fetched fresh');
+assert.match(sw, /chakra-piper-v13/, 'the changed Piper runtime is fetched fresh');
 // scripts.json: every narrated field in every language has a feeling.
 const scripts = JSON.parse(fs.readFileSync(new URL('../scripts.json', import.meta.url), 'utf8'));
 assert.ok(scripts.feelings && typeof scripts.feelings === 'object', 'scripts.json has a feelings block');

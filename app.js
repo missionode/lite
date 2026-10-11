@@ -2598,7 +2598,7 @@ function getMoonPhase() {
 }
 
 async function loadPiperVoiceRegistry() {
-    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console, 'piper-models.json?v=4');
+    piperVoiceRegistry = await piperLifecycle.loadVoiceRegistry(fetch, console, 'piper-models.json?v=5');
 }
 
 async function init() {

@@ -46,7 +46,7 @@ function storageWith(files) {
     } }) };
 }
 
-const context = vm.createContext({});
+const context = vm.createContext({ URL });
 vm.runInContext(source, context);
 const api = context.ChakraVoiceDownloadCard;
 const definition = { modelPath: 'ml/ml_IN/arjun/medium/ml_IN-arjun-medium.onnx', modelSize: 62950044 };
@@ -109,8 +109,18 @@ assert.equal(api.toMB(62950044), 60);
 // Wiring: card in Settings, loaded and cached, fed by the Piper worker progress.
 assert.match(html, /id="voice-status"[\s\S]*?<div id="voice-download-card" class="voice-dl" hidden><\/div>/);
 assert.ok(html.indexOf('modules/voice-download-card.js?v=1.0') < html.indexOf('app.js?v='));
-assert.match(sw, /'\.\/modules\/voice-download-card\.js\?v=1\.0'/);
+assert.match(sw, /'\.\/modules\/voice-download-card\.js\?v=1\.1'/);
 assert.match(lifecycle, /deps\.onDownloadProgress\(loaded, total\)/);
 assert.match(lifecycle, /deps\.onVoiceReady\(\)/);
 assert.match(app, /onDownloadProgress: \(loaded, total\) => voiceDownloadCard\.progress\(loaded, total\)/);
+// A voice served from the Lite folder (for example Syam) is kept by the service worker's Piper cache, not OPFS.
+{
+    const local = { modelPath: 'ml/ml_IN/syam/custom/voice.onnx', modelBaseUrl: './piper/models', modelSize: 63516077 };
+    const location = { href: 'https://example.test/lite/index.html' };
+    const cached = new Set(['https://example.test/lite/piper/models/ml/ml_IN/syam/custom/voice.onnx']);
+    const caches = { match: async url => (cached.has(String(url)) ? {} : undefined) };
+    assert.equal(await api.isStored(local, { storage: storageWith({}) }, caches, location), true, 'a cached Lite-folder voice shows Downloaded');
+    assert.equal(await api.isStored(local, { storage: storageWith({}) }, { match: async () => undefined }, location), false, 'an uncached Lite-folder voice still offers Download now');
+    assert.equal(await api.isStored({ modelPath: 'ml/ml_IN/arjun/medium/ml_IN-arjun-medium.onnx', modelSize: 62950044 }, { storage: storageWith({}) }, caches, location), false, 'Hugging Face voices still use OPFS only');
+}
 console.log('Voice download card passed: size and offline note, Wi-Fi and mobile-data hints, button, MB/percent progress, floating pill, failure, stored state.');

@@ -1,6 +1,6 @@
 # Screen and control inventory
 
-Source snapshot: production a176eb3 (live): video introduction fills any orientation and shows a loading meter · 2026-10-06.
+Source snapshot: production a176eb3 (live) + Syam custom Malayalam voice served from the Lite folder (local commit, not yet pushed) · 2026-10-06.
 
 This inventories static UI declarations in the three meditation HTML entry pages. Assessment questions and result cards are generated at runtime; two answer buttons render one prompt at a time. Translated copy, enhanced range-step buttons and controls moved at runtime are described separately below. IDs without a visible text label retain their source identifier; this is a coverage checklist alongside the flow maps, not a new user-facing menu.
 

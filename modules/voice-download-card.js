@@ -15,7 +15,20 @@
         return String(definition?.modelPath || '').split('/').pop();
     }
 
-    async function isStored(definition, navigatorRef = global.navigator) {
+    // Voices served from the Lite folder (relative modelBaseUrl, e.g. Syam) are kept
+    // by the service worker's Piper cache, not OPFS; look for the model there.
+    async function isCachedLocally(definition, cachesRef, locationRef) {
+        const base = String(definition?.modelBaseUrl || '');
+        if (!base || /^[a-z]+:/i.test(base) || !definition?.modelPath || !cachesRef?.match || !locationRef?.href) return false;
+        try {
+            return Boolean(await cachesRef.match(new URL(`${base.replace(/\/$/, '')}/${definition.modelPath}`, locationRef.href).href));
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async function isStored(definition, navigatorRef = global.navigator, cachesRef = global.caches, locationRef = global.location) {
+        if (await isCachedLocally(definition, cachesRef, locationRef)) return true;
         const name = modelFileName(definition);
         if (!name || !navigatorRef?.storage?.getDirectory) return false;
         try {
