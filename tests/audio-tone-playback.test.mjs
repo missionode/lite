@@ -144,8 +144,23 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 }
 
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.2') < html.indexOf('app.js?v=4.37'));
-assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.2/);
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.3') < html.indexOf('app.js?v=4.38'));
+assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.3/);
+
+// The speaker choice is only offered on phones and tablets (browser or installed PWA).
+{
+    const offer = playback.supportsShotSpeakerChoice;
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/129 Mobile Safari/537.36' }), true, 'Android phone');
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-X710) AppleWebKit/537.36 Chrome/129 Safari/537.36' }), true, 'Android tablet');
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148' }), true, 'iPhone');
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15', maxTouchPoints: 5 }), true, 'iPad (desktop-style user agent with touch)');
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/129 Safari/537.36', maxTouchPoints: 0 }), false, 'Mac desktop');
+    assert.equal(offer({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/129 Safari/537.36', userAgentData: { mobile: false } }), false, 'Windows desktop');
+    assert.equal(offer({ userAgent: 'x', userAgentData: { mobile: true } }), true, 'browser says mobile');
+    assert.equal(offer(null), false);
+    const appSource = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+    assert.match(appSource, /if \(!audioTonePlayback\.supportsShotSpeakerChoice\(navigator\)\) \{[\s\S]*?shotSpeakerControl\.hidden = true;[\s\S]*?state\.shotSpeaker = 'both';/, 'on desktops the control is hidden and Shots use both speakers');
+}
 
 // Shots speaker setting: saved per device, Both by default, picked with a test tone.
 {

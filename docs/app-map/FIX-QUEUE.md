@@ -1,5 +1,9 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Shots speaker choice only on phones and tablets (2026-10-12)
+
+- Owner request: show **Speaker for Shots** only when the app is opened on a mobile device. It is shown on phones and tablets (mobile browser or installed PWA), detected from the browser's mobile flag or the user agent (Android, iPhone, iPad, iPod, Mobile; iPad's desktop-style user agent by its touch screen). On desktops and laptops the control is hidden and Shots use both speakers; a saved phone choice stays in storage. `audio-tone-playback.js` v1.3 (`supportsShotSpeakerChoice`), app v4.38, shell cache `chakra-v5.381`; atlas map `shots`. Unit tests cover phone, tablet, iPad, Mac and Windows cases. Known limit: detection relies on what the browser reports.
+
 ## Completed locally — Shots: Activate button in the Shots section and a get-ready countdown (2026-10-12)
 
 - Owner request: start Shots from inside the Shots section, and give people a countdown to prepare. The Shots section now has its own **Activate … Shot** button (same label as before, same Begin dispatcher); the Lobby Begin button is hidden while Shots is selected. Before the first tone the screen shows **Get ready… 5, 4, 3, 2, 1** (pause-aware; Stop during it plays no tone); the Shot timer starts after it. Files: `index.html`, `app.js` v4.37, `modules/lobby-experience-visibility.js` v1.4, `modules/shot-session.js` v1.3, label `ui.shotGetReady` in five languages (ml/hi/ru/ta draft). Shell cache `chakra-v5.380`, language cache `chakra-language-v88`; atlas map `shots`.

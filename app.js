@@ -2921,6 +2921,13 @@ function attachEventListeners() {
     const shotTypeSelect = document.getElementById('shot-type-select');
     // Shots speaker: both speakers, or one built-in speaker picked with a test tone.
     const shotSpeakerSelect = document.getElementById('shot-speaker-select');
+    const shotSpeakerControl = document.getElementById('shot-speaker-control');
+    if (!audioTonePlayback.supportsShotSpeakerChoice(navigator)) {
+        // Desktop or laptop: no built-in speaker choice; Shots use both speakers
+        // (the saved phone choice is left untouched in storage).
+        if (shotSpeakerControl) shotSpeakerControl.hidden = true;
+        state.shotSpeaker = 'both';
+    }
     if (shotSpeakerSelect) shotSpeakerSelect.value = state.shotSpeaker;
     shotSpeakerSelect?.addEventListener('change', () => {
         state.shotSpeaker = ['left', 'right'].includes(shotSpeakerSelect.value) ? shotSpeakerSelect.value : 'both';

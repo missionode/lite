@@ -160,5 +160,16 @@
         return true;
     }
 
-    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, playSpeakerTest, startTransitionTone, stopTransitionTone, playSingingBowl });
+    // Phones and tablets (in a browser or as an installed PWA) have built-in
+    // speakers worth choosing between; desktops and laptops do not.
+    function supportsShotSpeakerChoice(nav) {
+        if (!nav) return false;
+        if (nav.userAgentData?.mobile === true) return true;
+        const userAgent = String(nav.userAgent || '');
+        if (/Android|iPhone|iPad|iPod|Mobile/i.test(userAgent)) return true;
+        // iPadOS reports a desktop Mac user agent; only the touch screen tells it apart.
+        return /Macintosh/.test(userAgent) && Number(nav.maxTouchPoints) > 1;
+    }
+
+    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, playSpeakerTest, supportsShotSpeakerChoice, startTransitionTone, stopTransitionTone, playSingingBowl });
 })(window);
