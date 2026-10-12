@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 
 const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const registry = JSON.parse(read('piper-models.json')).voices;
@@ -21,6 +22,8 @@ assert.equal(voice.modelBaseUrl, './piper/models', 'the model loads from the Lit
 const modelFile = new URL(`../piper/models/${voice.modelPath}`, import.meta.url);
 const configFile = new URL(`../piper/models/${voice.configPath}`, import.meta.url);
 assert.equal(fs.statSync(modelFile).size, voice.modelSize, 'registry size matches the shipped model');
+assert.equal(crypto.createHash('sha256').update(fs.readFileSync(modelFile)).digest('hex'), voice.modelLfsOid, 'registry fingerprint matches the shipped model (catches a replaced model without a registry update)');
+assert.equal(voice.modelLfsOid, '1684099485c6162ecd5ae119742232818acc9f76a2830de9d749d39414aecaeb', 'the 12 October 2026 model is shipped');
 const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 assert.equal(config.espeak.voice, 'ml');
 assert.equal(config.phoneme_type, 'espeak');
@@ -35,7 +38,7 @@ assert.equal(manifest.languages.find(language => language.id === 'ml').defaultPi
 // Downloaded on demand and kept offline by the Piper cache, never precached at install.
 assert.doesNotMatch(sw, /voice\.onnx/, 'the 63 MB model is not in the install precache');
 assert.match(sw, /url\.pathname\.includes\('\/piper\/'\)/, 'requests under /piper/ use the on-demand Piper cache');
-assert.match(sw, /const PIPER_CACHE_NAME = 'chakra-piper-v13'/, 'the Piper cache is renewed so phones see the new registry');
-assert.match(app, /loadVoiceRegistry\(fetch, console, 'piper-models\.json\?v=5'\)/, 'the registry URL is renewed');
+assert.match(sw, /const PIPER_CACHE_NAME = 'chakra-piper-v14'/, 'the Piper cache is renewed so phones see the new registry');
+assert.match(app, /loadVoiceRegistry\(fetch, console, 'piper-models\.json\?v=6'\)/, 'the registry URL is renewed');
 
 console.log('Custom Malayalam voice (Syam) passed: registered with the Malayalam voices, served from the Lite folder, on-demand offline cache.');

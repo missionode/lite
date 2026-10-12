@@ -43,10 +43,10 @@
       "modelBaseUrl": "./piper/models",
       "phonemizerVoice": "ml",
       "modelSize": 63516077,
-      "modelLfsOid": "2559d4d43d836cb5ff91e34717d311fbce56fb687a04e8db68195f2a60b822f8",
+      "modelLfsOid": "1684099485c6162ecd5ae119742232818acc9f76a2830de9d749d39414aecaeb",
       "quality": "custom",
       "license": "Owner's own voice and model (Ikigai); interim model, listening quality not yet reviewed",
-      "source": "Ikigai custom training, 2026-10-11"
+      "source": "Ikigai custom training, 2026-10-12 (415 recordings)"
     },
     {
       "id": "en_US-lessac-medium",

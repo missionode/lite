@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Syam voice: 12 October 2026 model (2026-10-12)
+
+- Owner supplied `Piper_custom_model/ikigai_malayalam_voice_20261012.zip` (415 recordings, 18 more training passes). `voice.onnx` replaced in `piper/models/ml/ml_IN/syam/custom/` (same 63,516,077 bytes; SHA-256 `16840994…`); `voice.onnx.json` is unchanged. Registry fingerprint and source updated (`piper-models.json?v=6`). Phones keep the old model by its address, so the Piper cache is renewed (`chakra-piper-v14`): Syam downloads once more (about 60 MB); Hugging Face voices are stored separately and are not re-downloaded. App v4.39, shell cache `chakra-v5.382`. The voice test now checks that the registry fingerprint matches the shipped file.
+- Checked: unit tests; in-app browser loads the new model from the Lite folder and reports the voice ready. Not checked: listening (the README says quality and similarity remain unverified).
+
 ## Completed locally — Shots speaker choice only on phones and tablets (2026-10-12)
 
 - Owner request: show **Speaker for Shots** only when the app is opened on a mobile device. It is shown on phones and tablets (mobile browser or installed PWA), detected from the browser's mobile flag or the user agent (Android, iPhone, iPad, iPod, Mobile; iPad's desktop-style user agent by its touch screen). On desktops and laptops the control is hidden and Shots use both speakers; a saved phone choice stays in storage. `audio-tone-playback.js` v1.3 (`supportsShotSpeakerChoice`), app v4.38, shell cache `chakra-v5.381`; atlas map `shots`. Unit tests cover phone, tablet, iPad, Mac and Windows cases. Known limit: detection relies on what the browser reports.

@@ -4113,7 +4113,7 @@
           [
             "route",
             "Voice engine choice",
-            "Use Piper only when selected, supported and configured. Voices come from piper-models.json by language; Malayalam offers Arjun (default), Meera and Syam (the owner’s own custom voice, experimental), all through the same speech-form, feelings and voice effects. Syam’s model is served from the Lite folder (piper/models/…), not Hugging Face."
+            "Use Piper only when selected, supported and configured. Voices come from piper-models.json by language; Malayalam offers Arjun (default), Meera and Syam (the owner’s own custom voice, experimental), all through the same speech-form, feelings and voice effects. Syam’s model (12 October 2026 training) is served from the Lite folder (piper/models/…), not Hugging Face; replacing it renews the Piper cache so phones fetch the new file."
           ],
           [
             "download",
