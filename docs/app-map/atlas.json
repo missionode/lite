@@ -2,7 +2,7 @@
   "meta": {
     "title": "Chakra Meditation · Flow Atlas",
     "date": "2026-10-06",
-    "commit": "production a176eb3 (live) + Syam custom Malayalam voice, Shots speaker choice, Activate in the Shots section, a get-ready countdown and the speaker choice on phones only (latest changes local, not yet pushed)",
+    "commit": "production a176eb3 (live) + Syam custom Malayalam voice, Shots speaker choice, Activate in the Shots section, a get-ready countdown and the speaker choice on phones only, plus a Voice Tuner page (latest changes local, not yet pushed)",
     "scope": "Focused release snapshot: centering-breath narration now invites comfortable rest in all five supported languages. No Frequency is selected for clients without a saved preference; a previously saved explicit opt-out remains respected. The established sound-suppression and journey flows are unchanged. Browser visual verification was not run. Calm translated in-app messages replace browser alerts (no developer text shown); repertory page in five languages with a No Frequency note, and it no longer changes the app language. Lobby frequency reminder above Begin: shows whether No Frequency Mode is on (tones off) or off, with a one-tap Turn on / Turn off that stays in sync with Settings. 2-Minute Mind Reset has no breathing cues: each mood uses body, senses, movement or thought, with time to do each step. Clearer first voice download (size, offline note, Download now, MB/percent progress card and floating pill); Sleep wind-down (last 3 minutes fade to dark and silence, quiet goodnight finish, wake lock released); app images served as WebP (about 20 MB → 1.6 MB). Heavenly Sound: voice has its own clean bus (no Eyes Close muffling), mud cut, soft de-ess and air lift; new heavenly echo (70 ms pre-delay, 3.5 s darkening tail, ducked under words, blooms in pauses), Off / Soft Halo / Heavenly; gentle master compressor and soft limiter; no 40 Hz hum; device sample rate. Chakra Touch added to the dev-mode Play Zone (chakra-touch map): consent-first couples touch game with a fixed Giver and Receiver, the receiver’s private Yes/Maybe/No map, Pause and check-ins. Mantra exits smoothly: 12 s chakra exit window (6 s fade + tail) inside chant time, pause fades the whole mix before suspending, skip fades over ~3 s. Assessment dot fixed: pleasure-vs-caution rounds, 75% rule (red now reachable), no card twice in a row, healthier chakra answer shown on either side. Assessment questions and value cards rewritten in plain, translation-friendly English (same meaning, IDs and weights). Narration rewritten in five languages to be natural, meditative and confident; engine keeps ? ! tone, breaks long sentences at commas and applies voice-only respellings (narration-speech-form module). Contactless Eye Shooter added to the dev-mode Play Zone (eye-shooter map): explanation-only gaze game with a points table and points goal. Hush Hush v2.0: hand-off lock, whose-turn banner, chakra images, real wheel, result flash; outer-body-part cards and 18+ Secret Card words; fixed an unclosed CSS media block that limited game and Pitch styles to small phones. Game renamed to Hush Hush (icebreaker) inside a new dev-mode Play Zone games section in the Lobby. Secret Body Part moved from Experiment Mode to its own dev-mode Lobby panel after Mood & Relaxation Ambience. Public Pitch Mode (2-Minute Mind Reset) added between Sound Shot and Meditation Room with fixed male voices per language (pitch-mode map). Dev-mode Secret Body Part party game added under Experiment Mode (secret-body-game map). 2026-09-30 release: ported local dev-mode (Advanced Features) Quiet Courage and Self-Exploration trio (Confidence Visualization, Deep Secrets, Final Challenge) as ordered preparation stages after Guided Noting; Lobby roadmap now follows runtime order (Intention before preparation practices); dev-mode session-only Reverse Journey (Crown → Root) restored."
   },
   "graphs": [
@@ -6771,6 +6771,80 @@
       ],
       "notes": [
         "Fetch or catalog-validation failures show a load error. This handoff prepares settings; it never automatically plays audio. Initial checkFirstTime still routes new visitors to Settings. The pending handoff is offered only after the shared unlock, then acceptance shows the Lobby."
+      ]
+    },
+    {
+      "id": "voice-tuner",
+      "group": "Supporting pages",
+      "title": "Voice Tuner · Piper voice tuning page",
+      "subtitle": "A development tool page (docs/voice-tuner.html, not linked from the app and not in the offline install) to tune how a Piper voice speaks, save the values per voice in the browser and export them for the owner to send back.",
+      "source": "docs/voice-tuner.html:1; piper/runtime/piper-tts-web.js:340; piper-worker.js:8; tests/voice-tuner.test.mjs:1",
+      "rows": [
+        [
+          [
+            "open",
+            "Open docs/voice-tuner.html",
+            "Loads piper-models.json and lists every selectable voice (Pitch-only voices excluded). Arjun is selected first."
+          ]
+        ],
+        [
+          [
+            "pick",
+            "Pick a voice and text",
+            "Shows the voice’s original speed (length_scale), expressiveness (noise_scale) and rhythm (noise_w) from its own settings file. Sample lines per language; the text is editable."
+          ]
+        ],
+        [
+          [
+            "tune",
+            "Move a slider",
+            "Speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line."
+          ]
+        ],
+        [
+          [
+            "play",
+            "Play tuned / Play original",
+            "A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values."
+          ]
+        ],
+        [
+          [
+            "share",
+            "Export / Import",
+            "Export downloads voice-tuning-DATE.json (schema 1, every tuned voice). Import checks the schema, ignores unknown voices and clamps values to the slider ranges. Applying exported values as app defaults is a separate, later step."
+          ]
+        ]
+      ],
+      "edges": [
+        [
+          "open",
+          "pick",
+          "Voice list loaded"
+        ],
+        [
+          "pick",
+          "tune",
+          "Adjust"
+        ],
+        [
+          "tune",
+          "play",
+          "Release slider / Play"
+        ],
+        [
+          "play",
+          "tune",
+          "Adjust again"
+        ],
+        [
+          "play",
+          "share",
+          "Export"
+        ]
+      ],
+      "notes": [
+        "Storage failures never break the page. Nothing is sent anywhere: synthesis runs on the device; Hugging Face voices download once like in the app."
       ]
     },
     {

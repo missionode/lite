@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Voice Tuner page (2026-10-12)
+
+- Owner request: a live page to tune Arjun, Meera or Syam (any selectable voice), saved in the browser, with export so the values can be applied later. `docs/voice-tuner.html` (development tool; not linked from the app, not precached): voice picker, editable text with sample lines, sliders for speed (length_scale 0.75–1.5), expressiveness (noise_scale 0–1.2) and rhythm (noise_w 0–1.2), Play tuned / Play original / Reset, auto re-speak on slider release, per-voice saving (`lite_voice_tuning_v1`), Export / Import JSON (schema 1, clamped). The Piper runtime now accepts exact noise values (bounded 0–1.5) besides the narration feeling factors; the worker loads it as `piper-tts-web.js?v=2`, and the tuner uses `piper-worker.js?v=2`, so phones get it without wiping the voice cache. Checked: unit test `tests/voice-tuner.test.mjs`; browser: Syam played at expressiveness 0.30 and the value was saved.
+- Next (not done): when the owner sends the exported JSON, apply the values as per-voice defaults (registry fields read by the runtime), so narration feelings adjust around the new base.
+
 ## Planned (owner approved A, 2026-10-12) — Syam voice trained on voice-converted speech
 
 - The owner's new pipeline (`syam_malayalam_tts_medium_smoothing_20261012.zip`: Arjun Piper → kNN-VC with Syam references → smoothing) is a 1.3 GB Python/PyTorch program and cannot run in the browser. Approved path A: on the owner's Mac (TTS project, `~/Desktop/Ikigai/TTS`), generate about 1,500–2,000 Malayalam sentences with the pipeline (raw converted audio, without the 10% slow-down and EQ, because the app controls pace and voice effects), then continue training the existing Syam Piper checkpoint on them, export one `voice.onnx`, and replace `piper/models/ml/ml_IN/syam/custom/` in Lite (renew the Piper cache, update the registry fingerprint, run the voice test).

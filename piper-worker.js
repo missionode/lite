@@ -5,7 +5,7 @@ let cancelledRequests = new Set();
 
 function loadPiper() {
     if (!piperModulePromise) {
-        piperModulePromise = import('./piper/runtime/piper-tts-web.js');
+        piperModulePromise = import('./piper/runtime/piper-tts-web.js?v=2');
     }
     return piperModulePromise;
 }

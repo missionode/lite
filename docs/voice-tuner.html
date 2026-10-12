@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Voice Tuner</title>
+  <style>
+    :root{color-scheme:dark;--ink:#f4f1ea;--muted:#c3cedb;--panel:rgba(15,24,38,.96);--line:rgba(192,207,225,.22);--gold:#e8c27e;--aqua:#a9d9df}
+    *{box-sizing:border-box}
+    html{background:#000}
+    body{margin:0;min-height:100vh;color:var(--ink);font:16px/1.55 Inter,"Noto Sans Malayalam",system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 50% 10%,rgba(232,194,126,.08),transparent 30rem),#000}
+    main{width:min(760px,100%);margin:auto;padding:16px 16px 48px}
+    h1{font-size:1.6rem;margin:8px 0 4px}
+    p{margin:0 0 12px;color:var(--muted)}
+    a{color:var(--gold)}
+    .panel{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:16px;margin-top:14px}
+    label{display:block;font-weight:650;margin:10px 0 6px}
+    select,textarea,button,input[type=file]{font:inherit;color:var(--ink)}
+    select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#0f1826}
+    textarea{min-height:5.5rem;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+    .row output{min-width:4.5rem;text-align:right;font-variant-numeric:tabular-nums;color:var(--gold);font-weight:700}
+    input[type=range]{width:100%;accent-color:var(--gold)}
+    .hint{font-size:.85rem;margin:2px 0 8px}
+    .buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    button{min-height:44px;padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);cursor:pointer}
+    button.primary{background:linear-gradient(135deg,#f0d49e,#d9ad65);color:#17130c;border-color:transparent;font-weight:700}
+    button:disabled{opacity:.5;cursor:default}
+    button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid rgba(169,217,223,.6);outline-offset:2px}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chips button{min-height:36px;padding:6px 12px;font-size:.85rem}
+    #status{min-height:1.5em;margin-top:10px;color:var(--aqua)}
+    .defaults{font-size:.85rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+<main>
+  <a href="../index.html">← Back to the app</a>
+  <h1>Voice Tuner</h1>
+  <p>Tune how a Piper voice speaks: speed, expressiveness and rhythm. Your values are saved in this browser for each voice. Export them and send the file to apply them as that voice’s defaults in the app.</p>
+
+  <section class="panel" aria-labelledby="voiceHeading">
+    <h2 id="voiceHeading" style="font-size:1.1rem;margin:0">Voice and text</h2>
+    <label for="voice">Voice</label>
+    <select id="voice"></select>
+    <p class="defaults" id="defaults" aria-live="polite"></p>
+    <label for="text">Test text</label>
+    <textarea id="text"></textarea>
+    <div class="chips" id="samples" aria-label="Sample lines"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="tuneHeading">
+    <h2 id="tuneHeading" style="font-size:1.1rem;margin:0">Tuning</h2>
+    <label for="lengthScale">Speed (higher = slower)</label>
+    <div class="row"><input id="lengthScale" type="range" min="0.75" max="1.5" step="0.01"><output for="lengthScale" id="lengthScaleOut"></output></div>
+    <p class="hint">Piper length scale. 1.0 is the voice’s normal pace.</p>
+    <label for="noiseScale">Expressiveness (lower = calmer, steadier)</label>
+    <div class="row"><input id="noiseScale" type="range" min="0" max="1.2" step="0.01"><output for="noiseScale" id="noiseScaleOut"></output></div>
+    <p class="hint">Piper noise scale. Lower values can reduce wobble; very low can sound flat.</p>
+    <label for="noiseW">Rhythm variation (lower = more even timing)</label>
+    <div class="row"><input id="noiseW" type="range" min="0" max="1.2" step="0.01"><output for="noiseW" id="noiseWOut"></output></div>
+    <p class="hint">Piper noise width. Changes how sound lengths vary.</p>
+    <div class="buttons">
+      <button class="primary" id="playTuned" type="button">▶ Play tuned</button>
+      <button id="playOriginal" type="button">▶ Play original</button>
+      <button id="reset" type="button">Reset this voice</button>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="saveHeading">
+    <h2 id="saveHeading" style="font-size:1.1rem;margin:0">Save and share</h2>
+    <p>Tuning is saved automatically in this browser. Export creates a file with every voice you tuned.</p>
+    <div class="buttons">
+      <button id="export" type="button">Export tuning (JSON)</button>
+      <label class="hint" style="margin:0;display:flex;align-items:center;gap:8px">Import <input id="import" type="file" accept="application/json,.json"></label>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+  'use strict';
+  const STORAGE_KEY = 'lite_voice_tuning_v1';
+  const HF_BASE = 'https://huggingface.co/rhasspy/piper-voices/resolve/main';
+  const SAMPLES = {
+    ml: ['ശാന്തമായി ശ്വസിക്കൂ. ഈ നിമിഷത്തിൽ നിങ്ങൾ സുരക്ഷിതരാണ്.', 'യോഗ പൂർത്തിയായി. ഇനി നിശ്ചലതയിലേക്ക് മടങ്ങി വിശ്രമിക്കൂ.', 'സൗമ്യമായി കുളിക്കൂ. വെള്ളത്തിന്റെ സ്പർശവും ഒഴുക്കും നിങ്ങളെ ഈ നിമിഷത്തിലേക്ക് പൂർണ്ണമായി കൊണ്ടുവരട്ടെ.'],
+    en: ['Breathe gently. You are safe in this moment.'],
+    hi: ['आराम से साँस भीतर लें। धीरे-धीरे साँस बाहर छोड़ें।'],
+    ru: ['Дышите мягко. В этот момент вы в безопасности.'],
+    ta: ['மெதுவாக மூச்சை உள்ளிழுங்கள். இந்தக் கணத்தில் நீங்கள் பாதுகாப்பாக இருக்கிறீர்கள்.']
+  };
+  const $ = id => document.getElementById(id);
+  const sliders = ['lengthScale', 'noiseScale', 'noiseW'];
+  let voices = [], current = null, defaults = null, worker = null, workerVoice = null, audioCtx = null, source = null, nextId = 0, busy = false;
+
+  function readAll() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (error) { return {}; }
+  }
+  function writeAll(all) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); return true; } catch (error) { return false; }
+  }
+  function setStatus(text) { $('status').textContent = text; }
+  function round(value) { return Math.round(Number(value) * 100) / 100; }
+  function tuned() { return Object.fromEntries(sliders.map(id => [id, round($(id).value)])); }
+  function showValues() { sliders.forEach(id => { $(id + 'Out').textContent = round($(id).value).toFixed(2); }); }
+
+  function baseUrl(voice) {
+    if (!voice.modelBaseUrl) return HF_BASE;
+    return /^[a-z]+:/i.test(voice.modelBaseUrl) ? voice.modelBaseUrl : new URL(voice.modelBaseUrl.replace(/^\.\//, '../'), location.href).href;
+  }
+
+  async function loadDefaults(voice) {
+    const response = await fetch(`${baseUrl(voice).replace(/\/$/, '')}/${voice.configPath}`);
+    if (!response.ok) throw new Error(`Voice settings could not load (${response.status})`);
+    const inference = (await response.json()).inference || {};
+    return { lengthScale: round(inference.length_scale ?? 1), noiseScale: round(inference.noise_scale ?? 0.667), noiseW: round(inference.noise_w ?? 0.8) };
+  }
+
+  function applyValues(values) { sliders.forEach(id => { $(id).value = values[id]; }); showValues(); }
+
+  function save() {
+    if (!current) return;
+    const all = readAll();
+    all[current.id] = { ...tuned(), updatedAt: new Date().toISOString() };
+    writeAll(all);
+  }
+
+  function ensureWorker(voice) {
+    if (worker && workerVoice === voice.id) return worker;
+    if (worker) worker.terminate();
+    // A versioned worker URL loads the runtime that accepts exact tuning values.
+    worker = new Worker('../piper-worker.js?v=2', { type: 'module' });
+    workerVoice = voice.id;
+    return worker;
+  }
+
+  function definitionFor(voice) {
+    // The worker resolves relative model paths from the app root.
+    return { ...voice };
+  }
+
+  function synthesize(values) {
+    const voice = current;
+    const activeWorker = ensureWorker(voice);
+    const requestId = `tune-${nextId++}`;
+    return new Promise((resolve, reject) => {
+      const onMessage = event => {
+        const message = event.data || {};
+        if (message.requestId !== requestId) return;
+        if (message.type === 'progress') {
+          if (message.total) setStatus(`Downloading the voice… ${Math.round(message.loaded / 1048576)} of ${Math.round(message.total / 1048576)} MB`);
+          return;
+        }
+        activeWorker.removeEventListener('message', onMessage);
+        if (message.type === 'audio') resolve(message.audio); else reject(new Error(message.error || 'Synthesis failed'));
+      };
+      activeWorker.addEventListener('message', onMessage);
+      const settings = values ? { lengthScale: values.lengthScale, lengthScaleMax: 1.5, noiseScale: values.noiseScale, noiseW: values.noiseW } : {};
+      activeWorker.postMessage({ type: 'synthesize', requestId, voiceId: voice.id, voiceDefinition: definitionFor(voice), text: $('text').value.trim(), settings });
+    });
+  }
+
+  async function play(values) {
+    if (busy || !current || !$('text').value.trim()) return;
+    busy = true;
+    $('playTuned').disabled = $('playOriginal').disabled = true;
+    setStatus('Preparing…');
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      await audioCtx.resume();
+      const audio = await synthesize(values);
+      const buffer = await audioCtx.decodeAudioData(await (audio instanceof Blob ? audio.arrayBuffer() : new Response(audio).arrayBuffer()));
+      if (source) { try { source.stop(); } catch (error) { /* already ended */ } }
+      source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start();
+      setStatus(values ? `Playing tuned (${buffer.duration.toFixed(1)} s)` : `Playing original (${buffer.duration.toFixed(1)} s)`);
+    } catch (error) {
+      setStatus(`Could not play: ${error.message}`);
+    } finally {
+      busy = false;
+      $('playTuned').disabled = $('playOriginal').disabled = false;
+    }
+  }
+
+  function renderSamples(language) {
+    const box = $('samples');
+    box.replaceChildren();
+    (SAMPLES[language] || []).forEach((line, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = `Sample ${index + 1}`;
+      button.title = line;
+      button.addEventListener('click', () => { $('text').value = line; });
+      box.append(button);
+    });
+  }
+
+  async function selectVoice(id) {
+    current = voices.find(voice => voice.id === id);
+    if (!current) return;
+    renderSamples(current.language);
+    if (!$('text').value.trim() || $('text').dataset.language !== current.language) {
+      $('text').value = (SAMPLES[current.language] || [''])[0];
+      $('text').dataset.language = current.language;
+    }
+    setStatus('Loading voice settings…');
+    try {
+      defaults = await loadDefaults(current);
+      $('defaults').textContent = `Original: speed ${defaults.lengthScale.toFixed(2)} · expressiveness ${defaults.noiseScale.toFixed(2)} · rhythm ${defaults.noiseW.toFixed(2)}`;
+      const saved = readAll()[current.id];
+      applyValues(saved ? { ...defaults, ...saved } : defaults);
+      setStatus(saved ? 'Saved tuning loaded.' : 'Original values. Move a slider to tune.');
+    } catch (error) {
+      setStatus(error.message);
+    }
+  }
+
+  function exportTuning() {
+    const all = readAll();
+    const payload = { schema: 1, app: 'Lite voice tuner', exportedAt: new Date().toISOString(), voices: all };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `voice-tuning-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    setStatus(`Exported ${Object.keys(all).length} tuned voice(s).`);
+  }
+
+  async function importTuning(file) {
+    try {
+      const data = JSON.parse(await file.text());
+      if (data?.schema !== 1 || typeof data.voices !== 'object') throw new Error('Not a voice tuning file');
+      const all = readAll();
+      for (const [id, values] of Object.entries(data.voices)) {
+        if (!voices.some(voice => voice.id === id)) continue;
+        const clean = {};
+        for (const key of sliders) {
+          const number = Number(values?.[key]);
+          if (Number.isFinite(number)) clean[key] = round(Math.max(Number($(key).min), Math.min(Number($(key).max), number)));
+        }
+        if (Object.keys(clean).length === sliders.length) all[id] = { ...clean, updatedAt: values.updatedAt || new Date().toISOString() };
+      }
+      writeAll(all);
+      await selectVoice(current.id);
+      setStatus('Tuning imported.');
+    } catch (error) {
+      setStatus(`Import failed: ${error.message}`);
+    }
+  }
+
+  async function start() {
+    try {
+      const registry = await (await fetch('../piper-models.json?v=6')).json();
+      voices = registry.voices.filter(voice => !voice.pitchOnly);
+    } catch (error) {
+      setStatus('The voice list could not load.');
+      return;
+    }
+    const select = $('voice');
+    voices.forEach(voice => {
+      const option = document.createElement('option');
+      option.value = voice.id;
+      option.textContent = voice.label;
+      select.append(option);
+    });
+    select.value = voices.some(voice => voice.id === 'ml_IN-arjun-medium') ? 'ml_IN-arjun-medium' : voices[0].id;
+    select.addEventListener('change', () => selectVoice(select.value));
+    sliders.forEach(id => {
+      $(id).addEventListener('input', showValues);
+      // Re-speak with the new value when the slider is released.
+      $(id).addEventListener('change', () => { save(); play(tuned()); });
+    });
+    $('playTuned').addEventListener('click', () => play(tuned()));
+    $('playOriginal').addEventListener('click', () => play(null));
+    $('reset').addEventListener('click', () => {
+      if (!defaults || !current) return;
+      const all = readAll(); delete all[current.id]; writeAll(all);
+      applyValues(defaults);
+      setStatus('Reset to the original values.');
+    });
+    $('export').addEventListener('click', exportTuning);
+    $('import').addEventListener('change', event => { const file = event.target.files?.[0]; if (file) importTuning(file); event.target.value = ''; });
+    await selectVoice(select.value);
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

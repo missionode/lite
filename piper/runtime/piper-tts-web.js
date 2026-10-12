@@ -337,7 +337,13 @@ const _TtsSession = class _TtsSession {
       const factor = Number(value);
       return Number.isFinite(factor) ? Math.max(0.75, Math.min(1.12, factor)) : 1;
     };
-    const noiseScale = inference.noise_scale * feelingFactor(settings.noiseScaleFactor);
+    // The voice tuner (docs/voice-tuner.html) may pass exact values; they are
+    // bounded to a safe range. Normal narration keeps using the factors above.
+    const exact = (value) => {
+      const number = Number(value);
+      return value !== undefined && value !== null && Number.isFinite(number) ? Math.max(0, Math.min(1.5, number)) : null;
+    };
+    const noiseScale = exact(settings.noiseScale) ?? inference.noise_scale * feelingFactor(settings.noiseScaleFactor);
     // A registered voice may request a slightly longer meditation cadence,
     // but the runtime never accepts an unbounded length scale from the UI.
     const requestedLengthScaleMax = Number(settings.lengthScaleMax);
@@ -345,7 +351,7 @@ const _TtsSession = class _TtsSession {
       ? Math.max(1.35, Math.min(1.5, requestedLengthScaleMax))
       : 1.35;
     const lengthScale = Math.max(0.75, Math.min(lengthScaleMax, Number(settings.lengthScale) || inference.length_scale));
-    const noiseW = inference.noise_w * feelingFactor(settings.noiseWFactor);
+    const noiseW = exact(settings.noiseW) ?? inference.noise_w * feelingFactor(settings.noiseWFactor);
     const session = __privateGet(this, _ortSession);
     const feeds = {
       input: new (__privateGet(this, _ort)).Tensor("int64", phonemeIds, [1, phonemeIds.length]),
