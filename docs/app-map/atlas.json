@@ -6812,7 +6812,7 @@
           [
             "share",
             "Export / Import",
-            "Export downloads voice-tuning-DATE.json (schema 1, every tuned voice). Import checks the schema, ignores unknown voices and clamps values to the slider ranges. Applying exported values as app defaults is a separate, later step."
+            "Export downloads voice-tuning-DATE.json (schema 1, every tuned voice). Import checks the schema, ignores unknown voices and clamps values to the slider ranges. Converting a great tuning: scripts/bake_voice_tuning.py writes a tuned copy of the voice (FIR tone and volume inside voice.onnx, speed/expressiveness/rhythm as defaults in voice.onnx.json, pitch and cleaner in app-side.json); installing it in the app is a separate, owner-approved step."
           ]
         ]
       ],
