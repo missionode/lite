@@ -27,7 +27,19 @@ assert.match(page, /Math\.max\(Number\(\$\(key\)\.min\), Math\.min\(Number\(\$\(
 assert.match(page, /voice\.pitchOnly/, 'Pitch-only voices are not offered');
 assert.match(page, /\$\(id\)\.addEventListener\('change', \(\) => \{ save\(\); play\(tuned\(\)\); \}\)/, 'releasing a slider saves and re-speaks');
 
+// Sound controls applied after synthesis (owner choice A: no pitch).
+for (const [id, min, max] of [['clarity', '-6', '6'], ['warmth', '-6', '6'], ['air', '-6', '6'], ['cleaner', '0', '100'], ['volume', '-6', '6']]) {
+    assert.match(page, new RegExp(`<input id="${id}" type="range" min="${min}" max="${max}"`), `${id} slider`);
+}
+assert.doesNotMatch(page, /id="pitch"/, 'no pitch control (it would change speed in the browser)');
+assert.match(page, /band\('peaking', 2300, 0\.8, values\.clarity\)/, 'clarity is a presence boost at 2.3 kHz');
+assert.match(page, /band\('peaking', 250, 0\.9, values\.warmth\)/);
+assert.match(page, /function cleanNoise\(input, sampleRate, strength\)[\s\S]*?\(strength \/ 100\) \* 30/, 'the noise cleaner lowers pauses by up to 30 dB');
+assert.match(page, /if \(peak > 0\.98\)/, 'tuned audio never clips');
+assert.match(page, /const buffer = values \? await renderSound\(decoded, values\) : decoded;/, 'Play original stays untouched');
+assert.match(page, /modelSliders\.every\(key => key in clean\)\) all\[id\] = \{ \.\.\.SOUND, \.\.\.clean/, 'older exports without sound values still import');
+
 // A development tool: not part of the app's offline install.
 assert.doesNotMatch(sw, /voice-tuner/);
 
-console.log('Voice tuner passed: exact bounded settings, versioned runtime, three sliders, per-voice saving, export/import.');
+console.log('Voice tuner passed: exact bounded settings, versioned runtime, model and sound sliders, noise cleaner, no clipping, per-voice saving, export/import.');

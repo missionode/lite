@@ -3,7 +3,8 @@
 ## Completed locally — Voice Tuner page (2026-10-12)
 
 - Owner request: a live page to tune Arjun, Meera or Syam (any selectable voice), saved in the browser, with export so the values can be applied later. `docs/voice-tuner.html` (development tool; not linked from the app, not precached): voice picker, editable text with sample lines, sliders for speed (length_scale 0.75–1.5), expressiveness (noise_scale 0–1.2) and rhythm (noise_w 0–1.2), Play tuned / Play original / Reset, auto re-speak on slider release, per-voice saving (`lite_voice_tuning_v1`), Export / Import JSON (schema 1, clamped). The Piper runtime now accepts exact noise values (bounded 0–1.5) besides the narration feeling factors; the worker loads it as `piper-tts-web.js?v=2`, and the tuner uses `piper-worker.js?v=2`, so phones get it without wiping the voice cache. Checked: unit test `tests/voice-tuner.test.mjs`; browser: Syam played at expressiveness 0.30 and the value was saved.
-- Next (not done): when the owner sends the exported JSON, apply the values as per-voice defaults (registry fields read by the runtime), so narration feelings adjust around the new base.
+- Sound controls added (owner choice A, no pitch): clarity (±6 dB at 2.3 kHz), warmth (±6 dB at 250 Hz), air (±6 dB high shelf), noise cleaner (0–100 %; pauses down by up to 30 dB, smoothed) and volume (±6 dB), applied offline to the spoken audio and kept below clipping; saved and exported with the model values (older exports still import). Browser check: Syam with cleaner 80 % and clarity +3 dB played and saved.
+- Next (not done): when the owner sends the exported JSON, apply the values as per-voice defaults (registry fields read by the runtime) and the sound values as that voice's effects in the app, so narration feelings adjust around the new base.
 
 ## Planned (owner approved A, 2026-10-12) — Syam voice trained on voice-converted speech
 

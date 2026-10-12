@@ -38,7 +38,7 @@
 <main>
   <a href="../index.html">← Back to the app</a>
   <h1>Voice Tuner</h1>
-  <p>Tune how a Piper voice speaks: speed, expressiveness and rhythm. Your values are saved in this browser for each voice. Export them and send the file to apply them as that voice’s defaults in the app.</p>
+  <p>Tune how a Piper voice speaks (speed, expressiveness, rhythm) and how it sounds (clarity, warmth, air, noise cleaner, volume). Your values are saved in this browser for each voice. Export them and send the file to apply them as that voice’s defaults in the app.</p>
 
   <section class="panel" aria-labelledby="voiceHeading">
     <h2 id="voiceHeading" style="font-size:1.1rem;margin:0">Voice and text</h2>
@@ -61,6 +61,18 @@
     <label for="noiseW">Rhythm variation (lower = more even timing)</label>
     <div class="row"><input id="noiseW" type="range" min="0" max="1.2" step="0.01"><output for="noiseW" id="noiseWOut"></output></div>
     <p class="hint">Piper noise width. Changes how sound lengths vary.</p>
+    <h3 style="font-size:1rem;margin:18px 0 0">Sound (applied after the voice speaks)</h3>
+    <label for="clarity">Clarity (presence around 2.3 kHz)</label>
+    <div class="row"><input id="clarity" type="range" min="-6" max="6" step="0.5"><output for="clarity" id="clarityOut"></output></div>
+    <label for="warmth">Warmth (body around 250 Hz)</label>
+    <div class="row"><input id="warmth" type="range" min="-6" max="6" step="0.5"><output for="warmth" id="warmthOut"></output></div>
+    <label for="air">Air (top sparkle)</label>
+    <div class="row"><input id="air" type="range" min="-6" max="6" step="0.5"><output for="air" id="airOut"></output></div>
+    <label for="cleaner">Noise cleaner (quietens hiss between words)</label>
+    <div class="row"><input id="cleaner" type="range" min="0" max="100" step="5"><output for="cleaner" id="cleanerOut"></output></div>
+    <label for="volume">Volume</label>
+    <div class="row"><input id="volume" type="range" min="-6" max="6" step="0.5"><output for="volume" id="volumeOut"></output></div>
+    <p class="hint">Clarity, warmth, air and volume are in dB; the cleaner is a strength in %. All start at 0 (no change).</p>
     <div class="buttons">
       <button class="primary" id="playTuned" type="button">▶ Play tuned</button>
       <button id="playOriginal" type="button">▶ Play original</button>
@@ -91,7 +103,9 @@
     ta: ['மெதுவாக மூச்சை உள்ளிழுங்கள். இந்தக் கணத்தில் நீங்கள் பாதுகாப்பாக இருக்கிறீர்கள்.']
   };
   const $ = id => document.getElementById(id);
-  const sliders = ['lengthScale', 'noiseScale', 'noiseW'];
+  const modelSliders = ['lengthScale', 'noiseScale', 'noiseW'];
+  const SOUND = Object.freeze({ clarity: 0, warmth: 0, air: 0, cleaner: 0, volume: 0 });
+  const sliders = [...modelSliders, ...Object.keys(SOUND)];
   let voices = [], current = null, defaults = null, worker = null, workerVoice = null, audioCtx = null, source = null, nextId = 0, busy = false;
 
   function readAll() {
@@ -103,7 +117,64 @@
   function setStatus(text) { $('status').textContent = text; }
   function round(value) { return Math.round(Number(value) * 100) / 100; }
   function tuned() { return Object.fromEntries(sliders.map(id => [id, round($(id).value)])); }
-  function showValues() { sliders.forEach(id => { $(id + 'Out').textContent = round($(id).value).toFixed(2); }); }
+  function showValues() {
+    sliders.forEach(id => {
+      const value = round($(id).value);
+      $(id + 'Out').textContent = id === 'cleaner' ? `${value}%` : SOUND[id] !== undefined ? `${value > 0 ? '+' : ''}${value} dB` : value.toFixed(2);
+    });
+  }
+
+  // Noise cleaner: a gentle downward expander. Quiet frames (pauses) are turned
+  // down by up to 30 dB at full strength; speech is untouched. Gain changes are
+  // smoothed sample by sample so there is no clicking.
+  function cleanNoise(input, sampleRate, strength) {
+    if (!strength) return input;
+    const frame = Math.max(1, Math.round(sampleRate * 0.02));
+    const levels = [];
+    for (let start = 0; start < input.length; start += frame) {
+      let energy = 0; const end = Math.min(input.length, start + frame);
+      for (let i = start; i < end; i++) energy += input[i] * input[i];
+      levels.push(20 * Math.log10(Math.max(Math.sqrt(energy / Math.max(1, end - start)), 1e-9)));
+    }
+    const sorted = [...levels].sort((a, b) => a - b);
+    const floor = sorted[Math.floor(sorted.length * 0.1)], speech = sorted[Math.floor(sorted.length * 0.9)];
+    const threshold = Math.min(floor + (speech - floor) * 0.35, speech - 12);
+    const low = Math.pow(10, -(strength / 100) * 30 / 20);
+    const gains = []; let gain = 1;
+    for (const level of levels) {
+      const target = level < threshold ? low : 1;
+      gain += (target - gain) * (target < gain ? 0.2 : 0.6);
+      gains.push(gain);
+    }
+    const output = new Float32Array(input.length);
+    for (let i = 0; i < input.length; i++) {
+      const position = i / frame, index = Math.min(gains.length - 1, Math.floor(position));
+      const next = Math.min(gains.length - 1, index + 1), mix = position - index;
+      output[i] = input[i] * (gains[index] * (1 - mix) + gains[next] * mix);
+    }
+    return output;
+  }
+
+  // Applies the sound controls offline and returns a new buffer (kept below clipping).
+  async function renderSound(buffer, values) {
+    const rate = buffer.sampleRate;
+    const data = cleanNoise(buffer.getChannelData(0), rate, values.cleaner || 0);
+    const context = new OfflineAudioContext(1, data.length, rate);
+    const clean = context.createBuffer(1, data.length, rate);
+    clean.copyToChannel(data, 0);
+    const node = context.createBufferSource(); node.buffer = clean;
+    const band = (type, frequency, q, gainDb) => { const filter = context.createBiquadFilter(); filter.type = type; filter.frequency.value = frequency; filter.Q.value = q; filter.gain.value = gainDb || 0; return filter; };
+    const warmth = band('peaking', 250, 0.9, values.warmth), clarity = band('peaking', 2300, 0.8, values.clarity);
+    const air = band('highshelf', Math.min(8000, rate * 0.36), 0.7, values.air);
+    const level = context.createGain(); level.gain.value = Math.pow(10, (values.volume || 0) / 20);
+    node.connect(warmth); warmth.connect(clarity); clarity.connect(air); air.connect(level); level.connect(context.destination);
+    node.start();
+    const rendered = await context.startRendering();
+    const channel = rendered.getChannelData(0); let peak = 0;
+    for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
+    if (peak > 0.98) for (let i = 0; i < channel.length; i++) channel[i] *= 0.98 / peak;
+    return rendered;
+  }
 
   function baseUrl(voice) {
     if (!voice.modelBaseUrl) return HF_BASE;
@@ -114,7 +185,7 @@
     const response = await fetch(`${baseUrl(voice).replace(/\/$/, '')}/${voice.configPath}`);
     if (!response.ok) throw new Error(`Voice settings could not load (${response.status})`);
     const inference = (await response.json()).inference || {};
-    return { lengthScale: round(inference.length_scale ?? 1), noiseScale: round(inference.noise_scale ?? 0.667), noiseW: round(inference.noise_w ?? 0.8) };
+    return { lengthScale: round(inference.length_scale ?? 1), noiseScale: round(inference.noise_scale ?? 0.667), noiseW: round(inference.noise_w ?? 0.8), ...SOUND };
   }
 
   function applyValues(values) { sliders.forEach(id => { $(id).value = values[id]; }); showValues(); }
@@ -170,7 +241,8 @@
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       await audioCtx.resume();
       const audio = await synthesize(values);
-      const buffer = await audioCtx.decodeAudioData(await (audio instanceof Blob ? audio.arrayBuffer() : new Response(audio).arrayBuffer()));
+      const decoded = await audioCtx.decodeAudioData(await (audio instanceof Blob ? audio.arrayBuffer() : new Response(audio).arrayBuffer()));
+      const buffer = values ? await renderSound(decoded, values) : decoded;
       if (source) { try { source.stop(); } catch (error) { /* already ended */ } }
       source = audioCtx.createBufferSource();
       source.buffer = buffer;
@@ -242,7 +314,8 @@
           const number = Number(values?.[key]);
           if (Number.isFinite(number)) clean[key] = round(Math.max(Number($(key).min), Math.min(Number($(key).max), number)));
         }
-        if (Object.keys(clean).length === sliders.length) all[id] = { ...clean, updatedAt: values.updatedAt || new Date().toISOString() };
+        // Model values are required; sound values are optional (older exports have none).
+        if (modelSliders.every(key => key in clean)) all[id] = { ...SOUND, ...clean, updatedAt: values.updatedAt || new Date().toISOString() };
       }
       writeAll(all);
       await selectVoice(current.id);

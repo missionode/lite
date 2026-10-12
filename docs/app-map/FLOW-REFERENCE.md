@@ -2638,7 +2638,7 @@ flowchart TD
 | --- | --- |
 | Open docs/voice-tuner.html | Loads piper-models.json and lists every selectable voice (Pitch-only voices excluded). Arjun is selected first. |
 | Pick a voice and text | Shows the voice’s original speed (length_scale), expressiveness (noise_scale) and rhythm (noise_w) from its own settings file. Sample lines per language; the text is editable. |
-| Move a slider | Speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line. |
+| Move a slider | Model: speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Sound (after synthesis, offline): clarity ±6 dB at 2.3 kHz, warmth ±6 dB at 250 Hz, air ±6 dB high shelf, noise cleaner 0–100 % (pauses down by up to 30 dB, smoothed), volume ±6 dB; kept below clipping. No pitch control. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line. |
 | Play tuned / Play original | A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values. |
 | Export / Import | Export downloads voice-tuning-DATE.json (schema 1, every tuned voice). Import checks the schema, ignores unknown voices and clamps values to the slider ranges. Applying exported values as app defaults is a separate, later step. |
 

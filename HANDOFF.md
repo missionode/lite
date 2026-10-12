@@ -20,7 +20,7 @@ This is the active checkpoint. Read it first. Update this block (do not add a se
 
 | Change | Where | Notes |
 | --- | --- | --- |
-| Voice Tuner page | `docs/voice-tuner.html`, `piper/runtime/piper-tts-web.js`, `piper-worker.js` | Tune speed/expressiveness/rhythm per voice, saved in the browser, export JSON for applying as defaults later. Local, not yet pushed. |
+| Voice Tuner page | `docs/voice-tuner.html`, `piper/runtime/piper-tts-web.js`, `piper-worker.js` | Tune speed/expressiveness/rhythm plus clarity, warmth, air, noise cleaner and volume per voice, saved in the browser, export JSON for applying as defaults later. Local, not yet pushed. |
 | Shots: Activate in section + countdown | `index.html`, `app.js`, `modules/shot-session.js`, `modules/lobby-experience-visibility.js` | Activate Shot button inside the Shots section (Begin hidden during Shots); Get ready 5-4-3-2-1 before the first tone; Speaker for Shots shown on phones and tablets only. Atlas `shots`. Local, not yet pushed. |
 | Shots on one speaker | `modules/audio-tone-playback.js`, `modules/app-state.js`, `app.js`, `index.html` | Speaker for Shots: Both / Single speaker 1 / 2 with Test speaker; single routes play only one channel (bottom speaker once picked). Atlas `shots`. Needs the one-time test on the phone. Local, not yet pushed. |
 | Syam custom Malayalam voice | `piper-models.json`, `piper/models/ml/ml_IN/syam/custom/`, `modules/voice-download-card.js` | Owner's own voice in the Malayalam list, served from the Lite folder, same effects as Arjun/Meera; Arjun stays default. Model updated to the 12 October 2026 training (Piper cache v14). Needs a listening check. Local, not yet pushed. |
