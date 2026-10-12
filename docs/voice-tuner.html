@@ -38,7 +38,7 @@
 <main>
   <a href="../index.html">← Back to the app</a>
   <h1>Voice Tuner</h1>
-  <p>Tune how a Piper voice speaks (speed, expressiveness, rhythm) and how it sounds (clarity, warmth, air, noise cleaner, volume). Your values are saved in this browser for each voice. Export them and send the file to apply them as that voice’s defaults in the app.</p>
+  <p>Tune how a Piper voice speaks (speed, expressiveness, rhythm) and how it sounds (pitch, clarity, warmth, air, noise cleaner, volume). Your values are saved in this browser for each voice. Export them and send the file to apply them as that voice’s defaults in the app.</p>
 
   <section class="panel" aria-labelledby="voiceHeading">
     <h2 id="voiceHeading" style="font-size:1.1rem;margin:0">Voice and text</h2>
@@ -62,6 +62,9 @@
     <div class="row"><input id="noiseW" type="range" min="0" max="1.2" step="0.01"><output for="noiseW" id="noiseWOut"></output></div>
     <p class="hint">Piper noise width. Changes how sound lengths vary.</p>
     <h3 style="font-size:1rem;margin:18px 0 0">Sound (applied after the voice speaks)</h3>
+    <label for="pitch">Pitch (semitones; 12 = one octave)</label>
+    <div class="row"><input id="pitch" type="range" min="-5" max="6" step="0.5"><output for="pitch" id="pitchOut"></output></div>
+    <p class="hint">Base voice frequency. Typical male about 85–155 Hz, typical female about 165–255 Hz. Length stays the same; large shifts also change the voice’s “size”.</p>
     <label for="clarity">Clarity (presence around 2.3 kHz)</label>
     <div class="row"><input id="clarity" type="range" min="-6" max="6" step="0.5"><output for="clarity" id="clarityOut"></output></div>
     <label for="warmth">Warmth (body around 250 Hz)</label>
@@ -104,7 +107,7 @@
   };
   const $ = id => document.getElementById(id);
   const modelSliders = ['lengthScale', 'noiseScale', 'noiseW'];
-  const SOUND = Object.freeze({ clarity: 0, warmth: 0, air: 0, cleaner: 0, volume: 0 });
+  const SOUND = Object.freeze({ pitch: 0, clarity: 0, warmth: 0, air: 0, cleaner: 0, volume: 0 });
   const sliders = [...modelSliders, ...Object.keys(SOUND)];
   let voices = [], current = null, defaults = null, worker = null, workerVoice = null, audioCtx = null, source = null, nextId = 0, busy = false;
 
@@ -120,7 +123,7 @@
   function showValues() {
     sliders.forEach(id => {
       const value = round($(id).value);
-      $(id + 'Out').textContent = id === 'cleaner' ? `${value}%` : SOUND[id] !== undefined ? `${value > 0 ? '+' : ''}${value} dB` : value.toFixed(2);
+      $(id + 'Out').textContent = id === 'cleaner' ? `${value}%` : id === 'pitch' ? `${value > 0 ? '+' : ''}${value} st` : SOUND[id] !== undefined ? `${value > 0 ? '+' : ''}${value} dB` : value.toFixed(2);
     });
   }
 
@@ -159,10 +162,13 @@
   async function renderSound(buffer, values) {
     const rate = buffer.sampleRate;
     const data = cleanNoise(buffer.getChannelData(0), rate, values.cleaner || 0);
-    const context = new OfflineAudioContext(1, data.length, rate);
+    // Pitch: the line was spoken longer by the same ratio, so playing it at this
+    // rate raises the pitch while the length comes back to normal.
+    const ratio = Math.pow(2, (values.pitch || 0) / 12);
+    const context = new OfflineAudioContext(1, Math.max(1, Math.ceil(data.length / ratio)), rate);
     const clean = context.createBuffer(1, data.length, rate);
     clean.copyToChannel(data, 0);
-    const node = context.createBufferSource(); node.buffer = clean;
+    const node = context.createBufferSource(); node.buffer = clean; node.playbackRate.value = ratio;
     const band = (type, frequency, q, gainDb) => { const filter = context.createBiquadFilter(); filter.type = type; filter.frequency.value = frequency; filter.Q.value = q; filter.gain.value = gainDb || 0; return filter; };
     const warmth = band('peaking', 250, 0.9, values.warmth), clarity = band('peaking', 2300, 0.8, values.clarity);
     const air = band('highshelf', Math.min(8000, rate * 0.36), 0.7, values.air);
@@ -174,6 +180,21 @@
     for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
     if (peak > 0.98) for (let i = 0; i < channel.length; i++) channel[i] *= 0.98 / peak;
     return rendered;
+  }
+
+  // Median voice pitch (Hz) of a buffer, for the status line.
+  function measurePitch(buffer) {
+    const rate = buffer.sampleRate / 2, data = buffer.getChannelData(0), frame = Math.round(rate * 0.04), found = [];
+    for (let start = 0; start + frame * 2 < data.length && found.length < 400; start += frame * 2) {
+      const y = []; for (let i = start * 2; i < (start + frame) * 2 && i < data.length; i += 2) y.push(data[i]);
+      let energy = 0; for (const v of y) energy += v * v;
+      if (Math.sqrt(energy / y.length) < 0.02) continue;
+      let best = 0, lag = 0;
+      for (let L = Math.floor(rate / 400); L <= Math.floor(rate / 60); L++) { let c = 0; for (let i = 0; i + L < y.length; i++) c += y[i] * y[i + L]; if (c > best) { best = c; lag = L; } }
+      if (lag && best / energy > 0.45) found.push(rate / lag);
+    }
+    found.sort((a, b) => a - b);
+    return found.length ? Math.round(found[Math.floor(found.length / 2)]) : null;
   }
 
   function baseUrl(voice) {
@@ -227,7 +248,10 @@
         if (message.type === 'audio') resolve(message.audio); else reject(new Error(message.error || 'Synthesis failed'));
       };
       activeWorker.addEventListener('message', onMessage);
-      const settings = values ? { lengthScale: values.lengthScale, lengthScaleMax: 1.5, noiseScale: values.noiseScale, noiseW: values.noiseW } : {};
+      // Known limit: speech length is bounded to 0.75–1.5, so a large pitch shift on an
+      // already slow or fast setting can leave the line slightly shorter or longer.
+      const ratio = values ? Math.pow(2, (values.pitch || 0) / 12) : 1;
+      const settings = values ? { lengthScale: Math.max(0.75, Math.min(1.5, values.lengthScale * ratio)), lengthScaleMax: 1.5, noiseScale: values.noiseScale, noiseW: values.noiseW } : {};
       activeWorker.postMessage({ type: 'synthesize', requestId, voiceId: voice.id, voiceDefinition: definitionFor(voice), text: $('text').value.trim(), settings });
     });
   }
@@ -248,7 +272,8 @@
       source.buffer = buffer;
       source.connect(audioCtx.destination);
       source.start();
-      setStatus(values ? `Playing tuned (${buffer.duration.toFixed(1)} s)` : `Playing original (${buffer.duration.toFixed(1)} s)`);
+      const hz = measurePitch(buffer);
+      setStatus(`${values ? 'Playing tuned' : 'Playing original'} (${buffer.duration.toFixed(1)} s${hz ? ` · voice pitch ≈ ${hz} Hz` : ''})`);
     } catch (error) {
       setStatus(`Could not play: ${error.message}`);
     } finally {

@@ -6798,7 +6798,7 @@
           [
             "tune",
             "Move a slider",
-            "Model: speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Sound (after synthesis, offline): clarity ±6 dB at 2.3 kHz, warmth ±6 dB at 250 Hz, air ±6 dB high shelf, noise cleaner 0–100 % (pauses down by up to 30 dB, smoothed), volume ±6 dB; kept below clipping. No pitch control. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line."
+            "Model: speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Sound (after synthesis, offline): pitch −5 to +6 semitones (the line is spoken longer or shorter by the same ratio and played back at that rate, so length stays the same; the measured voice pitch in Hz is shown after each play), clarity ±6 dB at 2.3 kHz, warmth ±6 dB at 250 Hz, air ±6 dB high shelf, noise cleaner 0–100 % (pauses down by up to 30 dB, smoothed), volume ±6 dB; kept below clipping. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line."
           ]
         ],
         [

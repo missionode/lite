@@ -27,11 +27,14 @@ assert.match(page, /Math\.max\(Number\(\$\(key\)\.min\), Math\.min\(Number\(\$\(
 assert.match(page, /voice\.pitchOnly/, 'Pitch-only voices are not offered');
 assert.match(page, /\$\(id\)\.addEventListener\('change', \(\) => \{ save\(\); play\(tuned\(\)\); \}\)/, 'releasing a slider saves and re-speaks');
 
-// Sound controls applied after synthesis (owner choice A: no pitch).
+// Sound controls applied after synthesis, including pitch without changing length.
 for (const [id, min, max] of [['clarity', '-6', '6'], ['warmth', '-6', '6'], ['air', '-6', '6'], ['cleaner', '0', '100'], ['volume', '-6', '6']]) {
     assert.match(page, new RegExp(`<input id="${id}" type="range" min="${min}" max="${max}"`), `${id} slider`);
 }
-assert.doesNotMatch(page, /id="pitch"/, 'no pitch control (it would change speed in the browser)');
+assert.match(page, /<input id="pitch" type="range" min="-5" max="6"/, 'pitch slider in semitones');
+assert.match(page, /lengthScale: Math\.max\(0\.75, Math\.min\(1\.5, values\.lengthScale \* ratio\)\)/, 'the line is spoken longer by the pitch ratio');
+assert.match(page, /node\.playbackRate\.value = ratio;/, 'and played at that rate, so length stays the same');
+assert.match(page, /function measurePitch\(buffer\)/, 'the measured voice pitch is shown in Hz');
 assert.match(page, /band\('peaking', 2300, 0\.8, values\.clarity\)/, 'clarity is a presence boost at 2.3 kHz');
 assert.match(page, /band\('peaking', 250, 0\.9, values\.warmth\)/);
 assert.match(page, /function cleanNoise\(input, sampleRate, strength\)[\s\S]*?\(strength \/ 100\) \* 30/, 'the noise cleaner lowers pauses by up to 30 dB');
