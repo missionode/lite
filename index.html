@@ -379,6 +379,16 @@
                         <label for="shot-frequency-input" data-i18n="ui.shotFrequency">Frequency (Hz)</label>
                         <input id="shot-frequency-input" type="number" min="0" max="20000" step="0.1" value="0" inputmode="decimal">
                     </div>
+                    <div id="shot-speaker-control" class="custom-shot-frequency">
+                        <label for="shot-speaker-select" data-i18n="ui.shotSpeaker">Speaker for Shots</label>
+                        <select id="shot-speaker-select">
+                            <option value="both" data-i18n="ui.shotSpeakerBoth">Both speakers (or headphones)</option>
+                            <option value="left" data-i18n="ui.shotSpeakerOne">Single speaker 1</option>
+                            <option value="right" data-i18n="ui.shotSpeakerTwo">Single speaker 2</option>
+                        </select>
+                        <button id="test-shot-speaker" class="secondary-btn" type="button" data-i18n="ui.testShotSpeaker">Test speaker</button>
+                        <p class="shots-help" data-i18n="ui.shotSpeakerHelp">To play Shots only from the bottom speaker near the mouthpiece: hold the phone upright, test Single speaker 1 and 2, and keep the one you hear from the bottom. Keep holding the phone upright during Shots.</p>
+                    </div>
                     <p class="shots-help" data-i18n="ui.shotsHelp">One short frequency-only activation. No narration or background music.</p>
                     <p id="shot-frequency-note" class="shots-help" hidden></p>
                     <a class="shots-repertory-link" href="./docs/repertory.html" data-i18n="ui.frequencyRepertory">View Frequency Repertory</a>
@@ -912,7 +922,7 @@
     <script src="modules/journey-preparation-selection.js?v=1.2"></script>
     <script src="modules/chakra-timing.js?v=1.0"></script>
     <script src="modules/chakra-timing-view.js?v=1.1"></script>
-    <script src="modules/app-state.js?v=1.3"></script>
+    <script src="modules/app-state.js?v=1.4"></script>
     <script src="modules/content-localization.js?v=1.0"></script>
     <script src="modules/media-lifecycle.js?v=1.1"></script>
     <script src="modules/piper-lifecycle.js?v=1.2"></script>
@@ -922,7 +932,7 @@
     <script src="modules/audio-signal-design.js?v=1.1"></script>
     <script src="modules/audio-spatial-geometry.js?v=1.0"></script>
     <script src="modules/audio-elemental-layer.js?v=1.0"></script>
-    <script src="modules/audio-tone-playback.js?v=1.0"></script>
+    <script src="modules/audio-tone-playback.js?v=1.1"></script>
     <script src="modules/audio-comfort-effects.js?v=1.1"></script>
     <script src="modules/audio-drone-start.js?v=1.0"></script>
     <script src="modules/audio-drone-stop.js?v=1.0"></script>
@@ -985,6 +995,6 @@
     <script src="modules/ambient-particle-field.js?v=1.1"></script>
     <script src="modules/visual-engine.js?v=1.0"></script>
     <script src="modules/app-notice.js?v=1.0"></script>
-    <script src="app.js?v=4.34"></script>
+    <script src="app.js?v=4.35"></script>
 </body>
 </html>

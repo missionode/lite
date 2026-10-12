@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.377';
+const CACHE_NAME = 'chakra-v5.378';
 const PIPER_CACHE_NAME = 'chakra-piper-v13';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v86';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v87';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './tailwind.css?v=2.3',
-  './app.js?v=4.34',
+  './app.js?v=4.35',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.1',
   './modules/ambient-particle-field.js?v=1.1',
@@ -39,7 +39,7 @@ const ASSETS = [
   './modules/journey-preparation-selection.js?v=1.2',
   './modules/chakra-timing.js?v=1.0',
   './modules/chakra-timing-view.js?v=1.1',
-  './modules/app-state.js?v=1.3',
+  './modules/app-state.js?v=1.4',
   './modules/content-localization.js?v=1.0',
   './modules/media-lifecycle.js?v=1.1',
   './modules/piper-lifecycle.js?v=1.2',
@@ -50,7 +50,7 @@ const ASSETS = [
   './modules/audio-signal-design.js?v=1.1',
   './modules/audio-spatial-geometry.js?v=1.0',
   './modules/audio-elemental-layer.js?v=1.0',
-  './modules/audio-tone-playback.js?v=1.0',
+  './modules/audio-tone-playback.js?v=1.1',
   './modules/audio-comfort-effects.js?v=1.1',
   './modules/audio-drone-start.js?v=1.0',
   './modules/audio-drone-stop.js?v=1.0',

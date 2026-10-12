@@ -1,6 +1,26 @@
 (function installAudioTonePlayback(global) {
     "use strict";
 
+    // Shots on one built-in speaker (owner requirement: only the bottom speaker
+    // near the mouthpiece). The tone skips the shared moving pan and echo and
+    // feeds one output channel straight to the device; the other stays silent.
+    // Known limit: which channel is the bottom speaker differs by phone and can
+    // flip when the phone is turned, so the person picks it once with a test
+    // tone while holding the phone upright.
+    function connectShotOutput(owner, source, route) {
+        if (route !== 'left' && route !== 'right') {
+            source.connect(owner.masterGain);
+            return [];
+        }
+        const level = owner.ctx.createGain();
+        level.gain.value = Number(owner.masterGain?.gain?.value) || 0;
+        const merger = owner.ctx.createChannelMerger(2);
+        source.connect(level);
+        level.connect(merger, 0, route === 'left' ? 0 : 1);
+        merger.connect(owner.ctx.destination);
+        return [level, merger];
+    }
+
     function startShot(owner, frequency, state) {
         owner.stopFrequencyShot();
         if (state.noFrequencyMode) {
@@ -18,9 +38,9 @@
         gain.gain.setValueAtTime(0, now);
         gain.gain.linearRampToValueAtTime(Math.max(0, Math.min(0.2, Number(state.volDrone) || 0)), now + 0.08);
         osc.connect(gain);
-        gain.connect(owner.masterGain);
+        const route = connectShotOutput(owner, gain, state.shotSpeaker);
         osc.start(now);
-        osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); route.forEach(node => node.disconnect()); };
         owner.shotOscillator = osc;
         owner.shotGain = gain;
     }
@@ -117,5 +137,26 @@
         });
     }
 
-    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, startTransitionTone, stopTransitionTone, playSingingBowl });
+    // A short, soft tone on the chosen route so the person can hear which
+    // built-in speaker it uses.
+    function playSpeakerTest(owner, route) {
+        if (!owner.ctx) return false;
+        const now = owner.ctx.currentTime;
+        const osc = owner.ctx.createOscillator();
+        const gain = owner.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(528, now);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+        gain.gain.setValueAtTime(0.15, now + 1.1);
+        gain.gain.linearRampToValueAtTime(0, now + 1.3);
+        osc.connect(gain);
+        const nodes = connectShotOutput(owner, gain, route);
+        osc.start(now);
+        osc.stop(now + 1.35);
+        osc.onended = () => { osc.disconnect(); gain.disconnect(); nodes.forEach(node => node.disconnect()); };
+        return true;
+    }
+
+    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, playSpeakerTest, startTransitionTone, stopTransitionTone, playSingingBowl });
 })(window);

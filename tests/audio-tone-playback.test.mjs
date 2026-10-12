@@ -13,7 +13,7 @@ function parameter() {
 }
 function makeOwner() {
     const nodes = [];
-    const ctx = { currentTime: 20, createOscillator() { const node = { frequency: parameter(), starts: [], stops: [], disconnects: 0, connect(target) { this.target = target; }, start(time) { this.starts.push(time); }, stop(time) { this.stops.push(time); }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createGain() { const node = { gain: parameter(), disconnects: 0, connect(target) { this.target = target; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; } };
+    const ctx = { currentTime: 20, createOscillator() { const node = { frequency: parameter(), starts: [], stops: [], disconnects: 0, connect(target) { this.target = target; }, start(time) { this.starts.push(time); }, stop(time) { this.stops.push(time); }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createGain() { const node = { gain: parameter(), disconnects: 0, connect(target, output = 0, input = 0) { this.target = target; this.targetInput = input; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createChannelMerger(count) { const node = { kind: 'merger', count, disconnects: 0, connect(target) { this.target = target; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, destination: { kind: 'destination' } };
     return { ctx, nodes, masterGain: {}, shotOscillator: null, shotGain: null, guidedTransitionTone: null, stoppedShots: 0, stopFrequencyShot() { this.stoppedShots++; playback.stopShot(this); }, stopGuidedTransitionTone(seconds) { playback.stopTransitionTone(this, seconds); } };
 }
 
@@ -100,8 +100,52 @@ assert.match(app, /startFrequencyShot\(frequency\)\s*\{\s*return audioTonePlayba
 assert.match(app, /startGuidedTransitionTone\(frequency, durationMs\)\s*\{\s*return audioTonePlayback\.startTransitionTone\(this, frequency, durationMs, state\);/);
 assert.match(app, /playSingingBowl\(\)\s*\{\s*return audioTonePlayback\.playSingingBowl\(this, state\);/);
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+// Shots on one built-in speaker: the tone skips the shared moving pan and echo
+// and feeds a single output channel straight to the device.
+{
+    const left = makeOwner();
+    left.masterGain = { gain: { value: 0.5 } };
+    playback.startShot(left, 432, { noFrequencyMode: false, volDrone: 0.2, shotSpeaker: 'left' });
+    const [, toneGain, levelGain, merger] = left.nodes;
+    assert.equal(toneGain.target, levelGain, 'the tone goes through a level stage');
+    assert.equal(levelGain.gain.value, 0.5, 'the level matches the usual Shots loudness');
+    assert.equal(levelGain.target, merger, 'then into a two-channel merger');
+    assert.equal(levelGain.targetInput, 0, 'single speaker 1 uses the first channel only');
+    assert.equal(merger.count, 2);
+    assert.equal(merger.target, left.ctx.destination, 'straight to the device, bypassing the shared pan and echo');
+    playback.stopShot(left);
+    left.nodes[0].onended();
+    assert.equal(merger.disconnects, 1, 'the merger is released after the Shot');
+    const right = makeOwner();
+    right.masterGain = { gain: { value: 0.5 } };
+    playback.startShot(right, 432, { noFrequencyMode: false, volDrone: 0.2, shotSpeaker: 'right' });
+    assert.equal(right.nodes[2].targetInput, 1, 'single speaker 2 uses the second channel only');
+    const both = makeOwner();
+    playback.startShot(both, 432, { noFrequencyMode: false, volDrone: 0.2, shotSpeaker: 'both' });
+    assert.equal(both.nodes[1].target, both.masterGain, 'Both speakers keeps the shared path');
+    const test = makeOwner();
+    test.masterGain = { gain: { value: 0.5 } };
+    assert.equal(playback.playSpeakerTest(test, 'right'), true);
+    assert.equal(test.nodes[2].targetInput, 1, 'the speaker test uses the same single-channel route');
+    assert.equal(test.nodes[3].target, test.ctx.destination);
+}
+
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.0') < html.indexOf('app.js?v=4.34'));
-assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.0/);
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.1') < html.indexOf('app.js?v=4.35'));
+assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.1/);
+
+// Shots speaker setting: saved per device, Both by default, picked with a test tone.
+{
+    const stateSource = fs.readFileSync(new URL('../modules/app-state.js', import.meta.url), 'utf8');
+    assert.match(stateSource, /shotSpeaker: \['left', 'right'\]\.includes\(get\('chakra_shot_speaker'\)\) \? get\('chakra_shot_speaker'\) : 'both'/);
+    assert.match(html, /id="shot-options"[\s\S]*?<select id="shot-speaker-select">[\s\S]*?value="both"[\s\S]*?value="left"[\s\S]*?value="right"[\s\S]*?id="test-shot-speaker"/, 'the Shots panel offers the speaker choice and a test');
+    const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+    assert.match(app, /localStorage\.setItem\('chakra_shot_speaker', state\.shotSpeaker\)/, 'the choice is saved');
+    assert.match(app, /audio\.testShotSpeaker\(state\.shotSpeaker\)/, 'the test plays on the chosen speaker');
+    for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
+        const ui = JSON.parse(fs.readFileSync(new URL(`../locales/${language}.json`, import.meta.url), 'utf8')).ui;
+        for (const key of ['shotSpeaker', 'shotSpeakerBoth', 'shotSpeakerOne', 'shotSpeakerTwo', 'testShotSpeaker', 'shotSpeakerHelp']) assert.ok(ui[key], `${language} needs ${key}`);
+    }
+}
 
 console.log('Audio tone playback contract passed: validation, Shot envelopes, transition fades, state cleanup and suppression.');

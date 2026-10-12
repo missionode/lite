@@ -9,7 +9,7 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const rangeControls = window\.ChakraRangeControls/);
 assert.match(app, /function enhanceRangeControls\(\)\s*\{\s*rangeControls\.enhance\(/);
 assert.match(app, /function refreshRangeControlDisplays\(\)\s*\{\s*rangeControls\.refresh\(/);
-assert.match(html, /modules\/range-controls\.js\?v=1\.0[\s\S]*?app\.js\?v=4.34/);
+assert.match(html, /modules\/range-controls\.js\?v=1\.0[\s\S]*?app\.js\?v=4.35/);
 assert.match(serviceWorker, /modules\/range-controls\.js\?v=1\.0/);
 
 const context = vm.createContext({ Event: class { constructor(type, options) { this.type = type; this.bubbles = options.bubbles; } } });

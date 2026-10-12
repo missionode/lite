@@ -921,6 +921,10 @@ class AudioEngine {
         return audioTonePlayback.startShot(this, frequency, state);
     }
 
+    testShotSpeaker(route) {
+        return audioTonePlayback.playSpeakerTest(this, route);
+    }
+
     startGuidedTransitionTone(frequency, durationMs) {
         return audioTonePlayback.startTransitionTone(this, frequency, durationMs, state);
     }
@@ -2910,6 +2914,21 @@ function attachEventListeners() {
     const sleepModeToggle = document.getElementById('sleep-mode-toggle');
     const shotsToggle = document.getElementById('shots-toggle');
     const shotTypeSelect = document.getElementById('shot-type-select');
+    // Shots speaker: both speakers, or one built-in speaker picked with a test tone.
+    const shotSpeakerSelect = document.getElementById('shot-speaker-select');
+    if (shotSpeakerSelect) shotSpeakerSelect.value = state.shotSpeaker;
+    shotSpeakerSelect?.addEventListener('change', () => {
+        state.shotSpeaker = ['left', 'right'].includes(shotSpeakerSelect.value) ? shotSpeakerSelect.value : 'both';
+        localStorage.setItem('chakra_shot_speaker', state.shotSpeaker);
+    });
+    document.getElementById('test-shot-speaker')?.addEventListener('click', async () => {
+        try {
+            await audio.init();
+            audio.testShotSpeaker(state.shotSpeaker);
+        } catch (error) {
+            console.warn('Shots speaker test unavailable:', error);
+        }
+    });
 
     function resetShotDurationForType(type) {
         state.timeShot = getShotDefaultDuration(type);

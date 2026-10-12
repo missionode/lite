@@ -101,6 +101,8 @@
             selectedYogaPoses: JSON.parse(get('chakra_yoga_selected')) || ['vrikshasana', 'adho_mukha_svanasana', 'marjaryasana', 'balasana', 'ananda_balasana'],
             timeSleepStage: parseFloat(get('chakra_time_sleep_stage')) || 5.0,
             timeShot: parseInt(get('chakra_time_shot')) || 7,
+            // Shots speaker: 'both' (default, also for headphones) or one built-in speaker channel.
+            shotSpeaker: ['left', 'right'].includes(get('chakra_shot_speaker')) ? get('chakra_shot_speaker') : 'both',
             timeIcebreaker: parseInt(get('chakra_time_icebreaker')) || 60,
             timeEmergence: parseInt(get('chakra_time_emergence')) || 60,
             timeBreathing: parseInt(get('chakra_time_breathing')) || 8,
