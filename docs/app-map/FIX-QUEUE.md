@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Planned (owner approved A, 2026-10-12) — Syam voice trained on voice-converted speech
+
+- The owner's new pipeline (`syam_malayalam_tts_medium_smoothing_20261012.zip`: Arjun Piper → kNN-VC with Syam references → smoothing) is a 1.3 GB Python/PyTorch program and cannot run in the browser. Approved path A: on the owner's Mac (TTS project, `~/Desktop/Ikigai/TTS`), generate about 1,500–2,000 Malayalam sentences with the pipeline (raw converted audio, without the 10% slow-down and EQ, because the app controls pace and voice effects), then continue training the existing Syam Piper checkpoint on them, export one `voice.onnx`, and replace `piper/models/ml/ml_IN/syam/custom/` in Lite (renew the Piper cache, update the registry fingerprint, run the voice test).
+- Constraints found: Apple M1, 8 GB RAM, about 12 GB free disk (TTS folder is 21 GB); the pipeline outputs 16 kHz, so the trained voice will sound slightly band-limited; owner previously rejected an Arjun two-pass adaptation, so listening approval decides. Estimated machine time: generation about 1.5–2 hours, training most of a day with the existing thermal cooling cycles. Not started.
+
 ## Completed locally — Syam voice: 12 October 2026 model (2026-10-12)
 
 - Owner supplied `Piper_custom_model/ikigai_malayalam_voice_20261012.zip` (415 recordings, 18 more training passes). `voice.onnx` replaced in `piper/models/ml/ml_IN/syam/custom/` (same 63,516,077 bytes; SHA-256 `16840994…`); `voice.onnx.json` is unchanged. Registry fingerprint and source updated (`piper-models.json?v=6`). Phones keep the old model by its address, so the Piper cache is renewed (`chakra-piper-v14`): Syam downloads once more (about 60 MB); Hugging Face voices are stored separately and are not re-downloaded. App v4.39, shell cache `chakra-v5.382`. The voice test now checks that the registry fingerprint matches the shipped file.
