@@ -921,8 +921,13 @@ class AudioEngine {
         return audioTonePlayback.startShot(this, frequency, state);
     }
 
-    testShotSpeaker(route) {
-        return audioTonePlayback.playSpeakerTest(this, route);
+    async testShotSpeaker(route) {
+        // Uses the app's own background music (offline) as an ordinary test sound.
+        if (!this.bgMusicBuffer) {
+            const response = await fetch(BACKGROUND_MUSIC_URL);
+            this.bgMusicBuffer = await this.ctx.decodeAudioData(await response.arrayBuffer());
+        }
+        return audioTonePlayback.playSpeakerTest(this, route, this.bgMusicBuffer);
     }
 
     startGuidedTransitionTone(frequency, durationMs) {
@@ -2924,7 +2929,7 @@ function attachEventListeners() {
     document.getElementById('test-shot-speaker')?.addEventListener('click', async () => {
         try {
             await audio.init();
-            audio.testShotSpeaker(state.shotSpeaker);
+            await audio.testShotSpeaker(state.shotSpeaker);
         } catch (error) {
             console.warn('Shots speaker test unavailable:', error);
         }

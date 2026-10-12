@@ -13,7 +13,7 @@ function parameter() {
 }
 function makeOwner() {
     const nodes = [];
-    const ctx = { currentTime: 20, createOscillator() { const node = { frequency: parameter(), starts: [], stops: [], disconnects: 0, connect(target) { this.target = target; }, start(time) { this.starts.push(time); }, stop(time) { this.stops.push(time); }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createGain() { const node = { gain: parameter(), disconnects: 0, connect(target, output = 0, input = 0) { this.target = target; this.targetInput = input; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createChannelMerger(count) { const node = { kind: 'merger', count, disconnects: 0, connect(target) { this.target = target; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, destination: { kind: 'destination' } };
+    const ctx = { currentTime: 20, createOscillator() { const node = { frequency: parameter(), starts: [], stops: [], disconnects: 0, connect(target) { this.target = target; }, start(time) { this.starts.push(time); }, stop(time) { this.stops.push(time); }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createGain() { const node = { gain: parameter(), disconnects: 0, connect(target, output = 0, input = 0) { this.target = target; this.targetInput = input; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createBufferSource() { const node = { kind: 'buffer', buffer: null, starts: [], stops: [], disconnects: 0, connect(target) { this.target = target; }, start(...args) { this.starts.push(args); }, stop(time) { this.stops.push(time); }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, createChannelMerger(count) { const node = { kind: 'merger', count, disconnects: 0, connect(target) { this.target = target; }, disconnect() { this.disconnects++; } }; nodes.push(node); return node; }, destination: { kind: 'destination' } };
     return { ctx, nodes, masterGain: {}, shotOscillator: null, shotGain: null, guidedTransitionTone: null, stoppedShots: 0, stopFrequencyShot() { this.stoppedShots++; playback.stopShot(this); }, stopGuidedTransitionTone(seconds) { playback.stopTransitionTone(this, seconds); } };
 }
 
@@ -123,16 +123,29 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     const both = makeOwner();
     playback.startShot(both, 432, { noFrequencyMode: false, volDrone: 0.2, shotSpeaker: 'both' });
     assert.equal(both.nodes[1].target, both.masterGain, 'Both speakers keeps the shared path');
+    // The speaker test plays a short clip of ordinary music (the app's own background music), not a tone.
+    const music = { duration: 40 };
     const test = makeOwner();
-    test.masterGain = { gain: { value: 0.5 } };
-    assert.equal(playback.playSpeakerTest(test, 'right'), true);
-    assert.equal(test.nodes[2].targetInput, 1, 'the speaker test uses the same single-channel route');
-    assert.equal(test.nodes[3].target, test.ctx.destination);
+    test.masterGain = { gain: { value: 0.05 } };
+    assert.equal(playback.playSpeakerTest(test, 'right', music), true);
+    const [clip, clipGain, clipLevel, clipMerger] = test.nodes;
+    assert.equal(clip.kind, 'buffer', 'a music clip, no oscillator');
+    assert.equal(clip.buffer, music);
+    assert.equal(test.nodes.some(node => node.frequency), false, 'no frequency tone is used for the test');
+    assert.equal(clipGain.target, clipLevel);
+    assert.equal(clipLevel.gain.value, 1, 'the test is clearly audible, not scaled by the drone volume');
+    assert.equal(clipLevel.targetInput, 1, 'the speaker test uses the same single-channel route');
+    assert.equal(clipMerger.target, test.ctx.destination);
+    assert.ok(clip.stops[0] - clip.starts[0][0] >= 4.9 && clip.stops[0] - clip.starts[0][0] <= 5.1, 'a clip of about five seconds');
+    const testBoth = makeOwner();
+    assert.equal(playback.playSpeakerTest(testBoth, 'both', music), true);
+    assert.equal(testBoth.nodes[1].target, testBoth.ctx.destination, 'Both plays the clip on both speakers');
+    assert.equal(playback.playSpeakerTest(makeOwner(), 'left', null), false, 'no clip, no test sound');
 }
 
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.1') < html.indexOf('app.js?v=4.35'));
-assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.1/);
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.2') < html.indexOf('app.js?v=4.36'));
+assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.2/);
 
 // Shots speaker setting: saved per device, Both by default, picked with a test tone.
 {

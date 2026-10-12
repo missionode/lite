@@ -7,13 +7,13 @@
     // Known limit: which channel is the bottom speaker differs by phone and can
     // flip when the phone is turned, so the person picks it once with a test
     // tone while holding the phone upright.
-    function connectShotOutput(owner, source, route) {
+    function connectShotOutput(owner, source, route, levelValue) {
         if (route !== 'left' && route !== 'right') {
             source.connect(owner.masterGain);
             return [];
         }
         const level = owner.ctx.createGain();
-        level.gain.value = Number(owner.masterGain?.gain?.value) || 0;
+        level.gain.value = Number.isFinite(levelValue) ? levelValue : (Number(owner.masterGain?.gain?.value) || 0);
         const merger = owner.ctx.createChannelMerger(2);
         source.connect(level);
         level.connect(merger, 0, route === 'left' ? 0 : 1);
@@ -137,24 +137,26 @@
         });
     }
 
-    // A short, soft tone on the chosen route so the person can hear which
-    // built-in speaker it uses.
-    function playSpeakerTest(owner, route) {
-        if (!owner.ctx) return false;
+    // Speaker test: about 5 seconds of ordinary music (the app's own background
+    // music, already kept offline), not a frequency tone, on the chosen route.
+    function playSpeakerTest(owner, route, buffer) {
+        if (!owner.ctx || !buffer) return false;
         const now = owner.ctx.currentTime;
-        const osc = owner.ctx.createOscillator();
+        const source = owner.ctx.createBufferSource();
         const gain = owner.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(528, now);
+        source.buffer = buffer;
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
-        gain.gain.setValueAtTime(0.15, now + 1.1);
-        gain.gain.linearRampToValueAtTime(0, now + 1.3);
-        osc.connect(gain);
-        const nodes = connectShotOutput(owner, gain, route);
-        osc.start(now);
-        osc.stop(now + 1.35);
-        osc.onended = () => { osc.disconnect(); gain.disconnect(); nodes.forEach(node => node.disconnect()); };
+        gain.gain.linearRampToValueAtTime(0.7, now + 0.15);
+        gain.gain.setValueAtTime(0.7, now + 4.6);
+        gain.gain.linearRampToValueAtTime(0, now + 5);
+        source.connect(gain);
+        let nodes = [];
+        if (route === 'left' || route === 'right') nodes = connectShotOutput(owner, gain, route, 1);
+        else gain.connect(owner.ctx.destination);
+        const offset = Math.min(8, Math.max(0, (Number(buffer.duration) || 0) - 6));
+        source.start(now, offset);
+        source.stop(now + 5.05);
+        source.onended = () => { source.disconnect(); gain.disconnect(); nodes.forEach(node => node.disconnect()); };
         return true;
     }
 
