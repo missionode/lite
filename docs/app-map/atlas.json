@@ -6804,8 +6804,8 @@
         [
           [
             "play",
-            "Play tuned / Play original",
-            "A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values."
+            "Play tuned (live loop) / Stop / Play original",
+            "Play tuned loops the line. Clarity, warmth, air, volume and pitch change the playing audio at once (Web Audio filters, gain, playback rate; a limiter prevents clipping). On release, pitch, speed, expressiveness and rhythm render the line again in the background and the noise cleaner re-cleans the current take; the new take cross-fades in at the same spot, and an older rendering never replaces a newer one. Play original plays the untouched line once. A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values."
           ]
         ],
         [

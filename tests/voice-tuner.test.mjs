@@ -25,7 +25,13 @@ assert.match(page, /schema: 1, app: 'Lite voice tuner'/, 'the export carries a s
 assert.match(page, /data\?\.schema !== 1/, 'import checks the schema');
 assert.match(page, /Math\.max\(Number\(\$\(key\)\.min\), Math\.min\(Number\(\$\(key\)\.max\), number\)\)/, 'imported values are clamped to the slider ranges');
 assert.match(page, /voice\.pitchOnly/, 'Pitch-only voices are not offered');
-assert.match(page, /\$\(id\)\.addEventListener\('change', \(\) => \{ save\(\); play\(tuned\(\)\); \}\)/, 'releasing a slider saves and re-speaks');
+assert.match(page, /\$\(id\)\.addEventListener\('input', \(\) => \{ showValues\(\); if \(liveSliders\.includes\(id\)\) applyLive\(\); \}\)/, 'sound sliders change the playing audio at once');
+assert.match(page, /const liveSliders = \['clarity', 'warmth', 'air', 'volume', 'pitch'\]/);
+assert.match(page, /source\.loop = true;/, 'the line loops while tuning');
+assert.match(page, /if \(id === 'cleaner' && rawBuffer\) refreshClean\(\);[\s\S]*?resynthesize\(\);/, 'cleaner and model sliders update in the background on release');
+assert.match(page, /if \(token !== renderToken\) return;/, 'an older rendering never replaces a newer one');
+assert.match(page, /linearRampToValueAtTime\(0, now \+ 0\.05\); old\.stop/, 'swaps cross-fade, no click');
+assert.match(page, /<button id="stop" type="button">/, 'a Stop button');
 
 // Sound controls applied after synthesis, including pitch without changing length.
 for (const [id, min, max] of [['clarity', '-6', '6'], ['warmth', '-6', '6'], ['air', '-6', '6'], ['cleaner', '0', '100'], ['volume', '-6', '6']]) {
@@ -33,13 +39,13 @@ for (const [id, min, max] of [['clarity', '-6', '6'], ['warmth', '-6', '6'], ['a
 }
 assert.match(page, /<input id="pitch" type="range" min="-5" max="6"/, 'pitch slider in semitones');
 assert.match(page, /lengthScale: Math\.max\(0\.75, Math\.min\(1\.5, values\.lengthScale \* ratio\)\)/, 'the line is spoken longer by the pitch ratio');
-assert.match(page, /node\.playbackRate\.value = ratio;/, 'and played at that rate, so length stays the same');
+assert.match(page, /source\.playbackRate\.value = rate;/, 'and played at that rate, so length stays the same');
 assert.match(page, /function measurePitch\(buffer\)/, 'the measured voice pitch is shown in Hz');
-assert.match(page, /band\('peaking', 2300, 0\.8, values\.clarity\)/, 'clarity is a presence boost at 2.3 kHz');
-assert.match(page, /band\('peaking', 250, 0\.9, values\.warmth\)/);
+assert.match(page, /clarity: band\('peaking', 2300, 0\.8\)/, 'clarity is a presence boost at 2.3 kHz');
+assert.match(page, /warmth: band\('peaking', 250, 0\.9\)/);
 assert.match(page, /function cleanNoise\(input, sampleRate, strength\)[\s\S]*?\(strength \/ 100\) \* 30/, 'the noise cleaner lowers pauses by up to 30 dB');
-assert.match(page, /if \(peak > 0\.98\)/, 'tuned audio never clips');
-assert.match(page, /const buffer = values \? await renderSound\(decoded, values\) : decoded;/, 'Play original stays untouched');
+assert.match(page, /nodes\.limiter\.threshold\.value = -3; nodes\.limiter\.ratio\.value = 20;/, 'a limiter keeps boosts from clipping');
+assert.match(page, /source = audioCtx\.createBufferSource\(\); source\.buffer = buffer; source\.connect\(audioCtx\.destination\);/, 'Play original stays untouched');
 assert.match(page, /modelSliders\.every\(key => key in clean\)\) all\[id\] = \{ \.\.\.SOUND, \.\.\.clean/, 'older exports without sound values still import');
 
 // A development tool: not part of the app's offline install.

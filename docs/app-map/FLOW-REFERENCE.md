@@ -2625,7 +2625,7 @@ flowchart TD
   open["Open docs/voice-tuner.html"]
   pick["Pick a voice and text"]
   tune["Move a slider"]
-  play["Play tuned / Play original"]
+  play["Play tuned (live loop) / Stop / Play original"]
   share["Export / Import"]
   open -->|"Voice list loaded"| pick
   pick -->|"Adjust"| tune
@@ -2639,7 +2639,7 @@ flowchart TD
 | Open docs/voice-tuner.html | Loads piper-models.json and lists every selectable voice (Pitch-only voices excluded). Arjun is selected first. |
 | Pick a voice and text | Shows the voice’s original speed (length_scale), expressiveness (noise_scale) and rhythm (noise_w) from its own settings file. Sample lines per language; the text is editable. |
 | Move a slider | Model: speed 0.75–1.5, expressiveness 0–1.2, rhythm 0–1.2. Sound (after synthesis, offline): pitch −5 to +6 semitones (the line is spoken longer or shorter by the same ratio and played back at that rate, so length stays the same; the measured voice pitch in Hz is shown after each play), clarity ±6 dB at 2.3 kHz, warmth ±6 dB at 250 Hz, air ±6 dB high shelf, noise cleaner 0–100 % (pauses down by up to 30 dB, smoothed), volume ±6 dB; kept below clipping. Releasing a slider saves the voice’s values in the browser (lite_voice_tuning_v1) and re-speaks the line. |
-| Play tuned / Play original | A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values. |
+| Play tuned (live loop) / Stop / Play original | Play tuned loops the line. Clarity, warmth, air, volume and pitch change the playing audio at once (Web Audio filters, gain, playback rate; a limiter prevents clipping). On release, pitch, speed, expressiveness and rhythm render the line again in the background and the noise cleaner re-cleans the current take; the new take cross-fades in at the same spot, and an older rendering never replaces a newer one. Play original plays the untouched line once. A versioned worker (piper-worker.js?v=2) loads the runtime that accepts exact values, bounded to 0–1.5; normal narration keeps using its bounded feeling factors. Reset this voice removes its saved values. |
 | Export / Import | Export downloads voice-tuning-DATE.json (schema 1, every tuned voice). Import checks the schema, ignores unknown voices and clamps values to the slider ranges. Applying exported values as app defaults is a separate, later step. |
 
 - Storage failures never break the page. Nothing is sent anywhere: synthesis runs on the device; Hugging Face voices download once like in the app.

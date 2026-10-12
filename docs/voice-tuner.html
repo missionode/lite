@@ -78,6 +78,7 @@
     <p class="hint">Clarity, warmth, air and volume are in dB; the cleaner is a strength in %. All start at 0 (no change).</p>
     <div class="buttons">
       <button class="primary" id="playTuned" type="button">▶ Play tuned</button>
+      <button id="stop" type="button">■ Stop</button>
       <button id="playOriginal" type="button">▶ Play original</button>
       <button id="reset" type="button">Reset this voice</button>
     </div>
@@ -158,30 +159,6 @@
     return output;
   }
 
-  // Applies the sound controls offline and returns a new buffer (kept below clipping).
-  async function renderSound(buffer, values) {
-    const rate = buffer.sampleRate;
-    const data = cleanNoise(buffer.getChannelData(0), rate, values.cleaner || 0);
-    // Pitch: the line was spoken longer by the same ratio, so playing it at this
-    // rate raises the pitch while the length comes back to normal.
-    const ratio = Math.pow(2, (values.pitch || 0) / 12);
-    const context = new OfflineAudioContext(1, Math.max(1, Math.ceil(data.length / ratio)), rate);
-    const clean = context.createBuffer(1, data.length, rate);
-    clean.copyToChannel(data, 0);
-    const node = context.createBufferSource(); node.buffer = clean; node.playbackRate.value = ratio;
-    const band = (type, frequency, q, gainDb) => { const filter = context.createBiquadFilter(); filter.type = type; filter.frequency.value = frequency; filter.Q.value = q; filter.gain.value = gainDb || 0; return filter; };
-    const warmth = band('peaking', 250, 0.9, values.warmth), clarity = band('peaking', 2300, 0.8, values.clarity);
-    const air = band('highshelf', Math.min(8000, rate * 0.36), 0.7, values.air);
-    const level = context.createGain(); level.gain.value = Math.pow(10, (values.volume || 0) / 20);
-    node.connect(warmth); warmth.connect(clarity); clarity.connect(air); air.connect(level); level.connect(context.destination);
-    node.start();
-    const rendered = await context.startRendering();
-    const channel = rendered.getChannelData(0); let peak = 0;
-    for (const sample of channel) peak = Math.max(peak, Math.abs(sample));
-    if (peak > 0.98) for (let i = 0; i < channel.length; i++) channel[i] *= 0.98 / peak;
-    return rendered;
-  }
-
   // Median voice pitch (Hz) of a buffer, for the status line.
   function measurePitch(buffer) {
     const rate = buffer.sampleRate / 2, data = buffer.getChannelData(0), frame = Math.round(rate * 0.04), found = [];
@@ -256,30 +233,107 @@
     });
   }
 
-  async function play(values) {
-    if (busy || !current || !$('text').value.trim()) return;
-    busy = true;
-    $('playTuned').disabled = $('playOriginal').disabled = true;
-    setStatus('Preparing…');
+  // Live playback: the line loops and the sound sliders change the playing audio
+  // at once. Speed, expressiveness, rhythm, pitch length and the noise cleaner need
+  // a new rendering, which is prepared in the background and swapped in place.
+  const live = { source: null, nodes: null, buffer: null, startedAt: 0, rate: 1 };
+  let rawBuffer = null, renderToken = 0;
+
+  async function decode(audio) {
+    return audioCtx.decodeAudioData(await (audio instanceof Blob ? audio.arrayBuffer() : new Response(audio).arrayBuffer()));
+  }
+  function soundNodes() {
+    const band = (type, frequency, q) => { const filter = audioCtx.createBiquadFilter(); filter.type = type; filter.frequency.value = frequency; filter.Q.value = q; return filter; };
+    const nodes = { warmth: band('peaking', 250, 0.9), clarity: band('peaking', 2300, 0.8), air: band('highshelf', 8000, 0.7), level: audioCtx.createGain(), limiter: audioCtx.createDynamicsCompressor() };
+    // Limiter so boosts never clip.
+    nodes.limiter.threshold.value = -3; nodes.limiter.ratio.value = 20; nodes.limiter.attack.value = 0.003; nodes.limiter.release.value = 0.1;
+    nodes.warmth.connect(nodes.clarity); nodes.clarity.connect(nodes.air); nodes.air.connect(nodes.level); nodes.level.connect(nodes.limiter); nodes.limiter.connect(audioCtx.destination);
+    return nodes;
+  }
+  function applyLive() {
+    if (!live.nodes || !live.buffer) return;
+    const values = tuned(), now = audioCtx.currentTime;
+    live.nodes.warmth.gain.setTargetAtTime(values.warmth, now, 0.03);
+    live.nodes.clarity.gain.setTargetAtTime(values.clarity, now, 0.03);
+    live.nodes.air.frequency.value = Math.min(8000, live.buffer.sampleRate * 0.36);
+    live.nodes.air.gain.setTargetAtTime(values.air, now, 0.03);
+    live.nodes.level.gain.setTargetAtTime(Math.pow(10, values.volume / 20), now, 0.03);
+    if (live.source) {
+      // Moving pitch changes speed for a moment; on release the line is rendered again so its length comes back.
+      const rate = Math.pow(2, values.pitch / 12);
+      live.startedAt = now - position() / rate; live.rate = rate;
+      live.source.playbackRate.setValueAtTime(rate, now);
+    }
+  }
+  function position() {
+    if (!live.source || !live.buffer) return 0;
+    return ((audioCtx.currentTime - live.startedAt) * live.rate) % live.buffer.duration;
+  }
+  function stopLive() {
+    if (live.source) { try { live.source.stop(); } catch (error) { /* already stopped */ } }
+    live.source = null;
+  }
+  function startLive(buffer, offset = 0) {
+    if (!live.nodes) live.nodes = soundNodes();
+    const now = audioCtx.currentTime, old = live.source;
+    const source = audioCtx.createBufferSource(), fade = audioCtx.createGain();
+    source.buffer = buffer; source.loop = true;
+    fade.gain.setValueAtTime(0, now); fade.gain.linearRampToValueAtTime(1, now + 0.05);
+    source.connect(fade); fade.connect(live.nodes.warmth);
+    const rate = Math.pow(2, tuned().pitch / 12);
+    source.playbackRate.value = rate;
+    const start = Math.max(0, Math.min(offset, buffer.duration - 0.05));
+    source.start(now, start);
+    source.fadeNode = fade;
+    if (old) { old.fadeNode.gain.setValueAtTime(old.fadeNode.gain.value, now); old.fadeNode.gain.linearRampToValueAtTime(0, now + 0.05); old.stop(now + 0.06); }
+    live.source = source; live.buffer = buffer; live.rate = rate; live.startedAt = now - start / rate;
+    applyLive();
+  }
+  function cleanedBuffer(raw, strength) {
+    if (!strength) return raw;
+    const data = cleanNoise(raw.getChannelData(0), raw.sampleRate, strength);
+    const buffer = audioCtx.createBuffer(1, data.length, raw.sampleRate);
+    buffer.copyToChannel(data, 0);
+    return buffer;
+  }
+  function refreshClean() {
+    if (!rawBuffer) return;
+    const buffer = cleanedBuffer(rawBuffer, tuned().cleaner);
+    const offset = live.source && live.buffer ? position() * (buffer.duration / live.buffer.duration) : 0;
+    startLive(buffer, offset);
+    const hz = measurePitch(buffer);
+    setStatus(`Playing tuned on a loop (${buffer.duration.toFixed(1)} s${hz ? ` · voice pitch ≈ ${Math.round(hz * Math.pow(2, tuned().pitch / 12))} Hz` : ''}). Sound sliders change it live.`);
+  }
+  async function resynthesize() {
+    if (!current || !$('text').value.trim()) return;
+    const token = ++renderToken;
+    setStatus(live.source ? 'Updating the voice…' : 'Preparing…');
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       await audioCtx.resume();
-      const audio = await synthesize(values);
-      const decoded = await audioCtx.decodeAudioData(await (audio instanceof Blob ? audio.arrayBuffer() : new Response(audio).arrayBuffer()));
-      const buffer = values ? await renderSound(decoded, values) : decoded;
+      const decoded = await decode(await synthesize(tuned()));
+      if (token !== renderToken) return;
+      rawBuffer = decoded;
+      refreshClean();
+    } catch (error) {
+      if (token === renderToken) setStatus(`Could not play: ${error.message}`);
+    }
+  }
+  async function playOriginal() {
+    if (busy || !current || !$('text').value.trim()) return;
+    busy = true; $('playOriginal').disabled = true; stopLive();
+    setStatus('Preparing the original…');
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      await audioCtx.resume();
+      const buffer = await decode(await synthesize(null));
       if (source) { try { source.stop(); } catch (error) { /* already ended */ } }
-      source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioCtx.destination);
-      source.start();
+      source = audioCtx.createBufferSource(); source.buffer = buffer; source.connect(audioCtx.destination); source.start();
       const hz = measurePitch(buffer);
-      setStatus(`${values ? 'Playing tuned' : 'Playing original'} (${buffer.duration.toFixed(1)} s${hz ? ` · voice pitch ≈ ${hz} Hz` : ''})`);
+      setStatus(`Playing original once (${buffer.duration.toFixed(1)} s${hz ? ` · voice pitch ≈ ${hz} Hz` : ''})`);
     } catch (error) {
       setStatus(`Could not play: ${error.message}`);
-    } finally {
-      busy = false;
-      $('playTuned').disabled = $('playOriginal').disabled = false;
-    }
+    } finally { busy = false; $('playOriginal').disabled = false; }
   }
 
   function renderSamples(language) {
@@ -366,18 +420,27 @@
       select.append(option);
     });
     select.value = voices.some(voice => voice.id === 'ml_IN-arjun-medium') ? 'ml_IN-arjun-medium' : voices[0].id;
-    select.addEventListener('change', () => selectVoice(select.value));
+    select.addEventListener('change', () => { stopLive(); rawBuffer = null; renderToken++; selectVoice(select.value); });
+    const liveSliders = ['clarity', 'warmth', 'air', 'volume', 'pitch'];
     sliders.forEach(id => {
-      $(id).addEventListener('input', showValues);
-      // Re-speak with the new value when the slider is released.
-      $(id).addEventListener('change', () => { save(); play(tuned()); });
+      // Sound sliders change the playing audio at once.
+      $(id).addEventListener('input', () => { showValues(); if (liveSliders.includes(id)) applyLive(); });
+      // On release: save; the cleaner re-cleans the current take, model sliders and pitch render the line again.
+      $(id).addEventListener('change', () => {
+        save();
+        if (id === 'cleaner' && rawBuffer) refreshClean();
+        else if (!liveSliders.includes(id) || id === 'pitch' || !live.source) resynthesize();
+      });
     });
-    $('playTuned').addEventListener('click', () => play(tuned()));
-    $('playOriginal').addEventListener('click', () => play(null));
+    $('playTuned').addEventListener('click', () => (live.source ? refreshClean() : resynthesize()));
+    $('stop').addEventListener('click', () => { stopLive(); renderToken++; setStatus('Stopped.'); });
+    $('playOriginal').addEventListener('click', playOriginal);
+    $('text').addEventListener('change', () => { if (live.source) resynthesize(); });
     $('reset').addEventListener('click', () => {
       if (!defaults || !current) return;
       const all = readAll(); delete all[current.id]; writeAll(all);
       applyValues(defaults);
+      if (live.source) resynthesize();
       setStatus('Reset to the original values.');
     });
     $('export').addEventListener('click', exportTuning);
