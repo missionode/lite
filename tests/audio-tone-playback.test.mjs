@@ -144,7 +144,7 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 }
 
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.2') < html.indexOf('app.js?v=4.36'));
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.2') < html.indexOf('app.js?v=4.37'));
 assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.2/);
 
 // Shots speaker setting: saved per device, Both by default, picked with a test tone.

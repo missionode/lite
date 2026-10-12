@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.379';
+const CACHE_NAME = 'chakra-v5.380';
 const PIPER_CACHE_NAME = 'chakra-piper-v13';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v87';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v88';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './tailwind.css?v=2.3',
-  './app.js?v=4.36',
+  './app.js?v=4.37',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.1',
   './modules/ambient-particle-field.js?v=1.1',
@@ -81,7 +81,7 @@ const ASSETS = [
   './modules/role-play-game.js?v=1.1',
   './modules/chakra-touch-game.js?v=1.2',
   './modules/screen-navigation.js?v=1.1',
-  './modules/shot-session.js?v=1.2',
+  './modules/shot-session.js?v=1.3',
   './modules/narration-feeling.js?v=1.0',
   './modules/pitch-mode.js?v=1.3',
   './modules/sleep-journey.js?v=1.1',
@@ -102,7 +102,7 @@ const ASSETS = [
   './modules/session-item-runner.js?v=1.0',
   './modules/mood-ambience-settings-view.js?v=1.1',
   './modules/drone-duration-settings-view.js?v=1.0',
-  './modules/lobby-experience-visibility.js?v=1.3',
+  './modules/lobby-experience-visibility.js?v=1.4',
   './modules/yoga-experience-settings.js?v=1.0',
   './modules/range-controls.js?v=1.0',
   './modules/journey-roadmap.js?v=1.2',

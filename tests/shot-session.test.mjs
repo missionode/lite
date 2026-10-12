@@ -9,8 +9,8 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
 assert.match(app, /runShot\(type, customFrequency\)\s*\{\s*return shotSession\.run\(this, type, customFrequency,/);
 assert.match(app, /finishShot\(\)\s*\{\s*return shotSession\.finish\(this,/);
 assert.match(app, /stopShot\(\)\s*\{\s*return shotSession\.stop\(this,/);
-assert.match(html, /modules\/shot-session\.js\?v=1\.2[\s\S]*?app\.js\?v=4\.36/);
-assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.2/);
+assert.match(html, /modules\/shot-session\.js\?v=1\.3[\s\S]*?app\.js\?v=4\.37/);
+assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.3/);
 assert.equal(pkg.scripts['test:shot-session'], 'node tests/shot-session.test.mjs');
 
 const context = vm.createContext({ window: {} });
@@ -65,6 +65,23 @@ function fixture(overrides = {}) {
     assert.equal(owner.isShotActive, false);
     assert.equal(startButton.disabled, false);
     assert.equal(shotToggle.disabled, true, 'successful Shot keeps its control disabled during reset');
+}
+
+// Get-ready countdown: five visible seconds before the first tone, so the person can prepare.
+{
+    const { owner, deps, events } = fixture({ journeyT: key => key === 'ui.shotGetReady' ? 'localized:ui.shotGetReady|{{seconds}}' : `localized:${key}` });
+    await shotSession.run(owner, 'meditation', undefined, deps);
+    const firstTone = events.indexOf('audio:shot:start:396');
+    const readyTexts = events.slice(0, firstTone).filter(event => event.startsWith('text:mantra-display,localized:ui.shotGetReady'));
+    assert.equal(readyTexts.length, 5, 'five get-ready steps come before the first tone');
+    assert.deepEqual(readyTexts.map(event => event.split('|')[1]), ['5', '4', '3', '2', '1'], 'the number counts down');
+    assert.ok(events.indexOf('countdown:start:2200') > events.lastIndexOf(readyTexts.at(-1)), 'the Shot timer starts after the get-ready countdown');
+    assert.equal(events.slice(0, firstTone).filter(event => event === 'wait:1000').length, 5, 'one second per step, pause-aware');
+}
+{
+    const { owner, deps, events } = fixture({ owner: { pauseAwareSleep: async value => { events.push(`wait:${value}`); owner.isMeditationActive = false; } } });
+    await shotSession.run(owner, 'meditation', undefined, deps);
+    assert.equal(events.some(event => event.startsWith('audio:shot:start:')), false, 'Stop during the countdown plays no tone');
 }
 
 {

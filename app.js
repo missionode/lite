@@ -2926,6 +2926,8 @@ function attachEventListeners() {
         state.shotSpeaker = ['left', 'right'].includes(shotSpeakerSelect.value) ? shotSpeakerSelect.value : 'both';
         localStorage.setItem('chakra_shot_speaker', state.shotSpeaker);
     });
+    // Activate Shot inside the Shots section uses the normal Begin dispatcher.
+    document.getElementById('activate-shot')?.addEventListener('click', () => startMeditationBtn.click());
     document.getElementById('test-shot-speaker')?.addEventListener('click', async () => {
         try {
             await audio.init();

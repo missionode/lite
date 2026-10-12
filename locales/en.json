@@ -441,6 +441,7 @@
     ,"shotFrequency": "Frequency (Hz)"
     ,"shotDuration": "Shot Duration (seconds)"
     ,"shotsHelp": "One short frequency-only activation. No narration or background music. Sound Shots use Shot Duration; chakra Drone Duration modes do not apply."
+    ,"shotGetReady": "Get ready… {{seconds}}"
     ,"shotSpeaker": "Speaker for Shots"
     ,"shotSpeakerBoth": "Both speakers (or headphones)"
     ,"shotSpeakerOne": "Single speaker 1"

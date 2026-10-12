@@ -9,8 +9,8 @@ const serviceWorker = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf
 assert.match(app, /const lobbyExperienceVisibility = window\.ChakraLobbyExperienceVisibility/);
 assert.match(app, /function updateExperienceModeVisibility\(\)\s*\{\s*lobbyExperienceVisibility\.sync\(/);
 assert.match(app, /lobbyExperienceVisibility\.bindShotTypeChange\(/);
-assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.3[\s\S]*?app\.js\?v=4.36/);
-assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.3/);
+assert.match(html, /modules\/lobby-experience-visibility\.js\?v=1\.4[\s\S]*?app\.js\?v=4.37/);
+assert.match(serviceWorker, /modules\/lobby-experience-visibility\.js\?v=1\.4/);
 
 const context = vm.createContext({});
 vm.runInContext(source, context);
@@ -24,7 +24,7 @@ const ids = [
     'journey-preparation-addons', 'chakra-selection-panel', 'journey-integration-addons', 'intention-config-group',
     'journey-preferences-group', 'experience-mode-group', 'intimate-service-panel', 'open-settings',
     'intimate-service-timings', 'row-perineal-care', 'row-assisted-bathing', 'massage-reverse-journey-note',
-    'shot-options', 'custom-shot-frequency', 'shot-frequency-note', 'shot-type-select', 'shots-control'
+    'shot-options', 'custom-shot-frequency', 'shot-frequency-note', 'shot-type-select', 'shots-control', 'activate-shot'
 ];
 
 function makeHarness({ checks = [], selectedChakras = [], state: stateOverrides = {}, shotType = 'custom', advancedUnlocked = true, intimateUnlocked = true } = {}) {
@@ -80,6 +80,7 @@ function makeHarness({ checks = [], selectedChakras = [], state: stateOverrides 
 
 let result = makeHarness({ checks: ['box-breathing-experience-toggle'] });
 assert.equal(result.startMeditationBtn.textContent, 'ui.beginBoxBreathing', 'Box Breathing remains a valid standalone start');
+assert.equal(result.startMeditationBtn.hidden, false, 'Begin is visible when Shots is off');
 assert.equal(result.controls['intention-config-group'].hidden, true, 'focused preparation hides unrelated intention settings');
 assert.equal(result.controls['journey-preferences-group'].hidden, true);
 assert.equal(result.normalDuration.style.display, 'none');
@@ -120,6 +121,8 @@ assert.equal(result.controls['custom-shot-frequency'].hidden, false);
 assert.equal(result.controls['chakra-selection-panel'].hidden, true);
 assert.equal(result.startMeditationBtn.textContent, 'ui.beginCustomShot');
 assert.equal(result.label.textContent, 'ui.shotDuration');
+assert.equal(result.controls['activate-shot'].textContent, 'ui.beginCustomShot', 'the Activate button inside the Shots section carries the Shot label');
+assert.equal(result.startMeditationBtn.hidden, true, 'the Lobby Begin button steps aside while Shots is selected');
 
 result = makeHarness({ checks: ['shots-toggle'], state: { noFrequencyMode: true } });
 assert.equal(result.shotsToggle.checked, false, 'No Frequency clears a directly checked Shot mode');
@@ -196,3 +199,6 @@ shotToggle.checked = true;
 modeListeners.get('shots:change')({ target: shotToggle });
 assert.deepEqual(shotCalls, ['music', 'high-energy', 'sleep', 'focused', 'addons', 'care', 'duration:custom', 'visibility', 'estimate'], 'confirmed Shot clears conflicting modes before refresh');
 console.log('Lobby experience visibility passed: standalone practice, chakra defaults, Sleep, HRIM, Shots gates, Intimate Service, ranges and shot-type refresh order.');
+
+assert.match(html, /id="shot-options"[\s\S]*?<button id="activate-shot" class="primary-btn shots-activate-btn" type="button">/, 'the Activate button sits inside the Shots section');
+assert.match(app, /getElementById\('activate-shot'\)\?\.addEventListener\('click', \(\) => startMeditationBtn\.click\(\)\)/, 'it uses the normal Begin dispatcher');

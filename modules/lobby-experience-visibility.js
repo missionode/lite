@@ -140,6 +140,11 @@
                 : state.advancedFeaturesUnlocked && state.selectedChakras.length === 0 && getChecked('quiet-courage-addon-toggle') ? 'ui.beginQuietCourage'
                         : 'ui.beginJourney';
         if (startMeditationBtn) startMeditationBtn.textContent = translate(shots ? shotLabel : (focusedExperience ? focusedLabel : 'ui.beginJourney'));
+        // Shots start from their own button inside the Shots section; the Lobby
+        // Begin button steps aside while Shots is selected.
+        const activateShot = document.getElementById('activate-shot');
+        if (activateShot) activateShot.textContent = translate(shotLabel);
+        if (startMeditationBtn) startMeditationBtn.hidden = shots;
         document.getElementById('shots-control')?.classList.toggle('shots-active', shots);
         refreshRangeControlDisplays();
         syncDroneDurationModeControls();

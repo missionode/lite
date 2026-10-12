@@ -1,4 +1,6 @@
 (function () {
+    const PREP_SECONDS = 5;
+
     function create() {
         async function run(owner, type, customFrequency, deps) {
             const { state, alert, t, document, getLanguageConfig, fetch, normalizeSleepStages, shotChakraOrder, wakeLock, showScreen, meditationScreen, setText, journeyT, logError, window } = deps;
@@ -58,6 +60,15 @@
                 if (stages.some(stage => !Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000)) {
                     throw new Error('The selected shot has no valid script frequency.');
                 }
+                // Get-ready countdown before the first tone, so the person can prepare
+                // (hold the phone, settle). Pause-aware; Stop ends it with no tone.
+                for (let left = PREP_SECONDS; left > 0; left -= 1) {
+                    if (!owner.isMeditationActive) return;
+                    setText('mantra-display', journeyT('ui.shotGetReady').replace('{{seconds}}', String(left)));
+                    await owner.pauseAwareSleep(1000);
+                }
+                if (!owner.isMeditationActive) return;
+                setText('mantra-display', journeyT('ui.shotsMode'));
                 const activeMs = (state.timeShot * 1000) / stages.length;
                 const intervalMs = type === 'sleep' ? Number(owner.scripts.sleep_mode?.intervalSeconds || 2) * 1000 : 2000;
                 owner.startSessionCountdown((state.timeShot * 1000) + Math.max(0, stages.length - 1) * intervalMs);
