@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Programme syllabus page and syllabus fonts (2026-10-13)
+
+- Owner request: add the Chakra Meditation Programme syllabus (claude.ai artifact) to the app unchanged, and use its fonts in Lite while keeping Lite's colours. `docs/syllabus.html` carries the artifact as is (six modules, nine day cards, its own light/dark colours and gold accent), plus a "← Back to the app" link. Settings shows a centred "Programme syllabus" link under "Benefits and safety" (five languages). App fonts: DM Sans for text (Manjari kept for Malayalam), Cormorant Garamond for h1–h3; Inter removed. `tailwind.css?v=2.4`, shell cache `chakra-v5.383`, language cache `chakra-language-v89`. Map `programme-syllabus` (atlas 58 maps).
+- Checked: `tests/syllabus-page.test.mjs`, `tests/tailwind-setup.test.mjs`, all 140 unit tests; atlas verifier; 375 px browser before/after screenshots of Settings and the syllabus page (fonts computed as DM Sans / Cormorant Garamond).
+- Limits: the syllabus is English only and not in the offline install; not yet checked on a phone.
+
 ## Completed locally — Voice Tuner page (2026-10-12)
 
 - Owner request: a live page to tune Arjun, Meera or Syam (any selectable voice), saved in the browser, with export so the values can be applied later. `docs/voice-tuner.html` (development tool; not linked from the app, not precached): voice picker, editable text with sample lines, sliders for speed (length_scale 0.75–1.5), expressiveness (noise_scale 0–1.2) and rhythm (noise_w 0–1.2), Play tuned / Play original / Reset, auto re-speak on slider release, per-voice saving (`lite_voice_tuning_v1`), Export / Import JSON (schema 1, clamped). The Piper runtime now accepts exact noise values (bounded 0–1.5) besides the narration feeling factors; the worker loads it as `piper-tts-web.js?v=2`, and the tuner uses `piper-worker.js?v=2`, so phones get it without wiping the voice cache. Checked: unit test `tests/voice-tuner.test.mjs`; browser: Syam played at expressiveness 0.30 and the value was saved.

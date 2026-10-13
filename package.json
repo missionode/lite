@@ -74,6 +74,7 @@
     "test:eye-shooter": "node tests/eye-shooter-game.test.mjs",
     "test:role-play": "node tests/role-play-game.test.mjs",
     "test:voice-tuner": "node tests/voice-tuner.test.mjs",
+    "test:syllabus": "node tests/syllabus-page.test.mjs",
     "test:bake-voice-tuning": "node tests/bake-voice-tuning.test.mjs",
     "test:chakra-touch": "node tests/chakra-touch-game.test.mjs",
     "test:voice-download-card": "node tests/voice-download-card.test.mjs",

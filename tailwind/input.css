@@ -50,7 +50,9 @@
   --color-chakra-thirdeye: #8e4ec6;
   --color-chakra-crown: #e8e1ff;
 
-  --font-sans: Inter, Manjari, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "DM Sans", Manjari, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Headings (programme syllabus style); Manjari keeps Malayalam readable. */
+  --font-display: "Cormorant Garamond", Manjari, Georgia, serif;
 
   /* Design-system spacing steps (s1–s6); Tailwind's numeric scale stays available. */
   --spacing-s1: 0.55rem;
@@ -368,6 +370,9 @@
   .per-chakra-time-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .per-chakra-time-status:empty { display: none; }
 
+  /* Programme syllabus link (an <a>) centred under Benefits and safety, like that button. */
+  a.benefits-safety-link { display: table; margin: 0.35rem auto 0; }
+
   /* Settings under a ticked journey option (Duration, Background score, Focus anchor…):
      a padded tile like the checkbox tiles, one label and field per row. */
   .ds-lobby .journey-addon-control .dharana-options {
@@ -589,6 +594,9 @@
   h4 { font-weight: 700; }
   h5 { font-size: 0.83em; font-weight: 700; }
   h6 { font-size: 0.67em; font-weight: 700; }
+  /* Headings use the programme syllabus display face (Cormorant Garamond);
+     body text uses DM Sans via --font-sans. Colours are unchanged. */
+  h1, h2, h3 { font-family: var(--tw-font-display); font-weight: 600; }
   a { color: var(--tw-color-gold); text-decoration: underline; }
   ol { list-style: decimal; }
   ul { list-style: disc; }
