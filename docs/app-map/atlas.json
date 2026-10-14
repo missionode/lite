@@ -6946,7 +6946,7 @@
       "id": "programme-syllabus",
       "group": "Supporting pages",
       "title": "Programme syllabus (9-day Chakra Meditation Programme)",
-      "subtitle": "A static page (docs/syllabus.html) carrying the owner’s programme syllabus unchanged: six practice modules and nine day cards. Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.",
+      "subtitle": "A static page (docs/syllabus.html) carrying the owner’s programme syllabus: nine day cards (days 1–6 include their practice focus: Breathe, Imagine, Focus, Notice, Release, Integrate; sections Idea, Points, Practice), no separate module cards and no bottom footer (owner edit 2026-10-14). Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.",
       "source": "docs/syllabus.html:1; index.html:41; locales/en.json:175; tailwind/input.css:374; tests/syllabus-page.test.mjs:1",
       "rows": [
         [
@@ -6958,14 +6958,9 @@
         ],
         [
           [
-            "modules",
-            "Practice modules",
-            "Six module cards, one introduced per day across the first six days."
-          ],
-          [
             "days",
             "Nine days",
-            "Nine day cards; tapping a day opens or closes its details (toggle())."
+            "Nine day cards labelled Day 01–09; tapping a day opens or closes its details (toggle()): practice focus (days 1–6), the idea, Points and Practice."
           ]
         ],
         [
@@ -6979,18 +6974,8 @@
       "edges": [
         [
           "open",
-          "modules",
-          "Read"
-        ],
-        [
-          "open",
           "days",
           "Read"
-        ],
-        [
-          "modules",
-          "back",
-          "Done"
         ],
         [
           "days",

@@ -784,11 +784,11 @@ add('benefits-safety','Supporting pages','Benefits and safety (FAQ)','One calm p
 meta.commit = 'production 4108ba0 + uncommitted Drone Duration tone and Benefits and safety (feature/narration-feeling)';
 
 // Programme syllabus page and syllabus typography, 2026-10-13 (owner: keep the page the same; fonts only, colours unchanged).
-add('programme-syllabus','Supporting pages','Programme syllabus (9-day Chakra Meditation Programme)','A static page (docs/syllabus.html) carrying the owner’s programme syllabus unchanged: six practice modules and nine day cards. Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.','docs/syllabus.html:1; index.html:41; locales/en.json:175; tailwind/input.css:374; tests/syllabus-page.test.mjs:1',[
+add('programme-syllabus','Supporting pages','Programme syllabus (9-day Chakra Meditation Programme)','A static page (docs/syllabus.html) carrying the owner’s programme syllabus: nine day cards (days 1–6 include their practice focus: Breathe, Imagine, Focus, Notice, Release, Integrate; sections Idea, Points, Practice), no separate module cards and no bottom footer (owner edit 2026-10-14). Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.','docs/syllabus.html:1; index.html:41; locales/en.json:175; tailwind/input.css:374; tests/syllabus-page.test.mjs:1',[
  [['open','Open from Settings','Settings shows a centred “Programme syllabus” link under “Benefits and safety” (five languages). It opens docs/syllabus.html in the same tab.']],
- [['modules','Practice modules','Six module cards, one introduced per day across the first six days.'],['days','Nine days','Nine day cards; tapping a day opens or closes its details (toggle()).']],
+ [['days','Nine days','Nine day cards labelled Day 01–09; tapping a day opens or closes its details (toggle()): practice focus (days 1–6), the idea, Points and Practice.']],
  [['back','Back to the app','“← Back to the app” at the top returns to index.html.']]
-],[['open','modules','Read'],['open','days','Read'],['modules','back','Done'],['days','back','Done']],[
+],[['open','days','Read'],['days','back','Done']],[
  'App fonts: body text DM Sans (Manjari keeps Malayalam readable), h1–h3 Cormorant Garamond; Inter removed. Colours are unchanged. The syllabus page keeps its own light/dark colours and gold accent, as the owner asked.',
  'The page is English only and is not in the offline install (needs a connection the first time, like the FAQ links). Evidence: unit tests and a 375 px browser check of Settings and the page; not yet checked on a phone.'
 ]);

@@ -4,6 +4,7 @@
 
 - Owner request: add the Chakra Meditation Programme syllabus (claude.ai artifact) to the app unchanged, and use its fonts in Lite while keeping Lite's colours. `docs/syllabus.html` carries the artifact as is (six modules, nine day cards, its own light/dark colours and gold accent), plus a "← Back to the app" link. Settings shows a centred "Programme syllabus" link under "Benefits and safety" (five languages). App fonts: DM Sans for text (Manjari kept for Malayalam), Cormorant Garamond for h1–h3; Inter removed. `tailwind.css?v=2.4`, shell cache `chakra-v5.383`, language cache `chakra-language-v89`. Map `programme-syllabus` (atlas 58 maps).
 - Checked: `tests/syllabus-page.test.mjs`, `tests/tailwind-setup.test.mjs`, all 140 unit tests; atlas verifier; 375 px browser before/after screenshots of Settings and the syllabus page (fonts computed as DM Sans / Cormorant Garamond).
+- Owner edit (2026-10-14): practice-module cards ("A gentle way in") folded into days 1–6 as "Practice focus"; labels say Day, not Module; Modules count removed; "Oral Talking Points" renamed "Points"; bottom footer (brand, evening sessions/venue, languages) removed.
 - Limits: the syllabus is English only and not in the offline install; not yet checked on a phone.
 
 ## Completed locally — Voice Tuner page (2026-10-12)

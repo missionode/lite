@@ -2688,27 +2688,23 @@ flowchart TD
 
 ## Programme syllabus (9-day Chakra Meditation Programme)
 
-A static page (docs/syllabus.html) carrying the owner’s programme syllabus unchanged: six practice modules and nine day cards. Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.
+A static page (docs/syllabus.html) carrying the owner’s programme syllabus: nine day cards (days 1–6 include their practice focus: Breathe, Imagine, Focus, Notice, Release, Integrate; sections Idea, Points, Practice), no separate module cards and no bottom footer (owner edit 2026-10-14). Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.
 
 Sources: [docs/syllabus.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/syllabus.html:1), [index.html:41](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:41), [locales/en.json:175](/Users/lekshmisyam/Desktop/Ikigai/lite/locales/en.json:175), [tailwind/input.css:374](/Users/lekshmisyam/Desktop/Ikigai/lite/tailwind/input.css:374), [tests/syllabus-page.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/syllabus-page.test.mjs:1).
 
 ```mermaid
 flowchart TD
   open["Open from Settings"]
-  modules["Practice modules"]
   days["Nine days"]
   back["Back to the app"]
-  open -->|"Read"| modules
   open -->|"Read"| days
-  modules -->|"Done"| back
   days -->|"Done"| back
 ```
 
 | Step | Current behavior |
 | --- | --- |
 | Open from Settings | Settings shows a centred “Programme syllabus” link under “Benefits and safety” (five languages). It opens docs/syllabus.html in the same tab. |
-| Practice modules | Six module cards, one introduced per day across the first six days. |
-| Nine days | Nine day cards; tapping a day opens or closes its details (toggle()). |
+| Nine days | Nine day cards labelled Day 01–09; tapping a day opens or closes its details (toggle()): practice focus (days 1–6), the idea, Points and Practice. |
 | Back to the app | “← Back to the app” at the top returns to index.html. |
 
 - App fonts: body text DM Sans (Manjari keeps Malayalam readable), h1–h3 Cormorant Garamond; Inter removed. Colours are unchanged. The syllabus page keeps its own light/dark colours and gold accent, as the owner asked.
