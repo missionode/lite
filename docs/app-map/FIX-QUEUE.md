@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Five listening tones in the Frequency Repertory (2026-10-15)
+
+- Owner request: add 100, 175, 200, 310 and 1000 Hz to the repertory. New family "Listening tone" (five languages, own colour): 100 Hz Deep Hum, 175 Hz Warm Low Tone, 200 Hz Humming Anchor, 310 Hz Open Voice, 1000 Hz Bright Clear Tone. They are not standard named healing frequencies, so each is described by what it sounds like and how it is used (grounding hum, settling, humming/toning pitch, alert cue); no healing claims. Each has the usual Prepare 1 sec Shot button. Fixed in passing: "Reference families" was hard-coded to 3 (it was already 4); it now counts the catalog (5). Shell cache `chakra-v5.384`. Map `repertory`.
+- Checked: `tests/frequency-repertory.test.mjs`, all unit tests; browser at 375 px: 21 entries, 5 families, the five rows render.
+- Limits: Malayalam, Hindi, Russian and Tamil text is a draft awaiting native review; 100 Hz is faint on small phone speakers (noted in its text); not yet checked on a phone or by listening.
+
 ## Completed locally — Programme syllabus page and syllabus fonts (2026-10-13)
 
 - Owner request: add the Chakra Meditation Programme syllabus (claude.ai artifact) to the app unchanged, and use its fonts in Lite while keeping Lite's colours. `docs/syllabus.html` carries the artifact as is (six modules, nine day cards, its own light/dark colours and gold accent), plus a "← Back to the app" link. Settings shows a centred "Programme syllabus" link under "Benefits and safety" (five languages). App fonts: DM Sans for text (Manjari kept for Malayalam), Cormorant Garamond for h1–h3; Inter removed. `tailwind.css?v=2.4`, shell cache `chakra-v5.383`, language cache `chakra-language-v89`. Map `programme-syllabus` (atlas 58 maps).

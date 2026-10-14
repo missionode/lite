@@ -18,7 +18,7 @@ assert.doesNotThrow(() => new Function(inlineScript), 'the repertory rendering s
 
 assert.equal(catalog.schemaVersion, 1, 'the reference catalog should use the supported schema');
 assert.equal(catalog.source.url, 'https://share.gemini.google/Mw3YMZgwmsHQ', 'the supplied reference document should be attributed');
-assert.equal(catalog.entries.length, 16, 'the catalog should contain five brainwave bands and eleven tone references');
+assert.equal(catalog.entries.length, 21, 'the catalog should contain five brainwave bands, eleven tone references and five listening tones');
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind === 'brainwave').map(entry => entry.frequencyLabel),
   ['0.5–3 Hz', '4–7 Hz', '8–12 Hz', '13–30 Hz', '30–100 Hz'],
@@ -26,7 +26,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind !== 'brainwave').map(entry => entry.shotFrequency),
-  [174, 285, 396, 417, 432, 528, 639, 741, 852, 963, 221.23],
+  [174, 285, 396, 417, 432, 528, 639, 741, 852, 963, 221.23, 100, 175, 200, 310, 1000],
   'all source tone frequencies should be present in order',
 );
 for (const entry of catalog.entries) {
@@ -40,6 +40,14 @@ assert.ok(catalog.entries.some(entry => entry.shotFrequency === 432), '432 Hz sh
 assert.match(catalog.entries.find(entry => entry.shotFrequency === 432)?.journeyUse?.en || '', /Arrival transition cue/, '432 Hz should document its Arrival transition use.');
 assert.match(catalog.entries.find(entry => entry.shotFrequency === 528)?.journeyUse?.en || '', /Arrival readiness cue/, '528 Hz should document its Arrival readiness use.');
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 221.23 && entry.kind === 'wellness'), '221.23 Hz should be included as a mood and relaxation reference');
+// Owner request (2026-10-15): 100, 175, 200, 310 and 1000 Hz as listening tones, named in all five languages.
+for (const hz of [100, 175, 200, 310, 1000]) {
+  const entry = catalog.entries.find(item => item.shotFrequency === hz);
+  assert.equal(entry?.kind, 'listening', `${hz} Hz is a listening tone`);
+  for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) assert.ok(entry.name[language] && entry.focus[language] && entry.features[language], `${hz} Hz has ${language} text`);
+}
+assert.equal((page.match(/listening:'|"listening": "/g) || []).length, 6, 'the listening family is labelled in five languages and coloured');
+assert.match(page, /document\.getElementById\('familyCount'\)\.textContent=String\(new Set\(catalog\.entries\.map\(entry=>entry\.kind\)\)\.size\)/, 'the family count follows the catalog');
 
 assert.match(page, /fetch\('\.\.\/scripts\.json',\{cache:'no-store'\}\)/, 'the repertory should verify the active script bundle');
 assert.match(page, /fetch\('\.\.\/data\/frequency-repertory\.json',\{cache:'no-store'\}\)/, 'the repertory should load reference features from the catalog');
