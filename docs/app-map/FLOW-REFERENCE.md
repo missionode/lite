@@ -2688,7 +2688,7 @@ flowchart TD
 
 ## Programme syllabus (9-day Chakra Meditation Programme)
 
-A static page (docs/syllabus.html) carrying the owner’s programme syllabus: nine day cards (days 1–6 include their practice focus: Breathe, Imagine, Focus, Notice, Release, Integrate; sections Idea, Points, Practice), no separate module cards and no bottom footer (owner edit 2026-10-14). Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.
+A static page (docs/syllabus.html) carrying the owner’s programme syllabus: “The seven chakras” framework section (seven cards: name, Sanskrit, place, quality, day; a symbolic map for attention) before nine day cards, Day 1 Points open by introducing the system; (days 1–6 include their practice focus: Breathe, Imagine, Focus, Notice, Release, Integrate; sections Idea, Points, Practice), no separate module cards and no bottom footer (owner edit 2026-10-14). Its fonts (Cormorant Garamond headings, DM Sans text) are now the app’s fonts too.
 
 Sources: [docs/syllabus.html:1](/Users/lekshmisyam/Desktop/Ikigai/lite/docs/syllabus.html:1), [index.html:41](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:41), [locales/en.json:175](/Users/lekshmisyam/Desktop/Ikigai/lite/locales/en.json:175), [tailwind/input.css:374](/Users/lekshmisyam/Desktop/Ikigai/lite/tailwind/input.css:374), [tests/syllabus-page.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/syllabus-page.test.mjs:1).
 

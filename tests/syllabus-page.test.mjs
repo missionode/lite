@@ -16,6 +16,11 @@ assert.equal((page.match(/<div class="day-section-title">Practice focus<\/div>/g
 assert.match(page, /<div class="day-module-label">Day 01 &middot; Breathe<\/div>/);
 assert.doesNotMatch(page, /Module 0\d|Oral Talking Points/, 'Day labels and "Points"');
 assert.match(page, /<div class="day-section-title">Points<\/div>/);
+// The chakra system is introduced as the framework, before the days and in Day 1's Points.
+assert.match(page, /<div class="section-title">The seven chakras<\/div>/);
+assert.equal((page.match(/class="chakra-card"/g) || []).length, 7, 'seven chakra cards');
+for (const name of ['Muladhara', 'Svadhisthana', 'Manipura', 'Anahata', 'Vishuddha', 'Ajna', 'Sahasrara']) assert.match(page, new RegExp(`<div class="chakra-name">[^<]*${name}<`));
+assert.match(page, /<div class="talk-point">Introduce the chakra system as the map for all nine days/);
 assert.doesNotMatch(page, /class="footer"|Evening sessions|English &middot; Malayalam/, 'no bottom footer');
 assert.match(page, /<a class="back-to-app" href="\.\.\/index\.html">/, 'back to the app');
 assert.match(page, /function toggle\(id\)/, 'days open and close');

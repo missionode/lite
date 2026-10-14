@@ -61,11 +61,13 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
 .section-title{font-family:var(--font-display);font-size:clamp(1.5rem,3.5vw,2rem);font-weight:400;line-height:1.2;margin-bottom:8px}
 .section-subtitle{font-size:14px;color:var(--fg-muted);max-width:620px;line-height:1.6;margin-bottom:24px}
 
-.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.module-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
-.module-num{font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px;letter-spacing:.06em}
-.module-name{font-family:var(--font-display);font-size:1.2rem;font-weight:500;margin-bottom:6px}
-.module-desc{font-size:13px;color:var(--fg-muted);line-height:1.55}
+.chakra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.chakra-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.chakra-num{font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px;letter-spacing:.06em}
+.chakra-name{font-family:var(--font-display);font-size:1.2rem;font-weight:500;margin-bottom:6px}
+.chakra-desc{font-size:13px;color:var(--fg-muted);line-height:1.55}
+.chakra-place{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:6px}
+.chakra-note{font-size:13px;color:var(--fg-muted);margin-top:16px;line-height:1.6}
 
 .day-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden}
 .day-card-header{padding:20px 24px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:16px;user-select:none;-webkit-user-select:none}
@@ -131,6 +133,65 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
 
 <hr class="divider accent">
 
+<!-- CHAKRA SYSTEM -->
+<div>
+  <div class="section-label">The Framework</div>
+  <div class="section-title">The seven chakras</div>
+  <div class="section-subtitle">
+    The whole programme is built on the chakra system: a traditional map from the yoga tradition
+    of seven centres running from the base of the spine to the crown of the head. Each centre is a
+    place in the body to rest attention on and a quality of the mind to explore. We climb one centre
+    a day, Root to Crown, and then bring all seven together.
+  </div>
+  <div class="chakra-grid">
+    <div class="chakra-card">
+      <div class="chakra-num">01 &middot; Day 1</div>
+      <div class="chakra-name">Root &middot; Muladhara</div>
+      <div class="chakra-place">Base of the spine</div>
+      <div class="chakra-desc">Safety, stability and belonging. The ground everything else stands on.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">02 &middot; Day 2</div>
+      <div class="chakra-name">Sacral &middot; Svadhisthana</div>
+      <div class="chakra-place">Just below the navel</div>
+      <div class="chakra-desc">Emotion, creativity and the ability to feel without being ruled by feeling.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">03 &middot; Day 3</div>
+      <div class="chakra-name">Solar Plexus &middot; Manipura</div>
+      <div class="chakra-place">Upper abdomen</div>
+      <div class="chakra-desc">Confidence, will and personal power: choosing where attention goes.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">04 &middot; Day 4</div>
+      <div class="chakra-name">Heart &middot; Anahata</div>
+      <div class="chakra-place">Centre of the chest</div>
+      <div class="chakra-desc">Compassion and gratitude. The bridge between the body-oriented and mind-oriented centres.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">05 &middot; Day 5</div>
+      <div class="chakra-name">Throat &middot; Vishuddha</div>
+      <div class="chakra-place">Throat</div>
+      <div class="chakra-desc">Expression and letting go: saying what is true, and the value of silence.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">06 &middot; Day 6</div>
+      <div class="chakra-name">Third Eye &middot; Ajna</div>
+      <div class="chakra-place">Between the eyebrows</div>
+      <div class="chakra-desc">Insight and clear seeing: observing without being caught by what you observe.</div>
+    </div>
+    <div class="chakra-card">
+      <div class="chakra-num">07 &middot; Day 7</div>
+      <div class="chakra-name">Crown &middot; Sahasrara</div>
+      <div class="chakra-place">Top of the head</div>
+      <div class="chakra-desc">Connection and spacious awareness: being part of something larger than yourself.</div>
+    </div>
+  </div>
+  <div class="chakra-note">Days 8 and 9 bring all seven centres together, first with sound and then with Resonant Energy Meditation. The chakras are used here as a symbolic map for attention, not an anatomy chart.</div>
+</div>
+
+<hr class="divider">
+
 <!-- ==================== DAY 1 ==================== -->
 <div class="day-card" id="day1">
   <div class="day-card-header" onclick="toggle('day1')">
@@ -155,6 +216,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
     </div>
     <div class="day-section">
       <div class="day-section-title">Points</div>
+      <div class="talk-point">Introduce the chakra system as the map for all nine days: seven centres from the base of the spine to the crown, each a place to rest attention and a quality to explore. We climb one centre a day, Root to Crown, then bring all seven together on Days 8 and 9. Present it as a traditional, symbolic map &mdash; useful because it gives attention somewhere to go, not something anyone has to believe in.</div>
       <div class="talk-point">Open with a question: &ldquo;How many thoughts do you think you had in the last five minutes?&rdquo; Research suggests the average is about 6,000 thoughts a day. We don&rsquo;t control them &mdash; but we can learn to choose which ones we follow.</div>
       <div class="talk-point">Explain the &ldquo;security guard&rdquo; metaphor for the Root Chakra &mdash; it&rsquo;s the part of your nervous system that decides if the environment is safe enough for the rest of your mind to relax. If the guard isn&rsquo;t satisfied, nothing else opens up.</div>
       <div class="talk-point">Introduce Box Breathing with a live demonstration. Breathe in for 4 counts, hold 4, out 4, hold 4. The same technique used by Navy SEALs and first responders &mdash; it directly activates the parasympathetic nervous system. The audience practises together for 3 rounds.</div>
