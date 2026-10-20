@@ -4,6 +4,7 @@
 
 - Owner request: a golden-ratio Shot (option A, golden steps up from 432 Hz). New Shot type "Golden Ratio Shot": 432 → 698.99 → 1130.99 Hz (each tone 1.618 times the one before), data in `sound_shots.golden_ratio.frequencies` (scripts, demo and test scripts), played like the Meditation Shot (Shot time shared equally, 2 s between tones, stage label "Golden Ratio Shot · 699 Hz"). Lobby note names the tones and calls it a harmonic idea; no healing claims. Five languages (drafts). An empty or invalid list never starts a Shot. `shot-session.js?v=1.4`, `lobby-experience-visibility.js?v=1.5`, shell cache `chakra-v5.386`. Map `shots`.
 - Checked: `tests/golden-ratio-shot.test.mjs`, all unit tests; browser: the option is listed and the note text resolves (Shots need developer mode, so the full run was not played).
+- Repertory (owner follow-up, same day): two entries beside 432 Hz in Musical tuning — 699 Hz "Golden Step" and 1131 Hz "Second Golden Step" — each with Prepare 1 sec Shot and a Lite-use note naming the Golden Ratio Shot; the Shot's three tones now count as "Configured in Lite". 23 entries. Shell cache `chakra-v5.387`. Map `repertory`.
 - Limits: not yet heard; 1131 Hz is bright, so check the level on a phone.
 
 ## Completed locally — Nyasa (installing the petals) in the chakra orientation (2026-10-20)

@@ -6701,7 +6701,7 @@
           [
             "load",
             "Load two JSON sources",
-            "scripts.json provides configured frequencies; frequency-repertory.json provides 21 reference entries in five families: brainwave bands, Solfeggio, musical tuning (432 Hz), mood & relaxation (221.23 Hz) and listening tones (100 Deep Hum, 175 Warm Low Tone, 200 Humming Anchor, 310 Open Voice, 1000 Hz Bright Clear Tone; added 2026-10-15). The summary counts entries and families from the catalog. Validate each Shot frequency."
+            "scripts.json provides configured frequencies (chakras, HRIM, Anesthetic, Mood & Relaxation, Golden Ratio Shot tones, Sleep stages); frequency-repertory.json provides 23 reference entries in five families: brainwave bands, Solfeggio, musical tuning (432 Hz and its golden-ratio steps 699 and 1131 Hz, the Golden Ratio Shot tones, added 2026-10-20), mood & relaxation (221.23 Hz) and listening tones (100 Deep Hum, 175 Warm Low Tone, 200 Humming Anchor, 310 Open Voice, 1000 Hz Bright Clear Tone; added 2026-10-15). The summary counts entries and families from the catalog. Validate each Shot frequency."
           ]
         ],
         [

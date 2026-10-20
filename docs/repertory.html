@@ -176,7 +176,7 @@
     function collectActiveFrequencies(data){
       const chakraKeys=['root','sacral','solar','heart','throat','thirdeye','crown'];
       return new Set([
-        ...chakraKeys.map(key=>Number(data[key]?.frequency)),Number(data.high_energy?.frequency),Number(data.sound_shots?.anesthetic?.frequency),Number(data.sound_shots?.mood_relaxation?.frequency),
+        ...chakraKeys.map(key=>Number(data[key]?.frequency)),Number(data.high_energy?.frequency),Number(data.sound_shots?.anesthetic?.frequency),Number(data.sound_shots?.mood_relaxation?.frequency),...(data.sound_shots?.golden_ratio?.frequencies||[]).map(Number),
         ...(data.sleep_mode?.stages||[]).map(stage=>Number(stage.frequency))
       ].filter(value=>Number.isFinite(value)&&value>0));
     }

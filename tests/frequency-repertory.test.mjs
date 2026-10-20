@@ -18,7 +18,7 @@ assert.doesNotThrow(() => new Function(inlineScript), 'the repertory rendering s
 
 assert.equal(catalog.schemaVersion, 1, 'the reference catalog should use the supported schema');
 assert.equal(catalog.source.url, 'https://share.gemini.google/Mw3YMZgwmsHQ', 'the supplied reference document should be attributed');
-assert.equal(catalog.entries.length, 21, 'the catalog should contain five brainwave bands, eleven tone references and five listening tones');
+assert.equal(catalog.entries.length, 23, 'the catalog should contain five brainwave bands, eleven tone references, two golden-ratio steps and five listening tones');
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind === 'brainwave').map(entry => entry.frequencyLabel),
   ['0.5–3 Hz', '4–7 Hz', '8–12 Hz', '13–30 Hz', '30–100 Hz'],
@@ -26,7 +26,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   catalog.entries.filter(entry => entry.kind !== 'brainwave').map(entry => entry.shotFrequency),
-  [174, 285, 396, 417, 432, 528, 639, 741, 852, 963, 221.23, 100, 175, 200, 310, 1000],
+  [174, 285, 396, 417, 432, 698.99, 1130.99, 528, 639, 741, 852, 963, 221.23, 100, 175, 200, 310, 1000],
   'all source tone frequencies should be present in order',
 );
 for (const entry of catalog.entries) {
@@ -40,6 +40,9 @@ assert.ok(catalog.entries.some(entry => entry.shotFrequency === 432), '432 Hz sh
 assert.match(catalog.entries.find(entry => entry.shotFrequency === 432)?.journeyUse?.en || '', /Arrival transition cue/, '432 Hz should document its Arrival transition use.');
 assert.match(catalog.entries.find(entry => entry.shotFrequency === 528)?.journeyUse?.en || '', /Arrival readiness cue/, '528 Hz should document its Arrival readiness use.');
 assert.ok(catalog.entries.some(entry => entry.shotFrequency === 221.23 && entry.kind === 'wellness'), '221.23 Hz should be included as a mood and relaxation reference');
+// Golden Ratio Shot tones (2026-10-20) sit beside 432 Hz and count as configured in Lite.
+for (const hz of [698.99, 1130.99]) assert.match(catalog.entries.find(entry => entry.shotFrequency === hz)?.journeyUse?.en || '', /Golden Ratio Shot \(432 → 699 → 1131 Hz\)/, `${hz} Hz documents its Golden Ratio Shot use`);
+assert.match(page, /\.\.\.\(data\.sound_shots\?\.golden_ratio\?\.frequencies\|\|\[\]\)\.map\(Number\)/, 'the Golden Ratio Shot tones count as configured values');
 // Owner request (2026-10-15): 100, 175, 200, 310 and 1000 Hz as listening tones, named in all five languages.
 for (const hz of [100, 175, 200, 310, 1000]) {
   const entry = catalog.entries.find(item => item.shotFrequency === hz);
