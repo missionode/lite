@@ -1424,6 +1424,9 @@ class MeditationController {
         const symbol = document.getElementById('newcomer-chakra-symbol');
         const name = document.getElementById('newcomer-chakra-name');
         const location = document.getElementById('newcomer-chakra-location');
+        const matrika = document.getElementById('newcomer-matrika-letters');
+        // Matrika Nyasa: the letters on each chakra's petals (Crown gathers all fifty).
+        const petals = { root: 'वं शं षं सं', sacral: 'बं भं मं यं रं लं', solar: 'डं ढं णं तं थं दं धं नं पं फं', heart: 'कं खं गं घं ङं चं छं जं झं ञं टं ठं', throat: 'अं आं इं ईं उं ऊं ऋं ॠं ऌं ॡं एं ऐं ओं औं अं अः', thirdeye: 'हं क्षं', crown: 'अ … क्ष' };
         const focus = [['root','root','newcomerRootLocation'],['sacral','sacral','newcomerSacralLocation'],['solar','solar','newcomerSolarLocation'],['heart','heart','newcomerHeartLocation'],['throat','throat','newcomerThroatLocation'],['thirdeye','thirdEye','newcomerThirdEyeLocation'],['crown','crown','newcomerCrownLocation']];
         showScreen(newcomerTutorialScreen);
         newcomerTutorialScreen?.classList.add('is-guided');
@@ -1434,6 +1437,9 @@ class MeditationController {
         // This is spoken guidance, so it must follow Meditation Language rather
         // than the independent Display Language used by the on-screen labels.
         await this.narrate(contentT('ui.newcomerOrientationIntro'), false, true, 'soft');
+        // Touch is the practitioner's free choice, said once: own hand, a trusted
+        // person's hand, or attention only. Each chakra then gets a short cue.
+        if (this.isMeditationActive) await this.narrate(contentT('ui.newcomerMatrikaIntro'), false, true, 'soft');
         for (let index = 0; index < focus.length && this.isMeditationActive; index += 1) {
             const [chakra, displayNameKey, locationKey] = focus[index];
             if (scene) scene.dataset.activeChakra = chakra;
@@ -1443,7 +1449,14 @@ class MeditationController {
             if (status) status.textContent = `${index + 1} / ${focus.length} · ${t('ui.newcomerGuidedStatus')}`;
             const narrationKey = `ui.newcomer${displayNameKey[0].toUpperCase()}${displayNameKey.slice(1)}Narration`;
             await this.narrate(contentT(narrationKey), false, true, 'soft');
+            if (!this.isMeditationActive) break;
+            if (matrika) { matrika.textContent = petals[chakra]; matrika.hidden = false; }
+            const matrikaKey = `ui.newcomerMatrika${displayNameKey[0].toUpperCase()}${displayNameKey.slice(1)}`;
+            await this.narrate(contentT(matrikaKey), false, true, 'soft');
+            await this.pauseAwareSleep(3000); // the hand rests a moment before moving on
+            if (matrika) matrika.hidden = true;
         }
+        if (matrika) matrika.hidden = true;
         if (this.isMeditationActive) await this.narrate(contentT('ui.newcomerOrientationClosing'), true, true, 'soft');
         if (!this.isMeditationActive) return;
         if (status) status.hidden = true;

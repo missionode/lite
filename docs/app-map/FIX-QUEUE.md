@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Matrika Nyasa in the chakra orientation (2026-10-20)
+
+- Owner request: bring Matrika Nyasa into the orientation, with touch (touching or being touched) as the practitioner's freedom, said as a condition and not repeated. After the orientation intro, one line: touch is your free choice — own hand, someone you trust, or attention only. Then each chakra, after its existing line: a short cue for where a hand rests (Root: lower back at the base of the spine; Sacral: lower belly; Solar: upper belly; Heart: centre of chest; Throat: collarbones just below the throat; Third Eye: a fingertip between the eyebrows; Crown: top of the head) and its petal sounds (50 letters in total; Crown rests in silence). The Devanagari letters show under the chakra caption; a 3-second pause-aware rest follows. Five languages. Adds roughly 2–3 minutes to the newcomer orientation; Skip still skips the whole orientation. `app.js?v=4.40`, `tailwind.css?v=2.5`, shell cache `chakra-v5.385`, language cache `chakra-language-v90`. Map `standard` (newcomer node).
+- Checked: `tests/newcomer-tutorial.test.mjs`, all unit tests; 375 px browser check of the letters under the caption.
+- Limits: the petal sounds are spoken by the existing voices; English and Russian use transliteration and Tamil approximates letters it does not have, so quality needs a listening check (recorded clips are the better long-term option). Malayalam, Hindi, Russian and Tamil text is a draft awaiting native review. The tradition places letters from the throat downwards; Lite keeps Root to Crown. Not yet heard on a phone.
+
 ## Completed locally — Five listening tones in the Frequency Repertory (2026-10-15)
 
 - Owner request: add 100, 175, 200, 310 and 1000 Hz to the repertory. New family "Listening tone" (five languages, own colour): 100 Hz Deep Hum, 175 Hz Warm Low Tone, 200 Hz Humming Anchor, 310 Hz Open Voice, 1000 Hz Bright Clear Tone. They are not standard named healing frequencies, so each is described by what it sounds like and how it is used (grounding hum, settling, humming/toning pitch, alert cue); no healing claims. Each has the usual Prepare 1 sec Shot button. Fixed in passing: "Reference families" was hard-coded to 3 (it was already 4); it now counts the catalog (5). Shell cache `chakra-v5.384`. Map `repertory`.

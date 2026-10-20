@@ -373,6 +373,9 @@
   /* Programme syllabus link (an <a>) centred under Benefits and safety, like that button. */
   a.benefits-safety-link { display: table; margin: 0.35rem auto 0; }
 
+  /* Matrika Nyasa: the petal letters of the chakra shown in the orientation. */
+  .newcomer-matrika-letters { width: min(100%, 24rem); margin: 0.7rem auto 0; color: var(--tw-color-gold); font-size: clamp(1.05rem, 4.4vw, 1.3rem); line-height: 1.6; letter-spacing: 0.04em; text-align: center; word-spacing: 0.35em; }
+
   /* Settings under a ticked journey option (Duration, Background score, Focus anchor…):
      a padded tile like the checkbox tiles, one label and field per row. */
   .ds-lobby .journey-addon-control .dharana-options {
