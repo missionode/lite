@@ -373,8 +373,14 @@
   /* Programme syllabus link (an <a>) centred under Benefits and safety, like that button. */
   a.benefits-safety-link { display: table; margin: 0.35rem auto 0; }
 
-  /* Matrika Nyasa: the petal letters of the chakra shown in the orientation. */
-  .newcomer-matrika-letters { width: min(100%, 24rem); margin: 0.7rem auto 0; color: var(--tw-color-gold); font-size: clamp(1.05rem, 4.4vw, 1.3rem); line-height: 1.6; letter-spacing: 0.04em; text-align: center; word-spacing: 0.35em; }
+  /* Nyasa in the orientation: petal count, the "stay with the touch" cue, and a slow glow during the silence. */
+  .newcomer-nyasa { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; width: min(100%, 24rem); margin: 0.7rem auto 0; text-align: center; }
+  .newcomer-nyasa[hidden] { display: none; }
+  .newcomer-nyasa-petals { color: var(--tw-color-gold); font-size: 0.95rem; letter-spacing: 0.08em; }
+  .newcomer-nyasa-stay { min-height: 1.3em; color: var(--tw-color-muted); font-size: 0.85rem; }
+  .newcomer-tutorial-screen.is-installing #newcomer-chakra-symbol { animation: newcomer-nyasa-glow 5s ease-in-out infinite; }
+  @keyframes newcomer-nyasa-glow { 0%, 100% { filter: drop-shadow(0 0 6px var(--tw-color-gold-glow)); } 50% { filter: drop-shadow(0 0 18px var(--tw-color-gold-glow)); } }
+  @media (prefers-reduced-motion: reduce) { .newcomer-tutorial-screen.is-installing #newcomer-chakra-symbol { animation: none; filter: drop-shadow(0 0 12px var(--tw-color-gold-glow)); } }
 
   /* Settings under a ticked journey option (Duration, Background score, Focus anchor…):
      a padded tile like the checkbox tiles, one label and field per row. */

@@ -63,25 +63,30 @@ for (const { id, localeSource } of manifest.languages) {
 assert.equal(JSON.parse(readFileSync('locales/en.json', 'utf8')).ui.thirdEye, 'Third Eye');
 console.log('Chakra orientation names match the screen and sound confident in all languages.');
 
-// Matrika Nyasa in the orientation (owner request 2026-10-20): touch is the practitioner's
-// free choice, said once (own hand, a trusted person's hand, or attention only); each
-// chakra then gets a short cue with its petal sounds, and the letters show on screen.
-const matrikaKeys = ['newcomerMatrikaIntro', ...orientation.map(([, part]) => `newcomerMatrika${part}`)];
+// Nyasa in the orientation (owner, 2026-10-20): the compressed version. Touch is the practitioner's
+// free choice, said once with what the silences mean; each chakra gets its petal count and where a
+// hand rests, a silence to feel and install the petals (shown on screen), then a short "ready" line.
+const parts = orientation.map(([, part]) => part);
+const nyasaKeys = ['newcomerMatrikaIntro', 'newcomerMatrikaStay', ...parts.flatMap(part => [`newcomerMatrika${part}`, `newcomerMatrika${part}Ready`, `newcomerPetals${part}`])];
 for (const { id, localeSource } of manifest.languages) {
   const ui = JSON.parse(readFileSync(localeSource, 'utf8')).ui;
-  for (const key of matrikaKeys) assert.ok(ui[key]?.trim(), `${id} needs ui.${key}`);
+  for (const key of nyasaKeys) assert.ok(ui[key]?.trim(), `${id} needs ui.${key}`);
+  assert.doesNotMatch(JSON.stringify(ui), /Sanskrit alphabet|vam, sham|वं, शं/, `${id}: no alphabet mention or letter recital`);
 }
 const en = JSON.parse(readFileSync('locales/en.json', 'utf8')).ui;
-assert.match(en.newcomerMatrikaIntro, /free choice: rest your own hand there, let someone you trust rest a hand there, or simply rest your attention there/);
+assert.match(en.newcomerMatrikaIntro, /This is Nyasa: placing, or installing\./);
+assert.match(en.newcomerMatrikaIntro, /fifty petals, one for each sound;/);
+assert.match(en.newcomerMatrikaIntro, /touch is your free choice: your own hand, the hand of someone you trust, or simply your attention/);
+assert.match(en.newcomerMatrikaIntro, /After each centre comes a short silence\. Stay with the touch and breathe; the voice returns/, 'the silence is explained before it happens');
+assert.deepEqual(parts.map(part => en[`newcomerPetals${part}`]), ['4 petals', '6 petals', '10 petals', '12 petals', '16 petals', '2 petals', '1,000 petals']);
 assert.match(en.newcomerMatrikaRoot, /lower back/, 'Root touch is on the lower back');
 assert.match(en.newcomerMatrikaThroat, /collarbones/, 'Throat touch rests on the collarbones, not the throat');
-assert.equal((en.newcomerMatrikaRoot.match(/hand there|someone you trust/g) || []).length, 0, 'the choice is not repeated per chakra');
+for (const part of parts) assert.doesNotMatch(en[`newcomerMatrika${part}`], /someone you trust|free choice/, 'the choice is not repeated per chakra');
 const orientationCode = app.slice(app.indexOf('    async runNewcomerGuidedOrientation()'), app.indexOf('    async start()'));
 assert.ok(orientationCode.indexOf("contentT('ui.newcomerMatrikaIntro')") > orientationCode.indexOf("contentT('ui.newcomerOrientationIntro')"), 'the choice follows the orientation intro, once');
-assert.match(orientationCode, /const matrikaKey = `ui\.newcomerMatrika\$\{displayNameKey\[0\]\.toUpperCase\(\)\}\$\{displayNameKey\.slice\(1\)\}`;/);
-assert.match(orientationCode, /await this\.pauseAwareSleep\(3000\);/, 'the hand rests a moment, and Pause holds it');
-const petals = orientationCode.match(/const petals = (\{[^}]*\});/)[1];
-const letters = Object.fromEntries([...petals.matchAll(/(\w+): '([^']*)'/g)].map(([, key, value]) => [key, value.split(' ')]));
-assert.deepEqual(['root', 'sacral', 'solar', 'heart', 'throat', 'thirdeye'].map(key => letters[key].length), [4, 6, 10, 12, 16, 2], 'petal counts follow the tradition (50 letters)');
-assert.match(html, /<p id="newcomer-matrika-letters" class="newcomer-matrika-letters" lang="sa" aria-hidden="true" hidden><\/p>/);
-console.log('Matrika Nyasa orientation passed: one free-choice touch line, short cue per chakra, 50 petal letters on screen, five languages.');
+assert.match(orientationCode, /await this\.pauseAwareSleep\(chakra === 'crown' \? 15000 : 10000\);/, '10 s per chakra, 15 s at the Crown, held by Pause');
+assert.match(orientationCode, /nyasaStay\.textContent = t\('ui\.newcomerMatrikaStay'\);[\s\S]*?classList\.add\('is-installing'\)/, 'the silence shows its cue and glow');
+assert.match(orientationCode, /contentT\(`ui\.newcomerMatrika\$\{part\}Ready`\)/);
+assert.match(html, /<p id="newcomer-nyasa" class="newcomer-nyasa" aria-live="polite" hidden>/);
+assert.doesNotMatch(html, /newcomer-matrika-letters/);
+console.log('Nyasa orientation passed: free-choice touch said once, petal counts, explained silences with on-screen cue, ready lines, five languages.');
