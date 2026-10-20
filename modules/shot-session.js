@@ -48,6 +48,9 @@
                     stages = shotChakraOrder.map(key => ({ key, frequency: Number(owner.scripts[key]?.frequency) }));
                 } else if (type === 'sleep') {
                     stages = normalizeSleepStages(owner.scripts);
+                } else if (type === 'golden_ratio') {
+                    // 432 Hz, then each tone 1.618 times the one before (the golden ratio).
+                    stages = (owner.scripts.sound_shots?.golden_ratio?.frequencies || []).map(frequency => ({ key: 'golden_ratio', frequency: Number(frequency) }));
                 } else {
                     const singleFrequencies = {
                         high_energy: Number(owner.scripts.high_energy?.frequency),
@@ -57,7 +60,7 @@
                     };
                     stages = [{ key: type, frequency: singleFrequencies[type] }];
                 }
-                if (stages.some(stage => !Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000)) {
+                if (stages.length === 0 || stages.some(stage => !Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000)) {
                     throw new Error('The selected shot has no valid script frequency.');
                 }
                 // Get-ready countdown before the first tone, so the person can prepare
@@ -83,6 +86,8 @@
                             ? t('ui.anestheticShot')
                             : stage.key === 'mood_relaxation'
                                 ? t('ui.moodRelaxationShot')
+                                : stage.key === 'golden_ratio'
+                                    ? `${t('ui.goldenRatioShot')} · ${Math.round(stage.frequency)} Hz`
                                 : stage.key === 'custom'
                                     ? t('ui.customShot')
                                     : t(stageLabelPath);

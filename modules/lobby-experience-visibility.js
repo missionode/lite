@@ -100,8 +100,9 @@
         const shotFrequencyNote = document.getElementById('shot-frequency-note');
         const selectedShotType = document.getElementById('shot-type-select')?.value;
         if (shotFrequencyNote) {
-            shotFrequencyNote.textContent = selectedShotType === 'mood_relaxation' ? translate('ui.moodRelaxationShotNote') : '';
-            shotFrequencyNote.hidden = !shots || noFrequencyMode || selectedShotType !== 'mood_relaxation';
+            const shotNoteKey = { mood_relaxation: 'ui.moodRelaxationShotNote', golden_ratio: 'ui.goldenRatioShotNote' }[selectedShotType];
+            shotFrequencyNote.textContent = shotNoteKey ? translate(shotNoteKey) : '';
+            shotFrequencyNote.hidden = !shots || noFrequencyMode || !shotNoteKey;
         }
         if (normalDuration) normalDuration.style.display = shots || focusedExperience || !highEnergy ? (focusedExperience ? 'none' : 'flex') : 'none';
         if (highEnergyDuration) highEnergyDuration.style.display = shots || focusedExperience ? 'none' : (highEnergy ? 'flex' : 'none');
@@ -132,7 +133,7 @@
             }
         }
         const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
+        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', golden_ratio: 'ui.activateGoldenRatioShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
         const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
             : intimateService ? 'ui.beginIntimateService'
                 : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'

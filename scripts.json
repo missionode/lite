@@ -519,6 +519,9 @@
     },
     "mood_relaxation": {
       "frequency": 221.23
+    },
+    "golden_ratio": {
+      "frequencies": [432, 698.99, 1130.99]
     }
   },
   "sleep_mode": {
