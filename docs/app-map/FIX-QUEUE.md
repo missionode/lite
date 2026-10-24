@@ -1,5 +1,13 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Mantra finishes its pass; get-ready before a Returning Journey (2026-10-24)
+
+- Owner request (option A): when the chant time is up, the mantra no longer fades mid-chant. `SeamlessLoop.finishCurrentPass()` (modules/media-lifecycle.js) switches, at the next point where the loop would blend into its next pass, to the original unblended tail of the file and lets it end as recorded; the chakra session waits for it (pause-aware), then the existing exit window (reverb tail, music restore) runs. Each chakra runs 0 to about 27 s longer than set (files are ~30 s with a 3 s overlap), so the session countdown can end slightly early. Skip and Stop still fade at once. The drone is unaffected (fixed ~20 s window). Map `standard` (affirmation node).
+- Owner request: a Returning Journey started the instant Begin was pressed. Journeys that open straight into Arriving (Returning, HRIM, demo, Sleep, Music Only) now show a 5-second pause-aware "Get ready… 5" count first (reusing the Shots wording, five languages); the session countdown starts after it. Map `standard` (setup node).
+- Versions: `app.js?v=4.41`, `media-lifecycle.js?v=1.2`, `audio-mantra-playback.js?v=1.1`, `chakra-session.js?v=1.3`, shell cache `chakra-v5.388`.
+- Checked: `tests/media-lifecycle.test.mjs` (tail starts at the exact blend point, original file, offset; Stop still fades), `tests/chakra-session.test.mjs`, `tests/stage-fades.test.mjs`, `tests/newcomer-tutorial.test.mjs`, all unit tests; browser: a Returning Journey counted 5, 4, 3… then entered Arriving.
+- Limits: the mantra ending has not been listened to on a phone.
+
 ## Completed locally — Golden Ratio Shot (2026-10-20)
 
 - Owner request: a golden-ratio Shot (option A, golden steps up from 432 Hz). New Shot type "Golden Ratio Shot": 432 → 698.99 → 1130.99 Hz (each tone 1.618 times the one before), data in `sound_shots.golden_ratio.frequencies` (scripts, demo and test scripts), played like the Meditation Shot (Shot time shared equally, 2 s between tones, stage label "Golden Ratio Shot · 699 Hz"). Lobby note names the tones and calls it a harmonic idea; no healing claims. Five languages (drafts). An empty or invalid list never starts a Shot. `shot-session.js?v=1.4`, `lobby-experience-visibility.js?v=1.5`, shell cache `chakra-v5.386`. Map `shots`.

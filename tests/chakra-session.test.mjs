@@ -35,6 +35,7 @@ const owner = {
     audio: {
         mantraLoop: true,
         playMantraTrack: async key => events.push(['mantra+', key]),
+        finishMantraPass: () => { events.push(['mantra-finish']); return 7.5; },
         stopMantraTrack: options => events.push(['mantra-', options])
     },
     visual: null,
@@ -67,6 +68,11 @@ assert.ok(narrateAt < mantraAt && mantraAt < droneAt, 'Narration ends before man
 assert.deepEqual(events[droneAt], ['drone', 417, 1, 1, 'advanced']);
 assert.deepEqual(events.filter(event => Array.isArray(event) && event[0] === 'sleep').slice(-1)[0], ['sleep', 2000]);
 assert.equal(events.find(event => Array.isArray(event) && event[0] === 'mantra-')[1].stageWindow, 2);
+// The chant finishes its current pass (here 7.5 s) before the exit fade begins.
+const finishAt = events.findIndex(event => Array.isArray(event) && event[0] === 'mantra-finish');
+const exitAt = events.findIndex(event => Array.isArray(event) && event[0] === 'mantra-');
+assert.ok(finishAt > -1 && finishAt < exitAt, 'finish the pass, then leave');
+assert.deepEqual(events[finishAt + 1], ['sleep', 7500], 'wait for the file to end');
 assert.ok(events.some(event => Array.isArray(event) && event[0] === 'narrate' && event[1] === 'affirmation'));
 assert.equal(symbol.src, chakra.symbol);
 assert.equal(mantra.textContent, 'VAM');

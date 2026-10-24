@@ -67,6 +67,7 @@
             this.output.connect(destination);
             this.activeSources = [];
             this.isRunning = false;
+            this.isFinishing = false;
         }
 
         start(fadeInSeconds = 0) {
@@ -134,7 +135,7 @@
             gain.gain.linearRampToValueAtTime(1, now + Math.min(0.03, this.crossfadeDuration));
 
             source.start(now);
-            this.activeSources.push({ source, gain });
+            this.activeSources.push({ source, gain, startedAt: now });
 
             source.onended = () => {
                 source.disconnect();
@@ -157,9 +158,46 @@
             param.linearRampToValueAtTime(value, now + 2);
         }
 
-        stop(fadeTime = 4) {
-            if (!this.isRunning) return;
+        // Let the file play to its natural end instead of fading mid-pass: at the
+        // next point where the loop would begin blending into its next pass, switch
+        // to the original, unblended tail (sample-identical up to that point) and
+        // let it end as recorded. Returns the seconds until the file ends (0 when
+        // nothing is playing). stop() still fades it if the person leaves early.
+        finishCurrentPass(minimumLead = 0.05) {
+            if (!this.isRunning || !this.activeSources.length) return 0;
+            const active = this.activeSources[this.activeSources.length - 1];
+            const overlap = Number(active.source.loopStart) || 0;
+            const period = this.buffer.duration - overlap;
+            if (!(period > 0) || !Number.isFinite(active.startedAt)) return 0;
+            const now = this.ctx.currentTime;
+            const firstBoundary = active.startedAt + period;
+            const boundary = firstBoundary + Math.max(0, Math.ceil((now + minimumLead - firstBoundary) / period)) * period;
+            const tail = this.ctx.createBufferSource();
+            const gain = this.ctx.createGain();
+            tail.buffer = this.buffer;
+            tail.connect(gain);
+            gain.connect(this.output);
+            tail.start(boundary, period);
+            try { active.source.stop(boundary); } catch (error) {}
             this.isRunning = false;
+            this.isFinishing = true;
+            this.activeSources.push({ source: tail, gain, startedAt: boundary });
+            tail.onended = () => {
+                tail.disconnect();
+                gain.disconnect();
+                this.activeSources = this.activeSources.filter(entry => entry.source !== tail);
+                if (!this.activeSources.length) {
+                    this.isFinishing = false;
+                    this.output.disconnect();
+                }
+            };
+            return boundary + overlap - now;
+        }
+
+        stop(fadeTime = 4) {
+            if (!this.isRunning && !this.isFinishing) return;
+            this.isRunning = false;
+            this.isFinishing = false;
 
             const now = this.ctx.currentTime;
             const param = this.output.gain;
@@ -170,7 +208,7 @@
                 param.setValueAtTime(current, now);
             }
             param.linearRampToValueAtTime(0, now + fadeTime);
-            this.activeSources.forEach(active => active.source.stop(now + fadeTime + 0.02));
+            this.activeSources.forEach(active => { try { active.source.stop(now + fadeTime + 0.02); } catch (error) {} });
         }
     }
 

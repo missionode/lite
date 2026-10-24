@@ -90,3 +90,11 @@ assert.match(orientationCode, /contentT\(`ui\.newcomerMatrika\$\{part\}Ready`\)/
 assert.match(html, /<p id="newcomer-nyasa" class="newcomer-nyasa" aria-live="polite" hidden>/);
 assert.doesNotMatch(html, /newcomer-matrika-letters/);
 console.log('Nyasa orientation passed: free-choice touch said once, petal counts, explained silences with on-screen cue, ready lines, five languages.');
+
+// Owner request (Oct 2026): a journey that opens straight into Arriving (Returning Journey,
+// HRIM, demo) starts with a 5-second get-ready count, before the session countdown.
+assert.match(app, /const JOURNEY_GET_READY_SECONDS = 5;/);
+const startFlow = app.slice(app.indexOf('    async start()'), app.indexOf('    async runGratitude()'));
+assert.match(startFlow, /if \(newcomerChoice === 'skip' && !focusedExperience\) \{[\s\S]*?for \(let left = JOURNEY_GET_READY_SECONDS; left > 0; left -= 1\) \{[\s\S]*?journeyT\('ui\.shotGetReady'\)[\s\S]*?await this\.pauseAwareSleep\(1000\);/);
+assert.ok(startFlow.indexOf('JOURNEY_GET_READY_SECONDS; left > 0') < startFlow.indexOf('this.startSessionCountdown('), 'the session countdown starts after the get-ready count');
+console.log('Returning Journey get-ready passed: 5-second pause-aware count before Arriving.');

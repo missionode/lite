@@ -62,7 +62,7 @@ const ctx = {
         const node = {
             connect() {},
             disconnect() {},
-            start(time) { this.startedAt = time; },
+            start(time, offset) { this.startedAt = time; this.offset = offset; },
             stop(time) { this.stoppedAt = time; }
         };
         sources.push(node);
@@ -87,6 +87,27 @@ loop.stop(4);
 assert.equal(JSON.stringify(loop.output.gain.events), exitEnvelope, 'repeated stop cannot restart the fade');
 sources[0].onended();
 assert.equal(loop.activeSources.length, 0, 'ended sources should release their loop ownership');
+
+// Owner choice (Oct 2026): when chant time is up the mantra finishes its current pass.
+// 20 s file, 5 s overlap: a pass is 15 s; the loop started at 10.01, so its blend
+// points are 25.01, 40.01, ... At 30 s the next one is 40.01; the unblended tail
+// (offset 15) takes over there and the file ends whole at 45.01.
+ctx.currentTime = 10;
+const chant = new media.SeamlessLoop(ctx, buffer, {}, 1, 5);
+chant.start();
+const chantSource = sources.at(-1);
+ctx.currentTime = 30;
+assert.ok(Math.abs(chant.finishCurrentPass() - 15.01) < 1e-9, 'seconds until the file ends naturally');
+const tailSource = sources.at(-1);
+assert.notEqual(tailSource, chantSource);
+assert.equal(tailSource.buffer, buffer, 'the tail plays the original file, not the blended loop');
+assert.ok(Math.abs(tailSource.startedAt - 40.01) < 1e-9 && tailSource.offset === 15, 'the tail starts exactly where the loop would blend');
+assert.ok(Math.abs(chantSource.stoppedAt - 40.01) < 1e-9, 'the loop stops at that same instant');
+assert.equal(chant.finishCurrentPass(), 0, 'finishing twice does nothing');
+chant.stop(4);
+assert.equal(tailSource.stoppedAt, 34.02, 'Skip or Stop while finishing still fades it out');
+const finishing = new media.SeamlessLoop(ctx, buffer, {}, 1, 5);
+assert.equal(finishing.finishCurrentPass(), 0, 'nothing playing: nothing to finish');
 
 assert.match(app, /return mediaLifecycle\.stageFadeSeconds\(durationSeconds\)/, 'app fade callers should use the module owner');
 assert.match(app, /return mediaLifecycle\.splitNarrationText\(text, limit\)/, 'app narration callers should use the module owner');

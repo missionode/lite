@@ -102,5 +102,10 @@
         if (restoreMusic) owner.restoreBackgroundMusicAfterMantra(fadeSeconds);
     }
 
-    global.ChakraAudioMantraPlayback = Object.freeze({ play, stop });
+    // Chant time is up: let the current pass of the looping file finish whole.
+    function finishPass(owner) {
+        return owner.mantraLoop?.finishCurrentPass ? owner.mantraLoop.finishCurrentPass() : 0;
+    }
+
+    global.ChakraAudioMantraPlayback = Object.freeze({ play, stop, finishPass });
 })(window);

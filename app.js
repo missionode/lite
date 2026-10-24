@@ -383,6 +383,7 @@ const screenNavigation = screenNavigationModule.create({
     dispatchDecorationChange: () => document.dispatchEvent(new Event('decorationchange'))
 });
 const icebreakerTimer = document.getElementById('icebreaker-timer');
+const JOURNEY_GET_READY_SECONDS = 5;
 
 const languageSelect = document.getElementById('language-select');
 const voiceSelect = document.getElementById('voice-select');
@@ -958,6 +959,10 @@ class AudioEngine {
             musicFadeSeconds: MANTRA_MUSIC_FADE_SECONDS,
             tailWet: MANTRA_REVERB_TAIL_WET
         });
+    }
+
+    finishMantraPass() {
+        return audioMantraPlayback.finishPass(this);
     }
 
     stopMantraTrack({ restoreMusic = true, invalidate = true, stageWindow = null } = {}) {
@@ -1562,6 +1567,21 @@ class MeditationController {
                 // Massage is a full reverse chakra wrapper, never a separately
                 // timed care stage. Keep the user's normal selection intact.
                 this.chakraOrder = ['crown', 'thirdeye', 'throat', 'heart', 'solar', 'sacral', 'root'];
+            }
+            // Owner request (Oct 2026): a journey that opens straight into Arriving
+            // (Returning Journey, HRIM, demo scripts) begins with a short get-ready
+            // count, so Begin does not start the practice the same instant.
+            // Pause-aware; Stop ends it. The session countdown starts after it.
+            if (newcomerChoice === 'skip' && !focusedExperience) {
+                document.getElementById('controls')?.classList.remove('hidden');
+                setText('icebreaker-subtitle', '');
+                if (icebreakerTimer) icebreakerTimer.textContent = '';
+                for (let left = JOURNEY_GET_READY_SECONDS; left > 0; left -= 1) {
+                    if (!this.isMeditationActive) return;
+                    setText('icebreaker-title', journeyT('ui.shotGetReady').replace('{{seconds}}', String(left)));
+                    await this.pauseAwareSleep(1000);
+                }
+                if (!this.isMeditationActive) return;
             }
             this.sessionStartedAt = Date.now();
             const openingChakra = this.isHighEnergy ? this.scripts.high_energy : this.scripts[this.chakraOrder[0]];

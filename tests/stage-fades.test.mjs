@@ -34,6 +34,7 @@ assert.deepEqual(transition.events.at(-1),[0,24],'Mantra tail reaches zero befor
 assert.equal(transition.retirement,4.1);
 assert.equal(run(0).fade,0,'Fast-test zero gap remains zero');
 assert.match(chakraSession,/owner\.audio\.stopMantraTrack\(\{ stageWindow: exitSeconds \}\)/);
+assert.match(chakraSession,/const passSeconds = owner\.isMeditationActive \? owner\.audio\.finishMantraPass\(\) : 0;\s*if \(passSeconds > 0\) await owner\.pauseAwareSleep\(passSeconds \* 1000\);\s*owner\.audio\.stopMantraTrack/,'the chant finishes its current pass before the exit');
 // Owner report (Oct 2026): the mantra dropped suddenly. It now leaves over a
 // 12 s window (6 s fade + reverb tail) that starts inside the chant time.
 assert.match(chakraSession,/exitSeconds = Math\.max\(transitionSeconds, Number\(timing\('transitions', 'chakraMantraExit', transitionSeconds\)\)/);

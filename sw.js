@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chakra-v5.387';
+const CACHE_NAME = 'chakra-v5.388';
 const PIPER_CACHE_NAME = 'chakra-piper-v14';
 const LANGUAGE_CACHE_NAME = 'chakra-language-v90';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
@@ -14,7 +14,7 @@ const ASSETS = [
   './timing-config.json',
   './audio/ambience-manifest.json',
   './tailwind.css?v=2.5',
-  './app.js?v=4.40',
+  './app.js?v=4.41',
   './modules/journey-chrome.js?v=1.0',
   './modules/journey-video-prelude.js?v=1.1',
   './modules/ambient-particle-field.js?v=1.1',
@@ -41,7 +41,7 @@ const ASSETS = [
   './modules/chakra-timing-view.js?v=1.1',
   './modules/app-state.js?v=1.4',
   './modules/content-localization.js?v=1.0',
-  './modules/media-lifecycle.js?v=1.1',
+  './modules/media-lifecycle.js?v=1.2',
   './modules/piper-lifecycle.js?v=1.2',
   './modules/voice-download-card.js?v=1.1',
   './modules/app-notice.js?v=1.0',
@@ -54,7 +54,7 @@ const ASSETS = [
   './modules/audio-comfort-effects.js?v=1.1',
   './modules/audio-drone-start.js?v=1.0',
   './modules/audio-drone-stop.js?v=1.0',
-  './modules/audio-mantra-playback.js?v=1.0',
+  './modules/audio-mantra-playback.js?v=1.1',
   './modules/audio-background-music-lifecycle.js?v=1.0',
   './modules/audio-background-music-controls.js?v=1.0',
   './modules/audio-pleasure-ambience.js?v=1.0',
@@ -87,7 +87,7 @@ const ASSETS = [
   './modules/sleep-journey.js?v=1.1',
   './modules/yoga-session.js?v=1.1',
   './modules/care-session.js?v=1.0',
-  './modules/chakra-session.js?v=1.2',
+  './modules/chakra-session.js?v=1.3',
   './modules/narration-speech-form.js?v=1.0',
   './modules/piper-narration.js?v=1.3',
   './modules/guide-controlled-transition.js?v=1.0',

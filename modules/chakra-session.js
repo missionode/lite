@@ -71,6 +71,11 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
+            // Owner choice (Oct 2026): never cut the chant mid-pass. The current pass of
+            // the looping file plays to its natural end (0 to about 27 s more), then the
+            // reverb tail leaves as before. Skip or Stop still fade it at once.
+            const passSeconds = owner.isMeditationActive ? owner.audio.finishMantraPass() : 0;
+            if (passSeconds > 0) await owner.pauseAwareSleep(passSeconds * 1000);
             owner.audio.stopMantraTrack({ stageWindow: exitSeconds });
             await owner.pauseAwareSleep(exitSeconds * 1000);
             if (owner.isMeditationActive) await owner.narrate(localized(chakra, 'affirmation'));
