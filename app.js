@@ -53,6 +53,11 @@ const MULTI_STAGE_SHOT_TYPES = Object.freeze(['meditation', 'sleep']);
 const SPATIAL_MODES = Object.freeze(['off', 'stereo', 'headphones', 'room']);
 const DEFAULT_SPATIAL_MODE = 'off';
 const BACKGROUND_MUSIC_STOP_FADE_SECONDS = 8;
+// Owner request (Oct 2026): a completed journey blends slowly into silence.
+// Music and ambience fade over 20 s, and the completion window waits 10 s.
+// Stop keeps the shorter exit.
+const JOURNEY_END_FADE_SECONDS = 20;
+const JOURNEY_END_QUIET_MS = 10000;
 const BACKGROUND_MUSIC_ENTRY_FADE_SECONDS = 10;
 const BACKGROUND_MUSIC_RESTORE_FADE_SECONDS = 8;
 // Change this alongside any committed replacement of background_music.mp3.
@@ -2452,8 +2457,11 @@ class MeditationController {
         this.sessionItemRunner.reset();
         return window.ChakraCompletionView.finish(this, {
             document, window, state, storage: localStorage, setText, translate: t, wakeLock, piperTTS,
-            backgroundMusicStopFadeSeconds: BACKGROUND_MUSIC_STOP_FADE_SECONDS,
-            visualizationAmbienceExitFadeSeconds: VISUALIZATION_AMBIENCE_EXIT_FADE_SECONDS,
+            backgroundMusicStopFadeSeconds: JOURNEY_END_FADE_SECONDS,
+            visualizationAmbienceExitFadeSeconds: JOURNEY_END_FADE_SECONDS,
+            pleasureAmbienceExitFadeSeconds: JOURNEY_END_FADE_SECONDS,
+            completionDelayMs: JOURNEY_END_QUIET_MS,
+            setTimeout: (callback, ms) => window.setTimeout(callback, ms),
             scheduleEarnHandoff
         }, options);
     }

@@ -6,8 +6,8 @@ const html = fs.readFileSync('index.html', 'utf8');
 const worker = fs.readFileSync('sw.js', 'utf8');
 const appSource = fs.readFileSync('app.js', 'utf8');
 const moduleSource = fs.readFileSync('modules/completion-view.js', 'utf8');
-assert.ok(html.indexOf('modules/completion-view.js?v=1.3') < html.indexOf('app.js?v='));
-assert.match(worker, /modules\/completion-view\.js\?v=1\.3/);
+assert.ok(html.indexOf('modules/completion-view.js?v=1.4') < html.indexOf('app.js?v='));
+assert.match(worker, /modules\/completion-view\.js\?v=1\.4/);
 assert.match(appSource, /finish\(options = \{\}\) \{\s*(?:this\.sessionItemRunner\.reset\(\);\s*)?return window\.ChakraCompletionView\.finish\(this,/);
 assert.match(appSource, /scheduleEarnHandoff\s*\}, options\);/, 'finish passes its options (quiet Sleep finish) to the view');
 assert.match(html, /id="sleep-goodnight"[\s\S]*?id="sleep-goodnight-close"/);
@@ -90,3 +90,26 @@ assert.ok(events.some(event => event[0] === 'app' && event[1] === 'style' && eve
     assert.ok(!events.some(event => event[0] === 'earn'), 'no Earn hand-off at night');
 }
 console.log('Completion session passed: time/stats, ordered audio cleanup, UI restoration, Earn handoff and quiet Sleep finish.');
+
+// Owner request (Oct 2026): a completed journey blends slowly into silence. Music and
+// ambience fade over 20 s, and the completion window waits 10 s before it appears.
+{
+    events.length = 0;
+    const timers = [];
+    view.finish({ ...owner, isMeditationActive: true, sessionStartedAt: 10_000 }, {
+        ...deps, backgroundMusicStopFadeSeconds: 20, visualizationAmbienceExitFadeSeconds: 20,
+        pleasureAmbienceExitFadeSeconds: 20, completionDelayMs: 10_000,
+        setTimeout: (callback, ms) => timers.push([callback, ms])
+    });
+    assert.deepEqual(['music', 'visualization', 'ambience'].map(name => events.find(event => event[0] === name)?.[1]), [20, 20, 20], 'every layer fades over 20 s');
+    assert.ok(!events.some(event => event[0] === 'completion-modal' && event[1] === 'remove'), 'no completion window yet');
+    assert.ok(!events.some(event => event[0] === 'earn'), 'no Earn hand-off yet');
+    assert.equal(timers.length, 1);
+    assert.equal(timers[0][1], 10_000, 'the window waits 10 s');
+    timers[0][0]();
+    assert.ok(events.some(event => event[0] === 'completion-modal' && event[1] === 'remove' && event[2] === 'hidden'), 'then the window appears');
+    assert.deepEqual(events.at(-1), ['earn', 'schedule']);
+}
+assert.match(appSource, /const JOURNEY_END_FADE_SECONDS = 20;\s*const JOURNEY_END_QUIET_MS = 10000;/);
+assert.match(appSource, /backgroundMusicStopFadeSeconds: JOURNEY_END_FADE_SECONDS,[\s\S]*?completionDelayMs: JOURNEY_END_QUIET_MS,/);
+console.log('Journey end blends into silence: 20 s fades, completion window after 10 s.');

@@ -4,8 +4,8 @@ import vm from 'node:vm';
 
 const html = readFileSync('index.html', 'utf8');
 const worker = readFileSync('sw.js', 'utf8');
-assert.ok(html.indexOf('modules/completion-view.js?v=1.3') < html.indexOf('app.js?v='));
-assert.match(worker, /modules\/completion-view\.js\?v=1\.3/);
+assert.ok(html.indexOf('modules/completion-view.js?v=1.4') < html.indexOf('app.js?v='));
+assert.match(worker, /modules\/completion-view\.js\?v=1\.4/);
 const events = new Map();
 const calls = [];
 const modalClasses = [];

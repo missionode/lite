@@ -71,6 +71,7 @@
         const {
             document, window, state, storage, setText, translate, wakeLock, piperTTS,
             backgroundMusicStopFadeSeconds, visualizationAmbienceExitFadeSeconds,
+            pleasureAmbienceExitFadeSeconds = 8, completionDelayMs = 0, setTimeout = null,
             scheduleEarnHandoff, now = () => Date.now()
         } = deps;
         document.body.classList.remove('visualization-active');
@@ -91,7 +92,7 @@
         owner.audio.bgMusicTargetEQ = 0;
         owner.audio.stopBackgroundMusic(backgroundMusicStopFadeSeconds);
         owner.audio.stopVisualizationAmbience(visualizationAmbienceExitFadeSeconds);
-        owner.audio.stopPleasureAmbience(8);
+        owner.audio.stopPleasureAmbience(pleasureAmbienceExitFadeSeconds);
         wakeLock.release();
         piperTTS.cancel('journey finished', { fadeSeconds: 2 });
         document.getElementById('aura-bg').style.opacity = '0';
@@ -121,6 +122,15 @@
                 return;
             }
         }
+        // The completion window waits while the sound blends into silence.
+        if (completionDelayMs > 0 && setTimeout) {
+            setTimeout(() => showCompletion(document, translate, scheduleEarnHandoff), completionDelayMs);
+            return;
+        }
+        showCompletion(document, translate, scheduleEarnHandoff);
+    }
+
+    function showCompletion(document, translate, scheduleEarnHandoff) {
         const modal = document.getElementById('completion-modal');
         const title = document.getElementById('completion-title');
         const msg = document.getElementById('completion-message');

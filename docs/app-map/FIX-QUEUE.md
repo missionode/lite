@@ -1,5 +1,11 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — A completed journey blends into silence (2026-10-24)
+
+- Owner request: the journey ended too suddenly (completion window at once, music fade 8 s). A completed journey now fades music, visualization and mood ambience over 20 s, and the completion window appears after 10 s of quiet, with the sound still fading behind it. Stop keeps its shorter exit; Sleep still shows its goodnight screen at once (with the longer fade). `app.js?v=4.42`, `completion-view.js?v=1.4`, shell cache `chakra-v5.389`. Map `completion`.
+- Checked: `tests/completion-session.test.mjs` (20 s fades, no window or Earn reveal until the 10 s timer, then both), all unit tests.
+- Limits: the ending has not been listened to on a phone; 20 s / 10 s are easy to tune.
+
 ## Completed locally — Mantra finishes its pass; get-ready before a Returning Journey (2026-10-24)
 
 - Owner request (option A): when the chant time is up, the mantra no longer fades mid-chant. `SeamlessLoop.finishCurrentPass()` (modules/media-lifecycle.js) switches, at the next point where the loop would blend into its next pass, to the original unblended tail of the file and lets it end as recorded; the chakra session waits for it (pause-aware), then the existing exit window (reverb tail, music restore) runs. Each chakra runs 0 to about 27 s longer than set (files are ~30 s with a 3 s overlap), so the session countdown can end slightly early. Skip and Stop still fade at once. The drone is unaffected (fixed ~20 s window). Map `standard` (affirmation node).
