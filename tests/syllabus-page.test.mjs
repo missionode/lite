@@ -26,7 +26,7 @@ assert.match(page, /<a class="back-to-app" href="\.\.\/index\.html">/, 'back to 
 assert.match(page, /function toggle\(id\)/, 'days open and close');
 
 // Linked from Settings, labelled in five languages.
-assert.match(html, /<a id="syllabus-link" class="benefits-safety-link" href="docs\/syllabus\.html" data-i18n="ui\.syllabusLink">/);
+assert.match(html, /<a id="syllabus-link" class="settings-learn-tile" href="docs\/syllabus\.html"><svg[\s\S]*?<\/svg><span data-i18n="ui\.syllabusLink">/);
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
     assert.ok(JSON.parse(read(`locales/${language}.json`)).ui.syllabusLink, `${language} labels the syllabus link`);
 }
@@ -50,6 +50,10 @@ assert.match(page, /fetch\('\.\.\/data\/petals\.json'\)/, 'the chart reads the o
 assert.match(page, /id="petal-search" type="search"/);
 assert.match(page, /50 lettered petals \+ 1,000 Crown petals = <strong>1,050<\/strong>/);
 assert.match(page, /<a href="#petals">petal chart<\/a>/, 'Day 1 points facilitators to the chart');
-assert.match(html, /<a id="petal-chart-link" class="benefits-safety-link" href="docs\/syllabus\.html#petals" data-i18n="ui\.petalChartLink">Petal chart<\/a>/);
+assert.match(html, /<a id="petal-chart-link" class="settings-learn-tile" href="docs\/syllabus\.html#petals"><svg[\s\S]*?<\/svg><span data-i18n="ui\.petalChartLink">Petal chart<\/span><\/a>/);
+// The three Settings links are one "learn more" row of equal tiles (owner, 2026-10-27).
+assert.match(html, /<nav class="settings-learn" aria-label="Learn more" data-i18n-aria-label="ui\.learnMore">\s*<button id="benefits-safety-button"[\s\S]*?id="syllabus-link"[\s\S]*?id="petal-chart-link"[\s\S]*?<\/nav>/);
+assert.match(read('tailwind.css'), /\.settings-learn\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/, 'three equal tiles');
+for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) assert.ok(JSON.parse(read(`locales/${language}.json`)).ui.learnMore, `${language} names the tile row`);
 for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) assert.ok(JSON.parse(read(`locales/${language}.json`)).ui.petalChartLink, `${language} labels the petal chart link`);
 console.log('Petal chart passed: 50 sourced petals + 1,000 Crown = 1,050, one data file, search, Day 1 pointer, Settings link in five languages.');

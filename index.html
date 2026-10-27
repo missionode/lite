@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Manjari:wght@100;400;700&display=swap" rel="stylesheet">
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="tailwind.css?v=2.5">
+    <link rel="stylesheet" href="tailwind.css?v=2.6">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -37,9 +37,11 @@
                 <button id="settings-help-button" class="help-icon" type="button" aria-label="Settings help" data-i18n-aria-label="ui.settingsHelp">?</button>
             </div>
             <p class="subtitle">Set your preferences for a guided experience</p>
-            <button id="benefits-safety-button" class="benefits-safety-link" type="button" data-i18n="ui.faqButton">Benefits and safety</button>
-            <a id="syllabus-link" class="benefits-safety-link" href="docs/syllabus.html" data-i18n="ui.syllabusLink">Programme syllabus</a>
-            <a id="petal-chart-link" class="benefits-safety-link" href="docs/syllabus.html#petals" data-i18n="ui.petalChartLink">Petal chart</a>
+            <nav class="settings-learn" aria-label="Learn more" data-i18n-aria-label="ui.learnMore">
+                <button id="benefits-safety-button" class="settings-learn-tile" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5C8 19.2 5 15.5 5 11V6z"/><path d="M9 12l2 2 4-4"/></svg><span data-i18n="ui.faqButton">Benefits and safety</span></button>
+                <a id="syllabus-link" class="settings-learn-tile" href="docs/syllabus.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/></svg><span data-i18n="ui.syllabusLink">Programme syllabus</span></a>
+                <a id="petal-chart-link" class="settings-learn-tile" href="docs/syllabus.html#petals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4c2 2.5 2 6 0 8.5C10 10 10 6.5 12 4z"/><path d="M12 12.5c2.8-1.6 6.2-1 8 1-2.6 1.6-6 1.4-8-1z"/><path d="M12 12.5c-2.8-1.6-6.2-1-8 1 2.6 1.6 6 1.4 8-1z"/><path d="M6 17.5c3.5 2 8.5 2 12 0"/></svg><span data-i18n="ui.petalChartLink">Petal chart</span></a>
+            </nav>
             
             <div id="stats-display" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">
                 <span data-i18n="ui.journeys">Journeys</span>: <span id="stat-journeys">0</span> | <span data-i18n="ui.totalTime">Total Time</span>: <span id="stat-time">0</span> <span data-i18n="ui.minutes">mins</span>

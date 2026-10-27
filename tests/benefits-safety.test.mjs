@@ -10,7 +10,7 @@ const view = read('modules/settings-help-view.js');
 const languages = ['en', 'ml', 'hi', 'ru', 'ta'];
 const keys = ['faqButton', 'faqTitle', 'faqIntro', ...[1, 2, 3, 4, 5, 6].flatMap(i => [`faqQ${i}`, `faqA${i}`])];
 
-assert.match(html, /id="benefits-safety-button"[^>]*data-i18n="ui\.faqButton"/, 'Settings shows a Benefits and safety link');
+assert.match(html, /<button id="benefits-safety-button" class="settings-learn-tile" type="button"><svg[\s\S]*?<\/svg><span data-i18n="ui\.faqButton">Benefits and safety<\/span><\/button>/, 'Settings shows a Benefits and safety tile');
 assert.match(html, /id="settings-help-faq"[^>]*data-i18n="ui\.faqButton"/, 'the Settings help also links to it');
 assert.match(html, /id="benefits-safety-modal" class="modal hidden" role="dialog"/);
 for (const key of keys.slice(1)) assert.match(html, new RegExp(`data-i18n="ui\\.${key}"`), `the FAQ shows ui.${key}`);

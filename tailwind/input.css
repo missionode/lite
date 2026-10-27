@@ -370,8 +370,13 @@
   .per-chakra-time-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .per-chakra-time-status:empty { display: none; }
 
-  /* Programme syllabus link (an <a>) centred under Benefits and safety, like that button. */
-  a.benefits-safety-link { display: table; margin: 0.35rem auto 0; }
+  /* Settings "learn more" row: Benefits and safety, Programme syllabus, Petal chart as three equal tiles. */
+  .settings-learn { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; width: min(100%, 26rem); margin: 0.5rem auto 1rem; }
+  .settings-learn-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; min-height: 4.75rem; padding: 0.65rem 0.4rem; border: 1px solid var(--tw-color-border-gold); border-radius: 14px; background: var(--tw-color-tile); color: var(--tw-color-ink); font: inherit; font-size: 0.8rem; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; transition: border-color 0.2s ease, background-color 0.2s ease; }
+  .settings-learn-tile svg { width: 1.45rem; height: 1.45rem; fill: none; stroke: var(--tw-color-gold); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .settings-learn-tile:hover { border-color: var(--tw-color-gold); background: var(--tw-color-tile-selected); }
+  .settings-learn-tile:focus-visible { outline: 2px solid var(--tw-color-focus); outline-offset: 2px; }
+  .settings-learn-tile:active { transform: translateY(1px); }
 
   /* Nyasa in the orientation: petal count, the "stay with the touch" cue, and a slow glow during the silence. */
   .newcomer-nyasa { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; width: min(100%, 24rem); margin: 0.7rem auto 0; text-align: center; }

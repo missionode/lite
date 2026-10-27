@@ -1,5 +1,10 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Settings "Learn more" tiles (2026-10-27)
+
+- Owner request: make Benefits and safety, Programme syllabus and Petal chart more presentable as calls to action. The three underlined text links are now one "Learn more" row of three equal tiles (shield, book and lotus icons, gold outline, hover and focus states), same ids and behaviour; labels in five languages (`ui.learnMore` names the row). `tailwind.css?v=2.6`, shell cache `chakra-v5.391`, language cache `chakra-language-v92`. Maps `benefits-safety`, `programme-syllabus`.
+- Checked: unit tests; 375 px browser: three 100 × 83 px tiles in one row, Benefits and safety still opens the FAQ.
+
 ## Completed locally — Nyasa petal chart in the syllabus (2026-10-27)
 
 - Owner request: a reference for every petal (1,050 in all) with its position and attributes, linked from the app. Step 1: `data/petals.json` built from Woodroffe, *The Serpent Power* (1919), pp. 116, 138–139, 144 (Internet Archive text) — 50 lettered petals with letter, transliteration, quality (vṛtti) and meaning, Crown 1,000 (fifty letters ×20); review copy `docs/petal-reference-review.md`; owner approved. Step 2: section `#petals` in `docs/syllabus.html` — chakra buttons, an SVG lotus per chakra with its real petal count and letters, a petal card, a searchable table of all fifty, total 1,050, source and reflection-only framing; Day 1 pointer; Settings "Petal chart" link (five languages). Shell cache `chakra-v5.390`, language cache `chakra-language-v91`. Map `programme-syllabus`.
