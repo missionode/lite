@@ -32,3 +32,24 @@ for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) {
 }
 
 console.log('Syllabus page passed: artifact content and theme, back link, Settings link, five languages.');
+
+// Nyasa petal chart (owner, 2026-10-27): every petal's letter, place and quality from
+// Woodroffe, The Serpent Power (1919); 50 lettered petals + 1,000 Crown petals = 1,050.
+const petals = JSON.parse(read('data/petals.json'));
+const lettered = petals.chakras.filter(chakra => Array.isArray(chakra.petals));
+assert.deepEqual(lettered.map(chakra => [chakra.id, chakra.petals.length]), [['root', 4], ['sacral', 6], ['solar', 10], ['heart', 12], ['throat', 16], ['thirdeye', 2]]);
+assert.equal(petals.chakras.find(chakra => chakra.id === 'crown').petals, 1000);
+assert.deepEqual(petals.totals, { lettered: 50, crown: 1000, all: 1050 });
+for (const chakra of lettered) for (const petal of chakra.petals) assert.ok(petal.letter && petal.iast && petal.attribute && petal.meaning, `${chakra.id} petal is complete`);
+assert.deepEqual(lettered[0].petals.map(petal => petal.iast), ['vaṁ', 'śaṁ', 'ṣaṁ', 'saṁ'], 'Root letters as in the source');
+assert.equal(lettered.find(chakra => chakra.id === 'thirdeye').petals.map(petal => petal.letter).join(' '), 'हं क्षं');
+assert.match(petals.source.url, /archive\.org\/details\/x-the-serpent-power/, 'the source is named and linked');
+assert.match(petals.note, /not as diagnosis or claims about health/, 'difficult qualities are offered for reflection');
+assert.match(page, /<section id="petals" class="petal-section"/);
+assert.match(page, /fetch\('\.\.\/data\/petals\.json'\)/, 'the chart reads the one data file');
+assert.match(page, /id="petal-search" type="search"/);
+assert.match(page, /50 lettered petals \+ 1,000 Crown petals = <strong>1,050<\/strong>/);
+assert.match(page, /<a href="#petals">petal chart<\/a>/, 'Day 1 points facilitators to the chart');
+assert.match(html, /<a id="petal-chart-link" class="benefits-safety-link" href="docs\/syllabus\.html#petals" data-i18n="ui\.petalChartLink">Petal chart<\/a>/);
+for (const language of ['en', 'ml', 'hi', 'ru', 'ta']) assert.ok(JSON.parse(read(`locales/${language}.json`)).ui.petalChartLink, `${language} labels the petal chart link`);
+console.log('Petal chart passed: 50 sourced petals + 1,000 Crown = 1,050, one data file, search, Day 1 pointer, Settings link in five languages.');

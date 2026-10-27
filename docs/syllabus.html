@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0c0b12">
 <title>Chakra Meditation Programme</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500&display=swap">
 <style>
 :root {
   --bg: #0c0b12;
@@ -106,6 +106,58 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
 .footer{text-align:center;padding:48px 0 0;font-size:12px;color:var(--fg-dim)}
 .footer-brand{font-family:var(--font-display);font-size:1.1rem;font-weight:500;color:var(--fg-muted);margin-bottom:6px}
 .footer-langs{font-size:11px;color:var(--fg-dim);letter-spacing:.08em;margin-top:12px}
+
+/* Nyasa petal chart */
+.petal-section{scroll-margin-top:16px}
+.petal-total{font-family:var(--font-display);font-size:1.15rem;color:var(--fg);margin:4px 0 20px}
+.petal-total strong{color:var(--accent);font-weight:600}
+.petal-chart{display:grid;grid-template-columns:minmax(200px,240px) 1fr;gap:20px;align-items:start}
+@media(max-width:640px){.petal-chart{grid-template-columns:1fr}}
+.petal-spine{display:flex;flex-direction:column;gap:6px;position:relative}
+@media(max-width:640px){.petal-spine{flex-direction:row;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}}
+.petal-spine-btn{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+@media(max-width:640px){.petal-spine-btn{flex:0 0 auto;width:auto;scroll-snap-align:start}}
+.petal-spine-btn:hover{border-color:var(--border-accent)}
+.petal-spine-btn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.petal-spine-btn:focus-visible,.petal-petal:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.petal-spine-btn svg{flex:0 0 auto;width:30px;height:30px}
+.petal-spine-name{display:block;font-family:var(--font-display);font-size:1.05rem;line-height:1.1}
+.petal-spine-meta{display:block;font-size:11px;color:var(--fg-muted);letter-spacing:.04em}
+.petal-stage{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:420px}
+.petal-lotus{width:min(100%,340px);height:auto;overflow:visible}
+.petal-lotus .petal-shape{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1}
+.petal-lotus .petal-petal{cursor:pointer}
+.petal-lotus .petal-petal:hover .petal-shape{fill:var(--accent-glow);stroke-width:1.6}
+.petal-lotus .petal-petal[aria-pressed="true"] .petal-shape{fill:var(--accent);opacity:.85}
+.petal-lotus .petal-petal[aria-pressed="true"] .petal-letter{fill:var(--bg)}
+.petal-lotus .petal-letter{fill:var(--fg);font-family:'Noto Sans Devanagari',var(--font-body);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.petal-lotus .petal-core{fill:var(--surface);stroke:var(--border-accent)}
+.petal-lotus .petal-core-name{fill:var(--fg);font-family:var(--font-display);font-size:17px;text-anchor:middle}
+.petal-lotus .petal-core-count{fill:var(--accent);font-family:var(--font-display);font-size:14px;text-anchor:middle}
+.petal-lotus .petal-start{fill:var(--fg-dim);font-size:9px;letter-spacing:.08em;text-anchor:start}
+.petal-card{width:min(100%,420px);background:var(--surface);border:1px solid var(--border-accent);border-radius:12px;padding:16px 18px;min-height:120px}
+.petal-card-kicker{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.petal-card-letter{font-size:2rem;line-height:1.1;font-family:'Noto Sans Devanagari',var(--font-body)}
+.petal-card-letter span{font-family:var(--font-display);font-size:1.2rem;color:var(--fg-muted);margin-left:8px}
+.petal-card-attr{font-family:var(--font-display);font-size:1.3rem;margin-top:6px}
+.petal-card-meaning{font-size:14px;color:var(--fg-muted)}
+.petal-card-place{font-size:12.5px;color:var(--fg-muted);margin-top:10px;border-top:1px solid var(--border);padding-top:8px}
+.petal-chakra-note{font-size:13px;color:var(--fg-muted);font-style:italic;line-height:1.6;margin-top:14px}
+.petal-table-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:28px}
+.petal-table-title{font-family:var(--font-display);font-size:1.3rem;font-weight:500}
+.petal-search input{width:min(100%,260px);padding:8px 12px;border-radius:999px;border:1px solid var(--border-accent);background:var(--surface);color:var(--fg);font:inherit;font-size:14px}
+.petal-table-wrap{overflow-x:auto;margin-top:10px;border:1px solid var(--border);border-radius:10px}
+.petal-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+.petal-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);padding:10px 12px;background:var(--surface-raised)}
+.petal-table td{padding:8px 12px;border-top:1px solid var(--border);color:var(--fg-muted);vertical-align:top}
+.petal-table td:nth-child(3){color:var(--fg);white-space:nowrap}
+.petal-table td:nth-child(4){color:var(--fg);font-family:var(--font-display);font-size:1rem}
+.petal-empty{padding:12px;font-size:13px;color:var(--fg-muted)}
+.petal-framing,.petal-source{font-size:12.5px;color:var(--fg-dim);line-height:1.6;margin-top:12px}
+.petal-source a{color:var(--accent)}
+.petal-error{font-size:14px;color:var(--fg-muted);margin-top:12px}
+.petal-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.petal-row-btn{border:0;background:none;padding:0;color:var(--fg);font:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:var(--border-accent);text-underline-offset:3px}.petal-row-btn:hover{color:var(--accent)}
 </style>
 
 <a class="back-to-app" href="../index.html">&larr; Back to the app</a>
@@ -192,6 +244,42 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
 
 <hr class="divider">
 
+<!-- NYASA PETAL CHART (data: ../data/petals.json) -->
+<section id="petals" class="petal-section" aria-labelledby="petals-title">
+  <div class="section-label">Nyasa &middot; Petal reference</div>
+  <h2 id="petals-title" class="section-title">Installing the petals</h2>
+  <div class="section-subtitle">
+    Nyasa means placing, or installing. In the orientation journey, touch and attention install the petals of
+    each chakra and make it ready. From Root to Third Eye the lotuses carry fifty petals, one for each sound;
+    the Crown holds a thousand. Choose a chakra, then a petal.
+  </div>
+  <div class="petal-total">50 lettered petals + 1,000 Crown petals = <strong>1,050</strong></div>
+  <div class="petal-chart">
+    <div class="petal-spine" id="petal-spine" role="group" aria-label="Chakras, crown to root"></div>
+    <div class="petal-stage">
+      <svg id="petal-lotus" class="petal-lotus" viewBox="-160 -160 320 320" role="group" aria-label="Petals of the selected chakra"></svg>
+      <div id="petal-card" class="petal-card" aria-live="polite"></div>
+    </div>
+  </div>
+  <p class="petal-chakra-note" id="petal-chakra-note"></p>
+  <div class="petal-table-head">
+    <h3 class="petal-table-title">All fifty petals</h3>
+    <label class="petal-search"><span class="petal-visually-hidden">Search the petals</span><input id="petal-search" type="search" placeholder="Search: fear, Heart, ka, bliss…" autocomplete="off"></label>
+  </div>
+  <div class="petal-table-wrap">
+    <table class="petal-table">
+      <thead><tr><th scope="col">Chakra</th><th scope="col">#</th><th scope="col">Letter</th><th scope="col">Attribute</th><th scope="col">Meaning</th></tr></thead>
+      <tbody id="petal-rows"></tbody>
+    </table>
+    <p id="petal-empty" class="petal-empty" hidden>No petal matches that search.</p>
+  </div>
+  <p class="petal-framing" id="petal-framing"></p>
+  <p class="petal-source" id="petal-source"></p>
+  <p class="petal-error" id="petal-error" hidden>The petal chart could not load. Open it from the app with a connection and try again.</p>
+</section>
+
+<hr class="divider">
+
 <!-- ==================== DAY 1 ==================== -->
 <div class="day-card" id="day1">
   <div class="day-card-header" onclick="toggle('day1')">
@@ -217,6 +305,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
     <div class="day-section">
       <div class="day-section-title">Points</div>
       <div class="talk-point">Introduce the chakra system as the map for all nine days: seven centres from the base of the spine to the crown, each a place to rest attention and a quality to explore. We climb one centre a day, Root to Crown, then bring all seven together on Days 8 and 9. Present it as a traditional, symbolic map &mdash; useful because it gives attention somewhere to go, not something anyone has to believe in.</div>
+      <div class="talk-point">For the petals the orientation installs (Nyasa), use the <a href="#petals">petal chart</a> as your reference: every petal&rsquo;s letter, place and traditional quality.</div>
       <div class="talk-point">Open with a question: &ldquo;How many thoughts do you think you had in the last five minutes?&rdquo; Research suggests the average is about 6,000 thoughts a day. We don&rsquo;t control them &mdash; but we can learn to choose which ones we follow.</div>
       <div class="talk-point">Explain the &ldquo;security guard&rdquo; metaphor for the Root Chakra &mdash; it&rsquo;s the part of your nervous system that decides if the environment is safe enough for the rest of your mind to relax. If the guard isn&rsquo;t satisfied, nothing else opens up.</div>
       <div class="talk-point">Introduce Box Breathing with a live demonstration. Breathe in for 4 counts, hold 4, out 4, hold 4. The same technique used by Navy SEALs and first responders &mdash; it directly activates the parasympathetic nervous system. The audience practises together for 3 rounds.</div>
@@ -534,6 +623,170 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);max-width
 
 <script>
 function toggle(id){var e=document.getElementById(id);if(!e)return;var o=e.classList.contains('open');document.querySelectorAll('.day-card.open').forEach(function(c){c.classList.remove('open')});if(!o)e.classList.add('open')}
+</script>
+<script>
+// Nyasa petal chart: reads ../data/petals.json (Woodroffe, The Serpent Power, 1919).
+(function () {
+  var SVG = 'http://www.w3.org/2000/svg';
+  var section = document.getElementById('petals');
+  if (!section) return;
+  var spine = document.getElementById('petal-spine');
+  var lotus = document.getElementById('petal-lotus');
+  var card = document.getElementById('petal-card');
+  var chakraNote = document.getElementById('petal-chakra-note');
+  var rows = document.getElementById('petal-rows');
+  var search = document.getElementById('petal-search');
+  var empty = document.getElementById('petal-empty');
+  var data = null, current = null, currentPetal = null;
+
+  function el(name, attrs, parent) {
+    var node = document.createElementNS(SVG, name);
+    Object.keys(attrs || {}).forEach(function (key) { node.setAttribute(key, attrs[key]); });
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function html(tag, className, text, parent) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function count(chakra) { return typeof chakra.petals === 'number' ? chakra.petals : chakra.petals.length; }
+  function plain(text) { return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+
+  // One petal along +x from the core, rotated into place. Petal 1 sits on the
+  // right and the count goes round clockwise ("from the right").
+  function petalPath(n, inner, outer) {
+    var half = Math.min(46, Math.PI * (inner + outer) / 2 / n * 0.92);
+    return 'M' + inner + ' 0C' + (inner + 30) + ' ' + (-half) + ' ' + (outer - 30) + ' ' + (-half) + ' ' + outer + ' 0C' +
+      (outer - 30) + ' ' + half + ' ' + (inner + 30) + ' ' + half + ' ' + inner + ' 0Z';
+  }
+  function drawMini(svg, n) {
+    var shown = Math.min(n, 24);
+    for (var i = 0; i < shown; i += 1) el('path', { d: petalPath(shown, 3, 14), transform: 'rotate(' + (i * 360 / shown) + ')', class: 'petal-shape' }, svg);
+    el('circle', { r: 3.2, class: 'petal-core' }, svg);
+  }
+
+  function select(id, petalIndex) {
+    current = data.chakras.filter(function (c) { return c.id === id; })[0];
+    currentPetal = petalIndex == null ? null : petalIndex;
+    Array.prototype.forEach.call(spine.children, function (button) { button.setAttribute('aria-pressed', String(button.dataset.chakra === id)); });
+    drawLotus();
+    drawCard();
+    chakraNote.textContent = current.note || '';
+  }
+
+  function drawLotus() {
+    while (lotus.firstChild) lotus.removeChild(lotus.firstChild);
+    var lettered = Array.isArray(current.petals);
+    var n = lettered ? current.petals.length : 50;
+    var size = n <= 6 ? 24 : n <= 12 ? 19 : 15;
+    for (var i = 0; i < n; i += 1) {
+      var angle = i * 360 / n;
+      var group = el('g', lettered ? { class: 'petal-petal', role: 'button', tabindex: '0' } : {}, lotus);
+      el('path', { d: petalPath(n, 46, 140), transform: 'rotate(' + angle + ')', class: 'petal-shape' }, group);
+      if (!lettered) continue;
+      var petal = current.petals[i];
+      var rad = angle * Math.PI / 180;
+      var letter = el('text', { x: (100 * Math.cos(rad)).toFixed(1), y: (100 * Math.sin(rad)).toFixed(1), class: 'petal-letter', 'font-size': size }, group);
+      letter.textContent = petal.letter;
+      group.setAttribute('aria-label', 'Petal ' + (i + 1) + ' of ' + n + ': ' + petal.iast + ', ' + petal.attribute + ', ' + petal.meaning);
+      group.setAttribute('aria-pressed', String(currentPetal === i));
+      (function (index) {
+        group.addEventListener('click', function () { select(current.id, index); });
+        group.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(current.id, index); lotus.querySelectorAll('.petal-petal')[index].focus(); }
+        });
+      })(i);
+    }
+    if (lettered) el('text', { x: 146, y: -10, class: 'petal-start' }, lotus).textContent = '1';
+    el('circle', { r: 44, class: 'petal-core' }, lotus);
+    el('text', { y: -2, class: 'petal-core-name' }, lotus).textContent = current.name;
+    el('text', { y: 18, class: 'petal-core-count' }, lotus).textContent = count(current).toLocaleString('en') + ' petals';
+  }
+
+  function drawCard() {
+    card.textContent = '';
+    var total = count(current);
+    if (currentPetal == null || !Array.isArray(current.petals)) {
+      html('div', 'petal-card-kicker', current.name + ' · ' + current.sanskrit, card);
+      html('div', 'petal-card-attr', total.toLocaleString('en') + ' petals', card);
+      html('div', 'petal-card-meaning', Array.isArray(current.petals) ? 'Choose a petal to see its letter and quality. Petal 1 is on the right; the count goes round from the right.' : 'All fifty letters, repeated twenty times. No separate quality is given to each petal.', card);
+    } else {
+      var petal = current.petals[currentPetal];
+      html('div', 'petal-card-kicker', current.name + ' · petal ' + (currentPetal + 1) + ' of ' + total, card);
+      var letter = html('div', 'petal-card-letter', petal.letter, card);
+      html('span', '', petal.iast, letter);
+      html('div', 'petal-card-attr', petal.attribute, card);
+      html('div', 'petal-card-meaning', petal.meaning, card);
+    }
+    html('div', 'petal-card-place', 'Location: ' + current.location + ' · Hand rests: ' + current.hand, card);
+  }
+
+  function buildSpine() {
+    data.chakras.slice().reverse().forEach(function (chakra) {
+      var button = html('button', 'petal-spine-btn', null, spine);
+      button.type = 'button';
+      button.dataset.chakra = chakra.id;
+      var svg = el('svg', { viewBox: '-16 -16 32 32', 'aria-hidden': 'true' }, button);
+      drawMini(svg, count(chakra));
+      var label = html('span', '', null, button);
+      html('span', 'petal-spine-name', chakra.name, label);
+      html('span', 'petal-spine-meta', chakra.sanskrit + ' · ' + count(chakra).toLocaleString('en') + ' petals', label);
+      button.addEventListener('click', function () { select(chakra.id); });
+    });
+  }
+
+  function buildTable() {
+    data.chakras.forEach(function (chakra) {
+      var list = Array.isArray(chakra.petals) ? chakra.petals : null;
+      (list || [null]).forEach(function (petal, index) {
+        var row = html('tr', '', null, rows);
+        html('td', '', chakra.name, row);
+        html('td', '', list ? String(index + 1) : '1–1,000', row);
+        var letterCell = html('td', '', null, row);
+        if (list) {
+          var go = html('button', 'petal-row-btn', petal.letter + ' ' + petal.iast, letterCell);
+          go.type = 'button';
+          go.setAttribute('aria-label', 'Show ' + chakra.name + ' petal ' + (index + 1) + ' in the chart');
+          go.addEventListener('click', function () { select(chakra.id, index); section.querySelector('.petal-chart').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        } else {
+          letterCell.textContent = 'All 50 letters × 20';
+        }
+        html('td', '', list ? petal.attribute : '—', row);
+        html('td', '', list ? petal.meaning : chakra.note, row);
+        row.dataset.search = plain([chakra.name, chakra.sanskrit, chakra.location, list ? [petal.letter, petal.iast, petal.attribute, petal.meaning].join(' ') : chakra.note].join(' '));
+      });
+    });
+  }
+
+  search.addEventListener('input', function () {
+    var needle = plain(search.value.trim());
+    var shown = 0;
+    Array.prototype.forEach.call(rows.children, function (row) {
+      var match = !needle || row.dataset.search.indexOf(needle) !== -1;
+      row.hidden = !match;
+      if (match) shown += 1;
+    });
+    empty.hidden = shown > 0;
+  });
+
+  fetch('../data/petals.json')
+    .then(function (response) { if (!response.ok) throw new Error('HTTP ' + response.status); return response.json(); })
+    .then(function (json) {
+      data = json;
+      buildSpine();
+      buildTable();
+      document.getElementById('petal-framing').textContent = data.note + ' ' + data.order;
+      var source = document.getElementById('petal-source');
+      source.textContent = 'Source: ' + data.source.author + ', ' + data.source.title + ', ' + data.source.year + ', pp. ' + data.source.pages + '. ';
+      var link = html('a', '', 'Read it on the Internet Archive', source);
+      link.href = data.source.url; link.target = '_blank'; link.rel = 'noopener';
+      select('root');
+    })
+    .catch(function () { document.getElementById('petal-error').hidden = false; });
+})();
 </script>
 </body>
 </html>

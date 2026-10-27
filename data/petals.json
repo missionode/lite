@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "source": {
+    "title": "The Serpent Power (Ṣaṭ-cakra-nirūpaṇa and Pādukā-pañcaka)",
+    "author": "Arthur Avalon (Sir John Woodroffe)",
+    "year": 1919,
+    "pages": "116, 138–139, 144",
+    "url": "https://archive.org/details/x-the-serpent-power"
+  },
+  "order": "Petals are counted from the right, going round the lotus (dakṣiṇāvarta), letter 1 on petal 1. The texts list letters and qualities in order; pairing them one to one by that order is the usual convention, not stated outright.",
+  "note": "These qualities describe tendencies of the mind traditionally associated with each centre, offered for reflection, not as diagnosis or claims about health.",
+  "totals": {
+    "lettered": 50,
+    "crown": 1000,
+    "all": 1050
+  },
+  "chakras": [
+    {
+      "id": "root",
+      "name": "Root",
+      "sanskrit": "Mūlādhāra",
+      "location": "Base of the spine",
+      "hand": "Lower back, at the base of the spine",
+      "note": "The four petals are four forms of bliss (Tarkālaṅkāra’s commentary on the Mahānirvāṇa Tantra). Woodroffe’s table lists the last two the other way round (Vīrānanda, then Yogānanda).",
+      "petals": [
+        {
+          "letter": "वं",
+          "iast": "vaṁ",
+          "attribute": "Paramānanda",
+          "meaning": "Supreme bliss"
+        },
+        {
+          "letter": "शं",
+          "iast": "śaṁ",
+          "attribute": "Sahajānanda",
+          "meaning": "Natural bliss"
+        },
+        {
+          "letter": "षं",
+          "iast": "ṣaṁ",
+          "attribute": "Yogānanda",
+          "meaning": "Bliss of union (yoga)"
+        },
+        {
+          "letter": "सं",
+          "iast": "saṁ",
+          "attribute": "Vīrānanda",
+          "meaning": "Bliss of the courageous"
+        }
+      ]
+    },
+    {
+      "id": "sacral",
+      "name": "Sacral",
+      "sanskrit": "Svādhiṣṭhāna",
+      "location": "Lower belly",
+      "hand": "Lower belly",
+      "note": "Order from the Adhyātmaviveka as quoted in Woodroffe’s text. His table gives a different order: Praśraya, Krūratā, Sarvanāśa, Mūrcchā, Avajñā, Aviśvāsa.",
+      "petals": [
+        {
+          "letter": "बं",
+          "iast": "baṁ",
+          "attribute": "Praśraya",
+          "meaning": "Credulity"
+        },
+        {
+          "letter": "भं",
+          "iast": "bhaṁ",
+          "attribute": "Aviśvāsa",
+          "meaning": "Suspicion"
+        },
+        {
+          "letter": "मं",
+          "iast": "maṁ",
+          "attribute": "Avajñā",
+          "meaning": "Disdain"
+        },
+        {
+          "letter": "यं",
+          "iast": "yaṁ",
+          "attribute": "Mūrcchā",
+          "meaning": "Delusion (or disinclination)"
+        },
+        {
+          "letter": "रं",
+          "iast": "raṁ",
+          "attribute": "Sarvanāśa",
+          "meaning": "False knowledge"
+        },
+        {
+          "letter": "लं",
+          "iast": "laṁ",
+          "attribute": "Krūratā",
+          "meaning": "Pitilessness"
+        }
+      ]
+    },
+    {
+      "id": "solar",
+      "name": "Solar Plexus",
+      "sanskrit": "Maṇipūra",
+      "location": "Upper belly",
+      "hand": "Upper belly",
+      "note": "Order from Woodroffe’s text; his table starts with Suṣupti and gives the same ten in another order.",
+      "petals": [
+        {
+          "letter": "डं",
+          "iast": "ḍaṁ",
+          "attribute": "Lajjā",
+          "meaning": "Shame"
+        },
+        {
+          "letter": "ढं",
+          "iast": "ḍhaṁ",
+          "attribute": "Piśunatā",
+          "meaning": "Treachery"
+        },
+        {
+          "letter": "णं",
+          "iast": "ṇaṁ",
+          "attribute": "Īrṣā",
+          "meaning": "Jealousy"
+        },
+        {
+          "letter": "तं",
+          "iast": "taṁ",
+          "attribute": "Tṛṣṇā",
+          "meaning": "Desire"
+        },
+        {
+          "letter": "थं",
+          "iast": "thaṁ",
+          "attribute": "Suṣupti",
+          "meaning": "Supineness"
+        },
+        {
+          "letter": "दं",
+          "iast": "daṁ",
+          "attribute": "Viṣāda",
+          "meaning": "Sadness"
+        },
+        {
+          "letter": "धं",
+          "iast": "dhaṁ",
+          "attribute": "Kaṣāya",
+          "meaning": "Worldliness"
+        },
+        {
+          "letter": "नं",
+          "iast": "naṁ",
+          "attribute": "Moha",
+          "meaning": "Ignorance"
+        },
+        {
+          "letter": "पं",
+          "iast": "paṁ",
+          "attribute": "Ghṛṇā",
+          "meaning": "Aversion"
+        },
+        {
+          "letter": "फं",
+          "iast": "phaṁ",
+          "attribute": "Bhaya",
+          "meaning": "Fear"
+        }
+      ]
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "sanskrit": "Anāhata",
+      "location": "Centre of the chest",
+      "hand": "Centre of the chest",
+      "note": "Order from Woodroffe’s text; his table gives the same twelve in another order. Woodroffe calls the Heart’s qualities “mixed”.",
+      "petals": [
+        {
+          "letter": "कं",
+          "iast": "kaṁ",
+          "attribute": "Āśā",
+          "meaning": "Hope"
+        },
+        {
+          "letter": "खं",
+          "iast": "khaṁ",
+          "attribute": "Cintā",
+          "meaning": "Care or anxiety"
+        },
+        {
+          "letter": "गं",
+          "iast": "gaṁ",
+          "attribute": "Ceṣṭā",
+          "meaning": "Endeavour"
+        },
+        {
+          "letter": "घं",
+          "iast": "ghaṁ",
+          "attribute": "Mamatā",
+          "meaning": "Mineness (attachment)"
+        },
+        {
+          "letter": "ङं",
+          "iast": "ṅaṁ",
+          "attribute": "Dambha",
+          "meaning": "Arrogance or hypocrisy"
+        },
+        {
+          "letter": "चं",
+          "iast": "caṁ",
+          "attribute": "Vikalatā",
+          "meaning": "Languor"
+        },
+        {
+          "letter": "छं",
+          "iast": "chaṁ",
+          "attribute": "Ahaṅkāra",
+          "meaning": "Egoism"
+        },
+        {
+          "letter": "जं",
+          "iast": "jaṁ",
+          "attribute": "Viveka",
+          "meaning": "Discernment"
+        },
+        {
+          "letter": "झं",
+          "iast": "jhaṁ",
+          "attribute": "Lolatā",
+          "meaning": "Covetousness"
+        },
+        {
+          "letter": "ञं",
+          "iast": "ñaṁ",
+          "attribute": "Kapaṭatā",
+          "meaning": "Duplicity"
+        },
+        {
+          "letter": "टं",
+          "iast": "ṭaṁ",
+          "attribute": "Vitarka",
+          "meaning": "Indecision"
+        },
+        {
+          "letter": "ठं",
+          "iast": "ṭhaṁ",
+          "attribute": "Anutāpa",
+          "meaning": "Regret"
+        }
+      ]
+    },
+    {
+      "id": "throat",
+      "name": "Throat",
+      "sanskrit": "Viśuddha",
+      "location": "Throat",
+      "hand": "Collarbones, just below the throat",
+      "note": "Order from Woodroffe’s table (the only complete list of sixteen). His text instead places poison on the 8th petal and nectar on the 16th. Nectar and poison both came from the churning of the ocean: the upbuilding and destructive forces of the world.",
+      "petals": [
+        {
+          "letter": "अं",
+          "iast": "aṁ",
+          "attribute": "Praṇava",
+          "meaning": "Om"
+        },
+        {
+          "letter": "आं",
+          "iast": "āṁ",
+          "attribute": "Udgītha",
+          "meaning": "Om as chanted in the Sāma Veda"
+        },
+        {
+          "letter": "इं",
+          "iast": "iṁ",
+          "attribute": "Huṃphaṭ",
+          "meaning": "A protective seed sound"
+        },
+        {
+          "letter": "ईं",
+          "iast": "īṁ",
+          "attribute": "Vaṣaṭ",
+          "meaning": "An offering call"
+        },
+        {
+          "letter": "उं",
+          "iast": "uṁ",
+          "attribute": "Svadhā",
+          "meaning": "Offering to the ancestors"
+        },
+        {
+          "letter": "ऊं",
+          "iast": "ūṁ",
+          "attribute": "Svāhā",
+          "meaning": "Offering into the fire"
+        },
+        {
+          "letter": "ऋं",
+          "iast": "ṛṁ",
+          "attribute": "Namaḥ",
+          "meaning": "Salutation"
+        },
+        {
+          "letter": "ॠं",
+          "iast": "ṝṁ",
+          "attribute": "Amṛta",
+          "meaning": "Nectar"
+        },
+        {
+          "letter": "ऌं",
+          "iast": "ḷṁ",
+          "attribute": "Ṣaḍja",
+          "meaning": "Musical note sa"
+        },
+        {
+          "letter": "ॡं",
+          "iast": "ḹṁ",
+          "attribute": "Ṛṣabha",
+          "meaning": "Musical note ri"
+        },
+        {
+          "letter": "एं",
+          "iast": "eṁ",
+          "attribute": "Gāndhāra",
+          "meaning": "Musical note ga"
+        },
+        {
+          "letter": "ऐं",
+          "iast": "aiṁ",
+          "attribute": "Madhyama",
+          "meaning": "Musical note ma"
+        },
+        {
+          "letter": "ओं",
+          "iast": "oṁ",
+          "attribute": "Pañcama",
+          "meaning": "Musical note pa"
+        },
+        {
+          "letter": "औं",
+          "iast": "auṁ",
+          "attribute": "Dhaivata",
+          "meaning": "Musical note dha"
+        },
+        {
+          "letter": "अं",
+          "iast": "aṁ",
+          "attribute": "Niṣāda",
+          "meaning": "Musical note ni"
+        },
+        {
+          "letter": "अः",
+          "iast": "aḥ",
+          "attribute": "Viṣa",
+          "meaning": "Poison"
+        }
+      ]
+    },
+    {
+      "id": "thirdeye",
+      "name": "Third Eye",
+      "sanskrit": "Ājñā",
+      "location": "Between the eyebrows",
+      "hand": "A fingertip between the eyebrows",
+      "note": "Woodroffe gives the three guṇas (sattva, rajas, tamas) across the two petals and the centre, without a per-petal split; the sacred syllable Om sits in the centre.",
+      "petals": [
+        {
+          "letter": "हं",
+          "iast": "haṁ",
+          "attribute": "Guṇas",
+          "meaning": "Sattva, rajas and tamas made manifest (shared)"
+        },
+        {
+          "letter": "क्षं",
+          "iast": "kṣaṁ",
+          "attribute": "Guṇas",
+          "meaning": "Sattva, rajas and tamas made manifest (shared)"
+        }
+      ]
+    },
+    {
+      "id": "crown",
+      "name": "Crown",
+      "sanskrit": "Sahasrāra",
+      "location": "Top of the head",
+      "hand": "Top of the head",
+      "petals": 1000,
+      "note": "The fifty letters, a to la (the second La, or Kṣa in another reading, is left out), repeated twenty times make the thousand petals, read from beginning to end going round the lotus. No separate quality is given to each petal."
+    }
+  ]
+}

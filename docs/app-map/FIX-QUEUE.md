@@ -1,5 +1,12 @@
 # Fix queue derived from the flow atlas
 
+## Completed locally — Nyasa petal chart in the syllabus (2026-10-27)
+
+- Owner request: a reference for every petal (1,050 in all) with its position and attributes, linked from the app. Step 1: `data/petals.json` built from Woodroffe, *The Serpent Power* (1919), pp. 116, 138–139, 144 (Internet Archive text) — 50 lettered petals with letter, transliteration, quality (vṛtti) and meaning, Crown 1,000 (fifty letters ×20); review copy `docs/petal-reference-review.md`; owner approved. Step 2: section `#petals` in `docs/syllabus.html` — chakra buttons, an SVG lotus per chakra with its real petal count and letters, a petal card, a searchable table of all fifty, total 1,050, source and reflection-only framing; Day 1 pointer; Settings "Petal chart" link (five languages). Shell cache `chakra-v5.390`, language cache `chakra-language-v91`. Map `programme-syllabus`.
+- Source notes kept in the data: Woodroffe gives two orders (text and table); the text order is used, the table for the Throat (only complete list; his text instead puts poison 8th, nectar 16th); letter-to-quality pairing by order is the usual convention; Third Eye's three guṇas are not split per petal.
+- Checked: `tests/syllabus-page.test.mjs`, all unit tests; 375 px browser check: seven chakra buttons, Heart petal 8 = jaṁ Viveka, Crown 1,000-petal ring, search "fear" → Bhaya and "ksam" → kṣaṁ, no page overflow.
+- Limits: English only; the page and data need a connection the first time (not in the offline install).
+
 ## Completed locally — A completed journey blends into silence (2026-10-24)
 
 - Owner request: the journey ended too suddenly (completion window at once, music fade 8 s). A completed journey now fades music, visualization and mood ambience over 20 s, and the completion window appears after 10 s of quiet, with the sound still fading behind it. Stop keeps its shorter exit; Sleep still shows its goodnight screen at once (with the longer fade). `app.js?v=4.42`, `completion-view.js?v=1.4`, shell cache `chakra-v5.389`. Map `completion`.
