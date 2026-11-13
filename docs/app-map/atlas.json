@@ -1003,7 +1003,7 @@
       "group": "Journeys",
       "title": "Standard chakra journey",
       "subtitle": "Selected chakras in Root → Crown order; returning, newcomer and demo branches included.",
-      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/session-item-runner.js:1; tests/session-item-runner.test.mjs:1; index.html:456; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1757; app.js:1767; app.js:1809; app.js:2106; app.js:1440; app.js:1442; app.js:2327; app.js:1558; app.js:2535",
+      "source": "modules/intention-settings-view.js:1; tests/intention-settings-view.test.mjs:1; modules/journey-hypnosis-wrapper.js:1; tests/journey-hypnosis-wrapper.test.mjs:1; modules/journey-opening-stage.js:1; tests/journey-opening-stage.test.mjs:1; modules/session-item-runner.js:1; tests/session-item-runner.test.mjs:1; index.html:456; modules/journey-transition-stages.js:1; tests/journey-transition-stages.test.mjs:1; modules/standard-journey-sequence.js:1; tests/standard-journey-sequence.test.mjs:1; modules/journey-content-loader.js:1; tests/journey-content-loader.test.mjs:1; app.js:1757; app.js:1767; app.js:1809; app.js:2106; app.js:1440; app.js:1442; app.js:2327; app.js:1556; app.js:2535",
       "rows": [
         [
           [
@@ -1309,7 +1309,7 @@
       "group": "Journeys",
       "title": "Inside one chakra",
       "subtitle": "Narration, audio handoff, bounded exposure, and loop transitions.",
-      "source": "modules/ambient-particle-field.js:165; app.js:2428; app.js:2523; app.js:2551; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1",
+      "source": "modules/ambient-particle-field.js:165; app.js:2427; app.js:2523; app.js:2551; modules/chakra-session.js:1; tests/chakra-session.test.mjs:1",
       "rows": [
         [
           [
@@ -1675,7 +1675,7 @@
       "group": "Journeys",
       "title": "Box breathing and Ho’oponopono",
       "subtitle": "Standalone practices launched through shared guided startup.",
-      "source": "modules/journey-transition-stages.js:25; app.js:1541; app.js:1800; app.js:1758; app.js:1919; app.js:1771; app.js:1971; app.js:2446",
+      "source": "modules/journey-transition-stages.js:25; app.js:1541; app.js:1799; app.js:1758; app.js:1918; app.js:1771; app.js:1970; app.js:2446",
       "rows": [
         [
           [
@@ -1789,7 +1789,7 @@
       "group": "Journeys",
       "title": "Yoga experience",
       "subtitle": "Advanced Features-gated rest, bathing, selected poses and shared master-mode behavior.",
-      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; index.html:456; timing-config.json:1; app.js:1197; modules/shot-session.js:64; app.js:2039; app.js:2238; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
+      "source": "modules/yoga-experience-settings.js:1; tests/yoga-experience-settings.test.mjs:1; index.html:456; timing-config.json:1; app.js:1197; modules/shot-session.js:64; app.js:2039; app.js:2237; modules/yoga-session.js:1; tests/yoga-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -1940,7 +1940,7 @@
       "group": "Journeys",
       "title": "Intimate Service and massage",
       "subtitle": "All seven nonempty combinations follow this ordered composition.",
-      "source": "modules/shot-session.js:23; app.js:2015; app.js:2027; app.js:2086; app.js:2459; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
+      "source": "modules/shot-session.js:23; app.js:2014; app.js:2027; app.js:2086; app.js:2457; modules/care-session.js:1; tests/care-session.test.mjs:1; modules/guide-controlled-transition.js:1; tests/guide-controlled-transition.test.mjs:1",
       "rows": [
         [
           [
@@ -2080,8 +2080,8 @@
       "id": "shots",
       "group": "Journeys",
       "title": "Sound Shots",
-      "subtitle": "Ten types, confirmation, frequency validation, and distinct finish behavior.",
-      "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:260; app.js:1519; app.js:1412",
+      "subtitle": "Single and Mixed Shot blending, confirmation, frequency validation, and distinct finish behavior.",
+      "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:260; app.js:1518; app.js:1416",
       "rows": [
         [
           [
@@ -2094,7 +2094,7 @@
           [
             "type",
             "Choose type",
-            "Meditation, High Energy, Deep Focus, Mental Clarity, Inner Ease & Joy, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Labels describe benefit-first app modes."
+            "Meditation, High Energy, Deep Focus, Mental Clarity, Inner Ease & Joy, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Toggling Mixed Shot enables multiple checkboxes to fire a simultaneous tone blend."
           ],
           [
             "speaker",
@@ -2104,7 +2104,7 @@
           [
             "activate",
             "Activate Shot (inside the Shots section)",
-            "The Shots section has its own Activate button carrying the Shot label (for example Activate Meditation Shot); it uses the normal Begin dispatcher. While Shots is selected the Lobby Begin button is hidden."
+            "The Shots section has its own Activate button carrying the Shot label (for example Activate Meditation Shot or Activate Mixed Shot); it uses the normal Begin dispatcher. While Shots is selected the Lobby Begin button is hidden."
           ]
         ],
         [
@@ -2125,8 +2125,8 @@
           ],
           [
             "single",
-            "Single-frequency Shot",
-            "High Energy 396 Hz; Deep Focus 40 Hz; Mental Clarity 528 Hz; Inner Ease & Joy 417 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values."
+            "Single or Mixed Shot",
+            "Single: High Energy 396 Hz; Deep Focus 40 Hz; Mental Clarity 528 Hz; Inner Ease & Joy 417 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. Mixed: simultaneous chord blend with equal gain distribution."
           ]
         ],
         [
@@ -3000,7 +3000,7 @@
       "group": "Journeys",
       "title": "Walk in My Shoes · dev-mode role-play acting game",
       "subtitle": "A trust-building role-play for two or more players. Opened from the Play Zone card only while Advanced Features (dev mode) is unlocked. Players agree to play and finalise their roles, a spinner wheel decides the time, the screen stays awake and a soft chime ends the role play. There is no script: the players invent the story. Nothing is recorded or saved.",
-      "source": "modules/role-play-game.js:1; modules/wake-lock.js:1; tests/role-play-game.test.mjs:1; app.js:3165; docs/role-play-game.md:1",
+      "source": "modules/role-play-game.js:1; modules/wake-lock.js:1; tests/role-play-game.test.mjs:1; app.js:3170; docs/role-play-game.md:1",
       "rows": [
         [
           [
@@ -3289,7 +3289,7 @@
       "group": "Journeys",
       "title": "Pitch Mode · 2-Minute Mind Reset",
       "subtitle": "Public marketing demo in normal mode, between Sound Shot and Meditation Room: choose a feeling, hear a two-minute voice-guided session, then an invite.",
-      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1692; app.js:3095; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1693",
+      "source": "modules/pitch-mode.js:1; tests/pitch-mode.test.mjs:1; app.js:1696; app.js:3095; piper-models.json:1; docs/pitch-mode.md:1; modules/narration-feeling.js:1; modules/audio-mode-settings-view.js:31; app.js:1696",
       "rows": [
         [
           [
@@ -3400,7 +3400,7 @@
       "group": "Journeys",
       "title": "Self-Exploration · Confidence Visualization, Deep Secrets and the standalone optional-service card",
       "subtitle": "Advanced Features-only optional stages after Quiet Courage and before chakras; individually selectable and available as standalone preparation.",
-      "source": "modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/lobby-experience-visibility.js:1; modules/session-estimate.js:1; modules/journey-roadmap.js:1; app.js:2350; index.html:371; sw.js:62; tests/self-exploration-practices.test.mjs:1",
+      "source": "modules/self-exploration-practices.js:1; modules/practice-module-loader.js:1; modules/journey-routing.js:1; modules/journey-preparation-selection.js:1; modules/lobby-experience-visibility.js:1; modules/session-estimate.js:1; modules/journey-roadmap.js:1; app.js:2351; index.html:371; sw.js:62; tests/self-exploration-practices.test.mjs:1",
       "rows": [
         [
           [
@@ -3508,7 +3508,7 @@
       "group": "Journeys",
       "title": "Separate time for each chakra",
       "subtitle": "Optional own time per chakra under Core Practice Duration, with autofill from the chakra assessment.",
-      "source": "modules/chakra-timing.js:1; modules/chakra-timing-view.js:1; tests/chakra-timing.test.mjs:1; index.html:496; app.js:2588; modules/chakra-session.js:39; modules/session-estimate.js:1; modules/lobby-experience-visibility.js:117",
+      "source": "modules/chakra-timing.js:1; modules/chakra-timing-view.js:1; tests/chakra-timing.test.mjs:1; index.html:496; app.js:2602; modules/chakra-session.js:39; modules/session-estimate.js:1; modules/lobby-experience-visibility.js:117",
       "rows": [
         [
           [
@@ -3901,7 +3901,7 @@
       "group": "Live session",
       "title": "Completion, statistics and external handoff",
       "subtitle": "Different end states are intentionally visible here.",
-      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; index.html:881; app.js:2458; tests/completion-session.test.mjs:1; tests/journey-completion-handoff.test.mjs:1",
+      "source": "modules/completion-view.js:1; tests/completion-view.test.mjs:1; index.html:881; app.js:2460; tests/completion-session.test.mjs:1; tests/journey-completion-handoff.test.mjs:1",
       "rows": [
         [
           [
@@ -4393,7 +4393,7 @@
       "group": "Systems",
       "title": "Sound options and live suppression",
       "subtitle": "What changes when sound settings are toggled.",
-      "source": "modules/app-state.js:1; tests/app-state.test.mjs:1; modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:2477; app.js:1110; app.js:3029",
+      "source": "modules/app-state.js:1; tests/app-state.test.mjs:1; modules/audio-mode-settings-view.js:1; tests/audio-mode-settings-view.test.mjs:1; modules/audio-volume-settings-view.js:1; tests/audio-volume-settings-view.test.mjs:1; modules/audio-effects-settings-view.js:1; tests/audio-effects-settings-view.test.mjs:1; modules/mood-ambience-settings-view.js:1; tests/mood-ambience-settings-view.test.mjs:1; modules/media-controls-view.js:1; tests/media-controls-view.test.mjs:1; modules/audio-pleasure-ambience.js:1; tests/audio-pleasure-ambience.test.mjs:1; modules/audio-voice-effects.js:1; tests/audio-voice-effects.test.mjs:1; tests/audio-effects-settings-view.test.mjs:1; app.js:2475; app.js:1110; app.js:3029",
       "rows": [
         [
           [
@@ -5844,7 +5844,7 @@
       "group": "Systems",
       "title": "Script preference control hydration",
       "subtitle": "Restores the selected script source and updates the custom-script presentation without owning journey-time script loading.",
-      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:3079",
+      "source": "modules/script-preference-hydration.js:1; tests/script-preference-hydration.test.mjs:1; app.js:2839",
       "rows": [
         [
           [
@@ -6332,7 +6332,7 @@
       "group": "Supporting pages",
       "title": "Settings backup and restore",
       "subtitle": "Portable restore of this app’s persisted preferences, including Visualization ambience choice and volume; page navigation, import/export interaction and operator-gated export are owned by the settings-manager view module.",
-      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; index.html:218; app.js:3430",
+      "source": "modules/settings-backup.js:1; modules/settings-manager-view.js:1; index.html:218; app.js:3431",
       "rows": [
         [
           [

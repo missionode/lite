@@ -365,24 +365,55 @@
         <section id="lobby-screen" class="screen lobby-shell hidden ds-lobby">
             <h1 id="sound-healing-title" data-i18n="ui.soundHealing" hidden>Sound Shot</h1>
             <div id="shots-control" class="shots-control lobby-panel tw:lobby2:col-[1/-1]" hidden>
-                <label class="shots-toggle-label">
-                    <input type="checkbox" id="shots-toggle" disabled>
-                    <span data-i18n="ui.shotsMode">⚡ Shots</span>
-                </label>
+                <div class="shots-header-row" style="display:flex; align-items:center; justify-content:center; gap:1.25rem; flex-wrap:wrap;">
+                    <label class="shots-toggle-label" style="width:auto;">
+                        <input type="checkbox" id="shots-toggle" disabled>
+                        <span data-i18n="ui.shotsMode">⚡ Shots</span>
+                    </label>
+                    <label id="mixed-shots-label" class="shots-toggle-label" style="width:auto;" hidden>
+                        <input type="checkbox" id="mixed-shots-toggle">
+                        <span data-i18n="ui.mixedShotsMode">✨ Mixed Shot</span>
+                    </label>
+                </div>
                 <div id="shot-options" class="shot-options" hidden>
-                    <label for="shot-type-select" data-i18n="ui.shotType">Shot Type</label>
-                    <select id="shot-type-select">
-                        <option value="meditation" data-i18n="ui.meditationShot">Meditation Shot</option>
-                        <option value="high_energy" data-i18n="ui.highEnergyShot">High Energy Shot</option>
-                        <option value="deep_focus" data-i18n="ui.deepFocusShot">Deep Focus Shot</option>
-                        <option value="mental_clarity" data-i18n="ui.mentalClarityShot">Mental Clarity Shot</option>
-                        <option value="joy_ease" data-i18n="ui.joyEaseShot">Inner Ease &amp; Joy Shot</option>
-                        <option value="anesthetic" data-i18n="ui.anestheticShot">Anesthetic Shot</option>
-                        <option value="mood_relaxation" data-i18n="ui.moodRelaxationShot">Mood &amp; Relaxation Shot</option>
-                        <option value="golden_ratio" data-i18n="ui.goldenRatioShot">Golden Ratio Shot</option>
-                        <option value="sleep" data-i18n="ui.sleepShot">Sleep Shot</option>
-                        <option value="custom" data-i18n="ui.customShot">Custom Shot</option>
-                    </select>
+                    <div id="single-shot-type-container">
+                        <label for="shot-type-select" data-i18n="ui.shotType">Shot Type</label>
+                        <select id="shot-type-select">
+                            <option value="meditation" data-i18n="ui.meditationShot">Meditation Shot</option>
+                            <option value="high_energy" data-i18n="ui.highEnergyShot">High Energy Shot</option>
+                            <option value="deep_focus" data-i18n="ui.deepFocusShot">Deep Focus Shot</option>
+                            <option value="mental_clarity" data-i18n="ui.mentalClarityShot">Mental Clarity Shot</option>
+                            <option value="joy_ease" data-i18n="ui.joyEaseShot">Inner Ease &amp; Joy Shot</option>
+                            <option value="warm_heart" data-i18n="ui.warmHeartShot">Warm Heart &amp; Connection Shot</option>
+                            <option value="sensory_awareness" data-i18n="ui.sensoryAwarenessShot">Sensory Awareness Shot</option>
+                            <option value="fresh_perception" data-i18n="ui.freshPerceptionShot">Fresh Perception Shot</option>
+                            <option value="humming_anchor" data-i18n="ui.hummingAnchorShot">Breath &amp; Humming Anchor Shot</option>
+                            <option value="body_renewal" data-i18n="ui.bodyRenewalShot">Body Renewal &amp; Balance Shot</option>
+                            <option value="earth_grounding" data-i18n="ui.earthGroundingShot">Deep Grounding &amp; Earth Shot</option>
+                            <option value="anesthetic" data-i18n="ui.anestheticShot">Anesthetic Shot</option>
+                            <option value="mood_relaxation" data-i18n="ui.moodRelaxationShot">Mood &amp; Relaxation Shot</option>
+                            <option value="golden_ratio" data-i18n="ui.goldenRatioShot">Golden Ratio Shot</option>
+                            <option value="sleep" data-i18n="ui.sleepShot">Sleep Shot</option>
+                            <option value="custom" data-i18n="ui.customShot">Custom Shot</option>
+                        </select>
+                    </div>
+                    <div id="mixed-shot-selection" class="mixed-shot-selection" hidden>
+                        <label data-i18n="ui.selectMixedShots">Select shots to blend</label>
+                        <div class="mixed-shot-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:0.5rem; margin-top:0.35rem;">
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="deep_focus" checked> <span data-i18n="ui.deepFocusShot">Deep Focus</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="mental_clarity" checked> <span data-i18n="ui.mentalClarityShot">Mental Clarity</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="joy_ease"> <span data-i18n="ui.joyEaseShot">Inner Ease &amp; Joy</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="warm_heart"> <span data-i18n="ui.warmHeartShot">Warm Heart</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="sensory_awareness"> <span data-i18n="ui.sensoryAwarenessShot">Sensory Awareness</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="fresh_perception"> <span data-i18n="ui.freshPerceptionShot">Fresh Perception</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="humming_anchor"> <span data-i18n="ui.hummingAnchorShot">Breath &amp; Humming</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="body_renewal"> <span data-i18n="ui.bodyRenewalShot">Body Renewal</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="earth_grounding"> <span data-i18n="ui.earthGroundingShot">Deep Grounding</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="high_energy"> <span data-i18n="ui.highEnergyShot">High Energy</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="anesthetic"> <span data-i18n="ui.anestheticShot">Anesthetic</span></label>
+                            <label class="checkbox-label" style="font-size:0.78rem;"><input type="checkbox" class="mixed-shot-checkbox" value="mood_relaxation"> <span data-i18n="ui.moodRelaxationShot">Mood &amp; Relaxation</span></label>
+                        </div>
+                    </div>
                     <div id="custom-shot-frequency" class="custom-shot-frequency" hidden>
                         <label for="shot-frequency-input" data-i18n="ui.shotFrequency">Frequency (Hz)</label>
                         <input id="shot-frequency-input" type="number" min="0" max="20000" step="0.1" value="0" inputmode="decimal">
@@ -942,7 +973,7 @@
     <script src="modules/audio-signal-design.js?v=1.1"></script>
     <script src="modules/audio-spatial-geometry.js?v=1.0"></script>
     <script src="modules/audio-elemental-layer.js?v=1.0"></script>
-    <script src="modules/audio-tone-playback.js?v=1.3"></script>
+    <script src="modules/audio-tone-playback.js?v=1.4"></script>
     <script src="modules/audio-comfort-effects.js?v=1.1"></script>
     <script src="modules/audio-drone-start.js?v=1.0"></script>
     <script src="modules/audio-drone-stop.js?v=1.0"></script>

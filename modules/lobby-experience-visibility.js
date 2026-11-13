@@ -93,20 +93,36 @@
         if (assistedBathingTiming) assistedBathingTiming.style.display = getChecked('assisted-bathing-toggle') ? '' : 'none';
         const massageNote = document.getElementById('massage-reverse-journey-note');
         if (massageNote) massageNote.hidden = shots || !getChecked('massage-toggle');
+        const isMixedShots = shots && getChecked('mixed-shots-toggle');
+        const mixedShotsLabel = document.getElementById('mixed-shots-label');
+        if (mixedShotsLabel) mixedShotsLabel.hidden = !shots || noFrequencyMode;
+        const singleContainer = document.getElementById('single-shot-type-container');
+        if (singleContainer) singleContainer.hidden = isMixedShots;
+        const mixedSelection = document.getElementById('mixed-shot-selection');
+        if (mixedSelection) mixedSelection.hidden = !isMixedShots;
+
         const shotOptions = document.getElementById('shot-options');
         if (shotOptions) shotOptions.hidden = !shots || noFrequencyMode;
         const customFrequency = document.getElementById('custom-shot-frequency');
-        if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || document.getElementById('shot-type-select')?.value !== 'custom';
+        if (customFrequency) customFrequency.hidden = !shots || noFrequencyMode || isMixedShots || document.getElementById('shot-type-select')?.value !== 'custom';
         const shotFrequencyNote = document.getElementById('shot-frequency-note');
         const selectedShotType = document.getElementById('shot-type-select')?.value;
         if (shotFrequencyNote) {
-            const shotNoteKey = {
-                deep_focus: 'ui.deepFocusShotNote',
-                mental_clarity: 'ui.mentalClarityShotNote',
-                joy_ease: 'ui.joyEaseShotNote',
-                mood_relaxation: 'ui.moodRelaxationShotNote',
-                golden_ratio: 'ui.goldenRatioShotNote'
-            }[selectedShotType];
+            const shotNoteKey = isMixedShots
+                ? 'ui.mixedShotsNote'
+                : {
+                    deep_focus: 'ui.deepFocusShotNote',
+                    mental_clarity: 'ui.mentalClarityShotNote',
+                    joy_ease: 'ui.joyEaseShotNote',
+                    warm_heart: 'ui.warmHeartShotNote',
+                    sensory_awareness: 'ui.sensoryAwarenessShotNote',
+                    fresh_perception: 'ui.freshPerceptionShotNote',
+                    humming_anchor: 'ui.hummingAnchorShotNote',
+                    body_renewal: 'ui.bodyRenewalShotNote',
+                    earth_grounding: 'ui.earthGroundingShotNote',
+                    mood_relaxation: 'ui.moodRelaxationShotNote',
+                    golden_ratio: 'ui.goldenRatioShotNote'
+                }[selectedShotType];
             shotFrequencyNote.textContent = shotNoteKey ? translate(shotNoteKey) : '';
             shotFrequencyNote.hidden = !shots || noFrequencyMode || !shotNoteKey;
         }
@@ -139,18 +155,25 @@
             }
         }
         const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = {
+        const singleShotLabel = {
             meditation: 'ui.activateMeditationShot',
             high_energy: 'ui.activateHighEnergyShot',
             anesthetic: 'ui.activateAnestheticShot',
             deep_focus: 'ui.activateDeepFocusShot',
             mental_clarity: 'ui.activateMentalClarityShot',
             joy_ease: 'ui.activateJoyEaseShot',
+            warm_heart: 'ui.activateWarmHeartShot',
+            sensory_awareness: 'ui.activateSensoryAwarenessShot',
+            fresh_perception: 'ui.activateFreshPerceptionShot',
+            humming_anchor: 'ui.activateHummingAnchorShot',
+            body_renewal: 'ui.activateBodyRenewalShot',
+            earth_grounding: 'ui.activateEarthGroundingShot',
             mood_relaxation: 'ui.activateMoodRelaxationShot',
             golden_ratio: 'ui.activateGoldenRatioShot',
             sleep: 'ui.activateSleepShot',
             custom: 'ui.beginCustomShot'
         }[shotType] || 'ui.beginJourney';
+        const shotLabel = isMixedShots ? 'ui.activateMixedShot' : singleShotLabel;
         const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
             : intimateService ? 'ui.beginIntimateService'
                 : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
@@ -178,6 +201,15 @@
             resetDurationForType(event.target.value);
             updateVisibility();
             updateSessionEstimate();
+        });
+        document.getElementById('mixed-shots-toggle')?.addEventListener('change', () => {
+            updateVisibility();
+            updateSessionEstimate();
+        });
+        document.querySelectorAll?.('.mixed-shot-checkbox')?.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateVisibility();
+            });
         });
     }
 

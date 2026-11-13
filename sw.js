@@ -1,6 +1,6 @@
-const CACHE_NAME = 'chakra-v5.392';
+const CACHE_NAME = 'chakra-v5.393';
 const PIPER_CACHE_NAME = 'chakra-piper-v14';
-const LANGUAGE_CACHE_NAME = 'chakra-language-v93';
+const LANGUAGE_CACHE_NAME = 'chakra-language-v94';
 const LANGUAGE_ASSETS = ['./language-manifest.json?v=2', './locales/ta.json'];
 const ASSETS = [
   './',
@@ -50,7 +50,7 @@ const ASSETS = [
   './modules/audio-signal-design.js?v=1.1',
   './modules/audio-spatial-geometry.js?v=1.0',
   './modules/audio-elemental-layer.js?v=1.0',
-  './modules/audio-tone-playback.js?v=1.3',
+  './modules/audio-tone-playback.js?v=1.4',
   './modules/audio-comfort-effects.js?v=1.1',
   './modules/audio-drone-start.js?v=1.0',
   './modules/audio-drone-stop.js?v=1.0',

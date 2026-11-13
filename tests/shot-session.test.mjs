@@ -33,6 +33,7 @@ function fixture(overrides = {}) {
         audio: {
             init: async () => events.push('audio:init'), stopBackgroundMusic: () => events.push('audio:music:stop'),
             stopMantraTrack: () => events.push('audio:mantra:stop'), startFrequencyShot: value => events.push(`audio:shot:start:${value}`),
+            startMixedFrequencyShot: freqs => events.push(`audio:shot:mixed:${freqs.join('+')}`),
             stopFrequencyShot: () => events.push('audio:shot:stop'), stopVisualizationAmbience: seconds => events.push(`audio:visualization:stop:${seconds}`)
         },
         visual: { startPulsing: color => events.push(`visual:pulse:${color}`), stop: () => events.push('visual:stop') },
@@ -143,6 +144,12 @@ function fixture(overrides = {}) {
     });
     await shotSession.run(owner, 'joy_ease', undefined, deps);
     assert.ok(events.includes('audio:shot:start:417'), 'joy_ease shot plays 417 Hz');
+}
+
+{
+    const { owner, deps, events } = fixture();
+    await shotSession.run(owner, 'mixed', [40, 528], deps);
+    assert.ok(events.includes('audio:shot:mixed:40+528'), 'mixed shot plays the simultaneous frequencies');
 }
 
 for (const blocked of [

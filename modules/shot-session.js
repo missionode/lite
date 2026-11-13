@@ -17,6 +17,9 @@
             owner.isShotActive = true;
             const shotToggle = document.getElementById('shots-toggle');
             if (shotToggle) shotToggle.disabled = true;
+            const mixedToggle = document.getElementById('mixed-shots-toggle');
+            if (mixedToggle) mixedToggle.disabled = true;
+            document.querySelectorAll?.('.mixed-shot-checkbox')?.forEach(cb => { cb.disabled = true; });
             document.getElementById('shot-type-select')?.setAttribute('disabled', 'true');
             document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
             const startBtn = document.getElementById('start-meditation');
@@ -44,7 +47,12 @@
                 owner.visual.startPulsing('#e8c27e');
 
                 let stages;
-                if (type === 'meditation') {
+                const isMixed = type === 'mixed' && Array.isArray(customFrequency) && customFrequency.length > 0;
+                if (isMixed) {
+                    const freqs = customFrequency.map(f => Number(f)).filter(f => Number.isFinite(f) && f > 0 && f <= 20000);
+                    if (freqs.length === 0) throw new Error('Mixed Shot requires at least one valid frequency.');
+                    stages = [{ key: 'mixed', frequencies: freqs }];
+                } else if (type === 'meditation') {
                     stages = shotChakraOrder.map(key => ({ key, frequency: Number(owner.scripts[key]?.frequency) }));
                 } else if (type === 'sleep') {
                     stages = normalizeSleepStages(owner.scripts);
@@ -58,12 +66,18 @@
                         deep_focus: Number(owner.scripts.sound_shots?.deep_focus?.frequency),
                         mental_clarity: Number(owner.scripts.sound_shots?.mental_clarity?.frequency),
                         joy_ease: Number(owner.scripts.sound_shots?.joy_ease?.frequency),
+                        warm_heart: Number(owner.scripts.sound_shots?.warm_heart?.frequency),
+                        sensory_awareness: Number(owner.scripts.sound_shots?.sensory_awareness?.frequency),
+                        fresh_perception: Number(owner.scripts.sound_shots?.fresh_perception?.frequency),
+                        humming_anchor: Number(owner.scripts.sound_shots?.humming_anchor?.frequency),
+                        body_renewal: Number(owner.scripts.sound_shots?.body_renewal?.frequency),
+                        earth_grounding: Number(owner.scripts.sound_shots?.earth_grounding?.frequency),
                         mood_relaxation: Number(owner.scripts.sound_shots?.mood_relaxation?.frequency),
                         custom: customFrequency
                     };
                     stages = [{ key: type, frequency: singleFrequencies[type] }];
                 }
-                if (stages.length === 0 || stages.some(stage => !Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000)) {
+                if (stages.length === 0 || stages.some(stage => stage.key === 'mixed' ? false : (!Number.isFinite(stage.frequency) || stage.frequency <= 0 || stage.frequency > 20000))) {
                     throw new Error('The selected shot has no valid script frequency.');
                 }
                 // Get-ready countdown before the first tone, so the person can prepare
@@ -83,7 +97,9 @@
                     const stageLabelPath = type === 'sleep'
                         ? `ui.sleepStage${stage.key[0].toUpperCase()}${stage.key.slice(1)}`
                         : `ui.${stage.key === 'thirdeye' ? 'thirdEye' : stage.key}`;
-                    const stageLabel = stage.key === 'high_energy'
+                    const stageLabel = stage.key === 'mixed'
+                        ? t('ui.mixedShot')
+                        : stage.key === 'high_energy'
                         ? t('ui.highEnergyShot')
                         : stage.key === 'anesthetic'
                             ? t('ui.anestheticShot')
@@ -93,16 +109,32 @@
                                     ? t('ui.mentalClarityShot')
                                     : stage.key === 'joy_ease'
                                         ? t('ui.joyEaseShot')
-                                        : stage.key === 'mood_relaxation'
-                                            ? t('ui.moodRelaxationShot')
-                                            : stage.key === 'golden_ratio'
-                                                ? `${t('ui.goldenRatioShot')} · ${Math.round(stage.frequency)} Hz`
-                                                : stage.key === 'custom'
-                                                    ? t('ui.customShot')
-                                                    : t(stageLabelPath);
-                    setText('mantra-display', stageLabel === stageLabelPath ? stage.key : journeyT(stageLabelPath));
+                                        : stage.key === 'warm_heart'
+                                            ? t('ui.warmHeartShot')
+                                            : stage.key === 'sensory_awareness'
+                                                ? t('ui.sensoryAwarenessShot')
+                                                : stage.key === 'fresh_perception'
+                                                    ? t('ui.freshPerceptionShot')
+                                                    : stage.key === 'humming_anchor'
+                                                        ? t('ui.hummingAnchorShot')
+                                                        : stage.key === 'body_renewal'
+                                                            ? t('ui.bodyRenewalShot')
+                                                            : stage.key === 'earth_grounding'
+                                                                ? t('ui.earthGroundingShot')
+                                                                : stage.key === 'mood_relaxation'
+                                                                    ? t('ui.moodRelaxationShot')
+                                                                    : stage.key === 'golden_ratio'
+                                                                        ? `${t('ui.goldenRatioShot')} · ${Math.round(stage.frequency)} Hz`
+                                                                        : stage.key === 'custom'
+                                                                            ? t('ui.customShot')
+                                                                            : t(stageLabelPath);
+                    setText('mantra-display', stageLabel === stageLabelPath ? stage.key : (stage.key === 'mixed' ? t('ui.mixedShot') : journeyT(stageLabelPath)));
                     await owner.runSessionItem(`Shot ${stageLabel}`, async () => {
-                        owner.audio.startFrequencyShot(stage.frequency);
+                        if (stage.key === 'mixed') {
+                            owner.audio.startMixedFrequencyShot ? owner.audio.startMixedFrequencyShot(stage.frequencies) : owner.audio.startFrequencyShot(stage.frequencies[0]);
+                        } else {
+                            owner.audio.startFrequencyShot(stage.frequency);
+                        }
                         let remaining = activeMs;
                         while (remaining > 0 && owner.isMeditationActive) {
                             const step = Math.min(100, remaining);
@@ -128,6 +160,9 @@
             // while the browser begins the safety reset.
             const shotToggle = document.getElementById('shots-toggle');
             if (shotToggle) shotToggle.disabled = true;
+            const mixedToggle = document.getElementById('mixed-shots-toggle');
+            if (mixedToggle) mixedToggle.disabled = true;
+            document.querySelectorAll?.('.mixed-shot-checkbox')?.forEach(cb => { cb.disabled = true; });
             document.getElementById('shot-type-select')?.setAttribute('disabled', 'true');
             document.getElementById('shot-frequency-input')?.setAttribute('disabled', 'true');
             owner.audio.stopFrequencyShot();

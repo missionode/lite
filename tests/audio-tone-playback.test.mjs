@@ -38,6 +38,15 @@ const mutedOwner = makeOwner();
 playback.startShot(mutedOwner, 880, { noFrequencyMode: false, volDrone: 0 });
 assert.equal(mutedOwner.nodes[1].gain.value, 0);
 
+const mixedOwner = makeOwner();
+playback.startMixedShot(mixedOwner, [40, 528], { noFrequencyMode: false, volDrone: 0.2 });
+assert.equal(mixedOwner.shotOscillators.length, 2);
+assert.equal(mixedOwner.shotGains.length, 2);
+assert.equal(mixedOwner.shotGains[0].gain.value, 0.1);
+playback.stopShot(mixedOwner);
+assert.equal(mixedOwner.shotOscillator, null);
+assert.equal(mixedOwner.shotOscillators, null);
+
 const transitionOwner = makeOwner();
 assert.equal(playback.startTransitionTone(transitionOwner, 528, 2000, { noFrequencyMode: false, volDrone: 0.1 }), true);
 const [transitionOsc, transitionGain] = transitionOwner.nodes;
@@ -144,8 +153,8 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 }
 
 const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
-assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.3') < html.indexOf('app.js?v=4.42'));
-assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.3/);
+assert.ok(html.indexOf('modules/audio-tone-playback.js?v=1.4') < html.indexOf('app.js?v=4.42'));
+assert.match(sw, /\.\/modules\/audio-tone-playback\.js\?v=1\.4/);
 
 // The speaker choice is only offered on phones and tablets (browser or installed PWA).
 {

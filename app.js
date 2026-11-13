@@ -927,6 +927,10 @@ class AudioEngine {
         return audioTonePlayback.startShot(this, frequency, state);
     }
 
+    startMixedFrequencyShot(frequencies) {
+        return audioTonePlayback.startMixedShot(this, frequencies, state);
+    }
+
     async testShotSpeaker(route) {
         // Uses the app's own background music (offline) as an ordinary test sound.
         if (!this.bgMusicBuffer) {
@@ -3299,7 +3303,11 @@ function attachEventListeners() {
         document.getElementById('shots-control').hidden = isLocked;
         document.getElementById('sound-healing-title').hidden = isLocked;
         if (shotsToggle) {
-            if (isLocked) shotsToggle.checked = false;
+            if (isLocked) {
+                shotsToggle.checked = false;
+                const mixedToggle = document.getElementById('mixed-shots-toggle');
+                if (mixedToggle) mixedToggle.checked = false;
+            }
             shotsToggle.disabled = isLocked || state.noFrequencyMode;
         }
         const sleepModeControl = document.getElementById('sleep-mode-control');
@@ -3827,6 +3835,32 @@ function attachEventListeners() {
             sleepSelected: getChecked('sleep-mode-toggle')
         });
         if (launchRoute === 'shot') {
+            const isMixed = getChecked('mixed-shots-toggle');
+            if (isMixed) {
+                const checkedBoxes = Array.from(document.querySelectorAll('.mixed-shot-checkbox:checked'));
+                const singleFrequencies = {
+                    high_energy: Number(meditation.scripts?.high_energy?.frequency || 396),
+                    anesthetic: Number(meditation.scripts?.sound_shots?.anesthetic?.frequency || 174),
+                    deep_focus: Number(meditation.scripts?.sound_shots?.deep_focus?.frequency || 40),
+                    mental_clarity: Number(meditation.scripts?.sound_shots?.mental_clarity?.frequency || 528),
+                    joy_ease: Number(meditation.scripts?.sound_shots?.joy_ease?.frequency || 417),
+                    warm_heart: Number(meditation.scripts?.sound_shots?.warm_heart?.frequency || 639),
+                    sensory_awareness: Number(meditation.scripts?.sound_shots?.sensory_awareness?.frequency || 20),
+                    fresh_perception: Number(meditation.scripts?.sound_shots?.fresh_perception?.frequency || 741),
+                    humming_anchor: Number(meditation.scripts?.sound_shots?.humming_anchor?.frequency || 200),
+                    body_renewal: Number(meditation.scripts?.sound_shots?.body_renewal?.frequency || 285),
+                    earth_grounding: Number(meditation.scripts?.sound_shots?.earth_grounding?.frequency || 136.1),
+                    mood_relaxation: Number(meditation.scripts?.sound_shots?.mood_relaxation?.frequency || 221.23)
+                };
+                const mixedFreqs = checkedBoxes.map(cb => singleFrequencies[cb.value]).filter(f => Number.isFinite(f) && f > 0);
+                if (mixedFreqs.length === 0) {
+                    notify(t('ui.mixedShotNoneSelected') || 'Please select at least one shot to mix.');
+                    return;
+                }
+                if (!audio.isInitialized) await audio.init();
+                meditation.runShot('mixed', mixedFreqs);
+                return;
+            }
             const shotType = document.getElementById('shot-type-select')?.value || 'meditation';
             const customFrequency = Number(document.getElementById('shot-frequency-input')?.value);
             if (!audio.isInitialized) await audio.init();

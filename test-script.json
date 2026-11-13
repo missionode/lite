@@ -221,6 +221,12 @@
     "deep_focus": { "frequency": 40 },
     "mental_clarity": { "frequency": 528 },
     "joy_ease": { "frequency": 417 },
+    "warm_heart": { "frequency": 639 },
+    "sensory_awareness": { "frequency": 20 },
+    "fresh_perception": { "frequency": 741 },
+    "humming_anchor": { "frequency": 200 },
+    "body_renewal": { "frequency": 285 },
+    "earth_grounding": { "frequency": 136.1 },
     "mood_relaxation": { "frequency": 221.23 },
     "golden_ratio": { "frequencies": [432, 698.99, 1130.99] }
   },

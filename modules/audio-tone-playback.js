@@ -45,19 +45,75 @@
         owner.shotGain = gain;
     }
 
-    function stopShot(owner) {
-        if (!owner.ctx || !owner.shotOscillator || !owner.shotGain) return;
+    function startMixedShot(owner, frequencies, state) {
+        owner.stopFrequencyShot();
+        if (state.noFrequencyMode) {
+            throw new Error('No Frequency Mode prevents frequency-only Shots.');
+        }
+        const validFreqs = (Array.isArray(frequencies) ? frequencies : [])
+            .map(f => Number(f))
+            .filter(f => Number.isFinite(f) && f > 0 && f <= 20000);
+        if (!owner.ctx || validFreqs.length === 0) {
+            throw new Error('Mixed Shot requires at least one frequency between 0 and 20,000 Hz.');
+        }
         const now = owner.ctx.currentTime;
-        const osc = owner.shotOscillator;
-        const gain = owner.shotGain;
+        // Divide gain evenly across the simultaneous oscillators so the mixed chord
+        // stays gentle and never clips or overwhelms the speaker.
+        const totalGain = Math.max(0, Math.min(0.2, Number(state.volDrone) || 0));
+        const perOscGain = totalGain / validFreqs.length;
+
+        const oscillators = [];
+        const gains = [];
+        const mixedRoutes = [];
+
+        for (const freq of validFreqs) {
+            const osc = owner.ctx.createOscillator();
+            const gain = owner.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(perOscGain, now + 0.08);
+            osc.connect(gain);
+            const route = connectShotOutput(owner, gain, state.shotSpeaker);
+            mixedRoutes.push(route);
+            osc.start(now);
+            osc.onended = () => {
+                osc.disconnect();
+                gain.disconnect();
+                route.forEach(node => node.disconnect());
+            };
+            oscillators.push(osc);
+            gains.push(gain);
+        }
+
+        owner.shotOscillator = oscillators[0];
+        owner.shotGain = gains[0];
+        owner.shotOscillators = oscillators;
+        owner.shotGains = gains;
+        owner.shotRoutes = mixedRoutes;
+    }
+
+    function stopShot(owner) {
+        if (!owner.ctx) return;
+        const now = owner.ctx.currentTime;
+        const oscillators = owner.shotOscillators || (owner.shotOscillator ? [owner.shotOscillator] : []);
+        const gains = owner.shotGains || (owner.shotGain ? [owner.shotGain] : []);
         owner.shotOscillator = null;
         owner.shotGain = null;
-        try {
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(Math.max(0, gain.gain.value), now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.08);
-            osc.stop(now + 0.1);
-        } catch (error) {}
+        owner.shotOscillators = null;
+        owner.shotGains = null;
+        owner.shotRoutes = null;
+
+        for (let i = 0; i < gains.length; i++) {
+            const g = gains[i];
+            const osc = oscillators[i];
+            try {
+                g.gain.cancelScheduledValues(now);
+                g.gain.setValueAtTime(Math.max(0, g.gain.value), now);
+                g.gain.linearRampToValueAtTime(0, now + 0.08);
+                if (osc) osc.stop(now + 0.1);
+            } catch (error) {}
+        }
     }
 
     function startTransitionTone(owner, frequency, durationMs, state) {
@@ -171,5 +227,5 @@
         return /Macintosh/.test(userAgent) && Number(nav.maxTouchPoints) > 1;
     }
 
-    global.ChakraAudioTonePlayback = Object.freeze({ startShot, stopShot, playSpeakerTest, supportsShotSpeakerChoice, startTransitionTone, stopTransitionTone, playSingingBowl });
+    global.ChakraAudioTonePlayback = Object.freeze({ startShot, startMixedShot, stopShot, playSpeakerTest, supportsShotSpeakerChoice, startTransitionTone, stopTransitionTone, playSingingBowl });
 })(window);
