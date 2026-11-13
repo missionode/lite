@@ -2080,7 +2080,7 @@
       "id": "shots",
       "group": "Journeys",
       "title": "Sound Shots",
-      "subtitle": "Seven types, confirmation, frequency validation, and distinct finish behavior.",
+      "subtitle": "Ten types, confirmation, frequency validation, and distinct finish behavior.",
       "source": "modules/shot-session.js:1; tests/shot-session.test.mjs:1; index.html:260; app.js:1519; app.js:1412",
       "rows": [
         [
@@ -2094,7 +2094,7 @@
           [
             "type",
             "Choose type",
-            "Meditation, HRIM, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Labels here describe app modes."
+            "Meditation, High Energy, Deep Focus, Mental Clarity, Inner Ease & Joy, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Labels describe benefit-first app modes."
           ],
           [
             "speaker",
@@ -2126,7 +2126,7 @@
           [
             "single",
             "Single-frequency Shot",
-            "HRIM 528 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values."
+            "High Energy 396 Hz; Deep Focus 40 Hz; Mental Clarity 528 Hz; Inner Ease & Joy 417 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values."
           ]
         ],
         [
@@ -3508,7 +3508,7 @@
       "group": "Journeys",
       "title": "Separate time for each chakra",
       "subtitle": "Optional own time per chakra under Core Practice Duration, with autofill from the chakra assessment.",
-      "source": "modules/chakra-timing.js:1; modules/chakra-timing-view.js:1; tests/chakra-timing.test.mjs:1; index.html:496; app.js:2588; modules/chakra-session.js:39; modules/session-estimate.js:1; modules/lobby-experience-visibility.js:112",
+      "source": "modules/chakra-timing.js:1; modules/chakra-timing-view.js:1; tests/chakra-timing.test.mjs:1; index.html:496; app.js:2588; modules/chakra-session.js:39; modules/session-estimate.js:1; modules/lobby-experience-visibility.js:117",
       "rows": [
         [
           [

@@ -55,6 +55,9 @@
                     const singleFrequencies = {
                         high_energy: Number(owner.scripts.high_energy?.frequency),
                         anesthetic: Number(owner.scripts.sound_shots?.anesthetic?.frequency),
+                        deep_focus: Number(owner.scripts.sound_shots?.deep_focus?.frequency),
+                        mental_clarity: Number(owner.scripts.sound_shots?.mental_clarity?.frequency),
+                        joy_ease: Number(owner.scripts.sound_shots?.joy_ease?.frequency),
                         mood_relaxation: Number(owner.scripts.sound_shots?.mood_relaxation?.frequency),
                         custom: customFrequency
                     };
@@ -84,13 +87,19 @@
                         ? t('ui.highEnergyShot')
                         : stage.key === 'anesthetic'
                             ? t('ui.anestheticShot')
-                            : stage.key === 'mood_relaxation'
-                                ? t('ui.moodRelaxationShot')
-                                : stage.key === 'golden_ratio'
-                                    ? `${t('ui.goldenRatioShot')} · ${Math.round(stage.frequency)} Hz`
-                                : stage.key === 'custom'
-                                    ? t('ui.customShot')
-                                    : t(stageLabelPath);
+                            : stage.key === 'deep_focus'
+                                ? t('ui.deepFocusShot')
+                                : stage.key === 'mental_clarity'
+                                    ? t('ui.mentalClarityShot')
+                                    : stage.key === 'joy_ease'
+                                        ? t('ui.joyEaseShot')
+                                        : stage.key === 'mood_relaxation'
+                                            ? t('ui.moodRelaxationShot')
+                                            : stage.key === 'golden_ratio'
+                                                ? `${t('ui.goldenRatioShot')} · ${Math.round(stage.frequency)} Hz`
+                                                : stage.key === 'custom'
+                                                    ? t('ui.customShot')
+                                                    : t(stageLabelPath);
                     setText('mantra-display', stageLabel === stageLabelPath ? stage.key : journeyT(stageLabelPath));
                     await owner.runSessionItem(`Shot ${stageLabel}`, async () => {
                         owner.audio.startFrequencyShot(stage.frequency);

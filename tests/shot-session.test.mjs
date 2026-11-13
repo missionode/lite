@@ -9,8 +9,8 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.ur
 assert.match(app, /runShot\(type, customFrequency\)\s*\{\s*return shotSession\.run\(this, type, customFrequency,/);
 assert.match(app, /finishShot\(\)\s*\{\s*return shotSession\.finish\(this,/);
 assert.match(app, /stopShot\(\)\s*\{\s*return shotSession\.stop\(this,/);
-assert.match(html, /modules\/shot-session\.js\?v=1\.4[\s\S]*?app\.js\?v=4\.42/);
-assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.4/);
+assert.match(html, /modules\/shot-session\.js\?v=1\.5[\s\S]*?app\.js\?v=4\.42/);
+assert.match(sw, /const CACHE_NAME = 'chakra-v5\.\d+'[\s\S]*?modules\/shot-session\.js\?v=1\.5/);
 assert.equal(pkg.scripts['test:shot-session'], 'node tests/shot-session.test.mjs');
 
 const context = vm.createContext({ window: {} });
@@ -95,6 +95,54 @@ function fixture(overrides = {}) {
     assert.ok(events.includes('countdown:start:2000'), 'sleep countdown includes the configured inter-stage interval');
     assert.ok(events.includes('audio:shot:start:100'));
     assert.ok(events.includes('audio:shot:start:200'));
+}
+
+{
+    const { owner, deps, events } = fixture({
+        owner: {
+            scripts: {
+                sound_shots: {
+                    deep_focus: { frequency: 40 },
+                    mental_clarity: { frequency: 528 },
+                    joy_ease: { frequency: 417 }
+                }
+            }
+        }
+    });
+    await shotSession.run(owner, 'deep_focus', undefined, deps);
+    assert.ok(events.includes('audio:shot:start:40'), 'deep_focus shot plays 40 Hz');
+}
+
+{
+    const { owner, deps, events } = fixture({
+        owner: {
+            scripts: {
+                sound_shots: {
+                    deep_focus: { frequency: 40 },
+                    mental_clarity: { frequency: 528 },
+                    joy_ease: { frequency: 417 }
+                }
+            }
+        }
+    });
+    await shotSession.run(owner, 'mental_clarity', undefined, deps);
+    assert.ok(events.includes('audio:shot:start:528'), 'mental_clarity shot plays 528 Hz');
+}
+
+{
+    const { owner, deps, events } = fixture({
+        owner: {
+            scripts: {
+                sound_shots: {
+                    deep_focus: { frequency: 40 },
+                    mental_clarity: { frequency: 528 },
+                    joy_ease: { frequency: 417 }
+                }
+            }
+        }
+    });
+    await shotSession.run(owner, 'joy_ease', undefined, deps);
+    assert.ok(events.includes('audio:shot:start:417'), 'joy_ease shot plays 417 Hz');
 }
 
 for (const blocked of [

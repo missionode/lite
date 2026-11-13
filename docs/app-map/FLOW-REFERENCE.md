@@ -827,7 +827,7 @@ flowchart TD
 
 ## Sound Shots
 
-Seven types, confirmation, frequency validation, and distinct finish behavior.
+Ten types, confirmation, frequency validation, and distinct finish behavior.
 
 Sources: [modules/shot-session.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/shot-session.js:1), [tests/shot-session.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/shot-session.test.mjs:1), [index.html:260](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:260), [app.js:1519](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1519), [app.js:1412](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:1412).
 
@@ -868,13 +868,13 @@ flowchart TD
 | Step | Current behavior |
 | --- | --- |
 | Enable Shots | Heading and controls start hidden/disabled. Shared seven-tap-and-password Advanced Features unlock reveals them alongside care. Relock clears Shots selection; reload locks again. Locked direct execution is rejected. No Frequency → blocked; otherwise confirm. Cancel leaves Shots off. |
-| Choose type | Meditation, HRIM, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Labels here describe app modes. |
+| Choose type | Meditation, High Energy, Deep Focus, Mental Clarity, Inner Ease & Joy, Anesthetic, Mood & Relaxation, Golden Ratio, Sleep, or Custom. Labels describe benefit-first app modes. |
 | Speaker for Shots | Shown only on phones and tablets (mobile browser or installed PWA; detected from the browser’s mobile flag or user agent, iPad by touch); on desktops and laptops it is hidden and Shots use both speakers, leaving any saved phone choice untouched. Saved per device (chakra_shot_speaker): Both speakers (default, also for headphones), Single speaker 1 or Single speaker 2. Test speaker plays about 5 seconds of the app’s own background music (offline; no frequency tone) on the chosen route. To keep Shots on the bottom speaker near the mouthpiece the person holds the phone upright and keeps the single speaker they hear from the bottom. |
 | Activate Shot (inside the Shots section) | The Shots section has its own Activate button carrying the Shot label (for example Activate Meditation Shot); it uses the normal Begin dispatcher. While Shots is selected the Lobby Begin button is hidden. |
 | Meditation Shot | Root 396 → Sacral 417 → Solar 528 → Heart 639 → Throat 741 → Third Eye 852 → Crown 963 Hz. Ignores selected chakra subset. |
 | Sleep Shot | Script sequence: 10 → 6 → 5 → 2 → 6 Hz. |
 | Golden Ratio Shot | Script sequence (sound_shots.golden_ratio): 432 → 698.99 → 1130.99 Hz, each tone 1.618 times the one before; the Shot time is shared equally, 2 s between tones; the Lobby note names the tones (2026-10-20). |
-| Single-frequency Shot | HRIM 528 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values. |
+| Single-frequency Shot | High Energy 396 Hz; Deep Focus 40 Hz; Mental Clarity 528 Hz; Inner Ease & Joy 417 Hz; Anesthetic 174 Hz; Mood & Relaxation 221.23 Hz; or custom finite frequency >0 and ≤20,000 Hz. These are app data values. |
 | Get ready countdown | Before the first tone the screen counts Get ready… 5, 4, 3, 2, 1 (one second each, pause-aware, in the meditation language). Stop during the countdown plays no tone. The Shot timer starts after it. |
 | Run tone stages | No music or narration; divide selected total active seconds equally across stages. With a single speaker the tone skips the shared moving pan and echo and feeds only that output channel straight to the device (level matched to the drone volume); Both keeps the shared path. |
 | Between stages | Meditation and Golden Ratio: 2 seconds; Sleep: script intervalSeconds, falling back to 2. |
@@ -1345,7 +1345,7 @@ flowchart TD
 
 Optional own time per chakra under Core Practice Duration, with autofill from the chakra assessment.
 
-Sources: [modules/chakra-timing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing.js:1), [modules/chakra-timing-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing-view.js:1), [tests/chakra-timing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/chakra-timing.test.mjs:1), [index.html:496](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:496), [app.js:2588](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2588), [modules/chakra-session.js:39](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-session.js:39), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/lobby-experience-visibility.js:112](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:112).
+Sources: [modules/chakra-timing.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing.js:1), [modules/chakra-timing-view.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-timing-view.js:1), [tests/chakra-timing.test.mjs:1](/Users/lekshmisyam/Desktop/Ikigai/lite/tests/chakra-timing.test.mjs:1), [index.html:496](/Users/lekshmisyam/Desktop/Ikigai/lite/index.html:496), [app.js:2588](/Users/lekshmisyam/Desktop/Ikigai/lite/app.js:2588), [modules/chakra-session.js:39](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/chakra-session.js:39), [modules/session-estimate.js:1](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/session-estimate.js:1), [modules/lobby-experience-visibility.js:117](/Users/lekshmisyam/Desktop/Ikigai/lite/modules/lobby-experience-visibility.js:117).
 
 ```mermaid
 flowchart TD

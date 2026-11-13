@@ -100,7 +100,13 @@
         const shotFrequencyNote = document.getElementById('shot-frequency-note');
         const selectedShotType = document.getElementById('shot-type-select')?.value;
         if (shotFrequencyNote) {
-            const shotNoteKey = { mood_relaxation: 'ui.moodRelaxationShotNote', golden_ratio: 'ui.goldenRatioShotNote' }[selectedShotType];
+            const shotNoteKey = {
+                deep_focus: 'ui.deepFocusShotNote',
+                mental_clarity: 'ui.mentalClarityShotNote',
+                joy_ease: 'ui.joyEaseShotNote',
+                mood_relaxation: 'ui.moodRelaxationShotNote',
+                golden_ratio: 'ui.goldenRatioShotNote'
+            }[selectedShotType];
             shotFrequencyNote.textContent = shotNoteKey ? translate(shotNoteKey) : '';
             shotFrequencyNote.hidden = !shots || noFrequencyMode || !shotNoteKey;
         }
@@ -133,7 +139,18 @@
             }
         }
         const shotType = document.getElementById('shot-type-select')?.value;
-        const shotLabel = { meditation: 'ui.activateMeditationShot', high_energy: 'ui.activateHighEnergyShot', anesthetic: 'ui.activateAnestheticShot', mood_relaxation: 'ui.activateMoodRelaxationShot', golden_ratio: 'ui.activateGoldenRatioShot', sleep: 'ui.activateSleepShot', custom: 'ui.beginCustomShot' }[shotType] || 'ui.beginJourney';
+        const shotLabel = {
+            meditation: 'ui.activateMeditationShot',
+            high_energy: 'ui.activateHighEnergyShot',
+            anesthetic: 'ui.activateAnestheticShot',
+            deep_focus: 'ui.activateDeepFocusShot',
+            mental_clarity: 'ui.activateMentalClarityShot',
+            joy_ease: 'ui.activateJoyEaseShot',
+            mood_relaxation: 'ui.activateMoodRelaxationShot',
+            golden_ratio: 'ui.activateGoldenRatioShot',
+            sleep: 'ui.activateSleepShot',
+            custom: 'ui.beginCustomShot'
+        }[shotType] || 'ui.beginJourney';
         const focusedLabel = getChecked('yoga-experience-toggle') ? 'ui.beginYogaExperience'
             : intimateService ? 'ui.beginIntimateService'
                 : state.selectedChakras.length === 0 && getChecked('box-breathing-experience-toggle') ? 'ui.beginBoxBreathing'
